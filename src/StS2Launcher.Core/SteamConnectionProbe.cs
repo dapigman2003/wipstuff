@@ -4,14 +4,16 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step-05.3 network-only SteamKit probe.
+/// Step-05.4 transport-isolation SteamKit probe.
 ///
-/// The iOS build patches SteamKit 3.3.1's unsupported Process.StartTime
-/// constructor assumption before AOT. Network behavior remains unchanged.
+/// Step 05.3 proved SteamClient construction succeeds on iOS after replacing
+/// SteamKit 3.3.1's unsupported Process.StartTime assumption. It then received
+/// an early DisconnectedCallback without ever receiving ConnectedCallback.
 ///
-/// It deliberately performs no authentication and sends no account credentials.
-/// The probe constructs SteamKit, connects to a Steam CM, observes the official
-/// ConnectedCallback, requests a disconnect, and observes DisconnectedCallback.
+/// This probe keeps authentication forbidden and isolates CM transport choice:
+/// callers explicitly select WebSocket-only or TCP-only. Each attempt constructs
+/// a fresh SteamClient/SteamConfiguration so server scoring from one transport
+/// cannot contaminate the other test.
 /// </summary>
 public sealed class SteamConnectionProbe
 {
@@ -20,18 +22,36 @@ public sealed class SteamConnectionProbe
         ?? "unknown";
 
     public Task<SteamConnectionProbeResult> RunAsync(
+        string transportName,
+        ProtocolTypes protocolTypes,
         TimeSpan timeout,
         CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(transportName);
+
         if (timeout <= TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(timeout));
 
+        if (protocolTypes != ProtocolTypes.WebSocket &&
+            protocolTypes != ProtocolTypes.Tcp)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(protocolTypes),
+                "Step 05.4 intentionally permits exactly one transport per probe.");
+        }
+
         return Task.Run(
-            () => RunBlocking(timeout, cancellationToken),
+            () => RunBlocking(
+                transportName,
+                protocolTypes,
+                timeout,
+                cancellationToken),
             cancellationToken);
     }
 
     private static SteamConnectionProbeResult RunBlocking(
+        string transportName,
+        ProtocolTypes protocolTypes,
         TimeSpan timeout,
         CancellationToken cancellationToken)
     {
@@ -40,25 +60,33 @@ public sealed class SteamConnectionProbe
         var clientConstructed = false;
         var connected = false;
         var disconnected = false;
+        bool? disconnectedUserInitiated = null;
         var disconnectRequested = false;
         string? callbackFailure = null;
-        var stage = "SteamClient constructor";
+        var stage = $"SteamConfiguration.Create ({transportName})";
 
         try
         {
-            var steamClient = new SteamClient();
+            // Force exactly one transport. SteamKit 3.x enables WebSocket in its
+            // default protocol set, so using an explicit configuration is the
+            // cleanest way to determine which transport can operate on iOS.
+            var configuration = SteamConfiguration.Create(
+                builder => builder.WithProtocolTypes(protocolTypes));
+
+            stage = $"SteamClient constructor ({transportName})";
+            var steamClient = new SteamClient(configuration);
             clientConstructed = true;
 
-            stage = "CallbackManager constructor";
+            stage = $"CallbackManager constructor ({transportName})";
             var manager = new CallbackManager(steamClient);
 
-            stage = "callback subscription";
+            stage = $"callback subscription ({transportName})";
             manager.Subscribe<SteamClient.ConnectedCallback>(_ =>
             {
                 connected = true;
 
-                // This step stops here on purpose. No SteamUser handler is used,
-                // no authentication session is started, and no credentials exist.
+                // Step 05.x ends at network connectivity. No SteamUser handler,
+                // authentication session, credentials, or tokens are used.
                 try
                 {
                     disconnectRequested = true;
@@ -71,23 +99,21 @@ public sealed class SteamConnectionProbe
                 }
             });
 
-            manager.Subscribe<SteamClient.DisconnectedCallback>(_ =>
+            manager.Subscribe<SteamClient.DisconnectedCallback>(callback =>
             {
+                disconnectedUserInitiated = callback.UserInitiated;
                 disconnected = true;
             });
 
-            stage = "SteamClient.Connect";
+            stage = $"SteamClient.Connect ({transportName})";
             steamClient.Connect();
-            stage = "callback pump";
+            stage = $"callback pump ({transportName})";
 
             while (!disconnected &&
                    callbackFailure is null &&
                    stopwatch.Elapsed < timeout)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
-                // SteamKit callbacks are explicitly pumped through CallbackManager,
-                // matching the upstream sample architecture.
                 manager.RunWaitCallbacks(TimeSpan.FromMilliseconds(250));
             }
 
@@ -95,12 +121,21 @@ public sealed class SteamConnectionProbe
             {
                 TryDisconnect(steamClient);
 
+                var reason = disconnected
+                    ? $"DisconnectedCallback arrived before ConnectedCallback. " +
+                      $"UserInitiated={FormatNullableBool(disconnectedUserInitiated)}."
+                    : $"No ConnectedCallback or DisconnectedCallback arrived within " +
+                      $"{timeout.TotalSeconds:F0}s.";
+
                 return Fail(
+                    transportName,
+                    protocolTypes,
                     clientConstructed,
                     connected,
                     disconnected,
+                    disconnectedUserInitiated,
                     stopwatch.Elapsed,
-                    "No ConnectedCallback was received before timeout.");
+                    reason);
             }
 
             if (callbackFailure is not null)
@@ -108,9 +143,12 @@ public sealed class SteamConnectionProbe
                 TryDisconnect(steamClient);
 
                 return Fail(
+                    transportName,
+                    protocolTypes,
                     clientConstructed,
                     connected,
                     disconnected,
+                    disconnectedUserInitiated,
                     stopwatch.Elapsed,
                     callbackFailure);
             }
@@ -120,9 +158,12 @@ public sealed class SteamConnectionProbe
                 TryDisconnect(steamClient);
 
                 return Fail(
+                    transportName,
+                    protocolTypes,
                     clientConstructed,
                     connected,
                     disconnected,
+                    disconnectedUserInitiated,
                     stopwatch.Elapsed,
                     "ConnectedCallback arrived, but the disconnect request was not issued.");
             }
@@ -132,24 +173,31 @@ public sealed class SteamConnectionProbe
                 TryDisconnect(steamClient);
 
                 return Fail(
+                    transportName,
+                    protocolTypes,
                     clientConstructed,
                     connected,
                     disconnected,
+                    disconnectedUserInitiated,
                     stopwatch.Elapsed,
                     "ConnectedCallback arrived, but DisconnectedCallback did not arrive before timeout.");
             }
 
             return new SteamConnectionProbeResult(
                 Passed: true,
+                TransportName: transportName,
+                Protocols: protocolTypes.ToString(),
                 ClientConstructed: true,
                 ConnectedCallbackReceived: true,
                 DisconnectedCallbackReceived: true,
+                DisconnectedUserInitiated: disconnectedUserInitiated,
                 SteamKitAssemblyVersion: AssemblyVersion,
                 Elapsed: stopwatch.Elapsed,
-                Summary: "STEAM CONNECTION PASS — 3/3",
+                Summary: $"{transportName.ToUpperInvariant()} PASS — 3/3",
                 Detail:
-                    "SteamKit client constructed; ConnectedCallback received; " +
+                    $"{transportName}: SteamKit client constructed; ConnectedCallback received; " +
                     "disconnect requested; DisconnectedCallback received. " +
+                    $"UserInitiated={FormatNullableBool(disconnectedUserInitiated)}. " +
                     "No authentication was attempted.");
         }
         catch (OperationCanceledException)
@@ -159,9 +207,12 @@ public sealed class SteamConnectionProbe
         catch (Exception ex)
         {
             return Fail(
+                transportName,
+                protocolTypes,
                 clientConstructed,
                 connected,
                 disconnected,
+                disconnectedUserInitiated,
                 stopwatch.Elapsed,
                 FormatException(stage, ex));
         }
@@ -183,18 +234,22 @@ public sealed class SteamConnectionProbe
     {
         var text = $"Stage: {stage}\n{ex}";
 
-        // Keep the full exception useful on-device without allowing one nested
-        // stack trace to make the diagnostic label unbounded.
         const int maxLength = 3500;
         return text.Length <= maxLength
             ? text
             : text[..maxLength] + "\n…(truncated)";
     }
 
+    private static string FormatNullableBool(bool? value) =>
+        value.HasValue ? value.Value.ToString() : "not-received";
+
     private static SteamConnectionProbeResult Fail(
+        string transportName,
+        ProtocolTypes protocolTypes,
         bool clientConstructed,
         bool connected,
         bool disconnected,
+        bool? disconnectedUserInitiated,
         TimeSpan elapsed,
         string detail)
     {
@@ -205,12 +260,15 @@ public sealed class SteamConnectionProbe
 
         return new SteamConnectionProbeResult(
             Passed: false,
+            TransportName: transportName,
+            Protocols: protocolTypes.ToString(),
             ClientConstructed: clientConstructed,
             ConnectedCallbackReceived: connected,
             DisconnectedCallbackReceived: disconnected,
+            DisconnectedUserInitiated: disconnectedUserInitiated,
             SteamKitAssemblyVersion: AssemblyVersion,
             Elapsed: elapsed,
-            Summary: $"STEAM CONNECTION FAIL — {passedChecks}/3",
+            Summary: $"{transportName.ToUpperInvariant()} FAIL — {passedChecks}/3",
             Detail: detail);
     }
 }

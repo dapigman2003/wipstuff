@@ -1,5 +1,6 @@
 using StS2Launcher.Core;
 using StS2Launcher.Step05.iOS.Platform;
+using SteamKit2;
 using UIKit;
 
 namespace StS2Launcher.Step05.iOS;
@@ -63,12 +64,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.3 — IOS STEAMCLIENT COMPAT",
+            "STEP 05.4 — STEAM TRANSPORT ISOLATION",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.9",
+            "Version 0.0.10",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -97,12 +98,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "This test only connects to the Steam network and disconnects.",
+            "This test tries WebSocket-only, then TCP-only. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run Steam Connection Probe", 17);
+        _steamButton = SystemButton("Run WebSocket + TCP Probes", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -161,7 +162,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.3 checks.",
+            "Status: starting Step 05.4 checks.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -177,7 +178,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.3: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.4: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -228,31 +229,59 @@ public sealed class RootViewController : UIViewController
         }
 
         _steamButton.Enabled = false;
-        _steamResultLabel.Text = "STEAM CONNECTION: CONNECTING…";
+        _steamResultLabel.Text = "STEAM TRANSPORTS: TESTING…";
         _steamResultLabel.TextColor = UIColor.Label;
         _steamDetailLabel.Text =
-            "Waiting for SteamKit ConnectedCallback; no authentication will be attempted.";
+            "1/2 WebSocket-only probe running. No authentication will be attempted.";
         _statusLabel.Text =
             "NETWORK TEST RUNNING — leave the app in foreground.";
 
         try
         {
-            var result = await _steamProbe.RunAsync(TimeSpan.FromSeconds(20));
+            var webSocket = await _steamProbe.RunAsync(
+                "WebSocket",
+                ProtocolTypes.WebSocket,
+                TimeSpan.FromSeconds(15));
 
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = result.Summary;
-                _steamResultLabel.TextColor = result.Passed
+                _steamDetailLabel.Text =
+                    FormatTransportResult(webSocket) +
+                    "\n\n2/2 TCP-only probe running…";
+            });
+
+            // Give the previous SteamClient's connection worker a short clean
+            // teardown window before constructing the independent TCP client.
+            await Task.Delay(500);
+
+            var tcp = await _steamProbe.RunAsync(
+                "TCP",
+                ProtocolTypes.Tcp,
+                TimeSpan.FromSeconds(15));
+
+            InvokeOnMainThread(() =>
+            {
+                var anyPassed = webSocket.Passed || tcp.Passed;
+
+                _steamResultLabel.Text = anyPassed
+                    ? $"STEAM TRANSPORT PASS — " +
+                      $"WS {(webSocket.Passed ? "3/3" : "FAIL")} • " +
+                      $"TCP {(tcp.Passed ? "3/3" : "FAIL")}"
+                    : "STEAM TRANSPORT FAIL — WS + TCP";
+
+                _steamResultLabel.TextColor = anyPassed
                     ? UIColor.Label
                     : UIColor.SystemRed;
 
                 _steamDetailLabel.Text =
-                    $"{result.Detail}\nElapsed: {result.Elapsed.TotalSeconds:F1}s\n" +
-                    $"SteamKit assembly: {result.SteamKitAssemblyVersion}";
+                    FormatTransportResult(webSocket) +
+                    "\n\n" +
+                    FormatTransportResult(tcp) +
+                    $"\n\nSteamKit assembly: {SteamConnectionProbe.AssemblyVersion}";
 
-                _statusLabel.Text = result.Passed
-                    ? "PASS: Steam network-only connection/disconnection completed."
-                    : "FAIL: Steam network probe did not complete. Report the detail above.";
+                _statusLabel.Text = anyPassed
+                    ? "PASS: at least one explicit Steam CM transport completed 3/3."
+                    : "FAIL: neither explicit transport reached ConnectedCallback.";
 
                 _steamButton.Enabled = true;
             });
@@ -261,15 +290,28 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEAM CONNECTION: EXCEPTION";
+                _steamResultLabel.Text = "STEAM TRANSPORT: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Steam connection probe.";
+                    "FAIL: unhandled exception in transport isolation probe.";
                 _steamButton.Enabled = true;
             });
         }
+    }
+
+    private static string FormatTransportResult(SteamConnectionProbeResult result)
+    {
+        return
+            $"{result.Summary}\n" +
+            $"Protocols: {result.Protocols}\n" +
+            $"ConnectedCallback: {(result.ConnectedCallbackReceived ? "YES" : "NO")}\n" +
+            $"DisconnectedCallback: {(result.DisconnectedCallbackReceived ? "YES" : "NO")}\n" +
+            $"Disconnected.UserInitiated: " +
+            $"{(result.DisconnectedUserInitiated.HasValue ? result.DisconnectedUserInitiated.Value.ToString() : "N/A")}\n" +
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s\n" +
+            result.Detail;
     }
 
     private void CheckKeychainRegression()
