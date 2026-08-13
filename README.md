@@ -1,71 +1,72 @@
-# StS2 Launcher iOS — Step 02
+# StS2 Launcher iOS — Step 03
 
-Step 01.1 passed on a physical iPhone.
+Step 01.1 proved the UIKit application lifecycle.
+Step 02 proved the launcher UI/state shell.
 
-Step 02 tests the **launcher UI/state shell** while deliberately keeping every real subsystem out.
+Step 03 introduces exactly one new architectural boundary:
+
+```text
+StS2Launcher.Step03.iOS
+        ↓
+StS2Launcher.Core
+```
+
+`StS2Launcher.Core` is a plain `net9.0` managed class library. It owns the launcher state machine and contains **no UIKit references**.
 
 ## Still NOT included
 
-- SteamKit2 / networking
-- Steam credentials or Keychain
+- SteamKit2
+- real network traffic
+- Keychain
 - ownership verification
-- depot downloads
+- depot downloading
 - Godot
 - Mono.Cecil
 - native libraries
 - game files
 - runtime patching
 
-## What Step 02 adds
+## What must appear on device
 
-One native UIKit launcher screen with seven deterministic mock states:
+At launch:
 
-1. Signed out
-2. Signing in…
-3. Checking ownership…
-4. Ready to install
-5. Downloading… (42%)
-6. Ready to play
-7. Example error
+```text
+STEP 03 — CORE STATE MACHINE
+Version 0.0.4
+CORE LINK: PASS
+CORE SELF-TEST: NOT RUN
+CORE STATE 1 OF 7
+Signed out
+```
 
-Use `Next Demo State` to cycle through them.
+`CORE LINK: PASS` means the iOS application successfully loaded and executed the separate `StS2Launcher.Core` assembly.
+
+Tap:
+
+```text
+Run Core Self-Test
+```
+
+Expected:
+
+```text
+CORE SELF-TEST PASS — 12/12
+```
+
+The existing state buttons are now driven by `LauncherController` in Core rather than an enum/state table inside the UIKit app.
+
+See `docs/STEP-03-TEST.md`.
 
 ## Build
 
 Codemagic workflow:
 
 ```text
-ios-step-02
+ios-step-03
 ```
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-02.ipa
+artifacts/StS2-Launcher-Step-03.ipa
 ```
-
-## Expected device result
-
-First launch must show:
-
-```text
-StS2 Launcher
-STEP 02 — LAUNCHER UI SHELL
-Version 0.0.3
-DEMO STATE 1 OF 7
-Signed out
-```
-
-Tap `Next Demo State` six times.
-
-Each state must render, and state 5 must show a visible progress bar at 42%.
-
-State 7 must show the deliberate text:
-
-```text
-TEST ERROR: This is a deliberate visible error state.
-```
-
-One more tap must wrap back to state 1.
-
-See `docs/STEP-02-TEST.md`.

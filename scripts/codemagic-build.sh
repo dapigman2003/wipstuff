@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 02 environment ==="
+  echo "=== StS2 Launcher Step 03 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step02-environment.log
+} | tee artifacts/logs/step03-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -67,28 +67,28 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step02-workload.log
+) | tee artifacts/logs/step03-workload.log
 
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/validate-step02.sh | tee artifacts/logs/step02-validation.log
-bash scripts/build-step02.sh 2>&1 | tee artifacts/logs/step02-publish.log
-bash scripts/verify-step02-ipa.sh artifacts/StS2-Launcher-Step-02.ipa \
-  2>&1 | tee artifacts/logs/step02-ipa-verification.log
+bash scripts/validate-step03.sh | tee artifacts/logs/step03-validation.log
+bash scripts/build-step03.sh 2>&1 | tee artifacts/logs/step03-publish.log
+bash scripts/verify-step03-ipa.sh artifacts/StS2-Launcher-Step-03.ipa \
+  2>&1 | tee artifacts/logs/step03-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 02"
+  echo "StS2 Launcher iOS — Step 03"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
   echo "Xcode: $(xcodebuild -version | tr '\n' ' ')"
   echo ".NET SDK: $(dotnet --version)"
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
-  echo "IPA: artifacts/StS2-Launcher-Step-02.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-03.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-02.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-03.ipa | awk '{print $1}')"
   fi
-} > artifacts/step02-build-summary.txt
+} > artifacts/step03-build-summary.txt
 
-cat artifacts/step02-build-summary.txt
+cat artifacts/step03-build-summary.txt
