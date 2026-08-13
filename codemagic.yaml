@@ -1,6 +1,6 @@
 workflows:
-  ios-step-03:
-    name: Step 03 - Pure managed Core state machine
+  ios-step-04:
+    name: Step 04 - iOS Keychain dummy-data probe
     instance_type: mac_mini_m2
     max_build_duration: 45
 
@@ -15,13 +15,13 @@ workflows:
         - $HOME/.nuget/packages
 
     scripts:
-      - name: Build Step 03 unsigned IPA
+      - name: Build Step 04 unsigned IPA
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic-build.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-03.ipa
-      - artifacts/step03-build-summary.txt
+      - artifacts/StS2-Launcher-Step-04.ipa
+      - artifacts/step04-build-summary.txt
       - artifacts/logs/**

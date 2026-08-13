@@ -1,72 +1,56 @@
-# StS2 Launcher iOS — Step 03
+# StS2 Launcher iOS — Step 04
 
-Step 01.1 proved the UIKit application lifecycle.
-Step 02 proved the launcher UI/state shell.
+Steps 01.1–03 proved:
 
-Step 03 introduces exactly one new architectural boundary:
+- UIKit scene/window startup
+- native UI rendering
+- sandbox file writing
+- separate `StS2Launcher.Core` assembly
+- Core-driven launcher state transitions
 
-```text
-StS2Launcher.Step03.iOS
-        ↓
-StS2Launcher.Core
-```
-
-`StS2Launcher.Core` is a plain `net9.0` managed class library. It owns the launcher state machine and contains **no UIKit references**.
-
-## Still NOT included
-
-- SteamKit2
-- real network traffic
-- Keychain
-- ownership verification
-- depot downloading
-- Godot
-- Mono.Cecil
-- native libraries
-- game files
-- runtime patching
-
-## What must appear on device
-
-At launch:
+Step 04 introduces exactly one new platform subsystem:
 
 ```text
-STEP 03 — CORE STATE MACHINE
-Version 0.0.4
-CORE LINK: PASS
-CORE SELF-TEST: NOT RUN
-CORE STATE 1 OF 7
-Signed out
+StS2Launcher.Core.ICredentialStore
+               ↑
+      iOS Keychain adapter
 ```
 
-`CORE LINK: PASS` means the iOS application successfully loaded and executed the separate `StS2Launcher.Core` assembly.
+## Important
 
-Tap:
+This build stores **no Steam credentials**.
+
+It uses only two fixed dummy strings:
 
 ```text
-Run Core Self-Test
+STEP04-ALPHA
+STEP04-BETA
 ```
 
-Expected:
+under a Step-04-specific Keychain service name.
 
-```text
-CORE SELF-TEST PASS — 12/12
-```
+## What the test proves
 
-The existing state buttons are now driven by `LauncherController` in Core rather than an enum/state table inside the UIKit app.
-
-See `docs/STEP-03-TEST.md`.
+1. missing record can be queried cleanly;
+2. dummy value can be written;
+3. dummy value can be read;
+4. same logical key can be overwritten;
+5. new value is returned instead of old value;
+6. value survives process termination/relaunch;
+7. dummy value can be deleted.
 
 ## Build
 
 Codemagic workflow:
 
 ```text
-ios-step-03
+ios-step-04
 ```
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-03.ipa
+artifacts/StS2-Launcher-Step-04.ipa
 ```
+
+See `docs/STEP-04-TEST.md` before testing.
