@@ -1,56 +1,56 @@
-# StS2 Launcher iOS — Step 04
+# StS2 Launcher iOS — Step 05
 
-Steps 01.1–03 proved:
+Step 04 passed on physical iPhone, including Keychain persistence/delete and Core 12/12.
 
-- UIKit scene/window startup
-- native UI rendering
-- sandbox file writing
-- separate `StS2Launcher.Core` assembly
-- Core-driven launcher state transitions
+Step 05 introduces **SteamKit2 and outbound Steam networking only**.
 
-Step 04 introduces exactly one new platform subsystem:
+## Absolutely NOT in this build
 
-```text
-StS2Launcher.Core.ICredentialStore
-               ↑
-      iOS Keychain adapter
-```
+- Steam username
+- Steam password
+- Steam Guard
+- QR login
+- refresh/access tokens
+- ownership verification
+- depot download
+- Steam Cloud
+- Godot
+- Mono.Cecil
+- game files
 
-## Important
+## Why SteamKit2 3.3.1
 
-This build stores **no Steam credentials**.
+The launcher remains on the already-proven .NET 9 toolchain.
 
-It uses only two fixed dummy strings:
+SteamKit2 `3.3.1` is intentionally pinned because the next SteamKit line (`3.4.0`) targets .NET 10. Runtime/toolchain migration is not being mixed into the first Steam network test.
 
-```text
-STEP04-ALPHA
-STEP04-BETA
-```
+## What the button does
 
-under a Step-04-specific Keychain service name.
+`Run Steam Connection Probe`:
 
-## What the test proves
+1. constructs `SteamClient`;
+2. constructs `CallbackManager`;
+3. subscribes to `ConnectedCallback`;
+4. calls `SteamClient.Connect()`;
+5. pumps SteamKit callbacks;
+6. on connection, immediately calls `Disconnect()`;
+7. waits for `DisconnectedCallback`;
+8. reports `STEAM CONNECTION PASS — 3/3`.
 
-1. missing record can be queried cleanly;
-2. dummy value can be written;
-3. dummy value can be read;
-4. same logical key can be overwritten;
-5. new value is returned instead of old value;
-6. value survives process termination/relaunch;
-7. dummy value can be deleted.
+No `SteamUser` login is performed.
 
 ## Build
 
 Codemagic workflow:
 
 ```text
-ios-step-04
+ios-step-05
 ```
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-04.ipa
+artifacts/StS2-Launcher-Step-05.ipa
 ```
 
-See `docs/STEP-04-TEST.md` before testing.
+See `docs/STEP-05-TEST.md`.

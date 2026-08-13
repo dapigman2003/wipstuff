@@ -4,4 +4,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+  <ItemGroup>
+    <!--
+      Intentionally pinned to 3.3.1 for the proven .NET 9 toolchain.
+      SteamKit2 3.4.0 targets .NET 10; upgrading the runtime is a separate decision.
+    -->
+    <PackageReference Include="SteamKit2" Version="3.3.1" />
+  </ItemGroup>
 </Project>
