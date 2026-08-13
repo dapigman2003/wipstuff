@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 05.2 environment ==="
+  echo "=== StS2 Launcher Step 05.3 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step05-2-environment.log
+} | tee artifacts/logs/step05-3-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -58,8 +58,6 @@ fi
 
 echo "Installing/verifying iOS workload set $DOTNET_WORKLOAD_SET..."
 
-# Workload management is deliberately run outside the repository so internal
-# workload commands cannot accidentally resolve a project from the checkout.
 WORKLOAD_CWD="$(mktemp -d)"
 trap 'rm -rf "$WORKLOAD_CWD"' EXIT
 
@@ -67,28 +65,29 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step05-2-workload.log
+) | tee artifacts/logs/step05-3-workload.log
 
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/validate-step05.sh | tee artifacts/logs/step05-2-validation.log
-bash scripts/build-step05.sh 2>&1 | tee artifacts/logs/step05-2-wrapper.log
-bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.2.ipa \
-  2>&1 | tee artifacts/logs/step05-2-ipa-verification.log
+bash scripts/validate-step05.sh | tee artifacts/logs/step05-3-validation.log
+bash scripts/build-step05.sh 2>&1 | tee artifacts/logs/step05-3-wrapper.log
+bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.3.ipa \
+  2>&1 | tee artifacts/logs/step05-3-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 05.2"
+  echo "StS2 Launcher iOS — Step 05.3"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
   echo "Xcode: $(xcodebuild -version | tr '\n' ' ')"
   echo ".NET SDK: $(dotnet --version)"
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
-  echo "IPA: artifacts/StS2-Launcher-Step-05.2.ipa"
+  echo "SteamKit compatibility patch: Process.StartTime -> DateTime.UtcNow"
+  echo "IPA: artifacts/StS2-Launcher-Step-05.3.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.2.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.3.ipa | awk '{print $1}')"
   fi
-} > artifacts/step05-2-build-summary.txt
+} > artifacts/step05-3-build-summary.txt
 
-cat artifacts/step05-2-build-summary.txt
+cat artifacts/step05-3-build-summary.txt

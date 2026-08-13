@@ -8,8 +8,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>8</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.8</ApplicationDisplayVersion>
+    <ApplicationVersion>9</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.9</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -20,12 +20,10 @@
       macOS-only machine-information P/Invokes.
 
       Keep full trimming because it successfully removes other unreachable
-      desktop dependencies. Step 05.2 then removes only the generated
-      DiskArbitration framework item after linker output is loaded and before
-      native-link inputs are computed. DiskArbitration does not exist in the
-      iPhoneOS SDK. If any live native DiskArbitration symbol is actually
-      required, clang/ld will now expose that symbol directly instead of
-      failing early on the unavailable framework name.
+      desktop dependencies. Step 05.3 retains Step 05.2's proven generated
+      DiskArbitration framework filter. The separate build-only compatibility
+      patch for SteamClient's unsupported Process.StartTime call is applied to
+      the isolated local SteamKit package before this project is compiled.
     -->
     <TrimMode>full</TrimMode>
   </PropertyGroup>

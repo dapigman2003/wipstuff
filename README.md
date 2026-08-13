@@ -1,33 +1,41 @@
-# StS2 Launcher iOS — Step 05.2
+# StS2 Launcher iOS — Step 05.3
 
-Step 05.1 proved that `TrimMode=full` is useful but does not eliminate the iOS native-link failure:
+Step 05.2 solved the native iPhoneOS link boundary. Its IPA built, installed,
+launched, stayed open, loaded SteamKit2 3.3.1.0, and retained the 12/12 Core
+regression test. The Steam connection probe then failed immediately at 0/3 with
+`PlatformNotSupportedException: Arg_PlatformNotSupported`.
 
-```text
-ld: framework 'DiskArbitration' not found
-```
+The 0/3 boundary means the exception occurs while constructing `SteamClient`,
+before the probe reaches any network operation. SteamKit2 3.3.1's constructor
+reads `System.Diagnostics.Process.StartTime`; .NET marks that property unsupported
+on iOS.
 
-The failed build's MSBuild/binlog artifacts showed that .NET iOS generated `DiskArbitration` inside its `_LinkerFrameworks` item set and passed it explicitly to the final `clang++` command.
+Step 05.3 makes one platform-compatibility change before the iOS AOT/link stage:
 
-Step 05.2 keeps the Steam runtime probe unchanged and makes one narrowly scoped link-boundary change:
+1. restore SteamKit2 3.3.1 into a repository-local, disposable NuGet cache;
+2. run a build-only Mono.Cecil tool against that local SteamKit assembly;
+3. require exactly one `Process.StartTime` call in `SteamKit2.SteamClient`;
+4. replace that call with `DateTime.UtcNow` while preserving SteamKit's surrounding
+   `Process` lifetime/disposal code;
+5. remove the third-party strong-name publisher signature from the modified local
+   build copy rather than pretending to re-sign it;
+6. compile the launcher against that already-patched local assembly;
+7. retain Step 05.2's proven `DiskArbitration` framework filter.
 
-1. keep `TrimMode=full`;
-2. let the .NET iOS linker produce its normal framework list;
-3. after `_LoadLinkerOutput`, remove only `DiskArbitration` from `_LinkerFrameworks`;
-4. do so before `_ComputeLinkNativeExecutableInputs`;
-5. leave every other framework untouched.
-
-If SteamKit contains a genuinely live call to a DiskArbitration symbol, the build should now progress far enough for `clang`/`ld` to report that concrete undefined symbol. If no live symbol remains, the native link can proceed without trying to load a macOS-only framework from the iPhoneOS SDK.
+The patcher is a **build-only compatibility tool** under `tools/`. Mono.Cecil is
+not referenced by Core or by the iOS application and is not packaged in the IPA.
+This is not the later StS2 RuntimePatch subsystem.
 
 ## Scope remains unchanged
 
-The on-device test still does only this:
+The physical-device test still performs no authentication. It only:
 
-1. construct `SteamClient`;
-2. construct `CallbackManager`;
-3. call `Connect()`;
-4. receive `ConnectedCallback`;
-5. call `Disconnect()`;
-6. receive `DisconnectedCallback`.
+1. constructs `SteamClient`;
+2. constructs `CallbackManager`;
+3. calls `Connect()`;
+4. waits for `ConnectedCallback`;
+5. requests `Disconnect()`;
+6. waits for `DisconnectedCallback`.
 
 Still excluded:
 
@@ -35,34 +43,41 @@ Still excluded:
 - passwords/tokens/Steam Guard;
 - ownership checks;
 - depot downloads;
-- Mono.Cecil;
+- runtime/game Mono.Cecil patching;
 - Godot;
 - game files.
 
 ## Device marker
 
 ```text
-STEP 05.2 — IOS FRAMEWORK FILTER
-Version 0.0.8
+STEP 05.3 — IOS STEAMCLIENT COMPAT
+Version 0.0.9
 ```
 
 ## Build artifact
 
 ```text
-artifacts/StS2-Launcher-Step-05.2.ipa
+artifacts/StS2-Launcher-Step-05.3.ipa
 ```
 
-## New diagnostics
+## Key diagnostics
 
 ```text
-artifacts/logs/step05-2-framework-filter.log
-artifacts/logs/step05-2-generated-linker-frameworks.txt
-artifacts/logs/step05-2-native-symbols.log
-artifacts/logs/step05-2-failure-scan.log
-artifacts/logs/step05-2-publish.log
-artifacts/logs/step05-2-dotnet-ios.binlog
+artifacts/logs/step05-3-steamkit-patch.log
+artifacts/logs/step05-3-framework-filter.log
+artifacts/logs/step05-3-generated-linker-frameworks.txt
+artifacts/logs/step05-3-native-symbols.log
+artifacts/logs/step05-3-publish.log
+artifacts/logs/step05-3-dotnet-ios.binlog
 ```
 
-The key successful-build telemetry should show `DiskArbitration` in `BEFORE` and absent from `AFTER`.
+The SteamKit patch log must contain:
 
-See `docs/STEP-05.2-TEST.md` for the result format.
+```text
+STEP05.3 STEAMKIT IOS PATCH: PASS
+Replacement count: 1
+Unsupported call removed: System.Diagnostics.Process.StartTime
+Replacement value: System.DateTime.UtcNow
+```
+
+See `docs/STEP-05.3-TEST.md` for the report format.

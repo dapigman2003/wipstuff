@@ -6,15 +6,15 @@ cd "$ROOT"
 
 IOS_PROJECT="src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj"
 CORE_PROJECT="src/StS2Launcher.Core/StS2Launcher.Core.csproj"
+PATCHER_PROJECT="tools/StS2Launcher.SteamKitIosPatcher/StS2Launcher.SteamKitIosPatcher.csproj"
+PATCHER_SOURCE="tools/StS2Launcher.SteamKitIosPatcher/Program.cs"
 
-[[ -f "$IOS_PROJECT" ]] || {
-  echo "ERROR: missing Step 05 iOS project." >&2
-  exit 2
-}
-[[ -f "$CORE_PROJECT" ]] || {
-  echo "ERROR: missing Core project." >&2
-  exit 2
-}
+for required in "$IOS_PROJECT" "$CORE_PROJECT" "$PATCHER_PROJECT" "$PATCHER_SOURCE"; do
+  [[ -f "$required" ]] || {
+    echo "ERROR: missing required Step 05.3 file: $required" >&2
+    exit 2
+  }
+done
 
 python3 - <<'PY'
 from pathlib import Path
@@ -31,9 +31,9 @@ if refs != ["../StS2Launcher.Core/StS2Launcher.Core.csproj"]:
 
 if any(True for _ in ios_root.iter("PackageReference")):
     raise SystemExit(
-        "ERROR: SteamKit package belongs in Core, not directly in the iOS UI project.")
+        "ERROR: SteamKit/build-tool packages must not be referenced directly by iOS UI.")
 if any(True for _ in ios_root.iter("NativeReference")):
-    raise SystemExit("ERROR: Step 05.2 must not contain NativeReference.")
+    raise SystemExit("ERROR: Step 05.3 must not contain NativeReference.")
 
 values = {}
 for name in (
@@ -49,26 +49,26 @@ for name in (
 expected = {
     "TargetFramework": "net9.0-ios",
     "RuntimeIdentifier": "ios-arm64",
-    "ApplicationVersion": "8",
-    "ApplicationDisplayVersion": "0.0.8",
+    "ApplicationVersion": "9",
+    "ApplicationDisplayVersion": "0.0.9",
     "TrimMode": "full",
 }
 if values != expected:
-    raise SystemExit(f"ERROR: Step 05.2 iOS build properties changed: {values}")
+    raise SystemExit(f"ERROR: Step 05.3 iOS build properties changed: {values}")
 
-# Step 05.2's only new functional behavior is the narrow framework-item filter.
+# Step 05.3 retains the exact Step 05.2 native-framework boundary fix.
 target = None
 for node in ios_root.iter("Target"):
     if node.attrib.get("Name") == "Step052RemoveMacOnlyDiskArbitrationFramework":
         target = node
         break
 if target is None:
-    raise SystemExit("ERROR: Step 05.2 DiskArbitration filter target is missing.")
+    raise SystemExit("ERROR: retained DiskArbitration filter target is missing.")
 if target.attrib.get("AfterTargets") != "_LoadLinkerOutput":
-    raise SystemExit("ERROR: Step 05.2 filter must run after _LoadLinkerOutput.")
+    raise SystemExit("ERROR: framework filter must run after _LoadLinkerOutput.")
 if target.attrib.get("BeforeTargets") != "_ComputeLinkNativeExecutableInputs":
     raise SystemExit(
-        "ERROR: Step 05.2 filter must run before _ComputeLinkNativeExecutableInputs.")
+        "ERROR: framework filter must run before _ComputeLinkNativeExecutableInputs.")
 removes = [
     node.attrib.get("Remove")
     for node in target.iter("_LinkerFrameworks")
@@ -76,7 +76,7 @@ removes = [
 ]
 if removes != ["DiskArbitration"]:
     raise SystemExit(
-        f"ERROR: Step 05.2 must remove only DiskArbitration; got {removes}")
+        f"ERROR: framework filter must remove only DiskArbitration; got {removes}")
 
 core_root = ET.parse("src/StS2Launcher.Core/StS2Launcher.Core.csproj").getroot()
 packages = {
@@ -85,17 +85,41 @@ packages = {
 }
 if packages != {"SteamKit2": "3.3.1"}:
     raise SystemExit(
-        f"ERROR: Step 05 expects exactly SteamKit2 3.3.1; got {packages}")
+        f"ERROR: Step 05.3 expects exactly SteamKit2 3.3.1 in Core; got {packages}")
+
+patcher_root = ET.parse(
+    "tools/StS2Launcher.SteamKitIosPatcher/StS2Launcher.SteamKitIosPatcher.csproj"
+).getroot()
+patcher_packages = {
+    e.attrib.get("Include"): e.attrib.get("Version")
+    for e in patcher_root.iter("PackageReference")
+}
+if patcher_packages != {"Mono.Cecil": "0.11.6"}:
+    raise SystemExit(
+        f"ERROR: build-only patcher dependency changed: {patcher_packages}")
+
+patcher = Path(
+    "tools/StS2Launcher.SteamKitIosPatcher/Program.cs"
+).read_text()
+for required in (
+    "System.DateTime System.Diagnostics.Process::get_StartTime()",
+    '"get_UtcNow"',
+    "replacements != 1",
+    "ModuleAttributes.StrongNameSigned",
+    "STEP05.3 STEAMKIT IOS PATCH: PASS",
+):
+    if required not in patcher:
+        raise SystemExit(f"ERROR: SteamKit iOS patcher guard missing: {required}")
 
 plist_path = Path("src/StS2Launcher.Step05.iOS/Info.plist")
 with plist_path.open("rb") as f:
     plist = plistlib.load(f)
 if plist.get("CFBundleIdentifier") != "com.community.sts2launcher":
     raise SystemExit("ERROR: unexpected bundle ID.")
-if plist.get("CFBundleShortVersionString") != "0.0.8":
-    raise SystemExit("ERROR: Info.plist Step 05.2 display version regression.")
-if str(plist.get("CFBundleVersion")) != "8":
-    raise SystemExit("ERROR: Info.plist Step 05.2 build version regression.")
+if plist.get("CFBundleShortVersionString") != "0.0.9":
+    raise SystemExit("ERROR: Info.plist Step 05.3 display version regression.")
+if str(plist.get("CFBundleVersion")) != "9":
+    raise SystemExit("ERROR: Info.plist Step 05.3 build version regression.")
 
 scene = Path("src/StS2Launcher.Step05.iOS/SceneDelegate.cs").read_text()
 if "class SceneDelegate : UIWindowSceneDelegate" not in scene:
@@ -113,6 +137,8 @@ for required in (
     "steamClient.Disconnect()",
     "manager.RunWaitCallbacks",
     "STEAM CONNECTION PASS — 3/3",
+    'stage = "SteamClient constructor"',
+    "FormatException(stage, ex)",
 ):
     if required not in probe:
         raise SystemExit(f"ERROR: Steam probe missing: {required}")
@@ -129,37 +155,50 @@ for forbidden in (
 ):
     if forbidden in probe:
         raise SystemExit(
-            f"ERROR: Step 05.2 connection probe contains authentication behavior: {forbidden}")
+            f"ERROR: Step 05.3 connection probe contains authentication behavior: {forbidden}")
 
 root_view = Path("src/StS2Launcher.Step05.iOS/RootViewController.cs").read_text()
 for required in (
-    "STEP 05.2 — IOS FRAMEWORK FILTER",
-    "Version 0.0.8",
+    "STEP 05.3 — IOS STEAMCLIENT COMPAT",
+    "Version 0.0.9",
     "NO LOGIN • NO PASSWORD • NO STEAM GUARD • NO TOKEN",
     "Run Steam Connection Probe",
     "STEAMKIT ASSEMBLY: PASS",
     "TimeSpan.FromSeconds(20)",
 ):
     if required not in root_view:
-        raise SystemExit(f"ERROR: Step 05.2 UI marker missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.3 UI marker missing: {required}")
 
-# Core may depend on SteamKit2 but remains free of iOS platform APIs.
+# Core remains platform-neutral and contains no build-time Cecil dependency.
 core_text = "\n".join(
     p.read_text(errors="ignore")
     for p in Path("src/StS2Launcher.Core").glob("*.cs")
 )
-for forbidden in ("UIKit", "Foundation", "Security.", "ObjCRuntime"):
+for forbidden in ("UIKit", "Foundation", "Security.", "ObjCRuntime", "Mono.Cecil"):
     if forbidden in core_text:
         raise SystemExit(
-            f"ERROR: Core contains iOS platform dependency: {forbidden}")
+            f"ERROR: Core contains forbidden platform/build dependency: {forbidden}")
 
-print("Step 05.2 SteamKit/framework-filter/Core/UI boundary validation passed.")
+build_script = Path("scripts/build-step05.sh").read_text()
+for required in (
+    'export NUGET_PACKAGES="$ROOT/.nuget/packages"',
+    'rm -rf "$NUGET_PACKAGES/steamkit2/3.3.1"',
+    'dotnet restore "$PROJECT"',
+    'dotnet run --project "$PATCHER"',
+    '--no-restore',
+    'STEP05.3 STEAMKIT IOS PATCH: PASS',
+):
+    if required not in build_script:
+        raise SystemExit(f"ERROR: Step 05.3 build isolation guard missing: {required}")
+
+print("Step 05.3 SteamKit constructor-compat/Core/UI boundary validation passed.")
 PY
 
-# Still forbidden: Godot, Cecil, Harmony/native runtime host.
+# Still forbidden from the actual application source: Godot, runtime Cecil,
+# Harmony/native game host. The build-only Cecil tool lives only under tools/.
 if grep -RniE 'Godot|Mono\.Cecil|Harmony|NativeGodotHost' \
   src --include='*.cs' --include='*.csproj'; then
-  echo "ERROR: Step 05.2 contains a forbidden later-stage subsystem." >&2
+  echo "ERROR: Step 05.3 app source contains a forbidden later-stage subsystem." >&2
   exit 3
 fi
 
@@ -167,4 +206,4 @@ for script in scripts/*.sh; do
   bash -n "$script"
 done
 
-echo "Step 05.2 repository validation passed."
+echo "Step 05.3 repository validation passed."

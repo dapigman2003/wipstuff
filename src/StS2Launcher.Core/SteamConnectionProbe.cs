@@ -4,7 +4,10 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step-05.2 network-only SteamKit probe (behavior unchanged from Step 05).
+/// Step-05.3 network-only SteamKit probe.
+///
+/// The iOS build patches SteamKit 3.3.1's unsupported Process.StartTime
+/// constructor assumption before AOT. Network behavior remains unchanged.
 ///
 /// It deliberately performs no authentication and sends no account credentials.
 /// The probe constructs SteamKit, connects to a Steam CM, observes the official
@@ -39,14 +42,17 @@ public sealed class SteamConnectionProbe
         var disconnected = false;
         var disconnectRequested = false;
         string? callbackFailure = null;
+        var stage = "SteamClient constructor";
 
         try
         {
             var steamClient = new SteamClient();
             clientConstructed = true;
 
+            stage = "CallbackManager constructor";
             var manager = new CallbackManager(steamClient);
 
+            stage = "callback subscription";
             manager.Subscribe<SteamClient.ConnectedCallback>(_ =>
             {
                 connected = true;
@@ -70,7 +76,9 @@ public sealed class SteamConnectionProbe
                 disconnected = true;
             });
 
+            stage = "SteamClient.Connect";
             steamClient.Connect();
+            stage = "callback pump";
 
             while (!disconnected &&
                    callbackFailure is null &&
@@ -155,7 +163,7 @@ public sealed class SteamConnectionProbe
                 connected,
                 disconnected,
                 stopwatch.Elapsed,
-                $"{ex.GetType().Name}: {ex.Message}");
+                FormatException(stage, ex));
         }
     }
 
@@ -169,6 +177,18 @@ public sealed class SteamConnectionProbe
         {
             // Preserve the original failure in the probe result.
         }
+    }
+
+    private static string FormatException(string stage, Exception ex)
+    {
+        var text = $"Stage: {stage}\n{ex}";
+
+        // Keep the full exception useful on-device without allowing one nested
+        // stack trace to make the diagnostic label unbounded.
+        const int maxLength = 3500;
+        return text.Length <= maxLength
+            ? text
+            : text[..maxLength] + "\n…(truncated)";
     }
 
     private static SteamConnectionProbeResult Fail(
