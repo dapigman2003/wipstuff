@@ -5,7 +5,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.11 metadata-only SteamKit network listener.
+/// Step 05.12 metadata-only SteamKit network listener.
 ///
 /// It deliberately records only direction, EMsg, serialized byte count, and elapsed
 /// time. Raw Steam message payloads are never retained. For the current boundary,

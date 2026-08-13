@@ -7,13 +7,12 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.11 SteamKit post-WebSocket-upgrade / ClientHello AOT diagnostic.
+/// Step 05.12 SteamKit 3.4.0 comparison probe.
 ///
-/// Step 05.9 proved that SteamKit's exact selected CM endpoint can complete the
-/// same custom-HttpMessageInvoker WebSocket upgrade outside SteamKit. This probe
-/// now observes only the next SteamKit boundary: whether an outgoing ClientHello
-/// is successfully serialized and exposed to IDebugNetworkListener before the
-/// library disconnects. No authentication is performed.
+/// The probe is intentionally unchanged in behavior from the Step 05.11 device test: it
+/// observes whether an outgoing ClientHello is exposed to IDebugNetworkListener and
+/// whether the public ConnectedCallback arrives. The controlled variable is the
+/// SteamKit2 package version (3.3.1 -> 3.4.0). No authentication is performed.
 /// </summary>
 public sealed class SteamConnectionProbe
 {

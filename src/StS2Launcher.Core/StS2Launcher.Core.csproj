@@ -6,9 +6,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!--
-      Intentionally pinned to 3.3.1 to preserve the currently proven dependency surface.
-      Any SteamKit package upgrade is a separate numbered experiment.
+      Step 05.12 is a controlled dependency comparison against the proven
+      Step 05.11 surface. No additional runtime capability is introduced.
     -->
-    <PackageReference Include="SteamKit2" Version="3.3.1" />
+    <PackageReference Include="SteamKit2" Version="3.4.0" />
   </ItemGroup>
 </Project>

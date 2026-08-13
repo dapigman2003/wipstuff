@@ -3,12 +3,10 @@ using ProtoBuf.Meta;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.11 experiment: keep protobuf-net 3.2.56 on its runtime/reflection
-/// serializer path instead of allowing runtime serializer compilation.
-///
-/// iOS device execution is AOT-only and cannot support Reflection.Emit. This
-/// setting is applied before SteamKit constructs/sends its initial ClientHello.
-/// It does not change the Steam protocol or add authentication.
+/// Retained Step 05.11 regression setting. The physical-iPhone Step 05.11 run
+/// showed RuntimeTypeModel.Default.AutoCompile was already false before this
+/// assignment, so Step 05.12 does not treat this as a fix. It remains only to
+/// keep the comparison surface identical while SteamKit2 changes to 3.4.0.
 /// </summary>
 public static class ProtobufAotCompatibility
 {

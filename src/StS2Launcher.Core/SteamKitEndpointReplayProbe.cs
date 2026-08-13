@@ -6,7 +6,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.11 replays the exact CM endpoint selected by SteamKit through the
+/// Step 05.12 replays the exact CM endpoint selected by SteamKit through the
 /// already-proven ClientWebSocket + CMWebSocket HttpMessageInvoker path.
 ///
 /// Step 05.8 proved that SocketsHttpHandler HTTPS and the custom-invoker
@@ -63,7 +63,7 @@ public sealed class SteamKitEndpointReplayProbe
                     using var closeCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
                     await socket.CloseAsync(
                         WebSocketCloseStatus.NormalClosure,
-                        "Step 05.11 exact endpoint replay complete",
+                        "Step 05.12 exact endpoint replay complete",
                         closeCts.Token).ConfigureAwait(false);
                 }
                 catch

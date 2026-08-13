@@ -16,7 +16,7 @@ PROTOBUF_AOT_SOURCE="src/StS2Launcher.Core/ProtobufAotCompatibility.cs"
 
 for required in "$IOS_PROJECT" "$CORE_PROJECT" "$PATCHER_PROJECT" "$PATCHER_SOURCE" "$HTTP_FACTORY_SOURCE" "$HANDLER_PROBE_SOURCE" "$ENDPOINT_REPLAY_SOURCE" "$NETWORK_TRACE_SOURCE" "$PROTOBUF_AOT_SOURCE"; do
   [[ -f "$required" ]] || {
-    echo "ERROR: missing required Step 05.11 file: $required" >&2
+    echo "ERROR: missing required Step 05.12 file: $required" >&2
     exit 2
   }
 done
@@ -36,7 +36,7 @@ if refs != ["../StS2Launcher.Core/StS2Launcher.Core.csproj"]:
 if any(True for _ in ios_root.iter("PackageReference")):
     raise SystemExit("ERROR: SteamKit/build-tool packages must not be referenced directly by iOS UI.")
 if any(True for _ in ios_root.iter("NativeReference")):
-    raise SystemExit("ERROR: Step 05.11 must not contain NativeReference.")
+    raise SystemExit("ERROR: Step 05.12 must not contain NativeReference.")
 
 values = {}
 for name in (
@@ -49,12 +49,12 @@ for name in (
 expected = {
     "TargetFramework": "net9.0-ios",
     "RuntimeIdentifier": "ios-arm64",
-    "ApplicationVersion": "17",
-    "ApplicationDisplayVersion": "0.0.17",
+    "ApplicationVersion": "18",
+    "ApplicationDisplayVersion": "0.0.18",
     "TrimMode": "full",
 }
 if values != expected:
-    raise SystemExit(f"ERROR: Step 05.11 iOS build properties changed: {values}")
+    raise SystemExit(f"ERROR: Step 05.12 iOS build properties changed: {values}")
 
 # Retain the exact native-framework boundary fix proven by Step 05.2+.
 target = None
@@ -81,8 +81,8 @@ packages = {
     e.attrib.get("Include"): e.attrib.get("Version")
     for e in core_root.iter("PackageReference")
 }
-if packages != {"SteamKit2": "3.3.1"}:
-    raise SystemExit(f"ERROR: Step 05.11 expects exactly SteamKit2 3.3.1 in Core; got {packages}")
+if packages != {"SteamKit2": "3.4.0"}:
+    raise SystemExit(f"ERROR: Step 05.12 expects exactly SteamKit2 3.4.0 in Core; got {packages}")
 
 patcher_root = ET.parse(
     "tools/StS2Launcher.SteamKitIosPatcher/StS2Launcher.SteamKitIosPatcher.csproj"
@@ -98,9 +98,11 @@ patcher = Path("tools/StS2Launcher.SteamKitIosPatcher/Program.cs").read_text()
 for required in (
     "System.DateTime System.Diagnostics.Process::get_StartTime()",
     '"get_UtcNow"',
-    "replacements != 1",
+    'ExpectedVersionPrefix = "3.4.0"',
+    "matches.Length > 1",
+    "Process.StartTime status: already absent",
     "ModuleAttributes.StrongNameSigned",
-    "STEP05.11 STEAMKIT IOS PATCH: PASS",
+    "STEP05.12 STEAMKIT IOS PATCH: PASS",
 ):
     if required not in patcher:
         raise SystemExit(f"ERROR: SteamKit iOS patcher guard missing: {required}")
@@ -110,10 +112,10 @@ with plist_path.open("rb") as f:
     plist = plistlib.load(f)
 if plist.get("CFBundleIdentifier") != "com.community.sts2launcher":
     raise SystemExit("ERROR: unexpected bundle ID.")
-if plist.get("CFBundleShortVersionString") != "0.0.17":
-    raise SystemExit("ERROR: Info.plist Step 05.11 display version regression.")
-if str(plist.get("CFBundleVersion")) != "17":
-    raise SystemExit("ERROR: Info.plist Step 05.11 build version regression.")
+if plist.get("CFBundleShortVersionString") != "0.0.18":
+    raise SystemExit("ERROR: Info.plist Step 05.12 display version regression.")
+if str(plist.get("CFBundleVersion")) != "18":
+    raise SystemExit("ERROR: Info.plist Step 05.12 build version regression.")
 
 scene = Path("src/StS2Launcher.Step05.iOS/SceneDelegate.cs").read_text()
 if "class SceneDelegate : UIWindowSceneDelegate" not in scene:
@@ -130,7 +132,7 @@ for required in (
     'new ProductInfoHeaderValue("SteamKit", assemblyVersion)',
 ):
     if required not in factory:
-        raise SystemExit(f"ERROR: Step 05.11 HTTP factory guard missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 HTTP factory guard missing: {required}")
 
 probe = Path("src/StS2Launcher.Core/SteamConnectionProbe.cs").read_text()
 for required in (
@@ -171,12 +173,12 @@ for required in (
     "protobuf-net",
 ):
     if required not in aot_helper:
-        raise SystemExit(f"ERROR: Step 05.11 protobuf AOT compatibility guard missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 protobuf AOT compatibility guard missing: {required}")
 
 if "ProtobufAotCompatibility.Configure()" not in probe:
-    raise SystemExit("ERROR: Step 05.11 Steam probe must configure protobuf no-emit mode before connecting.")
+    raise SystemExit("ERROR: Step 05.12 Steam probe must configure protobuf no-emit mode before connecting.")
 if "Protobuf AOT mode:" not in probe:
-    raise SystemExit("ERROR: Step 05.11 Steam probe must report protobuf AOT mode.")
+    raise SystemExit("ERROR: Step 05.12 Steam probe must report protobuf AOT mode.")
 
 network_trace = Path("src/StS2Launcher.Core/SteamNetworkTraceListener.cs").read_text()
 for required in (
@@ -188,10 +190,10 @@ for required in (
     "metadata-only",
 ):
     if required not in network_trace:
-        raise SystemExit(f"ERROR: Step 05.11 debug network trace guard missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 debug network trace guard missing: {required}")
 
 if "ProtocolTypes.Tcp" in probe:
-    raise SystemExit("ERROR: Step 05.11 SteamKit probe must stay WebSocket-only.")
+    raise SystemExit("ERROR: Step 05.12 SteamKit probe must stay WebSocket-only.")
 
 network_probe = Path("src/StS2Launcher.Core/CmNetworkProbe.cs").read_text()
 for required in (
@@ -202,10 +204,10 @@ for required in (
     "ClientWebSocket",
     '"/cmsocket/"',
     "JsonDocument.Parse",
-    "StS2Launcher-iOS-Step05.11/0.0.17",
+    "StS2Launcher-iOS-Step05.12/0.0.18",
 ):
     if required not in network_probe:
-        raise SystemExit(f"ERROR: Step 05.11 CM network regression probe missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 CM network regression probe missing: {required}")
 
 handler_probe = Path("src/StS2Launcher.Core/SocketsHandlerIsolationProbe.cs").read_text()
 for required in (
@@ -218,7 +220,7 @@ for required in (
     "FormatExceptionWithStack",
 ):
     if required not in handler_probe:
-        raise SystemExit(f"ERROR: Step 05.11 handler-isolation probe missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 handler-isolation probe missing: {required}")
 
 endpoint_replay = Path("src/StS2Launcher.Core/SteamKitEndpointReplayProbe.cs").read_text()
 for required in (
@@ -230,7 +232,7 @@ for required in (
     "EXACT STEAMKIT ENDPOINT REPLAY",
 ):
     if required not in endpoint_replay:
-        raise SystemExit(f"ERROR: Step 05.11 exact-endpoint replay probe missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 exact-endpoint replay probe missing: {required}")
 
 # Authentication is intentionally forbidden in Step 05.x.
 combined = probe + "\n" + network_probe + "\n" + factory + "\n" + handler_probe + "\n" + endpoint_replay + "\n" + network_trace
@@ -244,14 +246,14 @@ for forbidden in (
     "SteamGuard",
 ):
     if forbidden in combined:
-        raise SystemExit(f"ERROR: Step 05.11 contains authentication behavior: {forbidden}")
+        raise SystemExit(f"ERROR: Step 05.12 contains authentication behavior: {forbidden}")
 
 root_view = Path("src/StS2Launcher.Step05.iOS/RootViewController.cs").read_text()
 for required in (
-    "STEP 05.11 — PROTOBUF NO-EMIT TEST",
-    "Version 0.0.17",
+    "STEP 05.12 — STEAMKIT 3.4.0 COMPARISON",
+    "Version 0.0.18",
     "NO LOGIN • NO PASSWORD • NO STEAM GUARD • NO TOKEN",
-    "Run Step 05.11 Protobuf No-Emit Test",
+    "Run Step 05.12 SteamKit 3.4.0 Comparison",
     'TimeSpan.FromSeconds(25)',
     'TimeSpan.FromSeconds(12)',
     "STEAM CONNECTION PASS — 3/3",
@@ -265,7 +267,7 @@ for required in (
     "_endpointReplayProbe.RunAsync",
 ):
     if required not in root_view:
-        raise SystemExit(f"ERROR: Step 05.11 UI marker missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 UI marker missing: {required}")
 
 # Core remains UI/platform-binding neutral and contains no build-time Cecil dependency.
 core_text = "\n".join(
@@ -279,24 +281,24 @@ for forbidden in ("UIKit", "Foundation", "Security.", "ObjCRuntime", "Mono.Cecil
 build_script = Path("scripts/build-step05.sh").read_text()
 for required in (
     'export NUGET_PACKAGES="$ROOT/.nuget/packages"',
-    'rm -rf "$NUGET_PACKAGES/steamkit2/3.3.1"',
+    'rm -rf "$NUGET_PACKAGES/steamkit2/3.4.0"',
     'dotnet restore "$PROJECT"',
     'dotnet run --project "$PATCHER"',
     '--no-restore',
-    'STEP05.11 STEAMKIT IOS PATCH: PASS',
-    'StS2-Launcher-Step-05.11.ipa',
+    'STEP05.12 STEAMKIT IOS PATCH: PASS',
+    'StS2-Launcher-Step-05.12.ipa',
 ):
     if required not in build_script:
-        raise SystemExit(f"ERROR: Step 05.11 build isolation guard missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.12 build isolation guard missing: {required}")
 
-print("Step 05.11 protobuf-no-emit/Core/UI boundary validation passed.")
+print("Step 05.12 SteamKit-3.4.0-comparison/Core/UI boundary validation passed.")
 PY
 
 # Still forbidden from the actual application source: Godot, runtime Cecil,
 # Harmony/native game host. The build-only Cecil tool lives only under tools/.
 if grep -RniE 'Godot|Mono\.Cecil|Harmony|NativeGodotHost' \
   src --include='*.cs' --include='*.csproj'; then
-  echo "ERROR: Step 05.11 app source contains a forbidden later-stage subsystem." >&2
+  echo "ERROR: Step 05.12 app source contains a forbidden later-stage subsystem." >&2
   exit 3
 fi
 
@@ -304,4 +306,4 @@ for script in scripts/*.sh; do
   bash -n "$script"
 done
 
-echo "Step 05.11 repository validation passed."
+echo "Step 05.12 repository validation passed."

@@ -1,26 +1,28 @@
-# Third-Party Components — Step 05.11
+# Third-Party Components — Step 05.12
 
 ## SteamKit2
 
 - Project: SteamRE/SteamKit
 - Component: SteamKit2
-- Version pinned in this step: 3.3.1
+- Version pinned in this step: 3.4.0
 - Source: https://github.com/SteamRE/SteamKit
 - Purpose: Steam network protocol client
 - License: see the upstream SteamKit repository/license for authoritative terms
 
-Step 05.11 applies one build-time iOS compatibility edit to the local restored
-SteamKit2 assembly: the `SteamClient` constructor's unsupported iOS
-`System.Diagnostics.Process.StartTime` read is replaced with `DateTime.UtcNow`.
-The application still uses SteamKit only for an unauthenticated
-connection/disconnection probe in this step.
+Step 05.12 is a controlled upgrade comparison from SteamKit2 3.3.1 to 3.4.0.
+The build-only iOS compatibility patcher now accepts the 3.4.0 assembly and
+handles the constructor timestamp boundary conservatively: if exactly one
+`System.Diagnostics.Process.StartTime` call remains in `SteamClient`, it is
+replaced with `DateTime.UtcNow`; if the call is already absent, the assembly is
+left untouched; more than one match is a hard failure. The application still
+uses SteamKit only for an unauthenticated connection/disconnection probe.
 
 ## Mono.Cecil — build tool only
 
 - Project: Mono.Cecil
 - Version pinned in the build-only patcher: 0.11.6
 - Source: https://github.com/jbevain/cecil
-- Purpose: deterministic pre-AOT edit of the local SteamKit2 build copy
+- Purpose: deterministic pre-AOT edit of the local SteamKit2 build copy when required
 - Packaging: not referenced by Core/iOS and must not be present in the IPA
 - License: see the upstream Mono.Cecil repository/license for authoritative terms
 

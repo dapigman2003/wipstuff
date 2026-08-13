@@ -2,6 +2,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 const string ExpectedAssemblyName = "SteamKit2";
+const string ExpectedVersionPrefix = "3.4.0";
 const string SteamClientTypeName = "SteamKit2.SteamClient";
 const string UnsupportedGetter = "System.DateTime System.Diagnostics.Process::get_StartTime()";
 
@@ -32,21 +33,17 @@ try
             ReadSymbols = false
         });
 
-    if (!string.Equals(
-            assembly.Name.Name,
-            ExpectedAssemblyName,
-            StringComparison.Ordinal))
+    if (!string.Equals(assembly.Name.Name, ExpectedAssemblyName, StringComparison.Ordinal))
     {
-        Console.Error.WriteLine(
-            $"ERROR: expected {ExpectedAssemblyName}, got {assembly.Name.Name}.");
+        Console.Error.WriteLine($"ERROR: expected {ExpectedAssemblyName}, got {assembly.Name.Name}.");
         return 4;
     }
 
     var version = assembly.Name.Version?.ToString() ?? "unknown";
-    if (!version.StartsWith("3.3.1", StringComparison.Ordinal))
+    if (!version.StartsWith(ExpectedVersionPrefix, StringComparison.Ordinal))
     {
         Console.Error.WriteLine(
-            $"ERROR: Step 05.11 patch is pinned to SteamKit2 3.3.1; got {version}.");
+            $"ERROR: Step 05.12 comparison patcher expects SteamKit2 {ExpectedVersionPrefix}; got {version}.");
         return 5;
     }
 
@@ -58,66 +55,66 @@ try
         return 6;
     }
 
-    var replacements = 0;
-    string? patchedMethod = null;
+    var matches = steamClient.Methods
+        .Where(m => m.HasBody)
+        .SelectMany(m => m.Body.Instructions.Select(i => (Method: m, Instruction: i)))
+        .Where(x => x.Instruction.Operand is MethodReference mr &&
+                    string.Equals(mr.FullName, UnsupportedGetter, StringComparison.Ordinal))
+        .ToArray();
 
-    foreach (var method in steamClient.Methods.Where(m => m.HasBody))
-    {
-        var il = method.Body.GetILProcessor();
-        var instructions = method.Body.Instructions.ToArray();
-
-        foreach (var instruction in instructions)
-        {
-            if (instruction.Operand is not MethodReference called ||
-                !string.Equals(called.FullName, UnsupportedGetter, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            // Original stack at this point contains the Process instance used by
-            // Process.StartTime. iOS explicitly does not support that property.
-            // Consume that Process value, then push DateTime.UtcNow instead.
-            // The surrounding SteamKit using/finally remains intact and still
-            // disposes the Process instance exactly as upstream intended.
-            instruction.OpCode = OpCodes.Pop;
-            instruction.Operand = null;
-
-            var utcNowGetter = new MethodReference(
-                "get_UtcNow",
-                called.ReturnType,
-                called.ReturnType)
-            {
-                HasThis = false
-            };
-
-            il.InsertAfter(
-                instruction,
-                Instruction.Create(OpCodes.Call, utcNowGetter));
-
-            replacements++;
-            patchedMethod = method.FullName;
-        }
-    }
-
-    if (replacements != 1)
+    if (matches.Length > 1)
     {
         Console.Error.WriteLine(
-            $"ERROR: expected exactly one Process.StartTime call in {SteamClientTypeName}; " +
-            $"found {replacements}. Refusing to write a broad or ambiguous patch.");
+            $"ERROR: expected zero or one Process.StartTime call in {SteamClientTypeName}; " +
+            $"found {matches.Length}. Refusing a broad or ambiguous patch.");
         return 7;
     }
 
-    // SteamKit2 3.3.1 is strong-name signed. We cannot legitimately re-sign a
-    // third-party assembly with its publisher's private key. The application is
-    // compiled against this patched build after the patch is applied, so remove
-    // the signing identity rather than emitting an invalid strong-name signature.
+    if (matches.Length == 0)
+    {
+        // SteamKit 3.4.0 may have removed or changed the constructor-time use.
+        // This is acceptable for the controlled upgrade experiment: verify the
+        // unsupported call is absent and leave the publisher-signed assembly intact.
+        Console.WriteLine("STEP05.12 STEAMKIT IOS PATCH: PASS");
+        Console.WriteLine($"Assembly: SteamKit2 {version}");
+        Console.WriteLine("Patched method: (none)");
+        Console.WriteLine("Replacement count: 0");
+        Console.WriteLine("Process.StartTime status: already absent");
+        Console.WriteLine("Replacement value: not required");
+        Console.WriteLine("Strong-name publisher signature removed from local build copy: NO");
+        return 0;
+    }
+
+    var match = matches[0];
+    var called = (MethodReference)match.Instruction.Operand!;
+    var il = match.Method.Body.GetILProcessor();
+
+    // Original stack at this point contains the Process instance used by
+    // Process.StartTime. iOS explicitly does not support that property.
+    // Consume that Process value, then push DateTime.UtcNow instead. The
+    // surrounding SteamKit using/finally remains intact.
+    match.Instruction.OpCode = OpCodes.Pop;
+    match.Instruction.Operand = null;
+
+    var utcNowGetter = new MethodReference(
+        "get_UtcNow",
+        called.ReturnType,
+        called.ReturnType)
+    {
+        HasThis = false
+    };
+
+    il.InsertAfter(match.Instruction, Instruction.Create(OpCodes.Call, utcNowGetter));
+
+    // The assembly is publisher strong-name signed. We cannot re-sign a third-party
+    // assembly with its publisher key. The app compiles against this patched local
+    // copy, so strip the invalidated signature rather than emitting a bad signature.
     assembly.Name.HasPublicKey = false;
     assembly.Name.PublicKey = Array.Empty<byte>();
     module.Attributes &= ~ModuleAttributes.StrongNameSigned;
 
     assembly.Write(tempPath, new WriterParameters { WriteSymbols = false });
 
-    // Verify the emitted assembly before replacing the local NuGet copy.
     using (var verify = AssemblyDefinition.ReadAssembly(tempPath))
     {
         var remaining = verify.MainModule.Types
@@ -138,10 +135,11 @@ try
 
     File.Move(tempPath, inputPath, overwrite: true);
 
-    Console.WriteLine("STEP05.11 STEAMKIT IOS PATCH: PASS");
+    Console.WriteLine("STEP05.12 STEAMKIT IOS PATCH: PASS");
     Console.WriteLine($"Assembly: SteamKit2 {version}");
-    Console.WriteLine($"Patched method: {patchedMethod}");
+    Console.WriteLine($"Patched method: {match.Method.FullName}");
     Console.WriteLine("Replacement count: 1");
+    Console.WriteLine("Process.StartTime status: patched");
     Console.WriteLine("Unsupported call removed: System.Diagnostics.Process.StartTime");
     Console.WriteLine("Replacement value: System.DateTime.UtcNow");
     Console.WriteLine("Strong-name publisher signature removed from local build copy: YES");

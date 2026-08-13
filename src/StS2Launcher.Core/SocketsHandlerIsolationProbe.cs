@@ -6,7 +6,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.11 retains the Step 05.8 below-SteamKit handler regression probe.
+/// Step 05.12 retains the Step 05.8 below-SteamKit handler regression probe.
 ///
 /// The physical iPhone already passed both checks in Step 05.8. Re-run them here
 /// to ensure the exact SocketsHttpHandler + custom-HttpMessageInvoker framework
@@ -69,7 +69,7 @@ public sealed class SocketsHandlerIsolationProbe
                 using var socket = new ClientWebSocket();
                 socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(20);
 
-                // This overload is the important Step 05.11 boundary: it forces
+                // This overload is the important Step 05.12 boundary: it forces
                 // ClientWebSocket to use the supplied CMWebSocket HttpMessageInvoker.
                 await socket.ConnectAsync(uri, client, cts.Token).ConfigureAwait(false);
 
@@ -85,7 +85,7 @@ public sealed class SocketsHandlerIsolationProbe
                         using var closeCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
                         await socket.CloseAsync(
                             WebSocketCloseStatus.NormalClosure,
-                            "Step 05.11 handler isolation complete",
+                            "Step 05.12 handler isolation complete",
                             closeCts.Token).ConfigureAwait(false);
                     }
                     catch
