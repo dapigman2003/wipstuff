@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 05 environment ==="
+  echo "=== StS2 Launcher Step 05.1 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step05-environment.log
+} | tee artifacts/logs/step05-1-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -67,28 +67,28 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step05-workload.log
+) | tee artifacts/logs/step05-1-workload.log
 
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/validate-step05.sh | tee artifacts/logs/step05-validation.log
-bash scripts/build-step05.sh 2>&1 | tee artifacts/logs/step05-publish.log
-bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.ipa \
-  2>&1 | tee artifacts/logs/step05-ipa-verification.log
+bash scripts/validate-step05.sh | tee artifacts/logs/step05-1-validation.log
+bash scripts/build-step05.sh 2>&1 | tee artifacts/logs/step05-1-wrapper.log
+bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.1.ipa \
+  2>&1 | tee artifacts/logs/step05-1-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 05"
+  echo "StS2 Launcher iOS — Step 05.1"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
   echo "Xcode: $(xcodebuild -version | tr '\n' ' ')"
   echo ".NET SDK: $(dotnet --version)"
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
-  echo "IPA: artifacts/StS2-Launcher-Step-05.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-05.1.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.1.ipa | awk '{print $1}')"
   fi
-} > artifacts/step05-build-summary.txt
+} > artifacts/step05-1-build-summary.txt
 
-cat artifacts/step05-build-summary.txt
+cat artifacts/step05-1-build-summary.txt

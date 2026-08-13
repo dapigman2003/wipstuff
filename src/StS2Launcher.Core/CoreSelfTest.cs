@@ -13,9 +13,6 @@ public static class CoreSelfTest
         var passed = 0;
         const int total = 12;
 
-        static bool Equal<T>(T expected, T actual) =>
-            EqualityComparer<T>.Default.Equals(expected, actual);
-
         var controller = new LauncherController();
 
         if (controller.State == LauncherState.SignedOut)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IPA="${1:-artifacts/StS2-Launcher-Step-05.ipa}"
+IPA="${1:-artifacts/StS2-Launcher-Step-05.1.ipa}"
 
 if [[ ! -f "$IPA" ]]; then
   echo "ERROR: IPA not found: $IPA" >&2
@@ -45,8 +45,8 @@ EXECUTABLE="$APP/$EXEC_NAME"
   exit 4
 }
 
-[[ "$VERSION" == "0.0.6" ]] || {
-  echo "ERROR: wrong Step 05 version: $VERSION" >&2
+[[ "$VERSION" == "0.0.7" ]] || {
+  echo "ERROR: wrong Step 05.1 version: $VERSION" >&2
   exit 4
 }
 
@@ -74,11 +74,11 @@ fi
 
 SIZE="$(du -h "$IPA" | awk '{print $1}')"
 
-echo "Step 05 IPA verification passed."
+echo "Step 05.1 IPA verification passed."
 echo "  Bundle ID: $BUNDLE_ID"
 echo "  Version: $VERSION"
 echo "  Minimum iOS: ${MIN_IOS:-unknown}"
 echo "  Architecture: arm64"
 echo "  Package signing: $SIGNING"
 echo "  IPA size: $SIZE"
-echo "  Expected device UI: white screen + STEP 05 — STEAM NETWORK PROBE"
+echo "  Expected device UI: white screen + STEP 05.1 — STEAM LINK FIX"

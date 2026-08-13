@@ -1,56 +1,81 @@
-# StS2 Launcher iOS — Step 05
+# StS2 Launcher iOS — Step 05.1
 
-Step 04 passed on physical iPhone, including Keychain persistence/delete and Core 12/12.
+Step 05 did **not** fail in C# compilation. It reached the final iOS native link and failed with:
 
-Step 05 introduces **SteamKit2 and outbound Steam networking only**.
+```text
+ld: framework 'DiskArbitration' not found
+```
 
-## Absolutely NOT in this build
+The Step-05 app introduced one generic third-party assembly: SteamKit2 3.3.1.
 
-- Steam username
-- Steam password
-- Steam Guard
-- QR login
-- refresh/access tokens
-- ownership verification
-- depot download
-- Steam Cloud
-- Godot
-- Mono.Cecil
-- game files
+.NET 9 iOS device builds use `TrimMode=partial` by default. Partial trimming does not trim every third-party assembly. Step 05.1 changes only the publish/link boundary by setting:
 
-## Why SteamKit2 3.3.1
+```xml
+<TrimMode>full</TrimMode>
+```
 
-The launcher remains on the already-proven .NET 9 toolchain.
+This lets the iOS trimmer remove unreachable desktop/macOS code before the Apple native linker scans the surviving P/Invoke/native dependencies.
 
-SteamKit2 `3.3.1` is intentionally pinned because the next SteamKit line (`3.4.0`) targets .NET 10. Runtime/toolchain migration is not being mixed into the first Steam network test.
+## What did NOT change
 
-## What the button does
+The Steam test is still exactly the same network-only test:
 
-`Run Steam Connection Probe`:
+1. construct `SteamClient`;
+2. construct `CallbackManager`;
+3. call `Connect()`;
+4. wait for `ConnectedCallback`;
+5. immediately call `Disconnect()`;
+6. wait for `DisconnectedCallback`.
 
-1. constructs `SteamClient`;
-2. constructs `CallbackManager`;
-3. subscribes to `ConnectedCallback`;
-4. calls `SteamClient.Connect()`;
-5. pumps SteamKit callbacks;
-6. on connection, immediately calls `Disconnect()`;
-7. waits for `DisconnectedCallback`;
-8. reports `STEAM CONNECTION PASS — 3/3`.
+There is still:
 
-No `SteamUser` login is performed.
+- no username;
+- no password;
+- no Steam Guard;
+- no Steam token;
+- no ownership check;
+- no depot download;
+- no Godot;
+- no Cecil.
+
+## Same-repository note
+
+This package deliberately keeps the same project path as Step 05:
+
+```text
+src/StS2Launcher.Step05.iOS/
+```
+
+So if you are replacing Step-05 files in the same Git repository, overwrite those files rather than creating another iOS project folder.
+
+The version shown on-device is:
+
+```text
+STEP 05.1 — STEAM LINK FIX
+Version 0.0.7
+```
 
 ## Build
 
 Codemagic workflow:
 
 ```text
-ios-step-05
+ios-step-05-1
 ```
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-05.ipa
+artifacts/StS2-Launcher-Step-05.1.ipa
 ```
 
-See `docs/STEP-05-TEST.md`.
+If native linking still fails, this version preserves extra diagnostics in:
+
+```text
+artifacts/logs/step05-1-native-preflight.log
+artifacts/logs/step05-1-publish.log
+artifacts/logs/step05-1-failure-scan.log
+artifacts/logs/step05-1-dotnet-ios.binlog
+```
+
+See `docs/STEP-05.1-TEST.md`.

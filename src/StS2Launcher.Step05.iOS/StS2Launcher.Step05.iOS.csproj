@@ -8,11 +8,21 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>6</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.6</ApplicationDisplayVersion>
+    <ApplicationVersion>7</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.7</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <!--
+      Step 05 failed at the native iOS link because the generic SteamKit2
+      assembly retained a macOS-only DiskArbitration P/Invoke/framework
+      reference. .NET 9 iOS device builds default to TrimMode=partial, which
+      does not trim every third-party assembly. Step 05.1 deliberately uses
+      full trimming so unreachable desktop/macOS branches can be removed
+      before the native-link framework scan.
+    -->
+    <TrimMode>full</TrimMode>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../StS2Launcher.Core/StS2Launcher.Core.csproj" />

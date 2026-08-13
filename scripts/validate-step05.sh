@@ -33,7 +33,14 @@ if any(True for _ in ios_root.iter("PackageReference")):
     raise SystemExit(
         "ERROR: SteamKit package belongs in Core, not directly in the iOS UI project.")
 if any(True for _ in ios_root.iter("NativeReference")):
-    raise SystemExit("ERROR: Step 05 must not contain NativeReference.")
+    raise SystemExit("ERROR: Step 05.1 must not contain NativeReference.")
+
+trim_mode = None
+for e in ios_root.iter("TrimMode"):
+    trim_mode = (e.text or "").strip()
+if trim_mode != "full":
+    raise SystemExit(
+        f"ERROR: Step 05.1 requires TrimMode=full; got {trim_mode!r}.")
 
 core_root = ET.parse(
     "src/StS2Launcher.Core/StS2Launcher.Core.csproj").getroot()
@@ -86,20 +93,20 @@ for forbidden in (
 ):
     if forbidden in probe:
         raise SystemExit(
-            f"ERROR: Step 05 connection probe contains authentication behavior: {forbidden}")
+            f"ERROR: Step 05.1 connection probe contains authentication behavior: {forbidden}")
 
 root_view = Path(
     "src/StS2Launcher.Step05.iOS/RootViewController.cs").read_text()
 
 for required in (
-    "STEP 05 — STEAM NETWORK PROBE",
+    "STEP 05.1 — STEAM LINK FIX",
     "NO LOGIN • NO PASSWORD • NO STEAM GUARD • NO TOKEN",
     "Run Steam Connection Probe",
     "STEAMKIT ASSEMBLY: PASS",
     "TimeSpan.FromSeconds(20)",
 ):
     if required not in root_view:
-        raise SystemExit(f"ERROR: Step 05 UI marker missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.1 UI marker missing: {required}")
 
 # Core may now depend on SteamKit2 but remains free of iOS platform APIs.
 core_text = "\n".join(
@@ -111,13 +118,13 @@ for forbidden in ("UIKit", "Foundation", "Security.", "ObjCRuntime"):
         raise SystemExit(
             f"ERROR: Core contains iOS platform dependency: {forbidden}")
 
-print("Step 05 SteamKit/Core/UI boundary validation passed.")
+print("Step 05.1 SteamKit/full-trim/Core/UI boundary validation passed.")
 PY
 
 # Still forbidden: Godot, Cecil, Harmony/native runtime host.
 if grep -RniE 'Godot|Mono\.Cecil|Harmony|NativeGodotHost' \
   src --include='*.cs' --include='*.csproj'; then
-  echo "ERROR: Step 05 contains a forbidden later-stage subsystem." >&2
+  echo "ERROR: Step 05.1 contains a forbidden later-stage subsystem." >&2
   exit 3
 fi
 
@@ -125,4 +132,4 @@ for script in scripts/*.sh; do
   bash -n "$script"
 done
 
-echo "Step 05 repository validation passed."
+echo "Step 05.1 repository validation passed."
