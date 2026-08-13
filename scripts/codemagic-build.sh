@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 05.6 environment ==="
+  echo "=== StS2 Launcher Step 05.7 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step05-5-environment.log
+} | tee artifacts/logs/step05-7-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -65,18 +65,18 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step05-5-workload.log
+) | tee artifacts/logs/step05-7-workload.log
 
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/validate-step05.sh | tee artifacts/logs/step05-5-validation.log
-bash scripts/build-step05.sh 2>&1 | tee artifacts/logs/step05-5-wrapper.log
-bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.5.ipa \
-  2>&1 | tee artifacts/logs/step05-5-ipa-verification.log
+bash scripts/validate-step05.sh | tee artifacts/logs/step05-7-validation.log
+bash scripts/build-step05.sh 2>&1 | tee artifacts/logs/step05-7-wrapper.log
+bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.7.ipa \
+  2>&1 | tee artifacts/logs/step05-7-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 05.6"
+  echo "StS2 Launcher iOS — Step 05.7"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -84,11 +84,12 @@ bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.5.ipa \
   echo ".NET SDK: $(dotnet --version)"
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
   echo "SteamKit compatibility patch: Process.StartTime -> DateTime.UtcNow"
-  echo "Diagnostics: CM directory HTTPS + DNS + raw TCP/WebSocket, then SteamKit WebSocket/TCP"
-  echo "IPA: artifacts/StS2-Launcher-Step-05.5.ipa"
+  echo "SteamKit CM WebSocket HTTP handler: SocketsHttpHandler"
+  echo "Diagnostics: CM directory HTTPS + DNS + raw TCP/WebSocket, then SteamKit WebSocket with SocketsHttpHandler"
+  echo "IPA: artifacts/StS2-Launcher-Step-05.7.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.5.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.7.ipa | awk '{print $1}')"
   fi
-} > artifacts/step05-5-build-summary.txt
+} > artifacts/step05-7-build-summary.txt
 
-cat artifacts/step05-5-build-summary.txt
+cat artifacts/step05-7-build-summary.txt

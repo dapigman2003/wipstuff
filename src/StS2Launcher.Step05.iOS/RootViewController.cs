@@ -65,12 +65,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.6 — STEAMKIT INTERNAL BOUNDARY",
+            "STEP 05.7 — IOS WEBSOCKET HANDLER FIX",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.12",
+            "Version 0.0.13",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -99,12 +99,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "This test re-confirms the native CM network boundary, then captures SteamKit internal connection state and hidden runtime exceptions. It never authenticates.",
+            "Step 05.7 proved iOS networking works and exposed NSUrlSessionHandler as the SteamKit WebSocket failure. This test gives only SteamKit CM WebSockets a SocketsHttpHandler and verifies Connect/Disconnect. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run SteamKit Internal Diagnostics", 17);
+        _steamButton = SystemButton("Run SteamKit iOS WebSocket Fix Test", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -163,7 +163,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.6 checks.",
+            "Status: starting Step 05.7 checks.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -179,7 +179,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.6: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.7: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -233,7 +233,7 @@ public sealed class RootViewController : UIViewController
         _steamResultLabel.Text = "CM NETWORK: TESTING…";
         _steamResultLabel.TextColor = UIColor.Label;
         _steamDetailLabel.Text =
-            "1/3 Re-confirming native iOS/.NET CM network boundary…";
+            "1/2 Re-confirming native iOS/.NET CM network boundary…";
         _statusLabel.Text =
             "NETWORK TEST RUNNING — leave the app in foreground.";
 
@@ -247,45 +247,26 @@ public sealed class RootViewController : UIViewController
             {
                 _steamDetailLabel.Text =
                     FormatNetworkResult(network) +
-                    "\n\n2/3 SteamKit WebSocket internal-state probe running…";
+                    "\n\n2/2 SteamKit WebSocket + SocketsHttpHandler probe running…";
             });
 
-            var webSocket = await _steamProbe.RunAsync(
-                "WebSocket",
-                ProtocolTypes.WebSocket,
-                TimeSpan.FromSeconds(20));
-
-            InvokeOnMainThread(() =>
-            {
-                _steamDetailLabel.Text =
-                    FormatNetworkResult(network) +
-                    "\n\n" +
-                    FormatTransportResult(webSocket) +
-                    "\n\n3/3 SteamKit TCP internal-state probe running…";
-            });
-
-            await Task.Delay(500);
-
-            var tcp = await _steamProbe.RunAsync(
-                "TCP",
-                ProtocolTypes.Tcp,
-                TimeSpan.FromSeconds(20));
+            var webSocket = await _steamProbe.RunAsync(TimeSpan.FromSeconds(25));
 
             InvokeOnMainThread(() =>
             {
                 var nativeNetworkReady =
                     network.DirectoryHttpsPassed &&
                     network.DnsPassed &&
-                    (network.TcpPassed || network.WebSocketPassed);
-                var steamKitPassed = webSocket.Passed || tcp.Passed;
+                    network.TcpPassed &&
+                    network.WebSocketPassed;
 
-                _steamResultLabel.Text = steamKitPassed
-                    ? "STEAM CONNECTION PASS"
+                _steamResultLabel.Text = webSocket.Passed
+                    ? "STEAM CONNECTION PASS — 3/3"
                     : nativeNetworkReady
-                        ? "NATIVE NETWORK PASS • STEAMKIT FAIL"
+                        ? "NATIVE NETWORK 4/4 • STEAMKIT FAIL"
                         : "CM NETWORK BOUNDARY FAIL";
 
-                _steamResultLabel.TextColor = steamKitPassed
+                _steamResultLabel.TextColor = webSocket.Passed
                     ? UIColor.Label
                     : UIColor.SystemRed;
 
@@ -293,15 +274,13 @@ public sealed class RootViewController : UIViewController
                     FormatNetworkResult(network) +
                     "\n\n" +
                     FormatTransportResult(webSocket) +
-                    "\n\n" +
-                    FormatTransportResult(tcp) +
                     $"\n\nSteamKit assembly: {SteamConnectionProbe.AssemblyVersion}";
 
-                _statusLabel.Text = steamKitPassed
-                    ? "PASS: at least one SteamKit CM transport completed 3/3."
+                _statusLabel.Text = webSocket.Passed
+                    ? "PASS: SteamKit CM WebSocket connected and disconnected using the iOS-safe HTTP handler."
                     : nativeNetworkReady
-                        ? "RESULT: iOS can reach a Steam CM; failure is inside SteamKit's connection layer."
-                        : "RESULT: failure is below SteamKit; use the CM network details above.";
+                        ? "RESULT: native CM networking still passes; inspect the SteamKit exception/factory details above."
+                        : "RESULT: native CM network regression; inspect the 4/4 probe above.";
 
                 _steamButton.Enabled = true;
             });
@@ -310,12 +289,12 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "CM DIAGNOSTICS: EXCEPTION";
+                _steamResultLabel.Text = "STEP 05.7 DIAGNOSTICS: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.6 diagnostics.";
+                    "FAIL: unhandled exception in Step 05.7 diagnostics.";
                 _steamButton.Enabled = true;
             });
         }

@@ -1,6 +1,6 @@
-# StS2 Launcher iOS — Step 05.6
+# StS2 Launcher iOS — Step 05.7
 
-Step 05.6 isolates the remaining Steam CM connection failure below SteamKit's connection layer.
+Step 05.7 targets the exact SteamKit WebSocket failure exposed by Step 05.6.
 
 Proven before this step:
 
@@ -10,30 +10,38 @@ Proven before this step:
 - SteamKit2 3.3.1 loads on iOS;
 - the generated macOS-only DiskArbitration framework reference is filtered before native link;
 - the iOS-incompatible SteamClient Process.StartTime constructor assumption is patched in the isolated build copy;
-- WebSocket-only SteamKit constructs and posts an early non-user DisconnectedCallback without ConnectedCallback;
-- TCP-only SteamKit constructs but posts neither callback before the Step 05.4 timeout.
+- Valve CM directory HTTPS, DNS, raw TCP, and raw ClientWebSocket all pass on the physical iPhone (4/4);
+- SteamKit WebSocket fails before ConnectedCallback with an inner NotSupportedException from NSUrlSessionHandler (`net_http_missing_sync_implementation`);
+- SteamKit TCP reaches a CM endpoint but can be reset by the peer, so WebSocket remains the preferred mobile path to solve first.
 
-Step 05.6 keeps all of those proven boundaries and adds a network test below SteamKit:
+Step 05.7 makes one runtime compatibility change:
 
-1. HTTPS GET to Valve's `ISteamDirectory/GetCMListForConnect` endpoint;
-2. JSON endpoint discovery;
-3. DNS resolution of a returned CM host;
-4. raw `TcpClient` connection to a returned CM socket endpoint;
-5. raw `ClientWebSocket` HTTP upgrade to `/cmsocket/` on a returned websocket endpoint;
-6. rerun SteamKit WebSocket-only;
-7. rerun SteamKit TCP-only.
+- SteamKit `HttpClientPurpose.CMWebSocket` gets a dedicated `SocketsHttpHandler`;
+- SteamKit `WebAPI` and `CDN` purposes keep the platform-default `HttpClient`;
+- the normal SteamKit user-agent is preserved;
+- the existing CM network 4/4 probe is rerun first;
+- SteamKit WebSocket is then tested for constructor + ConnectedCallback + DisconnectedCallback (3/3).
 
-The raw TCP/WebSocket checks do not send Steam protocol messages. The WebSocket is closed immediately after a successful HTTP upgrade. No authentication, Steam Guard, ownership, depot, RuntimePatch, Godot, or game code is added.
+No authentication, Steam Guard, ownership, depot, RuntimePatch, Godot, or game code is added.
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-05.5.ipa
+artifacts/StS2-Launcher-Step-05.7.ipa
 ```
 
 Expected device header:
 
 ```text
-STEP 05.6 — STEAMKIT INTERNAL BOUNDARY
-Version 0.0.12
+STEP 05.7 — IOS WEBSOCKET HANDLER FIX
+Version 0.0.13
+```
+
+Success condition:
+
+```text
+CM NETWORK PASS — 4/4
+STEAM CONNECTION PASS — 3/3
+HTTP factory calls includes CMWebSocket
+CM WebSocket handler: SocketsHttpHandler
 ```
