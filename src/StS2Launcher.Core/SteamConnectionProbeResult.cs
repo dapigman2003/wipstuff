@@ -10,6 +10,8 @@ public sealed record SteamConnectionProbeResult(
     bool? DisconnectedUserInitiated,
     bool IsConnectedEver,
     string? LastCurrentEndPoint,
+    bool OutgoingClientHelloObserved,
+    string DebugNetworkTrace,
     string FirstChanceExceptions,
     string SteamKitAssemblyVersion,
     TimeSpan Elapsed,

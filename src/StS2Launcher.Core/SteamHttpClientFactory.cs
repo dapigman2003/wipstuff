@@ -5,7 +5,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.9 retained HTTP client factory for SteamKit on iOS.
+/// Step 05.10 retained HTTP client factory for SteamKit on iOS.
 ///
 /// Step 05.7 proved that the platform-default NSUrlSessionHandler cannot service
 /// SteamKit's CM WebSocket custom-invoker path on iOS. Step 05.8 then proved that

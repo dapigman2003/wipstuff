@@ -67,12 +67,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.9 — EXACT STEAMKIT ENDPOINT REPLAY",
+            "STEP 05.10 — CLIENTHELLO AOT DIAGNOSTICS",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.15",
+            "Version 0.0.16",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -101,12 +101,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "Step 05.8 proved SocketsHttpHandler HTTPS and the custom-invoker ClientWebSocket handshake both work on iPhone. SteamKit still selected a different CM and disconnected before ConnectedCallback. Step 05.9 replays SteamKit's exact selected endpoint through the proven custom-invoker path. It never authenticates.",
+            "Step 05.9 proved SteamKit's exact selected CM endpoint completes the same custom-invoker WebSocket upgrade outside SteamKit. Step 05.10 keeps that replay as a regression check and instruments SteamKit's next post-upgrade boundary: outgoing ClientHello serialization plus the exact Reflection.Emit caller context. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run Step 05.9 Exact Endpoint Replay Test", 17);
+        _steamButton = SystemButton("Run Step 05.10 ClientHello Diagnostics", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -165,7 +165,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.9 checks.",
+            "Status: starting Step 05.10 ClientHello diagnostics.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -181,7 +181,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.9: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.10: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -262,7 +262,7 @@ public sealed class RootViewController : UIViewController
                     FormatNetworkResult(network) +
                     "\n\n" +
                     FormatHandlerIsolationResult(handlerIsolation) +
-                    "\n\n3/4 SteamKit WebSocket probe running…";
+                    "\n\n3/4 SteamKit WebSocket + ClientHello diagnostic running…";
             });
 
             var webSocket = await _steamProbe.RunAsync(TimeSpan.FromSeconds(25));
@@ -275,7 +275,7 @@ public sealed class RootViewController : UIViewController
                     FormatHandlerIsolationResult(handlerIsolation) +
                     "\n\n" +
                     FormatTransportResult(webSocket) +
-                    "\n\n4/4 Replaying SteamKit-selected CM through exact custom-invoker path…";
+                    "\n\n4/4 Replaying SteamKit-selected CM as endpoint regression check…";
             });
 
             var endpointReplay = await _endpointReplayProbe.RunAsync(
@@ -299,7 +299,9 @@ public sealed class RootViewController : UIViewController
                         : !handlerReady
                             ? "SOCKETS HANDLER REGRESSION"
                             : endpointReplay.Passed
-                                ? "EXACT ENDPOINT PASS • STEAMKIT FAIL"
+                                ? webSocket.OutgoingClientHelloObserved
+                                ? "CLIENTHELLO OUT • CALLBACK FAIL"
+                                : "CLIENTHELLO NOT OBSERVED • STEAMKIT FAIL"
                                 : "STEAMKIT ENDPOINT REPLAY FAIL";
 
                 _steamResultLabel.TextColor = webSocket.Passed
@@ -323,7 +325,9 @@ public sealed class RootViewController : UIViewController
                         : !handlerReady
                             ? "RESULT: the previously proven custom-invoker handler path regressed in this run."
                             : endpointReplay.Passed
-                                ? "RESULT: SteamKit's exact chosen CM also upgrades through the same framework path; next boundary is inside SteamKit's connection lifecycle, not endpoint reachability."
+                                ? webSocket.OutgoingClientHelloObserved
+                                    ? "RESULT: exact endpoint replay passes and outgoing ClientHello serialized; inspect the caller stack for the failure after ClientHello."
+                                    : "RESULT: exact endpoint replay passes but outgoing ClientHello was not observed; inspect Reflection.Emit caller context for the ClientHello construction/serialization boundary."
                                 : "RESULT: SteamKit's chosen CM does not reproduce the successful HTTP upgrade; investigate CM selection/candidate quality before patching SteamKit internals.";
 
                 _steamButton.Enabled = true;
@@ -333,12 +337,12 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEP 05.9 DIAGNOSTICS: EXCEPTION";
+                _steamResultLabel.Text = "STEP 05.10 CLIENTHELLO DIAGNOSTICS: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.9 diagnostics.";
+                    "FAIL: unhandled exception in Step 05.10 diagnostics.";
                 _steamButton.Enabled = true;
             });
         }
@@ -392,6 +396,8 @@ public sealed class RootViewController : UIViewController
             $"{(result.DisconnectedUserInitiated.HasValue ? result.DisconnectedUserInitiated.Value.ToString() : "N/A")}\n" +
             $"IsConnected ever: {result.IsConnectedEver}\n" +
             $"CurrentEndPoint: {result.LastCurrentEndPoint ?? "never-set"}\n" +
+            $"Outgoing ClientHello: {(result.OutgoingClientHelloObserved ? "YES" : "NO")}\n" +
+            $"Debug network trace: {result.DebugNetworkTrace}\n" +
             $"Elapsed: {result.Elapsed.TotalSeconds:F1}s\n" +
             result.Detail;
     }

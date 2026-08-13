@@ -46,7 +46,7 @@ try
     if (!version.StartsWith("3.3.1", StringComparison.Ordinal))
     {
         Console.Error.WriteLine(
-            $"ERROR: Step 05.9 patch is pinned to SteamKit2 3.3.1; got {version}.");
+            $"ERROR: Step 05.10 patch is pinned to SteamKit2 3.3.1; got {version}.");
         return 5;
     }
 
@@ -138,7 +138,7 @@ try
 
     File.Move(tempPath, inputPath, overwrite: true);
 
-    Console.WriteLine("STEP05.9 STEAMKIT IOS PATCH: PASS");
+    Console.WriteLine("STEP05.10 STEAMKIT IOS PATCH: PASS");
     Console.WriteLine($"Assembly: SteamKit2 {version}");
     Console.WriteLine($"Patched method: {patchedMethod}");
     Console.WriteLine("Replacement count: 1");
