@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-ios</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+
+    <SupportedOSPlatformVersion>18.0</SupportedOSPlatformVersion>
+
+    <ApplicationId>com.community.sts2launcher</ApplicationId>
+    <ApplicationTitle>StS2 Launcher</ApplicationTitle>
+    <ApplicationVersion>20</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.20</ApplicationDisplayVersion>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!--
+      Step 05.1 proved that TrimMode=full alone does not prevent the .NET iOS
+      native-link pipeline from inferring DiskArbitration from SteamKit2's
+      macOS-only machine-information P/Invokes.
+
+      Keep full trimming because it successfully removes other unreachable
+      desktop dependencies. Step 05.14 retains Step 05.2's proven generated
+      DiskArbitration framework filter. The separate build-only compatibility
+      patch for SteamClient's unsupported Process.StartTime call is applied to
+      the isolated local SteamKit package before this project is compiled.
+    -->
+    <TrimMode>full</TrimMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../StS2Launcher.Core/StS2Launcher.Core.csproj" />
+  </ItemGroup>
+
+  <!--
+    _LinkerFrameworks is emitted by the .NET iOS linker. This target is
+    intentionally narrow: it removes only DiskArbitration and leaves all
+    other inferred Apple frameworks untouched.
+  -->
+  <Target Name="Step052RemoveMacOnlyDiskArbitrationFramework"
+          AfterTargets="_LoadLinkerOutput"
+          BeforeTargets="_ComputeLinkNativeExecutableInputs">
+    <Message Importance="High"
+             Text="STEP05.2 LINKER FRAMEWORKS BEFORE: @(_LinkerFrameworks, ',')" />
+
+    <ItemGroup>
+      <_LinkerFrameworks Remove="DiskArbitration" />
+    </ItemGroup>
+
+    <Message Importance="High"
+             Text="STEP05.2 LINKER FRAMEWORKS AFTER: @(_LinkerFrameworks, ',')" />
+
+  </Target>
+</Project>

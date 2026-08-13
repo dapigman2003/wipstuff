@@ -1,4 +1,4 @@
-# Third-Party Components — Step 05.13
+# Third-Party Components — Step 05.14
 
 ## SteamKit2
 
@@ -9,7 +9,7 @@
 - Purpose: Steam network protocol client
 - License: see the upstream SteamKit repository/license for authoritative terms
 
-Step 05.13 retains SteamKit2 3.4.0 after the Step 05.12 physical-device
+Step 05.14 retains SteamKit2 3.4.0 after the Step 05.12 physical-device
 comparison showed that the upgrade alone did not remove the iOS AOT failure.
 This step adds only lifecycle-stage diagnostics around the existing unauthenticated
 SteamKit connection probe. The build-only iOS compatibility patcher accepts the

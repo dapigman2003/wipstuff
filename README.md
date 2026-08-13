@@ -1,81 +1,66 @@
-# StS2 Launcher iOS — Step 05.13
+# StS2 Launcher iOS — Step 05.14
 
-Step 05.13 localizes the remaining iOS `PlatformNotSupported_ReflectionEmit` failure to a specific SteamKit lifecycle stage. It keeps SteamKit2 **3.4.0** from Step 05.12 and does not add another networking, protobuf, authentication, or IL workaround.
+Step 05.14 captures SteamKit2's own internal debug log around the already-isolated CM WebSocket failure. It keeps SteamKit2 **3.4.0**, the Step 05.7 `SocketsHttpHandler` CM WebSocket factory, the exact-endpoint replay, and every previously proven iOS build/network fix. It adds no authentication.
 
-## Evidence entering Step 05.13
+## Evidence entering Step 05.14
 
-Physical-iPhone Step 05.12 established:
+Physical-iPhone Step 05.13 established:
 
-- SteamKit2 3.4.0 still fails before the public `ConnectedCallback`;
-- `Outgoing ClientHello: NO` and no Steam messages reach `IDebugNetworkListener`;
-- `PlatformNotSupported_ReflectionEmit` still appears;
-- the exact SteamKit-selected CM endpoint still completes the WebSocket HTTP upgrade outside SteamKit through the proven `SocketsHttpHandler` / custom-invoker path;
-- changing SteamKit2 3.3.1 -> 3.4.0 therefore did not remove the AOT boundary.
+- the recurring `PlatformNotSupported_ReflectionEmit` first-chance exception fired during this project's own `ProtobufAotCompatibility.Configure()` diagnostic at about 4 ms;
+- `SteamConfiguration.Create` did not begin until about 6 ms and `SteamClient.Connect` until about 16 ms;
+- therefore that Reflection.Emit observation is not reliable evidence of the later SteamKit connection failure;
+- the SteamKit connection still failed before public `ConnectedCallback` and before an outgoing `ClientHello` reached `IDebugNetworkListener`;
+- the exact SteamKit-selected CM endpoint still completed a WebSocket HTTP upgrade outside SteamKit.
 
-Step 05.11 had already shown `RuntimeTypeModel.Default.AutoCompile` was `False -> False`, so the retained protobuf setting is not treated as a fix.
+Step 05.14 therefore removes the no-op protobuf compatibility diagnostic instead of continuing to chase its first-chance exception.
 
-## Single Step 05.13 diagnostic change
+## Single Step 05.14 diagnostic change
 
-The Steam connection probe now timestamps the active stage before each synchronous boundary:
+The Steam connection probe enables SteamKit's public `DebugLog` only for the duration of the unauthenticated connection test and captures its category/message output with elapsed timestamps.
 
-1. protobuf-net AOT configuration
-2. `SteamConfiguration.Create`
-3. `SteamClient` constructor
-4. attach `IDebugNetworkListener`
-5. `CallbackManager` constructor
-6. subscribe `ConnectedCallback`
-7. subscribe `DisconnectedCallback`
-8. `SteamClient.Connect` call
-9. post-Connect callback/state pump
-10. disconnect/result formatting
+This matters because SteamKit's CM connection code catches exceptions raised immediately after the transport connects, logs the exception to `DebugLog`, and then disconnects. Capturing that log should reveal the exception that was previously hidden behind the generic non-user disconnect.
 
-When a first-chance Reflection.Emit exception appears, the app records:
-
-- elapsed milliseconds;
-- the active stage name;
-- managed thread ID;
-- `IsConnected` at throw;
-- `CurrentEndPoint` at throw;
-- `RuntimeFeature.IsDynamicCodeSupported`;
-- `RuntimeFeature.IsDynamicCodeCompiled`;
-- the existing best-effort caller stack.
-
-The completed SteamKit result also displays the full stage timeline and a compact `ReflectionEmit observed stage(s)` section before the longer exception dump.
+The probe also retains the metadata-only `IDebugNetworkListener` and first-chance exception capture as secondary diagnostics. It never records raw Steam network payloads.
 
 ## Preserved regression boundaries
 
-Step 05.13 retains:
+Step 05.14 retains:
 
 - SteamKit2 3.4.0;
 - WebSocket-only SteamKit connection;
-- no authentication;
+- no authentication, password, Steam Guard, or token behavior;
 - `HttpClientPurpose.CMWebSocket` -> `SocketsHttpHandler`;
-- native CM HTTPS/DNS/TCP/WebSocket checks;
+- native CM directory HTTPS / DNS / raw TCP / raw WebSocket checks;
 - exact `SocketsHttpHandler` + custom-invoker WebSocket isolation;
 - exact SteamKit-selected endpoint replay;
 - metadata-only `IDebugNetworkListener` / ClientHello observation;
-- the Step 05.2 generated `DiskArbitration` linker-framework removal;
-- the isolated version-aware SteamKit `Process.StartTime` compatibility patch;
-- the retained protobuf `AutoCompile=false` regression setting.
+- Step 05.2 generated `DiskArbitration` linker-framework removal;
+- isolated version-aware SteamKit `Process.StartTime` compatibility patch.
 
-## Interpretation
+## Success / next boundary
 
-- Reflection.Emit at `SteamConfiguration.Create` or `SteamClient constructor` means the AOT issue is initialization-time and is earlier than CM transport/message serialization.
-- Reflection.Emit at a `CallbackManager`/subscription stage means callback setup itself needs an iOS-safe path.
-- Reflection.Emit during `SteamClient.Connect call` means it is synchronous inside the connect entry path.
-- Reflection.Emit during `post-Connect callback/state pump`, especially with `IsConnected=True`, puts it inside asynchronous connection/post-connect processing.
-- `Outgoing ClientHello: YES` means initial Steam message serialization completed and the boundary moved later.
-- `STEAM CONNECTION PASS — 3/3` completes Step 05 and allows Step 06 authentication-only work.
+If `STEAM CONNECTION PASS — 3/3` appears, Step 05 is complete and the next major step is authentication only.
+
+If SteamKit still fails, the most important new section is:
+
+```text
+SteamKit post-connect exception logged: YES/NO
+Connection-setup exception logged: YES/NO
+SteamKit DebugLog:
+...
+```
+
+That log should determine the next narrow compatibility change.
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-05.13.ipa
+artifacts/StS2-Launcher-Step-05.14.ipa
 ```
 
 Expected device header:
 
 ```text
-STEP 05.13 — REFLECTION.EMIT STAGE LOCALIZATION
-Version 0.0.19
+STEP 05.14 — STEAMKIT INTERNAL ERROR CAPTURE
+Version 0.0.20
 ```
