@@ -1,63 +1,71 @@
-# StS2 Launcher iOS — Step 01.1
+# StS2 Launcher iOS — Step 02
 
-This is the corrected **ground-zero UIKit bootstrap test**.
+Step 01.1 passed on a physical iPhone.
 
-## Why Step 01.1 exists
+Step 02 tests the **launcher UI/state shell** while deliberately keeping every real subsystem out.
 
-Step 01 installed successfully but immediately terminated on launch.
+## Still NOT included
 
-Reviewing the bootstrap found a concrete lifecycle bug: the scene configuration requested a
-`UIWindowScene`, but `SceneDelegate` inherited from `UISceneDelegate`.
+- SteamKit2 / networking
+- Steam credentials or Keychain
+- ownership verification
+- depot downloads
+- Godot
+- Mono.Cecil
+- native libraries
+- game files
+- runtime patching
 
-For a window scene, the delegate must conform to `UIWindowSceneDelegate`. In .NET iOS the
-correct base class is `UIWindowSceneDelegate`, which also exposes the Objective-C exported
-`Window` property UIKit expects.
+## What Step 02 adds
 
-Step 01.1 changes only that startup boundary (plus version/test identifiers).
+One native UIKit launcher screen with seven deterministic mock states:
 
-## Scope
+1. Signed out
+2. Signing in…
+3. Checking ownership…
+4. Ready to install
+5. Downloading… (42%)
+6. Ready to play
+7. Example error
 
-Contains only:
+Use `Next Demo State` to cycle through them.
 
-- .NET 9 iOS
-- UIKit/Foundation
-- AppDelegate
-- correctly typed UIWindowSceneDelegate
-- one UIKit view controller
-- one test-log button
-- unsigned IPA packaging
+## Build
 
-Still contains no Godot, SteamKit2, Mono.Cecil, Keychain integration, native game/runtime
-libraries, game files, or runtime patching.
+Codemagic workflow:
 
-## Expected physical-device result
+```text
+ios-step-02
+```
 
-Install:
+Expected artifact:
 
-`StS2-Launcher-Step-01.1.ipa`
+```text
+artifacts/StS2-Launcher-Step-02.ipa
+```
 
-Then launch it.
+## Expected device result
 
-Expected visible screen:
+First launch must show:
 
 ```text
 StS2 Launcher
-
-STEP 01.1 — UI BOOTSTRAP PASS
-
-Version 0.0.2
-
-Status: UI rendered successfully.
-
-Lifecycle: Active
-
-[ Write Test Log ]
+STEP 02 — LAUNCHER UI SHELL
+Version 0.0.3
+DEMO STATE 1 OF 7
+Signed out
 ```
 
-The screen should be white.
+Tap `Next Demo State` six times.
 
-Tap `Write Test Log`; the status should change to `PASS: test log written at ...`.
+Each state must render, and state 5 must show a visible progress bar at 42%.
 
-Then test background/foreground and terminate/reopen.
+State 7 must show the deliberate text:
 
-See `docs/STEP-01.1-TEST.md`.
+```text
+TEST ERROR: This is a deliberate visible error state.
+```
+
+One more tap must wrap back to state 1.
+
+See `docs/STEP-02-TEST.md`.
