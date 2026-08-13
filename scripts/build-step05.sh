@@ -15,7 +15,7 @@ rm -rf artifacts/publish artifacts/Payload
 mkdir -p artifacts/publish artifacts/logs
 
 APP="$ROOT/artifacts/publish/StS2Launcher.Step05.iOS.app"
-IPA="$ROOT/artifacts/StS2-Launcher-Step-05.12.ipa"
+IPA="$ROOT/artifacts/StS2-Launcher-Step-05.13.ipa"
 PROJECT="src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj"
 PATCHER="tools/StS2Launcher.SteamKitIosPatcher/StS2Launcher.SteamKitIosPatcher.csproj"
 PUBLISH_LOG="artifacts/logs/step05-12-publish.log"
@@ -24,7 +24,7 @@ FRAMEWORK_LOG="artifacts/logs/step05-12-framework-filter.log"
 GENERATED_FRAMEWORKS_LOG="artifacts/logs/step05-12-generated-linker-frameworks.txt"
 SYMBOL_LOG="artifacts/logs/step05-12-native-symbols.log"
 
-# Never mutate the global/cached NuGet package installation. Step 05.12 modifies
+# Never mutate the global/cached NuGet package installation. Step 05.13 modifies
 # one third-party assembly for this iOS build, so restore into a disposable
 # repository-local package root and compile against that exact patched copy.
 export NUGET_PACKAGES="$ROOT/.nuget/packages"
@@ -37,7 +37,7 @@ capture_linker_diagnostics() {
   : > "$SYMBOL_LOG"
 
   {
-    echo "=== Step 05.12 retained in-memory framework filter ==="
+    echo "=== Step 05.13 retained in-memory framework filter ==="
     grep 'STEP05.2 LINKER FRAMEWORKS' "$PUBLISH_LOG" || true
   } | tee "$FRAMEWORK_LOG" >/dev/null
 
@@ -79,7 +79,7 @@ capture_linker_diagnostics() {
   } > "$SYMBOL_LOG"
 }
 
-echo "=== Step 05.12 native-framework preflight ===" \
+echo "=== Step 05.13 native-framework preflight ===" \
   | tee artifacts/logs/step05-12-native-preflight.log
 
 SDK_ROOT="$(xcrun --sdk iphoneos --show-sdk-path)"
@@ -96,7 +96,7 @@ else
 fi
 
 cat <<'TXT' | tee -a artifacts/logs/step05-12-native-preflight.log
-Step 05.12 policy:
+Step 05.13 policy:
   - retain TrimMode=full;
   - retain the proven DiskArbitration generated-framework filter;
   - compare SteamKit2 3.4.0 on the same Step 05.11 diagnostic surface;
@@ -111,7 +111,7 @@ Step 05.12 policy:
 TXT
 
 echo
-echo "Restoring Step 05.12 into isolated NuGet package root..."
+echo "Restoring Step 05.13 into isolated NuGet package root..."
 dotnet restore "$PROJECT" \
   2>&1 | tee artifacts/logs/step05-12-restore.log
 
@@ -122,7 +122,7 @@ if [[ ! -f "$STEAMKIT_DLL" ]]; then
 fi
 
 {
-  echo "=== Step 05.12 SteamKit iOS compatibility patch ==="
+  echo "=== Step 05.13 SteamKit iOS compatibility patch ==="
   echo "Input: $STEAMKIT_DLL"
   if command -v shasum >/dev/null 2>&1; then
     echo "Before SHA-256: $(shasum -a 256 "$STEAMKIT_DLL" | awk '{print $1}')"
@@ -147,7 +147,7 @@ if command -v shasum >/dev/null 2>&1; then
 fi
 
 for required in \
-  'STEP05.12 STEAMKIT IOS PATCH: PASS' \
+  'STEP05.13 STEAMKIT IOS PATCH: PASS' \
   'Assembly: SteamKit2 3.4.0' \
   'Process.StartTime status:'; do
   if ! grep -Fq "$required" "$PATCH_LOG"; then
@@ -162,7 +162,7 @@ if ! grep -Eq '^Replacement count: [01]$' "$PATCH_LOG"; then
 fi
 
 echo
-echo "Publishing Step 05.12 against SteamKit2 3.4.0 comparison copy..."
+echo "Publishing Step 05.13 against SteamKit2 3.4.0 with Reflection.Emit stage localization..."
 
 set +e
 dotnet publish "$PROJECT" \
@@ -185,7 +185,7 @@ capture_linker_diagnostics
 if [[ "$PUBLISH_STATUS" != "0" ]]; then
   {
     echo
-    echo "=== Step 05.12 publish failed: focused scan ==="
+    echo "=== Step 05.13 publish failed: focused scan ==="
     echo "dotnet publish exit code: $PUBLISH_STATUS"
     echo
     echo "SteamKit patch telemetry:"
@@ -236,8 +236,8 @@ cp -R "$APP" artifacts/Payload/
 
 (
   cd artifacts
-  rm -f StS2-Launcher-Step-05.12.ipa
-  /usr/bin/zip -qry StS2-Launcher-Step-05.12.ipa Payload
+  rm -f StS2-Launcher-Step-05.13.ipa
+  /usr/bin/zip -qry StS2-Launcher-Step-05.13.ipa Payload
 )
 
 echo "Created $IPA"

@@ -1,4 +1,4 @@
-# Third-Party Components — Step 05.12
+# Third-Party Components — Step 05.13
 
 ## SteamKit2
 
@@ -9,8 +9,11 @@
 - Purpose: Steam network protocol client
 - License: see the upstream SteamKit repository/license for authoritative terms
 
-Step 05.12 is a controlled upgrade comparison from SteamKit2 3.3.1 to 3.4.0.
-The build-only iOS compatibility patcher now accepts the 3.4.0 assembly and
+Step 05.13 retains SteamKit2 3.4.0 after the Step 05.12 physical-device
+comparison showed that the upgrade alone did not remove the iOS AOT failure.
+This step adds only lifecycle-stage diagnostics around the existing unauthenticated
+SteamKit connection probe. The build-only iOS compatibility patcher accepts the
+3.4.0 assembly and
 handles the constructor timestamp boundary conservatively: if exactly one
 `System.Diagnostics.Process.StartTime` call remains in `SteamClient`, it is
 replaced with `DateTime.UtcNow`; if the call is already absent, the assembly is

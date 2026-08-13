@@ -43,7 +43,7 @@ try
     if (!version.StartsWith(ExpectedVersionPrefix, StringComparison.Ordinal))
     {
         Console.Error.WriteLine(
-            $"ERROR: Step 05.12 comparison patcher expects SteamKit2 {ExpectedVersionPrefix}; got {version}.");
+            $"ERROR: Step 05.13 comparison patcher expects SteamKit2 {ExpectedVersionPrefix}; got {version}.");
         return 5;
     }
 
@@ -75,7 +75,7 @@ try
         // SteamKit 3.4.0 may have removed or changed the constructor-time use.
         // This is acceptable for the controlled upgrade experiment: verify the
         // unsupported call is absent and leave the publisher-signed assembly intact.
-        Console.WriteLine("STEP05.12 STEAMKIT IOS PATCH: PASS");
+        Console.WriteLine("STEP05.13 STEAMKIT IOS PATCH: PASS");
         Console.WriteLine($"Assembly: SteamKit2 {version}");
         Console.WriteLine("Patched method: (none)");
         Console.WriteLine("Replacement count: 0");
@@ -135,7 +135,7 @@ try
 
     File.Move(tempPath, inputPath, overwrite: true);
 
-    Console.WriteLine("STEP05.12 STEAMKIT IOS PATCH: PASS");
+    Console.WriteLine("STEP05.13 STEAMKIT IOS PATCH: PASS");
     Console.WriteLine($"Assembly: SteamKit2 {version}");
     Console.WriteLine($"Patched method: {match.Method.FullName}");
     Console.WriteLine("Replacement count: 1");

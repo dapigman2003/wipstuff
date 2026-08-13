@@ -5,8 +5,8 @@ namespace StS2Launcher.Core;
 /// <summary>
 /// Retained Step 05.11 regression setting. The physical-iPhone Step 05.11 run
 /// showed RuntimeTypeModel.Default.AutoCompile was already false before this
-/// assignment, so Step 05.12 does not treat this as a fix. It remains only to
-/// keep the comparison surface identical while SteamKit2 changes to 3.4.0.
+/// assignment, so Step 05.13 does not treat this as a fix. It remains only to
+/// keep the proven Step 05.12 SteamKit2 3.4.0 surface unchanged while the Reflection.Emit stage is localized.
 /// </summary>
 public static class ProtobufAotCompatibility
 {

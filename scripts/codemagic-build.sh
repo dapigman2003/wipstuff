@@ -21,7 +21,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 05.12 environment ==="
+  echo "=== StS2 Launcher Step 05.13 environment ==="
   date -u
   uname -a
   xcodebuild -version
@@ -72,23 +72,23 @@ trap - EXIT
 
 bash scripts/validate-step05.sh | tee artifacts/logs/step05-12-validation.log
 bash scripts/build-step05.sh 2>&1 | tee artifacts/logs/step05-12-wrapper.log
-bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.12.ipa \
+bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.13.ipa \
   2>&1 | tee artifacts/logs/step05-12-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 05.12"
+  echo "StS2 Launcher iOS — Step 05.13"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
   echo "Xcode: $(xcodebuild -version | tr '\n' ' ')"
   echo ".NET SDK: $(dotnet --version)"
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
-  echo "SteamKit dependency comparison: 3.3.1 -> 3.4.0; Process.StartTime compatibility patch applies only if still required"
+  echo "SteamKit 3.4.0 retained; Reflection.Emit lifecycle-stage localization enabled; Process.StartTime compatibility patch applies only if still required"
   echo "SteamKit CM WebSocket HTTP handler: SocketsHttpHandler"
   echo "Diagnostics: native CM 4/4, SocketsHttpHandler/custom-invoker 2/2 regression, SteamKit WebSocket, then exact SteamKit-selected endpoint replay"
-  echo "IPA: artifacts/StS2-Launcher-Step-05.12.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-05.13.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.12.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.13.ipa | awk '{print $1}')"
   fi
 } > artifacts/step05-12-build-summary.txt
 

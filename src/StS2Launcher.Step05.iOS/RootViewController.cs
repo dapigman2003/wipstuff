@@ -67,12 +67,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.12 — STEAMKIT 3.4.0 COMPARISON",
+            "STEP 05.13 — REFLECTION.EMIT STAGE LOCALIZATION",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.18",
+            "Version 0.0.19",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -101,12 +101,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "Step 05.11 proved protobuf-net AutoCompile was already false (False -> False), so that experiment did not change the runtime and Reflection.Emit remained. Step 05.12 changes one controlled variable: SteamKit2 3.3.1 -> 3.4.0. All iOS networking, handler-isolation, exact-endpoint replay, ClientHello tracing, and known compatibility fixes remain regressions. It never authenticates.",
+            "Step 05.12 proved SteamKit2 3.4.0 still fails on iOS with no outgoing ClientHello, exact selected-CM replay passing, and PlatformNotSupported_ReflectionEmit still appearing. Step 05.13 keeps SteamKit2 3.4.0 and changes no connection behavior; it timestamps each setup/connect stage and records the active stage when Reflection.Emit fires. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run Step 05.12 SteamKit 3.4.0 Comparison", 17);
+        _steamButton = SystemButton("Run Step 05.13 Reflection.Emit Stage Test", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -165,7 +165,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.12 SteamKit 3.4.0 comparison.",
+            "Status: starting Step 05.13 Reflection.Emit stage localization.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -181,7 +181,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.12: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.13: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -262,7 +262,7 @@ public sealed class RootViewController : UIViewController
                     FormatNetworkResult(network) +
                     "\n\n" +
                     FormatHandlerIsolationResult(handlerIsolation) +
-                    "\n\n3/4 SteamKit 3.4.0 WebSocket comparison running…";
+                    "\n\n3/4 SteamKit 3.4.0 stage-localized WebSocket probe running…";
             });
 
             var webSocket = await _steamProbe.RunAsync(TimeSpan.FromSeconds(25));
@@ -327,7 +327,7 @@ public sealed class RootViewController : UIViewController
                             : endpointReplay.Passed
                                 ? webSocket.OutgoingClientHelloObserved
                                     ? "RESULT: exact endpoint replay passes and outgoing ClientHello serialized; inspect the caller stack for the failure after ClientHello."
-                                    : "RESULT: exact endpoint replay passes but outgoing ClientHello was not observed; inspect Reflection.Emit caller context for the ClientHello construction/serialization boundary."
+                                    : "RESULT: exact endpoint replay passes but outgoing ClientHello was not observed; inspect ReflectionEmit observed stage(s) and the stage timeline before choosing the next AOT compatibility change."
                                 : "RESULT: SteamKit's chosen CM does not reproduce the successful HTTP upgrade; investigate CM selection/candidate quality before patching SteamKit internals.";
 
                 _steamButton.Enabled = true;
@@ -337,12 +337,12 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEP 05.12 STEAMKIT 3.4.0 COMPARISON: EXCEPTION";
+                _steamResultLabel.Text = "STEP 05.13 REFLECTION.EMIT STAGE TEST: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.12 SteamKit 3.4.0 comparison.";
+                    "FAIL: unhandled exception in Step 05.13 Reflection.Emit stage test.";
                 _steamButton.Enabled = true;
             });
         }

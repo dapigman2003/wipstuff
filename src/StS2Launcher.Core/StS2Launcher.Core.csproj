@@ -6,8 +6,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!--
-      Step 05.12 is a controlled dependency comparison against the proven
-      Step 05.11 surface. No additional runtime capability is introduced.
+      Step 05.13 retains SteamKit2 3.4.0 and only localizes the remaining
+      Reflection.Emit failure to a SteamKit setup/connect stage. No additional
+      runtime capability is introduced.
     -->
     <PackageReference Include="SteamKit2" Version="3.4.0" />
   </ItemGroup>

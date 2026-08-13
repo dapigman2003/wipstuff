@@ -1,56 +1,81 @@
-# StS2 Launcher iOS — Step 05.12
+# StS2 Launcher iOS — Step 05.13
 
-Step 05.12 is a controlled dependency comparison. It changes the SteamKit2 package from 3.3.1 to 3.4.0 while preserving the already-proven iOS networking work and the Step 05.10/05.11 diagnostics.
+Step 05.13 localizes the remaining iOS `PlatformNotSupported_ReflectionEmit` failure to a specific SteamKit lifecycle stage. It keeps SteamKit2 **3.4.0** from Step 05.12 and does not add another networking, protobuf, authentication, or IL workaround.
 
-The completed Step 05.11 physical-iPhone run established that the protobuf `AutoCompile` experiment was not the fix:
+## Evidence entering Step 05.13
 
-- `RuntimeTypeModel.Default.AutoCompile` was already `False` before the Step 05.11 assignment (`False -> False`);
-- `PlatformNotSupported_ReflectionEmit` still appeared;
-- in that run it appeared very early (~5 ms), before a SteamKit endpoint had been reported;
-- `Outgoing ClientHello: NO` and no Steam messages reached `IDebugNetworkListener`;
-- SteamKit disconnected non-user-initiated;
-- replaying SteamKit's selected WebSocket CM still succeeded outside SteamKit.
+Physical-iPhone Step 05.12 established:
 
-Therefore Step 05.12 does **not** add another serializer workaround. It answers the narrower question: does the newer SteamKit2 release change this iOS/AOT connection behavior on the otherwise same test surface?
+- SteamKit2 3.4.0 still fails before the public `ConnectedCallback`;
+- `Outgoing ClientHello: NO` and no Steam messages reach `IDebugNetworkListener`;
+- `PlatformNotSupported_ReflectionEmit` still appears;
+- the exact SteamKit-selected CM endpoint still completes the WebSocket HTTP upgrade outside SteamKit through the proven `SocketsHttpHandler` / custom-invoker path;
+- changing SteamKit2 3.3.1 -> 3.4.0 therefore did not remove the AOT boundary.
 
-## Single Step 05.12 dependency change
+Step 05.11 had already shown `RuntimeTypeModel.Default.AutoCompile` was `False -> False`, so the retained protobuf setting is not treated as a fix.
 
-Core now references:
+## Single Step 05.13 diagnostic change
 
-```xml
-<PackageReference Include="SteamKit2" Version="3.4.0" />
-```
+The Steam connection probe now timestamps the active stage before each synchronous boundary:
 
-Everything else remains intentionally comparable to Step 05.11:
+1. protobuf-net AOT configuration
+2. `SteamConfiguration.Create`
+3. `SteamClient` constructor
+4. attach `IDebugNetworkListener`
+5. `CallbackManager` constructor
+6. subscribe `ConnectedCallback`
+7. subscribe `DisconnectedCallback`
+8. `SteamClient.Connect` call
+9. post-Connect callback/state pump
+10. disconnect/result formatting
 
-- WebSocket-only SteamKit connection; no authentication;
-- `HttpClientPurpose.CMWebSocket` still receives `SocketsHttpHandler`;
-- native CM HTTPS/DNS/TCP/WebSocket regression checks remain;
-- exact `SocketsHttpHandler` + custom-invoker WebSocket isolation remains;
-- exact SteamKit-selected endpoint replay remains;
-- metadata-only `IDebugNetworkListener` remains;
-- `RuntimeTypeModel.Default.AutoCompile = false` remains as a harmless regression setting (Step 05.11 proved it was already false on device);
-- the generated `DiskArbitration` linker-framework filter remains;
-- the isolated SteamKit constructor compatibility patch remains conditional: if SteamKit2 3.4.0 still contains exactly one `Process.StartTime` call it is replaced with `DateTime.UtcNow`; if 3.4.0 no longer contains that unsupported call, the patcher verifies the call is absent and leaves the assembly untouched. More than one match is a hard failure.
+When a first-chance Reflection.Emit exception appears, the app records:
 
-No authentication, Steam Guard, ownership, depot, Godot, RuntimePatch, or game code is added.
+- elapsed milliseconds;
+- the active stage name;
+- managed thread ID;
+- `IsConnected` at throw;
+- `CurrentEndPoint` at throw;
+- `RuntimeFeature.IsDynamicCodeSupported`;
+- `RuntimeFeature.IsDynamicCodeCompiled`;
+- the existing best-effort caller stack.
+
+The completed SteamKit result also displays the full stage timeline and a compact `ReflectionEmit observed stage(s)` section before the longer exception dump.
+
+## Preserved regression boundaries
+
+Step 05.13 retains:
+
+- SteamKit2 3.4.0;
+- WebSocket-only SteamKit connection;
+- no authentication;
+- `HttpClientPurpose.CMWebSocket` -> `SocketsHttpHandler`;
+- native CM HTTPS/DNS/TCP/WebSocket checks;
+- exact `SocketsHttpHandler` + custom-invoker WebSocket isolation;
+- exact SteamKit-selected endpoint replay;
+- metadata-only `IDebugNetworkListener` / ClientHello observation;
+- the Step 05.2 generated `DiskArbitration` linker-framework removal;
+- the isolated version-aware SteamKit `Process.StartTime` compatibility patch;
+- the retained protobuf `AutoCompile=false` regression setting.
 
 ## Interpretation
 
-- `STEAM CONNECTION PASS — 3/3` means the newer SteamKit eliminated the current Step 05 boundary and Step 06 can begin with authentication only.
-- `Outgoing ClientHello: YES` but connection still fails means the dependency upgrade moved the boundary beyond initial message construction/serialization.
-- `Outgoing ClientHello: NO` with the same Reflection.Emit behavior means the SteamKit upgrade alone does not solve the iOS AOT issue, and the next step should identify/replace the exact emit-dependent component rather than return to networking.
-- A build-time failure in the compatibility patch is also useful evidence: it means SteamKit 3.4.0 changed the constructor surface and the patch must be re-audited before any device conclusion.
+- Reflection.Emit at `SteamConfiguration.Create` or `SteamClient constructor` means the AOT issue is initialization-time and is earlier than CM transport/message serialization.
+- Reflection.Emit at a `CallbackManager`/subscription stage means callback setup itself needs an iOS-safe path.
+- Reflection.Emit during `SteamClient.Connect call` means it is synchronous inside the connect entry path.
+- Reflection.Emit during `post-Connect callback/state pump`, especially with `IsConnected=True`, puts it inside asynchronous connection/post-connect processing.
+- `Outgoing ClientHello: YES` means initial Steam message serialization completed and the boundary moved later.
+- `STEAM CONNECTION PASS — 3/3` completes Step 05 and allows Step 06 authentication-only work.
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-05.12.ipa
+artifacts/StS2-Launcher-Step-05.13.ipa
 ```
 
 Expected device header:
 
 ```text
-STEP 05.12 — STEAMKIT 3.4.0 COMPARISON
-Version 0.0.18
+STEP 05.13 — REFLECTION.EMIT STAGE LOCALIZATION
+Version 0.0.19
 ```
