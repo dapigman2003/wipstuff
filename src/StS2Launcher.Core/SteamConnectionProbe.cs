@@ -4,7 +4,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step-05.1 network-only SteamKit probe (behavior unchanged from Step 05).
+/// Step-05.2 network-only SteamKit probe (behavior unchanged from Step 05).
 ///
 /// It deliberately performs no authentication and sends no account credentials.
 /// The probe constructs SteamKit, connects to a Steam CM, observes the official

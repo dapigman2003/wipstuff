@@ -63,12 +63,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.1 — STEAM LINK FIX",
+            "STEP 05.2 — IOS FRAMEWORK FILTER",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.7",
+            "Version 0.0.8",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -161,7 +161,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.1 checks.",
+            "Status: starting Step 05.2 checks.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -177,7 +177,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.1: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.2: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)

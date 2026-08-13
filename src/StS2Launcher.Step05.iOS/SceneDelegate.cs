@@ -17,12 +17,12 @@ public sealed class SceneDelegate : UIWindowSceneDelegate
         UISceneSession session,
         UISceneConnectionOptions connectionOptions)
     {
-        Console.WriteLine("Step 05.1: SceneDelegate.WillConnect");
+        Console.WriteLine("Step 05.2: SceneDelegate.WillConnect");
 
         if (scene is not UIWindowScene windowScene)
         {
             Console.Error.WriteLine(
-                $"Step 05.1: expected UIWindowScene, received {scene.GetType().FullName}");
+                $"Step 05.2: expected UIWindowScene, received {scene.GetType().FullName}");
             return;
         }
 
@@ -38,7 +38,7 @@ public sealed class SceneDelegate : UIWindowSceneDelegate
 
             Window.MakeKeyAndVisible();
 
-            Console.WriteLine("Step 05.1: UIWindow is key and visible");
+            Console.WriteLine("Step 05.2: UIWindow is key and visible");
         }
         catch (Exception ex)
         {
@@ -76,24 +76,24 @@ public sealed class SceneDelegate : UIWindowSceneDelegate
 
     public override void DidBecomeActive(UIScene scene)
     {
-        Console.WriteLine("Step 05.1: scene active");
+        Console.WriteLine("Step 05.2: scene active");
         _rootViewController?.SetLifecycleState("Active");
     }
 
     public override void WillResignActive(UIScene scene)
     {
-        Console.WriteLine("Step 05.1: scene will resign active");
+        Console.WriteLine("Step 05.2: scene will resign active");
         _rootViewController?.SetLifecycleState("Inactive");
     }
 
     public override void WillEnterForeground(UIScene scene)
     {
-        Console.WriteLine("Step 05.1: scene entering foreground");
+        Console.WriteLine("Step 05.2: scene entering foreground");
         _rootViewController?.SetLifecycleState("Entering foreground");
     }
 
     public override void DidEnterBackground(UIScene scene)
     {
-        Console.WriteLine("Step 05.1: scene entered background");
+        Console.WriteLine("Step 05.2: scene entered background");
     }
 }

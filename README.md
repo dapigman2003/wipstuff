@@ -1,81 +1,68 @@
-# StS2 Launcher iOS — Step 05.1
+# StS2 Launcher iOS — Step 05.2
 
-Step 05 did **not** fail in C# compilation. It reached the final iOS native link and failed with:
+Step 05.1 proved that `TrimMode=full` is useful but does not eliminate the iOS native-link failure:
 
 ```text
 ld: framework 'DiskArbitration' not found
 ```
 
-The Step-05 app introduced one generic third-party assembly: SteamKit2 3.3.1.
+The failed build's MSBuild/binlog artifacts showed that .NET iOS generated `DiskArbitration` inside its `_LinkerFrameworks` item set and passed it explicitly to the final `clang++` command.
 
-.NET 9 iOS device builds use `TrimMode=partial` by default. Partial trimming does not trim every third-party assembly. Step 05.1 changes only the publish/link boundary by setting:
+Step 05.2 keeps the Steam runtime probe unchanged and makes one narrowly scoped link-boundary change:
 
-```xml
-<TrimMode>full</TrimMode>
-```
+1. keep `TrimMode=full`;
+2. let the .NET iOS linker produce its normal framework list;
+3. after `_LoadLinkerOutput`, remove only `DiskArbitration` from `_LinkerFrameworks`;
+4. do so before `_ComputeLinkNativeExecutableInputs`;
+5. leave every other framework untouched.
 
-This lets the iOS trimmer remove unreachable desktop/macOS code before the Apple native linker scans the surviving P/Invoke/native dependencies.
+If SteamKit contains a genuinely live call to a DiskArbitration symbol, the build should now progress far enough for `clang`/`ld` to report that concrete undefined symbol. If no live symbol remains, the native link can proceed without trying to load a macOS-only framework from the iPhoneOS SDK.
 
-## What did NOT change
+## Scope remains unchanged
 
-The Steam test is still exactly the same network-only test:
+The on-device test still does only this:
 
 1. construct `SteamClient`;
 2. construct `CallbackManager`;
 3. call `Connect()`;
-4. wait for `ConnectedCallback`;
-5. immediately call `Disconnect()`;
-6. wait for `DisconnectedCallback`.
+4. receive `ConnectedCallback`;
+5. call `Disconnect()`;
+6. receive `DisconnectedCallback`.
 
-There is still:
+Still excluded:
 
-- no username;
-- no password;
-- no Steam Guard;
-- no Steam token;
-- no ownership check;
-- no depot download;
-- no Godot;
-- no Cecil.
+- Steam login/authentication;
+- passwords/tokens/Steam Guard;
+- ownership checks;
+- depot downloads;
+- Mono.Cecil;
+- Godot;
+- game files.
 
-## Same-repository note
-
-This package deliberately keeps the same project path as Step 05:
+## Device marker
 
 ```text
-src/StS2Launcher.Step05.iOS/
+STEP 05.2 — IOS FRAMEWORK FILTER
+Version 0.0.8
 ```
 
-So if you are replacing Step-05 files in the same Git repository, overwrite those files rather than creating another iOS project folder.
-
-The version shown on-device is:
+## Build artifact
 
 ```text
-STEP 05.1 — STEAM LINK FIX
-Version 0.0.7
+artifacts/StS2-Launcher-Step-05.2.ipa
 ```
 
-## Build
-
-Codemagic workflow:
+## New diagnostics
 
 ```text
-ios-step-05-1
+artifacts/logs/step05-2-framework-filter.log
+artifacts/logs/step05-2-generated-linker-frameworks.txt
+artifacts/logs/step05-2-native-symbols.log
+artifacts/logs/step05-2-failure-scan.log
+artifacts/logs/step05-2-publish.log
+artifacts/logs/step05-2-dotnet-ios.binlog
 ```
 
-Expected artifact:
+The key successful-build telemetry should show `DiskArbitration` in `BEFORE` and absent from `AFTER`.
 
-```text
-artifacts/StS2-Launcher-Step-05.1.ipa
-```
-
-If native linking still fails, this version preserves extra diagnostics in:
-
-```text
-artifacts/logs/step05-1-native-preflight.log
-artifacts/logs/step05-1-publish.log
-artifacts/logs/step05-1-failure-scan.log
-artifacts/logs/step05-1-dotnet-ios.binlog
-```
-
-See `docs/STEP-05.1-TEST.md`.
+See `docs/STEP-05.2-TEST.md` for the result format.

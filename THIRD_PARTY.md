@@ -1,4 +1,4 @@
-# Third-Party Components — Step 05.1
+# Third-Party Components — Step 05.2
 
 ## SteamKit2
 
@@ -9,7 +9,7 @@
 - Purpose: Steam network protocol client
 - License: see the upstream SteamKit repository/license for authoritative terms
 
-Step 05.1 uses SteamKit2 only for a connection/disconnection probe. It does not authenticate a Steam account.
+Step 05.2 uses SteamKit2 only for a connection/disconnection probe. It does not authenticate a Steam account.
 
 ## Existing platform/runtime components
 
