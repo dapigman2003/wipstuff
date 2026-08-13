@@ -7,14 +7,13 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.8 SteamKit CM WebSocket regression probe.
+/// Step 05.9 SteamKit CM WebSocket regression probe.
 ///
-/// Step 05.7 proved the dedicated CMWebSocket SocketsHttpHandler factory is
-/// actually used on iOS and removed the prior NSUrlSessionHandler synchronous
-/// send failure. The newly exposed failure is PlatformNotSupported_ReflectionEmit.
-/// Step 05.8 keeps the same SteamKit connection behavior while capturing a more
-/// useful AOT/reflection stack after the separate below-SteamKit isolation probe.
-/// No authentication is performed.
+/// Step 05.8 proved the dedicated CMWebSocket SocketsHttpHandler and the same
+/// custom-HttpMessageInvoker ClientWebSocket handshake work on the physical iPhone.
+/// SteamKit still disconnected before ConnectedCallback on a different selected CM.
+/// Keep this probe behavior unchanged so Step 05.9 can replay its exact selected
+/// endpoint below SteamKit. No authentication is performed.
 /// </summary>
 public sealed class SteamConnectionProbe
 {

@@ -13,6 +13,7 @@ public sealed class RootViewController : UIViewController
     private readonly CmNetworkProbe _cmNetworkProbe = new();
     private readonly SocketsHandlerIsolationProbe _handlerIsolationProbe = new();
     private readonly SteamConnectionProbe _steamProbe = new();
+    private readonly SteamKitEndpointReplayProbe _endpointReplayProbe = new();
 
     private UILabel? _steamAssemblyLabel;
     private UILabel? _steamResultLabel;
@@ -66,12 +67,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.8 — REFLECTION.EMIT ORIGIN ISOLATION",
+            "STEP 05.9 — EXACT STEAMKIT ENDPOINT REPLAY",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.14",
+            "Version 0.0.15",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -100,12 +101,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "Step 05.7 confirmed the SocketsHttpHandler factory is used, then exposed PlatformNotSupported_ReflectionEmit before ConnectedCallback. Step 05.8 isolates whether that exception is in SocketsHttpHandler HTTPS, ClientWebSocket's custom-invoker handshake, or SteamKit around an otherwise-working path. It never authenticates.",
+            "Step 05.8 proved SocketsHttpHandler HTTPS and the custom-invoker ClientWebSocket handshake both work on iPhone. SteamKit still selected a different CM and disconnected before ConnectedCallback. Step 05.9 replays SteamKit's exact selected endpoint through the proven custom-invoker path. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run Step 05.8 Reflection.Emit Isolation Test", 17);
+        _steamButton = SystemButton("Run Step 05.9 Exact Endpoint Replay Test", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -164,7 +165,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.8 checks.",
+            "Status: starting Step 05.9 checks.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -180,7 +181,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.8: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.9: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -234,7 +235,7 @@ public sealed class RootViewController : UIViewController
         _steamResultLabel.Text = "CM NETWORK: TESTING…";
         _steamResultLabel.TextColor = UIColor.Label;
         _steamDetailLabel.Text =
-            "1/3 Re-confirming native iOS/.NET CM network boundary…";
+            "1/4 Re-confirming native iOS/.NET CM network boundary…";
         _statusLabel.Text =
             "NETWORK TEST RUNNING — leave the app in foreground.";
 
@@ -248,7 +249,7 @@ public sealed class RootViewController : UIViewController
             {
                 _steamDetailLabel.Text =
                     FormatNetworkResult(network) +
-                    "\n\n2/3 Exact SocketsHttpHandler/custom-invoker isolation running…";
+                    "\n\n2/4 SocketsHttpHandler/custom-invoker regression running…";
             });
 
             var handlerIsolation = await _handlerIsolationProbe.RunAsync(
@@ -261,10 +262,25 @@ public sealed class RootViewController : UIViewController
                     FormatNetworkResult(network) +
                     "\n\n" +
                     FormatHandlerIsolationResult(handlerIsolation) +
-                    "\n\n3/3 SteamKit WebSocket probe running…";
+                    "\n\n3/4 SteamKit WebSocket probe running…";
             });
 
             var webSocket = await _steamProbe.RunAsync(TimeSpan.FromSeconds(25));
+
+            InvokeOnMainThread(() =>
+            {
+                _steamDetailLabel.Text =
+                    FormatNetworkResult(network) +
+                    "\n\n" +
+                    FormatHandlerIsolationResult(handlerIsolation) +
+                    "\n\n" +
+                    FormatTransportResult(webSocket) +
+                    "\n\n4/4 Replaying SteamKit-selected CM through exact custom-invoker path…";
+            });
+
+            var endpointReplay = await _endpointReplayProbe.RunAsync(
+                webSocket.LastCurrentEndPoint,
+                TimeSpan.FromSeconds(12));
 
             InvokeOnMainThread(() =>
             {
@@ -280,9 +296,11 @@ public sealed class RootViewController : UIViewController
                     ? "STEAM CONNECTION PASS — 3/3"
                     : !nativeNetworkReady
                         ? "CM NETWORK BOUNDARY FAIL"
-                        : handlerReady
-                            ? "HANDLER ISOLATION 2/2 • STEAMKIT FAIL"
-                            : "SOCKETS HANDLER BOUNDARY IDENTIFIED";
+                        : !handlerReady
+                            ? "SOCKETS HANDLER REGRESSION"
+                            : endpointReplay.Passed
+                                ? "EXACT ENDPOINT PASS • STEAMKIT FAIL"
+                                : "STEAMKIT ENDPOINT REPLAY FAIL";
 
                 _steamResultLabel.TextColor = webSocket.Passed
                     ? UIColor.Label
@@ -294,15 +312,19 @@ public sealed class RootViewController : UIViewController
                     FormatHandlerIsolationResult(handlerIsolation) +
                     "\n\n" +
                     FormatTransportResult(webSocket) +
+                    "\n\n" +
+                    FormatEndpointReplayResult(endpointReplay) +
                     $"\n\nSteamKit assembly: {SteamConnectionProbe.AssemblyVersion}";
 
                 _statusLabel.Text = webSocket.Passed
                     ? "PASS: SteamKit CM WebSocket connected and disconnected."
                     : !nativeNetworkReady
                         ? "RESULT: native CM network regression; inspect the 4/4 probe above."
-                        : handlerReady
-                            ? "RESULT: SocketsHttpHandler + custom-invoker WebSocket both pass; remaining Reflection.Emit boundary is SteamKit-specific."
-                            : "RESULT: Step 05.8 isolated the failure below SteamKit; inspect the handler isolation exception/stack above.";
+                        : !handlerReady
+                            ? "RESULT: the previously proven custom-invoker handler path regressed in this run."
+                            : endpointReplay.Passed
+                                ? "RESULT: SteamKit's exact chosen CM also upgrades through the same framework path; next boundary is inside SteamKit's connection lifecycle, not endpoint reachability."
+                                : "RESULT: SteamKit's chosen CM does not reproduce the successful HTTP upgrade; investigate CM selection/candidate quality before patching SteamKit internals.";
 
                 _steamButton.Enabled = true;
             });
@@ -311,12 +333,12 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEP 05.8 DIAGNOSTICS: EXCEPTION";
+                _steamResultLabel.Text = "STEP 05.9 DIAGNOSTICS: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.8 diagnostics.";
+                    "FAIL: unhandled exception in Step 05.9 diagnostics.";
                 _steamButton.Enabled = true;
             });
         }
@@ -345,6 +367,18 @@ public sealed class RootViewController : UIViewController
             $"Custom-invoker WebSocket: {(result.WebSocketPassed ? "PASS" : "FAIL")} — {result.WebSocketDetail}\n" +
             $"Handler elapsed: {result.Elapsed.TotalSeconds:F1}s\n" +
             $"Handler exception/stack:\n{result.ExceptionDetail}";
+    }
+
+
+    private static string FormatEndpointReplayResult(SteamKitEndpointReplayProbeResult result)
+    {
+        return
+            $"{result.Summary}\n" +
+            $"SteamKit-selected endpoint: {result.SourceEndPoint ?? "none"}\n" +
+            $"Replay URI: {result.WebSocketUri ?? "none"}\n" +
+            $"Replay detail: {result.Detail}\n" +
+            $"Replay elapsed: {result.Elapsed.TotalSeconds:F1}s\n" +
+            $"Replay exception/stack:\n{result.ExceptionDetail}";
     }
 
     private static string FormatTransportResult(SteamConnectionProbeResult result)

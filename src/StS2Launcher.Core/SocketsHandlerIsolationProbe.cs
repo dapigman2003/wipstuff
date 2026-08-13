@@ -6,22 +6,11 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.8 isolates the new iOS Reflection.Emit failure exposed by Step 05.7.
+/// Step 05.9 retains the Step 05.8 below-SteamKit handler regression probe.
 ///
-/// Step 05.7 proved that SteamKit requests HttpClientPurpose.CMWebSocket and that
-/// the project returns SocketsHttpHandler, but SteamKit still disconnects before
-/// ConnectedCallback with PlatformNotSupported_ReflectionEmit.
-///
-/// This probe stays below SteamKit's connection machinery and exercises the exact
-/// CMWebSocket factory client in two progressively narrower operations:
-///   1) HTTPS through SocketsHttpHandler;
-///   2) ClientWebSocket.ConnectAsync(uri, HttpMessageInvoker, token) using that
-///      same factory shape.
-///
-/// If #1 fails, the managed HTTP handler itself is the boundary. If #1 passes but
-/// #2 fails, the custom-invoker WebSocket handshake is the boundary. If both pass
-/// while SteamKit still fails, the remaining fault is inside SteamKit around that
-/// otherwise-working framework path.
+/// The physical iPhone already passed both checks in Step 05.8. Re-run them here
+/// to ensure the exact SocketsHttpHandler + custom-HttpMessageInvoker framework
+/// path remains healthy before replaying SteamKit's selected CM endpoint.
 ///
 /// No Steam protocol payload and no authentication data are sent.
 /// </summary>
@@ -80,7 +69,7 @@ public sealed class SocketsHandlerIsolationProbe
                 using var socket = new ClientWebSocket();
                 socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(20);
 
-                // This overload is the important Step 05.8 boundary: it forces
+                // This overload is the important Step 05.9 boundary: it forces
                 // ClientWebSocket to use the supplied CMWebSocket HttpMessageInvoker.
                 await socket.ConnectAsync(uri, client, cts.Token).ConfigureAwait(false);
 
@@ -96,7 +85,7 @@ public sealed class SocketsHandlerIsolationProbe
                         using var closeCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
                         await socket.CloseAsync(
                             WebSocketCloseStatus.NormalClosure,
-                            "Step 05.8 handler isolation complete",
+                            "Step 05.9 handler isolation complete",
                             closeCts.Token).ConfigureAwait(false);
                     }
                     catch

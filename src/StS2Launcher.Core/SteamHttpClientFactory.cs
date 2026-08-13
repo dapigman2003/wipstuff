@@ -5,13 +5,13 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.8 HTTP client factory for SteamKit on iOS.
+/// Step 05.9 retained HTTP client factory for SteamKit on iOS.
 ///
-/// SteamKit 3.3.x routes CM WebSocket setup through SteamConfiguration.HttpClientFactory.
-/// The native iOS NSUrlSessionHandler does not implement the synchronous HTTP send path
-/// used by ClientWebSocket when an HttpMessageInvoker is supplied, so CM WebSocket setup
-/// fails before ConnectedCallback. Use the fully-managed SocketsHttpHandler only for
-/// HttpClientPurpose.CMWebSocket. Keep WebAPI/CDN on the platform default handler.
+/// Step 05.7 proved that the platform-default NSUrlSessionHandler cannot service
+/// SteamKit's CM WebSocket custom-invoker path on iOS. Step 05.8 then proved that
+/// SocketsHttpHandler works for both HTTPS and ClientWebSocket on the physical iPhone.
+/// Keep SocketsHttpHandler only for HttpClientPurpose.CMWebSocket; WebAPI/CDN remain
+/// on the platform-default HttpClient.
 /// </summary>
 public static class SteamHttpClientFactory
 {
