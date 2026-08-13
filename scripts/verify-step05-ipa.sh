@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IPA="${1:-artifacts/StS2-Launcher-Step-05.7.ipa}"
+IPA="${1:-artifacts/StS2-Launcher-Step-05.8.ipa}"
 
 if [[ ! -f "$IPA" ]]; then
   echo "ERROR: IPA not found: $IPA" >&2
@@ -45,8 +45,8 @@ EXECUTABLE="$APP/$EXEC_NAME"
   exit 4
 }
 
-[[ "$VERSION" == "0.0.13" ]] || {
-  echo "ERROR: wrong Step 05.7 version: $VERSION" >&2
+[[ "$VERSION" == "0.0.14" ]] || {
+  echo "ERROR: wrong Step 05.8 version: $VERSION" >&2
   exit 4
 }
 
@@ -64,7 +64,7 @@ grep -qi 'arm64' <<<"$FILE_INFO" || {
 # The build-only Cecil patcher must never enter the device package.
 if find "$APP" -type f | grep -Ei \
   '(godot|mono\.cecil|libsts2godothost|slay.*spire.*2|StS2Launcher\.SteamKitIosPatcher)' >/dev/null; then
-  echo "ERROR: Step 05.7 IPA contains a forbidden build/later-stage/game component." >&2
+  echo "ERROR: Step 05.8 IPA contains a forbidden build/later-stage/game component." >&2
   exit 5
 fi
 
@@ -75,11 +75,11 @@ fi
 
 SIZE="$(du -h "$IPA" | awk '{print $1}')"
 
-echo "Step 05.7 IPA verification passed."
+echo "Step 05.8 IPA verification passed."
 echo "  Bundle ID: $BUNDLE_ID"
 echo "  Version: $VERSION"
 echo "  Minimum iOS: ${MIN_IOS:-unknown}"
 echo "  Architecture: arm64"
 echo "  Package signing: $SIGNING"
 echo "  IPA size: $SIZE"
-echo "  Expected device UI: STEP 05.7 — IOS WEBSOCKET HANDLER FIX"
+echo "  Expected device UI: STEP 05.8 — REFLECTION.EMIT ORIGIN ISOLATION"

@@ -7,13 +7,13 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.7 SteamKit CM WebSocket compatibility probe.
+/// Step 05.8 SteamKit CM WebSocket regression probe.
 ///
-/// Step 05.6 proved the iPhone can reach Steam through HTTPS, DNS, raw TCP,
-/// and raw ClientWebSocket. It also exposed the remaining WebSocket failure as
-/// NSUrlSessionHandler's missing synchronous HTTP implementation. This step
-/// supplies SteamKit's CM WebSocket purpose with SocketsHttpHandler while
-/// retaining the native/default HttpClient for other Steam HTTP purposes.
+/// Step 05.7 proved the dedicated CMWebSocket SocketsHttpHandler factory is
+/// actually used on iOS and removed the prior NSUrlSessionHandler synchronous
+/// send failure. The newly exposed failure is PlatformNotSupported_ReflectionEmit.
+/// Step 05.8 keeps the same SteamKit connection behavior while capturing a more
+/// useful AOT/reflection stack after the separate below-SteamKit isolation probe.
 /// No authentication is performed.
 /// </summary>
 public sealed class SteamConnectionProbe
@@ -73,14 +73,28 @@ public sealed class SteamConnectionProbe
                 if (ex.InnerException is not null)
                     line += $" | Inner={ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
 
-                var firstRelevantLine = stack.Split('\n')
+                var stackLines = stack.Split('\n')
                     .Select(x => x.Trim())
-                    .FirstOrDefault(x =>
-                        x.Contains("SteamKit2", StringComparison.Ordinal) ||
-                        x.Contains("System.Net.Http", StringComparison.Ordinal) ||
-                        x.Contains("System.Net.WebSockets", StringComparison.Ordinal));
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToArray();
+
+                var firstRelevantLine = stackLines.FirstOrDefault(x =>
+                    x.Contains("SteamKit2", StringComparison.Ordinal) ||
+                    x.Contains("System.Net.Http", StringComparison.Ordinal) ||
+                    x.Contains("System.Net.WebSockets", StringComparison.Ordinal) ||
+                    x.Contains("System.Reflection", StringComparison.Ordinal) ||
+                    x.Contains("System.Linq.Expressions", StringComparison.Ordinal));
                 if (!string.IsNullOrWhiteSpace(firstRelevantLine))
                     line += $" | {firstRelevantLine}";
+
+                if (ex is PlatformNotSupportedException ||
+                    ex.Message.Contains("ReflectionEmit", StringComparison.OrdinalIgnoreCase) ||
+                    ex.Message.Contains("Reflection.Emit", StringComparison.OrdinalIgnoreCase))
+                {
+                    var stackExcerpt = string.Join("\n    ", stackLines.Take(12));
+                    if (!string.IsNullOrWhiteSpace(stackExcerpt))
+                        line += $"\n    {stackExcerpt}";
+                }
 
                 exceptions.Enqueue(line);
             }

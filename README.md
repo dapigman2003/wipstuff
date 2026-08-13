@@ -1,47 +1,31 @@
-# StS2 Launcher iOS — Step 05.7
+# StS2 Launcher iOS — Step 05.8
 
-Step 05.7 targets the exact SteamKit WebSocket failure exposed by Step 05.6.
+Step 05.8 isolates the `PlatformNotSupported_ReflectionEmit` failure exposed by the physical-iPhone Step 05.7 test.
 
 Proven before this step:
 
-- unsigned IPA build succeeds;
-- install/launch/lifecycle succeed;
-- Core regression self-test is 12/12;
-- SteamKit2 3.3.1 loads on iOS;
-- the generated macOS-only DiskArbitration framework reference is filtered before native link;
-- the iOS-incompatible SteamClient Process.StartTime constructor assumption is patched in the isolated build copy;
-- Valve CM directory HTTPS, DNS, raw TCP, and raw ClientWebSocket all pass on the physical iPhone (4/4);
-- SteamKit WebSocket fails before ConnectedCallback with an inner NotSupportedException from NSUrlSessionHandler (`net_http_missing_sync_implementation`);
-- SteamKit TCP reaches a CM endpoint but can be reset by the peer, so WebSocket remains the preferred mobile path to solve first.
+- unsigned IPA build/install/launch/lifecycle work;
+- Core regression self-test remains 12/12;
+- SteamKit2 3.3.1 loads and `SteamClient` constructs after the isolated `Process.StartTime` compatibility patch;
+- the generated macOS-only `DiskArbitration` framework reference is filtered before native link;
+- Valve CM directory HTTPS, DNS, raw TCP, and raw `ClientWebSocket` pass on the iPhone (4/4);
+- Step 05.7 confirmed SteamKit requests `HttpClientPurpose.CMWebSocket` and receives the dedicated `SocketsHttpHandler` client;
+- the prior `NSUrlSessionHandler` synchronous-send exception is no longer the observed failure;
+- SteamKit still disconnects before `ConnectedCallback`, now with `PlatformNotSupported_ReflectionEmit`.
 
-Step 05.7 makes one runtime compatibility change:
-
-- SteamKit `HttpClientPurpose.CMWebSocket` gets a dedicated `SocketsHttpHandler`;
-- SteamKit `WebAPI` and `CDN` purposes keep the platform-default `HttpClient`;
-- the normal SteamKit user-agent is preserved;
-- the existing CM network 4/4 probe is rerun first;
-- SteamKit WebSocket is then tested for constructor + ConnectedCallback + DisconnectedCallback (3/3).
+Step 05.8 adds one diagnostic capability only: isolate whether the Reflection.Emit failure occurs in `SocketsHttpHandler` HTTPS, in the `ClientWebSocket` custom-`HttpMessageInvoker` handshake, or only inside SteamKit around that path. It also captures a larger Reflection.Emit stack excerpt from the SteamKit probe.
 
 No authentication, Steam Guard, ownership, depot, RuntimePatch, Godot, or game code is added.
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-05.7.ipa
+artifacts/StS2-Launcher-Step-05.8.ipa
 ```
 
 Expected device header:
 
 ```text
-STEP 05.7 — IOS WEBSOCKET HANDLER FIX
-Version 0.0.13
-```
-
-Success condition:
-
-```text
-CM NETWORK PASS — 4/4
-STEAM CONNECTION PASS — 3/3
-HTTP factory calls includes CMWebSocket
-CM WebSocket handler: SocketsHttpHandler
+STEP 05.8 — REFLECTION.EMIT ORIGIN ISOLATION
+Version 0.0.14
 ```

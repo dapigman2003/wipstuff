@@ -7,7 +7,7 @@ using System.Text.Json;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.7 diagnostics below SteamKit's CM connection layer.
+/// Step 05.8 diagnostics below SteamKit's CM connection layer.
 ///
 /// The previous step proved SteamClient construction is healthy on iOS, but
 /// SteamKit never reaches ConnectedCallback. This probe therefore verifies the
@@ -59,7 +59,7 @@ public sealed class CmNetworkProbe
             {
                 Timeout = Timeout.InfiniteTimeSpan
             };
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("StS2Launcher-iOS-Step05.7/0.0.13");
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("StS2Launcher-iOS-Step05.8/0.0.14");
 
             using var response = await http.GetAsync(
                 DirectoryUri,
@@ -179,7 +179,7 @@ public sealed class CmNetworkProbe
                         using var closeCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
                         await socket.CloseAsync(
                             WebSocketCloseStatus.NormalClosure,
-                            "Step 05.7 network probe complete",
+                            "Step 05.8 network probe complete",
                             closeCts.Token).ConfigureAwait(false);
                     }
                     catch

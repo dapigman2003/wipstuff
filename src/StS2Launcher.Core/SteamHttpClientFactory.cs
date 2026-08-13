@@ -5,7 +5,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.7 HTTP client factory for SteamKit on iOS.
+/// Step 05.8 HTTP client factory for SteamKit on iOS.
 ///
 /// SteamKit 3.3.x routes CM WebSocket setup through SteamConfiguration.HttpClientFactory.
 /// The native iOS NSUrlSessionHandler does not implement the synchronous HTTP send path
