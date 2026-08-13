@@ -1,0 +1,27 @@
+workflows:
+  ios-step-01:
+    name: Step 01 - Pure UIKit bootstrap IPA
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+
+    environment:
+      xcode: 26.5
+      vars:
+        DOTNET_SDK_VERSION: "9.0.314"
+        DOTNET_WORKLOAD_SET: "9.0.314.3"
+
+    cache:
+      cache_paths:
+        - $HOME/.nuget/packages
+
+    scripts:
+      - name: Build Step 01 unsigned IPA
+        script: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          bash scripts/codemagic-build.sh
+
+    artifacts:
+      - artifacts/StS2-Launcher-Step-01.ipa
+      - artifacts/step01-build-summary.txt
+      - artifacts/logs/**
