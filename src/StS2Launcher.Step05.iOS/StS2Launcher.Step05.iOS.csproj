@@ -8,8 +8,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>11</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.11</ApplicationDisplayVersion>
+    <ApplicationVersion>12</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.12</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -20,7 +20,7 @@
       macOS-only machine-information P/Invokes.
 
       Keep full trimming because it successfully removes other unreachable
-      desktop dependencies. Step 05.5 retains Step 05.2's proven generated
+      desktop dependencies. Step 05.6 retains Step 05.2's proven generated
       DiskArbitration framework filter. The separate build-only compatibility
       patch for SteamClient's unsupported Process.StartTime call is applied to
       the isolated local SteamKit package before this project is compiled.

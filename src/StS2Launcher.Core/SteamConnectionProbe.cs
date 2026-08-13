@@ -1,25 +1,22 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using SteamKit2;
 
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step-05.5 transport-isolation SteamKit probe.
+/// Step 05.6 SteamKit internal-boundary probe.
 ///
-/// Step 05.3 proved SteamClient construction succeeds on iOS after replacing
-/// SteamKit 3.3.1's unsupported Process.StartTime assumption. It then received
-/// an early DisconnectedCallback without ever receiving ConnectedCallback.
-///
-/// This probe keeps authentication forbidden and isolates CM transport choice:
-/// callers explicitly select WebSocket-only or TCP-only. Each attempt constructs
-/// a fresh SteamClient/SteamConfiguration so server scoring from one transport
-/// cannot contaminate the other test.
+/// Step 05.5 proved Valve directory HTTPS, DNS, raw TCP and raw ClientWebSocket
+/// all work on the same iPhone. Both SteamKit transports still fail before
+/// ConnectedCallback, so this step captures the state and hidden exceptions
+/// inside SteamKit's asynchronous connection machinery without authenticating.
 /// </summary>
 public sealed class SteamConnectionProbe
 {
     public static string AssemblyVersion =>
-        typeof(SteamClient).Assembly.GetName().Version?.ToString()
-        ?? "unknown";
+        typeof(SteamClient).Assembly.GetName().Version?.ToString() ?? "unknown";
 
     public Task<SteamConnectionProbeResult> RunAsync(
         string transportName,
@@ -28,25 +25,11 @@ public sealed class SteamConnectionProbe
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(transportName);
+        if (timeout <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(timeout));
+        if (protocolTypes != ProtocolTypes.WebSocket && protocolTypes != ProtocolTypes.Tcp)
+            throw new ArgumentOutOfRangeException(nameof(protocolTypes));
 
-        if (timeout <= TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(timeout));
-
-        if (protocolTypes != ProtocolTypes.WebSocket &&
-            protocolTypes != ProtocolTypes.Tcp)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(protocolTypes),
-                "Step 05.5 intentionally permits exactly one transport per probe.");
-        }
-
-        return Task.Run(
-            () => RunBlocking(
-                transportName,
-                protocolTypes,
-                timeout,
-                cancellationToken),
-            cancellationToken);
+        return Task.Run(() => RunBlocking(transportName, protocolTypes, timeout, cancellationToken), cancellationToken);
     }
 
     private static SteamConnectionProbeResult RunBlocking(
@@ -55,220 +38,125 @@ public sealed class SteamConnectionProbe
         TimeSpan timeout,
         CancellationToken cancellationToken)
     {
-        var stopwatch = Stopwatch.StartNew();
-
+        var sw = Stopwatch.StartNew();
+        var exceptions = new ConcurrentQueue<string>();
         var clientConstructed = false;
         var connected = false;
         var disconnected = false;
         bool? disconnectedUserInitiated = null;
-        var disconnectRequested = false;
-        string? callbackFailure = null;
+        var isConnectedEver = false;
+        string? lastEndPoint = null;
         var stage = $"SteamConfiguration.Create ({transportName})";
+        SteamClient? steamClient = null;
 
+        void FirstChance(object? _, FirstChanceExceptionEventArgs e)
+        {
+            try
+            {
+                var ex = e.Exception;
+                var stack = ex.StackTrace ?? string.Empty;
+                var interesting = stack.Contains("SteamKit2", StringComparison.Ordinal) ||
+                                  ex is PlatformNotSupportedException ||
+                                  ex.GetType().Name == "CryptographicException" ||
+                                  ex is System.Net.Sockets.SocketException ||
+                                  ex is System.Net.WebSockets.WebSocketException;
+                if (!interesting || exceptions.Count >= 12) return;
+                var line = $"{ex.GetType().Name}: {ex.Message}";
+                if (ex.InnerException is not null)
+                    line += $" | Inner={ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
+                var firstSteamLine = stack.Split('\n')
+                    .Select(x => x.Trim())
+                    .FirstOrDefault(x => x.Contains("SteamKit2", StringComparison.Ordinal));
+                if (!string.IsNullOrWhiteSpace(firstSteamLine)) line += $" | {firstSteamLine}";
+                exceptions.Enqueue(line);
+            }
+            catch { }
+        }
+
+        AppDomain.CurrentDomain.FirstChanceException += FirstChance;
         try
         {
-            // Force exactly one transport. SteamKit 3.x enables WebSocket in its
-            // default protocol set, so using an explicit configuration is the
-            // cleanest way to determine which transport can operate on iOS.
-            var configuration = SteamConfiguration.Create(
-                builder => builder.WithProtocolTypes(protocolTypes));
-
+            var configuration = SteamConfiguration.Create(builder => builder.WithProtocolTypes(protocolTypes));
             stage = $"SteamClient constructor ({transportName})";
-            var steamClient = new SteamClient(configuration);
+            steamClient = new SteamClient(configuration);
             clientConstructed = true;
 
             stage = $"CallbackManager constructor ({transportName})";
             var manager = new CallbackManager(steamClient);
-
-            stage = $"callback subscription ({transportName})";
-            manager.Subscribe<SteamClient.ConnectedCallback>(_ =>
+            manager.Subscribe<SteamClient.ConnectedCallback>(_ => connected = true);
+            manager.Subscribe<SteamClient.DisconnectedCallback>(cb =>
             {
-                connected = true;
-
-                // Step 05.x ends at network connectivity. No SteamUser handler,
-                // authentication session, credentials, or tokens are used.
-                try
-                {
-                    disconnectRequested = true;
-                    steamClient.Disconnect();
-                }
-                catch (Exception ex)
-                {
-                    callbackFailure =
-                        $"Disconnect request threw {ex.GetType().Name}: {ex.Message}";
-                }
-            });
-
-            manager.Subscribe<SteamClient.DisconnectedCallback>(callback =>
-            {
-                disconnectedUserInitiated = callback.UserInitiated;
+                disconnectedUserInitiated = cb.UserInitiated;
                 disconnected = true;
             });
 
             stage = $"SteamClient.Connect ({transportName})";
             steamClient.Connect();
-            stage = $"callback pump ({transportName})";
+            stage = $"callback/state pump ({transportName})";
 
-            while (!disconnected &&
-                   callbackFailure is null &&
-                   stopwatch.Elapsed < timeout)
+            while (!connected && !disconnected && sw.Elapsed < timeout)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                manager.RunWaitCallbacks(TimeSpan.FromMilliseconds(250));
+                manager.RunWaitCallbacks(TimeSpan.FromMilliseconds(200));
+                isConnectedEver |= steamClient.IsConnected;
+                lastEndPoint = steamClient.CurrentEndPoint?.ToString() ?? lastEndPoint;
             }
 
-            if (!connected)
+            // If ConnectedCallback arrived, prove the normal disconnect callback too.
+            if (connected)
             {
-                TryDisconnect(steamClient);
-
-                var reason = disconnected
-                    ? $"DisconnectedCallback arrived before ConnectedCallback. " +
-                      $"UserInitiated={FormatNullableBool(disconnectedUserInitiated)}."
-                    : $"No ConnectedCallback or DisconnectedCallback arrived within " +
-                      $"{timeout.TotalSeconds:F0}s.";
-
-                return Fail(
-                    transportName,
-                    protocolTypes,
-                    clientConstructed,
-                    connected,
-                    disconnected,
-                    disconnectedUserInitiated,
-                    stopwatch.Elapsed,
-                    reason);
+                isConnectedEver = true;
+                lastEndPoint = steamClient.CurrentEndPoint?.ToString() ?? lastEndPoint;
+                steamClient.Disconnect();
+                while (!disconnected && sw.Elapsed < timeout)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    manager.RunWaitCallbacks(TimeSpan.FromMilliseconds(200));
+                }
             }
-
-            if (callbackFailure is not null)
+            else
             {
-                TryDisconnect(steamClient);
-
-                return Fail(
-                    transportName,
-                    protocolTypes,
-                    clientConstructed,
-                    connected,
-                    disconnected,
-                    disconnectedUserInitiated,
-                    stopwatch.Elapsed,
-                    callbackFailure);
+                try { steamClient.Disconnect(); } catch { }
             }
 
-            if (!disconnectRequested)
-            {
-                TryDisconnect(steamClient);
-
-                return Fail(
-                    transportName,
-                    protocolTypes,
-                    clientConstructed,
-                    connected,
-                    disconnected,
-                    disconnectedUserInitiated,
-                    stopwatch.Elapsed,
-                    "ConnectedCallback arrived, but the disconnect request was not issued.");
-            }
-
-            if (!disconnected)
-            {
-                TryDisconnect(steamClient);
-
-                return Fail(
-                    transportName,
-                    protocolTypes,
-                    clientConstructed,
-                    connected,
-                    disconnected,
-                    disconnectedUserInitiated,
-                    stopwatch.Elapsed,
-                    "ConnectedCallback arrived, but DisconnectedCallback did not arrive before timeout.");
-            }
+            var exceptionText = FormatExceptions(exceptions);
+            var passed = clientConstructed && connected && disconnected;
+            var checks = (clientConstructed ? 1 : 0) + (connected ? 1 : 0) + (disconnected ? 1 : 0);
+            var detail =
+                $"IsConnected ever: {isConnectedEver}. CurrentEndPoint: {lastEndPoint ?? "never-set"}. " +
+                $"Disconnected.UserInitiated={FormatNullable(disconnectedUserInitiated)}.\n" +
+                $"First-chance SteamKit/runtime exceptions:\n{exceptionText}";
 
             return new SteamConnectionProbeResult(
-                Passed: true,
-                TransportName: transportName,
-                Protocols: protocolTypes.ToString(),
-                ClientConstructed: true,
-                ConnectedCallbackReceived: true,
-                DisconnectedCallbackReceived: true,
-                DisconnectedUserInitiated: disconnectedUserInitiated,
-                SteamKitAssemblyVersion: AssemblyVersion,
-                Elapsed: stopwatch.Elapsed,
-                Summary: $"{transportName.ToUpperInvariant()} PASS — 3/3",
-                Detail:
-                    $"{transportName}: SteamKit client constructed; ConnectedCallback received; " +
-                    "disconnect requested; DisconnectedCallback received. " +
-                    $"UserInitiated={FormatNullableBool(disconnectedUserInitiated)}. " +
-                    "No authentication was attempted.");
+                passed, transportName, protocolTypes.ToString(), clientConstructed, connected, disconnected,
+                disconnectedUserInitiated, isConnectedEver, lastEndPoint, exceptionText, AssemblyVersion,
+                sw.Elapsed, $"{transportName.ToUpperInvariant()} {(passed ? "PASS" : "FAIL")} — {checks}/3", detail);
         }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
+        catch (OperationCanceledException) { throw; }
         catch (Exception ex)
         {
-            return Fail(
-                transportName,
-                protocolTypes,
-                clientConstructed,
-                connected,
-                disconnected,
-                disconnectedUserInitiated,
-                stopwatch.Elapsed,
-                FormatException(stage, ex));
+            var exceptionText = FormatExceptions(exceptions);
+            return new SteamConnectionProbeResult(
+                false, transportName, protocolTypes.ToString(), clientConstructed, connected, disconnected,
+                disconnectedUserInitiated, isConnectedEver, lastEndPoint, exceptionText, AssemblyVersion,
+                sw.Elapsed, $"{transportName.ToUpperInvariant()} FAIL",
+                $"Stage: {stage}\n{ex}\nCaptured first-chance exceptions:\n{exceptionText}");
         }
-    }
-
-    private static void TryDisconnect(SteamClient steamClient)
-    {
-        try
+        finally
         {
-            steamClient.Disconnect();
+            AppDomain.CurrentDomain.FirstChanceException -= FirstChance;
+            if (steamClient is not null)
+            {
+                try { steamClient.Disconnect(); } catch { }
+            }
         }
-        catch
-        {
-            // Preserve the original failure in the probe result.
-        }
     }
 
-    private static string FormatException(string stage, Exception ex)
+    private static string FormatExceptions(ConcurrentQueue<string> exceptions)
     {
-        var text = $"Stage: {stage}\n{ex}";
-
-        const int maxLength = 3500;
-        return text.Length <= maxLength
-            ? text
-            : text[..maxLength] + "\n…(truncated)";
+        var items = exceptions.Distinct().Take(12).ToArray();
+        return items.Length == 0 ? "(none captured)" : string.Join("\n", items.Select((x, i) => $"{i + 1}. {x}"));
     }
 
-    private static string FormatNullableBool(bool? value) =>
-        value.HasValue ? value.Value.ToString() : "not-received";
-
-    private static SteamConnectionProbeResult Fail(
-        string transportName,
-        ProtocolTypes protocolTypes,
-        bool clientConstructed,
-        bool connected,
-        bool disconnected,
-        bool? disconnectedUserInitiated,
-        TimeSpan elapsed,
-        string detail)
-    {
-        var passedChecks =
-            (clientConstructed ? 1 : 0) +
-            (connected ? 1 : 0) +
-            (disconnected ? 1 : 0);
-
-        return new SteamConnectionProbeResult(
-            Passed: false,
-            TransportName: transportName,
-            Protocols: protocolTypes.ToString(),
-            ClientConstructed: clientConstructed,
-            ConnectedCallbackReceived: connected,
-            DisconnectedCallbackReceived: disconnected,
-            DisconnectedUserInitiated: disconnectedUserInitiated,
-            SteamKitAssemblyVersion: AssemblyVersion,
-            Elapsed: elapsed,
-            Summary: $"{transportName.ToUpperInvariant()} FAIL — {passedChecks}/3",
-            Detail: detail);
-    }
+    private static string FormatNullable(bool? value) => value.HasValue ? value.Value.ToString() : "not-received";
 }

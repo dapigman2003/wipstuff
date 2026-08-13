@@ -1,6 +1,6 @@
-# StS2 Launcher iOS — Step 05.5
+# StS2 Launcher iOS — Step 05.6
 
-Step 05.5 isolates the remaining Steam CM connection failure below SteamKit's connection layer.
+Step 05.6 isolates the remaining Steam CM connection failure below SteamKit's connection layer.
 
 Proven before this step:
 
@@ -13,7 +13,7 @@ Proven before this step:
 - WebSocket-only SteamKit constructs and posts an early non-user DisconnectedCallback without ConnectedCallback;
 - TCP-only SteamKit constructs but posts neither callback before the Step 05.4 timeout.
 
-Step 05.5 keeps all of those proven boundaries and adds a network test below SteamKit:
+Step 05.6 keeps all of those proven boundaries and adds a network test below SteamKit:
 
 1. HTTPS GET to Valve's `ISteamDirectory/GetCMListForConnect` endpoint;
 2. JSON endpoint discovery;
@@ -34,6 +34,6 @@ artifacts/StS2-Launcher-Step-05.5.ipa
 Expected device header:
 
 ```text
-STEP 05.5 — CM NETWORK BOUNDARY
-Version 0.0.11
+STEP 05.6 — STEAMKIT INTERNAL BOUNDARY
+Version 0.0.12
 ```

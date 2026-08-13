@@ -21,7 +21,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 05.5 environment ==="
+  echo "=== StS2 Launcher Step 05.6 environment ==="
   date -u
   uname -a
   xcodebuild -version
@@ -76,7 +76,7 @@ bash scripts/verify-step05-ipa.sh artifacts/StS2-Launcher-Step-05.5.ipa \
   2>&1 | tee artifacts/logs/step05-5-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 05.5"
+  echo "StS2 Launcher iOS — Step 05.6"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"

@@ -24,7 +24,7 @@ FRAMEWORK_LOG="artifacts/logs/step05-5-framework-filter.log"
 GENERATED_FRAMEWORKS_LOG="artifacts/logs/step05-5-generated-linker-frameworks.txt"
 SYMBOL_LOG="artifacts/logs/step05-5-native-symbols.log"
 
-# Never mutate the global/cached NuGet package installation. Step 05.5 modifies
+# Never mutate the global/cached NuGet package installation. Step 05.6 modifies
 # one third-party assembly for this iOS build, so restore into a disposable
 # repository-local package root and compile against that exact patched copy.
 export NUGET_PACKAGES="$ROOT/.nuget/packages"
@@ -37,7 +37,7 @@ capture_linker_diagnostics() {
   : > "$SYMBOL_LOG"
 
   {
-    echo "=== Step 05.5 retained in-memory framework filter ==="
+    echo "=== Step 05.6 retained in-memory framework filter ==="
     grep 'STEP05.2 LINKER FRAMEWORKS' "$PUBLISH_LOG" || true
   } | tee "$FRAMEWORK_LOG" >/dev/null
 
@@ -79,7 +79,7 @@ capture_linker_diagnostics() {
   } > "$SYMBOL_LOG"
 }
 
-echo "=== Step 05.5 native-framework preflight ===" \
+echo "=== Step 05.6 native-framework preflight ===" \
   | tee artifacts/logs/step05-5-native-preflight.log
 
 SDK_ROOT="$(xcrun --sdk iphoneos --show-sdk-path)"
@@ -96,7 +96,7 @@ else
 fi
 
 cat <<'TXT' | tee -a artifacts/logs/step05-5-native-preflight.log
-Step 05.5 policy:
+Step 05.6 policy:
   - retain TrimMode=full;
   - retain the proven DiskArbitration generated-framework filter;
   - patch exactly one SteamKit2 3.3.1 Process.StartTime call before AOT;
@@ -107,7 +107,7 @@ Step 05.5 policy:
 TXT
 
 echo
-echo "Restoring Step 05.5 into isolated NuGet package root..."
+echo "Restoring Step 05.6 into isolated NuGet package root..."
 dotnet restore "$PROJECT" \
   2>&1 | tee artifacts/logs/step05-5-restore.log
 
@@ -118,7 +118,7 @@ if [[ ! -f "$STEAMKIT_DLL" ]]; then
 fi
 
 {
-  echo "=== Step 05.5 SteamKit iOS compatibility patch ==="
+  echo "=== Step 05.6 SteamKit iOS compatibility patch ==="
   echo "Input: $STEAMKIT_DLL"
   if command -v shasum >/dev/null 2>&1; then
     echo "Before SHA-256: $(shasum -a 256 "$STEAMKIT_DLL" | awk '{print $1}')"
@@ -143,7 +143,7 @@ if command -v shasum >/dev/null 2>&1; then
 fi
 
 for required in \
-  'STEP05.5 STEAMKIT IOS PATCH: PASS' \
+  'STEP05.6 STEAMKIT IOS PATCH: PASS' \
   'Replacement count: 1' \
   'Unsupported call removed: System.Diagnostics.Process.StartTime' \
   'Replacement value: System.DateTime.UtcNow'; do
@@ -154,7 +154,7 @@ for required in \
 done
 
 echo
-echo "Publishing Step 05.5 against patched SteamKit2..."
+echo "Publishing Step 05.6 against patched SteamKit2..."
 
 set +e
 dotnet publish "$PROJECT" \
@@ -177,7 +177,7 @@ capture_linker_diagnostics
 if [[ "$PUBLISH_STATUS" != "0" ]]; then
   {
     echo
-    echo "=== Step 05.5 publish failed: focused scan ==="
+    echo "=== Step 05.6 publish failed: focused scan ==="
     echo "dotnet publish exit code: $PUBLISH_STATUS"
     echo
     echo "SteamKit patch telemetry:"

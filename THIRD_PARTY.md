@@ -1,4 +1,4 @@
-# Third-Party Components — Step 05.5
+# Third-Party Components — Step 05.6
 
 ## SteamKit2
 
@@ -9,7 +9,7 @@
 - Purpose: Steam network protocol client
 - License: see the upstream SteamKit repository/license for authoritative terms
 
-Step 05.5 applies one build-time iOS compatibility edit to the local restored
+Step 05.6 applies one build-time iOS compatibility edit to the local restored
 SteamKit2 assembly: the `SteamClient` constructor's unsupported iOS
 `System.Diagnostics.Process.StartTime` read is replaced with `DateTime.UtcNow`.
 The application still uses SteamKit only for an unauthenticated

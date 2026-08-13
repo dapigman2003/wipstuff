@@ -1,4 +1,4 @@
-# Step 05.5 device report
+# Step 05.6 device report
 
 Build/install/launch must still pass before interpreting the network result.
 

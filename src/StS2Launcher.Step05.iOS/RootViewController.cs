@@ -65,12 +65,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.5 — CM NETWORK BOUNDARY",
+            "STEP 05.6 — STEAMKIT INTERNAL BOUNDARY",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.11",
+            "Version 0.0.12",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -99,12 +99,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "This test checks Valve CM HTTPS/DNS/raw sockets first, then reruns SteamKit WebSocket and TCP. It never authenticates.",
+            "This test re-confirms the native CM network boundary, then captures SteamKit internal connection state and hidden runtime exceptions. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run CM Boundary Diagnostics", 17);
+        _steamButton = SystemButton("Run SteamKit Internal Diagnostics", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -163,7 +163,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.5 checks.",
+            "Status: starting Step 05.6 checks.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -179,7 +179,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.5: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.6: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -233,7 +233,7 @@ public sealed class RootViewController : UIViewController
         _steamResultLabel.Text = "CM NETWORK: TESTING…";
         _steamResultLabel.TextColor = UIColor.Label;
         _steamDetailLabel.Text =
-            "1/3 Native iOS/.NET CM network boundary probe running…";
+            "1/3 Re-confirming native iOS/.NET CM network boundary…";
         _statusLabel.Text =
             "NETWORK TEST RUNNING — leave the app in foreground.";
 
@@ -247,7 +247,7 @@ public sealed class RootViewController : UIViewController
             {
                 _steamDetailLabel.Text =
                     FormatNetworkResult(network) +
-                    "\n\n2/3 SteamKit WebSocket-only probe running…";
+                    "\n\n2/3 SteamKit WebSocket internal-state probe running…";
             });
 
             var webSocket = await _steamProbe.RunAsync(
@@ -261,7 +261,7 @@ public sealed class RootViewController : UIViewController
                     FormatNetworkResult(network) +
                     "\n\n" +
                     FormatTransportResult(webSocket) +
-                    "\n\n3/3 SteamKit TCP-only probe running…";
+                    "\n\n3/3 SteamKit TCP internal-state probe running…";
             });
 
             await Task.Delay(500);
@@ -315,7 +315,7 @@ public sealed class RootViewController : UIViewController
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.5 diagnostics.";
+                    "FAIL: unhandled exception in Step 05.6 diagnostics.";
                 _steamButton.Enabled = true;
             });
         }
@@ -345,6 +345,8 @@ public sealed class RootViewController : UIViewController
             $"DisconnectedCallback: {(result.DisconnectedCallbackReceived ? "YES" : "NO")}\n" +
             $"Disconnected.UserInitiated: " +
             $"{(result.DisconnectedUserInitiated.HasValue ? result.DisconnectedUserInitiated.Value.ToString() : "N/A")}\n" +
+            $"IsConnected ever: {result.IsConnectedEver}\n" +
+            $"CurrentEndPoint: {result.LastCurrentEndPoint ?? "never-set"}\n" +
             $"Elapsed: {result.Elapsed.TotalSeconds:F1}s\n" +
             result.Detail;
     }
