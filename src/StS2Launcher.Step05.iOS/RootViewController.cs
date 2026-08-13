@@ -67,12 +67,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.10 — CLIENTHELLO AOT DIAGNOSTICS",
+            "STEP 05.11 — PROTOBUF NO-EMIT TEST",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.16",
+            "Version 0.0.17",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -101,12 +101,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "Step 05.9 proved SteamKit's exact selected CM endpoint completes the same custom-invoker WebSocket upgrade outside SteamKit. Step 05.10 keeps that replay as a regression check and instruments SteamKit's next post-upgrade boundary: outgoing ClientHello serialization plus the exact Reflection.Emit caller context. It never authenticates.",
+            "Step 05.10 proved SteamKit reaches an actually connected WebSocket but emits no Steam message before Reflection.Emit appears. Step 05.11 changes one thing: protobuf-net RuntimeTypeModel.Default.AutoCompile is disabled before SteamKit connects, forcing the non-runtime-compiled serializer path. All network and exact-endpoint checks remain regressions. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run Step 05.10 ClientHello Diagnostics", 17);
+        _steamButton = SystemButton("Run Step 05.11 Protobuf No-Emit Test", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -165,7 +165,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.10 ClientHello diagnostics.",
+            "Status: starting Step 05.11 protobuf no-emit test.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -181,7 +181,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.10: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.11: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -262,7 +262,7 @@ public sealed class RootViewController : UIViewController
                     FormatNetworkResult(network) +
                     "\n\n" +
                     FormatHandlerIsolationResult(handlerIsolation) +
-                    "\n\n3/4 SteamKit WebSocket + ClientHello diagnostic running…";
+                    "\n\n3/4 SteamKit WebSocket with protobuf runtime compilation disabled…";
             });
 
             var webSocket = await _steamProbe.RunAsync(TimeSpan.FromSeconds(25));
@@ -337,12 +337,12 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEP 05.10 CLIENTHELLO DIAGNOSTICS: EXCEPTION";
+                _steamResultLabel.Text = "STEP 05.11 PROTOBUF NO-EMIT TEST: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.10 diagnostics.";
+                    "FAIL: unhandled exception in Step 05.11 protobuf no-emit test.";
                 _steamButton.Enabled = true;
             });
         }

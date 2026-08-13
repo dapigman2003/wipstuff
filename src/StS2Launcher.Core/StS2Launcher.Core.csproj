@@ -6,8 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <!--
-      Intentionally pinned to 3.3.1 for the proven .NET 9 toolchain.
-      SteamKit2 3.4.0 targets .NET 10; upgrading the runtime is a separate decision.
+      Intentionally pinned to 3.3.1 to preserve the currently proven dependency surface.
+      Any SteamKit package upgrade is a separate numbered experiment.
     -->
     <PackageReference Include="SteamKit2" Version="3.3.1" />
   </ItemGroup>

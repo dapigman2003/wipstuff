@@ -7,7 +7,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.10 SteamKit post-WebSocket-upgrade / ClientHello AOT diagnostic.
+/// Step 05.11 SteamKit post-WebSocket-upgrade / ClientHello AOT diagnostic.
 ///
 /// Step 05.9 proved that SteamKit's exact selected CM endpoint can complete the
 /// same custom-HttpMessageInvoker WebSocket upgrade outside SteamKit. This probe
@@ -44,7 +44,8 @@ public sealed class SteamConnectionProbe
         bool? disconnectedUserInitiated = null;
         var isConnectedEver = false;
         string? lastEndPoint = null;
-        var stage = "SteamConfiguration.Create";
+        var stage = "protobuf-net AOT configuration";
+        var protobufAotMode = "not-configured";
         SteamClient? steamClient = null;
         SteamNetworkTraceListener? networkTrace = null;
 
@@ -121,6 +122,9 @@ public sealed class SteamConnectionProbe
         AppDomain.CurrentDomain.FirstChanceException += FirstChance;
         try
         {
+            protobufAotMode = ProtobufAotCompatibility.Configure();
+            stage = "SteamConfiguration.Create";
+
             var configuration = SteamConfiguration.Create(builder => builder
                 .WithProtocolTypes(protocolTypes)
                 .WithHttpClientFactory(Factory));
@@ -178,6 +182,7 @@ public sealed class SteamConnectionProbe
             var passed = clientConstructed && connected && disconnected;
             var checks = (clientConstructed ? 1 : 0) + (connected ? 1 : 0) + (disconnected ? 1 : 0);
             var detail =
+                $"Protobuf AOT mode: {protobufAotMode}.\n" +
                 $"HTTP factory calls: {factoryText}. " +
                 $"CM WebSocket handler: {nameof(SocketsHttpHandler)}.\n" +
                 $"Outgoing ClientHello observed: {(clientHelloObserved ? "YES" : "NO")}.\n" +
@@ -202,7 +207,7 @@ public sealed class SteamConnectionProbe
                 false, transportName, protocolTypes.ToString(), clientConstructed, connected, disconnected,
                 disconnectedUserInitiated, isConnectedEver, lastEndPoint, clientHelloObserved, traceText,
                 exceptionText, AssemblyVersion, sw.Elapsed, "STEAMKIT WEBSOCKET FAIL",
-                $"Stage: {stage}\nHTTP factory calls: {FormatFactoryCalls(factoryCalls)}\n" +
+                $"Stage: {stage}\nProtobuf AOT mode: {protobufAotMode}\nHTTP factory calls: {FormatFactoryCalls(factoryCalls)}\n" +
                 $"Outgoing ClientHello observed: {(clientHelloObserved ? "YES" : "NO")}\n" +
                 $"Debug network trace (metadata only):\n{traceText}\n{ex}\n" +
                 $"Captured first-chance exceptions:\n{exceptionText}");
