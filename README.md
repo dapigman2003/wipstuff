@@ -1,79 +1,63 @@
-# StS2 Launcher iOS — Step 01
+# StS2 Launcher iOS — Step 01.1
 
-This is the **ground-zero device bootstrap test**.
+This is the corrected **ground-zero UIKit bootstrap test**.
+
+## Why Step 01.1 exists
+
+Step 01 installed successfully but immediately terminated on launch.
+
+Reviewing the bootstrap found a concrete lifecycle bug: the scene configuration requested a
+`UIWindowScene`, but `SceneDelegate` inherited from `UISceneDelegate`.
+
+For a window scene, the delegate must conform to `UIWindowSceneDelegate`. In .NET iOS the
+correct base class is `UIWindowSceneDelegate`, which also exposes the Objective-C exported
+`Window` property UIKit expects.
+
+Step 01.1 changes only that startup boundary (plus version/test identifiers).
 
 ## Scope
 
-Step 01 contains only:
+Contains only:
 
 - .NET 9 iOS
 - UIKit/Foundation
-- an AppDelegate
-- a SceneDelegate
-- one native UIKit view controller
-- a tiny file-write test
-- unsigned IPA packaging for Sideloadly
+- AppDelegate
+- correctly typed UIWindowSceneDelegate
+- one UIKit view controller
+- one test-log button
+- unsigned IPA packaging
 
-It intentionally contains **no**:
-
-- Godot
-- SteamKit2
-- Mono.Cecil
-- Keychain code
-- native static libraries
-- game files
-- custom AOT/interpreter settings
-- runtime patching
-- engine overlays
+Still contains no Godot, SteamKit2, Mono.Cecil, Keychain integration, native game/runtime
+libraries, game files, or runtime patching.
 
 ## Expected physical-device result
 
-After installing `StS2-Launcher-Step-01.ipa` and opening it, the app must show a **white screen** with:
+Install:
 
-- `StS2 Launcher`
-- `STEP 01 — UI BOOTSTRAP PASS`
-- `Version 0.0.1`
-- `Status: UI rendered successfully.`
-- a `Write Test Log` button
+`StS2-Launcher-Step-01.1.ipa`
 
-Tap **Write Test Log**.
+Then launch it.
 
-The status must change to a message beginning with:
+Expected visible screen:
 
-`PASS: test log written`
+```text
+StS2 Launcher
 
-Then:
+STEP 01.1 — UI BOOTSTRAP PASS
 
-1. send the app to the background;
-2. return to it;
-3. terminate it from the app switcher;
-4. reopen it.
+Version 0.0.2
 
-The launcher screen must return each time.
+Status: UI rendered successfully.
 
-See `docs/STEP-01-TEST.md` for the exact pass/fail contract.
+Lifecycle: Active
 
-## Build in Codemagic
-
-Use workflow:
-
-`ios-step-01`
-
-Expected artifact:
-
-`artifacts/StS2-Launcher-Step-01.ipa`
-
-The IPA is intentionally unsigned so it can be locally re-signed/sideloaded.
-
-## Local macOS build
-
-```bash
-bash scripts/codemagic-build.sh
+[ Write Test Log ]
 ```
 
-or, if the correct .NET/iOS workload is already installed:
+The screen should be white.
 
-```bash
-bash scripts/build-step01.sh
-bash scripts/verify-step01-ipa.sh artifacts/StS2-Launcher-Step-01.ipa
-```
+Tap `Write Test Log`; the status should change to `PASS: test log written at ...`.
+
+Then test background/foreground and terminate/reopen.
+
+See `docs/STEP-01.1-TEST.md`.

@@ -15,7 +15,7 @@ rm -rf artifacts/publish artifacts/Payload
 mkdir -p artifacts/publish artifacts/logs
 
 APP="$ROOT/artifacts/publish/StS2Launcher.Step01.iOS.app"
-IPA="$ROOT/artifacts/StS2-Launcher-Step-01.ipa"
+IPA="$ROOT/artifacts/StS2-Launcher-Step-01.1.ipa"
 
 echo "Publishing Step 01..."
 dotnet publish src/StS2Launcher.Step01.iOS/StS2Launcher.Step01.iOS.csproj \
@@ -41,8 +41,8 @@ cp -R "$APP" artifacts/Payload/
 
 (
   cd artifacts
-  rm -f StS2-Launcher-Step-01.ipa
-  /usr/bin/zip -qry StS2-Launcher-Step-01.ipa Payload
+  rm -f StS2-Launcher-Step-01.1.ipa
+  /usr/bin/zip -qry StS2-Launcher-Step-01.1.ipa Payload
 )
 
 echo "Created $IPA"

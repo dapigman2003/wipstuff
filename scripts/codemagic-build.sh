@@ -74,7 +74,7 @@ trap - EXIT
 
 bash scripts/validate-step01.sh | tee artifacts/logs/step01-validation.log
 bash scripts/build-step01.sh 2>&1 | tee artifacts/logs/step01-publish.log
-bash scripts/verify-step01-ipa.sh artifacts/StS2-Launcher-Step-01.ipa \
+bash scripts/verify-step01-ipa.sh artifacts/StS2-Launcher-Step-01.1.ipa \
   2>&1 | tee artifacts/logs/step01-ipa-verification.log
 
 {
@@ -85,9 +85,9 @@ bash scripts/verify-step01-ipa.sh artifacts/StS2-Launcher-Step-01.ipa \
   echo "Xcode: $(xcodebuild -version | tr '\n' ' ')"
   echo ".NET SDK: $(dotnet --version)"
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
-  echo "IPA: artifacts/StS2-Launcher-Step-01.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-01.1.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-01.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-01.1.ipa | awk '{print $1}')"
   fi
 } > artifacts/step01-build-summary.txt
 

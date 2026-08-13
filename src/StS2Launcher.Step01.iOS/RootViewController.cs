@@ -26,7 +26,7 @@ public sealed class RootViewController : UIViewController
         var pass = new UILabel
         {
             TranslatesAutoresizingMaskIntoConstraints = false,
-            Text = "STEP 01 — UI BOOTSTRAP PASS",
+            Text = "STEP 01.1 — UI BOOTSTRAP PASS",
             TextColor = UIColor.Black,
             TextAlignment = UITextAlignment.Center,
             Lines = 0,
@@ -36,7 +36,7 @@ public sealed class RootViewController : UIViewController
         var version = new UILabel
         {
             TranslatesAutoresizingMaskIntoConstraints = false,
-            Text = "Version 0.0.1",
+            Text = "Version 0.0.2",
             TextColor = UIColor.DarkGray,
             TextAlignment = UITextAlignment.Center,
             Font = UIFont.SystemFontOfSize(16)
@@ -96,7 +96,7 @@ public sealed class RootViewController : UIViewController
             writeLogButton.HeightAnchor.ConstraintGreaterThanOrEqualTo(50)
         ]);
 
-        Console.WriteLine("Step 01: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 01.1: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -115,7 +115,7 @@ public sealed class RootViewController : UIViewController
             var path = Path.Combine(documents, "step01-device-test.log");
 
             var line =
-                $"{DateTimeOffset.Now:O} STEP01 PASS " +
+                $"{DateTimeOffset.Now:O} STEP01.1 PASS " +
                 $"iOS={UIDevice.CurrentDevice.SystemVersion} " +
                 $"device={UIDevice.CurrentDevice.Model}{Environment.NewLine}";
 
@@ -127,7 +127,7 @@ public sealed class RootViewController : UIViewController
                     $"PASS: test log written at {DateTime.Now:HH:mm:ss}";
             }
 
-            Console.WriteLine($"Step 01: wrote device test log: {path}");
+            Console.WriteLine($"Step 01.1: wrote device test log: {path}");
         }
         catch (Exception ex)
         {

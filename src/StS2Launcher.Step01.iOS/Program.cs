@@ -6,7 +6,7 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        Console.WriteLine("StS2 Launcher Step 01: entering UIApplication.Main");
+        Console.WriteLine("StS2 Launcher Step 01.1: entering UIApplication.Main");
         UIApplication.Main(args, null, typeof(AppDelegate));
     }
 }

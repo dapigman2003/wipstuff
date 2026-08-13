@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IPA="${1:-artifacts/StS2-Launcher-Step-01.ipa}"
+IPA="${1:-artifacts/StS2-Launcher-Step-01.1.ipa}"
 
 if [[ ! -f "$IPA" ]]; then
   echo "ERROR: IPA not found: $IPA" >&2
@@ -45,8 +45,8 @@ EXECUTABLE="$APP/$EXEC_NAME"
   exit 4
 }
 
-[[ "$VERSION" == "0.0.1" ]] || {
-  echo "ERROR: wrong Step 01 version: $VERSION" >&2
+[[ "$VERSION" == "0.0.2" ]] || {
+  echo "ERROR: wrong Step 01.1 version: $VERSION" >&2
   exit 4
 }
 
@@ -81,4 +81,4 @@ echo "  Minimum iOS: ${MIN_IOS:-unknown}"
 echo "  Architecture: arm64"
 echo "  Package signing: $SIGNING"
 echo "  IPA size: $SIZE"
-echo "  Expected device UI: white screen + STEP 01 — UI BOOTSTRAP PASS"
+echo "  Expected device UI: white screen + STEP 01.1 — UI BOOTSTRAP PASS"

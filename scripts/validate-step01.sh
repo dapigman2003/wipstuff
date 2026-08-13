@@ -42,7 +42,16 @@ if config.get("UISceneClassName") != "UIWindowScene":
 if config.get("UISceneDelegateClassName") != "SceneDelegate":
     raise SystemExit("ERROR: SceneDelegate is not explicitly registered in Info.plist.")
 
-print("Step 01 project/plist validation passed.")
+
+scene_source = Path("src/StS2Launcher.Step01.iOS/SceneDelegate.cs").read_text()
+if "class SceneDelegate : UIWindowSceneDelegate" not in scene_source:
+    raise SystemExit(
+        "ERROR: SceneDelegate must derive from UIWindowSceneDelegate for a UIWindowScene.")
+if "public override UIWindow? Window" not in scene_source:
+    raise SystemExit(
+        "ERROR: SceneDelegate must override UIWindowSceneDelegate.Window.")
+
+print("Step 01.1 project/plist validation passed.")
 PY
 
 # The actual app source must remain isolated from later subsystems.
@@ -56,4 +65,4 @@ for script in scripts/*.sh; do
   bash -n "$script"
 done
 
-echo "Step 01 repository validation passed."
+echo "Step 01.1 repository validation passed."
