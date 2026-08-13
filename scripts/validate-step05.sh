@@ -11,7 +11,7 @@ PATCHER_SOURCE="tools/StS2Launcher.SteamKitIosPatcher/Program.cs"
 
 for required in "$IOS_PROJECT" "$CORE_PROJECT" "$PATCHER_PROJECT" "$PATCHER_SOURCE"; do
   [[ -f "$required" ]] || {
-    echo "ERROR: missing required Step 05.4 file: $required" >&2
+    echo "ERROR: missing required Step 05.5 file: $required" >&2
     exit 2
   }
 done
@@ -33,7 +33,7 @@ if any(True for _ in ios_root.iter("PackageReference")):
     raise SystemExit(
         "ERROR: SteamKit/build-tool packages must not be referenced directly by iOS UI.")
 if any(True for _ in ios_root.iter("NativeReference")):
-    raise SystemExit("ERROR: Step 05.4 must not contain NativeReference.")
+    raise SystemExit("ERROR: Step 05.5 must not contain NativeReference.")
 
 values = {}
 for name in (
@@ -49,12 +49,12 @@ for name in (
 expected = {
     "TargetFramework": "net9.0-ios",
     "RuntimeIdentifier": "ios-arm64",
-    "ApplicationVersion": "10",
-    "ApplicationDisplayVersion": "0.0.10",
+    "ApplicationVersion": "11",
+    "ApplicationDisplayVersion": "0.0.11",
     "TrimMode": "full",
 }
 if values != expected:
-    raise SystemExit(f"ERROR: Step 05.4 iOS build properties changed: {values}")
+    raise SystemExit(f"ERROR: Step 05.5 iOS build properties changed: {values}")
 
 # Retain the exact native-framework boundary fix proven by Step 05.2/05.3.
 target = None
@@ -85,7 +85,7 @@ packages = {
 }
 if packages != {"SteamKit2": "3.3.1"}:
     raise SystemExit(
-        f"ERROR: Step 05.4 expects exactly SteamKit2 3.3.1 in Core; got {packages}")
+        f"ERROR: Step 05.5 expects exactly SteamKit2 3.3.1 in Core; got {packages}")
 
 patcher_root = ET.parse(
     "tools/StS2Launcher.SteamKitIosPatcher/StS2Launcher.SteamKitIosPatcher.csproj"
@@ -106,7 +106,7 @@ for required in (
     '"get_UtcNow"',
     "replacements != 1",
     "ModuleAttributes.StrongNameSigned",
-    "STEP05.4 STEAMKIT IOS PATCH: PASS",
+    "STEP05.5 STEAMKIT IOS PATCH: PASS",
 ):
     if required not in patcher:
         raise SystemExit(f"ERROR: SteamKit iOS patcher guard missing: {required}")
@@ -116,10 +116,10 @@ with plist_path.open("rb") as f:
     plist = plistlib.load(f)
 if plist.get("CFBundleIdentifier") != "com.community.sts2launcher":
     raise SystemExit("ERROR: unexpected bundle ID.")
-if plist.get("CFBundleShortVersionString") != "0.0.10":
-    raise SystemExit("ERROR: Info.plist Step 05.4 display version regression.")
-if str(plist.get("CFBundleVersion")) != "10":
-    raise SystemExit("ERROR: Info.plist Step 05.4 build version regression.")
+if plist.get("CFBundleShortVersionString") != "0.0.11":
+    raise SystemExit("ERROR: Info.plist Step 05.5 display version regression.")
+if str(plist.get("CFBundleVersion")) != "11":
+    raise SystemExit("ERROR: Info.plist Step 05.5 build version regression.")
 
 scene = Path("src/StS2Launcher.Step05.iOS/SceneDelegate.cs").read_text()
 if "class SceneDelegate : UIWindowSceneDelegate" not in scene:
@@ -147,6 +147,19 @@ for required in (
     if required not in probe:
         raise SystemExit(f"ERROR: Steam transport probe missing: {required}")
 
+network_probe = Path("src/StS2Launcher.Core/CmNetworkProbe.cs").read_text()
+for required in (
+    "ISteamDirectory/GetCMListForConnect",
+    "HttpClient",
+    "Dns.GetHostAddressesAsync",
+    "TcpClient",
+    "ClientWebSocket",
+    '"/cmsocket/"',
+    "JsonDocument.Parse",
+):
+    if required not in network_probe:
+        raise SystemExit(f"ERROR: Step 05.5 CM network probe missing: {required}")
+
 # Authentication is intentionally forbidden in Step 05.x.
 for forbidden in (
     "BeginAuthSession",
@@ -157,24 +170,24 @@ for forbidden in (
     "TwoFactor",
     "SteamGuard",
 ):
-    if forbidden in probe:
+    if forbidden in probe or forbidden in network_probe:
         raise SystemExit(
-            f"ERROR: Step 05.4 transport probe contains authentication behavior: {forbidden}")
+            f"ERROR: Step 05.5 diagnostics contain authentication behavior: {forbidden}")
 
 root_view = Path("src/StS2Launcher.Step05.iOS/RootViewController.cs").read_text()
 for required in (
-    "STEP 05.4 — STEAM TRANSPORT ISOLATION",
-    "Version 0.0.10",
+    "STEP 05.5 — CM NETWORK BOUNDARY",
+    "Version 0.0.11",
     "NO LOGIN • NO PASSWORD • NO STEAM GUARD • NO TOKEN",
-    "Run WebSocket + TCP Probes",
+    "Run CM Boundary Diagnostics",
     "ProtocolTypes.WebSocket",
     "ProtocolTypes.Tcp",
-    'TimeSpan.FromSeconds(15)',
+    'TimeSpan.FromSeconds(20)',
     "Disconnected.UserInitiated",
     "STEAMKIT ASSEMBLY: PASS",
 ):
     if required not in root_view:
-        raise SystemExit(f"ERROR: Step 05.4 UI marker missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.5 UI marker missing: {required}")
 
 # Core remains platform-neutral and contains no build-time Cecil dependency.
 core_text = "\n".join(
@@ -193,19 +206,19 @@ for required in (
     'dotnet restore "$PROJECT"',
     'dotnet run --project "$PATCHER"',
     '--no-restore',
-    'STEP05.4 STEAMKIT IOS PATCH: PASS',
+    'STEP05.5 STEAMKIT IOS PATCH: PASS',
 ):
     if required not in build_script:
-        raise SystemExit(f"ERROR: Step 05.4 build isolation guard missing: {required}")
+        raise SystemExit(f"ERROR: Step 05.5 build isolation guard missing: {required}")
 
-print("Step 05.4 Steam transport-isolation/Core/UI boundary validation passed.")
+print("Step 05.5 Steam transport-isolation/Core/UI boundary validation passed.")
 PY
 
 # Still forbidden from the actual application source: Godot, runtime Cecil,
 # Harmony/native game host. The build-only Cecil tool lives only under tools/.
 if grep -RniE 'Godot|Mono\.Cecil|Harmony|NativeGodotHost' \
   src --include='*.cs' --include='*.csproj'; then
-  echo "ERROR: Step 05.4 app source contains a forbidden later-stage subsystem." >&2
+  echo "ERROR: Step 05.5 app source contains a forbidden later-stage subsystem." >&2
   exit 3
 fi
 
@@ -213,4 +226,4 @@ for script in scripts/*.sh; do
   bash -n "$script"
 done
 
-echo "Step 05.4 repository validation passed."
+echo "Step 05.5 repository validation passed."

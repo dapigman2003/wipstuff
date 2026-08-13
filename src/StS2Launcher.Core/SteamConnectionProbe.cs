@@ -4,7 +4,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step-05.4 transport-isolation SteamKit probe.
+/// Step-05.5 transport-isolation SteamKit probe.
 ///
 /// Step 05.3 proved SteamClient construction succeeds on iOS after replacing
 /// SteamKit 3.3.1's unsupported Process.StartTime assumption. It then received
@@ -37,7 +37,7 @@ public sealed class SteamConnectionProbe
         {
             throw new ArgumentOutOfRangeException(
                 nameof(protocolTypes),
-                "Step 05.4 intentionally permits exactly one transport per probe.");
+                "Step 05.5 intentionally permits exactly one transport per probe.");
         }
 
         return Task.Run(

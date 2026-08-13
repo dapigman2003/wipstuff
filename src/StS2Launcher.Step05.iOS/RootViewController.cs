@@ -10,6 +10,7 @@ public sealed class RootViewController : UIViewController
     private readonly LauncherController _controller = new();
     private readonly KeychainProbe _keychainProbe =
         new(new KeychainCredentialStore());
+    private readonly CmNetworkProbe _cmNetworkProbe = new();
     private readonly SteamConnectionProbe _steamProbe = new();
 
     private UILabel? _steamAssemblyLabel;
@@ -64,12 +65,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.4 — STEAM TRANSPORT ISOLATION",
+            "STEP 05.5 — CM NETWORK BOUNDARY",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.10",
+            "Version 0.0.11",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -98,12 +99,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "This test tries WebSocket-only, then TCP-only. It never authenticates.",
+            "This test checks Valve CM HTTPS/DNS/raw sockets first, then reruns SteamKit WebSocket and TCP. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run WebSocket + TCP Probes", 17);
+        _steamButton = SystemButton("Run CM Boundary Diagnostics", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -162,7 +163,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.4 checks.",
+            "Status: starting Step 05.5 checks.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -178,7 +179,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.4: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.5: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -229,59 +230,78 @@ public sealed class RootViewController : UIViewController
         }
 
         _steamButton.Enabled = false;
-        _steamResultLabel.Text = "STEAM TRANSPORTS: TESTING…";
+        _steamResultLabel.Text = "CM NETWORK: TESTING…";
         _steamResultLabel.TextColor = UIColor.Label;
         _steamDetailLabel.Text =
-            "1/2 WebSocket-only probe running. No authentication will be attempted.";
+            "1/3 Native iOS/.NET CM network boundary probe running…";
         _statusLabel.Text =
             "NETWORK TEST RUNNING — leave the app in foreground.";
 
         try
         {
-            var webSocket = await _steamProbe.RunAsync(
-                "WebSocket",
-                ProtocolTypes.WebSocket,
-                TimeSpan.FromSeconds(15));
+            var network = await _cmNetworkProbe.RunAsync(
+                TimeSpan.FromSeconds(12),
+                TimeSpan.FromSeconds(8));
 
             InvokeOnMainThread(() =>
             {
                 _steamDetailLabel.Text =
-                    FormatTransportResult(webSocket) +
-                    "\n\n2/2 TCP-only probe running…";
+                    FormatNetworkResult(network) +
+                    "\n\n2/3 SteamKit WebSocket-only probe running…";
             });
 
-            // Give the previous SteamClient's connection worker a short clean
-            // teardown window before constructing the independent TCP client.
+            var webSocket = await _steamProbe.RunAsync(
+                "WebSocket",
+                ProtocolTypes.WebSocket,
+                TimeSpan.FromSeconds(20));
+
+            InvokeOnMainThread(() =>
+            {
+                _steamDetailLabel.Text =
+                    FormatNetworkResult(network) +
+                    "\n\n" +
+                    FormatTransportResult(webSocket) +
+                    "\n\n3/3 SteamKit TCP-only probe running…";
+            });
+
             await Task.Delay(500);
 
             var tcp = await _steamProbe.RunAsync(
                 "TCP",
                 ProtocolTypes.Tcp,
-                TimeSpan.FromSeconds(15));
+                TimeSpan.FromSeconds(20));
 
             InvokeOnMainThread(() =>
             {
-                var anyPassed = webSocket.Passed || tcp.Passed;
+                var nativeNetworkReady =
+                    network.DirectoryHttpsPassed &&
+                    network.DnsPassed &&
+                    (network.TcpPassed || network.WebSocketPassed);
+                var steamKitPassed = webSocket.Passed || tcp.Passed;
 
-                _steamResultLabel.Text = anyPassed
-                    ? $"STEAM TRANSPORT PASS — " +
-                      $"WS {(webSocket.Passed ? "3/3" : "FAIL")} • " +
-                      $"TCP {(tcp.Passed ? "3/3" : "FAIL")}"
-                    : "STEAM TRANSPORT FAIL — WS + TCP";
+                _steamResultLabel.Text = steamKitPassed
+                    ? "STEAM CONNECTION PASS"
+                    : nativeNetworkReady
+                        ? "NATIVE NETWORK PASS • STEAMKIT FAIL"
+                        : "CM NETWORK BOUNDARY FAIL";
 
-                _steamResultLabel.TextColor = anyPassed
+                _steamResultLabel.TextColor = steamKitPassed
                     ? UIColor.Label
                     : UIColor.SystemRed;
 
                 _steamDetailLabel.Text =
+                    FormatNetworkResult(network) +
+                    "\n\n" +
                     FormatTransportResult(webSocket) +
                     "\n\n" +
                     FormatTransportResult(tcp) +
                     $"\n\nSteamKit assembly: {SteamConnectionProbe.AssemblyVersion}";
 
-                _statusLabel.Text = anyPassed
-                    ? "PASS: at least one explicit Steam CM transport completed 3/3."
-                    : "FAIL: neither explicit transport reached ConnectedCallback.";
+                _statusLabel.Text = steamKitPassed
+                    ? "PASS: at least one SteamKit CM transport completed 3/3."
+                    : nativeNetworkReady
+                        ? "RESULT: iOS can reach a Steam CM; failure is inside SteamKit's connection layer."
+                        : "RESULT: failure is below SteamKit; use the CM network details above.";
 
                 _steamButton.Enabled = true;
             });
@@ -290,15 +310,30 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEAM TRANSPORT: EXCEPTION";
+                _steamResultLabel.Text = "CM DIAGNOSTICS: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
-                    $"{ex.GetType().Name}: {ex.Message}";
+                    $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in transport isolation probe.";
+                    "FAIL: unhandled exception in Step 05.5 diagnostics.";
                 _steamButton.Enabled = true;
             });
         }
+    }
+
+    private static string FormatNetworkResult(CmNetworkProbeResult result)
+    {
+        return
+            $"{result.Summary}\n" +
+            $"Directory HTTPS: {(result.DirectoryHttpsPassed ? "PASS" : "FAIL")}" +
+            $"{(result.DirectoryStatusCode.HasValue ? $" — HTTP {result.DirectoryStatusCode}" : string.Empty)}\n" +
+            $"CM endpoints: {result.EndpointCount}\n" +
+            $"DNS: {(result.DnsPassed ? "PASS" : "FAIL")} — {result.DnsDetail}\n" +
+            $"Raw TCP: {(result.TcpPassed ? "PASS" : "FAIL")} — {result.TcpEndpoint ?? "none"}\n" +
+            $"TCP detail: {result.TcpDetail}\n" +
+            $"Raw WebSocket: {(result.WebSocketPassed ? "PASS" : "FAIL")} — {result.WebSocketEndpoint ?? "none"}\n" +
+            $"WebSocket detail: {result.WebSocketDetail}\n" +
+            $"Native elapsed: {result.Elapsed.TotalSeconds:F1}s";
     }
 
     private static string FormatTransportResult(SteamConnectionProbeResult result)
