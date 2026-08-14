@@ -6,9 +6,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!--
-      Step 05.13 retains SteamKit2 3.4.0 and only localizes the remaining
-      Reflection.Emit failure to a SteamKit setup/connect stage. No additional
-      runtime capability is introduced.
+      Step 05.14 retains SteamKit2 3.4.0 and adds only SteamKit DebugLog capture
+      around the already-isolated CM WebSocket connection failure. No authentication
+      or additional runtime subsystem is introduced.
     -->
     <PackageReference Include="SteamKit2" Version="3.4.0" />
   </ItemGroup>

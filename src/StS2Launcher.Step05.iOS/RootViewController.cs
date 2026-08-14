@@ -67,12 +67,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.13 — REFLECTION.EMIT STAGE LOCALIZATION",
+            "STEP 05.14 — STEAMKIT INTERNAL ERROR CAPTURE",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.19",
+            "Version 0.0.20",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -101,12 +101,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "Step 05.12 proved SteamKit2 3.4.0 still fails on iOS with no outgoing ClientHello, exact selected-CM replay passing, and PlatformNotSupported_ReflectionEmit still appearing. Step 05.13 keeps SteamKit2 3.4.0 and changes no connection behavior; it timestamps each setup/connect stage and records the active stage when Reflection.Emit fires. It never authenticates.",
+            "Step 05.13 proved the recurring Reflection.Emit first-chance exception came from our own no-op protobuf AOT configuration diagnostic before SteamKit setup. Step 05.14 removes that diagnostic and captures SteamKit's own DebugLog around the unchanged WebSocket connection so we can see the exception SteamKit catches internally before it disconnects. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run Step 05.13 Reflection.Emit Stage Test", 17);
+        _steamButton = SystemButton("Run Step 05.14 SteamKit DebugLog Test", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -165,7 +165,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.13 Reflection.Emit stage localization.",
+            "Status: starting Step 05.14 SteamKit internal-error capture.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -181,7 +181,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.13: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.14: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -262,7 +262,7 @@ public sealed class RootViewController : UIViewController
                     FormatNetworkResult(network) +
                     "\n\n" +
                     FormatHandlerIsolationResult(handlerIsolation) +
-                    "\n\n3/4 SteamKit 3.4.0 stage-localized WebSocket probe running…";
+                    "\n\n3/4 SteamKit 3.4.0 WebSocket + internal DebugLog capture running…";
             });
 
             var webSocket = await _steamProbe.RunAsync(TimeSpan.FromSeconds(25));
@@ -301,7 +301,7 @@ public sealed class RootViewController : UIViewController
                             : endpointReplay.Passed
                                 ? webSocket.OutgoingClientHelloObserved
                                 ? "CLIENTHELLO OUT • CALLBACK FAIL"
-                                : "CLIENTHELLO NOT OBSERVED • STEAMKIT FAIL"
+                                : "STEAMKIT INTERNAL FAIL • SEE DEBUGLOG"
                                 : "STEAMKIT ENDPOINT REPLAY FAIL";
 
                 _steamResultLabel.TextColor = webSocket.Passed
@@ -326,8 +326,8 @@ public sealed class RootViewController : UIViewController
                             ? "RESULT: the previously proven custom-invoker handler path regressed in this run."
                             : endpointReplay.Passed
                                 ? webSocket.OutgoingClientHelloObserved
-                                    ? "RESULT: exact endpoint replay passes and outgoing ClientHello serialized; inspect the caller stack for the failure after ClientHello."
-                                    : "RESULT: exact endpoint replay passes but outgoing ClientHello was not observed; inspect ReflectionEmit observed stage(s) and the stage timeline before choosing the next AOT compatibility change."
+                                    ? "RESULT: exact endpoint replay passes and outgoing ClientHello serialized; inspect SteamKit DebugLog for the failure after ClientHello."
+                                    : "RESULT: exact endpoint replay passes but outgoing ClientHello was not observed; inspect SteamKit DebugLog for the exception SteamKit caught internally before disconnecting."
                                 : "RESULT: SteamKit's chosen CM does not reproduce the successful HTTP upgrade; investigate CM selection/candidate quality before patching SteamKit internals.";
 
                 _steamButton.Enabled = true;
@@ -337,12 +337,12 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEP 05.13 REFLECTION.EMIT STAGE TEST: EXCEPTION";
+                _steamResultLabel.Text = "STEP 05.14 STEAMKIT DEBUGLOG TEST: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.13 Reflection.Emit stage test.";
+                    "FAIL: unhandled exception in Step 05.14 SteamKit DebugLog test.";
                 _steamButton.Enabled = true;
             });
         }

@@ -1,21 +1,20 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using SteamKit2;
 
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.13 Reflection.Emit stage-localization probe on SteamKit2 3.4.0.
+/// Step 05.14 SteamKit internal-error capture probe on SteamKit2 3.4.0.
 ///
-/// Step 05.12 proved that upgrading SteamKit from 3.3.1 to 3.4.0 did not remove
-/// the iOS failure: the exact selected CM replay still worked, no ClientHello
-/// reached IDebugNetworkListener, and PlatformNotSupported_ReflectionEmit still
-/// appeared. Step 05.13 therefore changes no connection behavior. It timestamps
-/// every synchronous SteamKit setup/connect stage and records the active stage
-/// at the instant a first-chance Reflection.Emit exception is observed.
+/// Step 05.13 proved the recurring Reflection.Emit first-chance exception was
+/// triggered by this project's own no-op protobuf AOT configuration diagnostic,
+/// before SteamConfiguration.Create or SteamClient.Connect. Step 05.14 removes
+/// that diagnostic and changes only one boundary: it enables SteamKit's public
+/// DebugLog and captures its metadata/error text around the WebSocket connection.
+/// No authentication is performed.
 /// </summary>
 public sealed class SteamConnectionProbe
 {
@@ -39,27 +38,17 @@ public sealed class SteamConnectionProbe
 
         var sw = Stopwatch.StartNew();
         var exceptions = new ConcurrentQueue<string>();
-        var reflectionEmitStages = new ConcurrentQueue<string>();
-        var stageTimeline = new ConcurrentQueue<string>();
         var factoryCalls = new ConcurrentQueue<string>();
+        var steamDebugLines = new ConcurrentQueue<string>();
         var clientConstructed = false;
         var connected = false;
         var disconnected = false;
         bool? disconnectedUserInitiated = null;
         var isConnectedEver = false;
         string? lastEndPoint = null;
-        var stage = "probe entered";
-        var protobufAotMode = "not-configured";
         SteamClient? steamClient = null;
         SteamNetworkTraceListener? networkTrace = null;
-
-        void SetStage(string next)
-        {
-            stage = next;
-            stageTimeline.Enqueue($"{sw.Elapsed.TotalMilliseconds:F0}ms — {next}");
-        }
-
-        SetStage(stage);
+        var previousDebugLogEnabled = DebugLog.Enabled;
 
         HttpClient Factory(HttpClientPurpose purpose)
         {
@@ -67,73 +56,54 @@ public sealed class SteamConnectionProbe
             return SteamHttpClientFactory.Create(purpose);
         }
 
+        Action<string, string> debugListener = (category, message) =>
+        {
+            try
+            {
+                if (steamDebugLines.Count >= 80) return;
+
+                var cleanMessage = message
+                    .Replace("\r", string.Empty, StringComparison.Ordinal)
+                    .Trim();
+                steamDebugLines.Enqueue(
+                    $"{sw.Elapsed.TotalMilliseconds:F0}ms [{category}] {cleanMessage}");
+            }
+            catch { }
+        };
+
         void FirstChance(object? _, FirstChanceExceptionEventArgs e)
         {
             try
             {
                 var ex = e.Exception;
-                var exceptionStack = ex.StackTrace ?? string.Empty;
-                var isReflectionEmit = ex is PlatformNotSupportedException &&
-                                           (ex.Message.Contains("ReflectionEmit", StringComparison.OrdinalIgnoreCase) ||
-                                            ex.Message.Contains("Reflection.Emit", StringComparison.OrdinalIgnoreCase)) ||
-                                       ex.Message.Contains("ReflectionEmit", StringComparison.OrdinalIgnoreCase) ||
-                                       ex.Message.Contains("Reflection.Emit", StringComparison.OrdinalIgnoreCase);
-                var interesting = exceptionStack.Contains("SteamKit2", StringComparison.Ordinal) ||
-                                  isReflectionEmit ||
-                                  ex is NotSupportedException ||
-                                  ex.GetType().Name == "CryptographicException" ||
-                                  ex is System.Net.Http.HttpRequestException ||
-                                  ex is System.Net.Sockets.SocketException ||
-                                  ex is System.Net.WebSockets.WebSocketException;
+                var stack = ex.StackTrace ?? string.Empty;
+                var message = ex.Message ?? string.Empty;
+                var isReflectionEmit =
+                    message.Contains("ReflectionEmit", StringComparison.OrdinalIgnoreCase) ||
+                    message.Contains("Reflection.Emit", StringComparison.OrdinalIgnoreCase);
+                var interesting =
+                    stack.Contains("SteamKit2", StringComparison.Ordinal) ||
+                    stack.Contains("ProtoBuf", StringComparison.Ordinal) ||
+                    isReflectionEmit ||
+                    ex is NotSupportedException ||
+                    ex.GetType().Name == "CryptographicException" ||
+                    ex is System.Net.Http.HttpRequestException ||
+                    ex is System.Net.Sockets.SocketException ||
+                    ex is System.Net.WebSockets.WebSocketException;
+
                 if (!interesting || exceptions.Count >= 20) return;
 
                 var line = $"{ex.GetType().Name}: {ex.Message}";
                 if (ex.InnerException is not null)
                     line += $" | Inner={ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
 
-                var stackLines = exceptionStack.Split('\n')
+                var stackLines = stack.Split('\n')
                     .Select(x => x.Trim())
                     .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Take(10)
                     .ToArray();
-
-                var firstRelevantLine = stackLines.FirstOrDefault(x =>
-                    x.Contains("SteamKit2", StringComparison.Ordinal) ||
-                    x.Contains("ProtoBuf", StringComparison.Ordinal) ||
-                    x.Contains("System.Net.Http", StringComparison.Ordinal) ||
-                    x.Contains("System.Net.WebSockets", StringComparison.Ordinal) ||
-                    x.Contains("System.Reflection", StringComparison.Ordinal) ||
-                    x.Contains("System.Linq.Expressions", StringComparison.Ordinal));
-                if (!string.IsNullOrWhiteSpace(firstRelevantLine))
-                    line += $" | {firstRelevantLine}";
-
-                if (isReflectionEmit)
-                {
-                    // Exception.StackTrace is frequently still empty at FirstChanceException time on
-                    // iOS. The explicit stage marker is therefore the primary Step 05.13 diagnostic.
-                    var stageAtThrow = stage;
-                    reflectionEmitStages.Enqueue(
-                        $"{sw.Elapsed.TotalMilliseconds:F0}ms — {stageAtThrow} — thread {Environment.CurrentManagedThreadId}");
-
-                    var callerStack = Environment.StackTrace;
-                    var connectedAtThrow = steamClient?.IsConnected;
-                    var endPointAtThrow = steamClient?.CurrentEndPoint?.ToString() ?? "none";
-                    var targetSite = ex.TargetSite?.ToString() ?? "unknown";
-                    var source = ex.Source ?? "unknown";
-                    line +=
-                        $"\n    ReflectionEmit context: elapsed={sw.Elapsed.TotalMilliseconds:F0}ms; " +
-                        $"stage={stageAtThrow}; thread={Environment.CurrentManagedThreadId}; " +
-                        $"IsConnected at throw={FormatNullable(connectedAtThrow)}; " +
-                        $"CurrentEndPoint at throw={endPointAtThrow}; TargetSite={targetSite}; Source={source}; " +
-                        $"DynamicCodeSupported={RuntimeFeature.IsDynamicCodeSupported}; " +
-                        $"DynamicCodeCompiled={RuntimeFeature.IsDynamicCodeCompiled}";
-                    line += $"\n    Caller stack:\n    {TrimStack(callerStack, 18)}";
-                }
-                else
-                {
-                    var stackExcerpt = string.Join("\n    ", stackLines.Take(8));
-                    if (!string.IsNullOrWhiteSpace(stackExcerpt))
-                        line += $"\n    {stackExcerpt}";
-                }
+                if (stackLines.Length > 0)
+                    line += $"\n    {string.Join("\n    ", stackLines)}";
 
                 exceptions.Enqueue(line);
             }
@@ -141,41 +111,31 @@ public sealed class SteamConnectionProbe
         }
 
         AppDomain.CurrentDomain.FirstChanceException += FirstChance;
+        DebugLog.AddListener(debugListener);
+        DebugLog.Enabled = true;
+
         try
         {
-            SetStage("protobuf-net AOT configuration");
-            protobufAotMode = ProtobufAotCompatibility.Configure();
-
-            SetStage("SteamConfiguration.Create");
             var configuration = SteamConfiguration.Create(builder => builder
                 .WithProtocolTypes(protocolTypes)
                 .WithHttpClientFactory(Factory));
 
-            SetStage("SteamClient constructor");
             steamClient = new SteamClient(configuration);
             clientConstructed = true;
 
-            SetStage("attach IDebugNetworkListener");
             networkTrace = new SteamNetworkTraceListener(sw);
             steamClient.DebugNetworkListener = networkTrace;
 
-            SetStage("CallbackManager constructor");
             var manager = new CallbackManager(steamClient);
-
-            SetStage("subscribe ConnectedCallback");
             manager.Subscribe<SteamClient.ConnectedCallback>(_ => connected = true);
-
-            SetStage("subscribe DisconnectedCallback");
             manager.Subscribe<SteamClient.DisconnectedCallback>(cb =>
             {
                 disconnectedUserInitiated = cb.UserInitiated;
                 disconnected = true;
             });
 
-            SetStage("SteamClient.Connect call");
             steamClient.Connect();
 
-            SetStage("post-Connect callback/state pump");
             while (!connected && !disconnected && sw.Elapsed < timeout)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -188,10 +148,8 @@ public sealed class SteamConnectionProbe
             {
                 isConnectedEver = true;
                 lastEndPoint = steamClient.CurrentEndPoint?.ToString() ?? lastEndPoint;
-                SetStage("SteamClient.Disconnect after ConnectedCallback");
                 steamClient.Disconnect();
 
-                SetStage("post-disconnect callback pump");
                 while (!disconnected && sw.Elapsed < timeout)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -200,33 +158,34 @@ public sealed class SteamConnectionProbe
             }
             else
             {
-                SetStage("SteamClient.Disconnect after failed connection");
                 try { steamClient.Disconnect(); } catch { }
             }
-
-            SetStage("probe result formatting");
 
             var exceptionText = FormatExceptions(exceptions);
             var factoryText = FormatFactoryCalls(factoryCalls);
             var traceText = networkTrace?.Snapshot() ?? "(listener not attached)";
             var clientHelloObserved = networkTrace?.OutgoingClientHelloObserved ?? false;
+            var debugLogText = FormatDebugLog(steamDebugLines);
+            var caughtPostConnectException = steamDebugLines.Any(line =>
+                line.Contains("Unhandled exception after connecting", StringComparison.OrdinalIgnoreCase));
+            var connectionSetupException = steamDebugLines.Any(line =>
+                line.Contains("Unhandled exception when attempting to connect", StringComparison.OrdinalIgnoreCase) ||
+                line.Contains("Server record task threw exception", StringComparison.OrdinalIgnoreCase));
             var passed = clientConstructed && connected && disconnected;
             var checks = (clientConstructed ? 1 : 0) + (connected ? 1 : 0) + (disconnected ? 1 : 0);
-            var stageText = FormatStageTimeline(stageTimeline);
-            var emitStageText = FormatReflectionStages(reflectionEmitStages);
+
             var detail =
-                $"RuntimeFeature dynamic code: supported={RuntimeFeature.IsDynamicCodeSupported}; " +
-                $"compiled={RuntimeFeature.IsDynamicCodeCompiled}.\n" +
-                $"ReflectionEmit observed stage(s):\n{emitStageText}\n" +
-                $"Stage timeline:\n{stageText}\n" +
-                $"Protobuf AOT mode: {protobufAotMode}.\n" +
                 $"HTTP factory calls: {factoryText}. " +
                 $"CM WebSocket handler: {nameof(SocketsHttpHandler)}.\n" +
                 $"Outgoing ClientHello observed: {(clientHelloObserved ? "YES" : "NO")}.\n" +
                 $"Debug network trace (metadata only):\n{traceText}\n" +
                 $"IsConnected ever: {isConnectedEver}. CurrentEndPoint: {lastEndPoint ?? "never-set"}. " +
                 $"Disconnected.UserInitiated={FormatNullable(disconnectedUserInitiated)}.\n" +
-                $"First-chance SteamKit/runtime exceptions:\n{exceptionText}";
+                $"SteamKit DebugLog previous Enabled={previousDebugLogEnabled}; capture Enabled=True.\n" +
+                $"SteamKit post-connect exception logged: {(caughtPostConnectException ? "YES" : "NO")}. " +
+                $"Connection-setup exception logged: {(connectionSetupException ? "YES" : "NO")}.\n" +
+                $"SteamKit DebugLog:\n{debugLogText}\n" +
+                $"First-chance supplemental exceptions:\n{exceptionText}";
 
             return new SteamConnectionProbeResult(
                 passed, transportName, protocolTypes.ToString(), clientConstructed, connected, disconnected,
@@ -237,7 +196,6 @@ public sealed class SteamConnectionProbe
         catch (OperationCanceledException) { throw; }
         catch (Exception ex)
         {
-            SetStage($"outer catch: {ex.GetType().Name}");
             var exceptionText = FormatExceptions(exceptions);
             var traceText = networkTrace?.Snapshot() ?? "(listener not attached)";
             var clientHelloObserved = networkTrace?.OutgoingClientHelloObserved ?? false;
@@ -245,14 +203,9 @@ public sealed class SteamConnectionProbe
                 false, transportName, protocolTypes.ToString(), clientConstructed, connected, disconnected,
                 disconnectedUserInitiated, isConnectedEver, lastEndPoint, clientHelloObserved, traceText,
                 exceptionText, AssemblyVersion, sw.Elapsed, "STEAMKIT WEBSOCKET FAIL",
-                $"Stage: {stage}\n" +
-                $"RuntimeFeature dynamic code: supported={RuntimeFeature.IsDynamicCodeSupported}; compiled={RuntimeFeature.IsDynamicCodeCompiled}\n" +
-                $"ReflectionEmit observed stage(s):\n{FormatReflectionStages(reflectionEmitStages)}\n" +
-                $"Stage timeline:\n{FormatStageTimeline(stageTimeline)}\n" +
-                $"Protobuf AOT mode: {protobufAotMode}\nHTTP factory calls: {FormatFactoryCalls(factoryCalls)}\n" +
-                $"Outgoing ClientHello observed: {(clientHelloObserved ? "YES" : "NO")}\n" +
-                $"Debug network trace (metadata only):\n{traceText}\n{ex}\n" +
-                $"Captured first-chance exceptions:\n{exceptionText}");
+                $"Outer probe exception: {ex}\n" +
+                $"SteamKit DebugLog:\n{FormatDebugLog(steamDebugLines)}\n" +
+                $"Captured first-chance supplemental exceptions:\n{exceptionText}");
         }
         finally
         {
@@ -261,17 +214,9 @@ public sealed class SteamConnectionProbe
             {
                 try { steamClient.Disconnect(); } catch { }
             }
+            DebugLog.RemoveListener(debugListener);
+            DebugLog.Enabled = previousDebugLogEnabled;
         }
-    }
-
-    private static string TrimStack(string stack, int maxLines)
-    {
-        var lines = stack.Split('\n')
-            .Select(x => x.Trim())
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Take(maxLines)
-            .ToArray();
-        return lines.Length == 0 ? "(stack unavailable)" : string.Join("\n    ", lines);
     }
 
     private static string FormatExceptions(ConcurrentQueue<string> exceptions)
@@ -280,16 +225,10 @@ public sealed class SteamConnectionProbe
         return items.Length == 0 ? "(none captured)" : string.Join("\n", items.Select((x, i) => $"{i + 1}. {x}"));
     }
 
-    private static string FormatStageTimeline(ConcurrentQueue<string> stages)
+    private static string FormatDebugLog(ConcurrentQueue<string> lines)
     {
-        var items = stages.ToArray();
-        return items.Length == 0 ? "(none captured)" : string.Join("\n", items.Select(x => $"- {x}"));
-    }
-
-    private static string FormatReflectionStages(ConcurrentQueue<string> stages)
-    {
-        var items = stages.Distinct().ToArray();
-        return items.Length == 0 ? "(none captured)" : string.Join("\n", items.Select(x => $"- {x}"));
+        var items = lines.Take(80).ToArray();
+        return items.Length == 0 ? "(no SteamKit DebugLog lines captured)" : string.Join("\n", items);
     }
 
     private static string FormatFactoryCalls(ConcurrentQueue<string> calls)
