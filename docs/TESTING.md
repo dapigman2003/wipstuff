@@ -1,6 +1,6 @@
-# Foundation testing strategy — Steps 01–05
+# Testing strategy — Steps 01–06.2
 
-The project uses three test layers because no single test type can prove all of the iOS foundation.
+The project uses host unit tests, repository/build validation, and physical-iPhone verification because no single layer can prove all boundaries.
 
 ## 1. Host unit tests
 
@@ -16,35 +16,41 @@ Run with:
 bash scripts/run-unit-tests.sh
 ```
 
-These tests execute on normal .NET and cover deterministic logic: launcher Core/state behavior, credential-store contract semantics with a fake store, Steam HTTP-handler policy, Steam connection result evaluation, and final foundation-gate aggregation.
+These cover deterministic behavior including:
 
-They deliberately do **not** open a live Steam connection or access iOS Keychain/UIKit.
+- Core/state-machine regression;
+- credential-store set/get/overwrite/delete semantics;
+- Steam CM HTTP-handler policy/result contracts;
+- five-gate foundation aggregation;
+- Steam Guard mobile-confirmation policy;
+- Step 06.2 saved-session serialization, overwrite, clear and malformed-data handling;
+- refresh-token redaction from `SteamSavedSession.ToString()`;
+- saved-session resume result/identity-match contracts.
+
+They do not claim to prove live Steam authentication or real iOS Keychain behavior.
 
 ## 2. Repository/build validation
 
-Run with:
+Run:
 
 ```text
-bash scripts/validate-foundation.sh
+bash scripts/validate-step06-2.sh
 ```
 
-This statically verifies the iOS project contract and build safeguards, including app/scene/lifecycle wiring, version pins, trim roots, the DiskArbitration filter, the guarded SteamKit build patch, absence of later-stage/authentication code, and the existence of the required unit-test coverage.
+This preserves the Steps 01–05 foundation checks and verifies the Step 06.2 source contract: persistent auth requested, minimal Keychain payload, save after successful logon, password-free token resume, stored/returned SteamID comparison, explicit clear/sign-out, no manual Guard-code entry, and no ownership/download work.
 
-Codemagic additionally executes the build-only SteamKit patch, .NET iOS AOT/native link, IPA packaging, and IPA verification.
+Codemagic additionally runs the host unit tests, the isolated SteamKit iOS compatibility patch, .NET iOS AOT/native link, IPA packaging and IPA verification.
 
 ## 3. Physical-iPhone verification
 
-The app's single final verification action proves the platform/runtime boundaries host tests cannot:
+The device must prove the platform/runtime boundaries:
 
-- UIKit window actually becomes visible and lifecycle reaches Active;
-- real iOS Keychain supports set/get/overwrite/delete with the selected accessibility policy;
-- SteamKit2 constructs and connects over the proven WebSocket/SocketsHttpHandler route;
-- ConnectedCallback and DisconnectedCallback are delivered on the real device.
+- foundation remains 5/5;
+- Step 06.1 credential/mobile-Guard flow still succeeds;
+- persistent refresh token can be written to real iOS Keychain;
+- force-close/relaunch still finds the saved session;
+- saved refresh token authenticates without password entry/new Guard flow;
+- returned Steam identity matches the stored identity;
+- explicit sign-out removes the Keychain session and it remains absent after another relaunch.
 
-The final success gate is:
-
-```text
-FOUNDATION PASS — 5/5
-```
-
-This layered approach prevents unit tests from pretending to prove device-only behavior while still making deterministic regressions fail automatically before an IPA is published.
+See `STEP-06.2-TEST.md`.
