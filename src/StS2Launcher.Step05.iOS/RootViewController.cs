@@ -1,3 +1,4 @@
+using Foundation;
 using StS2Launcher.Core;
 using StS2Launcher.Step05.iOS.Platform;
 using UIKit;
@@ -9,12 +10,20 @@ public sealed class RootViewController : UIViewController
     private readonly KeychainProbe _keychainProbe =
         new(new KeychainCredentialStore());
     private readonly SteamConnectionProbe _steamProbe = new();
+    private readonly SteamAuthenticationAttempt _authenticationAttempt = new();
 
-    private UILabel? _resultLabel;
-    private UILabel? _detailLabel;
+    private UILabel? _foundationResultLabel;
+    private UILabel? _foundationDetailLabel;
+    private UILabel? _authResultLabel;
+    private UILabel? _authDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
-    private UIButton? _runButton;
+    private UITextField? _usernameField;
+    private UITextField? _passwordField;
+    private UIButton? _foundationButton;
+    private UIButton? _authButton;
+    private UIButton? _cancelAuthButton;
+    private CancellationTokenSource? _authCts;
     private bool _uiStartupPassed;
     private bool _lifecycleActive;
 
@@ -61,67 +70,94 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.16 — FOUNDATION FINALIZATION",
+            "STEP 06 — STEAM AUTHENTICATION SESSION",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.22",
+            "Version 0.0.23",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "STEPS 01–05 • CLEANUP + TEST GATE",
-            UIFont.BoldSystemFontOfSize(15),
+            "AUTHENTICATION ONLY • NO OWNERSHIP • NO DOWNLOAD",
+            UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "NO LOGIN • NO PASSWORD • NO STEAM GUARD • NO TOKEN",
-            UIFont.BoldSystemFontOfSize(14),
+            "Credentials are used only for this in-memory authentication attempt. Step 06 does not save passwords, refresh tokens, access tokens, or Steam Guard data. If Steam Guard is required, this build reports the challenge and stops without submitting a code or approving a device; that interaction belongs to Step 06.1.",
+            UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Foundation verification",
+            "Steps 01–05 regression",
+            UIFont.BoldSystemFontOfSize(24),
+            UIColor.Label));
+
+        _foundationButton = SystemButton("Run Foundation 5/5 Regression", 16);
+        _foundationButton.TouchUpInside += async (_, _) => await RunFoundationVerificationAsync();
+        content.AddArrangedSubview(_foundationButton);
+
+        _foundationResultLabel = Label(
+            "FOUNDATION: NOT RUN",
+            UIFont.BoldSystemFontOfSize(19),
+            UIColor.Label);
+        content.AddArrangedSubview(_foundationResultLabel);
+
+        _foundationDetailLabel = Label(
+            "The proven Steps 01–05 checks remain available unchanged.",
+            UIFont.SystemFontOfSize(14),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_foundationDetailLabel);
+
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 06 authentication",
             UIFont.BoldSystemFontOfSize(26),
             UIColor.Label));
 
-        content.AddArrangedSubview(Label(
-            "This final Step 05 build keeps only the proven runtime path: UIKit lifecycle, Core state machine, iOS Keychain, and an unauthenticated SteamKit CM WebSocket connection. The temporary endpoint/handler/exception diagnostics used to find the bugs have been removed. Host unit tests run in Codemagic before the iOS publish begins.",
-            UIFont.SystemFontOfSize(15),
-            UIColor.SecondaryLabel));
+        _usernameField = TextField(
+            placeholder: "Steam account name",
+            secure: false,
+            contentType: UITextContentType.Username);
+        _usernameField.AutocorrectionType = UITextAutocorrectionType.No;
+        _usernameField.AutocapitalizationType = UITextAutocapitalizationType.None;
+        content.AddArrangedSubview(_usernameField);
 
-        content.AddArrangedSubview(Label(
-            $"STEAMKIT ASSEMBLY — {SteamConnectionProbe.AssemblyVersion}",
-            UIFont.BoldSystemFontOfSize(16),
-            UIColor.Label));
+        _passwordField = TextField(
+            placeholder: "Steam password",
+            secure: true,
+            contentType: UITextContentType.Password);
+        content.AddArrangedSubview(_passwordField);
 
-        content.AddArrangedSubview(Label(
-            "RETAINED iOS FIXES — SocketsHttpHandler for CM WebSocket • protobuf/SteamKit trim roots • DiskArbitration linker filter • version-aware Process.StartTime patch",
-            UIFont.SystemFontOfSize(13),
-            UIColor.SecondaryLabel));
+        _authButton = SystemButton("Start Step 06 Authentication", 17);
+        _authButton.TouchUpInside += async (_, _) => await RunAuthenticationAsync();
+        content.AddArrangedSubview(_authButton);
 
-        _runButton = SystemButton("Run Steps 01–05 Device Verification", 17);
-        _runButton.TouchUpInside += async (_, _) => await RunFoundationVerificationAsync();
-        content.AddArrangedSubview(_runButton);
+        _cancelAuthButton = SystemButton("Cancel Authentication", 15);
+        _cancelAuthButton.Enabled = false;
+        _cancelAuthButton.TouchUpInside += (_, _) => _authCts?.Cancel();
+        content.AddArrangedSubview(_cancelAuthButton);
 
-        _resultLabel = Label(
-            "FOUNDATION: NOT RUN",
+        _authResultLabel = Label(
+            "STEAM AUTH: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
-        content.AddArrangedSubview(_resultLabel);
+        content.AddArrangedSubview(_authResultLabel);
 
-        _detailLabel = Label(
-            "Device gates will appear here.",
+        _authDetailLabel = Label(
+            "Enter your Steam account name and password to test the modern SteamKit authentication session.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
-        content.AddArrangedSubview(_detailLabel);
+        content.AddArrangedSubview(_authDetailLabel);
 
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: UIKit startup completed. Final device verification has not run yet.",
+            "Status: Steps 01–05 are proven. Step 06 has not run yet.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -132,11 +168,14 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_lifecycleLabel);
 
-        foreach (var button in content.ArrangedSubviews.OfType<UIButton>())
-            button.HeightAnchor.ConstraintGreaterThanOrEqualTo(44).Active = true;
+        foreach (var control in content.ArrangedSubviews)
+        {
+            if (control is UIButton or UITextField)
+                control.HeightAnchor.ConstraintGreaterThanOrEqualTo(44).Active = true;
+        }
 
         _uiStartupPassed = true;
-        Console.WriteLine("Step 05.16: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 06: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -147,37 +186,149 @@ public sealed class RootViewController : UIViewController
             _lifecycleLabel.Text = $"Lifecycle: {state}";
     }
 
+    private async Task RunAuthenticationAsync()
+    {
+        if (_authButton is null ||
+            _cancelAuthButton is null ||
+            _authResultLabel is null ||
+            _authDetailLabel is null ||
+            _statusLabel is null ||
+            _usernameField is null ||
+            _passwordField is null)
+        {
+            return;
+        }
+
+        var username = _usernameField.Text?.Trim() ?? string.Empty;
+        var password = _passwordField.Text ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(password))
+        {
+            _authResultLabel.Text = "STEAM AUTH: INPUT REQUIRED";
+            _authResultLabel.TextColor = UIColor.SystemRed;
+            _authDetailLabel.Text = "Enter both the Steam account name and password.";
+            return;
+        }
+
+        // Remove the password from the visible UIKit control immediately. The
+        // transient managed string is used only for this single request and is
+        // never stored or logged.
+        _passwordField.Text = string.Empty;
+
+        _authCts?.Dispose();
+        _authCts = new CancellationTokenSource();
+
+        _authButton.Enabled = false;
+        _cancelAuthButton.Enabled = true;
+        _authResultLabel.Text = "STEAM AUTH: RUNNING…";
+        _authResultLabel.TextColor = UIColor.Label;
+        _authDetailLabel.Text =
+            "Connecting with the proven Step 05 WebSocket path, then beginning the modern credential auth session…";
+        _statusLabel.Text = "STEP 06 RUNNING — keep the app in the foreground.";
+
+        try
+        {
+            var result = await _authenticationAttempt.RunAsync(
+                username,
+                password,
+                TimeSpan.FromSeconds(60),
+                _authCts.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _authResultLabel.Text = result.Summary;
+                _authResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamAuthenticationOutcome.Authenticated => UIColor.Label,
+                    SteamAuthenticationOutcome.GuardRequired => UIColor.SystemOrange,
+                    SteamAuthenticationOutcome.Cancelled => UIColor.SecondaryLabel,
+                    _ => UIColor.SystemRed,
+                };
+
+                _authDetailLabel.Text = FormatAuthDetail(result);
+
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamAuthenticationOutcome.Authenticated =>
+                        "PASS: Step 06 authenticated and returned Steam identity. No ownership request was made.",
+                    SteamAuthenticationOutcome.GuardRequired =>
+                        "BOUNDARY REACHED: Steam accepted the base credential session and requires Steam Guard. Step 06.1 should implement this exact challenge.",
+                    SteamAuthenticationOutcome.Cancelled =>
+                        "Authentication attempt cancelled; no credentials or tokens were persisted.",
+                    _ =>
+                        "FAIL: Step 06 authentication failed before a successful identity or expected Steam Guard boundary.",
+                };
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _authResultLabel.Text = "STEAM AUTH: EXCEPTION";
+                _authResultLabel.TextColor = UIColor.SystemRed;
+                _authDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 06 authentication.";
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(() =>
+            {
+                _authButton.Enabled = true;
+                _cancelAuthButton.Enabled = false;
+            });
+        }
+    }
+
+    private static string FormatAuthDetail(SteamAuthenticationResult result)
+    {
+        var lines = new List<string>
+        {
+            $"CM connected: {YesNo(result.CmConnected)}",
+            $"Auth session started: {YesNo(result.AuthSessionStarted)}",
+            $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
+            $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
+            $"Extended result: {result.ExtendedLogonResult?.ToString() ?? "N/A"}",
+            $"Account name: {result.AccountName ?? "not-returned"}",
+            $"SteamID64: {result.SteamId64 ?? "not-returned"}",
+            $"CurrentEndPoint: {result.CurrentEndPoint ?? "never-set"}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+        };
+
+        if (result.GuardChallenge is not null)
+        {
+            lines.Add($"Guard type: {result.GuardChallenge.Kind}");
+            if (!string.IsNullOrWhiteSpace(result.GuardChallenge.AssociatedMessage))
+                lines.Add($"Guard detail: {result.GuardChallenge.AssociatedMessage}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
+        lines.Add("Credential persistence: NONE");
+        lines.Add("Ownership request: NOT RUN");
+        return string.Join("\n", lines);
+    }
+
     private async Task RunFoundationVerificationAsync()
     {
-        if (_runButton is null ||
-            _resultLabel is null ||
-            _detailLabel is null ||
+        if (_foundationButton is null ||
+            _foundationResultLabel is null ||
+            _foundationDetailLabel is null ||
             _statusLabel is null)
         {
             return;
         }
 
-        _runButton.Enabled = false;
-        _resultLabel.Text = "FOUNDATION: TESTING…";
-        _resultLabel.TextColor = UIColor.Label;
-        _detailLabel.Text = "Running Core and Keychain checks, then SteamKit CM WebSocket 3/3…";
-        _statusLabel.Text = "FINAL STEP 05 VERIFICATION RUNNING — keep the app in the foreground.";
+        _foundationButton.Enabled = false;
+        _foundationResultLabel.Text = "FOUNDATION: TESTING…";
+        _foundationResultLabel.TextColor = UIColor.Label;
+        _foundationDetailLabel.Text = "Running the proven Steps 01–05 5/5 regression…";
 
         try
         {
             var core = CoreSelfTest.Run();
             var keychain = _keychainProbe.RunRoundTrip();
-
-            InvokeOnMainThread(() =>
-            {
-                _detailLabel.Text =
-                    $"App/UI startup: {PassFail(_uiStartupPassed)}\n" +
-                    $"Lifecycle active: {PassFail(_lifecycleActive)}\n" +
-                    $"{core.Summary}\n" +
-                    $"{keychain.Summary} — probe value cleaned\n" +
-                    "SteamKit CM WebSocket: testing…";
-            });
-
             var steam = await _steamProbe.RunAsync(TimeSpan.FromSeconds(25));
             var final = new FoundationVerificationResult(
                 UiStartupPassed: _uiStartupPassed,
@@ -188,46 +339,37 @@ public sealed class RootViewController : UIViewController
 
             InvokeOnMainThread(() =>
             {
-                _resultLabel.Text = final.Summary;
-                _resultLabel.TextColor = final.Passed
+                _foundationResultLabel.Text = final.Summary;
+                _foundationResultLabel.TextColor = final.Passed
                     ? UIColor.Label
                     : UIColor.SystemRed;
 
-                _detailLabel.Text =
+                _foundationDetailLabel.Text =
                     $"App/UI startup: {PassFail(final.UiStartupPassed)}\n" +
                     $"Lifecycle active: {PassFail(final.LifecycleActive)}\n" +
                     $"{final.Core.Summary}\n" +
                     $"{final.CredentialStore.Summary} — probe value cleaned\n" +
                     $"{final.Steam.Summary}\n" +
-                    $"SteamKit assembly: {final.Steam.SteamKitAssemblyVersion}\n" +
-                    $"CMWebSocket factory used: {YesNo(final.Steam.CmWebSocketFactoryUsed)}\n" +
-                    $"ConnectedCallback: {YesNo(final.Steam.ConnectedCallbackReceived)}\n" +
-                    $"DisconnectedCallback: {YesNo(final.Steam.DisconnectedCallbackReceived)}\n" +
-                    $"Disconnected.UserInitiated: {(final.Steam.DisconnectedUserInitiated?.ToString() ?? "N/A")}\n" +
-                    $"IsConnected ever: {final.Steam.IsConnectedEver}\n" +
-                    $"CurrentEndPoint: {final.Steam.LastCurrentEndPoint ?? "never-set"}\n" +
-                    $"Elapsed: {final.Steam.Elapsed.TotalSeconds:F1}s" +
-                    (string.IsNullOrWhiteSpace(final.Steam.Error)
-                        ? string.Empty
-                        : $"\nError: {final.Steam.Error}");
+                    $"CMWebSocket factory used: {YesNo(final.Steam.CmWebSocketFactoryUsed)}";
 
                 _statusLabel.Text = final.Passed
-                    ? "PASS: Steps 01–05 foundation verified on this device. Step 05 is finalized."
-                    : "FAIL: one or more foundation gates failed; do not advance until the failing gate is understood.";
-
-                _runButton.Enabled = true;
+                    ? "PASS: Steps 01–05 foundation still passes 5/5 on this device."
+                    : "FAIL: a proven foundation regression failed; stop Step 06 work until understood.";
             });
         }
         catch (Exception ex)
         {
             InvokeOnMainThread(() =>
             {
-                _resultLabel.Text = "FOUNDATION: EXCEPTION";
-                _resultLabel.TextColor = UIColor.SystemRed;
-                _detailLabel.Text = $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
-                _statusLabel.Text = "FAIL: unhandled exception during final Step 05 verification.";
-                _runButton.Enabled = true;
+                _foundationResultLabel.Text = "FOUNDATION: EXCEPTION";
+                _foundationResultLabel.TextColor = UIColor.SystemRed;
+                _foundationDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: exception during Steps 01–05 regression.";
             });
+        }
+        finally
+        {
+            InvokeOnMainThread(() => _foundationButton.Enabled = true);
         }
     }
 
@@ -244,6 +386,23 @@ public sealed class RootViewController : UIViewController
             TextAlignment = UITextAlignment.Center,
             Lines = 0,
             Font = font
+        };
+    }
+
+    private static UITextField TextField(
+        string placeholder,
+        bool secure,
+        NSString contentType)
+    {
+        return new UITextField
+        {
+            TranslatesAutoresizingMaskIntoConstraints = false,
+            Placeholder = placeholder,
+            SecureTextEntry = secure,
+            TextContentType = contentType,
+            BorderStyle = UITextBorderStyle.RoundedRect,
+            ClearButtonMode = UITextFieldViewMode.WhileEditing,
+            ReturnKeyType = secure ? UIReturnKeyType.Go : UIReturnKeyType.Next,
         };
     }
 

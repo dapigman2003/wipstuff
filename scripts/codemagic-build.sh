@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 05.16 environment ==="
+  echo "=== StS2 Launcher Step 06 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step05-final-environment.log
+} | tee artifacts/logs/step06-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -50,27 +50,25 @@ fi
   exit 3
 }
 
-# Host unit tests are an explicit build gate and do not require the iOS workload.
-bash scripts/validate-foundation.sh | tee artifacts/logs/step05-final-validation.log
+bash scripts/validate-step06.sh | tee artifacts/logs/step06-validation.log
 bash scripts/run-unit-tests.sh
 
-# Install/verify the pinned iOS workload only after host tests have passed.
 WORKLOAD_CWD="$(mktemp -d)"
 trap 'rm -rf "$WORKLOAD_CWD"' EXIT
 (
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step05-final-workload.log
+) | tee artifacts/logs/step06-workload.log
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/build-step05-final.sh 2>&1 | tee artifacts/logs/step05-final-wrapper.log
-bash scripts/verify-step05-final-ipa.sh artifacts/StS2-Launcher-Step-05.16.ipa \
-  2>&1 | tee artifacts/logs/step05-final-ipa-verification.log
+bash scripts/build-step06.sh 2>&1 | tee artifacts/logs/step06-wrapper.log
+bash scripts/verify-step06-ipa.sh artifacts/StS2-Launcher-Step-06.ipa \
+  2>&1 | tee artifacts/logs/step06-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 05.16 finalization"
+  echo "StS2 Launcher iOS — Step 06 authentication session"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -79,12 +77,15 @@ bash scripts/verify-step05-final-ipa.sh artifacts/StS2-Launcher-Step-05.16.ipa \
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
   echo "Host unit tests: PASS (required before publish)"
   echo "SteamKit: 3.4.0"
-  echo "Runtime path: WebSocket-only Steam CM; SocketsHttpHandler for CMWebSocket"
-  echo "Trim roots: SteamKit2, protobuf-net, protobuf-net.Core"
-  echo "IPA: artifacts/StS2-Launcher-Step-05.16.ipa"
+  echo "Foundation regression: retained"
+  echo "New capability: credential auth session only"
+  echo "Steam Guard: observation only; no code/approval handling"
+  echo "Credential/token persistence: none"
+  echo "Ownership/download: not implemented"
+  echo "IPA: artifacts/StS2-Launcher-Step-06.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-05.16.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-06.ipa | awk '{print $1}')"
   fi
-} > artifacts/step05-final-build-summary.txt
+} > artifacts/step06-build-summary.txt
 
-cat artifacts/step05-final-build-summary.txt
+cat artifacts/step06-build-summary.txt

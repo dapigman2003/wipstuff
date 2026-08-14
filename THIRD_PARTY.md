@@ -1,10 +1,10 @@
-# Third-Party Components — Step 05.16
+# Third-Party Components — Step 06
 
 ## Runtime
 
 ### SteamKit2 3.4.0
 
-Used for the unauthenticated Steam CM connection foundation. The iOS build uses WebSocket-only transport and supplies a dedicated `SocketsHttpHandler` for `HttpClientPurpose.CMWebSocket`.
+Used for the proven Steam CM connection foundation and the Step 06 authentication session. The iOS build uses WebSocket-only transport and supplies a dedicated `SocketsHttpHandler` for `HttpClientPurpose.CMWebSocket`.
 
 ### protobuf-net / protobuf-net.Core
 
