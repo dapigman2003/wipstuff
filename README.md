@@ -1,16 +1,28 @@
-# StS2 Launcher iOS — Step 06.2
+# StS2 Launcher iOS — Step 06.3
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 06.2 — persist the minimum reusable Steam session in iOS Keychain, prove relaunch/resume, and prove sign-out clears it**
+**Step 06.3 — automatic saved-session recovery on launcher startup**
 
-Steps 01–05 are closed and physically verified. Step 06 reached Steam's real authentication flow. Step 06.1 then completed the ideal mobile Steam Guard path and returned an authenticated account identity.
+Steps 01–05 are closed and physically verified. Step 06 credential authentication passed. Step 06.1 passed the mobile Steam Guard approval flow. Step 06.2 proved persistent refresh-token storage in the real iOS Keychain, password-free relaunch/resume, matching Steam identity, and explicit sign-out/clear.
 
-Step 06.2 adds one capability: after that already-proven authentication flow succeeds, request a persistent Steam auth session and save the returned refresh token plus account identity metadata in the device-bound iOS Keychain. A later app launch can use that token to log on without re-entering the password or starting a new Steam Guard approval.
+Step 06.3 adds one lifecycle capability: when the app reaches its first Active state after launch, it automatically attempts to restore the saved Steam session. The launcher does not ask for or read a password on this path and does not start a new Steam Guard flow.
 
-Ownership checking is intentionally not implemented.
+Ownership checking remains intentionally out of scope until Step 07.
+
+## Recovery policy
+
+The Keychain session is cleared automatically only when there is strong evidence it is unsafe or unusable:
+
+- the local saved-session record cannot be decoded/validated;
+- Steam successfully logs on but returns a different SteamID than the stored identity;
+- Steam rejects the saved credential with `InvalidPassword`, `Revoked`, or `Expired`.
+
+The saved session is **preserved** for timeout, cancellation, connection failure, and non-definitive/transient Steam results. A temporary Steam/network problem must not destroy a previously working login.
+
+After a recovery clear, the launcher returns to interactive `Authenticate + Save Session`; it never invents credentials or silently starts ownership work.
 
 ## Proven foundation retained
 
@@ -25,42 +37,26 @@ Ownership checking is intentionally not implemented.
 - isolated/version-aware `Process.StartTime` SteamKit iOS compatibility patch
 - Step 06 credential authentication
 - Step 06.1 mobile Steam Guard approval
+- Step 06.2 refresh-token Keychain persistence/resume/sign-out
 
-## Step 06.2 persistence policy
+## Security / persistence policy
 
-Persisted in iOS Keychain only after a successful `LoggedOnCallback` with `EResult.OK`:
+Persisted in the device-bound Keychain:
 
 - Steam account name
 - SteamID64
 - Steam refresh token
 
-Not persisted:
+Never persisted:
 
 - Steam password
-- access token
-- Steam Guard secret
-- Steam Guard authenticator/email code
+- Steam Guard secret/code
 - raw Steam protocol payloads
 
-The Keychain record uses `SecAccessible.AfterFirstUnlockThisDeviceOnly`, so it is device-bound and available for normal relaunch/resume after the device has been unlocked once after boot.
+The refresh token is never displayed or logged.
 
-The session payload is a small versioned format rather than JSON so Step 06.2 does not introduce another reflection/trimming boundary.
+## Runtime note
 
-## Saved-session resume
+The Step 06.3 automatic restore is still a verification-style login: after proving the saved session and identity, the current `SteamSessionResumeAttempt` logs off/disconnects cleanly. A later step may introduce a long-lived authenticated Steam session when a downstream capability requires it.
 
-The **Resume Saved Session (No Password)** action:
-
-1. loads the saved session from Keychain;
-2. connects over the Step 05-proven WebSocket path;
-3. calls `SteamUser.LogOn` with the saved refresh token;
-4. requires `LoggedOnCallback` with `EResult.OK`;
-5. verifies the returned SteamID64 matches the stored identity;
-6. displays no refresh token and requests no password/Guard code.
-
-The verification attempt logs off/disconnects after proving the boundary; Step 06.2 does not yet keep a long-lived Steam client session for launcher operation.
-
-## Sign out
-
-**Sign Out / Clear Saved Session** deletes the Keychain session and verifies it is absent. A subsequent app relaunch should show `Saved session: NONE`.
-
-See `docs/STEP-06.2-TEST.md` for the physical-device test.
+See `docs/STEP-06.3-TEST.md` for the physical-device test.

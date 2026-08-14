@@ -10,7 +10,7 @@ public sealed class AppDelegate : UIApplicationDelegate
         UIApplication application,
         NSDictionary? launchOptions)
     {
-        Console.WriteLine("Step 06.2: AppDelegate.FinishedLaunching");
+        Console.WriteLine("Step 06.3: AppDelegate.FinishedLaunching");
         return true;
     }
 
@@ -20,7 +20,7 @@ public sealed class AppDelegate : UIApplicationDelegate
         UISceneConnectionOptions options)
     {
         Console.WriteLine(
-            $"Step 06.2: AppDelegate.GetConfiguration role={connectingSceneSession.Role}");
+            $"Step 06.3: AppDelegate.GetConfiguration role={connectingSceneSession.Role}");
 
         return new UISceneConfiguration(
             "Default Configuration",

@@ -8,14 +8,14 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>25</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.25</ApplicationDisplayVersion>
+    <ApplicationVersion>26</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.26</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
     <!--
-      Step 06.2 retains the final Step 05 policy: keep full trimming globally, while preserving the
+      Step 06.3 retains the final Step 05 policy: keep full trimming globally, while preserving the
       three assemblies protobuf-net reflects over during SteamKit message
       serialization. Physical-iPhone Step 05.15 proved this is required for
       the initial ClientHello path.

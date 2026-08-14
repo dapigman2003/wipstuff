@@ -5,7 +5,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 06.2 saved-session boundary.
+/// Step 06.2/06.3 saved-session boundary.
 ///
 /// Loads a refresh token from the platform credential store, connects using
 /// the Step 05-proven WebSocket route, and performs SteamUser.LogOn without a
@@ -36,7 +36,7 @@ public sealed class SteamSessionResumeAttempt
         catch (Exception ex)
         {
             return new SteamSessionResumeResult(
-                Outcome: SteamSessionResumeOutcome.Failed,
+                Outcome: SteamSessionResumeOutcome.InvalidLocalSession,
                 SavedSessionFound: true,
                 CmConnected: false,
                 LoggedOnCallbackReceived: false,
@@ -171,6 +171,7 @@ public sealed class SteamSessionResumeAttempt
 
             if (!identityMatched)
             {
+                outcome = SteamSessionResumeOutcome.IdentityMismatch;
                 error = "Saved session authenticated, but the returned SteamID did not match the stored identity.";
                 return BuildResult();
             }

@@ -1,4 +1,4 @@
-# Third-Party Components — Step 06.2
+# Third-Party Components — Step 06.3
 
 ## Runtime
 

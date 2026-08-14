@@ -10,6 +10,8 @@ public enum SteamSessionResumeOutcome
     Rejected = 3,
     Cancelled = 4,
     TimedOut = 5,
+    InvalidLocalSession = 6,
+    IdentityMismatch = 7,
 }
 
 public sealed record SteamSessionResumeResult(
@@ -33,6 +35,8 @@ public sealed record SteamSessionResumeResult(
         SteamSessionResumeOutcome.Authenticated => "SAVED SESSION PASS — authenticated",
         SteamSessionResumeOutcome.NoSavedSession => "SAVED SESSION — none",
         SteamSessionResumeOutcome.Rejected => "SAVED SESSION REJECTED",
+        SteamSessionResumeOutcome.InvalidLocalSession => "SAVED SESSION INVALID — local record",
+        SteamSessionResumeOutcome.IdentityMismatch => "SAVED SESSION INVALID — identity mismatch",
         SteamSessionResumeOutcome.TimedOut => "SAVED SESSION TIMEOUT",
         SteamSessionResumeOutcome.Cancelled => "SAVED SESSION CANCELLED",
         _ => "SAVED SESSION FAIL",

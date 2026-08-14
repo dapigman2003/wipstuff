@@ -1,7 +1,7 @@
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Sensitive reusable Steam authentication material for Step 06.2.
+/// Sensitive reusable Steam authentication material for Step 06.2/06.3.
 ///
 /// The refresh token must never be logged, displayed, or serialized outside
 /// the platform credential store. Passwords and Steam Guard secrets are not

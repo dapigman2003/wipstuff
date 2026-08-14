@@ -19,6 +19,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _authResultLabel;
     private UILabel? _authDetailLabel;
     private UILabel? _savedSessionLabel;
+    private UILabel? _autoRestoreResultLabel;
+    private UILabel? _autoRestoreDetailLabel;
     private UILabel? _resumeResultLabel;
     private UILabel? _resumeDetailLabel;
     private UILabel? _statusLabel;
@@ -33,6 +35,7 @@ public sealed class RootViewController : UIViewController
     private CancellationTokenSource? _operationCts;
     private bool _uiStartupPassed;
     private bool _lifecycleActive;
+    private bool _automaticRestoreStarted;
 
     public RootViewController()
     {
@@ -85,22 +88,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 06.2 — KEYCHAIN SESSION RESUME",
+            "STEP 06.3 — SESSION RECOVERY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.25",
+            "Version 0.0.26",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "PERSIST REFRESH TOKEN ONLY • NO OWNERSHIP • NO DOWNLOAD",
+            "AUTO-RESTORE SAVED SESSION • SAFE FALLBACK • NO OWNERSHIP",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "After a successful Steam login, Step 06.2 stores the returned reusable refresh token plus account identity in the device-bound iOS Keychain. The Steam password is never stored. No Steam Guard secret/code is stored. Relaunch the app and use Resume Saved Session to prove password-free login, then Sign Out to delete the saved session.",
+            "Step 06.3 builds on the proven Keychain session from Step 06.2. On the first Active lifecycle state after launch, the app automatically attempts the saved refresh-token login with no password and no new Guard prompt. Invalid local records, identity mismatches, and definitively unusable tokens are cleared; transient service/network failures preserve the saved session for retry. Ownership is still not requested.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -167,7 +170,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Relaunch / saved-session verification",
+            "Saved-session diagnostics / manual retry",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
@@ -177,7 +180,19 @@ public sealed class RootViewController : UIViewController
             UIColor.Label);
         content.AddArrangedSubview(_savedSessionLabel);
 
-        _resumeButton = SystemButton("Resume Saved Session (No Password)", 17);
+        _autoRestoreResultLabel = Label(
+            "AUTO SESSION: WAITING FOR ACTIVE LIFECYCLE",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_autoRestoreResultLabel);
+
+        _autoRestoreDetailLabel = Label(
+            "Step 06.3 will automatically attempt the saved Keychain session once after launch. No password is read or requested for this path.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_autoRestoreDetailLabel);
+
+        _resumeButton = SystemButton("Retry Saved Session Now (No Password)", 17);
         _resumeButton.TouchUpInside += async (_, _) => await RunSavedSessionResumeAsync();
         content.AddArrangedSubview(_resumeButton);
 
@@ -188,7 +203,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_resumeResultLabel);
 
         _resumeDetailLabel = Label(
-            "After the first login succeeds, force-close and reopen the app. A saved account should still be detected here. Resume must authenticate without password entry or a new Guard approval.",
+            "Automatic restore is the Step 06.3 boundary. This manual retry remains available for diagnostics after a timeout or transient Steam/network failure.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_resumeDetailLabel);
@@ -205,7 +220,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Step 06.1 is proven. Step 06.2 is ready to test Keychain session persistence and password-free resume.",
+            "Status: Steps 06.1 and 06.2 are proven. Step 06.3 will auto-restore the saved session on launch and apply conservative stale-session recovery.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -224,7 +239,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 06.2: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 06.3: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -233,6 +248,12 @@ public sealed class RootViewController : UIViewController
 
         if (_lifecycleLabel is not null)
             _lifecycleLabel.Text = $"Lifecycle: {state}";
+
+        if (_lifecycleActive && !_automaticRestoreStarted)
+        {
+            _automaticRestoreStarted = true;
+            _ = RunAutomaticSessionRestoreAsync();
+        }
     }
 
     private async Task RunAuthenticationAsync()
@@ -264,7 +285,7 @@ public sealed class RootViewController : UIViewController
         _authResultLabel.Text = "STEAM AUTH: RUNNING…";
         _authResultLabel.TextColor = UIColor.Label;
         _authDetailLabel.Text = "Starting persistent Steam auth. If mobile Steam Guard appears, approve it and return here…";
-        _statusLabel.Text = "STEP 06.2 AUTH RUNNING — session is saved only after Steam logon succeeds.";
+        _statusLabel.Text = "STEP 06.3 AUTH RUNNING — session is saved only after Steam logon succeeds.";
 
         try
         {
@@ -279,7 +300,7 @@ public sealed class RootViewController : UIViewController
                             "WAITING FOR STEAM GUARD — approve the sign-in in Steam, then return here.",
                         SteamAuthenticationStage.MobileApprovalAccepted =>
                             "STEAM GUARD APPROVED — completing logon and Keychain persistence…",
-                        _ => $"Step 06.2: {update.Message}",
+                        _ => $"Step 06.3: {update.Message}",
                     };
                 });
             });
@@ -307,7 +328,7 @@ public sealed class RootViewController : UIViewController
                 _statusLabel.Text = result.Outcome switch
                 {
                     SteamAuthenticationOutcome.Authenticated when result.SessionPersisted =>
-                        "PASS: persistent Steam session saved to the iOS Keychain. Force-close/relaunch, then run Resume Saved Session.",
+                        "PASS: persistent Steam session saved to the iOS Keychain. On the next launch, Step 06.3 will attempt it automatically.",
                     SteamAuthenticationOutcome.GuardRequired =>
                         "BOUNDARY: Steam requested a code-based Guard method; manual code entry remains out of scope.",
                     SteamAuthenticationOutcome.TimedOut =>
@@ -315,7 +336,7 @@ public sealed class RootViewController : UIViewController
                     SteamAuthenticationOutcome.Cancelled =>
                         "Authentication cancelled; no new session was saved.",
                     _ =>
-                        "FAIL: Step 06.2 credential authentication or Keychain persistence failed.",
+                        "FAIL: credential authentication or Keychain persistence failed.",
                 };
 
                 RefreshSavedSessionStatus();
@@ -328,7 +349,139 @@ public sealed class RootViewController : UIViewController
                 _authResultLabel.Text = "STEAM AUTH: EXCEPTION";
                 _authResultLabel.TextColor = UIColor.SystemRed;
                 _authDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 06.2 authentication/persistence.";
+                _statusLabel.Text = "FAIL: unhandled exception during authentication/persistence.";
+                RefreshSavedSessionStatus();
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
+    private async Task RunAutomaticSessionRestoreAsync()
+    {
+        if (_autoRestoreResultLabel is null ||
+            _autoRestoreDetailLabel is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        BeginSteamOperation();
+        _autoRestoreResultLabel.Text = "AUTO SESSION: RUNNING…";
+        _autoRestoreResultLabel.TextColor = UIColor.Label;
+        _autoRestoreDetailLabel.Text =
+            "Active lifecycle reached. Reading the saved Keychain session and attempting password-free Steam logon…";
+        _statusLabel.Text = "STEP 06.3 AUTO-RESTORE RUNNING — no password or new Guard flow.";
+
+        try
+        {
+            var result = await _resumeAttempt.RunAsync(
+                TimeSpan.FromSeconds(45),
+                _operationCts!.Token);
+
+            var recoveryAction = SteamSessionRecoveryPolicy.Evaluate(result);
+            var sessionCleared = false;
+            string? recoveryError = null;
+
+            if (recoveryAction == SteamSessionRecoveryAction.ClearSavedSessionAndRequireInteractiveAuthentication)
+            {
+                try
+                {
+                    _sessionStore.Clear();
+                    sessionCleared = _sessionStore.Load() is null;
+                    if (!sessionCleared)
+                        recoveryError = "Keychain clear returned but the saved session is still present.";
+                }
+                catch (Exception ex)
+                {
+                    recoveryError = $"Keychain recovery clear failed: {ex.GetType().Name}: {ex.Message}";
+                }
+            }
+
+            InvokeOnMainThread(() =>
+            {
+                _autoRestoreResultLabel.Text = result.Outcome switch
+                {
+                    SteamSessionResumeOutcome.Authenticated => "AUTO SESSION PASS — authenticated",
+                    SteamSessionResumeOutcome.NoSavedSession => "AUTO SESSION — signed out",
+                    SteamSessionResumeOutcome.Rejected when sessionCleared => "AUTO SESSION RESET — rejected token cleared",
+                    SteamSessionResumeOutcome.InvalidLocalSession when sessionCleared => "AUTO SESSION RESET — invalid record cleared",
+                    SteamSessionResumeOutcome.IdentityMismatch when sessionCleared => "AUTO SESSION RESET — identity mismatch cleared",
+                    SteamSessionResumeOutcome.TimedOut => "AUTO SESSION — timeout; saved session preserved",
+                    SteamSessionResumeOutcome.Cancelled => "AUTO SESSION — cancelled; saved session preserved",
+                    SteamSessionResumeOutcome.Rejected => "AUTO SESSION — rejected; saved session preserved",
+                    _ => "AUTO SESSION FAIL — saved session preserved",
+                };
+
+                _autoRestoreResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamSessionResumeOutcome.Authenticated => UIColor.Label,
+                    SteamSessionResumeOutcome.NoSavedSession => UIColor.SecondaryLabel,
+                    SteamSessionResumeOutcome.TimedOut => UIColor.SystemOrange,
+                    SteamSessionResumeOutcome.Cancelled => UIColor.SecondaryLabel,
+                    _ when sessionCleared && recoveryError is null => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+
+                var details = new List<string>
+                {
+                    FormatResumeDetail(result),
+                    $"Automatic launch restore: YES",
+                    $"Recovery policy: {recoveryAction}",
+                    $"Saved session cleared by recovery: {YesNo(sessionCleared)}",
+                };
+
+                if (!string.IsNullOrWhiteSpace(recoveryError))
+                    details.Add($"Recovery error: {recoveryError}");
+
+                _autoRestoreDetailLabel.Text = string.Join("\n", details);
+
+                if (!string.IsNullOrWhiteSpace(result.AccountName) && _usernameField is not null)
+                    _usernameField.Text = result.AccountName;
+
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamSessionResumeOutcome.Authenticated =>
+                        "PASS: saved Steam session restored automatically on launch with matching identity and no password/Guard prompt.",
+                    SteamSessionResumeOutcome.NoSavedSession =>
+                        "SIGNED OUT: no saved Steam session exists. Use Authenticate + Save Session when needed.",
+                    _ when recoveryError is not null =>
+                        $"FAIL: recovery policy selected clear, but Keychain cleanup failed: {recoveryError}",
+                    _ when sessionCleared =>
+                        "RECOVERED: unusable/unsafe saved session was removed. Interactive Steam authentication is required again.",
+                    SteamSessionResumeOutcome.TimedOut =>
+                        "TRANSIENT: automatic resume timed out; saved session was preserved for retry.",
+                    SteamSessionResumeOutcome.Cancelled =>
+                        "Automatic resume cancelled; saved session was preserved.",
+                    SteamSessionResumeOutcome.Rejected =>
+                        "Steam rejected this resume with a non-definitive result; saved session was preserved for retry rather than destroyed.",
+                    _ =>
+                        "Automatic resume failed without evidence that the credential is invalid; saved session was preserved.",
+                };
+
+                _statusLabel.TextColor = result.Outcome == SteamSessionResumeOutcome.Authenticated ||
+                                         result.Outcome == SteamSessionResumeOutcome.NoSavedSession ||
+                                         sessionCleared
+                    ? UIColor.Label
+                    : result.Outcome is SteamSessionResumeOutcome.TimedOut or SteamSessionResumeOutcome.Cancelled
+                        ? UIColor.SystemOrange
+                        : UIColor.SystemRed;
+
+                RefreshSavedSessionStatus();
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _autoRestoreResultLabel.Text = "AUTO SESSION: EXCEPTION";
+                _autoRestoreResultLabel.TextColor = UIColor.SystemRed;
+                _autoRestoreDetailLabel.Text =
+                    $"{ex.GetType().Name}: {ex.Message}\nSaved session was not cleared because no definitive invalid-session result was obtained.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 06.3 automatic session restore.";
+                _statusLabel.TextColor = UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });
         }
@@ -347,7 +500,7 @@ public sealed class RootViewController : UIViewController
         _resumeResultLabel.Text = "SAVED SESSION: RUNNING…";
         _resumeResultLabel.TextColor = UIColor.Label;
         _resumeDetailLabel.Text = "Reading the device-bound Keychain entry and logging on with the saved refresh token. No password or Guard code is requested by the launcher.";
-        _statusLabel.Text = "STEP 06.2 RESUME RUNNING — password-free saved-session login.";
+        _statusLabel.Text = "STEP 06.3 MANUAL RESUME RUNNING — password-free saved-session login.";
 
         try
         {
@@ -374,7 +527,11 @@ public sealed class RootViewController : UIViewController
                     SteamSessionResumeOutcome.NoSavedSession =>
                         "No saved Steam session exists. Authenticate + Save Session first.",
                     SteamSessionResumeOutcome.Rejected =>
-                        "Saved token was rejected by Steam. Step 06.2 does not silently delete it; use Sign Out/Clear or authenticate again to replace it.",
+                        "Saved token was rejected by Steam. Automatic Step 06.3 recovery clears it only for definitive unusable-token results; transient rejections are preserved for retry.",
+                    SteamSessionResumeOutcome.InvalidLocalSession =>
+                        "Saved Keychain record is invalid. Automatic recovery would clear it and require interactive authentication.",
+                    SteamSessionResumeOutcome.IdentityMismatch =>
+                        "SECURITY: saved session authenticated as a different SteamID. Automatic recovery clears it and requires interactive authentication.",
                     SteamSessionResumeOutcome.TimedOut =>
                         "Saved-session resume timed out.",
                     SteamSessionResumeOutcome.Cancelled =>
@@ -432,7 +589,7 @@ public sealed class RootViewController : UIViewController
             }
 
             if (_resumeDetailLabel is not null)
-                _resumeDetailLabel.Text = "Relaunching now should show that no saved Steam session is available.";
+                _resumeDetailLabel.Text = "Relaunching now should automatically report AUTO SESSION — signed out because no saved Steam session is available.";
         }
         catch (Exception ex)
         {
@@ -474,6 +631,7 @@ public sealed class RootViewController : UIViewController
         _operationCts?.Dispose();
         _operationCts = new CancellationTokenSource();
 
+        if (_foundationButton is not null) _foundationButton.Enabled = false;
         if (_authButton is not null) _authButton.Enabled = false;
         if (_resumeButton is not null) _resumeButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
@@ -482,6 +640,7 @@ public sealed class RootViewController : UIViewController
 
     private void EndSteamOperation()
     {
+        if (_foundationButton is not null) _foundationButton.Enabled = true;
         if (_authButton is not null) _authButton.Enabled = true;
         if (_resumeButton is not null) _resumeButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
@@ -526,8 +685,11 @@ public sealed class RootViewController : UIViewController
 
     private static string FormatResumeDetail(SteamSessionResumeResult result)
     {
+        var recoveryAction = SteamSessionRecoveryPolicy.Evaluate(result);
         var lines = new List<string>
         {
+            $"Outcome: {result.Outcome}",
+            $"Recovery action: {recoveryAction}",
             $"Saved session found: {YesNo(result.SavedSessionFound)}",
             $"CM connected: {YesNo(result.CmConnected)}",
             $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
@@ -594,7 +756,7 @@ public sealed class RootViewController : UIViewController
 
                 _statusLabel.Text = final.Passed
                     ? "PASS: Steps 01–05 foundation still passes 5/5 on this device."
-                    : "FAIL: a proven foundation regression failed; stop Step 06.2 work until understood.";
+                    : "FAIL: a proven foundation regression failed; stop Step 06.3 work until understood.";
                 _statusLabel.TextColor = final.Passed ? UIColor.Label : UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });

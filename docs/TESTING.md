@@ -1,4 +1,4 @@
-# Testing strategy — Steps 01–06.2
+# Testing strategy — Steps 01–06.3
 
 The project uses host unit tests, repository/build validation, and physical-iPhone verification because no single layer can prove all boundaries.
 
@@ -25,7 +25,10 @@ These cover deterministic behavior including:
 - Steam Guard mobile-confirmation policy;
 - Step 06.2 saved-session serialization, overwrite, clear and malformed-data handling;
 - refresh-token redaction from `SteamSavedSession.ToString()`;
-- saved-session resume result/identity-match contracts.
+- saved-session resume result/identity-match contracts;
+- Step 06.3 conservative saved-session recovery policy;
+- destructive clear for invalid local data, identity mismatch, `InvalidPassword`, `Revoked`, and `Expired`;
+- preservation for transient/routing results, timeout, and cancellation.
 
 They do not claim to prove live Steam authentication or real iOS Keychain behavior.
 
@@ -34,23 +37,22 @@ They do not claim to prove live Steam authentication or real iOS Keychain behavi
 Run:
 
 ```text
-bash scripts/validate-step06-2.sh
+bash scripts/validate-step06-3.sh
 ```
 
-This preserves the Steps 01–05 foundation checks and verifies the Step 06.2 source contract: persistent auth requested, minimal Keychain payload, save after successful logon, password-free token resume, stored/returned SteamID comparison, explicit clear/sign-out, no manual Guard-code entry, and no ownership/download work.
+This preserves the Steps 01–05 foundation and Steps 06–06.2 authentication/persistence contracts, then verifies the Step 06.3 automatic restore trigger and conservative recovery policy. It also verifies no ownership/download or manual Guard-code scope was introduced.
 
-Codemagic additionally runs the host unit tests, the isolated SteamKit iOS compatibility patch, .NET iOS AOT/native link, IPA packaging and IPA verification.
+Codemagic additionally runs the host unit tests, isolated SteamKit iOS compatibility patch, .NET iOS AOT/native link, IPA packaging, and IPA verification.
 
 ## 3. Physical-iPhone verification
 
-The device must prove the platform/runtime boundaries:
+The device should prove:
 
-- foundation remains 5/5;
-- Step 06.1 credential/mobile-Guard flow still succeeds;
-- persistent refresh token can be written to real iOS Keychain;
-- force-close/relaunch still finds the saved session;
-- saved refresh token authenticates without password entry/new Guard flow;
-- returned Steam identity matches the stored identity;
-- explicit sign-out removes the Keychain session and it remains absent after another relaunch.
+- the saved Step 06.2 Keychain session survives the app upgrade;
+- first Active lifecycle automatically starts saved-session restore;
+- automatic restore authenticates with no password and no new Guard prompt;
+- returned identity still matches the saved SteamID;
+- saved session remains present after successful restore;
+- Steps 01–05 foundation remains 5/5.
 
-See `STEP-06.2-TEST.md`.
+See `STEP-06.3-TEST.md`.
