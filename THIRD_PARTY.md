@@ -1,4 +1,4 @@
-# Third-Party Components — Step 05.14
+# Third-Party Components — Step 05.15
 
 ## SteamKit2
 
@@ -9,7 +9,7 @@
 - Purpose: Steam network protocol client
 - License: see the upstream SteamKit repository/license for authoritative terms
 
-Step 05.14 retains SteamKit2 3.4.0 after the Step 05.12 physical-device
+Step 05.15 retains SteamKit2 3.4.0 after the Step 05.12 physical-device
 comparison showed that the upgrade alone did not remove the iOS AOT failure.
 This step adds only lifecycle-stage diagnostics around the existing unauthenticated
 SteamKit connection probe. The build-only iOS compatibility patcher accepts the
@@ -36,3 +36,8 @@ Mono.Cecil is used only by `tools/StS2Launcher.SteamKitIosPatcher` during CI.
 
 The app also relies on the .NET iOS runtime/SDK and Apple system frameworks
 supplied by the build/runtime environment.
+
+
+## Step 05.15 trimming note
+
+The iOS app roots `SteamKit2`, `protobuf-net`, and `protobuf-net.Core` from full trimming because Step 05.14 proved protobuf-net reflects over generated SteamKit protobuf metadata during the initial `ClientHello` serialization. This does not modify third-party source or ship build-only Mono.Cecil tooling in the IPA.

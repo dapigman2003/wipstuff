@@ -7,13 +7,13 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 05.14 SteamKit internal-error capture probe on SteamKit2 3.4.0.
+/// Step 05.15 protobuf trim-preservation connection probe on SteamKit2 3.4.0.
 ///
-/// Step 05.13 proved the recurring Reflection.Emit first-chance exception was
-/// triggered by this project's own no-op protobuf AOT configuration diagnostic,
-/// before SteamConfiguration.Create or SteamClient.Connect. Step 05.14 removes
-/// that diagnostic and changes only one boundary: it enables SteamKit's public
-/// DebugLog and captures its metadata/error text around the WebSocket connection.
+/// Step 05.14 captured SteamKit's real post-connect exception: protobuf-net failed
+/// while reflecting over CMsgProtoBufHeader because a property getter was missing
+/// after iOS full trimming. Step 05.15 changes only trimmer preservation in the
+/// iOS project; this probe intentionally keeps the same SteamKit DebugLog and
+/// ClientHello instrumentation so the device result is directly comparable.
 /// No authentication is performed.
 /// </summary>
 public sealed class SteamConnectionProbe

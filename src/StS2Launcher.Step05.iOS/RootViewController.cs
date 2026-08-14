@@ -67,13 +67,18 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 05.14 — STEAMKIT INTERNAL ERROR CAPTURE",
+            "STEP 05.15 — PROTOBUF TRIM PRESERVATION",
             UIFont.BoldSystemFontOfSize(15),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.20",
+            "Version 0.0.21",
             UIFont.SystemFontOfSize(14),
+            UIColor.SecondaryLabel));
+
+        content.AddArrangedSubview(Label(
+            "TRIM ROOTS: SteamKit2 • protobuf-net • protobuf-net.Core",
+            UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
@@ -101,12 +106,12 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_steamResultLabel);
 
         _steamDetailLabel = Label(
-            "Step 05.13 proved the recurring Reflection.Emit first-chance exception came from our own no-op protobuf AOT configuration diagnostic before SteamKit setup. Step 05.14 removes that diagnostic and captures SteamKit's own DebugLog around the unchanged WebSocket connection so we can see the exception SteamKit catches internally before it disconnects. It never authenticates.",
+            "Step 05.14 captured the real post-connect failure: protobuf-net tries to reflect over SteamKit's CMsgProtoBufHeader and hits Arg_GetMethNotFnd because an accessor was removed by full trimming. Step 05.15 keeps full trim globally but roots SteamKit2, protobuf-net, and protobuf-net.Core so that reflection metadata/accessors survive. It never authenticates.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_steamDetailLabel);
 
-        _steamButton = SystemButton("Run Step 05.14 SteamKit DebugLog Test", 17);
+        _steamButton = SystemButton("Run Step 05.15 Protobuf Trim Test", 17);
         _steamButton.TouchUpInside += async (_, _) => await RunSteamProbeAsync();
         content.AddArrangedSubview(_steamButton);
 
@@ -165,7 +170,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: starting Step 05.14 SteamKit internal-error capture.",
+            "Status: starting Step 05.15 protobuf trim-preservation test.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -181,7 +186,7 @@ public sealed class RootViewController : UIViewController
 
         RunStartupChecks();
 
-        Console.WriteLine("Step 05.14: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 05.15: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -337,12 +342,12 @@ public sealed class RootViewController : UIViewController
         {
             InvokeOnMainThread(() =>
             {
-                _steamResultLabel.Text = "STEP 05.14 STEAMKIT DEBUGLOG TEST: EXCEPTION";
+                _steamResultLabel.Text = "STEP 05.15 PROTOBUF TRIM TEST: EXCEPTION";
                 _steamResultLabel.TextColor = UIColor.SystemRed;
                 _steamDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
                 _statusLabel.Text =
-                    "FAIL: unhandled exception in Step 05.14 SteamKit DebugLog test.";
+                    "FAIL: unhandled exception in Step 05.15 protobuf trim test.";
                 _steamButton.Enabled = true;
             });
         }

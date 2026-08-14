@@ -1,30 +1,43 @@
-# StS2 Launcher iOS — Step 05.14
+# StS2 Launcher iOS — Step 05.15
 
-Step 05.14 captures SteamKit2's own internal debug log around the already-isolated CM WebSocket failure. It keeps SteamKit2 **3.4.0**, the Step 05.7 `SocketsHttpHandler` CM WebSocket factory, the exact-endpoint replay, and every previously proven iOS build/network fix. It adds no authentication.
+Step 05.15 tests one compatibility change: preserve the assemblies used by SteamKit's reflection-based protobuf serialization from iOS full trimming. SteamKit2 remains **3.4.0** and the connection test remains unauthenticated.
 
-## Evidence entering Step 05.14
+## Evidence entering Step 05.15
 
-Physical-iPhone Step 05.13 established:
+Physical-iPhone Step 05.14 finally exposed SteamKit's internally caught post-connect exception. The WebSocket connected successfully, then `CMClient.OnClientConnected()` attempted to serialize the initial `ClientHello`. The failure stack was:
 
-- the recurring `PlatformNotSupported_ReflectionEmit` first-chance exception fired during this project's own `ProtobufAotCompatibility.Configure()` diagnostic at about 4 ms;
-- `SteamConfiguration.Create` did not begin until about 6 ms and `SteamClient.Connect` until about 16 ms;
-- therefore that Reflection.Emit observation is not reliable evidence of the later SteamKit connection failure;
-- the SteamKit connection still failed before public `ConnectedCallback` and before an outgoing `ClientHello` reached `IDebugNetworkListener`;
-- the exact SteamKit-selected CM endpoint still completed a WebSocket HTTP upgrade outside SteamKit.
+```text
+System.ArgumentException: Arg_GetMethNotFnd
+  at System.Reflection.RuntimePropertyInfo.GetValue(...)
+  at ProtoBuf.Meta.AttributeMap.ReflectionAttributeMap.TryGet(...)
+  at ProtoBuf.Meta.MetaType.ApplyDefaultBehaviourImpl(...)
+  at ProtoBuf.Meta.RuntimeTypeModel.GetSerializer[CMsgProtoBufHeader]()
+  at ProtoBuf.Serializer.Serialize[CMsgProtoBufHeader](...)
+  at SteamKit2.Internal.MsgHdrProtoBuf.Serialize(...)
+  at SteamKit2.ClientMsgProtobuf<CMsgClientHello>.Serialize()
+  at SteamKit2.Internal.CMClient.Send(...)
+  at SteamKit2.Internal.CMClient.OnClientConnected()
+```
 
-Step 05.14 therefore removes the no-op protobuf compatibility diagnostic instead of continuing to chase its first-chance exception.
+That proves the CM network, WebSocket handler, and selected endpoint are not the failing boundary. The fatal exception is now in protobuf-net's reflection-based serializer while it inspects SteamKit-generated protobuf metadata.
 
-## Single Step 05.14 diagnostic change
+## Single Step 05.15 compatibility change
 
-The Steam connection probe enables SteamKit's public `DebugLog` only for the duration of the unauthenticated connection test and captures its category/message output with elapsed timestamps.
+The iOS project keeps `TrimMode=full`, but roots exactly these runtime assemblies:
 
-This matters because SteamKit's CM connection code catches exceptions raised immediately after the transport connects, logs the exception to `DebugLog`, and then disconnects. Capturing that log should reveal the exception that was previously hidden behind the generic non-user disconnect.
+```text
+SteamKit2
+protobuf-net
+protobuf-net.Core
+```
 
-The probe also retains the metadata-only `IDebugNetworkListener` and first-chance exception capture as secondary diagnostics. It never records raw Steam network payloads.
+The intent is to preserve property accessors and metadata that protobuf-net reaches only through reflection. All other assemblies remain under full trimming. This is deliberately broader than preserving only `CMsgProtoBufHeader`/`CMsgClientHello`, because later Steam authentication and content messages use the same generated protobuf model and would otherwise fail one message type at a time.
+
+The existing SteamKit `DebugLog` and metadata-only `IDebugNetworkListener` remain so the physical-device result is directly comparable with Step 05.14.
 
 ## Preserved regression boundaries
 
-Step 05.14 retains:
+Step 05.15 retains:
 
 - SteamKit2 3.4.0;
 - WebSocket-only SteamKit connection;
@@ -34,33 +47,34 @@ Step 05.14 retains:
 - exact `SocketsHttpHandler` + custom-invoker WebSocket isolation;
 - exact SteamKit-selected endpoint replay;
 - metadata-only `IDebugNetworkListener` / ClientHello observation;
+- SteamKit internal `DebugLog` capture;
 - Step 05.2 generated `DiskArbitration` linker-framework removal;
 - isolated version-aware SteamKit `Process.StartTime` compatibility patch.
 
 ## Success / next boundary
 
-If `STEAM CONNECTION PASS — 3/3` appears, Step 05 is complete and the next major step is authentication only.
-
-If SteamKit still fails, the most important new section is:
+The strongest success result is:
 
 ```text
-SteamKit post-connect exception logged: YES/NO
-Connection-setup exception logged: YES/NO
-SteamKit DebugLog:
-...
+STEAM CONNECTION PASS — 3/3
+ConnectedCallback: YES
+Outgoing ClientHello: YES
 ```
 
-That log should determine the next narrow compatibility change.
+If that appears, Step 05 is complete and the next major step is Steam authentication only.
+
+If the build fails, preserve the linker/AOT error because rooting SteamKit may expose another desktop-only native dependency that full trimming previously removed. If the app builds but SteamKit still fails, send the full `SteamKit DebugLog` stack so the next change stays on the exact serialization/AOT boundary.
 
 Expected artifact:
 
 ```text
-artifacts/StS2-Launcher-Step-05.14.ipa
+artifacts/StS2-Launcher-Step-05.15.ipa
 ```
 
 Expected device header:
 
 ```text
-STEP 05.14 — STEAMKIT INTERNAL ERROR CAPTURE
-Version 0.0.20
+STEP 05.15 — PROTOBUF TRIM PRESERVATION
+Version 0.0.21
+TRIM ROOTS: SteamKit2 • protobuf-net • protobuf-net.Core
 ```

@@ -8,8 +8,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>20</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.20</ApplicationDisplayVersion>
+    <ApplicationVersion>21</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.21</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -19,17 +19,32 @@
       native-link pipeline from inferring DiskArbitration from SteamKit2's
       macOS-only machine-information P/Invokes.
 
-      Keep full trimming because it successfully removes other unreachable
-      desktop dependencies. Step 05.14 retains Step 05.2's proven generated
-      DiskArbitration framework filter. The separate build-only compatibility
-      patch for SteamClient's unsupported Process.StartTime call is applied to
-      the isolated local SteamKit package before this project is compiled.
+      Keep full trimming for the app overall. Step 05.14 proved the actual
+      post-connect failure is protobuf-net reflecting over SteamKit-generated
+      protobuf metadata after full trimming removed a required property getter.
+      Step 05.15 roots only the three assemblies participating in that reflective
+      serialization path; all other assemblies remain fully trimmed.
+
+      Step 05.15 also retains Step 05.2's generated DiskArbitration framework
+      filter and the isolated SteamKit Process.StartTime compatibility patch.
     -->
     <TrimMode>full</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../StS2Launcher.Core/StS2Launcher.Core.csproj" />
+  </ItemGroup>
+
+  <!--
+    Step 05.15 single compatibility change: protobuf-net builds its runtime
+    serializer by reflecting over its own contract attributes and SteamKit's
+    generated protobuf message properties. Preserve those assemblies so iOS
+    full trimming cannot remove accessors that are reached only by reflection.
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="SteamKit2" />
+    <TrimmerRootAssembly Include="protobuf-net" />
+    <TrimmerRootAssembly Include="protobuf-net.Core" />
   </ItemGroup>
 
   <!--
