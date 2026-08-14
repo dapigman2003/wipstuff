@@ -1,6 +1,6 @@
 workflows:
-  ios-step-06:
-    name: Step 06 - Steam authentication session
+  ios-step-06-1:
+    name: Step 06.1 - Steam Guard mobile approval
     instance_type: mac_mini_m2
     max_build_duration: 45
 
@@ -15,14 +15,14 @@ workflows:
         - $HOME/.nuget/packages
 
     scripts:
-      - name: Test + build Step 06 unsigned IPA
+      - name: Test + build Step 06.1 unsigned IPA
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic-build.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-06.ipa
-      - artifacts/step06-build-summary.txt
+      - artifacts/StS2-Launcher-Step-06.1.ipa
+      - artifacts/step06.1-build-summary.txt
       - artifacts/test-results/**
       - artifacts/logs/**

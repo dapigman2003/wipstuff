@@ -8,12 +8,15 @@ public enum SteamAuthenticationOutcome
     GuardRequired = 1,
     Authenticated = 2,
     Cancelled = 3,
+    TimedOut = 4,
 }
 
 public sealed record SteamAuthenticationResult(
     SteamAuthenticationOutcome Outcome,
     bool CmConnected,
     bool AuthSessionStarted,
+    bool MobileApprovalRequested,
+    bool MobileApprovalCompleted,
     bool LoggedOnCallbackReceived,
     EResult? LogonResult,
     EResult? ExtendedLogonResult,
@@ -29,8 +32,11 @@ public sealed record SteamAuthenticationResult(
 
     public string Summary => Outcome switch
     {
+        SteamAuthenticationOutcome.Authenticated when MobileApprovalCompleted =>
+            "STEAM AUTH PASS — Steam Guard approved",
         SteamAuthenticationOutcome.Authenticated => "STEAM AUTH PASS — authenticated",
         SteamAuthenticationOutcome.GuardRequired => GuardChallenge?.Summary ?? "STEAM GUARD REQUIRED",
+        SteamAuthenticationOutcome.TimedOut => "STEAM AUTH TIMEOUT",
         SteamAuthenticationOutcome.Cancelled => "STEAM AUTH CANCELLED",
         _ => "STEAM AUTH FAIL",
     };

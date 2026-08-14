@@ -17,12 +17,12 @@ public sealed class SceneDelegate : UIWindowSceneDelegate
         UISceneSession session,
         UISceneConnectionOptions connectionOptions)
     {
-        Console.WriteLine("Step 06: SceneDelegate.WillConnect");
+        Console.WriteLine("Step 06.1: SceneDelegate.WillConnect");
 
         if (scene is not UIWindowScene windowScene)
         {
             Console.Error.WriteLine(
-                $"Step 06: expected UIWindowScene, received {scene.GetType().FullName}");
+                $"Step 06.1: expected UIWindowScene, received {scene.GetType().FullName}");
             return;
         }
 
@@ -38,7 +38,7 @@ public sealed class SceneDelegate : UIWindowSceneDelegate
 
             Window.MakeKeyAndVisible();
 
-            Console.WriteLine("Step 06: UIWindow is key and visible");
+            Console.WriteLine("Step 06.1: UIWindow is key and visible");
         }
         catch (Exception ex)
         {
@@ -53,7 +53,7 @@ public sealed class SceneDelegate : UIWindowSceneDelegate
                 TextColor = UIColor.Red,
                 Lines = 0,
                 TextAlignment = UITextAlignment.Center,
-                Text = $"STEP 06 STARTUP ERROR\n\n{ex.GetType().Name}\n{ex.Message}"
+                Text = $"STEP 06.1 STARTUP ERROR\n\n{ex.GetType().Name}\n{ex.Message}"
             };
 
             fallback.View.AddSubview(label);
@@ -76,24 +76,24 @@ public sealed class SceneDelegate : UIWindowSceneDelegate
 
     public override void DidBecomeActive(UIScene scene)
     {
-        Console.WriteLine("Step 06: scene active");
+        Console.WriteLine("Step 06.1: scene active");
         _rootViewController?.SetLifecycleState("Active");
     }
 
     public override void WillResignActive(UIScene scene)
     {
-        Console.WriteLine("Step 06: scene will resign active");
+        Console.WriteLine("Step 06.1: scene will resign active");
         _rootViewController?.SetLifecycleState("Inactive");
     }
 
     public override void WillEnterForeground(UIScene scene)
     {
-        Console.WriteLine("Step 06: scene entering foreground");
+        Console.WriteLine("Step 06.1: scene entering foreground");
         _rootViewController?.SetLifecycleState("Entering foreground");
     }
 
     public override void DidEnterBackground(UIScene scene)
     {
-        Console.WriteLine("Step 06: scene entered background");
+        Console.WriteLine("Step 06.1: scene entered background");
     }
 }

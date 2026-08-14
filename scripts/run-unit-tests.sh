@@ -13,10 +13,10 @@ if ! command -v dotnet >/dev/null 2>&1; then
   exit 2
 fi
 
-echo "=== Step 06 host unit tests ==="
+echo "=== Step 06.1 host unit tests ==="
 dotnet test "$TEST_PROJECT" \
   -c Release \
   --nologo \
   --results-directory "$RESULTS_DIR" \
-  --logger "trx;LogFileName=step06.trx" \
-  2>&1 | tee artifacts/logs/step06-unit-tests.log
+  --logger "trx;LogFileName=step06.1.trx" \
+  2>&1 | tee artifacts/logs/step06.1-unit-tests.log

@@ -70,22 +70,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 06 — STEAM AUTHENTICATION SESSION",
+            "STEP 06.1 — STEAM GUARD MOBILE APPROVAL",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.23",
+            "Version 0.0.24",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "AUTHENTICATION ONLY • NO OWNERSHIP • NO DOWNLOAD",
+            "MOBILE APPROVAL ONLY • NO OWNERSHIP • NO DOWNLOAD",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Credentials are used only for this in-memory authentication attempt. Step 06 does not save passwords, refresh tokens, access tokens, or Steam Guard data. If Steam Guard is required, this build reports the challenge and stops without submitting a code or approving a device; that interaction belongs to Step 06.1.",
+            "Credentials are used only for this in-memory authentication attempt. Step 06.1 can wait for a Steam Guard mobile-app approval on the same authentication session. Open Steam, approve the sign-in, then return here. Passwords, tokens, and Steam Guard data are not persisted. Authenticator-code and email-code entry remain out of scope.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -115,7 +115,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 06 authentication",
+            "Step 06.1 authentication + mobile approval",
             UIFont.BoldSystemFontOfSize(26),
             UIColor.Label));
 
@@ -133,7 +133,7 @@ public sealed class RootViewController : UIViewController
             contentType: UITextContentType.Password);
         content.AddArrangedSubview(_passwordField);
 
-        _authButton = SystemButton("Start Step 06 Authentication", 17);
+        _authButton = SystemButton("Start Step 06.1 Authentication", 17);
         _authButton.TouchUpInside += async (_, _) => await RunAuthenticationAsync();
         content.AddArrangedSubview(_authButton);
 
@@ -149,7 +149,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_authResultLabel);
 
         _authDetailLabel = Label(
-            "Enter your Steam account name and password to test the modern SteamKit authentication session.",
+            "Enter your Steam account name and password. If Steam sends a mobile Guard prompt, approve it in the Steam app and return here.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_authDetailLabel);
@@ -157,7 +157,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–05 are proven. Step 06 has not run yet.",
+            "Status: Step 06 reached the Steam Guard mobile-confirmation boundary. Step 06.1 has not run yet.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -175,7 +175,7 @@ public sealed class RootViewController : UIViewController
         }
 
         _uiStartupPassed = true;
-        Console.WriteLine("Step 06: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 06.1: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -223,16 +223,33 @@ public sealed class RootViewController : UIViewController
         _authResultLabel.Text = "STEAM AUTH: RUNNING…";
         _authResultLabel.TextColor = UIColor.Label;
         _authDetailLabel.Text =
-            "Connecting with the proven Step 05 WebSocket path, then beginning the modern credential auth session…";
-        _statusLabel.Text = "STEP 06 RUNNING — keep the app in the foreground.";
+            "Connecting with the proven Step 05 WebSocket path, then beginning the credential auth session. If Steam Guard appears, approve it in the Steam app and return here…";
+        _statusLabel.Text = "STEP 06.1 RUNNING — Steam app switching is expected for mobile approval.";
 
         try
         {
+            var progress = new Progress<SteamAuthenticationProgress>(update =>
+            {
+                InvokeOnMainThread(() =>
+                {
+                    _authDetailLabel.Text = update.Message;
+                    _statusLabel.Text = update.Stage switch
+                    {
+                        SteamAuthenticationStage.WaitingForMobileApproval =>
+                            "WAITING FOR STEAM GUARD — open Steam, approve the sign-in, then return here.",
+                        SteamAuthenticationStage.MobileApprovalAccepted =>
+                            "STEAM GUARD APPROVED — completing Steam logon…",
+                        _ => $"Step 06.1: {update.Message}",
+                    };
+                });
+            });
+
             var result = await _authenticationAttempt.RunAsync(
                 username,
                 password,
-                TimeSpan.FromSeconds(60),
-                _authCts.Token);
+                TimeSpan.FromMinutes(3),
+                _authCts.Token,
+                progress);
 
             InvokeOnMainThread(() =>
             {
@@ -242,6 +259,7 @@ public sealed class RootViewController : UIViewController
                     SteamAuthenticationOutcome.Authenticated => UIColor.Label,
                     SteamAuthenticationOutcome.GuardRequired => UIColor.SystemOrange,
                     SteamAuthenticationOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamAuthenticationOutcome.TimedOut => UIColor.SystemOrange,
                     _ => UIColor.SystemRed,
                 };
 
@@ -249,14 +267,18 @@ public sealed class RootViewController : UIViewController
 
                 _statusLabel.Text = result.Outcome switch
                 {
+                    SteamAuthenticationOutcome.Authenticated when result.MobileApprovalCompleted =>
+                        "PASS: Step 06.1 mobile Steam Guard approval completed and Steam returned the authenticated identity.",
                     SteamAuthenticationOutcome.Authenticated =>
-                        "PASS: Step 06 authenticated and returned Steam identity. No ownership request was made.",
+                        "PASS: authentication completed without a mobile Guard challenge.",
                     SteamAuthenticationOutcome.GuardRequired =>
-                        "BOUNDARY REACHED: Steam accepted the base credential session and requires Steam Guard. Step 06.1 should implement this exact challenge.",
+                        "BOUNDARY: Steam requested a code-based Guard method. Step 06.1 intentionally handles mobile approval only.",
+                    SteamAuthenticationOutcome.TimedOut =>
+                        "TIMEOUT: mobile approval/authentication did not complete within 3 minutes; no credentials or tokens were persisted.",
                     SteamAuthenticationOutcome.Cancelled =>
                         "Authentication attempt cancelled; no credentials or tokens were persisted.",
                     _ =>
-                        "FAIL: Step 06 authentication failed before a successful identity or expected Steam Guard boundary.",
+                        "FAIL: Step 06.1 authentication/mobile-approval flow failed.",
                 };
             });
         }
@@ -267,7 +289,7 @@ public sealed class RootViewController : UIViewController
                 _authResultLabel.Text = "STEAM AUTH: EXCEPTION";
                 _authResultLabel.TextColor = UIColor.SystemRed;
                 _authDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 06 authentication.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 06.1 authentication + mobile approval.";
             });
         }
         finally
@@ -286,6 +308,8 @@ public sealed class RootViewController : UIViewController
         {
             $"CM connected: {YesNo(result.CmConnected)}",
             $"Auth session started: {YesNo(result.AuthSessionStarted)}",
+            $"Mobile approval requested: {YesNo(result.MobileApprovalRequested)}",
+            $"Mobile approval completed: {YesNo(result.MobileApprovalCompleted)}",
             $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
             $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
             $"Extended result: {result.ExtendedLogonResult?.ToString() ?? "N/A"}",
@@ -305,7 +329,7 @@ public sealed class RootViewController : UIViewController
         if (!string.IsNullOrWhiteSpace(result.Error))
             lines.Add($"Error: {result.Error}");
 
-        lines.Add("Credential persistence: NONE");
+        lines.Add("Credential/token/Guard persistence: NONE");
         lines.Add("Ownership request: NOT RUN");
         return string.Join("\n", lines);
     }
@@ -354,7 +378,7 @@ public sealed class RootViewController : UIViewController
 
                 _statusLabel.Text = final.Passed
                     ? "PASS: Steps 01–05 foundation still passes 5/5 on this device."
-                    : "FAIL: a proven foundation regression failed; stop Step 06 work until understood.";
+                    : "FAIL: a proven foundation regression failed; stop Step 06.1 work until understood.";
             });
         }
         catch (Exception ex)

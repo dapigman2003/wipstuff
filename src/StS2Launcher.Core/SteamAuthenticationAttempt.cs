@@ -6,15 +6,16 @@ using SteamKit2.Authentication;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 06 credential authentication boundary.
+/// Step 06.1 authentication boundary.
 ///
 /// Scope:
 /// - connect using the Step 05-proven CM WebSocket path;
 /// - begin modern Steam credential authentication;
-/// - if no Steam Guard challenge is required, obtain the transient refresh
-///   token and use it to perform SteamUser.LogOn;
+/// - if Steam requests mobile-app confirmation, keep the same auth session
+///   alive and poll until the user approves it in the Steam mobile app;
+/// - use the transient refresh token to perform SteamUser.LogOn;
 /// - report the authenticated account name and SteamID;
-/// - if Steam Guard is required, stop before handling the challenge.
+/// - continue to stop at device-code/email-code challenges.
 ///
 /// This class never persists the password, refresh token, access token, guard
 /// data, or any Steam credential. Step 06.2 owns persistence later.
@@ -27,7 +28,8 @@ public sealed class SteamAuthenticationAttempt
         string username,
         string password,
         TimeSpan timeout,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IProgress<SteamAuthenticationProgress>? progress = null)
     {
         if (string.IsNullOrWhiteSpace(username))
             throw new ArgumentException("Steam username is required.", nameof(username));
@@ -46,8 +48,10 @@ public sealed class SteamAuthenticationAttempt
         SteamClient? steamClient = null;
         SteamUser? steamUser = null;
         Task? callbackPump = null;
+        SteamGuardChallengeAuthenticator? authenticator = null;
         var cmConnected = false;
         var authSessionStarted = false;
+        var mobileApprovalCompleted = false;
         var loggedOnCallbackReceived = false;
         EResult? logonResult = null;
         EResult? extendedLogonResult = null;
@@ -57,6 +61,8 @@ public sealed class SteamAuthenticationAttempt
         string? currentEndPoint = null;
         string? error = null;
         var outcome = SteamAuthenticationOutcome.Failed;
+
+        Report(SteamAuthenticationStage.Starting, "Starting Steam authentication session.");
 
         try
         {
@@ -92,6 +98,7 @@ public sealed class SteamAuthenticationAttempt
             });
 
             callbackPump = Task.Run(() => PumpCallbacks(manager, pumpCts.Token));
+            Report(SteamAuthenticationStage.Connecting, "Connecting to the Steam CM over WebSocket.");
             steamClient.Connect();
 
             var connectWinner = await Task.WhenAny(
@@ -104,10 +111,13 @@ public sealed class SteamAuthenticationAttempt
             if (connectWinner == disconnectedTcs.Task || !cmConnected)
             {
                 error = "Steam disconnected before ConnectedCallback.";
+                Report(SteamAuthenticationStage.Failed, error);
                 return BuildResult();
             }
 
-            var authenticator = new SteamGuardChallengeAuthenticator();
+            Report(SteamAuthenticationStage.CmConnected, "Steam CM connected. Beginning credential authentication.");
+
+            authenticator = new SteamGuardChallengeAuthenticator(progress);
             CredentialsAuthSession authSession;
 
             try
@@ -126,36 +136,54 @@ public sealed class SteamAuthenticationAttempt
                     .WaitAsync(token)
                     .ConfigureAwait(false);
                 authSessionStarted = true;
+                Report(SteamAuthenticationStage.AuthSessionStarted, "Steam credential authentication session started.");
             }
             catch (AuthenticationException ex)
             {
                 error = $"AuthenticationException ({ex.Result}): {ex.Message}";
+                Report(SteamAuthenticationStage.Failed, error);
                 return BuildResult();
             }
 
             AuthPollResult pollResult;
             try
             {
+                // If Steam prefers DeviceConfirmation, our authenticator returns
+                // true from AcceptDeviceConfirmationAsync. SteamKit then polls
+                // this same session until the user approves it in the Steam app.
                 pollResult = await authSession
                     .PollingWaitForResultAsync(token)
                     .ConfigureAwait(false);
             }
             catch (SteamGuardChallengeRequiredException ex)
             {
+                // Step 06.1 handles mobile approval only. Authenticator-code and
+                // email-code entry remain explicit later substeps.
                 guardChallenge = ex.Challenge;
                 outcome = SteamAuthenticationOutcome.GuardRequired;
+                Report(SteamAuthenticationStage.Failed, ex.Challenge.Summary);
                 return BuildResult();
             }
             catch (AuthenticationException ex)
             {
                 error = $"AuthenticationException ({ex.Result}): {ex.Message}";
+                Report(SteamAuthenticationStage.Failed, error);
                 return BuildResult();
+            }
+
+            if (authenticator.MobileApprovalRequested)
+            {
+                mobileApprovalCompleted = true;
+                Report(
+                    SteamAuthenticationStage.MobileApprovalAccepted,
+                    "Steam Guard mobile approval accepted. Completing Steam logon.");
             }
 
             accountName = pollResult.AccountName;
 
             // The refresh token is used only for this in-memory logon. It is
             // never returned in SteamAuthenticationResult, logged, or stored.
+            Report(SteamAuthenticationStage.LoggingOn, "Authentication approved. Logging on to Steam with the transient session token.");
             steamUser.LogOn(new SteamUser.LogOnDetails
             {
                 Username = pollResult.AccountName,
@@ -175,30 +203,43 @@ public sealed class SteamAuthenticationAttempt
             if (logonWinner == disconnectedTcs.Task || !loggedOnCallbackReceived)
             {
                 error = "Steam disconnected before LoggedOnCallback.";
+                Report(SteamAuthenticationStage.Failed, error);
                 return BuildResult();
             }
 
             if (logonResult != EResult.OK)
             {
                 error = $"Steam logon rejected: {logonResult} / {extendedLogonResult}.";
+                Report(SteamAuthenticationStage.Failed, error);
                 return BuildResult();
             }
 
             steamId64 = steamUser.SteamID?.ConvertToUInt64().ToString();
             outcome = SteamAuthenticationOutcome.Authenticated;
+            Report(SteamAuthenticationStage.Authenticated, "Steam authentication completed successfully.");
             return BuildResult();
         }
         catch (OperationCanceledException)
         {
-            outcome = SteamAuthenticationOutcome.Cancelled;
-            error = cancellationToken.IsCancellationRequested
-                ? "Authentication cancelled by user."
-                : $"Authentication timed out after {timeout.TotalSeconds:F0}s.";
+            if (cancellationToken.IsCancellationRequested)
+            {
+                outcome = SteamAuthenticationOutcome.Cancelled;
+                error = "Authentication cancelled by user.";
+                Report(SteamAuthenticationStage.Cancelled, error);
+            }
+            else
+            {
+                outcome = SteamAuthenticationOutcome.TimedOut;
+                error = $"Authentication timed out after {timeout.TotalSeconds:F0}s.";
+                Report(SteamAuthenticationStage.TimedOut, error);
+            }
+
             return BuildResult();
         }
         catch (Exception ex)
         {
             error = $"{ex.GetType().Name}: {ex.Message}";
+            Report(SteamAuthenticationStage.Failed, error);
             return BuildResult();
         }
         finally
@@ -211,7 +252,7 @@ public sealed class SteamAuthenticationAttempt
                 }
                 catch
                 {
-                    // Best-effort cleanup only. Step 06 proves authentication;
+                    // Best-effort cleanup only. Step 06.1 proves auth/approval;
                     // it does not keep a persistent Steam session alive yet.
                 }
             }
@@ -245,32 +286,36 @@ public sealed class SteamAuthenticationAttempt
             sw.Stop();
         }
 
+        void Report(SteamAuthenticationStage stage, string message) =>
+            progress?.Report(new SteamAuthenticationProgress(stage, message));
+
         SteamAuthenticationResult BuildResult() => new(
             Outcome: outcome,
             CmConnected: cmConnected,
             AuthSessionStarted: authSessionStarted,
+            MobileApprovalRequested: authenticator?.MobileApprovalRequested == true,
+            MobileApprovalCompleted: mobileApprovalCompleted,
             LoggedOnCallbackReceived: loggedOnCallbackReceived,
             LogonResult: logonResult,
             ExtendedLogonResult: extendedLogonResult,
             AccountName: accountName,
             SteamId64: steamId64,
-            GuardChallenge: guardChallenge,
+            GuardChallenge: guardChallenge ?? authenticator?.LastChallenge,
             CurrentEndPoint: currentEndPoint,
             Elapsed: sw.Elapsed,
             Error: error);
     }
 
-    private static async Task PumpCallbacks(
+    private static TaskCompletionSource<T> NewTcs<T>() =>
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    private static void PumpCallbacks(
         CallbackManager manager,
         CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            manager.RunWaitCallbacks(TimeSpan.FromMilliseconds(50));
-            await Task.Yield();
+            manager.RunWaitCallbacks(TimeSpan.FromMilliseconds(250));
         }
     }
-
-    private static TaskCompletionSource<T> NewTcs<T>() =>
-        new(TaskCreationOptions.RunContinuationsAsynchronously);
 }

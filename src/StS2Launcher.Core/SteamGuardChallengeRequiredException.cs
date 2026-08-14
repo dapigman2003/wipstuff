@@ -1,9 +1,9 @@
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Internal control-flow exception used only by the Step 06 challenge observer.
-/// It deliberately stops the auth flow before any Steam Guard code or approval
-/// is supplied. Step 06.1 will add real challenge handling.
+/// Internal control-flow exception used by Step 06.1 for code-based Steam Guard
+/// challenges that this step intentionally does not handle. Mobile device
+/// confirmation uses SteamKit's same-session polling path instead.
 /// </summary>
 public sealed class SteamGuardChallengeRequiredException : Exception
 {
