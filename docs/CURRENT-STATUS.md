@@ -34,3 +34,6 @@ FOUNDATION PASS — 5/5
 ```
 
 After that final cleanup smoke test, proceed to **Step 06 — Steam authentication session only**. Do not add ownership in Step 06.
+## 05.16.1 test-gate hotfix
+
+The first Step 05.16 Codemagic run reached the host unit-test gate and stopped before the iOS build because MSTest 4.3.2 no longer exposes `Assert.ThrowsException`. It also reported the `DataTestMethod` obsolescence warning. The 05.16.1 source hotfix changes only test code (`Assert.ThrowsExactly`, `TestMethod` + `DataRow`) and strengthens repository validation against those legacy APIs. Runtime Step 05.16 remains version 0.0.22 and still awaits the final physical-device `FOUNDATION PASS — 5/5` verification.
