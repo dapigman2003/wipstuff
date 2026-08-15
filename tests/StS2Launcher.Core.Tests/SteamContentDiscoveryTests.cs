@@ -32,6 +32,7 @@ public sealed class SteamContentDiscoveryTests
         Add(manifests, "public", "1234567890123456789");
 
         var sharedDepot = Add(depots, "2868842");
+        Add(sharedDepot, "depotfromapp", "123456");
         var nestedManifests = Add(sharedDepot, "manifests");
         var beta = Add(nestedManifests, "beta");
         Add(beta, "gid", "9876543210987654321");
@@ -48,6 +49,7 @@ public sealed class SteamContentDiscoveryTests
         Assert.AreEqual("1234567890123456789", parsed[0].Manifests[0].ManifestId);
 
         Assert.AreEqual(2868842u, parsed[1].DepotId);
+        Assert.AreEqual(123456u, parsed[1].DepotFromAppId);
         Assert.AreEqual(1, parsed[1].Manifests.Count);
         Assert.AreEqual("beta", parsed[1].Manifests[0].Branch);
         Assert.AreEqual("9876543210987654321", parsed[1].Manifests[0].ManifestId);

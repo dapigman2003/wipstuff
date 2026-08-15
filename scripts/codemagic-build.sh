@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 08 environment ==="
+  echo "=== StS2 Launcher Step 09 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step08-environment.log
+} | tee artifacts/logs/step09-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -50,7 +50,7 @@ fi
   exit 3
 }
 
-bash scripts/validate-step08.sh | tee artifacts/logs/step08-validation.log
+bash scripts/validate-step09.sh | tee artifacts/logs/step09-validation.log
 bash scripts/run-unit-tests.sh
 
 WORKLOAD_CWD="$(mktemp -d)"
@@ -59,16 +59,16 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step08-workload.log
+) | tee artifacts/logs/step09-workload.log
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/build-step08.sh 2>&1 | tee artifacts/logs/step08-wrapper.log
-bash scripts/verify-step08-ipa.sh artifacts/StS2-Launcher-Step-08.ipa \
-  2>&1 | tee artifacts/logs/step08-ipa-verification.log
+bash scripts/build-step09.sh 2>&1 | tee artifacts/logs/step09-wrapper.log
+bash scripts/verify-step09-ipa.sh artifacts/StS2-Launcher-Step-09.ipa \
+  2>&1 | tee artifacts/logs/step09-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 08 depot / manifest discovery"
+  echo "StS2 Launcher iOS — Step 09 one controlled small file"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -78,15 +78,18 @@ bash scripts/verify-step08-ipa.sh artifacts/StS2-Launcher-Step-08.ipa \
   echo "Host unit tests: PASS (required before publish)"
   echo "SteamKit: 3.4.0"
   echo "Foundation regression: retained"
-  echo "Fix boundary: PICS depot / visible manifest-ID discovery for App ID 2868840"
+  echo "Boundary: one controlled small StS2 file (<= 2 MiB), manifest SHA-1 verified"
   echo "Steam Guard: Step 06.1 mobile approval retained; no manual code entry"
   echo "Credential persistence: refresh token + identity in iOS Keychain; ShouldRememberPassword=true; password/Guard secrets never stored"
-  echo "Ownership: Step 07 ticket gate retained and re-proven before PICS metadata"
-  echo "Discovery: PICS access metadata + product info only; depot keys/manifest bodies/CDN/files not implemented"
-  echo "IPA: artifacts/StS2-Launcher-Step-08.ipa"
+  echo "Ownership: Step 07 ticket gate retained and re-proven before content access"
+  echo "Discovery: Step 08 PICS metadata gate retained"
+  echo "Content access: exactly one direct public depot key + one manifest + chunks for one selected file"
+  echo "Integrity: final bytes must match the manifest SHA-1 before atomic persistence"
+  echo "Still absent: full-depot queue, resume, update/install/repair, Godot, Cloud, Workshop"
+  echo "IPA: artifacts/StS2-Launcher-Step-09.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-08.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-09.ipa | awk '{print $1}')"
   fi
-} > artifacts/step08-build-summary.txt
+} > artifacts/step09-build-summary.txt
 
-cat artifacts/step08-build-summary.txt
+cat artifacts/step09-build-summary.txt

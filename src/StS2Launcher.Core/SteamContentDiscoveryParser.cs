@@ -54,7 +54,8 @@ public static class SteamContentDiscoveryParser
                 Language: Clean(config is null ? null : Child(config, "language")?.Value),
                 Manifests: manifests
                     .OrderBy(m => m.Branch, StringComparer.OrdinalIgnoreCase)
-                    .ToArray()));
+                    .ToArray(),
+                DepotFromAppId: ParseOptionalUInt(Child(depotNode, "depotfromapp")?.Value)));
         }
 
         return depots
@@ -89,4 +90,7 @@ public static class SteamContentDiscoveryParser
 
     private static string? Clean(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static uint? ParseOptionalUInt(string? value) =>
+        uint.TryParse(value, out var parsed) && parsed != 0 ? parsed : null;
 }

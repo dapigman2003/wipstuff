@@ -1,58 +1,54 @@
-# Testing strategy — Step 08
+# Testing strategy — Step 09
 
-The project uses host unit tests, repository/build validation, and physical-iPhone verification because no single layer can prove all boundaries.
+The project uses host unit tests, repository/build validation, Codemagic iOS compilation/AOT/linking, and physical-iPhone verification because no single layer proves every boundary.
 
 ## 1. Host unit tests
 
-Project:
-
-```text
-tests/StS2Launcher.Core.Tests/StS2Launcher.Core.Tests.csproj
-```
-
-Run with:
+Run:
 
 ```text
 bash scripts/run-unit-tests.sh
 ```
 
-Coverage retains the foundation/auth/session/ownership contracts and adds deterministic Step 08 metadata tests:
+Coverage retains the foundation/auth/session/ownership/discovery contracts and adds deterministic Step 09 policy tests:
 
 - target App ID remains exactly `2868840`;
-- PICS `depots` parsing accepts only numeric depot nodes;
-- optional depot platform metadata (`oslist`, `osarch`, `language`) is retained;
-- direct manifest IDs and nested `gid` forms are parsed;
-- invalid/zero manifest IDs are ignored;
-- the discovery result cannot expose raw ownership-ticket bytes or a PICS access-token value;
-- discovery summary counts depots and visible branch manifest IDs.
+- the controlled file cap is exactly 2 MiB;
+- a direct public macOS depot is preferred;
+- shared/proxied depots are not selected for this proof;
+- a visible `public` manifest is required;
+- traversal/rooted manifest paths are rejected;
+- Step 09 result telemetry cannot expose raw downloaded bytes or token/key/request-code values.
 
-Host tests do not claim to prove live Steam PICS behavior, native iOS AOT/linking, or real iOS Keychain behavior.
+Host tests do not prove live Steam CDN behavior, native iOS AOT/linking, or real iOS storage/network behavior.
 
 ## 2. Repository/build validation
 
 Run:
 
 ```text
-bash scripts/validate-step08.sh
+bash scripts/validate-step09.sh
 ```
 
-The validator first protects the Steps 01–05 foundation, then verifies the Steps 06–07 regressions and the narrow Step 08 operation.
+The validator protects Steps 01–08, requires the single-file Steam content-access API path, checks the 2 MiB/path/hash/atomic-write guards, and rejects markers for a full downloader, resume, update/install/repair, Godot, Cloud, or Workshop.
 
-It requires PICS access-token + product-info calls and explicitly rejects depot-key, manifest-body, CDN, chunk, and file-download APIs in the Step 08 discovery implementation.
-
-Codemagic additionally runs host tests, the isolated SteamKit iOS compatibility patch, .NET iOS AOT/native linking, IPA packaging, and IPA verification.
+Codemagic then runs host tests, the isolated SteamKit iOS compatibility patch, .NET iOS AOT/native linking, IPA packaging, and IPA verification.
 
 ## 3. Physical-iPhone verification
 
 The device must prove:
 
-- saved-session authentication still works with matching Steam identity;
+- the saved Steam session still authenticates with matching identity;
 - Step 07 ownership is re-proven;
-- the PICS token callback arrives;
-- target app product info arrives without a missing-token flag;
-- at least one numeric depot ID is discovered;
-- at least one visible branch manifest ID is discovered;
-- no depot key, manifest body, CDN, chunk, or file request is made;
-- Steps 01–05 foundation still passes 5/5.
+- Step 08 PICS metadata discovery still succeeds;
+- exactly one direct public depot is selected;
+- one depot key and one manifest request code are obtained;
+- one manifest is fetched;
+- one safe regular file at most 2 MiB is selected;
+- all selected-file chunks arrive at expected uncompressed sizes;
+- assembled file SHA-1 matches the manifest;
+- exactly one final verified file is written;
+- secret/key/token values remain undisplayed;
+- Foundation 5/5 still passes.
 
-See `STEP-08-TEST.md`.
+See `STEP-09-TEST.md`.

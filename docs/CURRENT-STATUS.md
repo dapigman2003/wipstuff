@@ -9,11 +9,14 @@
 - Step 06.1: **passed** — mobile Steam Guard approval completed and authenticated identity returned.
 - Step 06.2: **passed** — refresh token + identity stored in real iOS Keychain; password-free relaunch/resume and sign-out passed.
 - Step 06.3.1: **passed** — persistent token semantics corrected; automatic and manual saved-session login remain reliable over time.
-- Step 07: **passed on physical iPhone** — App ID **2868840** returned an exact-AppID, `EResult.OK`, non-empty ownership ticket and no content request followed.
-- Current source step: **Step 08**.
-- App version: **0.0.29 / build 29**.
-- New boundary: PICS app metadata discovery for App ID **2868840** after re-proving Step 07 ownership.
-- Success condition: target app info returned without missing-token state, at least one numeric depot found, and at least one visible branch manifest ID found.
-- Displayed discovery metadata: depot ID, optional `oslist` / `osarch` / `language`, branch name, manifest ID, PICS change number.
-- PICS access-token value: **never displayed/logged/persisted**.
-- Depot keys / manifest bodies / CDN / chunks / file download: **not implemented**.
+- Step 07: **passed on physical iPhone** — App ID **2868840** returned an exact-AppID, `EResult.OK`, non-empty ownership ticket.
+- Step 08: **passed on physical iPhone** — PICS product metadata returned numeric depot IDs and visible branch manifest IDs without broadening into download behavior.
+- Current source step: **Step 09**.
+- App version: **0.0.30 / build 30**.
+- New boundary: retrieve one direct public depot manifest and download exactly one selected regular file no larger than **2 MiB**.
+- Selection policy: prefer direct public macOS depot metadata; then language-neutral/English; choose the smallest safe non-empty regular file under the size cap.
+- Integrity gate: assembled bytes must match the manifest SHA-1 before final persistence.
+- Output: one verified file beneath `Documents/StS2Launcher/Step09-SingleFile/...`.
+- PICS token / depot key / manifest request code / CDN auth token: **never exposed by result telemetry or persisted**.
+- Raw manifest body / chunk cache / partial-file state: **not persisted**.
+- Full-depot queue / resume / install-update-repair / Godot / Cloud / Workshop: **not implemented**.

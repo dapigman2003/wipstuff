@@ -15,6 +15,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamSessionResumeAttempt _resumeAttempt;
     private readonly SteamOwnershipVerificationAttempt _ownershipAttempt;
     private readonly SteamContentDiscoveryAttempt _contentDiscoveryAttempt;
+    private readonly SteamSingleFileDownloadAttempt _singleFileDownloadAttempt;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -29,6 +30,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _ownershipDetailLabel;
     private UILabel? _discoveryResultLabel;
     private UILabel? _discoveryDetailLabel;
+    private UILabel? _singleFileResultLabel;
+    private UILabel? _singleFileDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -38,6 +41,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _resumeButton;
     private UIButton? _ownershipButton;
     private UIButton? _discoveryButton;
+    private UIButton? _singleFileButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -53,6 +57,10 @@ public sealed class RootViewController : UIViewController
         _resumeAttempt = new SteamSessionResumeAttempt(_sessionStore);
         _ownershipAttempt = new SteamOwnershipVerificationAttempt(_sessionStore);
         _contentDiscoveryAttempt = new SteamContentDiscoveryAttempt(_sessionStore);
+        var documentsRoot = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        _singleFileDownloadAttempt = new SteamSingleFileDownloadAttempt(
+            _sessionStore,
+            Path.Combine(documentsRoot, "StS2Launcher"));
     }
 
     public override void ViewDidLoad()
@@ -98,22 +106,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 08 — DEPOT / MANIFEST DISCOVERY",
+            "STEP 09 — ONE CONTROLLED SMALL FILE",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.29",
+            "Version 0.0.30",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "APP ID 2868840 • PICS METADATA ONLY • NO DOWNLOAD",
+            "APP ID 2868840 • ONE FILE ≤ 2 MiB • SHA-1 VERIFIED",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 08 starts only after the proven Step 07 ownership gate. It reuses the saved Steam session, proves ownership again, requests PICS access metadata and product info for Slay the Spire 2 (App ID 2868840), then enumerates numeric depot IDs and already-visible branch manifest IDs. The PICS access-token value is never displayed, logged, or persisted. No depot decryption key, manifest body, CDN server/token, chunk, or file is requested.",
+            "Step 09 preserves the proven Step 08 discovery path, then adds one tightly bounded content-access test. It re-proves the saved session and App ID 2868840 ownership, re-discovers direct public depots, prefers a macOS depot when available, downloads one manifest in memory, selects the smallest safe regular file no larger than 2 MiB, downloads only that file's chunks, verifies the assembled SHA-1 against Steam's manifest, and atomically writes only that verified file. No full-depot queue, resume, install/update, repair, Godot, Cloud, or Workshop work is included.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -264,6 +272,29 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_discoveryDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 09 — one controlled small StS2 file",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _singleFileButton = SystemButton("Download One Small StS2 File", 17);
+        _singleFileButton.TouchUpInside += async (_, _) => await RunSingleFileDownloadAsync();
+        content.AddArrangedSubview(_singleFileButton);
+
+        _singleFileResultLabel = Label(
+            "SINGLE-FILE: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_singleFileResultLabel);
+
+        _singleFileDetailLabel = Label(
+            "Bounded content test only: one direct public depot, one in-memory manifest, one safe regular file <= 2 MiB, SHA-1 verification, then one atomic Documents write. Depot keys, request codes, CDN auth tokens, manifest bytes and chunk buffers are never displayed or persisted.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_singleFileDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -276,7 +307,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Step 07 passed on the physical iPhone. Step 08 is ready to discover depot IDs and visible branch manifest IDs for App ID 2868840 using PICS metadata only — no manifest body or file download.",
+            "Status: Step 08 passed on the physical iPhone. Step 09 is ready to download exactly one small StS2 file after re-proving the saved session, ownership, and discovery gates.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -295,7 +326,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 08: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 09: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -779,6 +810,87 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunSingleFileDownloadAsync()
+    {
+        if (_singleFileResultLabel is null || _singleFileDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation();
+        _singleFileResultLabel.Text = "SINGLE-FILE: RUNNING…";
+        _singleFileResultLabel.TextColor = UIColor.Label;
+        _singleFileDetailLabel.Text =
+            "Re-proving saved-session identity, Step 07 ownership and Step 08 PICS metadata; then downloading one direct public manifest and one <= 2 MiB file only…";
+        _statusLabel.Text =
+            "STEP 09 RUNNING — exactly one bounded file; no full-depot queue, resume, install, update, repair, Godot, Cloud, or Workshop operation.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var result = await _singleFileDownloadAttempt.RunAsync(
+                TimeSpan.FromSeconds(120),
+                _operationCts!.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _singleFileResultLabel.Text = result.Summary;
+                _singleFileResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamSingleFileDownloadOutcome.Downloaded => UIColor.Label,
+                    SteamSingleFileDownloadOutcome.NoSavedSession => UIColor.SystemOrange,
+                    SteamSingleFileDownloadOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamSingleFileDownloadOutcome.TimedOut => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+                _singleFileDetailLabel.Text = FormatSingleFileDownloadDetail(result);
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamSingleFileDownloadOutcome.Downloaded =>
+                        $"PASS: one verified StS2 file was downloaded and written ({result.SelectedFileBytes} bytes). No other game file was requested.",
+                    SteamSingleFileDownloadOutcome.NoSavedSession =>
+                        "No saved Steam session exists. Authenticate + Save Session first, then retry Step 09.",
+                    SteamSingleFileDownloadOutcome.SessionRejected =>
+                        "Saved Steam session was rejected before Step 09 content access. Reauthenticate.",
+                    SteamSingleFileDownloadOutcome.IdentityMismatch =>
+                        "SECURITY: saved session returned a different SteamID. Step 09 stopped before content access.",
+                    SteamSingleFileDownloadOutcome.OwnershipNotProven =>
+                        "Step 07 ownership could not be re-proven. Step 09 stopped before depot-key/CDN access.",
+                    SteamSingleFileDownloadOutcome.NoSuitableDepot =>
+                        "Step 08 metadata had no direct depot with a visible public manifest suitable for this controlled test.",
+                    SteamSingleFileDownloadOutcome.NoSmallFile =>
+                        "The selected manifest had no safe non-empty regular file <= 2 MiB. No file was written.",
+                    SteamSingleFileDownloadOutcome.FileHashMismatch =>
+                        "Downloaded chunks assembled, but SHA-1 did not match Steam's manifest. Nothing was written.",
+                    SteamSingleFileDownloadOutcome.TimedOut =>
+                        "Step 09 timed out. No unverified file is persisted.",
+                    SteamSingleFileDownloadOutcome.Cancelled =>
+                        "Step 09 cancelled. No unverified file is persisted.",
+                    _ =>
+                        "FAIL: Step 09 did not complete. Review the detailed boundary telemetry before changing scope.",
+                };
+                _statusLabel.TextColor = result.Outcome == SteamSingleFileDownloadOutcome.Downloaded
+                    ? UIColor.Label
+                    : result.Outcome is SteamSingleFileDownloadOutcome.TimedOut or SteamSingleFileDownloadOutcome.Cancelled or SteamSingleFileDownloadOutcome.NoSavedSession
+                        ? UIColor.SystemOrange
+                        : UIColor.SystemRed;
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _singleFileResultLabel.Text = "SINGLE-FILE: EXCEPTION";
+                _singleFileResultLabel.TextColor = UIColor.SystemRed;
+                _singleFileDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 09 single-file boundary.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
     private void ClearSavedSession()
     {
         if (_statusLabel is null)
@@ -862,6 +974,7 @@ public sealed class RootViewController : UIViewController
         if (_resumeButton is not null) _resumeButton.Enabled = false;
         if (_ownershipButton is not null) _ownershipButton.Enabled = false;
         if (_discoveryButton is not null) _discoveryButton.Enabled = false;
+        if (_singleFileButton is not null) _singleFileButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = true;
     }
@@ -873,6 +986,7 @@ public sealed class RootViewController : UIViewController
         if (_resumeButton is not null) _resumeButton.Enabled = true;
         if (_ownershipButton is not null) _ownershipButton.Enabled = true;
         if (_discoveryButton is not null) _discoveryButton.Enabled = true;
+        if (_singleFileButton is not null) _singleFileButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
@@ -1035,6 +1149,66 @@ public sealed class RootViewController : UIViewController
         return string.Join("\n", lines);
     }
 
+    private static string FormatSingleFileDownloadDetail(SteamSingleFileDownloadResult result)
+    {
+        var lines = new List<string>
+        {
+            $"Target AppID: {result.TargetAppId}",
+            $"Saved session found: {YesNo(result.SavedSessionFound)}",
+            $"CM connected: {YesNo(result.CmConnected)}",
+            $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
+            $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
+            $"Stored/returned identity match: {YesNo(result.IdentityMatched)}",
+            $"Step 07 ownership callback: {YesNo(result.OwnershipTicketCallbackReceived)}",
+            $"Step 07 ownership result: {result.OwnershipResult?.ToString() ?? "N/A"}",
+            $"Step 07 ownership ticket bytes: {result.OwnershipTicketLength}",
+            $"Step 07 ownership re-proven: {YesNo(result.OwnershipProven)}",
+            $"Step 08 PICS access-token callback: {YesNo(result.PicsAccessTokenCallbackReceived)}",
+            $"Step 08 PICS access token returned: {YesNo(result.PicsAccessTokenReceived)} (value never exposed)",
+            $"Step 08 PICS product-info callback: {YesNo(result.PicsProductInfoCallbackReceived)}",
+            $"Step 08 target app found: {YesNo(result.PicsAppInfoFound)}",
+            $"Step 08 PICS reports missing token: {YesNo(result.PicsMissingToken)}",
+            $"Selected depot: {result.SelectedDepotId?.ToString() ?? "N/A"}",
+            $"Selected depot oslist: {result.SelectedDepotOsList ?? "not-specified"}",
+            $"Selected branch: {result.SelectedBranch ?? "N/A"}",
+            $"Selected manifest ID: {result.SelectedManifestId?.ToString() ?? "N/A"}",
+            $"Depot key requested: {YesNo(result.DepotKeyRequested)}",
+            $"Depot key result: {result.DepotKeyResult?.ToString() ?? "N/A"}",
+            $"Depot key received: {YesNo(result.DepotKeyReceived)} (value never exposed)",
+            $"Manifest request code requested: {YesNo(result.ManifestRequestCodeRequested)}",
+            $"Manifest request code received: {YesNo(result.ManifestRequestCodeReceived)} (value never exposed)",
+            $"Eligible CDN servers: {result.EligibleCdnServerCount}",
+            $"Manifest downloaded: {YesNo(result.ManifestDownloaded)} (in memory only)",
+            $"Selected file: {result.SelectedFileName ?? "N/A"}",
+            $"Selected file bytes: {result.SelectedFileBytes}",
+            $"Selected file chunks: {result.SelectedFileChunkCount}",
+            $"Chunks downloaded: {result.ChunksDownloaded}",
+            $"Downloaded uncompressed bytes: {result.DownloadedUncompressedBytes}",
+            $"CDN auth token requested after 403: {YesNo(result.CdnAuthTokenRequested)}",
+            $"CDN auth token received: {YesNo(result.CdnAuthTokenReceived)} (value never exposed)",
+            $"File SHA-1 matches manifest: {YesNo(result.FileHashMatched)}",
+            $"Final verified file written: {YesNo(result.FileWritten)}",
+            $"Output relative path: {result.OutputRelativePath ?? "not-written"}",
+            $"Account name: {result.AccountName ?? "not-returned"}",
+            $"SteamID64: {result.SteamId64 ?? "not-returned"}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+        };
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
+        lines.Add("Ownership ticket payload display/logging/persistence: NONE");
+        lines.Add("PICS access-token value display/logging/persistence: NONE");
+        lines.Add("Depot-key value display/logging/persistence: NONE");
+        lines.Add("Manifest request-code value display/logging/persistence: NONE");
+        lines.Add("CDN auth-token value display/logging/persistence: NONE");
+        lines.Add("Manifest body persistence: NONE");
+        lines.Add("Chunk cache/partial-file persistence: NONE");
+        lines.Add("Full-depot queue: NOT IMPLEMENTED");
+        lines.Add("Resume/update/install/repair: NOT IMPLEMENTED");
+        return string.Join("\n", lines);
+    }
+
     private static string FormatUtc(DateTimeOffset? value) =>
         value?.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'") ?? "unavailable";
 
@@ -1085,7 +1259,7 @@ public sealed class RootViewController : UIViewController
 
                 _statusLabel.Text = final.Passed
                     ? "PASS: Steps 01–05 foundation still passes 5/5 on this device."
-                    : "FAIL: a proven foundation regression failed; stop Step 08 work until understood.";
+                    : "FAIL: a proven foundation regression failed; stop Step 09 work until understood.";
                 _statusLabel.TextColor = final.Passed ? UIColor.Label : UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });
