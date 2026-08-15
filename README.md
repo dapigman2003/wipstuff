@@ -1,28 +1,36 @@
-# StS2 Launcher iOS — Step 06.3.1
+# StS2 Launcher iOS — Step 07
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 06.3.1 — persistent saved-session semantics fix**
+**Step 07 — verify ownership of Slay the Spire 2 (Steam App ID 2868840) only.**
 
-Steps 01–05 are closed and physically verified. Step 06 credential authentication passed. Step 06.1 passed the mobile Steam Guard approval flow. Step 06.2 proved persistent refresh-token storage in the real iOS Keychain, password-free relaunch/resume, matching Steam identity, and explicit sign-out/clear.
+Steps 01–05 are closed and physically verified. Steps 06 through 06.3.1 are also physically proven: real credential authentication, mobile Steam Guard approval, device-bound Keychain refresh-token persistence, password-free relaunch/resume, sign-out, automatic restore, and corrected persistent-session semantics.
 
-Step 06.3 automatic restore passed initially, but repeated real-device retries exposed a persistence defect: the code requested `IsPersistentSession=true` during authentication while token logons still used `ShouldRememberPassword=false`. Step 06.3.1 corrects that mismatch, uses a fresh non-secret Steam `LoginID` per logon attempt to avoid rapid-retry session collisions, removes explicit `SteamUser.LogOff()` from successful verification, and shows only non-secret refresh-token JWT timing metadata.
+Step 07 adds one network capability after a saved-session logon with matching identity:
 
-Ownership checking remains intentionally out of scope until Step 07.
+1. obtain the existing `SteamApps` handler;
+2. call `GetAppOwnershipTicket(2868840)`;
+3. wait for `AppOwnershipTicketCallback`;
+4. count ownership as proven only when the callback is for App ID `2868840`, `Result == EResult.OK`, and the returned ticket is non-empty.
 
-## Recovery policy
+The ownership ticket payload itself is never displayed, logged, persisted, or passed into another subsystem. Only its byte length is shown as diagnostic evidence.
 
-The Keychain session is cleared automatically only when there is strong evidence it is unsafe or unusable:
+## Explicitly not included
 
-- the local saved-session record cannot be decoded/validated;
-- Steam successfully logs on but returns a different SteamID than the stored identity;
-- Steam rejects the saved credential with `InvalidPassword`, `Revoked`, or `Expired`.
+Step 07 does **not** add:
 
-The saved session is **preserved** for timeout, cancellation, connection failure, and non-definitive/transient Steam results. A temporary Steam/network problem must not destroy a previously working login.
+- PICS app/package product-info requests;
+- depot discovery;
+- depot keys;
+- manifest discovery;
+- CDN access;
+- file download;
+- ownership-ticket parsing/decryption;
+- Godot/game runtime integration.
 
-After a recovery clear, the launcher returns to interactive `Authenticate + Save Session`; it never invents credentials or silently starts ownership work.
+A non-OK ticket response is reported as **ownership not proven**, not guessed to mean a specific license state.
 
 ## Proven foundation retained
 
@@ -38,8 +46,9 @@ After a recovery clear, the launcher returns to interactive `Authenticate + Save
 - Step 06 credential authentication
 - Step 06.1 mobile Steam Guard approval
 - Step 06.2 refresh-token Keychain persistence/resume/sign-out
+- Step 06.3.1 persistent-session correction (`ShouldRememberPassword=true`, fresh `LoginID`)
 
-## Security / persistence policy
+## Security
 
 Persisted in the device-bound Keychain:
 
@@ -52,11 +61,6 @@ Never persisted:
 - Steam password
 - Steam Guard secret/code
 - raw Steam protocol payloads
+- Step 07 ownership-ticket bytes
 
-The refresh token is never displayed or logged.
-
-## Runtime note
-
-Step 06.3.1 remains a verification-style login and closes the transport after proving the saved session and identity, but it no longer sends an explicit Steam `LogOff` for that successful persistent-session verification. A later downstream step may introduce a long-lived authenticated Steam client when ownership/content work needs it.
-
-See `docs/STEP-06.3.1-TEST.md` for the physical-device test.
+See `docs/STEP-07-TEST.md` for the physical-device test.

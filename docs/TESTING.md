@@ -1,4 +1,4 @@
-# Testing strategy — Steps 01–06.3
+# Testing strategy — Step 07
 
 The project uses host unit tests, repository/build validation, and physical-iPhone verification because no single layer can prove all boundaries.
 
@@ -16,43 +16,47 @@ Run with:
 bash scripts/run-unit-tests.sh
 ```
 
-These cover deterministic behavior including:
+Coverage retains the proven foundation/auth/session contracts and adds Step 07 deterministic ownership rules:
 
 - Core/state-machine regression;
 - credential-store set/get/overwrite/delete semantics;
 - Steam CM HTTP-handler policy/result contracts;
 - five-gate foundation aggregation;
 - Steam Guard mobile-confirmation policy;
-- Step 06.2 saved-session serialization, overwrite, clear and malformed-data handling;
-- refresh-token redaction from `SteamSavedSession.ToString()`;
-- saved-session resume result/identity-match contracts;
-- Step 06.3.1 persistent-token/session-retry contract;
-- destructive clear for invalid local data, identity mismatch, `InvalidPassword`, `Revoked`, and `Expired`;
-- preservation for transient/routing results, timeout, and cancellation.
+- saved-session serialization/overwrite/clear/malformed-data handling;
+- persistent token logon contract and fresh LoginID;
+- session-recovery preservation/clear policy;
+- target App ID is exactly `2868840`;
+- ownership requires exact AppID + `EResult.OK` + non-empty ticket;
+- non-OK, empty-ticket, and wrong-AppID responses do not prove ownership;
+- ownership result objects cannot expose raw `byte[]` ticket data.
 
-They do not claim to prove live Steam authentication or real iOS Keychain behavior.
+Host tests do not claim to prove live Steam ownership or real iOS Keychain behavior.
 
 ## 2. Repository/build validation
 
 Run:
 
 ```text
-bash scripts/validate-step06-3-1.sh
+bash scripts/validate-step07.sh
 ```
 
-This preserves the Steps 01–05 foundation and Steps 06–06.2 authentication/persistence contracts, then verifies the Step 06.3.1 persistent-token settings, unique LoginID helper, JWT timing parser, automatic restore trigger, and conservative recovery policy. It also verifies no ownership/download or manual Guard-code scope was introduced.
+This first runs the Steps 01–05 foundation validator, then verifies that Steps 06–06.3.1 remain intact and that Step 07 adds only the ownership-ticket boundary.
 
-Codemagic additionally runs the host unit tests, isolated SteamKit iOS compatibility patch, .NET iOS AOT/native link, IPA packaging, and IPA verification.
+It explicitly rejects PICS/depot/manifest/CDN/download APIs inside the Step 07 ownership implementation.
+
+Codemagic additionally runs host tests, the isolated SteamKit iOS compatibility patch, .NET iOS AOT/native linking, IPA packaging, and IPA verification.
 
 ## 3. Physical-iPhone verification
 
 The device should prove:
 
-- the saved Step 06.2 Keychain session survives the app upgrade;
-- first Active lifecycle automatically starts saved-session restore;
-- automatic restore authenticates with no password and no new Guard prompt;
-- returned identity still matches the saved SteamID;
-- saved session remains present after successful restore;
+- saved-session authentication still succeeds with matching Steam identity;
+- `GetAppOwnershipTicket(2868840)` receives `AppOwnershipTicketCallback`;
+- callback AppID is exactly `2868840`;
+- ownership result is `OK`;
+- ticket length is non-zero;
+- no PICS/depot/manifest/CDN/download request is made;
 - Steps 01–05 foundation remains 5/5.
 
-See `STEP-06.3.1-TEST.md`.
+See `STEP-07-TEST.md`.

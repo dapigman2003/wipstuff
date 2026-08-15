@@ -13,6 +13,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamConnectionProbe _steamProbe = new();
     private readonly SteamAuthenticationAttempt _authenticationAttempt;
     private readonly SteamSessionResumeAttempt _resumeAttempt;
+    private readonly SteamOwnershipVerificationAttempt _ownershipAttempt;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -23,6 +24,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _autoRestoreDetailLabel;
     private UILabel? _resumeResultLabel;
     private UILabel? _resumeDetailLabel;
+    private UILabel? _ownershipResultLabel;
+    private UILabel? _ownershipDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -30,6 +33,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _foundationButton;
     private UIButton? _authButton;
     private UIButton? _resumeButton;
+    private UIButton? _ownershipButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -43,6 +47,7 @@ public sealed class RootViewController : UIViewController
         _sessionStore = new SteamSessionStore(_credentialStore);
         _authenticationAttempt = new SteamAuthenticationAttempt(_sessionStore);
         _resumeAttempt = new SteamSessionResumeAttempt(_sessionStore);
+        _ownershipAttempt = new SteamOwnershipVerificationAttempt(_sessionStore);
     }
 
     public override void ViewDidLoad()
@@ -88,22 +93,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 06.3.1 — PERSISTENT SESSION FIX",
+            "STEP 07 — OWNERSHIP VERIFICATION",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.27",
+            "Version 0.0.28",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "PERSISTENT TOKEN SEMANTICS • UNIQUE LOGINID • NO OWNERSHIP",
+            "APP ID 2868840 • OWNERSHIP TICKET ONLY • NO DOWNLOAD",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 06.3.1 fixes the persistent-session contract exposed by repeated 06.3 testing: token logons now use ShouldRememberPassword=true to match IsPersistentSession=true, each logon gets a fresh non-secret LoginID to avoid rapid-retry session collisions, and successful verification disconnects without sending an explicit Steam LogOff. Only non-secret JWT timing metadata is shown; the refresh token itself remains hidden. Ownership is still not requested.",
+            "Step 07 keeps the completed authentication/session foundation and adds one new boundary: after password-free saved-session logon with matching Steam identity, request a Steam app ownership ticket for Slay the Spire 2 (App ID 2868840). Ownership is accepted only when Steam returns OK for the exact AppID with a non-empty ticket. Ticket bytes are never displayed, logged, or persisted. No PICS, depot, manifest, CDN, or download request is made.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -187,7 +192,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_autoRestoreResultLabel);
 
         _autoRestoreDetailLabel = Label(
-            "Step 06.3.1 automatically tests the saved Keychain session once after launch using persistent token semantics. No password or new Guard prompt is used.",
+            "The proven 06.3.1 saved-session regression automatically tests the Keychain session once after launch. No password or new Guard prompt is used.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_autoRestoreDetailLabel);
@@ -208,6 +213,29 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_resumeDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 07 — Slay the Spire 2 ownership",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _ownershipButton = SystemButton("Verify Slay the Spire 2 Ownership", 17);
+        _ownershipButton.TouchUpInside += async (_, _) => await RunOwnershipVerificationAsync();
+        content.AddArrangedSubview(_ownershipButton);
+
+        _ownershipResultLabel = Label(
+            "OWNERSHIP: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_ownershipResultLabel);
+
+        _ownershipDetailLabel = Label(
+            "Uses only the saved Keychain session and SteamApps.GetAppOwnershipTicket for App ID 2868840. A non-empty OK ticket proves this account owns the target app. The ticket payload is discarded immediately; no content request follows.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_ownershipDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -220,7 +248,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: 06.3 auto-restore worked, but repeated retries exposed AccessDenied/session-lifetime behavior. 06.3.1 corrects persistent token logon semantics and adds token-expiry diagnostics.",
+            "Status: Steps 01–06.3.1 are proven. Step 07 is ready to verify ownership of Slay the Spire 2 (App ID 2868840) without requesting any depot, manifest, or file.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -239,7 +267,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 06.3.1: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 07: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -300,7 +328,7 @@ public sealed class RootViewController : UIViewController
                             "WAITING FOR STEAM GUARD — approve the sign-in in Steam, then return here.",
                         SteamAuthenticationStage.MobileApprovalAccepted =>
                             "STEAM GUARD APPROVED — completing logon and Keychain persistence…",
-                        _ => $"Step 06.3.1: {update.Message}",
+                        _ => $"Step 07 auth regression: {update.Message}",
                     };
                 });
             });
@@ -328,7 +356,7 @@ public sealed class RootViewController : UIViewController
                 _statusLabel.Text = result.Outcome switch
                 {
                     SteamAuthenticationOutcome.Authenticated when result.SessionPersisted =>
-                        "PASS: persistent Steam session saved to the iOS Keychain. On the next launch, Step 06.3.1 will attempt it automatically.",
+                        "PASS: persistent Steam session saved to the iOS Keychain. On the next launch, the saved-session regression will attempt it automatically.",
                     SteamAuthenticationOutcome.GuardRequired =>
                         "BOUNDARY: Steam requested a code-based Guard method; manual code entry remains out of scope.",
                     SteamAuthenticationOutcome.TimedOut =>
@@ -480,7 +508,7 @@ public sealed class RootViewController : UIViewController
                 _autoRestoreResultLabel.TextColor = UIColor.SystemRed;
                 _autoRestoreDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\nSaved session was not cleared because no definitive invalid-session result was obtained.";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 06.3.1 automatic session restore.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 07 automatic session restore regression.";
                 _statusLabel.TextColor = UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });
@@ -551,6 +579,85 @@ public sealed class RootViewController : UIViewController
                 _resumeDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
                 _statusLabel.Text = "FAIL: unhandled exception during saved-session resume.";
                 RefreshSavedSessionStatus();
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
+    private async Task RunOwnershipVerificationAsync()
+    {
+        if (_ownershipResultLabel is null || _ownershipDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation();
+        _ownershipResultLabel.Text = "OWNERSHIP: RUNNING…";
+        _ownershipResultLabel.TextColor = UIColor.Label;
+        _ownershipDetailLabel.Text =
+            "Authenticating with the saved Keychain refresh token, verifying the stored SteamID, then requesting one ownership ticket for App ID 2868840…";
+        _statusLabel.Text = "STEP 07 RUNNING — ownership ticket only; no PICS/depot/manifest/CDN/download request.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var result = await _ownershipAttempt.RunAsync(
+                TimeSpan.FromSeconds(45),
+                _operationCts!.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _ownershipResultLabel.Text = result.Summary;
+                _ownershipResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamOwnershipVerificationOutcome.Owned => UIColor.Label,
+                    SteamOwnershipVerificationOutcome.NoSavedSession => UIColor.SystemOrange,
+                    SteamOwnershipVerificationOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamOwnershipVerificationOutcome.TimedOut => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+
+                _ownershipDetailLabel.Text = FormatOwnershipDetail(result);
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamOwnershipVerificationOutcome.Owned =>
+                        "PASS: Steam issued a non-empty ownership ticket for Slay the Spire 2 App ID 2868840. No content/download request was made.",
+                    SteamOwnershipVerificationOutcome.NoSavedSession =>
+                        "No saved Steam session exists. Authenticate + Save Session first, then retry Step 07.",
+                    SteamOwnershipVerificationOutcome.SessionRejected =>
+                        "Saved Steam session was rejected. Reauthenticate if needed; Step 07 did not request content.",
+                    SteamOwnershipVerificationOutcome.IdentityMismatch =>
+                        "SECURITY: saved session returned a different SteamID. Do not trust this ownership result.",
+                    SteamOwnershipVerificationOutcome.TicketRejected =>
+                        "Steam did not issue an OK ownership ticket. Ownership is not proven; no download was attempted.",
+                    SteamOwnershipVerificationOutcome.EmptyTicket =>
+                        "Steam returned OK but no ticket bytes. Ownership is not proven; stop before content work.",
+                    SteamOwnershipVerificationOutcome.UnexpectedAppId =>
+                        "Steam returned an ownership callback for an unexpected AppID. Ownership is not proven.",
+                    SteamOwnershipVerificationOutcome.TimedOut =>
+                        "Ownership verification timed out. No download was attempted.",
+                    SteamOwnershipVerificationOutcome.Cancelled =>
+                        "Ownership verification cancelled. No download was attempted.",
+                    _ =>
+                        "FAIL: Step 07 ownership verification did not complete. No content request was made.",
+                };
+                _statusLabel.TextColor = result.Outcome == SteamOwnershipVerificationOutcome.Owned
+                    ? UIColor.Label
+                    : result.Outcome is SteamOwnershipVerificationOutcome.TimedOut or SteamOwnershipVerificationOutcome.Cancelled or SteamOwnershipVerificationOutcome.NoSavedSession
+                        ? UIColor.SystemOrange
+                        : UIColor.SystemRed;
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _ownershipResultLabel.Text = "OWNERSHIP: EXCEPTION";
+                _ownershipResultLabel.TextColor = UIColor.SystemRed;
+                _ownershipDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 07 ownership verification. No content request was made.";
+                _statusLabel.TextColor = UIColor.SystemRed;
             });
         }
         finally
@@ -640,6 +747,7 @@ public sealed class RootViewController : UIViewController
         if (_foundationButton is not null) _foundationButton.Enabled = false;
         if (_authButton is not null) _authButton.Enabled = false;
         if (_resumeButton is not null) _resumeButton.Enabled = false;
+        if (_ownershipButton is not null) _ownershipButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = true;
     }
@@ -649,6 +757,7 @@ public sealed class RootViewController : UIViewController
         if (_foundationButton is not null) _foundationButton.Enabled = true;
         if (_authButton is not null) _authButton.Enabled = true;
         if (_resumeButton is not null) _resumeButton.Enabled = true;
+        if (_ownershipButton is not null) _ownershipButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
@@ -689,7 +798,7 @@ public sealed class RootViewController : UIViewController
         lines.Add("Password persistence: NONE");
         lines.Add("Steam Guard secret/code persistence: NONE");
         lines.Add("Refresh token display/logging: NONE");
-        lines.Add("Ownership request: NOT RUN");
+        lines.Add("Ownership request in this operation: NOT RUN");
         return string.Join("\n", lines);
     }
 
@@ -722,7 +831,39 @@ public sealed class RootViewController : UIViewController
         lines.Add("Password used: NO");
         lines.Add("New Steam Guard approval requested by launcher: NO");
         lines.Add("Refresh token display/logging: NONE");
-        lines.Add("Ownership request: NOT RUN");
+        lines.Add("Ownership request in this operation: NOT RUN");
+        return string.Join("\n", lines);
+    }
+
+    private static string FormatOwnershipDetail(SteamOwnershipVerificationResult result)
+    {
+        var lines = new List<string>
+        {
+            $"Target AppID: {result.TargetAppId}",
+            $"Saved session found: {YesNo(result.SavedSessionFound)}",
+            $"CM connected: {YesNo(result.CmConnected)}",
+            $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
+            $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
+            $"Extended result: {result.ExtendedLogonResult?.ToString() ?? "N/A"}",
+            $"Stored/returned identity match: {YesNo(result.IdentityMatched)}",
+            $"Ownership callback: {YesNo(result.OwnershipTicketCallbackReceived)}",
+            $"Ownership result: {result.OwnershipResult?.ToString() ?? "N/A"}",
+            $"Ownership callback AppID: {result.OwnershipAppId?.ToString() ?? "N/A"}",
+            $"Ownership ticket bytes: {result.OwnershipTicketLength}",
+            $"Ownership proven: {YesNo(result.OwnershipProven)}",
+            $"Account name: {result.AccountName ?? "not-returned"}",
+            $"SteamID64: {result.SteamId64 ?? "not-returned"}",
+            $"LoginID: {result.LoginId?.ToString() ?? "not-set"}",
+            $"CurrentEndPoint: {result.CurrentEndPoint ?? "never-set"}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+        };
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
+        lines.Add("Ownership ticket payload display/logging/persistence: NONE");
+        lines.Add("PICS request: NOT RUN");
+        lines.Add("Depot/manifest/CDN/download request: NOT RUN");
         return string.Join("\n", lines);
     }
 
@@ -776,7 +917,7 @@ public sealed class RootViewController : UIViewController
 
                 _statusLabel.Text = final.Passed
                     ? "PASS: Steps 01–05 foundation still passes 5/5 on this device."
-                    : "FAIL: a proven foundation regression failed; stop Step 06.3.1 work until understood.";
+                    : "FAIL: a proven foundation regression failed; stop Step 07 work until understood.";
                 _statusLabel.TextColor = final.Passed ? UIColor.Label : UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });
