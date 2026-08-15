@@ -6,7 +6,7 @@ using SteamKit2.Authentication;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 06.2 credential-authentication boundary.
+/// Step 06.3.1 persistent credential-authentication boundary.
 ///
 /// Scope:
 /// - retain the Step 06 / 06.1 modern credential + mobile Guard flow;
@@ -64,6 +64,9 @@ public sealed class SteamAuthenticationAttempt
         string? currentEndPoint = null;
         string? error = null;
         var outcome = SteamAuthenticationOutcome.Failed;
+        uint? loginId = null;
+        DateTimeOffset? refreshTokenExpiresAtUtc = null;
+        bool? refreshTokenExpiredAtAttempt = null;
 
         Report(SteamAuthenticationStage.Starting, "Starting persistent Steam authentication session.");
 
@@ -179,17 +182,24 @@ public sealed class SteamAuthenticationAttempt
 
             accountName = pollResult.AccountName;
 
-            // pollResult.RefreshToken is sensitive. It stays in memory until the
-            // logon is proven, then SteamSessionStore writes it to Keychain.
-            Report(SteamAuthenticationStage.LoggingOn, "Authentication approved. Logging on with the persistent refresh token.");
-            steamUser.LogOn(new SteamUser.LogOnDetails
+            // Decode only non-secret timing metadata from the JWT. The raw
+            // refresh token is never displayed or logged.
+            if (SteamRefreshTokenMetadata.TryParse(pollResult.RefreshToken, out var tokenMetadata) &&
+                tokenMetadata is not null)
             {
-                Username = pollResult.AccountName,
-                AccessToken = pollResult.RefreshToken,
-                ShouldRememberPassword = false,
-                ClientOSType = EOSType.IOSUnknown,
-                MachineName = DeviceFriendlyName,
-            });
+                refreshTokenExpiresAtUtc = tokenMetadata.ExpiresAtUtc;
+                refreshTokenExpiredAtAttempt = tokenMetadata.IsExpiredAt(DateTimeOffset.UtcNow);
+            }
+
+            // IsPersistentSession=true above requires ShouldRememberPassword=true
+            // on the token-based SteamUser.LogOn call. Keep this policy in one
+            // unit-tested factory used by both fresh auth and saved-session resume.
+            var logOnDetails = SteamPersistentLogOnDetails.Create(
+                pollResult.AccountName,
+                pollResult.RefreshToken);
+            loginId = logOnDetails.LoginID;
+            Report(SteamAuthenticationStage.LoggingOn, "Authentication approved. Logging on with the persistent refresh token.");
+            steamUser.LogOn(logOnDetails);
 
             var logonWinner = await Task.WhenAny(
                     loggedOnTcs.Task,
@@ -264,11 +274,8 @@ public sealed class SteamAuthenticationAttempt
         }
         finally
         {
-            if (steamUser is not null && outcome == SteamAuthenticationOutcome.Authenticated)
-            {
-                try { steamUser.LogOff(); } catch { }
-            }
-
+            // Do not explicitly SteamUser.LogOff after proving a persistent
+            // token. Close the transport only.
             if (steamClient is not null)
             {
                 try
@@ -312,7 +319,10 @@ public sealed class SteamAuthenticationAttempt
             GuardChallenge: guardChallenge ?? authenticator?.LastChallenge,
             CurrentEndPoint: currentEndPoint,
             Elapsed: sw.Elapsed,
-            Error: error);
+            Error: error,
+            LoginId: loginId,
+            RefreshTokenExpiresAtUtc: refreshTokenExpiresAtUtc,
+            RefreshTokenExpiredAtAttempt: refreshTokenExpiredAtAttempt);
     }
 
     private static TaskCompletionSource<T> NewTcs<T>() =>

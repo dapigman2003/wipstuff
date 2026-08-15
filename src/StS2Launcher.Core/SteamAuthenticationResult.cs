@@ -26,7 +26,10 @@ public sealed record SteamAuthenticationResult(
     SteamGuardChallenge? GuardChallenge,
     string? CurrentEndPoint,
     TimeSpan Elapsed,
-    string? Error)
+    string? Error,
+    uint? LoginId = null,
+    DateTimeOffset? RefreshTokenExpiresAtUtc = null,
+    bool? RefreshTokenExpiredAtAttempt = null)
 {
     public bool Authenticated => Outcome == SteamAuthenticationOutcome.Authenticated;
     public bool GuardRequired => Outcome == SteamAuthenticationOutcome.GuardRequired;

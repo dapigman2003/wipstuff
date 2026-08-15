@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 06.3 environment ==="
+  echo "=== StS2 Launcher Step 06.3.1 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step06.3-environment.log
+} | tee artifacts/logs/step06.3.1-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -50,7 +50,7 @@ fi
   exit 3
 }
 
-bash scripts/validate-step06-3.sh | tee artifacts/logs/step06.3-validation.log
+bash scripts/validate-step06-3-1.sh | tee artifacts/logs/step06.3.1-validation.log
 bash scripts/run-unit-tests.sh
 
 WORKLOAD_CWD="$(mktemp -d)"
@@ -59,16 +59,16 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step06.3-workload.log
+) | tee artifacts/logs/step06.3.1-workload.log
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/build-step06-3.sh 2>&1 | tee artifacts/logs/step06.3-wrapper.log
-bash scripts/verify-step06-3-ipa.sh artifacts/StS2-Launcher-Step-06.3.ipa \
-  2>&1 | tee artifacts/logs/step06.3-ipa-verification.log
+bash scripts/build-step06-3-1.sh 2>&1 | tee artifacts/logs/step06.3.1-wrapper.log
+bash scripts/verify-step06-3-1-ipa.sh artifacts/StS2-Launcher-Step-06.3.1.ipa \
+  2>&1 | tee artifacts/logs/step06.3.1-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 06.3 automatic saved-session recovery"
+  echo "StS2 Launcher iOS — Step 06.3.1 persistent saved-session semantics fix"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -78,14 +78,14 @@ bash scripts/verify-step06-3-ipa.sh artifacts/StS2-Launcher-Step-06.3.ipa \
   echo "Host unit tests: PASS (required before publish)"
   echo "SteamKit: 3.4.0"
   echo "Foundation regression: retained"
-  echo "New capability: automatic launch-time saved-session restore + conservative stale-session recovery"
+  echo "Fix boundary: persistent token logon semantics + fresh LoginID + non-secret JWT expiry diagnostics"
   echo "Steam Guard: Step 06.1 mobile approval retained; no manual code entry"
-  echo "Credential persistence: refresh token + identity in iOS Keychain; password/Guard secrets never stored"
+  echo "Credential persistence: refresh token + identity in iOS Keychain; ShouldRememberPassword=true; password/Guard secrets never stored"
   echo "Ownership/download: not implemented"
-  echo "IPA: artifacts/StS2-Launcher-Step-06.3.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-06.3.1.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-06.3.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-06.3.1.ipa | awk '{print $1}')"
   fi
-} > artifacts/step06.3-build-summary.txt
+} > artifacts/step06.3.1-build-summary.txt
 
-cat artifacts/step06.3-build-summary.txt
+cat artifacts/step06.3.1-build-summary.txt

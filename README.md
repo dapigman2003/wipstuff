@@ -1,14 +1,14 @@
-# StS2 Launcher iOS — Step 06.3
+# StS2 Launcher iOS — Step 06.3.1
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 06.3 — automatic saved-session recovery on launcher startup**
+**Step 06.3.1 — persistent saved-session semantics fix**
 
 Steps 01–05 are closed and physically verified. Step 06 credential authentication passed. Step 06.1 passed the mobile Steam Guard approval flow. Step 06.2 proved persistent refresh-token storage in the real iOS Keychain, password-free relaunch/resume, matching Steam identity, and explicit sign-out/clear.
 
-Step 06.3 adds one lifecycle capability: when the app reaches its first Active state after launch, it automatically attempts to restore the saved Steam session. The launcher does not ask for or read a password on this path and does not start a new Steam Guard flow.
+Step 06.3 automatic restore passed initially, but repeated real-device retries exposed a persistence defect: the code requested `IsPersistentSession=true` during authentication while token logons still used `ShouldRememberPassword=false`. Step 06.3.1 corrects that mismatch, uses a fresh non-secret Steam `LoginID` per logon attempt to avoid rapid-retry session collisions, removes explicit `SteamUser.LogOff()` from successful verification, and shows only non-secret refresh-token JWT timing metadata.
 
 Ownership checking remains intentionally out of scope until Step 07.
 
@@ -57,6 +57,6 @@ The refresh token is never displayed or logged.
 
 ## Runtime note
 
-The Step 06.3 automatic restore is still a verification-style login: after proving the saved session and identity, the current `SteamSessionResumeAttempt` logs off/disconnects cleanly. A later step may introduce a long-lived authenticated Steam session when a downstream capability requires it.
+Step 06.3.1 remains a verification-style login and closes the transport after proving the saved session and identity, but it no longer sends an explicit Steam `LogOff` for that successful persistent-session verification. A later downstream step may introduce a long-lived authenticated Steam client when ownership/content work needs it.
 
-See `docs/STEP-06.3-TEST.md` for the physical-device test.
+See `docs/STEP-06.3.1-TEST.md` for the physical-device test.

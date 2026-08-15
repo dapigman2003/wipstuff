@@ -9,7 +9,7 @@ public enum SteamSessionRecoveryAction
 }
 
 /// <summary>
-/// Step 06.3 recovery policy for a persisted Steam refresh-token session.
+/// Step 06.3.1 recovery policy for a persisted Steam refresh-token session.
 ///
 /// The policy is intentionally conservative: transient connection/service
 /// failures never destroy a previously working Keychain session. The saved

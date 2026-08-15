@@ -26,7 +26,10 @@ public sealed record SteamSessionResumeResult(
     string? SteamId64,
     string? CurrentEndPoint,
     TimeSpan Elapsed,
-    string? Error)
+    string? Error,
+    uint? LoginId = null,
+    DateTimeOffset? RefreshTokenExpiresAtUtc = null,
+    bool? RefreshTokenExpiredAtAttempt = null)
 {
     public bool Authenticated => Outcome == SteamSessionResumeOutcome.Authenticated;
 

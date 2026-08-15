@@ -68,6 +68,7 @@ public sealed class SteamSessionRecoveryTests
     }
 
     [TestMethod]
+    [DataRow(EResult.AccessDenied)]
     [DataRow(EResult.ServiceUnavailable)]
     [DataRow(EResult.RateLimitExceeded)]
     [DataRow(EResult.TryAnotherCM)]

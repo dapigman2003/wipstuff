@@ -88,22 +88,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 06.3 — SESSION RECOVERY",
+            "STEP 06.3.1 — PERSISTENT SESSION FIX",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.26",
+            "Version 0.0.27",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "AUTO-RESTORE SAVED SESSION • SAFE FALLBACK • NO OWNERSHIP",
+            "PERSISTENT TOKEN SEMANTICS • UNIQUE LOGINID • NO OWNERSHIP",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 06.3 builds on the proven Keychain session from Step 06.2. On the first Active lifecycle state after launch, the app automatically attempts the saved refresh-token login with no password and no new Guard prompt. Invalid local records, identity mismatches, and definitively unusable tokens are cleared; transient service/network failures preserve the saved session for retry. Ownership is still not requested.",
+            "Step 06.3.1 fixes the persistent-session contract exposed by repeated 06.3 testing: token logons now use ShouldRememberPassword=true to match IsPersistentSession=true, each logon gets a fresh non-secret LoginID to avoid rapid-retry session collisions, and successful verification disconnects without sending an explicit Steam LogOff. Only non-secret JWT timing metadata is shown; the refresh token itself remains hidden. Ownership is still not requested.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -187,7 +187,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_autoRestoreResultLabel);
 
         _autoRestoreDetailLabel = Label(
-            "Step 06.3 will automatically attempt the saved Keychain session once after launch. No password is read or requested for this path.",
+            "Step 06.3.1 automatically tests the saved Keychain session once after launch using persistent token semantics. No password or new Guard prompt is used.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_autoRestoreDetailLabel);
@@ -203,7 +203,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_resumeResultLabel);
 
         _resumeDetailLabel = Label(
-            "Automatic restore is the Step 06.3 boundary. This manual retry remains available for diagnostics after a timeout or transient Steam/network failure.",
+            "Manual retry now uses a fresh LoginID and the same persistent-token settings as automatic restore. AccessDenied remains non-destructive unless Steam reports a definitive expired/revoked credential.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_resumeDetailLabel);
@@ -220,7 +220,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 06.1 and 06.2 are proven. Step 06.3 will auto-restore the saved session on launch and apply conservative stale-session recovery.",
+            "Status: 06.3 auto-restore worked, but repeated retries exposed AccessDenied/session-lifetime behavior. 06.3.1 corrects persistent token logon semantics and adds token-expiry diagnostics.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -239,7 +239,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 06.3: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 06.3.1: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -285,7 +285,7 @@ public sealed class RootViewController : UIViewController
         _authResultLabel.Text = "STEAM AUTH: RUNNING…";
         _authResultLabel.TextColor = UIColor.Label;
         _authDetailLabel.Text = "Starting persistent Steam auth. If mobile Steam Guard appears, approve it and return here…";
-        _statusLabel.Text = "STEP 06.3 AUTH RUNNING — session is saved only after Steam logon succeeds.";
+        _statusLabel.Text = "STEP 06.3.1 AUTH RUNNING — requesting a persistent session and saving only after Steam logon succeeds.";
 
         try
         {
@@ -300,7 +300,7 @@ public sealed class RootViewController : UIViewController
                             "WAITING FOR STEAM GUARD — approve the sign-in in Steam, then return here.",
                         SteamAuthenticationStage.MobileApprovalAccepted =>
                             "STEAM GUARD APPROVED — completing logon and Keychain persistence…",
-                        _ => $"Step 06.3: {update.Message}",
+                        _ => $"Step 06.3.1: {update.Message}",
                     };
                 });
             });
@@ -328,7 +328,7 @@ public sealed class RootViewController : UIViewController
                 _statusLabel.Text = result.Outcome switch
                 {
                     SteamAuthenticationOutcome.Authenticated when result.SessionPersisted =>
-                        "PASS: persistent Steam session saved to the iOS Keychain. On the next launch, Step 06.3 will attempt it automatically.",
+                        "PASS: persistent Steam session saved to the iOS Keychain. On the next launch, Step 06.3.1 will attempt it automatically.",
                     SteamAuthenticationOutcome.GuardRequired =>
                         "BOUNDARY: Steam requested a code-based Guard method; manual code entry remains out of scope.",
                     SteamAuthenticationOutcome.TimedOut =>
@@ -373,7 +373,7 @@ public sealed class RootViewController : UIViewController
         _autoRestoreResultLabel.TextColor = UIColor.Label;
         _autoRestoreDetailLabel.Text =
             "Active lifecycle reached. Reading the saved Keychain session and attempting password-free Steam logon…";
-        _statusLabel.Text = "STEP 06.3 AUTO-RESTORE RUNNING — no password or new Guard flow.";
+        _statusLabel.Text = "STEP 06.3.1 AUTO-RESTORE RUNNING — persistent token + fresh LoginID; no password or new Guard flow.";
 
         try
         {
@@ -480,7 +480,7 @@ public sealed class RootViewController : UIViewController
                 _autoRestoreResultLabel.TextColor = UIColor.SystemRed;
                 _autoRestoreDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\nSaved session was not cleared because no definitive invalid-session result was obtained.";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 06.3 automatic session restore.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 06.3.1 automatic session restore.";
                 _statusLabel.TextColor = UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });
@@ -500,7 +500,7 @@ public sealed class RootViewController : UIViewController
         _resumeResultLabel.Text = "SAVED SESSION: RUNNING…";
         _resumeResultLabel.TextColor = UIColor.Label;
         _resumeDetailLabel.Text = "Reading the device-bound Keychain entry and logging on with the saved refresh token. No password or Guard code is requested by the launcher.";
-        _statusLabel.Text = "STEP 06.3 MANUAL RESUME RUNNING — password-free saved-session login.";
+        _statusLabel.Text = "STEP 06.3.1 MANUAL RESUME RUNNING — persistent token + fresh LoginID; no password.";
 
         try
         {
@@ -527,7 +527,7 @@ public sealed class RootViewController : UIViewController
                     SteamSessionResumeOutcome.NoSavedSession =>
                         "No saved Steam session exists. Authenticate + Save Session first.",
                     SteamSessionResumeOutcome.Rejected =>
-                        "Saved token was rejected by Steam. Automatic Step 06.3 recovery clears it only for definitive unusable-token results; transient rejections are preserved for retry.",
+                        "Saved token was rejected by Steam. AccessDenied and other non-definitive results are preserved; only explicit expired/revoked/invalid credentials are cleared.",
                     SteamSessionResumeOutcome.InvalidLocalSession =>
                         "Saved Keychain record is invalid. Automatic recovery would clear it and require interactive authentication.",
                     SteamSessionResumeOutcome.IdentityMismatch =>
@@ -615,8 +615,14 @@ public sealed class RootViewController : UIViewController
                 return;
             }
 
+            var tokenTiming = SteamRefreshTokenMetadata.TryParse(saved.RefreshToken, out var metadata) &&
+                              metadata is not null
+                ? $"\nRefresh token expires (UTC): {FormatUtc(metadata.ExpiresAtUtc)}" +
+                  $"\nRefresh token expired now: {YesNo(metadata.IsExpiredAt(DateTimeOffset.UtcNow))}"
+                : "\nRefresh token timing: unavailable";
+
             _savedSessionLabel.Text =
-                $"Saved session: YES\nAccount: {saved.AccountName}\nSteamID64: {saved.SteamId64}\nRefresh token: PRESENT (not displayed)";
+                $"Saved session: YES\nAccount: {saved.AccountName}\nSteamID64: {saved.SteamId64}\nRefresh token: PRESENT (not displayed){tokenTiming}";
             _savedSessionLabel.TextColor = UIColor.Label;
         }
         catch (Exception ex)
@@ -659,6 +665,10 @@ public sealed class RootViewController : UIViewController
             $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
             $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
             $"Extended result: {result.ExtendedLogonResult?.ToString() ?? "N/A"}",
+            $"ShouldRememberPassword: YES",
+            $"LoginID: {result.LoginId?.ToString() ?? "not-set"}",
+            $"Refresh token expires (UTC): {FormatUtc(result.RefreshTokenExpiresAtUtc)}",
+            $"Refresh token expired at attempt: {YesNoNullable(result.RefreshTokenExpiredAtAttempt)}",
             $"Session persisted to Keychain: {YesNo(result.SessionPersisted)}",
             $"Account name: {result.AccountName ?? "not-returned"}",
             $"SteamID64: {result.SteamId64 ?? "not-returned"}",
@@ -695,6 +705,10 @@ public sealed class RootViewController : UIViewController
             $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
             $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
             $"Extended result: {result.ExtendedLogonResult?.ToString() ?? "N/A"}",
+            $"ShouldRememberPassword: YES",
+            $"LoginID: {result.LoginId?.ToString() ?? "not-set"}",
+            $"Refresh token expires (UTC): {FormatUtc(result.RefreshTokenExpiresAtUtc)}",
+            $"Refresh token expired at attempt: {YesNoNullable(result.RefreshTokenExpiredAtAttempt)}",
             $"Stored/returned identity match: {YesNo(result.IdentityMatched)}",
             $"Account name: {result.AccountName ?? "not-returned"}",
             $"SteamID64: {result.SteamId64 ?? "not-returned"}",
@@ -711,6 +725,12 @@ public sealed class RootViewController : UIViewController
         lines.Add("Ownership request: NOT RUN");
         return string.Join("\n", lines);
     }
+
+    private static string FormatUtc(DateTimeOffset? value) =>
+        value?.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'") ?? "unavailable";
+
+    private static string YesNoNullable(bool? value) =>
+        value.HasValue ? YesNo(value.Value) : "unknown";
 
     private async Task RunFoundationVerificationAsync()
     {
@@ -756,7 +776,7 @@ public sealed class RootViewController : UIViewController
 
                 _statusLabel.Text = final.Passed
                     ? "PASS: Steps 01–05 foundation still passes 5/5 on this device."
-                    : "FAIL: a proven foundation regression failed; stop Step 06.3 work until understood.";
+                    : "FAIL: a proven foundation regression failed; stop Step 06.3.1 work until understood.";
                 _statusLabel.TextColor = final.Passed ? UIColor.Label : UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });

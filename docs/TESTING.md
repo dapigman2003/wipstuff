@@ -26,7 +26,7 @@ These cover deterministic behavior including:
 - Step 06.2 saved-session serialization, overwrite, clear and malformed-data handling;
 - refresh-token redaction from `SteamSavedSession.ToString()`;
 - saved-session resume result/identity-match contracts;
-- Step 06.3 conservative saved-session recovery policy;
+- Step 06.3.1 persistent-token/session-retry contract;
 - destructive clear for invalid local data, identity mismatch, `InvalidPassword`, `Revoked`, and `Expired`;
 - preservation for transient/routing results, timeout, and cancellation.
 
@@ -37,10 +37,10 @@ They do not claim to prove live Steam authentication or real iOS Keychain behavi
 Run:
 
 ```text
-bash scripts/validate-step06-3.sh
+bash scripts/validate-step06-3-1.sh
 ```
 
-This preserves the Steps 01–05 foundation and Steps 06–06.2 authentication/persistence contracts, then verifies the Step 06.3 automatic restore trigger and conservative recovery policy. It also verifies no ownership/download or manual Guard-code scope was introduced.
+This preserves the Steps 01–05 foundation and Steps 06–06.2 authentication/persistence contracts, then verifies the Step 06.3.1 persistent-token settings, unique LoginID helper, JWT timing parser, automatic restore trigger, and conservative recovery policy. It also verifies no ownership/download or manual Guard-code scope was introduced.
 
 Codemagic additionally runs the host unit tests, isolated SteamKit iOS compatibility patch, .NET iOS AOT/native link, IPA packaging, and IPA verification.
 
@@ -55,4 +55,4 @@ The device should prove:
 - saved session remains present after successful restore;
 - Steps 01–05 foundation remains 5/5.
 
-See `STEP-06.3-TEST.md`.
+See `STEP-06.3.1-TEST.md`.

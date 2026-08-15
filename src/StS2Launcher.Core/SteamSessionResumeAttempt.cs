@@ -5,7 +5,7 @@ using SteamKit2;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 06.2/06.3 saved-session boundary.
+/// Step 06.2/06.3.1 saved-session boundary.
 ///
 /// Loads a refresh token from the platform credential store, connects using
 /// the Step 05-proven WebSocket route, and performs SteamUser.LogOn without a
@@ -84,6 +84,16 @@ public sealed class SteamSessionResumeAttempt
         var identityMatched = false;
         var outcome = SteamSessionResumeOutcome.Failed;
         string? error = null;
+        uint? loginId = null;
+        DateTimeOffset? refreshTokenExpiresAtUtc = null;
+        bool? refreshTokenExpiredAtAttempt = null;
+
+        if (SteamRefreshTokenMetadata.TryParse(savedSession.RefreshToken, out var tokenMetadata) &&
+            tokenMetadata is not null)
+        {
+            refreshTokenExpiresAtUtc = tokenMetadata.ExpiresAtUtc;
+            refreshTokenExpiredAtAttempt = tokenMetadata.IsExpiredAt(DateTimeOffset.UtcNow);
+        }
 
         try
         {
@@ -134,14 +144,11 @@ public sealed class SteamSessionResumeAttempt
                 return BuildResult();
             }
 
-            steamUser.LogOn(new SteamUser.LogOnDetails
-            {
-                Username = savedSession.AccountName,
-                AccessToken = savedSession.RefreshToken,
-                ShouldRememberPassword = false,
-                ClientOSType = EOSType.IOSUnknown,
-                MachineName = SteamAuthenticationAttempt.DeviceFriendlyName,
-            });
+            var logOnDetails = SteamPersistentLogOnDetails.Create(
+                savedSession.AccountName,
+                savedSession.RefreshToken);
+            loginId = logOnDetails.LoginID;
+            steamUser.LogOn(logOnDetails);
 
             var logonWinner = await Task.WhenAny(
                     loggedOnTcs.Task,
@@ -201,11 +208,8 @@ public sealed class SteamSessionResumeAttempt
         }
         finally
         {
-            if (steamUser is not null && outcome == SteamSessionResumeOutcome.Authenticated)
-            {
-                try { steamUser.LogOff(); } catch { }
-            }
-
+            // Keep persistent-session semantics: close the transport without
+            // explicitly sending SteamUser.LogOff after a successful retry.
             if (steamClient is not null)
             {
                 try
@@ -243,7 +247,10 @@ public sealed class SteamSessionResumeAttempt
             SteamId64: returnedSteamId64 ?? savedSession.SteamId64,
             CurrentEndPoint: currentEndPoint,
             Elapsed: sw.Elapsed,
-            Error: error);
+            Error: error,
+            LoginId: loginId,
+            RefreshTokenExpiresAtUtc: refreshTokenExpiresAtUtc,
+            RefreshTokenExpiredAtAttempt: refreshTokenExpiredAtAttempt);
     }
 
     private static TaskCompletionSource<T> NewTcs<T>() =>
