@@ -5,22 +5,20 @@
 - Core: `12/12`.
 - Real iOS Keychain regression: `7/7`.
 - Steam CM connection: `3/3`.
-- Step 06: **passed** — real credential authentication reached Steam Guard.
-- Step 06.1: **passed** — mobile Steam Guard approval completed and authenticated identity returned.
-- Step 06.2: **passed** — refresh token + identity stored in real iOS Keychain; password-free relaunch/resume and sign-out passed.
-- Step 06.3.1: **passed** — persistent token semantics corrected; automatic and manual saved-session login remain reliable over time.
-- Step 07: **passed on physical iPhone** — App ID **2868840** returned an exact-AppID, `EResult.OK`, non-empty ownership ticket.
-- Step 08: **passed on physical iPhone** — PICS product metadata returned numeric depot IDs and visible branch manifest IDs.
-- Step 09: **passed on physical iPhone** — one controlled StS2 file was retrieved from Steam CDN chunks, SHA-1 verified against its manifest, and persisted.
-- Current source step: **Step 10**.
-- App version: **0.0.31 / build 31**.
-- New boundary: download one complete selected direct `public` depot through a deterministic file queue.
-- Selection policy: preserve Step 09's direct/public/macOS-first policy.
-- Staging policy: all writes remain beneath `Documents/StS2Launcher/Step10-FullDepot/.staging/...` until complete.
-- Integrity gate: every regular file must match the manifest SHA-1.
-- Completion gate: the final `<depot>/<manifest>` directory appears only after one directory rename of a completely verified staging tree.
-- Cancel/timeout/failure: current staging directory is recursively removed; no partial final depot is committed.
-- Existing final manifest directory: Step 10 blocks rather than overwriting it.
+- Steps 06–06.3.1: **passed** — authentication, mobile Guard, Keychain persistence, and saved-session recovery.
+- Step 07: **passed on physical iPhone** — exact App ID `2868840`, `EResult.OK`, non-empty ownership ticket.
+- Step 08: **passed on physical iPhone** — PICS depot IDs and visible branch manifest IDs.
+- Step 09: **passed on physical iPhone** — one controlled file downloaded, reconstructed, SHA-1 verified and persisted.
+- Step 10: **passed on physical iPhone** — one selected public depot completed with queue/progress/cancel/staging cleanup and atomic final-directory commit.
+- Current source step: **Step 11**.
+- App version: **0.0.32 / build 32**.
+- New boundary: interrupted-download resume for that same one-depot model.
+- Resume staging: deterministic per `<depot>-<manifest>` beneath `Documents/StS2Launcher/Step11-ResumableDepot/.resume/`.
+- Complete staged-file reuse: requires full manifest SHA-1.
+- Partial-file reuse: each candidate chunk must match the manifest Adler-32 checksum before it is skipped.
+- Final integrity gate: every file must match the manifest SHA-1.
+- Completion gate: final directory appears only after validation of the full staging tree and one atomic directory rename.
+- Cancel/timeout/transient failure: staging is deliberately preserved for a later retry.
+- Force-quit/process termination: no cleanup handler is required; the next run discovers and revalidates the deterministic staging tree.
 - PICS token / depot key / manifest request code / CDN auth token: **never exposed by result telemetry or persisted**.
-- Raw manifest body: **not persisted**.
-- Resume / update-install-repair / multi-depot app install / Godot / Cloud / Workshop: **not implemented**.
+- Update/install/repair / manifest delta migration / multi-depot app install / Godot / Cloud / Workshop: **not implemented**.

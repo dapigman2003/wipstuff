@@ -17,6 +17,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamContentDiscoveryAttempt _contentDiscoveryAttempt;
     private readonly SteamSingleFileDownloadAttempt _singleFileDownloadAttempt;
     private readonly SteamFullDepotDownloadAttempt _fullDepotDownloadAttempt;
+    private readonly SteamResumableDepotDownloadAttempt _resumableDepotDownloadAttempt;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -35,6 +36,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _singleFileDetailLabel;
     private UILabel? _fullDepotResultLabel;
     private UILabel? _fullDepotDetailLabel;
+    private UILabel? _resumableDepotResultLabel;
+    private UILabel? _resumableDepotDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -46,6 +49,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _discoveryButton;
     private UIButton? _singleFileButton;
     private UIButton? _fullDepotButton;
+    private UIButton? _resumableDepotButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -66,6 +70,9 @@ public sealed class RootViewController : UIViewController
             _sessionStore,
             Path.Combine(documentsRoot, "StS2Launcher"));
         _fullDepotDownloadAttempt = new SteamFullDepotDownloadAttempt(
+            _sessionStore,
+            Path.Combine(documentsRoot, "StS2Launcher"));
+        _resumableDepotDownloadAttempt = new SteamResumableDepotDownloadAttempt(
             _sessionStore,
             Path.Combine(documentsRoot, "StS2Launcher"));
     }
@@ -113,22 +120,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 10 — MINIMAL FULL-DEPOT DOWNLOADER",
+            "STEP 11 — INTERRUPTED-DOWNLOAD RESUME",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.31",
+            "Version 0.0.32",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "APP ID 2868840 • ONE PUBLIC DEPOT • QUEUE + CANCEL + ATOMIC COMMIT",
+            "APP ID 2868840 • ONE PUBLIC DEPOT • CRASH-SAFE RESUME + ATOMIC COMMIT",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 10 preserves the proven Step 09 single-file boundary, then downloads one selected direct public depot (preferring macOS metadata). The manifest becomes a deterministic file queue. Every regular file is reconstructed in an isolated staging tree, individually SHA-1 verified against Steam's manifest, and only after the complete queue passes is that staging directory atomically renamed into its final depot/manifest directory. Cancel/timeout removes staging data. Resume, update/repair/install orchestration, multi-depot app installation, Godot, Cloud, and Workshop remain out of scope.",
+            "Step 11 preserves the proven Step 10 full-depot queue and adds only interrupted-download resume. The resume staging path is deterministic for the selected depot/manifest. After a force-quit, relaunch, cancellation, timeout, or transient failure, complete staged files are re-proven by SHA-1 and partial files are scanned chunk-by-chunk with Steam's manifest Adler-32 checksums. Only missing/corrupt chunks are fetched again. The final depot still appears only after every file passes SHA-1 and one atomic directory rename. Update/repair/install orchestration, manifest delta updates, multi-depot app installation, Godot, Cloud, and Workshop remain out of scope.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -320,10 +327,33 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_fullDepotResultLabel);
 
         _fullDepotDetailLabel = Label(
-            "One selected direct public depot only. Files are queued sequentially into an isolated staging tree, every file is SHA-1 verified, cancellation removes staging data, and the final depot directory appears only after one atomic directory rename. No resume/update/repair behavior is implemented yet.",
+            "Step 10 regression remains unchanged: one selected direct public depot, temporary staging removed on cancel, per-file SHA-1 verification, and one atomic final-directory commit.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_fullDepotDetailLabel);
+
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 11 — interrupted-download resume",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _resumableDepotButton = SystemButton("Resume / Download One Public Depot", 17);
+        _resumableDepotButton.TouchUpInside += async (_, _) => await RunResumableDepotDownloadAsync();
+        content.AddArrangedSubview(_resumableDepotButton);
+
+        _resumableDepotResultLabel = Label(
+            "RESUME: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_resumableDepotResultLabel);
+
+        _resumableDepotDetailLabel = Label(
+            "For the physical Step 11 gate: start this download, wait until chunk/byte progress is non-zero, then force-quit the app from the app switcher. Relaunch and tap this same button. Step 11 must detect the deterministic staging tree, revalidate existing complete files/chunks, download only missing data, SHA-1 verify every file, and atomically commit the complete depot.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_resumableDepotDetailLabel);
 
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
@@ -337,7 +367,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Step 09 passed on the physical iPhone. Step 10 is ready to download one complete selected public depot through a verified staging queue with cancel and atomic completion.",
+            "Status: Step 10 passed on the physical iPhone. Step 11 is ready to prove an interrupted depot download can resume after process termination without re-downloading checksum-valid data.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -356,7 +386,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 10: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 11: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1020,6 +1050,106 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunResumableDepotDownloadAsync()
+    {
+        if (_resumableDepotResultLabel is null || _resumableDepotDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation();
+        _resumableDepotResultLabel.Text = "RESUME: PREPARING…";
+        _resumableDepotResultLabel.TextColor = UIColor.Label;
+        _resumableDepotDetailLabel.Text =
+            "Re-proving saved-session identity, Step 07 ownership and Step 08 discovery, then checking the deterministic Step 11 staging tree for SHA-1-valid complete files and Adler-32-valid partial chunks.";
+        _statusLabel.Text =
+            "STEP 11 RUNNING — if this is the first run, force-quit after chunk/byte progress becomes non-zero. Relaunch and run Step 11 again to prove resume.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        var progress = new Progress<SteamDepotDownloadProgress>(value =>
+        {
+            if (_resumableDepotResultLabel is null || _resumableDepotDetailLabel is null)
+                return;
+
+            _resumableDepotResultLabel.Text = value.Summary;
+            _resumableDepotResultLabel.TextColor = UIColor.Label;
+            _resumableDepotDetailLabel.Text =
+                $"Phase: {value.Phase}\n" +
+                $"Files satisfied: {value.CompletedFiles}/{value.TotalFiles}\n" +
+                $"Chunks satisfied: {value.CompletedChunks}/{value.TotalChunks}\n" +
+                $"Bytes satisfied: {value.CompletedBytes}/{value.TotalBytes}\n" +
+                $"Current file: {value.CurrentFile ?? "none"}\n\n" +
+                "Step 11 preserves its deterministic staging tree across interruption. The final output remains invisible until the entire depot passes SHA-1 verification.";
+        });
+
+        try
+        {
+            var result = await _resumableDepotDownloadAttempt.RunAsync(
+                TimeSpan.FromMinutes(60),
+                progress,
+                _operationCts!.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _resumableDepotResultLabel.Text = result.Summary;
+                _resumableDepotResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamResumableDepotDownloadOutcome.Downloaded when result.ResumeWasUsed => UIColor.Label,
+                    SteamResumableDepotDownloadOutcome.Downloaded => UIColor.SystemOrange,
+                    SteamResumableDepotDownloadOutcome.NoSavedSession => UIColor.SystemOrange,
+                    SteamResumableDepotDownloadOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamResumableDepotDownloadOutcome.TimedOut => UIColor.SystemOrange,
+                    SteamResumableDepotDownloadOutcome.OutputAlreadyExists => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+                _resumableDepotDetailLabel.Text = FormatResumableDepotDownloadDetail(result);
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamResumableDepotDownloadOutcome.Downloaded when result.ResumeWasUsed =>
+                        $"PASS: Step 11 resumed depot {result.SelectedDepotId} manifest {result.SelectedManifestId}, reused {result.ReusedChunkCount} checksum-valid chunks / {result.ReusedBytes} bytes, downloaded only the remainder, re-verified every file, and atomically committed the final directory.",
+                    SteamResumableDepotDownloadOutcome.Downloaded =>
+                        "BASELINE ONLY: the Step 11 depot completed, but no prior resume data was reused. Interrupted-download resume is not yet proven; rerun the physical interruption test from clean Step 11 data.",
+                    SteamResumableDepotDownloadOutcome.Cancelled =>
+                        "Step 11 interruption/cancel preserved the deterministic staging tree. Run Step 11 again and require reused files/chunks/bytes > 0.",
+                    SteamResumableDepotDownloadOutcome.TimedOut =>
+                        "Step 11 timed out with resume staging preserved. Run it again and require reuse telemetry > 0.",
+                    SteamResumableDepotDownloadOutcome.NoSavedSession =>
+                        "No saved Steam session exists. Authenticate + Save Session first, then retry Step 11.",
+                    SteamResumableDepotDownloadOutcome.SessionRejected =>
+                        "Saved Steam session was rejected before Step 11. Reauthenticate.",
+                    SteamResumableDepotDownloadOutcome.IdentityMismatch =>
+                        "SECURITY: saved session returned a different SteamID. Step 11 stopped before depot content access.",
+                    SteamResumableDepotDownloadOutcome.OwnershipNotProven =>
+                        "Step 07 ownership could not be re-proven. Step 11 stopped before depot-key/CDN access.",
+                    SteamResumableDepotDownloadOutcome.OutputAlreadyExists =>
+                        "This exact Step 11 final depot already exists. The resume test has already committed this manifest; Step 11 deliberately has no overwrite/update/repair behavior.",
+                    SteamResumableDepotDownloadOutcome.FileHashMismatch =>
+                        "A reconstructed file failed Steam manifest SHA-1. That partial file was discarded; other checksum-valid resume data remains uncommitted.",
+                    _ =>
+                        "FAIL: Step 11 did not complete. Resume staging is preserved when safe, but do not advance to update/repair until this boundary passes.",
+                };
+                _statusLabel.TextColor = result.Outcome == SteamResumableDepotDownloadOutcome.Downloaded && result.ResumeWasUsed
+                    ? UIColor.Label
+                    : result.Outcome is SteamResumableDepotDownloadOutcome.NoSavedSession or SteamResumableDepotDownloadOutcome.Cancelled or SteamResumableDepotDownloadOutcome.TimedOut or SteamResumableDepotDownloadOutcome.OutputAlreadyExists or SteamResumableDepotDownloadOutcome.Downloaded
+                        ? UIColor.SystemOrange
+                        : UIColor.SystemRed;
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _resumableDepotResultLabel.Text = "RESUME: EXCEPTION";
+                _resumableDepotResultLabel.TextColor = UIColor.SystemRed;
+                _resumableDepotDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 11 interrupted-download-resume boundary.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
     private void ClearSavedSession()
     {
         if (_statusLabel is null)
@@ -1105,6 +1235,7 @@ public sealed class RootViewController : UIViewController
         if (_discoveryButton is not null) _discoveryButton.Enabled = false;
         if (_singleFileButton is not null) _singleFileButton.Enabled = false;
         if (_fullDepotButton is not null) _fullDepotButton.Enabled = false;
+        if (_resumableDepotButton is not null) _resumableDepotButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = true;
     }
@@ -1118,6 +1249,7 @@ public sealed class RootViewController : UIViewController
         if (_discoveryButton is not null) _discoveryButton.Enabled = true;
         if (_singleFileButton is not null) _singleFileButton.Enabled = true;
         if (_fullDepotButton is not null) _fullDepotButton.Enabled = true;
+        if (_resumableDepotButton is not null) _resumableDepotButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
@@ -1392,6 +1524,72 @@ public sealed class RootViewController : UIViewController
         lines.Add("Chunk cache outside staging: NONE");
         lines.Add("Partial final-depot visibility: NONE — final directory appears only after atomic staging rename");
         lines.Add("Resume: NOT IMPLEMENTED");
+        lines.Add("Update/install/repair orchestration: NOT IMPLEMENTED");
+        lines.Add("Multi-depot app install: NOT IMPLEMENTED");
+        return string.Join("\n", lines);
+    }
+
+    private static string FormatResumableDepotDownloadDetail(SteamResumableDepotDownloadResult result)
+    {
+        var lines = new List<string>
+        {
+            $"Target AppID: {result.TargetAppId}",
+            $"Saved session found: {YesNo(result.SavedSessionFound)}",
+            $"CM connected: {YesNo(result.CmConnected)}",
+            $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
+            $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
+            $"Stored/returned identity match: {YesNo(result.IdentityMatched)}",
+            $"Step 07 ownership re-proven: {YesNo(result.OwnershipProven)}",
+            $"Step 08 PICS access-token callback: {YesNo(result.PicsAccessTokenCallbackReceived)}",
+            $"Step 08 PICS product-info callback: {YesNo(result.PicsProductInfoCallbackReceived)}",
+            $"Step 08 target app found: {YesNo(result.PicsAppInfoFound)}",
+            $"Selected depot: {result.SelectedDepotId?.ToString() ?? "N/A"}",
+            $"Selected depot oslist: {result.SelectedDepotOsList ?? "not-specified"}",
+            $"Selected branch: {result.SelectedBranch ?? "N/A"}",
+            $"Selected manifest ID: {result.SelectedManifestId?.ToString() ?? "N/A"}",
+            $"Depot key requested/received: {YesNo(result.DepotKeyRequested)} / {YesNo(result.DepotKeyReceived)}",
+            $"Manifest request code requested/received: {YesNo(result.ManifestRequestCodeRequested)} / {YesNo(result.ManifestRequestCodeReceived)}",
+            $"Eligible CDN servers: {result.EligibleCdnServerCount}",
+            $"Manifest downloaded: {YesNo(result.ManifestDownloaded)} (in memory only)",
+            $"Planned files: {result.PlannedFileCount}",
+            $"Planned chunks: {result.PlannedChunkCount}",
+            $"Planned uncompressed bytes: {result.PlannedBytes}",
+            $"Resume staging found at start: {YesNo(result.ResumeStagingFoundAtStart)}",
+            $"Resume staging exists/created this run: {YesNo(result.ResumeStagingCreated)}",
+            $"Reused fully SHA-1-verified files: {result.ReusedVerifiedFileCount}",
+            $"Reused Adler-32-valid chunks: {result.ReusedChunkCount}",
+            $"Reused bytes: {result.ReusedBytes}",
+            $"Invalid prior resume files discarded: {result.InvalidResumeFileCount}",
+            $"Invalid prior resume chunks re-downloaded: {result.InvalidResumeChunkCount}",
+            $"New chunks downloaded this run: {result.NewlyDownloadedChunkCount}",
+            $"New uncompressed bytes downloaded this run: {result.NewlyDownloadedBytes}",
+            $"Satisfied chunks after resume/download: {result.SatisfiedChunkCount}/{result.PlannedChunkCount}",
+            $"Satisfied bytes after resume/download: {result.SatisfiedBytes}/{result.PlannedBytes}",
+            $"Completed files: {result.CompletedFileCount}/{result.PlannedFileCount}",
+            $"SHA-1 verified files: {result.VerifiedFileCount}/{result.PlannedFileCount}",
+            $"Resume data preserved after result: {YesNo(result.ResumeDataPreserved)}",
+            $"Final directory atomically committed: {YesNo(result.FinalDirectoryCommitted)}",
+            $"Resume relative path: {result.ResumeRelativePath ?? "not-created"}",
+            $"Output relative path: {result.OutputRelativePath ?? "not-committed"}",
+            $"CDN auth token requested after 403: {YesNo(result.CdnAuthTokenRequested)}",
+            $"CDN auth token received: {YesNo(result.CdnAuthTokenReceived)} (value never exposed)",
+            $"Account name: {result.AccountName ?? "not-returned"}",
+            $"SteamID64: {result.SteamId64 ?? "not-returned"}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+        };
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
+        lines.Add("Ownership ticket payload display/logging/persistence: NONE");
+        lines.Add("PICS access-token value display/logging/persistence: NONE");
+        lines.Add("Depot-key value display/logging/persistence: NONE");
+        lines.Add("Manifest request-code value display/logging/persistence: NONE");
+        lines.Add("CDN auth-token value display/logging/persistence: NONE");
+        lines.Add("Manifest body persistence: NONE");
+        lines.Add("Resume journal containing Steam secrets: NONE — local files are revalidated directly");
+        lines.Add("Partial final-depot visibility: NONE — only deterministic staging persists until atomic commit");
+        lines.Add("Manifest delta/update migration: NOT IMPLEMENTED");
         lines.Add("Update/install/repair orchestration: NOT IMPLEMENTED");
         lines.Add("Multi-depot app install: NOT IMPLEMENTED");
         return string.Join("\n", lines);

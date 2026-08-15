@@ -7,10 +7,11 @@ public enum SteamDepotDownloadPhase
     Verifying = 2,
     Committing = 3,
     Complete = 4,
+    Resuming = 5,
 }
 
 /// <summary>
-/// Non-secret Step 10 progress telemetry suitable for direct UI display.
+/// Non-secret Step 10/11 progress telemetry suitable for direct UI display.
 /// </summary>
 public sealed record SteamDepotDownloadProgress(
     SteamDepotDownloadPhase Phase,

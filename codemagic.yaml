@@ -1,6 +1,6 @@
 workflows:
-  ios-step-10:
-    name: Step 10 - Minimal full-depot downloader
+  ios-step-11:
+    name: Step 11 - Interrupted-download resume
     instance_type: mac_mini_m2
     max_build_duration: 45
 
@@ -15,14 +15,14 @@ workflows:
         - $HOME/.nuget/packages
 
     scripts:
-      - name: Test + build Step 10 unsigned IPA
+      - name: Test + build Step 11 unsigned IPA
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic-build.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-10.ipa
-      - artifacts/step10-build-summary.txt
+      - artifacts/StS2-Launcher-Step-11.ipa
+      - artifacts/step11-build-summary.txt
       - artifacts/test-results/**
       - artifacts/logs/**
