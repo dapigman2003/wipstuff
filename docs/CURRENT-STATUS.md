@@ -10,13 +10,17 @@
 - Step 06.2: **passed** — refresh token + identity stored in real iOS Keychain; password-free relaunch/resume and sign-out passed.
 - Step 06.3.1: **passed** — persistent token semantics corrected; automatic and manual saved-session login remain reliable over time.
 - Step 07: **passed on physical iPhone** — App ID **2868840** returned an exact-AppID, `EResult.OK`, non-empty ownership ticket.
-- Step 08: **passed on physical iPhone** — PICS product metadata returned numeric depot IDs and visible branch manifest IDs without broadening into download behavior.
-- Current source step: **Step 09**.
-- App version: **0.0.30 / build 30**.
-- New boundary: retrieve one direct public depot manifest and download exactly one selected regular file no larger than **2 MiB**.
-- Selection policy: prefer direct public macOS depot metadata; then language-neutral/English; choose the smallest safe non-empty regular file under the size cap.
-- Integrity gate: assembled bytes must match the manifest SHA-1 before final persistence.
-- Output: one verified file beneath `Documents/StS2Launcher/Step09-SingleFile/...`.
+- Step 08: **passed on physical iPhone** — PICS product metadata returned numeric depot IDs and visible branch manifest IDs.
+- Step 09: **passed on physical iPhone** — one controlled StS2 file was retrieved from Steam CDN chunks, SHA-1 verified against its manifest, and persisted.
+- Current source step: **Step 10**.
+- App version: **0.0.31 / build 31**.
+- New boundary: download one complete selected direct `public` depot through a deterministic file queue.
+- Selection policy: preserve Step 09's direct/public/macOS-first policy.
+- Staging policy: all writes remain beneath `Documents/StS2Launcher/Step10-FullDepot/.staging/...` until complete.
+- Integrity gate: every regular file must match the manifest SHA-1.
+- Completion gate: the final `<depot>/<manifest>` directory appears only after one directory rename of a completely verified staging tree.
+- Cancel/timeout/failure: current staging directory is recursively removed; no partial final depot is committed.
+- Existing final manifest directory: Step 10 blocks rather than overwriting it.
 - PICS token / depot key / manifest request code / CDN auth token: **never exposed by result telemetry or persisted**.
-- Raw manifest body / chunk cache / partial-file state: **not persisted**.
-- Full-depot queue / resume / install-update-repair / Godot / Cloud / Workshop: **not implemented**.
+- Raw manifest body: **not persisted**.
+- Resume / update-install-repair / multi-depot app install / Godot / Cloud / Workshop: **not implemented**.

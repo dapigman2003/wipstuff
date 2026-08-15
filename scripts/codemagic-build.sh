@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 09 environment ==="
+  echo "=== StS2 Launcher Step 10 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step09-environment.log
+} | tee artifacts/logs/step10-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -50,7 +50,7 @@ fi
   exit 3
 }
 
-bash scripts/validate-step09.sh | tee artifacts/logs/step09-validation.log
+bash scripts/validate-step10.sh | tee artifacts/logs/step10-validation.log
 bash scripts/run-unit-tests.sh
 
 WORKLOAD_CWD="$(mktemp -d)"
@@ -59,16 +59,16 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step09-workload.log
+) | tee artifacts/logs/step10-workload.log
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/build-step09.sh 2>&1 | tee artifacts/logs/step09-wrapper.log
-bash scripts/verify-step09-ipa.sh artifacts/StS2-Launcher-Step-09.ipa \
-  2>&1 | tee artifacts/logs/step09-ipa-verification.log
+bash scripts/build-step10.sh 2>&1 | tee artifacts/logs/step10-wrapper.log
+bash scripts/verify-step10-ipa.sh artifacts/StS2-Launcher-Step-10.ipa \
+  2>&1 | tee artifacts/logs/step10-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 09 one controlled small file"
+  echo "StS2 Launcher iOS — Step 10 minimal full-depot downloader"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -78,18 +78,18 @@ bash scripts/verify-step09-ipa.sh artifacts/StS2-Launcher-Step-09.ipa \
   echo "Host unit tests: PASS (required before publish)"
   echo "SteamKit: 3.4.0"
   echo "Foundation regression: retained"
-  echo "Boundary: one controlled small StS2 file (<= 2 MiB), manifest SHA-1 verified"
+  echo "Boundary: one selected direct public depot queued into staging, every file SHA-1 verified, atomic directory commit"
   echo "Steam Guard: Step 06.1 mobile approval retained; no manual code entry"
   echo "Credential persistence: refresh token + identity in iOS Keychain; ShouldRememberPassword=true; password/Guard secrets never stored"
   echo "Ownership: Step 07 ticket gate retained and re-proven before content access"
   echo "Discovery: Step 08 PICS metadata gate retained"
-  echo "Content access: exactly one direct public depot key + one manifest + chunks for one selected file"
-  echo "Integrity: final bytes must match the manifest SHA-1 before atomic persistence"
-  echo "Still absent: full-depot queue, resume, update/install/repair, Godot, Cloud, Workshop"
-  echo "IPA: artifacts/StS2-Launcher-Step-09.ipa"
+  echo "Content access: exactly one direct public depot key + one manifest + complete regular-file queue for that depot"
+  echo "Integrity: every file must match its manifest SHA-1; final depot directory appears only after atomic staging rename"
+  echo "Still absent: resume, update/install/repair orchestration, multi-depot app install, Godot, Cloud, Workshop"
+  echo "IPA: artifacts/StS2-Launcher-Step-10.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-09.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-10.ipa | awk '{print $1}')"
   fi
-} > artifacts/step09-build-summary.txt
+} > artifacts/step10-build-summary.txt
 
-cat artifacts/step09-build-summary.txt
+cat artifacts/step10-build-summary.txt
