@@ -14,6 +14,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamAuthenticationAttempt _authenticationAttempt;
     private readonly SteamSessionResumeAttempt _resumeAttempt;
     private readonly SteamOwnershipVerificationAttempt _ownershipAttempt;
+    private readonly SteamContentDiscoveryAttempt _contentDiscoveryAttempt;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -26,6 +27,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _resumeDetailLabel;
     private UILabel? _ownershipResultLabel;
     private UILabel? _ownershipDetailLabel;
+    private UILabel? _discoveryResultLabel;
+    private UILabel? _discoveryDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -34,6 +37,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _authButton;
     private UIButton? _resumeButton;
     private UIButton? _ownershipButton;
+    private UIButton? _discoveryButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -48,6 +52,7 @@ public sealed class RootViewController : UIViewController
         _authenticationAttempt = new SteamAuthenticationAttempt(_sessionStore);
         _resumeAttempt = new SteamSessionResumeAttempt(_sessionStore);
         _ownershipAttempt = new SteamOwnershipVerificationAttempt(_sessionStore);
+        _contentDiscoveryAttempt = new SteamContentDiscoveryAttempt(_sessionStore);
     }
 
     public override void ViewDidLoad()
@@ -93,22 +98,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 07 — OWNERSHIP VERIFICATION",
+            "STEP 08 — DEPOT / MANIFEST DISCOVERY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.28",
+            "Version 0.0.29",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "APP ID 2868840 • OWNERSHIP TICKET ONLY • NO DOWNLOAD",
+            "APP ID 2868840 • PICS METADATA ONLY • NO DOWNLOAD",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 07 keeps the completed authentication/session foundation and adds one new boundary: after password-free saved-session logon with matching Steam identity, request a Steam app ownership ticket for Slay the Spire 2 (App ID 2868840). Ownership is accepted only when Steam returns OK for the exact AppID with a non-empty ticket. Ticket bytes are never displayed, logged, or persisted. No PICS, depot, manifest, CDN, or download request is made.",
+            "Step 08 starts only after the proven Step 07 ownership gate. It reuses the saved Steam session, proves ownership again, requests PICS access metadata and product info for Slay the Spire 2 (App ID 2868840), then enumerates numeric depot IDs and already-visible branch manifest IDs. The PICS access-token value is never displayed, logged, or persisted. No depot decryption key, manifest body, CDN server/token, chunk, or file is requested.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -216,7 +221,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 07 — Slay the Spire 2 ownership",
+            "Step 07 regression — Slay the Spire 2 ownership",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
@@ -236,6 +241,29 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_ownershipDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 08 — depot / manifest discovery",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _discoveryButton = SystemButton("Discover StS2 Depots + Manifests", 17);
+        _discoveryButton.TouchUpInside += async (_, _) => await RunContentDiscoveryAsync();
+        content.AddArrangedSubview(_discoveryButton);
+
+        _discoveryResultLabel = Label(
+            "DISCOVERY: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_discoveryResultLabel);
+
+        _discoveryDetailLabel = Label(
+            "Metadata only: after the Step 07 ownership gate, request PICS app info for App ID 2868840 and list numeric depot IDs plus visible branch manifest IDs. No depot key, manifest body, CDN request, chunk, or file download is allowed in this step.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_discoveryDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -248,7 +276,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–06.3.1 are proven. Step 07 is ready to verify ownership of Slay the Spire 2 (App ID 2868840) without requesting any depot, manifest, or file.",
+            "Status: Step 07 passed on the physical iPhone. Step 08 is ready to discover depot IDs and visible branch manifest IDs for App ID 2868840 using PICS metadata only — no manifest body or file download.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -267,7 +295,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 07: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 08: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -328,7 +356,7 @@ public sealed class RootViewController : UIViewController
                             "WAITING FOR STEAM GUARD — approve the sign-in in Steam, then return here.",
                         SteamAuthenticationStage.MobileApprovalAccepted =>
                             "STEAM GUARD APPROVED — completing logon and Keychain persistence…",
-                        _ => $"Step 07 auth regression: {update.Message}",
+                        _ => $"Step 08 auth regression: {update.Message}",
                     };
                 });
             });
@@ -508,7 +536,7 @@ public sealed class RootViewController : UIViewController
                 _autoRestoreResultLabel.TextColor = UIColor.SystemRed;
                 _autoRestoreDetailLabel.Text =
                     $"{ex.GetType().Name}: {ex.Message}\nSaved session was not cleared because no definitive invalid-session result was obtained.";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 07 automatic session restore regression.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 08 automatic session restore regression.";
                 _statusLabel.TextColor = UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });
@@ -666,6 +694,91 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunContentDiscoveryAsync()
+    {
+        if (_discoveryResultLabel is null || _discoveryDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation();
+        _discoveryResultLabel.Text = "DISCOVERY: RUNNING…";
+        _discoveryResultLabel.TextColor = UIColor.Label;
+        _discoveryDetailLabel.Text =
+            "Restoring the saved session, re-proving App ID 2868840 ownership, then requesting PICS access metadata + product info only…";
+        _statusLabel.Text =
+            "STEP 08 RUNNING — PICS metadata only; no depot key, manifest body, CDN server/token, chunk, or file request.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var result = await _contentDiscoveryAttempt.RunAsync(
+                TimeSpan.FromSeconds(60),
+                _operationCts!.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _discoveryResultLabel.Text = result.Summary;
+                _discoveryResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamContentDiscoveryOutcome.Discovered => UIColor.Label,
+                    SteamContentDiscoveryOutcome.NoSavedSession => UIColor.SystemOrange,
+                    SteamContentDiscoveryOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamContentDiscoveryOutcome.TimedOut => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+                _discoveryDetailLabel.Text = FormatContentDiscoveryDetail(result);
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamContentDiscoveryOutcome.Discovered =>
+                        $"PASS: PICS exposed {result.DepotCount} depot(s) and {result.ManifestCount} visible branch manifest ID(s) for App ID 2868840. Metadata only; nothing was downloaded.",
+                    SteamContentDiscoveryOutcome.NoSavedSession =>
+                        "No saved Steam session exists. Authenticate + Save Session first, then retry Step 08.",
+                    SteamContentDiscoveryOutcome.SessionRejected =>
+                        "Saved Steam session was rejected before discovery. Reauthenticate; no content bytes were requested.",
+                    SteamContentDiscoveryOutcome.IdentityMismatch =>
+                        "SECURITY: saved session returned a different SteamID. Discovery stopped before PICS product info.",
+                    SteamContentDiscoveryOutcome.OwnershipNotProven =>
+                        "Step 07 ownership could not be re-proven. Discovery stopped before PICS product info.",
+                    SteamContentDiscoveryOutcome.PicsAccessTokenDenied =>
+                        "Steam denied the PICS app access token. No manifest body or CDN request was attempted.",
+                    SteamContentDiscoveryOutcome.ProductInfoUnavailable =>
+                        "PICS did not return product info for App ID 2868840.",
+                    SteamContentDiscoveryOutcome.MissingPicsToken =>
+                        "PICS app info says a required access token is still missing; discovery is not proven.",
+                    SteamContentDiscoveryOutcome.NoDepots =>
+                        "PICS app info returned, but no numeric depot entries were found.",
+                    SteamContentDiscoveryOutcome.NoVisibleManifests =>
+                        "Depot metadata returned, but no visible branch manifest IDs were found. No manifest body was requested.",
+                    SteamContentDiscoveryOutcome.TimedOut =>
+                        "Step 08 discovery timed out; no download was attempted.",
+                    SteamContentDiscoveryOutcome.Cancelled =>
+                        "Step 08 discovery cancelled; no download was attempted.",
+                    _ =>
+                        "FAIL: Step 08 depot/manifest discovery did not complete. No download was attempted.",
+                };
+                _statusLabel.TextColor = result.Outcome == SteamContentDiscoveryOutcome.Discovered
+                    ? UIColor.Label
+                    : result.Outcome is SteamContentDiscoveryOutcome.TimedOut or SteamContentDiscoveryOutcome.Cancelled or SteamContentDiscoveryOutcome.NoSavedSession
+                        ? UIColor.SystemOrange
+                        : UIColor.SystemRed;
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _discoveryResultLabel.Text = "DISCOVERY: EXCEPTION";
+                _discoveryResultLabel.TextColor = UIColor.SystemRed;
+                _discoveryDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 08 metadata discovery. No download was attempted.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
     private void ClearSavedSession()
     {
         if (_statusLabel is null)
@@ -748,6 +861,7 @@ public sealed class RootViewController : UIViewController
         if (_authButton is not null) _authButton.Enabled = false;
         if (_resumeButton is not null) _resumeButton.Enabled = false;
         if (_ownershipButton is not null) _ownershipButton.Enabled = false;
+        if (_discoveryButton is not null) _discoveryButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = true;
     }
@@ -758,6 +872,7 @@ public sealed class RootViewController : UIViewController
         if (_authButton is not null) _authButton.Enabled = true;
         if (_resumeButton is not null) _resumeButton.Enabled = true;
         if (_ownershipButton is not null) _ownershipButton.Enabled = true;
+        if (_discoveryButton is not null) _discoveryButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
@@ -867,6 +982,59 @@ public sealed class RootViewController : UIViewController
         return string.Join("\n", lines);
     }
 
+    private static string FormatContentDiscoveryDetail(SteamContentDiscoveryResult result)
+    {
+        var lines = new List<string>
+        {
+            $"Target AppID: {result.TargetAppId}",
+            $"Saved session found: {YesNo(result.SavedSessionFound)}",
+            $"CM connected: {YesNo(result.CmConnected)}",
+            $"LoggedOnCallback: {YesNo(result.LoggedOnCallbackReceived)}",
+            $"Logon result: {result.LogonResult?.ToString() ?? "N/A"}",
+            $"Extended result: {result.ExtendedLogonResult?.ToString() ?? "N/A"}",
+            $"Stored/returned identity match: {YesNo(result.IdentityMatched)}",
+            $"Step 07 ownership callback: {YesNo(result.OwnershipTicketCallbackReceived)}",
+            $"Step 07 ownership result: {result.OwnershipResult?.ToString() ?? "N/A"}",
+            $"Step 07 ownership ticket bytes: {result.OwnershipTicketLength}",
+            $"Step 07 ownership re-proven: {YesNo(result.OwnershipProven)}",
+            $"PICS access-token callback: {YesNo(result.PicsAccessTokenCallbackReceived)}",
+            $"PICS app access token returned: {YesNo(result.PicsAccessTokenReceived)} (value never exposed)",
+            $"PICS product-info callback: {YesNo(result.PicsProductInfoCallbackReceived)}",
+            $"PICS target app found: {YesNo(result.PicsAppInfoFound)}",
+            $"PICS reports missing token: {YesNo(result.PicsMissingToken)}",
+            $"PICS change number: {result.PicsChangeNumber?.ToString() ?? "N/A"}",
+            $"Depot count: {result.DepotCount}",
+            $"Visible branch manifest count: {result.ManifestCount}",
+            $"Account name: {result.AccountName ?? "not-returned"}",
+            $"SteamID64: {result.SteamId64 ?? "not-returned"}",
+            $"LoginID: {result.LoginId?.ToString() ?? "not-set"}",
+            $"CurrentEndPoint: {result.CurrentEndPoint ?? "never-set"}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+        };
+
+        foreach (var depot in result.Depots)
+        {
+            var platform = new List<string>();
+            if (!string.IsNullOrWhiteSpace(depot.OsList)) platform.Add($"oslist={depot.OsList}");
+            if (!string.IsNullOrWhiteSpace(depot.OsArch)) platform.Add($"osarch={depot.OsArch}");
+            if (!string.IsNullOrWhiteSpace(depot.Language)) platform.Add($"language={depot.Language}");
+
+            lines.Add($"Depot {depot.DepotId}{(platform.Count == 0 ? string.Empty : " — " + string.Join(", ", platform))}");
+            foreach (var manifest in depot.Manifests)
+                lines.Add($"  {manifest.Branch}: {manifest.ManifestId}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
+        lines.Add("Ownership ticket payload display/logging/persistence: NONE");
+        lines.Add("PICS access-token value display/logging/persistence: NONE");
+        lines.Add("Depot decryption key request: NOT RUN");
+        lines.Add("Manifest body request: NOT RUN");
+        lines.Add("CDN server/token/chunk/file request: NOT RUN");
+        return string.Join("\n", lines);
+    }
+
     private static string FormatUtc(DateTimeOffset? value) =>
         value?.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'") ?? "unavailable";
 
@@ -917,7 +1085,7 @@ public sealed class RootViewController : UIViewController
 
                 _statusLabel.Text = final.Passed
                     ? "PASS: Steps 01–05 foundation still passes 5/5 on this device."
-                    : "FAIL: a proven foundation regression failed; stop Step 07 work until understood.";
+                    : "FAIL: a proven foundation regression failed; stop Step 08 work until understood.";
                 _statusLabel.TextColor = final.Passed ? UIColor.Label : UIColor.SystemRed;
                 RefreshSavedSessionStatus();
             });

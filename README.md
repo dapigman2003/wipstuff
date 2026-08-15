@@ -1,36 +1,38 @@
-# StS2 Launcher iOS — Step 07
+# StS2 Launcher iOS — Step 08
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 07 — verify ownership of Slay the Spire 2 (Steam App ID 2868840) only.**
+**Step 08 — discover depot IDs and visible branch manifest IDs for Steam App ID 2868840 only.**
 
-Steps 01–05 are closed and physically verified. Steps 06 through 06.3.1 are also physically proven: real credential authentication, mobile Steam Guard approval, device-bound Keychain refresh-token persistence, password-free relaunch/resume, sign-out, automatic restore, and corrected persistent-session semantics.
+Steps 01–07 are treated as closed regressions. Step 07 proved ownership of Slay the Spire 2 on the physical iPhone. Step 08 adds only Steam PICS metadata discovery after that same ownership gate is re-proven.
 
-Step 07 adds one network capability after a saved-session logon with matching identity:
+The new operation:
 
-1. obtain the existing `SteamApps` handler;
-2. call `GetAppOwnershipTicket(2868840)`;
-3. wait for `AppOwnershipTicketCallback`;
-4. count ownership as proven only when the callback is for App ID `2868840`, `Result == EResult.OK`, and the returned ticket is non-empty.
+1. restores the saved Keychain Steam session;
+2. requires matching returned SteamID;
+3. re-runs `GetAppOwnershipTicket(2868840)` and requires the proven Step 07 success contract;
+4. requests the PICS app access token for App ID `2868840`;
+5. requests PICS product info for App ID `2868840` only;
+6. parses the returned `depots` metadata;
+7. displays numeric depot IDs, platform metadata such as `oslist` / `osarch` / `language`, and already-visible branch manifest IDs.
 
-The ownership ticket payload itself is never displayed, logged, persisted, or passed into another subsystem. Only its byte length is shown as diagnostic evidence.
+The PICS access-token value itself is never displayed, logged, or persisted.
 
 ## Explicitly not included
 
-Step 07 does **not** add:
+Step 08 does **not** add:
 
-- PICS app/package product-info requests;
-- depot discovery;
-- depot keys;
-- manifest discovery;
-- CDN access;
-- file download;
-- ownership-ticket parsing/decryption;
+- depot decryption-key requests;
+- depot manifest-body requests;
+- CDN server discovery/authentication;
+- chunk requests;
+- file download or writes;
+- install/update logic;
 - Godot/game runtime integration.
 
-A non-OK ticket response is reported as **ownership not proven**, not guessed to mean a specific license state.
+Manifest IDs shown by Step 08 are metadata identifiers only. The corresponding manifest contents are not requested.
 
 ## Proven foundation retained
 
@@ -43,12 +45,10 @@ A non-OK ticket response is reported as **ownership not proven**, not guessed to
 - `TrimMode=full` with `SteamKit2`, `protobuf-net`, `protobuf-net.Core` trim roots
 - generated `DiskArbitration` framework removal
 - isolated/version-aware `Process.StartTime` SteamKit iOS compatibility patch
-- Step 06 credential authentication
-- Step 06.1 mobile Steam Guard approval
-- Step 06.2 refresh-token Keychain persistence/resume/sign-out
-- Step 06.3.1 persistent-session correction (`ShouldRememberPassword=true`, fresh `LoginID`)
+- Steps 06–06.3.1 authentication / Guard / persistent saved-session behavior
+- Step 07 exact-AppID, OK, non-empty ownership-ticket proof
 
-## Security
+## Security / scope
 
 Persisted in the device-bound Keychain:
 
@@ -56,11 +56,13 @@ Persisted in the device-bound Keychain:
 - SteamID64
 - Steam refresh token
 
-Never persisted:
+Never persisted by Step 08:
 
 - Steam password
 - Steam Guard secret/code
+- raw ownership-ticket bytes
+- PICS app access-token value
 - raw Steam protocol payloads
-- Step 07 ownership-ticket bytes
+- game/depot files
 
-See `docs/STEP-07-TEST.md` for the physical-device test.
+See `docs/STEP-08-TEST.md` for the physical-device test.

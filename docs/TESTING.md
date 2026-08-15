@@ -1,4 +1,4 @@
-# Testing strategy — Step 07
+# Testing strategy — Step 08
 
 The project uses host unit tests, repository/build validation, and physical-iPhone verification because no single layer can prove all boundaries.
 
@@ -16,47 +16,43 @@ Run with:
 bash scripts/run-unit-tests.sh
 ```
 
-Coverage retains the proven foundation/auth/session contracts and adds Step 07 deterministic ownership rules:
+Coverage retains the foundation/auth/session/ownership contracts and adds deterministic Step 08 metadata tests:
 
-- Core/state-machine regression;
-- credential-store set/get/overwrite/delete semantics;
-- Steam CM HTTP-handler policy/result contracts;
-- five-gate foundation aggregation;
-- Steam Guard mobile-confirmation policy;
-- saved-session serialization/overwrite/clear/malformed-data handling;
-- persistent token logon contract and fresh LoginID;
-- session-recovery preservation/clear policy;
-- target App ID is exactly `2868840`;
-- ownership requires exact AppID + `EResult.OK` + non-empty ticket;
-- non-OK, empty-ticket, and wrong-AppID responses do not prove ownership;
-- ownership result objects cannot expose raw `byte[]` ticket data.
+- target App ID remains exactly `2868840`;
+- PICS `depots` parsing accepts only numeric depot nodes;
+- optional depot platform metadata (`oslist`, `osarch`, `language`) is retained;
+- direct manifest IDs and nested `gid` forms are parsed;
+- invalid/zero manifest IDs are ignored;
+- the discovery result cannot expose raw ownership-ticket bytes or a PICS access-token value;
+- discovery summary counts depots and visible branch manifest IDs.
 
-Host tests do not claim to prove live Steam ownership or real iOS Keychain behavior.
+Host tests do not claim to prove live Steam PICS behavior, native iOS AOT/linking, or real iOS Keychain behavior.
 
 ## 2. Repository/build validation
 
 Run:
 
 ```text
-bash scripts/validate-step07.sh
+bash scripts/validate-step08.sh
 ```
 
-This first runs the Steps 01–05 foundation validator, then verifies that Steps 06–06.3.1 remain intact and that Step 07 adds only the ownership-ticket boundary.
+The validator first protects the Steps 01–05 foundation, then verifies the Steps 06–07 regressions and the narrow Step 08 operation.
 
-It explicitly rejects PICS/depot/manifest/CDN/download APIs inside the Step 07 ownership implementation.
+It requires PICS access-token + product-info calls and explicitly rejects depot-key, manifest-body, CDN, chunk, and file-download APIs in the Step 08 discovery implementation.
 
 Codemagic additionally runs host tests, the isolated SteamKit iOS compatibility patch, .NET iOS AOT/native linking, IPA packaging, and IPA verification.
 
 ## 3. Physical-iPhone verification
 
-The device should prove:
+The device must prove:
 
-- saved-session authentication still succeeds with matching Steam identity;
-- `GetAppOwnershipTicket(2868840)` receives `AppOwnershipTicketCallback`;
-- callback AppID is exactly `2868840`;
-- ownership result is `OK`;
-- ticket length is non-zero;
-- no PICS/depot/manifest/CDN/download request is made;
-- Steps 01–05 foundation remains 5/5.
+- saved-session authentication still works with matching Steam identity;
+- Step 07 ownership is re-proven;
+- the PICS token callback arrives;
+- target app product info arrives without a missing-token flag;
+- at least one numeric depot ID is discovered;
+- at least one visible branch manifest ID is discovered;
+- no depot key, manifest body, CDN, chunk, or file request is made;
+- Steps 01–05 foundation still passes 5/5.
 
-See `STEP-07-TEST.md`.
+See `STEP-08-TEST.md`.
