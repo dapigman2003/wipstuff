@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-ios</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+
+    <SupportedOSPlatformVersion>18.0</SupportedOSPlatformVersion>
+
+    <ApplicationId>com.community.sts2launcher</ApplicationId>
+    <ApplicationTitle>StS2 Launcher</ApplicationTitle>
+    <ApplicationVersion>35</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.35</ApplicationDisplayVersion>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!--
+      Step 12.2 retains the final Step 05 policy: keep full trimming globally, while preserving the
+      three assemblies protobuf-net reflects over during SteamKit message
+      serialization. Physical-iPhone Step 05.15 proved this is required for
+      the initial ClientHello path.
+    -->
+    <TrimMode>full</TrimMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../StS2Launcher.Core/StS2Launcher.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="SteamKit2" />
+    <TrimmerRootAssembly Include="protobuf-net" />
+    <TrimmerRootAssembly Include="protobuf-net.Core" />
+  </ItemGroup>
+
+  <!--
+    SteamKit carries macOS-only machine-information P/Invokes that cause the
+    .NET iOS linker to infer DiskArbitration.framework. iPhoneOS does not ship
+    that framework, so remove only this generated framework item after linker
+    output is loaded and before native link inputs are computed.
+  -->
+  <Target Name="Step052RemoveMacOnlyDiskArbitrationFramework"
+          AfterTargets="_LoadLinkerOutput"
+          BeforeTargets="_ComputeLinkNativeExecutableInputs">
+    <Message Importance="High"
+             Text="STEP05.2 LINKER FRAMEWORKS BEFORE: @(_LinkerFrameworks, ',')" />
+    <ItemGroup>
+      <_LinkerFrameworks Remove="DiskArbitration" />
+    </ItemGroup>
+    <Message Importance="High"
+             Text="STEP05.2 LINKER FRAMEWORKS AFTER: @(_LinkerFrameworks, ',')" />
+  </Target>
+</Project>
