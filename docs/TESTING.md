@@ -16,5 +16,9 @@ Physical-device proof remains mandatory because host tests cannot establish iOS 
 See `STEP-11-TEST.md` for the required force-quit/relaunch/resume sequence.
 
 
-## Step 12
+## Step 12 / 12.1
 See `STEP-12-TEST.md` for install / update / repair manager verification.
+
+Step 12.1 failure localization and AOT receipt hotfix notes: `docs/STEP-12.1-FIX.md`.
+
+Step 12.2 iOS CDN timeout/failover localization and hotfix notes: `docs/STEP-12.2-FIX.md`.
