@@ -15,7 +15,7 @@ rm -rf artifacts/publish artifacts/Payload
 mkdir -p artifacts/publish artifacts/logs
 
 APP="$ROOT/artifacts/publish/StS2Launcher.Step05.iOS.app"
-IPA="$ROOT/artifacts/StS2-Launcher-Step-12.ipa"
+IPA="$ROOT/artifacts/StS2-Launcher-Step-12.2.ipa"
 PROJECT="src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj"
 PATCHER="tools/StS2Launcher.SteamKitIosPatcher/StS2Launcher.SteamKitIosPatcher.csproj"
 PUBLISH_LOG="artifacts/logs/step12-publish.log"
@@ -32,7 +32,7 @@ if [[ -d "$SDK_ROOT/System/Library/Frameworks/DiskArbitration.framework" ]]; the
   exit 3
 fi
 
-echo "Restoring Step 12 projects into isolated NuGet package root..."
+echo "Restoring Step 12.2 projects into isolated NuGet package root..."
 dotnet restore "$PROJECT" 2>&1 | tee artifacts/logs/step12-restore.log
 dotnet restore "$PATCHER" 2>&1 | tee artifacts/logs/step12-patcher-restore.log
 
@@ -43,7 +43,7 @@ if [[ ! -f "$STEAMKIT_DLL" ]]; then
 fi
 
 {
-  echo "=== Step 12 SteamKit iOS compatibility patch ==="
+  echo "=== Step 12.2 SteamKit iOS compatibility patch ==="
   echo "Input: $STEAMKIT_DLL"
   if command -v shasum >/dev/null 2>&1; then
     echo "Before SHA-256: $(shasum -a 256 "$STEAMKIT_DLL" | awk '{print $1}')"
@@ -73,7 +73,7 @@ if ! grep -Eq '^Replacement count: [01]$' "$PATCH_LOG"; then
   exit 7
 fi
 
-echo "Publishing Step 12 install/update/repair-manager build..."
+echo "Publishing Step 12.2 CDN-timeout-failover-hotfix build..."
 set +e
 dotnet publish "$PROJECT" \
   --no-restore \
@@ -91,7 +91,7 @@ PUBLISH_STATUS=${PIPESTATUS[0]}
 set -e
 
 if [[ "$PUBLISH_STATUS" != "0" ]]; then
-  echo "=== Step 12 publish failed: focused scan ===" \
+  echo "=== Step 12.2 publish failed: focused scan ===" \
     | tee artifacts/logs/step12-failure-scan.log
   grep -E -m 160 \
     '(^|: )(error|fatal error)|undefined symbol|Undefined symbols|framework .+ not found|DiskArbitration|PlatformNotSupported|Authentication' \
@@ -119,8 +119,8 @@ mkdir -p artifacts/Payload
 cp -R "$APP" artifacts/Payload/
 (
   cd artifacts
-  rm -f StS2-Launcher-Step-12.ipa
-  /usr/bin/zip -qry StS2-Launcher-Step-12.ipa Payload
+  rm -f StS2-Launcher-Step-12.2.ipa
+  /usr/bin/zip -qry StS2-Launcher-Step-12.2.ipa Payload
 )
 
 echo "Created $IPA"

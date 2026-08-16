@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace StS2Launcher.Core;
 
@@ -18,10 +18,19 @@ public sealed record SteamManagedInstallReceipt(
 {
     public const int CurrentSchemaVersion = 1;
     public const string FileName = ".sts2launcher-install.json";
+}
 
-    public static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true,
-        PropertyNameCaseInsensitive = false,
-    };
+/// <summary>
+/// Step 12.1 iOS/AOT compatibility boundary for the managed-install receipt.
+/// The receipt JSON contract is generated at compile time so full trimming does
+/// not need to discover positional-record constructor parameter names through
+/// reflection at runtime.
+/// </summary>
+[JsonSourceGenerationOptions(
+    GenerationMode = JsonSourceGenerationMode.Metadata,
+    WriteIndented = true)]
+[JsonSerializable(typeof(SteamManagedInstallReceipt))]
+[JsonSerializable(typeof(SteamManagedInstallFile))]
+public sealed partial class SteamManagedInstallJsonContext : JsonSerializerContext
+{
 }

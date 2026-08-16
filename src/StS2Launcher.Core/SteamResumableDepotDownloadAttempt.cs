@@ -968,6 +968,24 @@ public sealed class SteamResumableDepotDownloadAttempt
                         .WaitAsync(cancellationToken)
                         .ConfigureAwait(false);
                 }
+                catch (TimeoutException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    // iOS NSUrlSessionHandler can surface SteamKit's bounded response-body cancellation
+                    // as TimeoutException instead of TaskCanceledException. Treat it as an endpoint
+                    // timeout and fail over just like the other transient CDN transport failures.
+                }
+                catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    // Per-server timeout inside SteamKit: try another server.
+                }
+                catch (HttpRequestException)
+                {
+                    // Transport failure on this endpoint: try another bounded server.
+                }
+                catch (IOException)
+                {
+                    // Stream failure on this endpoint: try another bounded server.
+                }
                 catch (SteamKitWebRequestException)
                 {
                     // Try the next bounded server.
@@ -976,6 +994,12 @@ public sealed class SteamResumableDepotDownloadAttempt
             catch (SteamKitWebRequestException)
             {
                 // Try the next bounded server.
+            }
+            catch (TimeoutException) when (!cancellationToken.IsCancellationRequested)
+            {
+                // On iOS, NSUrlSessionHandler may translate SteamKit's request/body cancellation
+                // into TimeoutException. This is a recoverable per-endpoint CDN timeout, not a
+                // reason to abandon the resumable depot attempt.
             }
             catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
@@ -1053,6 +1077,24 @@ public sealed class SteamResumableDepotDownloadAttempt
                         .WaitAsync(cancellationToken)
                         .ConfigureAwait(false);
                 }
+                catch (TimeoutException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    // iOS NSUrlSessionHandler can surface SteamKit's bounded response-body cancellation
+                    // as TimeoutException instead of TaskCanceledException. Treat it as an endpoint
+                    // timeout and fail over just like the other transient CDN transport failures.
+                }
+                catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    // Per-server timeout inside SteamKit: try another server.
+                }
+                catch (HttpRequestException)
+                {
+                    // Transport failure on this endpoint: try another bounded server.
+                }
+                catch (IOException)
+                {
+                    // Stream failure on this endpoint: try another bounded server.
+                }
                 catch (SteamKitWebRequestException)
                 {
                     // Try another server.
@@ -1061,6 +1103,12 @@ public sealed class SteamResumableDepotDownloadAttempt
             catch (SteamKitWebRequestException)
             {
                 // Try another server.
+            }
+            catch (TimeoutException) when (!cancellationToken.IsCancellationRequested)
+            {
+                // On iOS, NSUrlSessionHandler may translate SteamKit's request/body cancellation
+                // into TimeoutException. This is a recoverable per-endpoint CDN timeout, not a
+                // reason to abandon the resumable depot attempt.
             }
             catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
             {

@@ -14,11 +14,11 @@ ios_proj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').re
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
 
-if plist.get('CFBundleShortVersionString') != '0.0.33' or str(plist.get('CFBundleVersion')) != '33':
-    raise SystemExit('ERROR: source Info.plist must be Step 12 version 0.0.33 (33).')
+if plist.get('CFBundleShortVersionString') != '0.0.35' or str(plist.get('CFBundleVersion')) != '35':
+    raise SystemExit('ERROR: source Info.plist must be Step 12.2 version 0.0.35 (35).')
 for marker in (
-    '<ApplicationVersion>33</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.33</ApplicationDisplayVersion>',
+    '<ApplicationVersion>35</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.35</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -35,6 +35,19 @@ step11 = Path('src/StS2Launcher.Core/SteamResumableDepotDownloadAttempt.cs').rea
 for marker in ('BuildResumeRelativePath(selectedDepot)', 'SteamDepotResumeValidation.ComputeAdler32Async(', 'Directory.Move(stagingPath, finalPath)', 'resumeDataPreserved'):
     if marker not in step11:
         raise SystemExit(f'ERROR: Step 11 regression marker missing: {marker}')
+
+# Step 12.2: the iOS platform HTTP stack can surface SteamKit's bounded CDN
+# cancellation as TimeoutException. Both manifest and chunk paths, including
+# authenticated retries, must fail over to another bounded CDN server instead
+# of abandoning the entire resumable source attempt.
+timeout_catch = 'catch (TimeoutException) when (!cancellationToken.IsCancellationRequested)'
+if step11.count(timeout_catch) < 4:
+    raise SystemExit('ERROR: Step 12.2 must retain TimeoutException failover in Step 11 manifest/chunk initial and authenticated CDN requests.')
+factory = Path('src/StS2Launcher.Core/SteamHttpClientFactory.cs').read_text()
+if 'purpose == HttpClientPurpose.CMWebSocket' not in factory:
+    raise SystemExit('ERROR: Step 12.2 must retain the proven CMWebSocket-only SocketsHttpHandler policy.')
+if 'HttpClientPurpose.CDN' in factory:
+    raise SystemExit('ERROR: Step 12.2 must not broaden SocketsHttpHandler to SteamKit CDN traffic.')
 
 attempt = Path('src/StS2Launcher.Core/SteamManagedInstallAttempt.cs').read_text()
 receipt = Path('src/StS2Launcher.Core/SteamManagedInstallReceipt.cs').read_text()
@@ -74,6 +87,30 @@ for forbidden in ('RefreshToken', 'Password', 'Guard', 'DepotKey', 'CdnAuthToken
         raise SystemExit(f'ERROR: Step 12 receipt may persist a Steam secret/payload: {forbidden}')
 
 for marker in (
+    'JsonSourceGenerationOptions',
+    'JsonSourceGenerationMode.Metadata',
+    'JsonSerializable(typeof(SteamManagedInstallReceipt))',
+    'public sealed partial class SteamManagedInstallJsonContext : JsonSerializerContext',
+):
+    if marker not in receipt:
+        raise SystemExit(f'ERROR: Step 12.1 receipt-source-generation regression marker missing: {marker}')
+for marker in (
+    'SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt',
+    'JsonSerializer.DeserializeAsync(',
+    'JsonSerializer.Deserialize(',
+    'JsonSerializer.SerializeAsync(',
+):
+    if marker not in attempt:
+        raise SystemExit(f'ERROR: Step 12.1 receipt JSON regression call-site marker missing: {marker}')
+for forbidden in (
+    'DeserializeAsync<SteamManagedInstallReceipt>',
+    'Deserialize<SteamManagedInstallReceipt>',
+    'SteamManagedInstallReceipt.JsonOptions',
+):
+    if forbidden in attempt or forbidden in receipt:
+        raise SystemExit(f'ERROR: Step 12.1 regression must not return to reflection/options-based receipt serialization: {forbidden}')
+
+for marker in (
     'ExistingInstallPreservedUntilCommit', 'AtomicCommitCompleted', 'RollbackRestoredPreviousInstall',
     'StagingAbsentAfterResult', 'BackupAbsentAfterResult', 'INSTALL PASS —', 'UPDATE PASS —', 'REPAIR PASS —',
 ):
@@ -83,7 +120,7 @@ if 'byte[]' in result:
     raise SystemExit('ERROR: Step 12 result must not expose raw content/secret arrays.')
 
 for marker in (
-    'STEP 12 — INSTALL / UPDATE / REPAIR MANAGER', 'Version 0.0.33',
+    'STEP 12.2 — IOS CDN TIMEOUT FAILOVER', 'Version 0.0.35',
     'Inspect + Install / Update / Repair', 'Prepare Repair Test (Corrupt One Managed File)',
     'Prepare Update-State Test (Stale Local Receipt Only)', 'RunManagedInstallAsync',
     'FormatManagedInstallDetail', 'State before:', 'Action taken:', 'State after:',
@@ -97,6 +134,7 @@ for marker in (
     'Step12TargetAppIdRemainsSlayTheSpire2',
     'StateClassifierDistinguishesInstallUpdateRepairAndCurrent',
     'ReceiptContainsOnlyNonSecretIntegrityMetadata',
+    'ReceiptJsonUsesSourceGeneratedMetadataAndRoundTrips',
     'SuccessfulResultContractIncludesAtomicReplacementProof',
 ):
     if marker not in tests:
@@ -111,16 +149,18 @@ for forbidden in (
         raise SystemExit(f'ERROR: Step 12 broadened into a later boundary: {forbidden}')
 
 codemagic = Path('codemagic.yaml').read_text()
-for marker in ('ios-step-12:', 'artifacts/StS2-Launcher-Step-12.ipa', 'artifacts/step12-build-summary.txt'):
+for marker in ('ios-step-12-2:', 'artifacts/StS2-Launcher-Step-12.2.ipa', 'artifacts/step12.2-build-summary.txt'):
     if marker not in codemagic:
         raise SystemExit(f'ERROR: Codemagic Step 12 marker missing: {marker}')
 
-print('Step 12 source validation: PASS')
+print('Step 12.2 source validation: PASS')
 print('  Steps 01-11 regressions retained')
 print('  One direct public depot is managed as Not Installed / Up To Date / Update Available / Repair Needed')
 print('  Step 11 remains the verified Steam source-acquisition engine')
+print('  iOS TimeoutException from bounded CDN reads now fails over across manifest/chunk endpoints, including authenticated retries')
 print('  Install/update/repair stage a complete SHA-1 receipt-verified replacement before swap')
 print('  Previous good install is preserved until commit and restored on replacement failure')
+print('  Receipt JSON uses compile-time System.Text.Json metadata; no runtime constructor-name reflection path remains')
 print('  Local receipt contains only non-secret app/depot/manifest/path/length/SHA-1 metadata')
 print('  Multi-depot composition, compatibility inspection, Godot/runtime, Cloud and Workshop remain absent')
 PY
