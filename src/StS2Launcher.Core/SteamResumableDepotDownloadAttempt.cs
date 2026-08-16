@@ -978,6 +978,11 @@ public sealed class SteamResumableDepotDownloadAttempt
                 {
                     // Per-server timeout inside SteamKit: try another server.
                 }
+                catch (SteamKitWebRequestException)
+                {
+                    // SteamKitWebRequestException derives from HttpRequestException, so the
+                    // SteamKit-specific catch must precede the broader transport catch.
+                }
                 catch (HttpRequestException)
                 {
                     // Transport failure on this endpoint: try another bounded server.
@@ -985,10 +990,6 @@ public sealed class SteamResumableDepotDownloadAttempt
                 catch (IOException)
                 {
                     // Stream failure on this endpoint: try another bounded server.
-                }
-                catch (SteamKitWebRequestException)
-                {
-                    // Try the next bounded server.
                 }
             }
             catch (SteamKitWebRequestException)
@@ -1087,6 +1088,11 @@ public sealed class SteamResumableDepotDownloadAttempt
                 {
                     // Per-server timeout inside SteamKit: try another server.
                 }
+                catch (SteamKitWebRequestException)
+                {
+                    // SteamKitWebRequestException derives from HttpRequestException, so the
+                    // SteamKit-specific catch must precede the broader transport catch.
+                }
                 catch (HttpRequestException)
                 {
                     // Transport failure on this endpoint: try another bounded server.
@@ -1094,10 +1100,6 @@ public sealed class SteamResumableDepotDownloadAttempt
                 catch (IOException)
                 {
                     // Stream failure on this endpoint: try another bounded server.
-                }
-                catch (SteamKitWebRequestException)
-                {
-                    // Try another server.
                 }
             }
             catch (SteamKitWebRequestException)

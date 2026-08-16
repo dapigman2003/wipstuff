@@ -129,12 +129,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 12.2 — IOS CDN TIMEOUT FAILOVER",
+            "STEP 12.2.1 — CATCH ORDER COMPILE FIX",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.35",
+            "Version 0.0.36",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -144,7 +144,7 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 12.2 is a narrow iOS CDN timeout-failover hotfix over the same Step 12 manager. Step 12.1 already moved receipt JSON to compile-time System.Text.Json metadata. The latest physical-iPhone run then exposed an iOS NSUrlSessionHandler TimeoutException while the proven Step 11 resumable downloader was materializing Slay the Spire 2.pck. Step 12.2 keeps the platform-default CDN HTTP policy and instead treats that bounded per-endpoint TimeoutException like the existing TaskCanceled/HTTP/stream failures: try another CDN server while preserving resumable data. The manager still discovers the current public manifest, classifies local state as Not Installed / Up To Date / Update Available / Repair Needed, acquires a fully verified Step 11 source when work is required, stages a complete verified replacement, and only then atomically swaps the stable managed-install directory. The previous good install is retained until commit and restored if replacement fails. Multi-depot app composition, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
+            "Step 12.2.1 is a compile-only hotfix over Step 12.2. The CDN timeout-failover behavior is unchanged; the authenticated retry catch ordering is corrected so SteamKitWebRequestException is caught before its HttpRequestException base type. Step 12.1 already moved receipt JSON to compile-time System.Text.Json metadata. The latest physical-iPhone run then exposed an iOS NSUrlSessionHandler TimeoutException while the proven Step 11 resumable downloader was materializing Slay the Spire 2.pck. Step 12.2 keeps the platform-default CDN HTTP policy and instead treats that bounded per-endpoint TimeoutException like the existing TaskCanceled/HTTP/stream failures: try another CDN server while preserving resumable data. The manager still discovers the current public manifest, classifies local state as Not Installed / Up To Date / Update Available / Repair Needed, acquires a fully verified Step 11 source when work is required, stages a complete verified replacement, and only then atomically swaps the stable managed-install directory. The previous good install is retained until commit and restored if replacement fails. Multi-depot app composition, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -367,7 +367,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 12.2 — iOS CDN timeout failover hotfix",
+            "Step 12.2.1 — catch-order compile hotfix",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
@@ -407,7 +407,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–11 passed on the physical iPhone. Step 12.0 reached complete source/staging verification but failed before commit on reflection-based receipt JSON. Step 12.1 fixed that AOT receipt path. The next physical-iPhone run progressed into Step 11 source reacquisition and failed while materializing Slay the Spire 2.pck because iOS surfaced a bounded CDN response cancellation as TimeoutException; the old failover code only recognized TaskCanceledException/HTTP/stream failures. Step 12.2 adds only that missing iOS timeout failover case; install/update/repair still require the original physical-device gates.",
+            "Status: Steps 01–11 passed on the physical iPhone. Step 12.0 reached complete source/staging verification but failed before commit on reflection-based receipt JSON. Step 12.1 fixed that AOT receipt path. The next physical-iPhone run progressed into Step 11 source reacquisition and failed while materializing Slay the Spire 2.pck because iOS surfaced a bounded CDN response cancellation as TimeoutException; the old failover code only recognized TaskCanceledException/HTTP/stream failures. Step 12.2 added that missing iOS timeout failover case. Step 12.2.1 fixes the Codemagic CS0160 catch-order compile error only; install/update/repair still require the original physical-device gates.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -426,7 +426,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 12.2: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 12.2.1: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1200,7 +1200,7 @@ public sealed class RootViewController : UIViewController
         _managedInstallResultLabel.TextColor = UIColor.Label;
         _managedInstallDetailLabel.Text =
             "Discovering the current public manifest, verifying the stable managed install, then performing exactly one of: no-op, install, update, or repair. Any replacement is fully staged and verified before the prior good install is swapped out.";
-        _statusLabel.Text = "STEP 12.2 RUNNING — iOS CDN timeouts fail over within the resumable Step 11 source path; source-generated receipt JSON remains enabled; previous good managed install remains authoritative until atomic commit.";
+        _statusLabel.Text = "STEP 12.2.1 RUNNING — iOS CDN timeouts fail over within the resumable Step 11 source path; source-generated receipt JSON remains enabled; previous good managed install remains authoritative until atomic commit.";
         _statusLabel.TextColor = UIColor.Label;
 
         var progress = new Progress<SteamManagedInstallProgress>(value =>
@@ -1233,8 +1233,8 @@ public sealed class RootViewController : UIViewController
                         : UIColor.SystemRed;
                 _managedInstallDetailLabel.Text = FormatManagedInstallDetail(result);
                 _statusLabel.Text = result.Success
-                    ? $"PASS: Step 12.2 state {result.StateBefore} -> {result.StateAfter}; action {result.ActionTaken}; stable managed install is verified and current."
-                    : $"Step 12.2 did not complete: {result.Error ?? result.Outcome.ToString()}. The prior good install was preserved when one existed.";
+                    ? $"PASS: Step 12.2.1 state {result.StateBefore} -> {result.StateAfter}; action {result.ActionTaken}; stable managed install is verified and current."
+                    : $"Step 12.2.1 did not complete: {result.Error ?? result.Outcome.ToString()}. The prior good install was preserved when one existed.";
                 _statusLabel.TextColor = result.Success ? UIColor.Label : UIColor.SystemRed;
             });
         }
@@ -1245,7 +1245,7 @@ public sealed class RootViewController : UIViewController
                 _managedInstallResultLabel.Text = "INSTALL MANAGER: EXCEPTION";
                 _managedInstallResultLabel.TextColor = UIColor.SystemRed;
                 _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 12.2 install/update/repair manager.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 12.2.1 install/update/repair manager.";
                 _statusLabel.TextColor = UIColor.SystemRed;
             });
         }
