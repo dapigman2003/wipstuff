@@ -21,6 +21,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamManagedInstallAttempt _managedInstallAttempt;
     private readonly SteamDownloadCacheMaintenance _downloadCacheMaintenance;
     private readonly SteamOfflineInstallInspection _offlineInstallInspection;
+    private readonly SteamCompatibilityInventoryInspection _compatibilityInventoryInspection;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -45,6 +46,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _managedInstallDetailLabel;
     private UILabel? _offlineInstallResultLabel;
     private UILabel? _offlineInstallDetailLabel;
+    private UILabel? _compatibilityInventoryResultLabel;
+    private UILabel? _compatibilityInventoryDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -63,6 +66,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _clearDownloadCacheButton;
     private UIButton? _prepareFreshDownloadTestButton;
     private UIButton? _offlineInstallButton;
+    private UIButton? _compatibilityInventoryButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -94,6 +98,7 @@ public sealed class RootViewController : UIViewController
             launcherDataRoot);
         _downloadCacheMaintenance = new SteamDownloadCacheMaintenance(launcherDataRoot);
         _offlineInstallInspection = new SteamOfflineInstallInspection(launcherDataRoot);
+        _compatibilityInventoryInspection = new SteamCompatibilityInventoryInspection(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -139,22 +144,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 13 — OFFLINE LAUNCHER STATE",
+            "STEP 14 — COMPATIBILITY INVENTORY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.40",
+            "Version 0.0.41",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "APP ID 2868840 • VERIFIED LOCAL MANAGED INSTALL • OFFLINE STATE",
+            "APP ID 2868840 • READ-ONLY INSTALLED CONTENT INVENTORY",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–12 are complete on the physical iPhone. Step 13 adds exactly one capability: derive an offline launcher state from the already-managed Step 12 install using only the local source-generated receipt and exact file SHA-1 verification. The Step 13 check does not consult the saved Steam session, open a Steam connection, or claim that the installed manifest is still the newest online version. Game launch, compatibility inspection, multi-depot composition, Godot, Cloud, and Workshop remain out of scope.",
+            "Steps 01–13 are complete on the physical iPhone. Step 14 adds exactly one capability: inspect the already-verified managed StS2 content read-only and inventory assets, managed assemblies, Godot/GodotSharp indicators, native binaries, FMOD/Spine indicators, reflection/dynamic-code markers, and platform-specific pieces. It reuses Step 13 OfflineReady as a local trust precondition and does not contact Steam, modify game files, load game assemblies, launch the game, perform Cecil rewriting, or start Godot.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -436,6 +441,29 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_offlineInstallDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 14 — read-only compatibility inventory",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _compatibilityInventoryButton = SystemButton("Inventory Installed Game Compatibility (Read Only)", 17);
+        _compatibilityInventoryButton.TouchUpInside += async (_, _) => await RunCompatibilityInventoryAsync();
+        content.AddArrangedSubview(_compatibilityInventoryButton);
+
+        _compatibilityInventoryResultLabel = Label(
+            "COMPATIBILITY INVENTORY: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_compatibilityInventoryResultLabel);
+
+        _compatibilityInventoryDetailLabel = Label(
+            "Step 14 first re-proves the Step 13 OfflineReady local tree, then classifies the receipt-backed installed files and scans only managed-binary metadata strings for compatibility indicators. Evidence is heuristic: a marker means a later boundary needs targeted inspection, not that the marked API is definitely executed. No game assembly is loaded, no managed/native game code is executed, and no file inside the managed install is changed.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_compatibilityInventoryDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -448,7 +476,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–12 COMPLETE on the physical iPhone. Step 13 is the current single-capability boundary: prove OfflineReady from the existing verified local install with no Steam/session/network dependency. No game launch or later-phase work is included.",
+            "Status: Steps 01–13 COMPLETE on the physical iPhone. Step 14 is the current single-capability boundary: read-only compatibility inventory of the already-verified local StS2 install. No Cecil rewrite, Godot host, game launch, Cloud, Workshop, or other later boundary is included.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -467,7 +495,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 13: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 14: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1383,6 +1411,95 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunCompatibilityInventoryAsync()
+    {
+        if (_compatibilityInventoryResultLabel is null ||
+            _compatibilityInventoryDetailLabel is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        BeginSteamOperation();
+        _compatibilityInventoryResultLabel.Text = "COMPATIBILITY INVENTORY: RUNNING…";
+        _compatibilityInventoryResultLabel.TextColor = UIColor.Label;
+        _compatibilityInventoryDetailLabel.Text =
+            "Read-only Step 14 inventory started. Re-proving OfflineReady, then classifying installed files and scanning managed metadata strings. No Steam/network request, game-file write, assembly load, or game launch is performed.";
+        _statusLabel.Text = "STEP 14 INVENTORY RUNNING — local/read-only compatibility inspection only.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var progress = new Progress<SteamCompatibilityInventoryProgress>(value =>
+            {
+                InvokeOnMainThread(() =>
+                {
+                    if (_compatibilityInventoryResultLabel is null || _compatibilityInventoryDetailLabel is null)
+                        return;
+
+                    _compatibilityInventoryResultLabel.Text =
+                        $"COMPATIBILITY INVENTORY: {value.Phase.ToString().ToUpperInvariant()}";
+                    _compatibilityInventoryResultLabel.TextColor = UIColor.Label;
+                    _compatibilityInventoryDetailLabel.Text =
+                        $"{value.Message}\nFiles: {value.ProcessedFiles}/{value.TotalFiles}\nBytes: {value.ProcessedBytes}/{value.TotalBytes}" +
+                        (string.IsNullOrWhiteSpace(value.CurrentRelativePath)
+                            ? string.Empty
+                            : $"\nCurrent: {value.CurrentRelativePath}");
+                });
+            });
+
+            var result = await _compatibilityInventoryInspection.RunAsync(
+                progress,
+                _operationCts!.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _compatibilityInventoryResultLabel.Text = result.Summary;
+                _compatibilityInventoryResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamCompatibilityInventoryOutcome.Complete => UIColor.Label,
+                    SteamCompatibilityInventoryOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamCompatibilityInventoryOutcome.LocalInstallNotReady => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+                _compatibilityInventoryDetailLabel.Text = FormatCompatibilityInventoryDetail(result);
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamCompatibilityInventoryOutcome.Complete =>
+                        $"PASS: Step 14 classified {result.TotalFiles} installed files read-only. Review the reported dependency and potential iOS blocker signals before choosing the next compatibility boundary.",
+                    SteamCompatibilityInventoryOutcome.LocalInstallNotReady =>
+                        "STEP 14 BLOCKED: the managed install is not currently OfflineReady. Restore it with the proven Step 12 manager, then rerun the inventory.",
+                    SteamCompatibilityInventoryOutcome.Cancelled =>
+                        "Step 14 inventory cancelled; the managed install was not modified.",
+                    _ =>
+                        $"STEP 14 FAIL: {result.Error ?? result.Outcome.ToString()}. The managed install was not modified.",
+                };
+                _statusLabel.TextColor = result.Outcome switch
+                {
+                    SteamCompatibilityInventoryOutcome.Complete => UIColor.Label,
+                    SteamCompatibilityInventoryOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamCompatibilityInventoryOutcome.LocalInstallNotReady => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _compatibilityInventoryResultLabel.Text = "COMPATIBILITY INVENTORY: EXCEPTION";
+                _compatibilityInventoryResultLabel.TextColor = UIColor.SystemRed;
+                _compatibilityInventoryDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 14 read-only compatibility inventory.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
     private async Task PrepareRepairTestAsync()
     {
         if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
@@ -1594,6 +1711,7 @@ public sealed class RootViewController : UIViewController
         if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = false;
         if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = false;
         if (_offlineInstallButton is not null) _offlineInstallButton.Enabled = false;
+        if (_compatibilityInventoryButton is not null) _compatibilityInventoryButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = allowCancel;
     }
@@ -1614,6 +1732,7 @@ public sealed class RootViewController : UIViewController
         if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = true;
         if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = true;
         if (_offlineInstallButton is not null) _offlineInstallButton.Enabled = true;
+        if (_compatibilityInventoryButton is not null) _compatibilityInventoryButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
@@ -1986,6 +2105,73 @@ public sealed class RootViewController : UIViewController
             lines.Add($"Error: {result.Error}");
 
         return string.Join("\n", lines);
+    }
+
+    private static string FormatCompatibilityInventoryDetail(SteamCompatibilityInventoryResult result)
+    {
+        var lines = new List<string>
+        {
+            $"Target AppID: {result.TargetAppId}",
+            $"Depot: {result.DepotId?.ToString() ?? "N/A"}",
+            $"Installed manifest recorded locally: {result.InstalledManifestId?.ToString() ?? "N/A"}",
+            $"Branch recorded locally: {result.Branch ?? "N/A"}",
+            $"OfflineReady precondition re-proven: {YesNo(result.OfflineReadyPreconditionVerified)}",
+            $"Total installed files/bytes: {result.TotalFiles} / {result.TotalBytes}",
+            $"Asset files/bytes: {result.AssetFiles} / {result.AssetBytes}",
+            $"Godot content files: {result.GodotContentFiles}",
+            $"Managed assemblies: {result.ManagedAssemblyFiles} ({result.ManagedAssemblyBytes} bytes)",
+            $"Managed assemblies metadata-scanned: {result.ManagedAssembliesScanned}",
+            $"Native binaries: {result.NativeBinaryFiles} ({result.NativeBinaryBytes} bytes)",
+            $"Godot/GodotSharp indicator files: {result.GodotSharpIndicatorFiles}",
+            $"FMOD indicator files: {result.FmodIndicatorFiles}",
+            $"Spine indicator files: {result.SpineIndicatorFiles}",
+            $"General reflection indicator files: {result.ReflectionIndicatorFiles}",
+            $"Dynamic-code/JIT indicator files: {result.DynamicCodeIndicatorFiles}",
+            $"Platform-specific indicator files: {result.PlatformSpecificFiles}",
+            $"Other/unclassified files: {result.OtherFiles}",
+            $"Potential iOS blocker signals: {result.PotentialIosBlockerSignals.Count}",
+            $"Dependency notes: {result.DependencyNotes.Count}",
+            $"Steam session consulted: {YesNo(result.SteamSessionConsulted)}",
+            $"Network access attempted by Step 14: {YesNo(result.NetworkAccessAttempted)}",
+            $"Managed install modified by Step 14: {YesNo(result.ManagedInstallModified)}",
+            $"Game launch attempted: {YesNo(result.GameLaunchAttempted)}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+        };
+
+        AddEvidence(lines, "Potential iOS blocker signals", result.PotentialIosBlockerSignals, 8);
+        AddEvidence(lines, "Dependency notes", result.DependencyNotes, 8);
+        AddEvidence(lines, "Managed assembly sample", result.ManagedAssemblyEvidence, 10);
+        AddEvidence(lines, "Native binary sample", result.NativeBinaryEvidence, 10);
+        AddEvidence(lines, "Dynamic-code evidence", result.DynamicCodeEvidence, 8);
+        AddEvidence(lines, "Reflection evidence", result.ReflectionEvidence, 8);
+        AddEvidence(lines, "Godot/GodotSharp evidence", result.GodotSharpEvidence, 8);
+        AddEvidence(lines, "FMOD evidence", result.FmodEvidence, 8);
+        AddEvidence(lines, "Spine evidence", result.SpineEvidence, 8);
+        AddEvidence(lines, "Platform-specific evidence", result.PlatformSpecificEvidence, 8);
+
+        lines.Add("Step 14 evidence policy: metadata/path indicators are triage signals, not proof that an API path executes at runtime.");
+        lines.Add("Mono.Cecil rewrite / Godot host / game execution: NOT IMPLEMENTED");
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
+        return string.Join("\n", lines);
+    }
+
+    private static void AddEvidence(
+        List<string> lines,
+        string title,
+        IReadOnlyList<string> evidence,
+        int limit)
+    {
+        if (evidence.Count == 0)
+            return;
+
+        lines.Add($"{title}:");
+        foreach (var item in evidence.Take(limit))
+            lines.Add($"  • {item}");
+        if (evidence.Count > limit)
+            lines.Add($"  • … {evidence.Count - limit} more");
     }
 
     private static string FormatManagedInstallDetail(SteamManagedInstallResult result)
