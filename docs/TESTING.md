@@ -1,4 +1,4 @@
-# Testing strategy — through Step 12.3
+# Testing strategy — through Step 12.4 stabilization
 
 Codemagic performs source-policy validation, host unit tests, the iOS AOT/native build and IPA structure verification before device testing.
 
@@ -16,7 +16,7 @@ Physical-device proof remains mandatory because host tests cannot establish iOS 
 See `STEP-11-TEST.md` for the required force-quit/relaunch/resume sequence.
 
 
-## Step 12 / 12.1 / 12.2 / 12.2.1 / 12.3
+## Step 12 / 12.1 / 12.2 / 12.2.1 / 12.3 / 12.4
 See `STEP-12-TEST.md` for install / update / repair manager verification.
 
 Step 12.1 failure localization and AOT receipt hotfix notes: `docs/STEP-12.1-FIX.md`.
@@ -24,3 +24,5 @@ Step 12.1 failure localization and AOT receipt hotfix notes: `docs/STEP-12.1-FIX
 Step 12.2 iOS CDN timeout/failover localization and hotfix notes: `docs/STEP-12.2-FIX.md`.
 
 Step 12.3 verified cache reuse and stronger update-gate notes: `docs/STEP-12.3-FIX.md`.
+
+Step 12.4 post-completion cleanup/hardening and regression gate: `docs/STEP-12.4-STABILIZATION.md`.

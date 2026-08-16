@@ -1,6 +1,6 @@
-# Step 12.3 physical-iPhone completion gate
+# Step 12.3 physical-iPhone completion record
 
-Use Codemagic workflow `ios-step-12-3`, install version `0.0.37 (37)`, and keep the legitimate saved Steam session used by the previous steps.
+This gate was completed successfully on the physical iPhone with Step 12.3 / `0.0.37 (37)`, closing Step 12. The current cleanup candidate is Step 12.4; see `STEP-12.4-STABILIZATION.md` for its regression-only gate.
 
 Step 12.1's source-generated receipt JSON and Step 12.2/12.2.1's bounded iOS CDN timeout failover/catch-order fix remain enabled. Step 12.3 adds independently verified current-manifest cache reuse, better source-progress/cancellation telemetry, and a stronger deterministic update capability test.
 
@@ -76,4 +76,4 @@ Only if you want to verify the UI fix: start a manager run that enters source ac
 
 Run **Foundation 5/5 Regression** and require `FOUNDATION PASS — 5/5`.
 
-Step 12 is complete only after Codemagic passes and Gates A, B, C, and E pass on the physical iPhone. Gate D is a targeted telemetry regression check, not a prerequisite if the other device evidence already demonstrates correct source progress.
+**Completion status: PASS.** Gates A, B, C, and E were reported successful on the physical iPhone, so Step 12 is closed. Gate D remained optional telemetry coverage. Step 12.4 does not reopen the capability boundary; it is a cleanup/hardening candidate only.
