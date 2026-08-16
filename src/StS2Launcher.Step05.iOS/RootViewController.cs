@@ -19,6 +19,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamFullDepotDownloadAttempt _fullDepotDownloadAttempt;
     private readonly SteamResumableDepotDownloadAttempt _resumableDepotDownloadAttempt;
     private readonly SteamManagedInstallAttempt _managedInstallAttempt;
+    private readonly SteamDownloadCacheMaintenance _downloadCacheMaintenance;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -56,6 +57,8 @@ public sealed class RootViewController : UIViewController
     private UIButton? _managedInstallButton;
     private UIButton? _prepareRepairTestButton;
     private UIButton? _prepareUpdateTestButton;
+    private UIButton? _clearDownloadCacheButton;
+    private UIButton? _prepareFreshDownloadTestButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -81,9 +84,11 @@ public sealed class RootViewController : UIViewController
         _resumableDepotDownloadAttempt = new SteamResumableDepotDownloadAttempt(
             _sessionStore,
             Path.Combine(documentsRoot, "StS2Launcher"));
+        var launcherDataRoot = Path.Combine(documentsRoot, "StS2Launcher");
         _managedInstallAttempt = new SteamManagedInstallAttempt(
             _sessionStore,
-            Path.Combine(documentsRoot, "StS2Launcher"));
+            launcherDataRoot);
+        _downloadCacheMaintenance = new SteamDownloadCacheMaintenance(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -129,12 +134,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 12.4 — POST-STEP-12 STABILIZATION",
+            "STEP 12.4.1 — DOWNLOAD CACHE TEST CONTROL",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.38",
+            "Version 0.0.39",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -144,7 +149,7 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–12 are now complete on the physical iPhone. Step 12.4 is a stabilization-only release: no Step 13 behavior is added. It retains the proven AOT-safe receipt JSON, current-manifest cache revalidation, resumable CDN acquisition, install/update/repair staging, full SHA-1 verification, and rollback-safe commit behavior. This pass hardens corrupted-receipt handling, interrupted receipt writes, resume-scan accounting, cleanup telemetry, and the older Step 09/10 CDN timeout regression paths while removing stale step labels. Multi-depot composition, offline-state work, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
+            "Steps 01–12 are complete on the physical iPhone. Step 12.4.1 adds maintenance/test controls only: no Step 13 behavior is added. The proven Step 12.4 stabilization remains intact. You can now delete only the project-owned Step 11 download cache while preserving the managed install and saved Steam session, or prepare a forced fresh-download regression by making the local update receipt stale and then clearing that cache. Multi-depot composition, offline-state work, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -367,7 +372,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 12.4 — completed install/update/repair regression",
+            "Step 12.4.1 — completed install/update/repair + cache regression controls",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
@@ -383,6 +388,14 @@ public sealed class RootViewController : UIViewController
         _prepareUpdateTestButton.TouchUpInside += async (_, _) => await PrepareUpdateStateTestAsync();
         content.AddArrangedSubview(_prepareUpdateTestButton);
 
+        _clearDownloadCacheButton = SystemButton("Clear Download Cache Only (Keep Managed Install)", 15);
+        _clearDownloadCacheButton.TouchUpInside += async (_, _) => await ClearDownloadCacheAsync();
+        content.AddArrangedSubview(_clearDownloadCacheButton);
+
+        _prepareFreshDownloadTestButton = SystemButton("Prepare Fresh Download Test (Force Update + Clear Cache)", 15);
+        _prepareFreshDownloadTestButton.TouchUpInside += async (_, _) => await PrepareFreshDownloadTestAsync();
+        content.AddArrangedSubview(_prepareFreshDownloadTestButton);
+
         _managedInstallResultLabel = Label(
             "INSTALL MANAGER: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
@@ -390,7 +403,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_managedInstallResultLabel);
 
         _managedInstallDetailLabel = Label(
-            "First run proves Install. The repair-test button mutates one managed file locally, then the manager must classify Repair Needed and restore it. The update test changes only the project-owned receipt: it makes the manifest ID stale and marks one receipt file identity as different while leaving the actual game files untouched. The manager must classify Update Available, independently reverify the current Step 11 cache against Steam, replace at least that one synthetic changed-file identity from the verified source, verify the complete staging tree, and atomically commit the current receipt. No Steam content or credential is fabricated by either helper.",
+            "The existing Install / Repair / Update regression helpers remain unchanged. Clear Download Cache deletes only Step11-ResumableDepot (complete + resume cache) and leaves the managed Step 12 install plus Keychain session untouched. Prepare Fresh Download Test first makes the project-owned install receipt synthetic-update stale, then deletes the Step 11 cache. The next manager run must therefore acquire the real current depot from Steam again, verify it, exercise Update, and atomically return to UpToDate.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_managedInstallDetailLabel);
@@ -407,7 +420,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–12 COMPLETE on the physical iPhone. Step 12.4 is post-completion cleanup/bug hardening only; Step 13 has not started. Receipt parsing now treats malformed local metadata as Repair Needed instead of allowing incidental exceptions, failed receipt writes clean their temp file, Step 11 resume accounting is transactional across partial-file checksum scans, invalid/unreadable final caches fall back to reacquisition, and the proven iOS CDN timeout classification is mirrored into the older Step 09/10 regression paths.",
+            "Status: Steps 01–12 COMPLETE on the physical iPhone. Step 12.4.1 is maintenance/test-only; Step 13 has not started. Step 12.4 remains the stabilized baseline behavior. New controls can clear only the Step 11 source cache, or pair a synthetic UpdateAvailable receipt with a cleared cache to force a genuine fresh CDN acquisition on the next manager run.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -426,7 +439,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 12.4: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 12.4.1: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1205,7 +1218,7 @@ public sealed class RootViewController : UIViewController
         _managedInstallResultLabel.TextColor = UIColor.Label;
         _managedInstallDetailLabel.Text =
             "Discovering the current public manifest, verifying the stable managed install, then performing exactly one of: no-op, install, update, or repair. Any replacement is fully staged and verified before the prior good install is swapped out.";
-        _statusLabel.Text = "STEP 12.4 RUNNING — completed Step 12 manager regression; current source/cache/receipt/staging/rollback safeguards remain active.";
+        _statusLabel.Text = "STEP 12.4.1 RUNNING — completed Step 12 manager regression; current source/cache/receipt/staging/rollback safeguards remain active.";
         _statusLabel.TextColor = UIColor.Label;
 
         var progress = new Progress<SteamManagedInstallProgress>(value =>
@@ -1238,8 +1251,8 @@ public sealed class RootViewController : UIViewController
                         : UIColor.SystemRed;
                 _managedInstallDetailLabel.Text = FormatManagedInstallDetail(result);
                 _statusLabel.Text = result.Success
-                    ? $"PASS: Step 12.4 state {result.StateBefore} -> {result.StateAfter}; action {result.ActionTaken}; stable managed install is verified and current."
-                    : $"Step 12.4 manager regression did not complete: {result.Error ?? result.Outcome.ToString()}. The prior good install was preserved when one existed.";
+                    ? $"PASS: Step 12.4.1 state {result.StateBefore} -> {result.StateAfter}; action {result.ActionTaken}; stable managed install is verified and current."
+                    : $"Step 12.4.1 manager regression did not complete: {result.Error ?? result.Outcome.ToString()}. The prior good install was preserved when one existed.";
                 _statusLabel.TextColor = result.Success ? UIColor.Label : UIColor.SystemRed;
             });
         }
@@ -1250,7 +1263,7 @@ public sealed class RootViewController : UIViewController
                 _managedInstallResultLabel.Text = "INSTALL MANAGER: EXCEPTION";
                 _managedInstallResultLabel.TextColor = UIColor.SystemRed;
                 _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 12.4 install/update/repair manager regression.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 12.4.1 install/update/repair manager regression.";
                 _statusLabel.TextColor = UIColor.SystemRed;
             });
         }
@@ -1299,6 +1312,83 @@ public sealed class RootViewController : UIViewController
             _managedInstallResultLabel.Text = "UPDATE TEST PREP FAILED";
             _managedInstallResultLabel.TextColor = UIColor.SystemRed;
             _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+        }
+    }
+
+    private async Task ClearDownloadCacheAsync()
+    {
+        if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation(allowCancel: false);
+        try
+        {
+            _managedInstallResultLabel.Text = "DOWNLOAD CACHE: CLEARING…";
+            _managedInstallResultLabel.TextColor = UIColor.Label;
+            _managedInstallDetailLabel.Text = "Deleting only the project-owned Step 11 download cache. The managed install and saved Steam session are not touched.";
+
+            var result = await Task.Run(_downloadCacheMaintenance.Clear);
+            _managedInstallResultLabel.Text = result.CacheExisted ? "DOWNLOAD CACHE: CLEARED" : "DOWNLOAD CACHE: ALREADY EMPTY";
+            _managedInstallResultLabel.TextColor = UIColor.Label;
+            _managedInstallDetailLabel.Text =
+                $"Cache path: {result.CacheRelativePath}\n" +
+                $"Cache existed: {YesNo(result.CacheExisted)}\n" +
+                $"Cache absent now: {YesNo(result.CacheAbsentAfterClear)}\n" +
+                "Managed Step 12 install: PRESERVED\nSaved Steam session: PRESERVED";
+            _statusLabel.Text = "PASS: Step 11 download cache is absent. A normal UpToDate manager run may still no-op; use Prepare Fresh Download Test when you specifically want to force CDN acquisition.";
+            _statusLabel.TextColor = UIColor.Label;
+        }
+        catch (Exception ex)
+        {
+            _managedInstallResultLabel.Text = "DOWNLOAD CACHE: CLEAR FAILED";
+            _managedInstallResultLabel.TextColor = UIColor.SystemRed;
+            _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+            _statusLabel.Text = "FAIL: Step 11 cache clear did not complete. Managed install/session were not intentionally modified by this control.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
+        }
+    }
+
+    private async Task PrepareFreshDownloadTestAsync()
+    {
+        if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation(allowCancel: false);
+        try
+        {
+            _managedInstallResultLabel.Text = "FRESH DOWNLOAD TEST: PREPARING…";
+            _managedInstallResultLabel.TextColor = UIColor.Label;
+            _managedInstallDetailLabel.Text = "Preparing the existing synthetic UpdateAvailable receipt, then deleting only the Step 11 source cache.";
+
+            var simulatedManifest = await _managedInstallAttempt.PrepareUpdateStateTestAsync();
+            var clearResult = await Task.Run(_downloadCacheMaintenance.Clear);
+
+            _managedInstallResultLabel.Text = "FRESH DOWNLOAD TEST PREPARED";
+            _managedInstallResultLabel.TextColor = UIColor.SystemOrange;
+            _managedInstallDetailLabel.Text =
+                $"Synthetic stale receipt manifest: {simulatedManifest}\n" +
+                $"Download cache existed: {YesNo(clearResult.CacheExisted)}\n" +
+                $"Download cache absent now: {YesNo(clearResult.CacheAbsentAfterClear)}\n" +
+                "Managed game files: UNCHANGED\nSaved Steam session: PRESERVED\n\n" +
+                "Now tap Inspect + Install / Update / Repair. It must report StateBefore=UpdateAvailable, reacquire the current public depot from Steam because no Step 11 cache exists, verify the full source, replace at least the synthetic changed-file identity, atomically commit, and finish UPDATE PASS / UpToDate.";
+            _statusLabel.Text = "Fresh-download regression prepared. The next manager run is expected to transfer the current depot from Steam; do not clear/prepare again until that run completes or is deliberately cancelled.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+        }
+        catch (Exception ex)
+        {
+            _managedInstallResultLabel.Text = "FRESH DOWNLOAD TEST PREP FAILED";
+            _managedInstallResultLabel.TextColor = UIColor.SystemRed;
+            _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+            _statusLabel.Text = "Fresh-download test preparation did not complete. If the receipt was already made stale before cache deletion failed, the normal manager can safely reconcile it using the existing verified source cache.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
         }
     }
 
@@ -1391,6 +1481,8 @@ public sealed class RootViewController : UIViewController
         if (_managedInstallButton is not null) _managedInstallButton.Enabled = false;
         if (_prepareRepairTestButton is not null) _prepareRepairTestButton.Enabled = false;
         if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = false;
+        if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = false;
+        if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = allowCancel;
     }
@@ -1408,6 +1500,8 @@ public sealed class RootViewController : UIViewController
         if (_managedInstallButton is not null) _managedInstallButton.Enabled = true;
         if (_prepareRepairTestButton is not null) _prepareRepairTestButton.Enabled = true;
         if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = true;
+        if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = true;
+        if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
