@@ -1,25 +1,19 @@
 # Current status
 
-**Steps 01–12 are complete and closed on a physical iPhone.**
+**Steps 01–13 are complete and closed on a physical iPhone.**
 
-**Current physically exercised baseline:** Step 12.4.1 / `0.0.39`, including the download-cache clear and forced fresh-CDN update regression.
+**Current physically proven baseline:** Step 13.0.1 runtime / `0.0.40 (40)`. The Step 13 local-only gate passed: the legitimate Step 12 managed install became `OfflineReady` without a Steam/session/network dependency, local corruption became `RepairRequired`, repair returned it to a good state, and the prior regressions passed.
 
-**Current source candidate:** Step 13.0.1 — offline launcher state host-test compile hotfix.
+**Current source candidate:** Step 14 — read-only compatibility inventory.
 
-The Step 13 runtime remains `0.0.40 (40)`; 13.0.1 changes only the host test/validator after the initial Codemagic run hit `CS0121` before the iOS build.
+- App version: `0.0.41 (41)`
+- Codemagic workflow: `ios-step-14`
+- Expected IPA: `artifacts/StS2-Launcher-Step-14.ipa`
 
-- App version: `0.0.40 (40)`
-- Codemagic workflow: `ios-step-13`
-- Expected IPA: `artifacts/StS2-Launcher-Step-13.ipa`
+Step 14 adds one capability only: re-prove `OfflineReady`, then inventory the receipt-backed installed depot for assets, Godot content, managed assemblies, native binaries, GodotSharp/FMOD/Spine indicators, reflection/dynamic-code indicators, and platform-specific pieces.
 
-Step 13 adds exactly one capability: inspect the already-managed Step 12 depot using local storage only and classify it as:
+The Step 14 inspector has no Steam session/client/HTTP/CDN dependency, does not write the managed install, does not load game assemblies, and does not execute or launch game code.
 
-- `OnlineSetupRequired` — no managed install exists;
-- `OfflineReady` — the source-generated receipt is valid for App ID 2868840 and the exact local tree matches all recorded lengths/SHA-1s;
-- `RepairRequired` — the local receipt/layout/tree is missing, malformed, foreign, incomplete, extra, length-mismatched, or hash-mismatched.
+**Step 14 is not complete until the physical-iPhone inventory gate in `docs/STEP-14-TEST.md` passes and the actual inventory findings are reviewed.**
 
-The Step 13 inspector does not accept or consult a Steam session and contains no Steam client/HTTP/WebSocket/PICS/CDN path. `OfflineReady` therefore remains available when Steam is unreachable. Online manifest freshness is intentionally unknown until the existing Step 12 online manager is run again.
-
-**Step 13 is not complete until the physical-iPhone offline gate in `docs/STEP-13-TEST.md` passes.**
-
-No Step 14 compatibility-inventory work has started.
+No Step 15 Godot-host work or later compatibility rewriting has started.

@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 13 offline-launcher-state environment ==="
+  echo "=== StS2 Launcher Step 14 compatibility-inventory environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step13-environment.log
+} | tee artifacts/logs/step14-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -50,7 +50,7 @@ fi
   exit 3
 }
 
-bash scripts/validate-step13.sh | tee artifacts/logs/step13-validation.log
+bash scripts/validate-step14.sh | tee artifacts/logs/step14-validation.log
 bash scripts/run-unit-tests.sh
 
 WORKLOAD_CWD="$(mktemp -d)"
@@ -59,16 +59,16 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step13-workload.log
+) | tee artifacts/logs/step14-workload.log
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/build-step13.sh 2>&1 | tee artifacts/logs/step13-wrapper.log
-bash scripts/verify-step13-ipa.sh artifacts/StS2-Launcher-Step-13.ipa \
-  2>&1 | tee artifacts/logs/step13-ipa-verification.log
+bash scripts/build-step14.sh 2>&1 | tee artifacts/logs/step14-wrapper.log
+bash scripts/verify-step14-ipa.sh artifacts/StS2-Launcher-Step-14.ipa \
+  2>&1 | tee artifacts/logs/step14-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 13 offline launcher state"
+  echo "StS2 Launcher iOS — Step 14 compatibility inventory"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -77,16 +77,16 @@ bash scripts/verify-step13-ipa.sh artifacts/StS2-Launcher-Step-13.ipa \
   echo "iOS workload set requested: $DOTNET_WORKLOAD_SET"
   echo "Host unit tests: PASS (required before publish)"
   echo "SteamKit: 3.4.0"
-  echo "Foundation regression: retained"
-  echo "Steps 01-12: retained as regression-protected online setup/content-management foundation"
-  echo "Step 13 boundary: OfflineReady / OnlineSetupRequired / RepairRequired local state only"
-  echo "Step 13 network/session policy: local receipt + exact file-set/length/SHA-1 verification only; no Steam session consultation or network request"
-  echo "Online manifest freshness while offline: intentionally UNKNOWN"
-  echo "Still absent: game launch, multi-depot app composition, compatibility inventory, Godot/runtime execution, Cloud, Workshop"
-  echo "IPA: artifacts/StS2-Launcher-Step-13.ipa"
+  echo "Foundation + Steps 01-13 regression boundaries: retained"
+  echo "Step 14 boundary: read-only compatibility inventory of the existing OfflineReady managed depot"
+  echo "Inventory dimensions: assets, Godot content, managed assemblies, native binaries, GodotSharp, FMOD, Spine, reflection/dynamic-code, platform-specific indicators"
+  echo "Step 14 network/session policy: no Steam session consultation and no network request"
+  echo "Step 14 mutation/execution policy: no managed-install writes, no game assembly load, no game/native code execution"
+  echo "Still absent: Mono.Cecil rewriting, Godot host/rendering, game launch, Cloud, Workshop"
+  echo "IPA: artifacts/StS2-Launcher-Step-14.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-13.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-14.ipa | awk '{print $1}')"
   fi
-} > artifacts/step13-build-summary.txt
+} > artifacts/step14-build-summary.txt
 
-cat artifacts/step13-build-summary.txt
+cat artifacts/step14-build-summary.txt

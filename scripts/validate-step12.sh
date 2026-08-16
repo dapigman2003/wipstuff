@@ -7,25 +7,38 @@ bash scripts/validate-foundation.sh
 
 python3 - <<'PY'
 from pathlib import Path
+import os
 import plistlib
 import re
+
+parent_mode = os.environ.get('STS2_VALIDATE_AS_PARENT') == '1'
 
 core_proj = Path('src/StS2Launcher.Core/StS2Launcher.Core.csproj').read_text()
 ios_proj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
 
-if plist.get('CFBundleShortVersionString') != '0.0.40' or str(plist.get('CFBundleVersion')) != '40':
-    raise SystemExit('ERROR: source Info.plist must be Step 13 version 0.0.40 (40).')
-for marker in (
-    '<ApplicationVersion>40</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.40</ApplicationDisplayVersion>',
+if not parent_mode:
+    if plist.get('CFBundleShortVersionString') != '0.0.40' or str(plist.get('CFBundleVersion')) != '40':
+        raise SystemExit('ERROR: standalone Step 12/13 regression source must be version 0.0.40 (40).')
+else:
+    build = int(str(plist.get('CFBundleVersion') or '0'))
+    if build < 40:
+        raise SystemExit('ERROR: later-step Step 12 regression validation requires build version >= 40.')
+
+project_markers = [
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
     '<TrimmerRootAssembly Include="protobuf-net.Core" />',
     'Step052RemoveMacOnlyDiskArbitrationFramework',
-):
+]
+if not parent_mode:
+    project_markers.extend([
+        '<ApplicationVersion>40</ApplicationVersion>',
+        '<ApplicationDisplayVersion>0.0.40</ApplicationDisplayVersion>',
+    ])
+for marker in project_markers:
     if marker not in ios_proj:
         raise SystemExit(f'ERROR: Step 12 iOS project marker missing: {marker}')
 if '<PackageReference Include="SteamKit2" Version="3.4.0" />' not in core_proj:
@@ -300,12 +313,13 @@ for stale in ('Step 08:', 'STEP 06.3.1 STARTUP ERROR', 'Step 06 startup exceptio
     if stale in program or stale in app_delegate or stale in scene_delegate:
         raise SystemExit(f'ERROR: stale startup diagnostic label remains after Step 12.4 cleanup: {stale}')
 
-codemagic = Path('codemagic.yaml').read_text()
-for marker in ('ios-step-13:', 'artifacts/StS2-Launcher-Step-13.ipa', 'artifacts/step13-build-summary.txt'):
-    if marker not in codemagic:
-        raise SystemExit(f'ERROR: Codemagic Step 12 marker missing: {marker}')
+if not parent_mode:
+    codemagic = Path('codemagic.yaml').read_text()
+    for marker in ('ios-step-13:', 'artifacts/StS2-Launcher-Step-13.ipa', 'artifacts/step13-build-summary.txt'):
+        if marker not in codemagic:
+            raise SystemExit(f'ERROR: Codemagic Step 12 marker missing: {marker}')
 
-print('Steps 01-12 regression source validation under Step 13: PASS')
+print('Steps 01-12 regression source validation: PASS' if parent_mode else 'Steps 01-12 regression source validation under Step 13: PASS')
 print('  Steps 01-12 completed-device regressions retained under the Step 13 source tree')
 print('  One direct public depot is managed as Not Installed / Up To Date / Update Available / Repair Needed')
 print('  Step 11 remains the Steam source-acquisition engine and now revalidates an existing final cache directly against the current Steam manifest')
@@ -318,5 +332,5 @@ print('  Install/update/repair stage a complete SHA-1 receipt-verified replaceme
 print('  Previous good install is preserved until commit and restored on replacement failure')
 print('  Receipt JSON uses compile-time System.Text.Json metadata; no runtime constructor-name reflection path remains')
 print('  Local receipt contains only non-secret app/depot/manifest/path/length/SHA-1 metadata')
-print('  Multi-depot composition, compatibility inspection, Godot/runtime, Cloud and Workshop remain absent')
+print('  Multi-depot composition, Godot/runtime, Cloud and Workshop remain absent; later parent steps may add read-only compatibility inventory')
 PY

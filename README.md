@@ -1,58 +1,58 @@
-# StS2 Launcher iOS — Step 13 offline launcher state
+# StS2 Launcher iOS — Step 14 compatibility inventory
 
-Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
+Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Project state
 
-**Steps 01–12 are complete and closed on a physical iPhone.** Step 12.4.1 / `0.0.39` is the current physically exercised content-management baseline, including the forced fresh-CDN regression.
+**Steps 01–13 are complete and closed on a physical iPhone.** The physically proven Step 13 runtime is `0.0.40 (40)`: a valid Step 12 managed install can be re-hash-verified as `OfflineReady` with networking unavailable, while deliberately corrupted local content becomes `RepairRequired` and is recoverable through the existing online manager.
 
-This archive is **Step 13.0.1 / `0.0.40 (40)`**, a host-test compile hotfix over the Step 13 runtime candidate. No runtime launcher code changed.
+This archive is **Step 14 / `0.0.41 (41)`**.
 
-The initial Step 13 Codemagic attempt stopped before the iOS build on `CS0121` in the new offline-state unit test. See `docs/STEP-13.0.1-FIX.md`.
+## Step 14 boundary
 
-## Step 13 boundary
+Step 14 adds exactly one capability: a **read-only compatibility inventory** of the already-managed StS2 depot.
 
-Step 13 adds one capability only: determine whether the previously created Step 12 managed install is **offline-ready** without consulting Steam or the saved Steam session.
+Before classifying anything, Step 14 reuses the Step 13 local inspector and requires the managed install to prove `OfflineReady`. It then reads the existing non-secret receipt and inventories the installed files without consulting Steam or modifying/launching the game.
 
-The Step 13 inspector:
+The report includes:
 
-- reads only `Step12-ManagedInstall` from the project-owned Documents tree;
-- accepts exactly one current-boundary `Depot-*` managed directory;
-- reads the existing non-secret `.sts2launcher-install.json` with the Step 12.1 source-generated `System.Text.Json` context;
-- validates App ID, depot identity, manifest ID, branch, safe unique paths, lengths and SHA-1 metadata;
-- verifies the exact local file set;
-- re-hashes every managed file and requires the recorded SHA-1/length to match;
-- returns `OfflineReady`, `OnlineSetupRequired`, or `RepairRequired`;
-- never receives a `SteamSessionStore`, `SteamClient`, HTTP client, WebSocket, PICS/CDN object, or other network dependency;
-- explicitly reports that online manifest freshness is **unknown while offline**.
+- total files/bytes and broad asset counts;
+- Godot content such as `.pck` / project-resource formats;
+- managed assembly candidates recognized by CLR metadata signature;
+- native binary candidates recognized by Mach-O/ELF/PE signatures and native-library paths;
+- Godot/GodotSharp dependency indicators;
+- FMOD indicators;
+- Spine indicators;
+- general reflection indicators;
+- dynamic-code/JIT indicators such as `System.Reflection.Emit`, `DynamicMethod`, builder APIs and `Expression.Compile`;
+- platform-specific file/API indicators;
+- concise potential-iOS-blocker signals and dependency notes.
 
-`OfflineReady` does **not** mean the game can execute on iOS yet. It also does not re-prove ownership or tell us whether Steam has published a newer manifest since the last online manager run. Those require the already-proven online path.
-
-All Step 12 install/update/repair/cache controls remain available as regression tools.
+Managed assemblies are **not loaded or executed**. Step 14 scans only their raw metadata/string bytes for triage indicators. A hit means “inspect this in a later focused boundary”; it does not prove that the corresponding runtime path executes.
 
 ## Build
 
 Use Codemagic workflow:
 
 ```text
-ios-step-13
+ios-step-14
 ```
 
-Expected app version/header:
+Expected app:
 
 ```text
-0.0.40 (40)
-STEP 13 — OFFLINE LAUNCHER STATE
+0.0.41 (41)
+STEP 14 — COMPATIBILITY INVENTORY
 ```
 
-Expected IPA artifact:
+Expected IPA:
 
 ```text
-artifacts/StS2-Launcher-Step-13.ipa
+artifacts/StS2-Launcher-Step-14.ipa
 ```
 
-See `docs/STEP-13-TEST.md` for the physical-iPhone gate.
+See `docs/STEP-14-TEST.md` for the physical-iPhone gate.
 
 ## Scope boundary
 
-No game launch, multi-depot composition, compatibility inventory, Mono.Cecil work, Godot host/rendering, Steam Cloud, or Workshop support is added in Step 13.
+Step 14 does **not** add Mono.Cecil, rewrite assemblies, compose multiple depots, build/start Godot, load game assemblies, execute native/managed game code, launch StS2, or add Cloud/Workshop features.
