@@ -120,6 +120,14 @@ for marker in (
     if marker not in tests:
         raise SystemExit(f'ERROR: Step 13 host-test marker missing: {marker}')
 
+# Step 13.0.1 compile hotfix guard: Enumerable.Sum has no UInt64 selector overload,
+# so a lambda explicitly returning ulong can become ambiguous between float/decimal.
+# Keep the expected-byte calculation on the compile-safe UInt64 Aggregate path.
+if 'Values.Sum(bytes => (ulong)bytes.Length)' in tests:
+    raise SystemExit('ERROR: ambiguous UInt64 Enumerable.Sum selector returned to SteamOfflineInstallTests.')
+if 'Values.Aggregate(0UL, (total, bytes) => total + (ulong)bytes.Length)' not in tests:
+    raise SystemExit('ERROR: Step 13 offline byte-count host test must use the compile-safe UInt64 Aggregate expression.')
+
 # Step 13 must not silently become game launch / compatibility / later Steam features.
 for forbidden in (
     'GodotSharp',

@@ -4,7 +4,9 @@
 
 **Current physically exercised baseline:** Step 12.4.1 / `0.0.39`, including the download-cache clear and forced fresh-CDN update regression.
 
-**Current source candidate:** Step 13 — offline launcher state.
+**Current source candidate:** Step 13.0.1 — offline launcher state host-test compile hotfix.
+
+The Step 13 runtime remains `0.0.40 (40)`; 13.0.1 changes only the host test/validator after the initial Codemagic run hit `CS0121` before the iOS build.
 
 - App version: `0.0.40 (40)`
 - Codemagic workflow: `ios-step-13`

@@ -6,7 +6,9 @@ Experimental unofficial iOS launcher/compatibility-host foundation for users who
 
 **Steps 01–12 are complete and closed on a physical iPhone.** Step 12.4.1 / `0.0.39` is the current physically exercised content-management baseline, including the forced fresh-CDN regression.
 
-This archive is **Step 13 / `0.0.40 (40)`**, the next single-capability candidate.
+This archive is **Step 13.0.1 / `0.0.40 (40)`**, a host-test compile hotfix over the Step 13 runtime candidate. No runtime launcher code changed.
+
+The initial Step 13 Codemagic attempt stopped before the iOS build on `CS0121` in the new offline-state unit test. See `docs/STEP-13.0.1-FIX.md`.
 
 ## Step 13 boundary
 

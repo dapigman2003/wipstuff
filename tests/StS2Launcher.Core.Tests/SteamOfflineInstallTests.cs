@@ -39,7 +39,7 @@ public sealed class SteamOfflineInstallTests
             Assert.IsTrue(result.ReceiptStructurallyValid);
             Assert.AreEqual(files.Count, result.PlannedFiles);
             Assert.AreEqual(files.Count, result.VerifiedFiles);
-            Assert.AreEqual(files.Values.Sum(bytes => (ulong)bytes.Length), result.PlannedBytes);
+            Assert.AreEqual(files.Values.Aggregate(0UL, (total, bytes) => total + (ulong)bytes.Length), result.PlannedBytes);
             Assert.AreEqual(result.PlannedBytes, result.VerifiedBytes);
             Assert.IsTrue(result.ExactManagedTreeVerified);
             Assert.IsFalse(result.SteamSessionConsulted);
