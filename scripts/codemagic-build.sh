@@ -21,7 +21,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 12.2 environment ==="
+  echo "=== StS2 Launcher Step 12.2.1 environment ==="
   date -u
   uname -a
   xcodebuild -version
@@ -64,11 +64,11 @@ rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
 bash scripts/build-step12.sh 2>&1 | tee artifacts/logs/step12-wrapper.log
-bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.2.ipa \
+bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.2.1.ipa \
   2>&1 | tee artifacts/logs/step12-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 12.2 iOS CDN timeout failover hotfix"
+  echo "StS2 Launcher iOS — Step 12.2.1 catch-order compile hotfix"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -83,13 +83,13 @@ bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.2.ipa \
   echo "Credential persistence: refresh token + identity in iOS Keychain; ShouldRememberPassword=true; password/Guard secrets never stored"
   echo "Ownership: Step 07 ticket gate retained and re-proven before content access"
   echo "Discovery: Step 08 PICS metadata gate retained"
-  echo "Content access: Step 11 remains the verified source-acquisition engine; Step 12.2 keeps the same stable one-depot manager boundary"
-  echo "Integrity: Step 12.1 source-generated receipt JSON is retained; Step 12.2 adds iOS TimeoutException CDN-server failover inside the resumable Step 11 source path; receipt still stores only path/length/SHA-1 and staging is verified before rollback-safe commit"
+  echo "Content access: Step 11 remains the verified source-acquisition engine; Step 12.2.1 keeps the same stable one-depot manager boundary"
+  echo "Integrity: Step 12.1 source-generated receipt JSON is retained; Step 12.2 timeout failover is retained; Step 12.2.1 fixes catch ordering for iOS TimeoutException CDN-server failover inside the resumable Step 11 source path; receipt still stores only path/length/SHA-1 and staging is verified before rollback-safe commit"
   echo "Still absent: multi-depot app composition, compatibility inventory, Godot/runtime execution, Cloud, Workshop"
-  echo "IPA: artifacts/StS2-Launcher-Step-12.2.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-12.2.1.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-12.2.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-12.2.1.ipa | awk '{print $1}')"
   fi
-} > artifacts/step12.2-build-summary.txt
+} > artifacts/step12.2.1-build-summary.txt
 
-cat artifacts/step12.2-build-summary.txt
+cat artifacts/step12.2.1-build-summary.txt

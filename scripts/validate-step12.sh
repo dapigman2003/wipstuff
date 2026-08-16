@@ -8,17 +8,18 @@ bash scripts/validate-foundation.sh
 python3 - <<'PY'
 from pathlib import Path
 import plistlib
+import re
 
 core_proj = Path('src/StS2Launcher.Core/StS2Launcher.Core.csproj').read_text()
 ios_proj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
 
-if plist.get('CFBundleShortVersionString') != '0.0.35' or str(plist.get('CFBundleVersion')) != '35':
-    raise SystemExit('ERROR: source Info.plist must be Step 12.2 version 0.0.35 (35).')
+if plist.get('CFBundleShortVersionString') != '0.0.36' or str(plist.get('CFBundleVersion')) != '36':
+    raise SystemExit('ERROR: source Info.plist must be Step 12.2.1 version 0.0.36 (36).')
 for marker in (
-    '<ApplicationVersion>35</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.35</ApplicationDisplayVersion>',
+    '<ApplicationVersion>36</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.36</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -43,6 +44,28 @@ for marker in ('BuildResumeRelativePath(selectedDepot)', 'SteamDepotResumeValida
 timeout_catch = 'catch (TimeoutException) when (!cancellationToken.IsCancellationRequested)'
 if step11.count(timeout_catch) < 4:
     raise SystemExit('ERROR: Step 12.2 must retain TimeoutException failover in Step 11 manifest/chunk initial and authenticated CDN requests.')
+
+# Step 12.2.1: SteamKitWebRequestException derives from HttpRequestException.
+# In each authenticated retry chain the derived catch must precede the base catch,
+# otherwise C# reports CS0160 and Codemagic stops at host compilation.
+auth_retry_anchor = 'cdnTokensByHost[server.Host] = tokenValue;'
+auth_retry_positions = [m.start() for m in re.finditer(re.escape(auth_retry_anchor), step11)]
+if len(auth_retry_positions) != 2:
+    raise SystemExit(f'ERROR: expected exactly two authenticated CDN retry chains, found {len(auth_retry_positions)}.')
+expected_retry_catches = [
+    'TimeoutException',
+    'TaskCanceledException',
+    'SteamKitWebRequestException',
+    'HttpRequestException',
+    'IOException',
+]
+for index, pos in enumerate(auth_retry_positions, start=1):
+    signatures = re.findall(r'catch \(([^ )]+)', step11[pos:])[:5]
+    if signatures != expected_retry_catches:
+        raise SystemExit(
+            f'ERROR: authenticated CDN retry catch chain {index} has invalid ordering {signatures}; '
+            f'expected {expected_retry_catches}. SteamKitWebRequestException must precede HttpRequestException.'
+        )
 factory = Path('src/StS2Launcher.Core/SteamHttpClientFactory.cs').read_text()
 if 'purpose == HttpClientPurpose.CMWebSocket' not in factory:
     raise SystemExit('ERROR: Step 12.2 must retain the proven CMWebSocket-only SocketsHttpHandler policy.')
@@ -120,7 +143,7 @@ if 'byte[]' in result:
     raise SystemExit('ERROR: Step 12 result must not expose raw content/secret arrays.')
 
 for marker in (
-    'STEP 12.2 — IOS CDN TIMEOUT FAILOVER', 'Version 0.0.35',
+    'STEP 12.2.1 — CATCH ORDER COMPILE FIX', 'Version 0.0.36',
     'Inspect + Install / Update / Repair', 'Prepare Repair Test (Corrupt One Managed File)',
     'Prepare Update-State Test (Stale Local Receipt Only)', 'RunManagedInstallAsync',
     'FormatManagedInstallDetail', 'State before:', 'Action taken:', 'State after:',
@@ -149,11 +172,11 @@ for forbidden in (
         raise SystemExit(f'ERROR: Step 12 broadened into a later boundary: {forbidden}')
 
 codemagic = Path('codemagic.yaml').read_text()
-for marker in ('ios-step-12-2:', 'artifacts/StS2-Launcher-Step-12.2.ipa', 'artifacts/step12.2-build-summary.txt'):
+for marker in ('ios-step-12-2-1:', 'artifacts/StS2-Launcher-Step-12.2.1.ipa', 'artifacts/step12.2.1-build-summary.txt'):
     if marker not in codemagic:
         raise SystemExit(f'ERROR: Codemagic Step 12 marker missing: {marker}')
 
-print('Step 12.2 source validation: PASS')
+print('Step 12.2.1 source validation: PASS')
 print('  Steps 01-11 regressions retained')
 print('  One direct public depot is managed as Not Installed / Up To Date / Update Available / Repair Needed')
 print('  Step 11 remains the verified Steam source-acquisition engine')

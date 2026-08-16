@@ -1,12 +1,12 @@
-# StS2 Launcher iOS — Step 12.2
+# StS2 Launcher iOS — Step 12.2.1
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 12.2 — iOS CDN timeout/failover hotfix for the existing one-depot install / update / repair manager.**
+**Step 12.2.1 — compile hotfix for the Step 12.2 iOS CDN timeout/failover change.**
 
-Steps 01–11 remain regressions. Step 12.2 keeps the same Step 12 manager boundary and continues to reuse the proven Step 11 resumable downloader as its Steam acquisition engine instead of creating a second CDN implementation.
+Steps 01–11 remain regressions. Step 12.2.1 keeps the same Step 12 manager boundary and continues to reuse the proven Step 11 resumable downloader as its Steam acquisition engine instead of creating a second CDN implementation.
 
 The physical-device history is now:
 
@@ -14,6 +14,8 @@ The physical-device history is now:
 - Step 12.1 / `0.0.34`: receipt serialization/deserialization moved to compile-time `System.Text.Json` source-generated metadata.
 - The next Step 12.1 device run progressed into source reacquisition but failed while materializing `Slay the Spire 2.pck` with `TimeoutException: The request timed out.`.
 - Step 12.2 / `0.0.35`: direct iOS `TimeoutException` from a bounded SteamKit CDN request/body read is now treated like the existing transient endpoint failures and fails over to another CDN server, including the authenticated retry path. The platform-default CDN HTTP handler remains unchanged.
+- The first Step 12.2 Codemagic compile failed with `CS0160` because two authenticated-retry catch chains placed `HttpRequestException` before its derived `SteamKitWebRequestException`.
+- Step 12.2.1 / `0.0.36`: catch ordering is corrected; runtime timeout-failover semantics are otherwise unchanged.
 
 See `docs/STEP-12.1-FIX.md` and `docs/STEP-12.2-FIX.md` for the two narrow compatibility fixes.
 
@@ -61,6 +63,6 @@ These helpers exist only to deterministically exercise the manager branches. The
 
 ## Explicitly not included
 
-Step 12.2 does **not** add multi-depot app composition, compatibility inventory, Mono.Cecil rewriting, Godot/runtime execution, Steam Cloud, or Workshop.
+Step 12.2.1 does **not** add multi-depot app composition, compatibility inventory, Mono.Cecil rewriting, Godot/runtime execution, Steam Cloud, or Workshop.
 
 See `docs/STEP-12-TEST.md` for the physical-device completion gate.

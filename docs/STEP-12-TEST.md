@@ -1,8 +1,8 @@
 # Step 12 / 12.1 physical-iPhone completion gate
 
-Use Codemagic workflow `ios-step-12-2`, install version `0.0.35 (35)`, and keep the same legitimate saved Steam session used by the previous steps.
+Use Codemagic workflow `ios-step-12-2-1`, install version `0.0.36 (36)`, and keep the same legitimate saved Steam session used by the previous steps.
 
-Step 12.2 is the current narrow hotfix build. Step 12.1 fixed the AOT receipt-JSON failure from `0.0.33`; the next device run then exposed an iOS `TimeoutException: The request timed out.` while the Step 11 resumable source path was materializing `Slay the Spire 2.pck`. Step 12.2 keeps the same manager gates and adds only bounded CDN-server failover for that iOS timeout shape. The pass criteria below are otherwise unchanged.
+Step 12.2.1 is the current compile-hotfix build; Step 12.2 runtime behavior is retained. Step 12.1 fixed the AOT receipt-JSON failure from `0.0.33`; the next device run then exposed an iOS `TimeoutException: The request timed out.` while the Step 11 resumable source path was materializing `Slay the Spire 2.pck`. Step 12.2 keeps the same manager gates and adds only bounded CDN-server failover for that iOS timeout shape. The pass criteria below are otherwise unchanged.
 
 ## Gate A — Install
 
@@ -64,4 +64,4 @@ This test changes only the project-owned receipt. It does not invent a Steam man
 
 Run **Foundation 5/5 Regression** and require `FOUNDATION PASS — 5/5`.
 
-Step 12/12.1 is complete only after Codemagic passes and Gates A–D pass on the physical iPhone.
+Step 12/12.1/12.2/12.2.1 is complete only after Codemagic passes and Gates A–D pass on the physical iPhone.
