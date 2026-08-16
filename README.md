@@ -1,14 +1,12 @@
-# StS2 Launcher iOS — Step 12.1
+# StS2 Launcher iOS — Step 12
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 12.1 — AOT receipt-serialization hotfix for the existing one-depot install / update / repair manager.**
+**Step 12 — install / update / repair manager for one selected direct public depot.**
 
-Steps 01–11 remain regressions. Step 12.1 keeps the same Step 12 manager boundary and deliberately reuses the proven Step 11 resumable downloader as its Steam acquisition engine instead of creating a second CDN implementation.
-
-The first physical-iPhone Step 12 (`0.0.33`) run processed all 428 planned files / 2,323,747,842 bytes but failed before commit with `NotSupportedException: ConstructorContainsNullParameterNames, StS2Launcher.Core.SteamManagedInstallReceipt`. Step 12.1 changes only receipt JSON serialization/deserialization to compile-time `System.Text.Json` source-generated metadata so it is safe under the existing full-trimming policy. See `docs/STEP-12.1-FIX.md`.
+Steps 01–11 remain regressions. Step 12 deliberately reuses the proven Step 11 resumable downloader as its Steam acquisition engine instead of creating a second CDN implementation.
 
 The manager:
 
@@ -39,7 +37,7 @@ It contains no Steam password, refresh token, Guard data, ownership ticket, PICS
 
 ## Physical-device proof helpers
 
-After proving the first Install run, Step 12/12.1 includes two local-only diagnostics:
+After proving the first Install run, Step 12 includes two local-only diagnostics:
 
 - **Prepare Repair Test** flips one byte in one managed file. The next manager run must classify `RepairNeeded` and finish `REPAIR PASS`.
 - **Prepare Update-State Test** changes only the project-owned local receipt manifest ID. The next manager run must classify `UpdateAvailable`, rediscover Steam's real current manifest, and finish `UPDATE PASS`.
@@ -48,6 +46,6 @@ These helpers exist only to deterministically exercise the manager branches. The
 
 ## Explicitly not included
 
-Step 12.1 does **not** add multi-depot app composition, compatibility inventory, Mono.Cecil rewriting, Godot/runtime execution, Steam Cloud, or Workshop.
+Step 12 does **not** add multi-depot app composition, compatibility inventory, Mono.Cecil rewriting, Godot/runtime execution, Steam Cloud, or Workshop.
 
 See `docs/STEP-12-TEST.md` for the physical-device completion gate.

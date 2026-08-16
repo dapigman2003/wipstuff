@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IPA="${1:-artifacts/StS2-Launcher-Step-12.1.ipa}"
+IPA="${1:-artifacts/StS2-Launcher-Step-12.ipa}"
 
 if [[ ! -f "$IPA" ]]; then
   echo "ERROR: IPA not found: $IPA" >&2
@@ -29,8 +29,8 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "0.0.34" ]] || { echo "ERROR: wrong Step 12.1 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "34" ]] || { echo "ERROR: wrong Step 12.1 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$VERSION" == "0.0.33" ]] || { echo "ERROR: wrong Step 12 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "33" ]] || { echo "ERROR: wrong Step 12 build version: $BUILD_VERSION" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 
@@ -40,8 +40,8 @@ if find "$APP" -type f | grep -Ei \
   exit 5
 fi
 
-echo "Step 12.1 IPA verification passed."
+echo "Step 12 IPA verification passed."
 echo "  Bundle ID: $BUNDLE_ID"
 echo "  Version: $VERSION ($BUILD_VERSION)"
 echo "  Architecture: arm64"
-echo "  Expected device UI: STEP 12.1 — AOT RECEIPT HOTFIX"
+echo "  Expected device UI: STEP 12 — INSTALL / UPDATE / REPAIR MANAGER"

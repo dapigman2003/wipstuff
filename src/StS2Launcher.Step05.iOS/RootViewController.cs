@@ -129,12 +129,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 12.1 — AOT RECEIPT HOTFIX",
+            "STEP 12 — INSTALL / UPDATE / REPAIR MANAGER",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.34",
+            "Version 0.0.33",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -144,7 +144,7 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 12.1 is a narrow compatibility hotfix over the Step 12 manager. It preserves the proven Step 11 resumable downloader and the same one-depot install/update/repair boundary. Receipt JSON now uses a compile-time System.Text.Json source-generation context so full iOS trimming cannot remove constructor-parameter metadata needed by reflection. The manager discovers the current public manifest, classifies local state as Not Installed / Up To Date / Update Available / Repair Needed, acquires a fully verified Step 11 source when work is required, stages a complete verified replacement, and only then atomically swaps the stable managed-install directory. The previous good install is retained until commit and restored if replacement fails. Multi-depot app composition, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
+            "Step 12 preserves the proven Step 11 resumable downloader and adds one managed-install boundary for the selected direct public depot. The manager discovers the current public manifest, classifies local state as Not Installed / Up To Date / Update Available / Repair Needed, acquires a fully verified Step 11 source when work is required, stages a complete verified replacement, and only then atomically swaps the stable managed-install directory. The previous good install is retained until commit and restored if replacement fails. Multi-depot app composition, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -367,7 +367,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 12.1 — install manager AOT receipt hotfix",
+            "Step 12 — install / update / repair manager",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
@@ -407,7 +407,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–11 passed on the physical iPhone. Step 12.0 reached complete source/staging verification on-device but failed before commit while System.Text.Json reflectively inspected the positional receipt record under full trimming. Step 12.1 keeps the same manager boundary and switches only the receipt JSON path to compile-time generated metadata; install/update/repair still require the original physical-device gates.",
+            "Status: Step 11 passed on the physical iPhone. Step 12 is ready to prove stable install, deterministic update-state handling, and repair while preserving the last good managed install until atomic commit.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -426,7 +426,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 12.1: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 12: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1200,7 +1200,7 @@ public sealed class RootViewController : UIViewController
         _managedInstallResultLabel.TextColor = UIColor.Label;
         _managedInstallDetailLabel.Text =
             "Discovering the current public manifest, verifying the stable managed install, then performing exactly one of: no-op, install, update, or repair. Any replacement is fully staged and verified before the prior good install is swapped out.";
-        _statusLabel.Text = "STEP 12.1 RUNNING — source-generated receipt JSON; previous good managed install remains authoritative until atomic commit.";
+        _statusLabel.Text = "STEP 12 RUNNING — previous good managed install remains authoritative until atomic commit.";
         _statusLabel.TextColor = UIColor.Label;
 
         var progress = new Progress<SteamManagedInstallProgress>(value =>
@@ -1233,8 +1233,8 @@ public sealed class RootViewController : UIViewController
                         : UIColor.SystemRed;
                 _managedInstallDetailLabel.Text = FormatManagedInstallDetail(result);
                 _statusLabel.Text = result.Success
-                    ? $"PASS: Step 12.1 state {result.StateBefore} -> {result.StateAfter}; action {result.ActionTaken}; stable managed install is verified and current."
-                    : $"Step 12.1 did not complete: {result.Error ?? result.Outcome.ToString()}. The prior good install was preserved when one existed.";
+                    ? $"PASS: Step 12 state {result.StateBefore} -> {result.StateAfter}; action {result.ActionTaken}; stable managed install is verified and current."
+                    : $"Step 12 did not complete: {result.Error ?? result.Outcome.ToString()}. The prior good install was preserved when one existed.";
                 _statusLabel.TextColor = result.Success ? UIColor.Label : UIColor.SystemRed;
             });
         }
@@ -1245,7 +1245,7 @@ public sealed class RootViewController : UIViewController
                 _managedInstallResultLabel.Text = "INSTALL MANAGER: EXCEPTION";
                 _managedInstallResultLabel.TextColor = UIColor.SystemRed;
                 _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
-                _statusLabel.Text = "FAIL: unhandled exception during Step 12.1 install/update/repair manager.";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 12 install/update/repair manager.";
                 _statusLabel.TextColor = UIColor.SystemRed;
             });
         }

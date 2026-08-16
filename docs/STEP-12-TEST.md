@@ -1,8 +1,6 @@
-# Step 12 / 12.1 physical-iPhone completion gate
+# Step 12 physical-iPhone completion gate
 
-Use Codemagic workflow `ios-step-12-1`, install version `0.0.34 (34)`, and keep the same legitimate saved Steam session used by the previous steps.
-
-Step 12.1 is a narrow AOT receipt-JSON hotfix after the `0.0.33` device run failed with `ConstructorContainsNullParameterNames` before atomic commit. The pass criteria below are otherwise unchanged.
+Use Codemagic workflow `ios-step-12`, install version `0.0.33 (33)`, and keep the same legitimate saved Steam session used by the previous steps.
 
 ## Gate A — Install
 
@@ -64,4 +62,4 @@ This test changes only the project-owned receipt. It does not invent a Steam man
 
 Run **Foundation 5/5 Regression** and require `FOUNDATION PASS — 5/5`.
 
-Step 12/12.1 is complete only after Codemagic passes and Gates A–D pass on the physical iPhone.
+Step 12 is complete only after Codemagic passes and Gates A–D pass on the physical iPhone.
