@@ -1,4 +1,4 @@
-# Testing strategy — through Step 12.4.1 cache regression control
+# Testing strategy — through Step 13 offline launcher state
 
 Codemagic performs source-policy validation, host unit tests, the iOS AOT/native build and IPA structure verification before device testing.
 
@@ -28,3 +28,6 @@ Step 12.3 verified cache reuse and stronger update-gate notes: `docs/STEP-12.3-F
 Step 12.4 post-completion cleanup/hardening and regression gate: `docs/STEP-12.4-STABILIZATION.md`.
 
 Step 12.4.1 download-cache clear and forced fresh-CDN regression: `docs/STEP-12.4.1-CACHE-TEST.md`.
+
+
+Step 13 offline launcher-state gate: `docs/STEP-13-TEST.md`.

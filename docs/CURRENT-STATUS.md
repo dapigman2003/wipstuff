@@ -2,17 +2,22 @@
 
 **Steps 01–12 are complete and closed on a physical iPhone.**
 
-**Current physically exercised baseline: Step 12.4 — post-Step-12 stabilization / cleanup (`0.0.38`).**
+**Current physically exercised baseline:** Step 12.4.1 / `0.0.39`, including the download-cache clear and forced fresh-CDN update regression.
 
-The Step 12.4 short regression was reported working correctly. Its install/update/repair manager used the already-valid Step 11 source cache, so a brand-new CDN acquisition was not forced during that specific stabilization pass. Fresh acquisition and interrupted/resumable acquisition had already been physically proven in Steps 09–11.
+**Current source candidate:** Step 13 — offline launcher state.
 
-**Current source candidate: Step 12.4.1 — download-cache test control.**
+- App version: `0.0.40 (40)`
+- Codemagic workflow: `ios-step-13`
+- Expected IPA: `artifacts/StS2-Launcher-Step-13.ipa`
 
-App version: `0.0.39 (39)`.
-Codemagic workflow: `ios-step-12-4-1`.
+Step 13 adds exactly one capability: inspect the already-managed Step 12 depot using local storage only and classify it as:
 
-Step 12.4.1 adds no launcher capability and does not begin Step 13. It adds only project-owned maintenance/test controls that can delete `Step11-ResumableDepot` without touching the Step 12 managed install or saved Steam session, and can pair that clear with the already-proven synthetic UpdateAvailable state so the next manager run is forced to reacquire the current public depot from Steam.
+- `OnlineSetupRequired` — no managed install exists;
+- `OfflineReady` — the source-generated receipt is valid for App ID 2868840 and the exact local tree matches all recorded lengths/SHA-1s;
+- `RepairRequired` — the local receipt/layout/tree is missing, malformed, foreign, incomplete, extra, length-mismatched, or hash-mismatched.
 
-The proven Step 12 behavior remains unchanged: one selected direct public depot is classified as `NotInstalled`, `UpToDate`, `UpdateAvailable`, or `RepairNeeded`; a current-manifest Step 11 source is independently verified; install/update/repair build a complete staging tree, SHA-1 verify it, write the AOT-safe non-secret receipt, and replace the managed directory only after verification.
+The Step 13 inspector does not accept or consult a Steam session and contains no Steam client/HTTP/WebSocket/PICS/CDN path. `OfflineReady` therefore remains available when Steam is unreachable. Online manifest freshness is intentionally unknown until the existing Step 12 online manager is run again.
 
-**Step 13 has not started.**
+**Step 13 is not complete until the physical-iPhone offline gate in `docs/STEP-13-TEST.md` passes.**
+
+No Step 14 compatibility-inventory work has started.

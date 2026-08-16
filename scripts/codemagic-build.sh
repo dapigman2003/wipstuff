@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 12.4.1 download-cache test-control environment ==="
+  echo "=== StS2 Launcher Step 13 offline-launcher-state environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step12-environment.log
+} | tee artifacts/logs/step13-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -50,7 +50,7 @@ fi
   exit 3
 }
 
-bash scripts/validate-step12.sh | tee artifacts/logs/step12-validation.log
+bash scripts/validate-step13.sh | tee artifacts/logs/step13-validation.log
 bash scripts/run-unit-tests.sh
 
 WORKLOAD_CWD="$(mktemp -d)"
@@ -59,16 +59,16 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step12-workload.log
+) | tee artifacts/logs/step13-workload.log
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/build-step12.sh 2>&1 | tee artifacts/logs/step12-wrapper.log
-bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.4.1.ipa \
-  2>&1 | tee artifacts/logs/step12-ipa-verification.log
+bash scripts/build-step13.sh 2>&1 | tee artifacts/logs/step13-wrapper.log
+bash scripts/verify-step13-ipa.sh artifacts/StS2-Launcher-Step-13.ipa \
+  2>&1 | tee artifacts/logs/step13-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 12.4.1 download-cache test control"
+  echo "StS2 Launcher iOS — Step 13 offline launcher state"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -78,18 +78,15 @@ bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.4.1.ipa \
   echo "Host unit tests: PASS (required before publish)"
   echo "SteamKit: 3.4.0"
   echo "Foundation regression: retained"
-  echo "Boundary: one selected direct public depot managed as Not Installed / Up To Date / Update Available / Repair Needed with verified staging and rollback-safe replacement"
-  echo "Steam Guard: Step 06.1 mobile approval retained; no manual code entry"
-  echo "Credential persistence: refresh token + identity in iOS Keychain; ShouldRememberPassword=true; password/Guard secrets never stored"
-  echo "Ownership: Step 07 ticket gate retained and re-proven before content access"
-  echo "Discovery: Step 08 PICS metadata gate retained"
-  echo "Content access: Step 11 remains the source-acquisition engine; Step 12.4.1 retains the stabilized Step 12 content path and adds only download-cache/fresh-acquisition test controls"
-  echo "Integrity: Step 12.1 source-generated receipt JSON and Step 12.2/12.2.1 CDN timeout failover/catch ordering are retained; Step 12.3 verified-cache/update behavior is retained; Step 12.4 hardening is retained; Step 12.4.1 adds only safe Step 11 download-cache clear / forced fresh-download regression controls"
-  echo "Still absent: multi-depot app composition, compatibility inventory, Godot/runtime execution, Cloud, Workshop"
-  echo "IPA: artifacts/StS2-Launcher-Step-12.4.1.ipa"
+  echo "Steps 01-12: retained as regression-protected online setup/content-management foundation"
+  echo "Step 13 boundary: OfflineReady / OnlineSetupRequired / RepairRequired local state only"
+  echo "Step 13 network/session policy: local receipt + exact file-set/length/SHA-1 verification only; no Steam session consultation or network request"
+  echo "Online manifest freshness while offline: intentionally UNKNOWN"
+  echo "Still absent: game launch, multi-depot app composition, compatibility inventory, Godot/runtime execution, Cloud, Workshop"
+  echo "IPA: artifacts/StS2-Launcher-Step-13.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-12.4.1.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-13.ipa | awk '{print $1}')"
   fi
-} > artifacts/step12.4.1-build-summary.txt
+} > artifacts/step13-build-summary.txt
 
-cat artifacts/step12.4.1-build-summary.txt
+cat artifacts/step13-build-summary.txt

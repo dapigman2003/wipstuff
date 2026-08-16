@@ -1,36 +1,56 @@
-# StS2 Launcher iOS — Step 12.4.1 download-cache test control
+# StS2 Launcher iOS — Step 13 offline launcher state
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Project state
 
-**Steps 01–12 are complete and closed on a physical iPhone.** Step 12.4 / `0.0.38` is the current stabilized baseline. Its short regression was reported working correctly on-device; the only path not freshly forced in that pass was CDN acquisition because the already-valid Step 11 cache was reused.
+**Steps 01–12 are complete and closed on a physical iPhone.** Step 12.4.1 / `0.0.39` is the current physically exercised content-management baseline, including the forced fresh-CDN regression.
 
-This archive is **Step 12.4.1 / `0.0.39`**, a maintenance/test-only candidate. It adds no Step 13 functionality.
+This archive is **Step 13 / `0.0.40 (40)`**, the next single-capability candidate.
 
-The current proven stack includes persistent Steam authentication in iOS Keychain, ownership verification, PICS depot/manifest discovery, controlled CDN access, complete resumable one-depot acquisition, independently verified source-cache reuse, and the Step 12 install/update/repair manager with AOT-safe receipt JSON, full SHA-1 staging verification, and rollback-safe replacement.
+## Step 13 boundary
 
-## Step 12.4.1 addition
+Step 13 adds one capability only: determine whether the previously created Step 12 managed install is **offline-ready** without consulting Steam or the saved Steam session.
 
-Two local maintenance/test controls are added:
+The Step 13 inspector:
 
-- **Clear Download Cache Only (Keep Managed Install)** deletes only `Step11-ResumableDepot`, including completed and resumable source-cache data. It does not delete the Step 12 managed install and does not touch the saved Steam Keychain session.
-- **Prepare Fresh Download Test (Force Update + Clear Cache)** first prepares the existing synthetic `UpdateAvailable` receipt state, then clears the Step 11 source cache. The next **Inspect + Install / Update / Repair** run must reacquire the current public depot from Steam, verify the source, exercise the normal Update path, atomically commit, and finish `UpToDate`.
+- reads only `Step12-ManagedInstall` from the project-owned Documents tree;
+- accepts exactly one current-boundary `Depot-*` managed directory;
+- reads the existing non-secret `.sts2launcher-install.json` with the Step 12.1 source-generated `System.Text.Json` context;
+- validates App ID, depot identity, manifest ID, branch, safe unique paths, lengths and SHA-1 metadata;
+- verifies the exact local file set;
+- re-hashes every managed file and requires the recorded SHA-1/length to match;
+- returns `OfflineReady`, `OnlineSetupRequired`, or `RepairRequired`;
+- never receives a `SteamSessionStore`, `SteamClient`, HTTP client, WebSocket, PICS/CDN object, or other network dependency;
+- explicitly reports that online manifest freshness is **unknown while offline**.
 
-The purpose is to force a real CDN regression without deleting or corrupting the stable managed game installation.
+`OfflineReady` does **not** mean the game can execute on iOS yet. It also does not re-prove ownership or tell us whether Steam has published a newer manifest since the last online manager run. Those require the already-proven online path.
 
-All Step 12.4 hardening remains unchanged, as do the proven Step 05 iOS compatibility fixes: SteamKit2 `3.4.0`, WebSocket CM transport, CMWebSocket-only `SocketsHttpHandler`, full trimming with `SteamKit2`/`protobuf-net`/`protobuf-net.Core` rooted, the narrow DiskArbitration linker filter, and the isolated build-only Process.StartTime patch.
+All Step 12 install/update/repair/cache controls remain available as regression tools.
 
 ## Build
 
-Use Codemagic workflow `ios-step-12-4-1`. The expected app version is `0.0.39 (39)` and the expected device header is:
+Use Codemagic workflow:
 
 ```text
-STEP 12.4.1 — DOWNLOAD CACHE TEST CONTROL
+ios-step-13
 ```
 
-See `docs/STEP-12.4.1-CACHE-TEST.md` for the fresh-download regression procedure.
+Expected app version/header:
+
+```text
+0.0.40 (40)
+STEP 13 — OFFLINE LAUNCHER STATE
+```
+
+Expected IPA artifact:
+
+```text
+artifacts/StS2-Launcher-Step-13.ipa
+```
+
+See `docs/STEP-13-TEST.md` for the physical-iPhone gate.
 
 ## Scope boundary
 
-No Step 13/offline-state work, multi-depot composition, compatibility inventory, Mono.Cecil preparation, Godot/runtime execution, Steam Cloud, or Workshop work is included in this archive.
+No game launch, multi-depot composition, compatibility inventory, Mono.Cecil work, Godot host/rendering, Steam Cloud, or Workshop support is added in Step 13.

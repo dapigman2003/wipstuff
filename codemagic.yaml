@@ -1,6 +1,6 @@
 workflows:
-  ios-step-12-4-1:
-    name: Step 12.4.1 - download-cache test control
+  ios-step-13:
+    name: Step 13 - offline launcher state
     instance_type: mac_mini_m2
     max_build_duration: 45
 
@@ -15,14 +15,14 @@ workflows:
         - $HOME/.nuget/packages
 
     scripts:
-      - name: Test + build Step 12.4.1 unsigned IPA
+      - name: Test + build Step 13 unsigned IPA
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic-build.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-12.4.1.ipa
-      - artifacts/step12.4.1-build-summary.txt
+      - artifacts/StS2-Launcher-Step-13.ipa
+      - artifacts/step13-build-summary.txt
       - artifacts/test-results/**
       - artifacts/logs/**

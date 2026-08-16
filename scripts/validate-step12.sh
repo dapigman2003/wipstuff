@@ -15,11 +15,11 @@ ios_proj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').re
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
 
-if plist.get('CFBundleShortVersionString') != '0.0.39' or str(plist.get('CFBundleVersion')) != '39':
-    raise SystemExit('ERROR: source Info.plist must be Step 12.4.1 version 0.0.39 (39).')
+if plist.get('CFBundleShortVersionString') != '0.0.40' or str(plist.get('CFBundleVersion')) != '40':
+    raise SystemExit('ERROR: source Info.plist must be Step 13 version 0.0.40 (40).')
 for marker in (
-    '<ApplicationVersion>39</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.39</ApplicationDisplayVersion>',
+    '<ApplicationVersion>40</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.40</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -262,7 +262,7 @@ if 'byte[]' in result:
     raise SystemExit('ERROR: Step 12 result must not expose raw content/secret arrays.')
 
 for marker in (
-    'STEP 12.4.1 — DOWNLOAD CACHE TEST CONTROL', 'Version 0.0.39',
+    'Step 12.4.1 — completed install/update/repair + cache regression controls',
     'Inspect + Install / Update / Repair', 'Prepare Repair Test (Corrupt One Managed File)',
     'Prepare Update Test (Stale Receipt + One Changed File Identity)', 'RunManagedInstallAsync',
     'FormatManagedInstallDetail', 'State before:', 'Action taken:', 'State after:',
@@ -301,12 +301,12 @@ for stale in ('Step 08:', 'STEP 06.3.1 STARTUP ERROR', 'Step 06 startup exceptio
         raise SystemExit(f'ERROR: stale startup diagnostic label remains after Step 12.4 cleanup: {stale}')
 
 codemagic = Path('codemagic.yaml').read_text()
-for marker in ('ios-step-12-4-1:', 'artifacts/StS2-Launcher-Step-12.4.1.ipa', 'artifacts/step12.4.1-build-summary.txt'):
+for marker in ('ios-step-13:', 'artifacts/StS2-Launcher-Step-13.ipa', 'artifacts/step13-build-summary.txt'):
     if marker not in codemagic:
         raise SystemExit(f'ERROR: Codemagic Step 12 marker missing: {marker}')
 
-print('Step 12.4.1 download-cache test-control source validation: PASS')
-print('  Steps 01-12 completed-device regressions retained; no Step 13 capability added')
+print('Steps 01-12 regression source validation under Step 13: PASS')
+print('  Steps 01-12 completed-device regressions retained under the Step 13 source tree')
 print('  One direct public depot is managed as Not Installed / Up To Date / Update Available / Repair Needed')
 print('  Step 11 remains the Steam source-acquisition engine and now revalidates an existing final cache directly against the current Steam manifest')
 print('  iOS TimeoutException failover is retained in Step 11 and backported to the still-exposed Step 09/10 regression paths')

@@ -13,7 +13,7 @@ if ! command -v dotnet >/dev/null 2>&1; then
   exit 2
 fi
 
-echo "=== Step 12.4.1 host unit tests ==="
+echo "=== Step 13 host unit tests (Steps 01-12 regressions + offline state) ==="
 dotnet test "$TEST_PROJECT" \
   -c Release \
   --nologo \
