@@ -1,36 +1,40 @@
-# StS2 Launcher iOS — Step 12.2.1
+# StS2 Launcher iOS — Step 12.3
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 12.2.1 — compile hotfix for the Step 12.2 iOS CDN timeout/failover change.**
+**Step 12.3 — independently verified Step 11 cache reuse + stronger deterministic update test.**
 
-Steps 01–11 remain regressions. Step 12.2.1 keeps the same Step 12 manager boundary and continues to reuse the proven Step 11 resumable downloader as its Steam acquisition engine instead of creating a second CDN implementation.
+Steps 01–11 remain physical-iPhone regressions. Step 12 is still the one-depot install/update/repair manager boundary; Step 12.3 fixes the cache-trust and test-telemetry weakness exposed while exercising its synthetic update path.
 
-The physical-device history is now:
+Physical-device/debug history:
 
-- Step 12 / `0.0.33`: all 428 files / 2,323,747,842 bytes reached full source/staging verification, then receipt JSON failed before commit with `ConstructorContainsNullParameterNames` under full trimming.
-- Step 12.1 / `0.0.34`: receipt serialization/deserialization moved to compile-time `System.Text.Json` source-generated metadata.
-- The next Step 12.1 device run progressed into source reacquisition but failed while materializing `Slay the Spire 2.pck` with `TimeoutException: The request timed out.`.
-- Step 12.2 / `0.0.35`: direct iOS `TimeoutException` from a bounded SteamKit CDN request/body read is now treated like the existing transient endpoint failures and fails over to another CDN server, including the authenticated retry path. The platform-default CDN HTTP handler remains unchanged.
-- The first Step 12.2 Codemagic compile failed with `CS0160` because two authenticated-retry catch chains placed `HttpRequestException` before its derived `SteamKitWebRequestException`.
-- Step 12.2.1 / `0.0.36`: catch ordering is corrected; runtime timeout-failover semantics are otherwise unchanged.
+- Step 12 / `0.0.33`: all 428 files / 2,323,747,842 bytes reached complete source/staging verification, then receipt JSON failed before commit with `ConstructorContainsNullParameterNames` under full trimming.
+- Step 12.1 / `0.0.34`: receipt JSON moved to compile-time `System.Text.Json` metadata.
+- The next device run reached source reacquisition and failed while materializing `Slay the Spire 2.pck` with `TimeoutException: The request timed out.`.
+- Step 12.2 / `0.0.35`: direct iOS `TimeoutException` is treated as a bounded per-CDN endpoint failure and fails over just like the existing transient transport failures.
+- The first Step 12.2 Codemagic run failed host compilation with `CS0160` because `HttpRequestException` appeared before derived `SteamKitWebRequestException` in two authenticated retry catch chains.
+- Step 12.2.1 / `0.0.36`: corrected that catch ordering.
+- Physical update-state testing then revealed that intentionally staling the Step 12 receipt caused an already-complete Step 11 cache to be discarded and reacquired. Cancelling during that phase also left the Step 12 result showing `Planned bytes: 0`, even though the current manifest had already been discovered.
+- Step 12.3 / `0.0.37`: an existing manifest-specific Step 11 final cache is directly reverified against the freshly downloaded current Steam manifest (exact paths, sizes, and Steam SHA-1s). A stale Step 12 receipt is no longer used as the cache trust anchor. Only a cache that fails that independent manifest check is discarded and reacquired. Source progress is forwarded into the Step 12 UI, and planned file/byte telemetry is retained on cancel/timeout.
 
-See `docs/STEP-12.1-FIX.md` and `docs/STEP-12.2-FIX.md` for the two narrow compatibility fixes.
+The synthetic update test is stronger in Step 12.3. It changes only the project-owned receipt: the manifest ID becomes stale and one smallest non-empty file identity is given a synthetic different SHA-1. Actual installed game bytes are untouched. The next manager run must therefore exercise the real `UpdateAvailable -> Update -> UpToDate` path, copy at least one file from the verified current source, verify the complete staging tree, write the real current receipt, and atomically replace the managed install.
 
-The manager:
+## Manager guarantees
+
+The Step 12 manager:
 
 1. restores/authenticates the saved Steam session through the existing boundaries;
-2. re-proves ownership and discovers the current public manifest;
+2. re-proves ownership and discovers the real current public manifest;
 3. selects the same single direct public depot policy used by Steps 09–11;
 4. classifies the stable managed install as `NotInstalled`, `UpToDate`, `UpdateAvailable`, or `RepairNeeded`;
-5. acquires a fully verified manifest-specific Step 11 source only when work is required;
+5. obtains a current-manifest Step 11 source, reusing an existing final cache only after direct Steam-manifest verification;
 6. builds a non-secret local receipt containing only AppID/depot/manifest/branch and file path/length/SHA-1;
-7. stages a complete replacement tree, reusing already-valid installed files when hashes match;
-8. verifies the complete staging tree against the receipt;
+7. stages a complete replacement tree, reusing installed files only when their recorded identity and actual SHA-1 match the current source;
+8. verifies the staging tree against the current receipt;
 9. preserves the previous managed install until commit;
-10. replaces the stable install through a rollback-safe directory-rename commit and restores the prior install if replacement fails.
+10. performs a rollback-safe directory-rename commit and restores the prior install if replacement fails.
 
 Stable managed files live beneath:
 
@@ -38,31 +42,19 @@ Stable managed files live beneath:
 Documents/StS2Launcher/Step12-ManagedInstall/Depot-<depot>/...
 ```
 
-The receipt is:
-
-```text
-.sts2launcher-install.json
-```
-
-It contains no Steam password, refresh token, Guard data, ownership ticket, PICS token, depot key, manifest request code, CDN token, or downloaded payload bytes.
-
-## Step 12.2 timeout behavior
-
-SteamKit 3.4.0 uses bounded cancellation for CDN request headers and response-body reads. On iOS, the platform HTTP stack can surface that bounded read cancellation as `TimeoutException` instead of `TaskCanceledException`. Step 11 already failed over across CDN servers for the other transient network shapes; Step 12.2 adds the missing direct `TimeoutException` case without broadening the Step 05 handler policy or changing SteamKit's timeout values.
-
-The change is deliberately limited to the resumable Step 11 manifest/chunk CDN helpers used by Step 12. Valid resume data remains subject to the same checksum and final SHA-1 verification rules.
+The receipt is `.sts2launcher-install.json`. It contains no Steam password, refresh token, Guard data, ownership ticket, PICS token, depot key, manifest request code, CDN token, or downloaded payload bytes.
 
 ## Physical-device proof helpers
 
-After proving the first Install run, Step 12 includes two local-only diagnostics:
+After a successful Install and no-op/UpToDate run:
 
 - **Prepare Repair Test** flips one byte in one managed file. The next manager run must classify `RepairNeeded` and finish `REPAIR PASS`.
-- **Prepare Update-State Test** changes only the project-owned local receipt manifest ID. The next manager run must classify `UpdateAvailable`, rediscover Steam's real current manifest, and finish `UPDATE PASS`.
+- **Prepare Update Test** changes only the receipt (stale manifest + one synthetic changed-file SHA-1). The next manager run must classify `UpdateAvailable`, reverify the existing current-manifest Step 11 cache against Steam, show `Source bytes downloaded this manager run: 0` when that cache is valid, replace at least one file from the verified source, and finish `UPDATE PASS` with an atomic commit.
 
-These helpers exist only to deterministically exercise the manager branches. They do not fabricate Steam content or credentials.
+These helpers deterministically exercise manager branches; they do not fabricate Steam content or credentials.
 
 ## Explicitly not included
 
-Step 12.2.1 does **not** add multi-depot app composition, compatibility inventory, Mono.Cecil rewriting, Godot/runtime execution, Steam Cloud, or Workshop.
+Step 12.3 does **not** add multi-depot app composition, compatibility inventory, Mono.Cecil rewriting, Godot/runtime execution, Steam Cloud, or Workshop.
 
 See `docs/STEP-12-TEST.md` for the physical-device completion gate.
