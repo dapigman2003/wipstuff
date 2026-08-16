@@ -20,6 +20,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamResumableDepotDownloadAttempt _resumableDepotDownloadAttempt;
     private readonly SteamManagedInstallAttempt _managedInstallAttempt;
     private readonly SteamDownloadCacheMaintenance _downloadCacheMaintenance;
+    private readonly SteamOfflineInstallInspection _offlineInstallInspection;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -42,6 +43,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _resumableDepotDetailLabel;
     private UILabel? _managedInstallResultLabel;
     private UILabel? _managedInstallDetailLabel;
+    private UILabel? _offlineInstallResultLabel;
+    private UILabel? _offlineInstallDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -59,6 +62,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _prepareUpdateTestButton;
     private UIButton? _clearDownloadCacheButton;
     private UIButton? _prepareFreshDownloadTestButton;
+    private UIButton? _offlineInstallButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -89,6 +93,7 @@ public sealed class RootViewController : UIViewController
             _sessionStore,
             launcherDataRoot);
         _downloadCacheMaintenance = new SteamDownloadCacheMaintenance(launcherDataRoot);
+        _offlineInstallInspection = new SteamOfflineInstallInspection(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -134,22 +139,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 12.4.1 — DOWNLOAD CACHE TEST CONTROL",
+            "STEP 13 — OFFLINE LAUNCHER STATE",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.39",
+            "Version 0.0.40",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "APP ID 2868840 • ONE PUBLIC DEPOT • MANAGED INSTALL + UPDATE + REPAIR",
+            "APP ID 2868840 • VERIFIED LOCAL MANAGED INSTALL • OFFLINE STATE",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–12 are complete on the physical iPhone. Step 12.4.1 adds maintenance/test controls only: no Step 13 behavior is added. The proven Step 12.4 stabilization remains intact. You can now delete only the project-owned Step 11 download cache while preserving the managed install and saved Steam session, or prepare a forced fresh-download regression by making the local update receipt stale and then clearing that cache. Multi-depot composition, offline-state work, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
+            "Steps 01–12 are complete on the physical iPhone. Step 13 adds exactly one capability: derive an offline launcher state from the already-managed Step 12 install using only the local source-generated receipt and exact file SHA-1 verification. The Step 13 check does not consult the saved Steam session, open a Steam connection, or claim that the installed manifest is still the newest online version. Game launch, compatibility inspection, multi-depot composition, Godot, Cloud, and Workshop remain out of scope.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -408,11 +413,34 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_managedInstallDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 13 — offline launcher state",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _offlineInstallButton = SystemButton("Verify Offline-Ready Install (Local Only)", 17);
+        _offlineInstallButton.TouchUpInside += async (_, _) => await RunOfflineInstallInspectionAsync();
+        content.AddArrangedSubview(_offlineInstallButton);
+
+        _offlineInstallResultLabel = Label(
+            "OFFLINE STATE: NOT CHECKED",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_offlineInstallResultLabel);
+
+        _offlineInstallDetailLabel = Label(
+            "Physical Step 13 gate: keep the already-proven Step 12 managed install, enable Airplane Mode and disable Wi-Fi, force-quit/relaunch, let the saved-session attempt finish or time out without clearing the token, then run this local-only check. It must hash-verify the exact managed tree and report OFFLINE READY PASS without consulting Steam/session state. Manifest freshness is intentionally UNKNOWN offline, and Play remains unimplemented.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_offlineInstallDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
 
-        _cancelOperationButton = SystemButton("Cancel Current Steam Operation", 15);
+        _cancelOperationButton = SystemButton("Cancel Current Operation", 15);
         _cancelOperationButton.Enabled = false;
         _cancelOperationButton.TouchUpInside += (_, _) => _operationCts?.Cancel();
         content.AddArrangedSubview(_cancelOperationButton);
@@ -420,7 +448,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–12 COMPLETE on the physical iPhone. Step 12.4.1 is maintenance/test-only; Step 13 has not started. Step 12.4 remains the stabilized baseline behavior. New controls can clear only the Step 11 source cache, or pair a synthetic UpdateAvailable receipt with a cleared cache to force a genuine fresh CDN acquisition on the next manager run.",
+            "Status: Steps 01–12 COMPLETE on the physical iPhone. Step 13 is the current single-capability boundary: prove OfflineReady from the existing verified local install with no Steam/session/network dependency. No game launch or later-phase work is included.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -439,7 +467,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 12.4.1: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 13: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1273,6 +1301,88 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunOfflineInstallInspectionAsync()
+    {
+        if (_offlineInstallResultLabel is null || _offlineInstallDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation();
+        _offlineInstallResultLabel.Text = "OFFLINE STATE: VERIFYING LOCAL INSTALL…";
+        _offlineInstallResultLabel.TextColor = UIColor.Label;
+        _offlineInstallDetailLabel.Text =
+            "Local-only Step 13 verification started. Reading the Step 12 receipt and hashing managed files; no Steam session or network API is used by this check.";
+        _statusLabel.Text = "STEP 13 LOCAL CHECK RUNNING — exact receipt/file verification only; online manifest freshness intentionally unknown.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var progress = new Progress<SteamOfflineInstallProgress>(value =>
+            {
+                InvokeOnMainThread(() =>
+                {
+                    if (_offlineInstallResultLabel is null || _offlineInstallDetailLabel is null)
+                        return;
+
+                    _offlineInstallResultLabel.Text = $"OFFLINE STATE: {value.Phase.ToString().ToUpperInvariant()}";
+                    _offlineInstallResultLabel.TextColor = UIColor.Label;
+                    _offlineInstallDetailLabel.Text =
+                        $"{value.Message}\nFiles: {value.CompletedFiles}/{value.TotalFiles}\nBytes: {value.CompletedBytes}/{value.TotalBytes}" +
+                        (string.IsNullOrWhiteSpace(value.CurrentFile) ? string.Empty : $"\nCurrent: {value.CurrentFile}");
+                });
+            });
+
+            var result = await _offlineInstallInspection.RunAsync(
+                progress,
+                _operationCts!.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _offlineInstallResultLabel.Text = result.Summary;
+                _offlineInstallResultLabel.TextColor = result.Outcome switch
+                {
+                    SteamOfflineInstallOutcome.OfflineReady => UIColor.Label,
+                    SteamOfflineInstallOutcome.NoManagedInstall => UIColor.SystemOrange,
+                    SteamOfflineInstallOutcome.Cancelled => UIColor.SecondaryLabel,
+                    _ => UIColor.SystemRed,
+                };
+                _offlineInstallDetailLabel.Text = FormatOfflineInstallDetail(result);
+                _statusLabel.Text = result.Outcome switch
+                {
+                    SteamOfflineInstallOutcome.OfflineReady =>
+                        "PASS: Step 13 local state is OfflineReady. The managed install was verified without consulting Steam/session/network; online manifest freshness remains unknown until an online manager check.",
+                    SteamOfflineInstallOutcome.NoManagedInstall =>
+                        "OFFLINE SETUP REQUIRED: no Step 12 managed install exists. Reconnect and complete the legitimate online setup path first.",
+                    SteamOfflineInstallOutcome.Cancelled =>
+                        "Step 13 local verification cancelled; no managed files were changed.",
+                    _ =>
+                        $"OFFLINE REPAIR REQUIRED: {result.Error ?? result.Outcome.ToString()}. Reconnect and use the proven Step 12 manager before treating the install as offline-ready.",
+                };
+                _statusLabel.TextColor = result.Outcome switch
+                {
+                    SteamOfflineInstallOutcome.OfflineReady => UIColor.Label,
+                    SteamOfflineInstallOutcome.Cancelled => UIColor.SecondaryLabel,
+                    SteamOfflineInstallOutcome.NoManagedInstall => UIColor.SystemOrange,
+                    _ => UIColor.SystemRed,
+                };
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _offlineInstallResultLabel.Text = "OFFLINE CHECK: EXCEPTION";
+                _offlineInstallResultLabel.TextColor = UIColor.SystemRed;
+                _offlineInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 13 local-only inspection.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
     private async Task PrepareRepairTestAsync()
     {
         if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
@@ -1483,6 +1593,7 @@ public sealed class RootViewController : UIViewController
         if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = false;
         if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = false;
         if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = false;
+        if (_offlineInstallButton is not null) _offlineInstallButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = allowCancel;
     }
@@ -1502,6 +1613,7 @@ public sealed class RootViewController : UIViewController
         if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = true;
         if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = true;
         if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = true;
+        if (_offlineInstallButton is not null) _offlineInstallButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
@@ -1845,6 +1957,34 @@ public sealed class RootViewController : UIViewController
         lines.Add("Manifest delta/update migration: NOT IMPLEMENTED");
         lines.Add("Update/install/repair orchestration: NOT IMPLEMENTED");
         lines.Add("Multi-depot app install: NOT IMPLEMENTED");
+        return string.Join("\n", lines);
+    }
+
+    private static string FormatOfflineInstallDetail(SteamOfflineInstallResult result)
+    {
+        var lines = new List<string>
+        {
+            $"State: {result.State}",
+            $"Managed directory found: {YesNo(result.ManagedDirectoryFound)}",
+            $"Receipt found: {YesNo(result.ReceiptFound)}",
+            $"Receipt structurally valid: {YesNo(result.ReceiptStructurallyValid)}",
+            $"Depot: {result.DepotId?.ToString() ?? "N/A"}",
+            $"Installed manifest recorded locally: {result.InstalledManifestId?.ToString() ?? "N/A"}",
+            $"Branch recorded locally: {result.Branch ?? "N/A"}",
+            $"Files verified: {result.VerifiedFiles}/{result.PlannedFiles}",
+            $"Bytes verified: {result.VerifiedBytes}/{result.PlannedBytes}",
+            $"Exact managed tree verified: {YesNo(result.ExactManagedTreeVerified)}",
+            $"Steam session consulted: {YesNo(result.SteamSessionConsulted)}",
+            $"Network access attempted by Step 13 check: {YesNo(result.NetworkAccessAttempted)}",
+            $"Online manifest freshness known: {YesNo(result.OnlineManifestFreshnessKnown)}",
+            $"Managed install: {result.ManagedInstallRelativePath ?? "N/A"}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+            "Game launch / compatibility preparation: NOT IMPLEMENTED",
+        };
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
         return string.Join("\n", lines);
     }
 
