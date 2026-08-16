@@ -14,3 +14,7 @@ Host tests retain the older foundation/auth/session/ownership/discovery/content 
 Physical-device proof remains mandatory because host tests cannot establish iOS lifecycle behavior, abrupt process termination, Keychain behavior, Steam CM/CDN connectivity, filesystem persistence, or atomic directory behavior on the actual device.
 
 See `STEP-11-TEST.md` for the required force-quit/relaunch/resume sequence.
+
+
+## Step 12
+See `STEP-12-TEST.md` for install / update / repair manager verification.

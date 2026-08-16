@@ -1,24 +1,12 @@
 # Current status
 
-- Steps 01–05: **complete and physically verified**.
-- Foundation: `FOUNDATION PASS — 5/5`.
-- Core: `12/12`.
-- Real iOS Keychain regression: `7/7`.
-- Steam CM connection: `3/3`.
-- Steps 06–06.3.1: **passed** — authentication, mobile Guard, Keychain persistence, and saved-session recovery.
-- Step 07: **passed on physical iPhone** — exact App ID `2868840`, `EResult.OK`, non-empty ownership ticket.
-- Step 08: **passed on physical iPhone** — PICS depot IDs and visible branch manifest IDs.
-- Step 09: **passed on physical iPhone** — one controlled file downloaded, reconstructed, SHA-1 verified and persisted.
-- Step 10: **passed on physical iPhone** — one selected public depot completed with queue/progress/cancel/staging cleanup and atomic final-directory commit.
-- Current source step: **Step 11**.
-- App version: **0.0.32 / build 32**.
-- New boundary: interrupted-download resume for that same one-depot model.
-- Resume staging: deterministic per `<depot>-<manifest>` beneath `Documents/StS2Launcher/Step11-ResumableDepot/.resume/`.
-- Complete staged-file reuse: requires full manifest SHA-1.
-- Partial-file reuse: each candidate chunk must match the manifest Adler-32 checksum before it is skipped.
-- Final integrity gate: every file must match the manifest SHA-1.
-- Completion gate: final directory appears only after validation of the full staging tree and one atomic directory rename.
-- Cancel/timeout/transient failure: staging is deliberately preserved for a later retry.
-- Force-quit/process termination: no cleanup handler is required; the next run discovers and revalidates the deterministic staging tree.
-- PICS token / depot key / manifest request code / CDN auth token: **never exposed by result telemetry or persisted**.
-- Update/install/repair / manifest delta migration / multi-depot app install / Godot / Cloud / Workshop: **not implemented**.
+**Steps 01–11: complete on physical iPhone.**
+
+**Current source boundary: Step 12 — install / update / repair manager for one selected direct public depot.**
+
+App version: `0.0.33 (33)`.
+Codemagic workflow: `ios-step-12`.
+
+Step 12 keeps Step 11 as the verified resumable Steam acquisition engine and adds stable local install-state classification, a non-secret integrity receipt, complete verified staging, local-file reuse, repair, update-state handling, and rollback-safe replacement.
+
+Later boundaries remain excluded: multi-depot composition, compatibility inventory, Godot/runtime execution, Cloud, Workshop.

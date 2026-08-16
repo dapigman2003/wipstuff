@@ -18,6 +18,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamSingleFileDownloadAttempt _singleFileDownloadAttempt;
     private readonly SteamFullDepotDownloadAttempt _fullDepotDownloadAttempt;
     private readonly SteamResumableDepotDownloadAttempt _resumableDepotDownloadAttempt;
+    private readonly SteamManagedInstallAttempt _managedInstallAttempt;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -38,6 +39,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _fullDepotDetailLabel;
     private UILabel? _resumableDepotResultLabel;
     private UILabel? _resumableDepotDetailLabel;
+    private UILabel? _managedInstallResultLabel;
+    private UILabel? _managedInstallDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -50,6 +53,9 @@ public sealed class RootViewController : UIViewController
     private UIButton? _singleFileButton;
     private UIButton? _fullDepotButton;
     private UIButton? _resumableDepotButton;
+    private UIButton? _managedInstallButton;
+    private UIButton? _prepareRepairTestButton;
+    private UIButton? _prepareUpdateTestButton;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
@@ -73,6 +79,9 @@ public sealed class RootViewController : UIViewController
             _sessionStore,
             Path.Combine(documentsRoot, "StS2Launcher"));
         _resumableDepotDownloadAttempt = new SteamResumableDepotDownloadAttempt(
+            _sessionStore,
+            Path.Combine(documentsRoot, "StS2Launcher"));
+        _managedInstallAttempt = new SteamManagedInstallAttempt(
             _sessionStore,
             Path.Combine(documentsRoot, "StS2Launcher"));
     }
@@ -120,22 +129,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 11 — INTERRUPTED-DOWNLOAD RESUME",
+            "STEP 12 — INSTALL / UPDATE / REPAIR MANAGER",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.32",
+            "Version 0.0.33",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "APP ID 2868840 • ONE PUBLIC DEPOT • CRASH-SAFE RESUME + ATOMIC COMMIT",
+            "APP ID 2868840 • ONE PUBLIC DEPOT • MANAGED INSTALL + UPDATE + REPAIR",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 11 preserves the proven Step 10 full-depot queue and adds only interrupted-download resume. The resume staging path is deterministic for the selected depot/manifest. After a force-quit, relaunch, cancellation, timeout, or transient failure, complete staged files are re-proven by SHA-1 and partial files are scanned chunk-by-chunk with Steam's manifest Adler-32 checksums. Only missing/corrupt chunks are fetched again. The final depot still appears only after every file passes SHA-1 and one atomic directory rename. Update/repair/install orchestration, manifest delta updates, multi-depot app installation, Godot, Cloud, and Workshop remain out of scope.",
+            "Step 12 preserves the proven Step 11 resumable downloader and adds one managed-install boundary for the selected direct public depot. The manager discovers the current public manifest, classifies local state as Not Installed / Up To Date / Update Available / Repair Needed, acquires a fully verified Step 11 source when work is required, stages a complete verified replacement, and only then atomically swaps the stable managed-install directory. The previous good install is retained until commit and restored if replacement fails. Multi-depot app composition, compatibility inspection, Godot, Cloud, and Workshop remain out of scope.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -355,6 +364,37 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_resumableDepotDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 12 — install / update / repair manager",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _managedInstallButton = SystemButton("Inspect + Install / Update / Repair", 17);
+        _managedInstallButton.TouchUpInside += async (_, _) => await RunManagedInstallAsync();
+        content.AddArrangedSubview(_managedInstallButton);
+
+        _prepareRepairTestButton = SystemButton("Prepare Repair Test (Corrupt One Managed File)", 15);
+        _prepareRepairTestButton.TouchUpInside += async (_, _) => await PrepareRepairTestAsync();
+        content.AddArrangedSubview(_prepareRepairTestButton);
+
+        _prepareUpdateTestButton = SystemButton("Prepare Update-State Test (Stale Local Receipt Only)", 15);
+        _prepareUpdateTestButton.TouchUpInside += async (_, _) => await PrepareUpdateStateTestAsync();
+        content.AddArrangedSubview(_prepareUpdateTestButton);
+
+        _managedInstallResultLabel = Label(
+            "INSTALL MANAGER: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_managedInstallResultLabel);
+
+        _managedInstallDetailLabel = Label(
+            "First run proves Install. The repair-test button mutates one managed file locally, then the manager must classify Repair Needed and restore it. The update-state test changes only the project-owned local receipt manifest ID, then the manager must classify Update Available and replace the managed tree from the current Steam manifest. No Steam content or credential is fabricated by either test helper.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_managedInstallDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -367,7 +407,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Step 10 passed on the physical iPhone. Step 11 is ready to prove an interrupted depot download can resume after process termination without re-downloading checksum-valid data.",
+            "Status: Step 11 passed on the physical iPhone. Step 12 is ready to prove stable install, deterministic update-state handling, and repair while preserving the last good managed install until atomic commit.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -386,7 +426,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 11: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 12: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1150,6 +1190,113 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunManagedInstallAsync()
+    {
+        if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
+            return;
+
+        BeginSteamOperation();
+        _managedInstallResultLabel.Text = "INSTALL MANAGER: INSPECTING…";
+        _managedInstallResultLabel.TextColor = UIColor.Label;
+        _managedInstallDetailLabel.Text =
+            "Discovering the current public manifest, verifying the stable managed install, then performing exactly one of: no-op, install, update, or repair. Any replacement is fully staged and verified before the prior good install is swapped out.";
+        _statusLabel.Text = "STEP 12 RUNNING — previous good managed install remains authoritative until atomic commit.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        var progress = new Progress<SteamManagedInstallProgress>(value =>
+        {
+            if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null)
+                return;
+            _managedInstallResultLabel.Text = $"INSTALL MANAGER: {value.Phase.ToString().ToUpperInvariant()}";
+            _managedInstallResultLabel.TextColor = UIColor.Label;
+            _managedInstallDetailLabel.Text =
+                $"{value.Message}\n" +
+                $"Files: {value.CompletedFiles}/{value.TotalFiles}\n" +
+                $"Bytes: {value.CompletedBytes}/{value.TotalBytes}\n" +
+                $"Current file: {value.CurrentFile ?? "none"}";
+        });
+
+        try
+        {
+            var result = await _managedInstallAttempt.RunAsync(
+                TimeSpan.FromMinutes(90),
+                progress,
+                _operationCts!.Token);
+
+            InvokeOnMainThread(() =>
+            {
+                _managedInstallResultLabel.Text = result.Summary;
+                _managedInstallResultLabel.TextColor = result.Success
+                    ? UIColor.Label
+                    : result.Outcome is SteamManagedInstallOutcome.Cancelled or SteamManagedInstallOutcome.TimedOut
+                        ? UIColor.SystemOrange
+                        : UIColor.SystemRed;
+                _managedInstallDetailLabel.Text = FormatManagedInstallDetail(result);
+                _statusLabel.Text = result.Success
+                    ? $"PASS: Step 12 state {result.StateBefore} -> {result.StateAfter}; action {result.ActionTaken}; stable managed install is verified and current."
+                    : $"Step 12 did not complete: {result.Error ?? result.Outcome.ToString()}. The prior good install was preserved when one existed.";
+                _statusLabel.TextColor = result.Success ? UIColor.Label : UIColor.SystemRed;
+            });
+        }
+        catch (Exception ex)
+        {
+            InvokeOnMainThread(() =>
+            {
+                _managedInstallResultLabel.Text = "INSTALL MANAGER: EXCEPTION";
+                _managedInstallResultLabel.TextColor = UIColor.SystemRed;
+                _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "FAIL: unhandled exception during Step 12 install/update/repair manager.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            });
+        }
+        finally
+        {
+            InvokeOnMainThread(EndSteamOperation);
+        }
+    }
+
+    private async Task PrepareRepairTestAsync()
+    {
+        if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
+            return;
+        try
+        {
+            var relative = await _managedInstallAttempt.PrepareRepairTestAsync();
+            _managedInstallResultLabel.Text = "REPAIR TEST PREPARED";
+            _managedInstallResultLabel.TextColor = UIColor.SystemOrange;
+            _managedInstallDetailLabel.Text = $"Intentionally changed one local byte in managed file: {relative}\nRun Inspect + Install / Update / Repair now. It must report StateBefore=RepairNeeded and finish REPAIR PASS.";
+            _statusLabel.Text = "Repair test prepared locally; no Steam credential/content request was made by the test helper.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+        }
+        catch (Exception ex)
+        {
+            _managedInstallResultLabel.Text = "REPAIR TEST PREP FAILED";
+            _managedInstallResultLabel.TextColor = UIColor.SystemRed;
+            _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+        }
+    }
+
+    private async Task PrepareUpdateStateTestAsync()
+    {
+        if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
+            return;
+        try
+        {
+            var simulatedManifest = await _managedInstallAttempt.PrepareUpdateStateTestAsync();
+            _managedInstallResultLabel.Text = "UPDATE-STATE TEST PREPARED";
+            _managedInstallResultLabel.TextColor = UIColor.SystemOrange;
+            _managedInstallDetailLabel.Text = $"Changed only the project-owned local install receipt to stale manifest ID {simulatedManifest}. Game files were not modified. Run Inspect + Install / Update / Repair now. It must report StateBefore=UpdateAvailable and finish UPDATE PASS using Steam's actual current public manifest.";
+            _statusLabel.Text = "Update-state test prepared locally; the next manager run must replace the stale-receipt state from current Steam metadata.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+        }
+        catch (Exception ex)
+        {
+            _managedInstallResultLabel.Text = "UPDATE TEST PREP FAILED";
+            _managedInstallResultLabel.TextColor = UIColor.SystemRed;
+            _managedInstallDetailLabel.Text = $"{ex.GetType().Name}: {ex.Message}";
+        }
+    }
+
     private void ClearSavedSession()
     {
         if (_statusLabel is null)
@@ -1236,6 +1383,9 @@ public sealed class RootViewController : UIViewController
         if (_singleFileButton is not null) _singleFileButton.Enabled = false;
         if (_fullDepotButton is not null) _fullDepotButton.Enabled = false;
         if (_resumableDepotButton is not null) _resumableDepotButton.Enabled = false;
+        if (_managedInstallButton is not null) _managedInstallButton.Enabled = false;
+        if (_prepareRepairTestButton is not null) _prepareRepairTestButton.Enabled = false;
+        if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = true;
     }
@@ -1250,6 +1400,9 @@ public sealed class RootViewController : UIViewController
         if (_singleFileButton is not null) _singleFileButton.Enabled = true;
         if (_fullDepotButton is not null) _fullDepotButton.Enabled = true;
         if (_resumableDepotButton is not null) _resumableDepotButton.Enabled = true;
+        if (_managedInstallButton is not null) _managedInstallButton.Enabled = true;
+        if (_prepareRepairTestButton is not null) _prepareRepairTestButton.Enabled = true;
+        if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = true;
         if (_signOutButton is not null) _signOutButton.Enabled = true;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
@@ -1592,6 +1745,48 @@ public sealed class RootViewController : UIViewController
         lines.Add("Manifest delta/update migration: NOT IMPLEMENTED");
         lines.Add("Update/install/repair orchestration: NOT IMPLEMENTED");
         lines.Add("Multi-depot app install: NOT IMPLEMENTED");
+        return string.Join("\n", lines);
+    }
+
+    private static string FormatManagedInstallDetail(SteamManagedInstallResult result)
+    {
+        var lines = new List<string>
+        {
+            $"Target AppID: {result.TargetAppId}",
+            $"Selected depot: {result.DepotId?.ToString() ?? "N/A"}",
+            $"Current public manifest: {result.CurrentManifestId?.ToString() ?? "N/A"}",
+            $"Installed manifest before: {result.InstalledManifestIdBefore?.ToString() ?? "none"}",
+            $"Installed manifest after: {result.InstalledManifestIdAfter?.ToString() ?? "none"}",
+            $"Branch: {result.Branch ?? "N/A"}",
+            $"State before: {result.StateBefore}",
+            $"Action taken: {result.ActionTaken}",
+            $"State after: {result.StateAfter}",
+            $"Planned files: {result.PlannedFiles}",
+            $"Planned bytes: {result.PlannedBytes}",
+            $"Verified source files/bytes: {result.VerifiedSourceFiles} / {result.VerifiedSourceBytes}",
+            $"Reused locally verified files/bytes: {result.ReusedLocalFiles} / {result.ReusedLocalBytes}",
+            $"Replaced files/bytes: {result.ReplacedFiles} / {result.ReplacedBytes}",
+            $"Previous install preserved until commit: {YesNo(result.ExistingInstallPreservedUntilCommit)}",
+            $"Atomic commit completed: {YesNo(result.AtomicCommitCompleted)}",
+            $"Rollback restored previous install: {YesNo(result.RollbackRestoredPreviousInstall)}",
+            $"Staging absent after result: {YesNo(result.StagingAbsentAfterResult)}",
+            $"Backup absent after result: {YesNo(result.BackupAbsentAfterResult)}",
+            $"Managed install relative path: {result.ManagedInstallRelativePath ?? "not-installed"}",
+            $"Verified Step 11 source cache: {result.SourceCacheRelativePath ?? "not-needed"}",
+            $"Elapsed: {result.Elapsed.TotalSeconds:F1}s",
+        };
+
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            lines.Add($"Error: {result.Error}");
+
+        lines.Add("Managed receipt contents: AppID/depot/manifest/branch + relative path/length/SHA-1 only");
+        lines.Add("Steam refresh token/password/Guard persistence in install receipt: NONE");
+        lines.Add("Depot key / manifest request code / CDN auth token persistence in install receipt: NONE");
+        lines.Add("Previous good install visibility during staging: PRESERVED");
+        lines.Add("Partial replacement visibility: NONE — replacement becomes live only at directory swap");
+        lines.Add("Multi-depot app composition: NOT IMPLEMENTED");
+        lines.Add("Compatibility inventory / Cecil / Godot / game launch: NOT RUN");
+        lines.Add("Steam Cloud / Workshop: NOT RUN");
         return string.Join("\n", lines);
     }
 

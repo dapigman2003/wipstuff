@@ -21,13 +21,13 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 11 environment ==="
+  echo "=== StS2 Launcher Step 12 environment ==="
   date -u
   uname -a
   xcodebuild -version
   xcrun --sdk iphoneos --show-sdk-version
   sw_vers
-} | tee artifacts/logs/step11-environment.log
+} | tee artifacts/logs/step12-environment.log
 
 NEED_DOTNET=1
 if [[ -x "$DOTNET_ROOT/dotnet" ]]; then
@@ -50,7 +50,7 @@ fi
   exit 3
 }
 
-bash scripts/validate-step11.sh | tee artifacts/logs/step11-validation.log
+bash scripts/validate-step12.sh | tee artifacts/logs/step12-validation.log
 bash scripts/run-unit-tests.sh
 
 WORKLOAD_CWD="$(mktemp -d)"
@@ -59,16 +59,16 @@ trap 'rm -rf "$WORKLOAD_CWD"' EXIT
   cd "$WORKLOAD_CWD"
   "$DOTNET_ROOT/dotnet" workload install ios --version "$DOTNET_WORKLOAD_SET"
   "$DOTNET_ROOT/dotnet" workload --info
-) | tee artifacts/logs/step11-workload.log
+) | tee artifacts/logs/step12-workload.log
 rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
-bash scripts/build-step11.sh 2>&1 | tee artifacts/logs/step11-wrapper.log
-bash scripts/verify-step11-ipa.sh artifacts/StS2-Launcher-Step-11.ipa \
-  2>&1 | tee artifacts/logs/step11-ipa-verification.log
+bash scripts/build-step12.sh 2>&1 | tee artifacts/logs/step12-wrapper.log
+bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.ipa \
+  2>&1 | tee artifacts/logs/step12-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 11 interrupted-download resume"
+  echo "StS2 Launcher iOS — Step 12 install/update/repair manager"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -78,18 +78,18 @@ bash scripts/verify-step11-ipa.sh artifacts/StS2-Launcher-Step-11.ipa \
   echo "Host unit tests: PASS (required before publish)"
   echo "SteamKit: 3.4.0"
   echo "Foundation regression: retained"
-  echo "Boundary: one selected direct public depot with deterministic manifest-specific resume staging; verified files/chunks are reused after interruption"
+  echo "Boundary: one selected direct public depot managed as Not Installed / Up To Date / Update Available / Repair Needed with verified staging and rollback-safe replacement"
   echo "Steam Guard: Step 06.1 mobile approval retained; no manual code entry"
   echo "Credential persistence: refresh token + identity in iOS Keychain; ShouldRememberPassword=true; password/Guard secrets never stored"
   echo "Ownership: Step 07 ticket gate retained and re-proven before content access"
   echo "Discovery: Step 08 PICS metadata gate retained"
-  echo "Content access: same one direct public depot key + one manifest + complete regular-file queue; only missing/corrupt chunks are fetched after resume validation"
-  echo "Integrity: existing partial chunks use manifest Adler-32 for reuse decisions; every completed file must match manifest SHA-1; final directory appears only after atomic rename"
-  echo "Still absent: update/install/repair orchestration, manifest delta migration, multi-depot app install, Godot, Cloud, Workshop"
-  echo "IPA: artifacts/StS2-Launcher-Step-11.ipa"
+  echo "Content access: Step 11 remains the verified source-acquisition engine; Step 12 manages a stable one-depot install from that verified source"
+  echo "Integrity: Step 12 receipt stores only path/length/SHA-1; complete replacement staging is verified before rollback-safe rename commit and previous install is restored on commit failure"
+  echo "Still absent: multi-depot app composition, compatibility inventory, Godot/runtime execution, Cloud, Workshop"
+  echo "IPA: artifacts/StS2-Launcher-Step-12.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-11.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-12.ipa | awk '{print $1}')"
   fi
-} > artifacts/step11-build-summary.txt
+} > artifacts/step12-build-summary.txt
 
-cat artifacts/step11-build-summary.txt
+cat artifacts/step12-build-summary.txt
