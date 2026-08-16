@@ -15,11 +15,11 @@ ios_proj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').re
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
 
-if plist.get('CFBundleShortVersionString') != '0.0.38' or str(plist.get('CFBundleVersion')) != '38':
-    raise SystemExit('ERROR: source Info.plist must be Step 12.4 version 0.0.38 (38).')
+if plist.get('CFBundleShortVersionString') != '0.0.39' or str(plist.get('CFBundleVersion')) != '39':
+    raise SystemExit('ERROR: source Info.plist must be Step 12.4.1 version 0.0.39 (39).')
 for marker in (
-    '<ApplicationVersion>38</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.38</ApplicationDisplayVersion>',
+    '<ApplicationVersion>39</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.39</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -113,6 +113,7 @@ receipt = Path('src/StS2Launcher.Core/SteamManagedInstallReceipt.cs').read_text(
 result = Path('src/StS2Launcher.Core/SteamManagedInstallResult.cs').read_text()
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 tests = '\n'.join(p.read_text() for p in Path('tests/StS2Launcher.Core.Tests').glob('*.cs'))
+maintenance = Path('src/StS2Launcher.Core/SteamDownloadCacheMaintenance.cs').read_text()
 
 acquire_start = attempt.index('private async Task<(bool Success, SteamResumableDepotDownloadResult? Result, string? SourcePath, string? Error)> AcquireVerifiedSourceAsync(')
 acquire_end = attempt.index('private static async Task<SteamManagedInstallReceipt> BuildReceiptAsync(', acquire_start)
@@ -221,6 +222,35 @@ for marker in (
     if marker not in step11:
         raise SystemExit(f'ERROR: Step 12.4 Step 11 hardening marker missing: {marker}')
 
+# Step 12.4.1 adds maintenance/test controls only. Cache deletion must remain
+# narrowly rooted at Step11-ResumableDepot and must not reference the managed
+# install or Keychain/session storage. The forced test reuses the existing
+# synthetic update preparation, then clears the source cache so the next manager
+# run must perform a fresh current-depot acquisition.
+for marker in (
+    'public const string CacheRelativePath = "Step11-ResumableDepot";',
+    'Directory.Delete(cachePath, recursive: true)',
+    'CacheAbsentAfterClear',
+    'public bool Exists()',
+):
+    if marker not in maintenance:
+        raise SystemExit(f'ERROR: Step 12.4.1 cache-maintenance marker missing: {marker}')
+for forbidden in ('Step12-ManagedInstall', 'SteamSessionStore', 'ICredentialStore', 'Keychain', 'RefreshToken'):
+    if forbidden in maintenance:
+        raise SystemExit(f'ERROR: Step 12.4.1 cache helper broadened beyond Step 11 cache ownership: {forbidden}')
+for marker in (
+    'Clear Download Cache Only (Keep Managed Install)',
+    'Prepare Fresh Download Test (Force Update + Clear Cache)',
+    'await _managedInstallAttempt.PrepareUpdateStateTestAsync()',
+    'Task.Run(_downloadCacheMaintenance.Clear)',
+    'Managed Step 12 install: PRESERVED',
+    'Saved Steam session: PRESERVED',
+):
+    if marker not in root:
+        raise SystemExit(f'ERROR: Step 12.4.1 cache-test UI marker missing: {marker}')
+if 'DownloadCacheMaintenanceDeletesOnlyStep11CacheAndIsIdempotent' not in tests:
+    raise SystemExit('ERROR: Step 12.4.1 must unit-test that cache clear preserves the managed-install tree and is idempotent.')
+
 for marker in (
     'ExistingInstallPreservedUntilCommit', 'AtomicCommitCompleted', 'RollbackRestoredPreviousInstall',
     'StagingAbsentAfterResult', 'BackupAbsentAfterResult', 'SourceCacheReverifiedAgainstCurrentManifest',
@@ -232,7 +262,7 @@ if 'byte[]' in result:
     raise SystemExit('ERROR: Step 12 result must not expose raw content/secret arrays.')
 
 for marker in (
-    'STEP 12.4 — POST-STEP-12 STABILIZATION', 'Version 0.0.38',
+    'STEP 12.4.1 — DOWNLOAD CACHE TEST CONTROL', 'Version 0.0.39',
     'Inspect + Install / Update / Repair', 'Prepare Repair Test (Corrupt One Managed File)',
     'Prepare Update Test (Stale Receipt + One Changed File Identity)', 'RunManagedInstallAsync',
     'FormatManagedInstallDetail', 'State before:', 'Action taken:', 'State after:',
@@ -271,16 +301,17 @@ for stale in ('Step 08:', 'STEP 06.3.1 STARTUP ERROR', 'Step 06 startup exceptio
         raise SystemExit(f'ERROR: stale startup diagnostic label remains after Step 12.4 cleanup: {stale}')
 
 codemagic = Path('codemagic.yaml').read_text()
-for marker in ('ios-step-12-4:', 'artifacts/StS2-Launcher-Step-12.4.ipa', 'artifacts/step12.4-build-summary.txt'):
+for marker in ('ios-step-12-4-1:', 'artifacts/StS2-Launcher-Step-12.4.1.ipa', 'artifacts/step12.4.1-build-summary.txt'):
     if marker not in codemagic:
         raise SystemExit(f'ERROR: Codemagic Step 12 marker missing: {marker}')
 
-print('Step 12.4 stabilization source validation: PASS')
+print('Step 12.4.1 download-cache test-control source validation: PASS')
 print('  Steps 01-12 completed-device regressions retained; no Step 13 capability added')
 print('  One direct public depot is managed as Not Installed / Up To Date / Update Available / Repair Needed')
 print('  Step 11 remains the Steam source-acquisition engine and now revalidates an existing final cache directly against the current Steam manifest')
 print('  iOS TimeoutException failover is retained in Step 11 and backported to the still-exposed Step 09/10 regression paths')
-print('  Step 12.3 current-manifest cache reuse remains intact; Step 12.4 adds receipt/cleanup/resume robustness only')
+print('  Step 12.3 current-manifest cache reuse and Step 12.4 receipt/cleanup/resume hardening remain intact')
+print('  Step 12.4.1 cache helper deletes only Step11-ResumableDepot and supports a forced fresh-download update regression')
 print('  Synthetic update test stales the receipt and changes one smallest-file identity so UPDATE must replace at least one source file before atomic commit')
 print('  Planned file/byte telemetry is retained when source acquisition is cancelled or times out')
 print('  Install/update/repair stage a complete SHA-1 receipt-verified replacement before swap')

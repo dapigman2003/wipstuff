@@ -21,7 +21,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 12.4 stabilization environment ==="
+  echo "=== StS2 Launcher Step 12.4.1 download-cache test-control environment ==="
   date -u
   uname -a
   xcodebuild -version
@@ -64,11 +64,11 @@ rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
 bash scripts/build-step12.sh 2>&1 | tee artifacts/logs/step12-wrapper.log
-bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.4.ipa \
+bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.4.1.ipa \
   2>&1 | tee artifacts/logs/step12-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 12.4 post-Step-12 stabilization"
+  echo "StS2 Launcher iOS — Step 12.4.1 download-cache test control"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -83,13 +83,13 @@ bash scripts/verify-step12-ipa.sh artifacts/StS2-Launcher-Step-12.4.ipa \
   echo "Credential persistence: refresh token + identity in iOS Keychain; ShouldRememberPassword=true; password/Guard secrets never stored"
   echo "Ownership: Step 07 ticket gate retained and re-proven before content access"
   echo "Discovery: Step 08 PICS metadata gate retained"
-  echo "Content access: Step 11 remains the source-acquisition engine; Step 12.4 retains Step 12.3 current-manifest cache revalidation and adds post-completion robustness only"
-  echo "Integrity: Step 12.1 source-generated receipt JSON and Step 12.2/12.2.1 CDN timeout failover/catch ordering are retained; Step 12.3 verified-cache/update behavior is retained; Step 12.4 hardens malformed receipts, receipt temp cleanup, resume accounting, unreadable-cache reacquisition, and legacy Step 09/10 timeout failover"
+  echo "Content access: Step 11 remains the source-acquisition engine; Step 12.4.1 retains the stabilized Step 12 content path and adds only download-cache/fresh-acquisition test controls"
+  echo "Integrity: Step 12.1 source-generated receipt JSON and Step 12.2/12.2.1 CDN timeout failover/catch ordering are retained; Step 12.3 verified-cache/update behavior is retained; Step 12.4 hardening is retained; Step 12.4.1 adds only safe Step 11 download-cache clear / forced fresh-download regression controls"
   echo "Still absent: multi-depot app composition, compatibility inventory, Godot/runtime execution, Cloud, Workshop"
-  echo "IPA: artifacts/StS2-Launcher-Step-12.4.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-12.4.1.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-12.4.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-12.4.1.ipa | awk '{print $1}')"
   fi
-} > artifacts/step12.4-build-summary.txt
+} > artifacts/step12.4.1-build-summary.txt
 
-cat artifacts/step12.4-build-summary.txt
+cat artifacts/step12.4.1-build-summary.txt

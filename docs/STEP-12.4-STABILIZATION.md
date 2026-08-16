@@ -1,6 +1,6 @@
 # Step 12.4 — post-Step-12 stabilization
 
-Step 12 was completed on a physical iPhone in Step 12.3. Step 12.4 adds no Step 13 capability. It is a cleanup and defensive bug-hardening release intended to become the new baseline only after Codemagic and a short physical-device regression pass.
+Step 12 was completed on a physical iPhone in Step 12.3. Step 12.4 added no Step 13 capability. It was a cleanup and defensive bug-hardening release, and its short physical-device regression was subsequently reported working correctly. The already-valid Step 11 cache was reused during that pass, so fresh CDN acquisition was not forced again there.
 
 ## Changes
 
@@ -48,13 +48,13 @@ Step 12 was completed on a physical iPhone in Step 12.3. Step 12.4 adds no Step 
 
 No offline launcher state, multi-depot composition, compatibility inventory, Godot/runtime, Cloud, Workshop, or other Step 13+ work is included.
 
-## Regression gate before adopting 12.4 as the baseline
+## Regression result for adopting 12.4 as the baseline
 
-Run Codemagic workflow `ios-step-12-4`, install `0.0.38 (38)`, then on the physical iPhone:
+The following short regression was used for `ios-step-12-4` / `0.0.38 (38)` on the physical iPhone:
 
 1. Run **Foundation 5/5 Regression** and require `FOUNDATION PASS — 5/5`.
 2. Run **Inspect + Install / Update / Repair** on the existing current install and require `UpToDate -> None -> UpToDate`.
 3. Run **Prepare Repair Test**, then the manager, and require `REPAIR PASS` ending `UpToDate`.
 4. Run **Prepare Update Test**, then the manager, and require `UPDATE PASS`, at least one replaced file, atomic commit, and final `UpToDate`.
 
-The already-completed Step 12 capability remains closed while this stabilization build is being verified. Do not start Step 13 as part of this pass.
+The Step 12 capability remains closed. Step 12.4 is now the stabilized baseline. Step 12.4.1 adds only a download-cache maintenance/fresh-download regression control; see `STEP-12.4.1-CACHE-TEST.md`.

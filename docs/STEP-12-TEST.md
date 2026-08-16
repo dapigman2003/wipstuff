@@ -1,6 +1,6 @@
 # Step 12.3 physical-iPhone completion record
 
-This gate was completed successfully on the physical iPhone with Step 12.3 / `0.0.37 (37)`, closing Step 12. The current cleanup candidate is Step 12.4; see `STEP-12.4-STABILIZATION.md` for its regression-only gate.
+This gate was completed successfully on the physical iPhone with Step 12.3 / `0.0.37 (37)`, closing Step 12. Step 12.4 / `0.0.38` was subsequently exercised as the stabilization baseline. Step 12.4.1 / `0.0.39` adds only cache-maintenance/fresh-download regression controls; see `STEP-12.4.1-CACHE-TEST.md`.
 
 Step 12.1's source-generated receipt JSON and Step 12.2/12.2.1's bounded iOS CDN timeout failover/catch-order fix remain enabled. Step 12.3 adds independently verified current-manifest cache reuse, better source-progress/cancellation telemetry, and a stronger deterministic update capability test.
 
@@ -76,4 +76,4 @@ Only if you want to verify the UI fix: start a manager run that enters source ac
 
 Run **Foundation 5/5 Regression** and require `FOUNDATION PASS — 5/5`.
 
-**Completion status: PASS.** Gates A, B, C, and E were reported successful on the physical iPhone, so Step 12 is closed. Gate D remained optional telemetry coverage. Step 12.4 does not reopen the capability boundary; it is a cleanup/hardening candidate only.
+**Completion status: PASS.** Gates A, B, C, and E were reported successful on the physical iPhone, so Step 12 is closed. Gate D remained optional telemetry coverage. Step 12.4 and Step 12.4.1 do not reopen the capability boundary; they are stabilization/test-maintenance releases only.

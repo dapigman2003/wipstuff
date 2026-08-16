@@ -197,4 +197,39 @@ public sealed class SteamManagedInstallTests
         Assert.IsTrue(properties.Contains(nameof(SteamManagedInstallResult.StagingAbsentAfterResult)));
         Assert.IsTrue(properties.Contains(nameof(SteamManagedInstallResult.BackupAbsentAfterResult)));
     }
+    [TestMethod]
+    public void DownloadCacheMaintenanceDeletesOnlyStep11CacheAndIsIdempotent()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "sts2-cache-maintenance-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var cache = Path.Combine(root, SteamDownloadCacheMaintenance.CacheRelativePath);
+            var managed = Path.Combine(root, "Step12-ManagedInstall", "Depot-2868842");
+            Directory.CreateDirectory(Path.Combine(cache, "complete", "2868842", "123"));
+            Directory.CreateDirectory(Path.Combine(cache, ".resume", "2868842-123"));
+            Directory.CreateDirectory(managed);
+            File.WriteAllText(Path.Combine(cache, "complete", "2868842", "123", "cached.bin"), "cache");
+            File.WriteAllText(Path.Combine(managed, "managed.bin"), "managed");
+
+            var maintenance = new SteamDownloadCacheMaintenance(root);
+            Assert.IsTrue(maintenance.Exists());
+
+            var first = maintenance.Clear();
+            Assert.IsTrue(first.CacheExisted);
+            Assert.IsTrue(first.CacheAbsentAfterClear);
+            Assert.IsFalse(maintenance.Exists());
+            Assert.IsTrue(File.Exists(Path.Combine(managed, "managed.bin")));
+
+            var second = maintenance.Clear();
+            Assert.IsFalse(second.CacheExisted);
+            Assert.IsTrue(second.CacheAbsentAfterClear);
+            Assert.IsTrue(File.Exists(Path.Combine(managed, "managed.bin")));
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+                Directory.Delete(root, recursive: true);
+        }
+    }
+
 }
