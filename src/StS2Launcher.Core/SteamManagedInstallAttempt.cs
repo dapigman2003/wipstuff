@@ -634,8 +634,10 @@ public sealed class SteamManagedInstallAttempt
         try
         {
             await using var stream = new FileStream(receiptPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return await JsonSerializer.DeserializeAsync<SteamManagedInstallReceipt>(
-                stream, SteamManagedInstallReceipt.JsonOptions, token).ConfigureAwait(false);
+            return await JsonSerializer.DeserializeAsync(
+                stream,
+                SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt,
+                token).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
         {
@@ -650,8 +652,9 @@ public sealed class SteamManagedInstallAttempt
             return null;
         try
         {
-            return JsonSerializer.Deserialize<SteamManagedInstallReceipt>(
-                File.ReadAllText(receiptPath), SteamManagedInstallReceipt.JsonOptions);
+            return JsonSerializer.Deserialize(
+                File.ReadAllText(receiptPath),
+                SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt);
         }
         catch
         {
@@ -666,7 +669,11 @@ public sealed class SteamManagedInstallAttempt
         if (File.Exists(tempPath)) File.Delete(tempPath);
         await using (var stream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         {
-            await JsonSerializer.SerializeAsync(stream, receipt, SteamManagedInstallReceipt.JsonOptions, token)
+            await JsonSerializer.SerializeAsync(
+                    stream,
+                    receipt,
+                    SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt,
+                    token)
                 .ConfigureAwait(false);
             await stream.FlushAsync(token).ConfigureAwait(false);
         }

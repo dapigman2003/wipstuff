@@ -1,89 +1,53 @@
-# StS2 Launcher iOS — Step 11
+# StS2 Launcher iOS — Step 12.1
 
 Experimental unofficial iOS launcher/compatibility-host foundation for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Current boundary
 
-**Step 11 — interrupted-download resume for one selected direct public Slay the Spire 2 depot.**
+**Step 12.1 — AOT receipt-serialization hotfix for the existing one-depot install / update / repair manager.**
 
-Steps 01–10 are treated as closed regressions. Step 10 proved that one complete selected public depot can be queued, downloaded into temporary staging, SHA-1 verified file-by-file, cancelled cleanly, and atomically committed on a physical iPhone. Step 11 adds only safe reuse of interrupted staging data.
+Steps 01–11 remain regressions. Step 12.1 keeps the same Step 12 manager boundary and deliberately reuses the proven Step 11 resumable downloader as its Steam acquisition engine instead of creating a second CDN implementation.
 
-The Step 11 operation:
+The first physical-iPhone Step 12 (`0.0.33`) run processed all 428 planned files / 2,323,747,842 bytes but failed before commit with `NotSupportedException: ConstructorContainsNullParameterNames, StS2Launcher.Core.SteamManagedInstallReceipt`. Step 12.1 changes only receipt JSON serialization/deserialization to compile-time `System.Text.Json` source-generated metadata so it is safe under the existing full-trimming policy. See `docs/STEP-12.1-FIX.md`.
 
-1. restores the saved Keychain Steam session;
-2. requires a matching returned SteamID;
-3. re-proves Step 07 ownership for App ID `2868840`;
-4. re-runs Step 08 PICS metadata discovery;
-5. selects one direct depot with a visible `public` manifest using the existing macOS-first policy;
-6. requests the depot key, one manifest request code, and a bounded CDN server set;
-7. downloads the selected manifest in memory and builds the same safe Step 10 file plan;
-8. uses a deterministic resume path tied to the selected depot + manifest;
-9. reuses a complete staged file only after its full manifest SHA-1 passes;
-10. scans an interrupted `.step11.part` file chunk-by-chunk using each Steam manifest chunk's Adler-32 checksum;
-11. downloads only chunks that are missing or fail that local checksum;
-12. flushes each completed chunk to improve process-interruption durability;
-13. requires the complete reconstructed file to pass the manifest SHA-1 before it becomes a completed staged file;
-14. preserves resume staging on user cancellation, timeout, transient failure, or force-quit/process termination;
-15. after every file is verified, validates that staging contains only expected manifest paths and atomically renames it to the final directory.
+The manager:
 
-Paths are isolated beneath:
+1. restores/authenticates the saved Steam session through the existing boundaries;
+2. re-proves ownership and discovers the current public manifest;
+3. selects the same single direct public depot policy used by Steps 09–11;
+4. classifies the stable managed install as `NotInstalled`, `UpToDate`, `UpdateAvailable`, or `RepairNeeded`;
+5. acquires a fully verified manifest-specific Step 11 source only when work is required;
+6. builds a non-secret local receipt containing only AppID/depot/manifest/branch and file path/length/SHA-1;
+7. stages a complete replacement tree, reusing already-valid installed files when hashes match;
+8. verifies the complete staging tree against the receipt;
+9. preserves the previous managed install until commit;
+10. replaces the stable install through a rollback-safe directory-rename commit and restores the prior install if replacement fails.
+
+Stable managed files live beneath:
 
 ```text
-Documents/StS2Launcher/Step11-ResumableDepot/.resume/<depot>-<manifest>/...
-Documents/StS2Launcher/Step11-ResumableDepot/complete/<depot>/<manifest>/...
+Documents/StS2Launcher/Step12-ManagedInstall/Depot-<depot>/...
 ```
 
-No separate resume journal containing Steam keys/tokens is written. The local staged bytes themselves are revalidated against the current manifest.
+The receipt is:
+
+```text
+.sts2launcher-install.json
+```
+
+It contains no Steam password, refresh token, Guard data, ownership ticket, PICS token, depot key, manifest request code, CDN token, or downloaded payload bytes.
+
+## Physical-device proof helpers
+
+After proving the first Install run, Step 12/12.1 includes two local-only diagnostics:
+
+- **Prepare Repair Test** flips one byte in one managed file. The next manager run must classify `RepairNeeded` and finish `REPAIR PASS`.
+- **Prepare Update-State Test** changes only the project-owned local receipt manifest ID. The next manager run must classify `UpdateAvailable`, rediscover Steam's real current manifest, and finish `UPDATE PASS`.
+
+These helpers exist only to deterministically exercise the manager branches. They do not fabricate Steam content or credentials.
 
 ## Explicitly not included
 
-Step 11 does **not** add:
+Step 12.1 does **not** add multi-depot app composition, compatibility inventory, Mono.Cecil rewriting, Godot/runtime execution, Steam Cloud, or Workshop.
 
-- installed-manifest state;
-- updating an already committed depot;
-- old-manifest/new-manifest delta migration;
-- repair orchestration;
-- multi-depot app installation;
-- background downloader service;
-- Godot/game runtime integration;
-- Steam Cloud;
-- Workshop.
-
-## Secret handling
-
-Persisted in the device-bound Keychain:
-
-- Steam account name;
-- SteamID64;
-- Steam refresh token.
-
-Never displayed/logged/persisted by the Step 11 result path:
-
-- Steam password;
-- Steam Guard secret/code;
-- raw ownership-ticket bytes;
-- PICS access-token value;
-- depot decryption-key bytes;
-- manifest request-code value;
-- CDN auth-token value;
-- raw manifest body;
-- raw chunk buffers.
-
-## Proven foundation retained
-
-- UIKit launch/lifecycle;
-- Core self-test 12/12;
-- real iOS Keychain regression 7/7;
-- SteamKit2 3.4.0;
-- WebSocket-only CM connection;
-- `SocketsHttpHandler` for `HttpClientPurpose.CMWebSocket`;
-- `TrimMode=full` with `SteamKit2`, `protobuf-net`, `protobuf-net.Core` trim roots;
-- generated `DiskArbitration` framework removal;
-- isolated/version-aware `Process.StartTime` SteamKit iOS compatibility patch;
-- Steps 06–06.3.1 authentication / Guard / saved-session behavior;
-- Step 07 ownership proof;
-- Step 08 depot/manifest discovery;
-- Step 09 controlled single-file CDN proof;
-- Step 10 complete one-depot queue/cancel/staging/atomic-commit proof.
-
-See `docs/STEP-11-TEST.md` for the physical-device completion gate.
+See `docs/STEP-12-TEST.md` for the physical-device completion gate.
