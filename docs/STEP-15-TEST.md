@@ -7,8 +7,8 @@ Step 15 is the first accelerated subsystem build. Gates are ordered. **Stop at t
 Build Codemagic workflow `ios-step-15`, install the resulting IPA, and confirm the launcher shows:
 
 ```text
-STEP 15 — GODOT FOUNDATION
-Version 0.0.42
+STEP 15.1 — GODOT FOUNDATION HARDENING
+Version 0.0.43
 ```
 
 The first CI build may be longer because Codemagic source-builds Godot 4.5.1-stable. No StS2 game content is packaged into the IPA.
@@ -112,3 +112,13 @@ Step 15 does not test StS2 startup, StS2 managed assemblies, Cecil rewriting, St
 
 The custom embedded host now supplies the two app-level Godot iOS plugin glue hooks (`godot_apple_embedded_plugins_initialize` / `deinitialize`) as intentional no-ops. A normal Godot-exported Xcode app generates these hooks from selected iOS plugins; Step 15 has no iOS plugins and does not use Godot's generated app wrapper. The archive validator now requires both C++ definitions before the .NET/iOS publish stage. Runtime version remains 0.0.42 (42).
 
+
+### Step 15.0.4 native-link hotfix
+
+The combined Godot iOS archive must be linked with normal archive-member selection, not `-force_load`. The Step 15.0.3 final link forced every Godot object member into the executable and therefore pulled mutually exclusive PCRE2 16-bit and 32-bit helper objects that both define `__pcre2_ckd_smul`. Step 15.0.4 sets the Godot NativeReference to `ForceLoad=false`, `SmartLink=false`, retains `-ObjC`, and adds validation against reintroducing force-loading. Runtime/device Gate A-D behavior is unchanged.
+
+### Step 15.1 preflight/runtime hardening
+
+Before the next physical run, the complete Step 15 integration was re-audited. Version `0.0.43 (43)` adds a standalone Apple native-link preflight before .NET publish, immutable Godot commit/toolchain-aware cache validation, symlink-safe Codemagic caching, deterministic archive selection, broader IPA dependency/export verification, explicit one-Godot-start-attempt-per-process safety, non-zero UIKit host bounds checks, UTF-8 path marshaling, and stronger fresh-session render-marker semantics.
+
+The device gate sequence remains A → B → C → D. If Gate B or C fails after native initialization has been entered, **force-quit and relaunch before any retry or unrelated launcher regression**. The UI now enforces this lock instead of merely documenting it.
