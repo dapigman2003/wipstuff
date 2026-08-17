@@ -1,6 +1,6 @@
 workflows:
-  ios-step-15:
-    name: Step 15 - Godot Foundation
+  ios-step-16:
+    name: Step 16 - Managed Preparation Foundation
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -16,14 +16,14 @@ workflows:
         - $HOME/.cache/sts2launcher/godot-step15
 
     scripts:
-      - name: Test + build Step 15 unsigned IPA
+      - name: Test + build Step 16 unsigned IPA
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
-          bash scripts/codemagic-build.sh
+          bash scripts/codemagic-build-step16.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-15.ipa
-      - artifacts/step15-build-summary.txt
+      - artifacts/StS2-Launcher-Step-16.ipa
+      - artifacts/step16-build-summary.txt
       - artifacts/test-results/**
       - artifacts/logs/**

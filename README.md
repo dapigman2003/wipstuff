@@ -1,79 +1,51 @@
-# StS2 Launcher iOS — Step 15.1.1 Native-Preflight Language Hotfix
+# StS2 Launcher iOS — Step 16 Managed Preparation Foundation
 
 Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Project state
 
-**Steps 01–14 are complete and closed on a physical iPhone.** Step 14 physically classified the installed public depot read-only: 428 files / 2,323,747,842 bytes, including 370 managed assemblies and 39 native binaries. It identified three broad iOS-risk classes for later work: desktop-native binaries, dynamic-code/JIT indicators, and platform-specific indicators. Those are triage signals, not proof that every marked path executes.
+**Steps 01–15 are complete and closed on a physical iPhone.** Step 15 physically proved the independent source-built Godot 4.5.1-stable iOS host: native bridge availability, embedded initialization/render-loop control, Metal smoke-scene rendering, physical touch, and UIKit lifecycle forwarding all passed. A small initial-orientation/panel-layout quirk is recorded as non-blocking and is not changed in this release.
 
-This archive is **Step 15.1.1 CI/native-preflight hotfix / runtime `0.0.43 (43)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
+This archive is **Step 16 / runtime `0.0.44 (44)`**, using the accelerated model of one tightly related subsystem with several ordered gates.
 
-## Step 15 subsystem boundary — Godot Foundation
+## Step 16 subsystem — Managed Preparation Foundation
 
-Step 15 builds **Godot 4.5.1-stable from source on the Codemagic macOS runner** as an arm64 iOS static archive and embeds a tiny project-owned Objective-C++ bridge. The normal Godot iOS `main()` symbol is renamed at build time so it cannot compete with the existing .NET/UIKit launcher entry point; Godot's `apple_embedded_main` embedded entry remains available.
+Step 16 adds Mono.Cecil `0.11.6` to the launcher runtime and proves the file-based managed-assembly preparation mechanism before touching any real game assembly.
 
-The physical-device gates are:
+Ordered gates:
 
-- **Gate A — Native availability:** managed `DllImport("__Internal")` resolves the statically linked bridge and it reports exactly Godot `4.5.1-stable`.
-- **Gate B — Engine/render-loop control:** initialize Godot against the launcher-owned smoke project, prove the CADisplayLink render loop can stop and restart, then leave it active.
-- **Gate C — Metal render:** wait for Godot setup to finish, require a Metal-backed rendering layer, and require the smoke scene's fresh render marker while the scene is visibly rendered.
-- **Gate D — Touch/lifecycle:** require a real `InputEventScreenTouch` marker plus focus/background/foreground callbacks forwarded into `OS_AppleEmbedded`.
+- **Gate A — Fixture read:** open a project-owned fixture DLL with Cecil as raw metadata/IL; do not load or execute it.
+- **Gate B — Fixture write/reopen:** write only a launcher-private fixture copy and reopen it successfully.
+- **Gate C — Controlled IL rewrite:** change only the fixture `RewriteMe()` body from constant `7` to `42`, write, reopen, and verify the exact transformation.
+- **Gate D — Real StS2 metadata inspection:** re-prove the Step 13 `OfflineReady` managed tree, then parse the receipt-backed installed managed assemblies one at a time with Cecil, including real `sts2.dll`, without writing/loading/executing them.
 
-The Step 15 bridge mirrors the lifecycle calls used by Godot's normal Apple-embedded app-delegate service, because this project intentionally keeps the already-proven .NET/UIKit app delegate instead of replacing it.
+The only Step 16 writes are under launcher-private `Step16-ManagedPreparation` scratch storage. The real Step 12 managed installation remains read-only.
 
 ## Build
 
 Use Codemagic workflow:
 
 ```text
-ios-step-15
+ios-step-16
 ```
 
 Expected app:
 
 ```text
-0.0.43 (43)
-STEP 15.1 — GODOT FOUNDATION HARDENING
+0.0.44 (44)
+STEP 16 — MANAGED PREPARATION FOUNDATION
 ```
 
 Expected IPA:
 
 ```text
-artifacts/StS2-Launcher-Step-15.ipa
+artifacts/StS2-Launcher-Step-16.ipa
 ```
 
-The first Codemagic run may take materially longer than previous steps because it compiles Godot from source. A fingerprinted Godot static archive is cached for later identical builds.
+The cached/pinned Godot 4.5.1 Step 15 static host is still built/restored and linked so that proven native foundation remains regression-protected.
 
-See `docs/STEP-15-TEST.md` for the ordered physical-iPhone gates.
+See `docs/STEP-16-TEST.md` for physical-iPhone testing.
 
 ## Scope boundary
 
-Step 15 uses only the launcher-owned GDScript smoke project. It does **not** load, rewrite, or execute StS2 managed assemblies; it does not link the desktop StS2 native libraries; it does not add Mono.Cecil; and it does not implement FMOD, Spine, Steamworks-in-game integration, Cloud, Workshop, or actual game launch.
-
-
-## Step 15.0.1 build hotfix
-
-The first Step 15 Codemagic attempt completed the pinned Godot iOS source build, then failed only in the project-owned archive-symbol validator. Step 15.0.1 corrects C++ symbol-mangling validation for `apple_embedded_main` and removes a `grep -q`/`pipefail` SIGPIPE hazard. Runtime code/version and the physical Gate A–D contract are unchanged.
-
-## Step 15.0.2 link hotfix
-
-The next Codemagic run passed the Godot source build and corrected archive validator, then reached the real .NET/iOS native link and failed with `ld: framework 'AudioUnit' not found`. The project-owned `NativeReference` list incorrectly treated the AudioUnit header surface as a standalone iPhoneOS link framework. Step 15.0.2 removes only `AudioUnit` from the app link list, retains `AudioToolbox`, and adds a static regression guard against reintroducing the failed standalone framework request. No launcher runtime/gate behavior changed.
-
-### Step 15.0.3 build hotfix
-
-The custom embedded host now supplies the two app-level Godot iOS plugin glue hooks (`godot_apple_embedded_plugins_initialize` / `deinitialize`) as intentional no-ops. A normal Godot-exported Xcode app generates these hooks from selected iOS plugins; Step 15 has no iOS plugins and does not use Godot's generated app wrapper. The archive validator now requires both C++ definitions before the .NET/iOS publish stage. Runtime version remained 0.0.42 (42).
-
-
-## Step 15.0.4 native-link hotfix
-
-The Step 15.0.3 Codemagic run passed the Godot build, archive validation, AudioUnit correction, and embedded plugin-glue correction, then failed at the final Apple link with duplicate `__pcre2_ckd_smul` definitions from PCRE2 16-bit and 32-bit members inside the combined Godot archive. The app project had incorrectly marked the entire combined archive `ForceLoad=true`, which forces every member into the executable. Step 15.0.4 switches only the Godot `NativeReference` to normal static-archive member selection (`ForceLoad=false`, `SmartLink=false`) while retaining `-ObjC`, C++ linkage, all required Apple frameworks, and every prior Step 15 fix. Runtime version and Gate A-D behavior remained 0.0.42 (42).
-
-
-## Step 15.1 full preflight / stability audit
-
-Before another Codemagic run, Step 15 was reviewed end-to-end. The current candidate now pins the immutable Godot 4.5.1 commit, makes the Godot cache toolchain-aware and symlink-safe, selects the exact combined iOS archive, runs a standalone Xcode native-link preflight before .NET publish, audits every managed native export and final dynamic dependency, and blocks unsafe in-process retries once `apple_embedded_main` has touched Godot process-global state. The smoke render marker now waits for `RenderingServer.frame_post_draw`, so Gate C is tied to a completed renderer frame rather than only scene-tree processing. See `docs/STEP-15.1-PREFLIGHT-STABILITY.md`.
-
-
-## Step 15.1.1 Codemagic hotfix
-
-The runtime remains Step 15.1 / `0.0.43`. The standalone Apple link probe is now compiled in an explicit C++17 stage before linking; see `docs/STEP-15.1.1-NATIVE-PREFLIGHT-LANGUAGE.md`.
+Step 16 does **not** rewrite real StS2 assemblies, execute `sts2.dll`, integrate FMOD/Spine, launch the game, add Cloud, or add Workshop support.
