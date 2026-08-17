@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 15.1 Godot Foundation Preflight / Stability Hardening
+# StS2 Launcher iOS — Step 15.1.1 Native-Preflight Language Hotfix
 
 Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
@@ -6,7 +6,7 @@ Experimental unofficial iOS launcher/compatibility-host project for users who le
 
 **Steps 01–14 are complete and closed on a physical iPhone.** Step 14 physically classified the installed public depot read-only: 428 files / 2,323,747,842 bytes, including 370 managed assemblies and 39 native binaries. It identified three broad iOS-risk classes for later work: desktop-native binaries, dynamic-code/JIT indicators, and platform-specific indicators. Those are triage signals, not proof that every marked path executes.
 
-This archive is **Step 15.1 preflight/stability hardening / runtime `0.0.43 (43)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
+This archive is **Step 15.1.1 CI/native-preflight hotfix / runtime `0.0.43 (43)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
 
 ## Step 15 subsystem boundary — Godot Foundation
 
@@ -72,3 +72,8 @@ The Step 15.0.3 Codemagic run passed the Godot build, archive validation, AudioU
 ## Step 15.1 full preflight / stability audit
 
 Before another Codemagic run, Step 15 was reviewed end-to-end. The current candidate now pins the immutable Godot 4.5.1 commit, makes the Godot cache toolchain-aware and symlink-safe, selects the exact combined iOS archive, runs a standalone Xcode native-link preflight before .NET publish, audits every managed native export and final dynamic dependency, and blocks unsafe in-process retries once `apple_embedded_main` has touched Godot process-global state. The smoke render marker now waits for `RenderingServer.frame_post_draw`, so Gate C is tied to a completed renderer frame rather than only scene-tree processing. See `docs/STEP-15.1-PREFLIGHT-STABILITY.md`.
+
+
+## Step 15.1.1 Codemagic hotfix
+
+The runtime remains Step 15.1 / `0.0.43`. The standalone Apple link probe is now compiled in an explicit C++17 stage before linking; see `docs/STEP-15.1.1-NATIVE-PREFLIGHT-LANGUAGE.md`.

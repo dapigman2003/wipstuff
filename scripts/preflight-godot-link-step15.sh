@@ -66,26 +66,35 @@ done
 
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/sts2-step15-link-preflight.XXXXXX")"
 trap 'rm -rf "$TMP"' EXIT
-SRC="$TMP/preflight.mm"
+SRC="$TMP/preflight.cc"
+OBJ="$TMP/preflight.o"
 OUT="$TMP/preflight"
 LOG="artifacts/logs/step15-native-link-preflight.log"
 mkdir -p artifacts/logs
 
 cat > "$SRC" <<'SRC'
-extern "C" const char *sts2_step15_get_engine_version();
-extern "C" int sts2_step15_start(void *, void *, const char *);
-extern "C" int sts2_step15_requires_process_restart();
-extern "C" int sts2_step15_is_metal_layer_ready();
-extern "C" int sts2_step15_touch_marker_ready();
+extern "C" {
+const char *sts2_step15_get_engine_version(void);
+int sts2_step15_start(void *, void *, const char *);
+int sts2_step15_requires_process_restart(void);
+int sts2_step15_is_metal_layer_ready(void);
+int sts2_step15_touch_marker_ready(void);
+}
 
 // Make the test executable carry real unresolved references into the archive.
-// -O0 plus volatile dispatch prevents the compiler from erasing the roots.
+// Explicit function-pointer types plus volatile dispatch prevent the compiler
+// from erasing the roots while keeping the probe valid C++17.
 int main(int argc, char **argv) {
-    volatile auto version_fn = &sts2_step15_get_engine_version;
-    volatile auto start_fn = &sts2_step15_start;
-    volatile auto restart_fn = &sts2_step15_requires_process_restart;
-    volatile auto metal_fn = &sts2_step15_is_metal_layer_ready;
-    volatile auto touch_fn = &sts2_step15_touch_marker_ready;
+    using VersionFn = const char *(*)(void);
+    using StartFn = int (*)(void *, void *, const char *);
+    using IntFn = int (*)(void);
+
+    volatile VersionFn version_fn = &sts2_step15_get_engine_version;
+    volatile StartFn start_fn = &sts2_step15_start;
+    volatile IntFn restart_fn = &sts2_step15_requires_process_restart;
+    volatile IntFn metal_fn = &sts2_step15_is_metal_layer_ready;
+    volatile IntFn touch_fn = &sts2_step15_touch_marker_ready;
+
     if (argc == -1) {
         return start_fn(nullptr, nullptr, argv ? argv[0] : nullptr);
     }
@@ -122,12 +131,28 @@ done
   echo "ReferenceNativeSymbol roots: $STEP15_ROOT_SYMBOLS"
 } | tee "$LOG"
 
+# Compile the probe in an explicit C++ language mode first. Do not rely on
+# xcrun/driver-name/file-extension inference: Codemagic's Xcode 26.5 worker
+# compiled the earlier .mm probe as Objective-C, which rejected extern "C",
+# auto and nullptr before the linker was reached.
 xcrun --sdk iphoneos clang++ \
   -arch arm64 \
   -isysroot "$SDK_ROOT" \
   -miphoneos-version-min="$DEPLOYMENT_TARGET" \
   -O0 \
-  "$SRC" \
+  -std=c++17 \
+  -x c++ \
+  -c "$SRC" \
+  -o "$OBJ" \
+  2>&1 | tee -a "$LOG"
+
+# Link the already-compiled C++ object against the same normal Godot archive
+# selection, ReferenceNativeSymbol roots, app linker flags and frameworks.
+xcrun --sdk iphoneos clang++ \
+  -arch arm64 \
+  -isysroot "$SDK_ROOT" \
+  -miphoneos-version-min="$DEPLOYMENT_TARGET" \
+  "$OBJ" \
   "$LIB" \
   "${LINK_FLAG_ARGS[@]}" \
   "${FRAMEWORK_ARGS[@]}" \

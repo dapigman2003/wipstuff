@@ -377,6 +377,12 @@ for marker in (
 preflight = Path('scripts/preflight-godot-link-step15.sh').read_text()
 for marker in (
     'xcrun --sdk iphoneos clang++',
+    'SRC="$TMP/preflight.cc"',
+    'OBJ="$TMP/preflight.o"',
+    '-std=c++17',
+    '-x c++',
+    '-c "$SRC"',
+    '"$OBJ"',
     '-miphoneos-version-min="$DEPLOYMENT_TARGET"',
     'NativeBuild/libgodot-step15',
     'sts2_step15_requires_process_restart',
@@ -389,6 +395,8 @@ for marker in (
         raise SystemExit(f'ERROR: Step 15 native-link preflight marker missing: {marker}')
 if '-force_load' in preflight or '-all_load' in preflight:
     raise SystemExit('ERROR: Step 15 native-link preflight must mirror normal archive-member selection.')
+if 'preflight.mm' in preflight:
+    raise SystemExit('ERROR: Step 15 native-link preflight must not depend on Objective-C++ filename inference; use explicit C++ compile mode.')
 
 app_delegate = Path('src/StS2Launcher.Step05.iOS/AppDelegate.cs').read_text()
 if 'public override UIWindow? Window { get; set; }' not in app_delegate:
