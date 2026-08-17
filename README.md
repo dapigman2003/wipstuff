@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 15.0.1 Godot Foundation Build Hotfix
+# StS2 Launcher iOS — Step 15.0.2 Godot Foundation Link Hotfix
 
 Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
@@ -6,7 +6,7 @@ Experimental unofficial iOS launcher/compatibility-host project for users who le
 
 **Steps 01–14 are complete and closed on a physical iPhone.** Step 14 physically classified the installed public depot read-only: 428 files / 2,323,747,842 bytes, including 370 managed assemblies and 39 native binaries. It identified three broad iOS-risk classes for later work: desktop-native binaries, dynamic-code/JIT indicators, and platform-specific indicators. Those are triage signals, not proof that every marked path executes.
 
-This archive is **Step 15.0.1 source hotfix / runtime `0.0.42 (42)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
+This archive is **Step 15.0.2 source hotfix / runtime `0.0.42 (42)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
 
 ## Step 15 subsystem boundary — Godot Foundation
 
@@ -54,3 +54,7 @@ Step 15 uses only the launcher-owned GDScript smoke project. It does **not** loa
 ## Step 15.0.1 build hotfix
 
 The first Step 15 Codemagic attempt completed the pinned Godot iOS source build, then failed only in the project-owned archive-symbol validator. Step 15.0.1 corrects C++ symbol-mangling validation for `apple_embedded_main` and removes a `grep -q`/`pipefail` SIGPIPE hazard. Runtime code/version and the physical Gate A–D contract are unchanged.
+
+## Step 15.0.2 link hotfix
+
+The next Codemagic run passed the Godot source build and corrected archive validator, then reached the real .NET/iOS native link and failed with `ld: framework 'AudioUnit' not found`. The project-owned `NativeReference` list incorrectly treated the AudioUnit header surface as a standalone iPhoneOS link framework. Step 15.0.2 removes only `AudioUnit` from the app link list, retains `AudioToolbox`, and adds a static regression guard against reintroducing the failed standalone framework request. No launcher runtime/gate behavior changed.

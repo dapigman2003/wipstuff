@@ -176,8 +176,12 @@ if [[ ! -x "$SCONS_VENV/bin/scons" ]]; then
 fi
 
 SDK_ROOT="$(xcrun --sdk iphoneos --show-sdk-path)"
+# These are app-link frameworks for the embedded Godot archive. Upstream Godot
+# also adds AudioUnit.framework/Headers to its compile include path, but on the
+# current iPhoneOS SDK that is a header surface rather than a standalone
+# framework we should pass to ld. AudioUnit C APIs are linked via AudioToolbox.
 for framework in \
-  Accelerate AudioToolbox AudioUnit AVFoundation CFNetwork CoreAudio CoreFoundation CoreGraphics \
+  Accelerate AudioToolbox AVFoundation CFNetwork CoreAudio CoreFoundation CoreGraphics \
   CoreHaptics CoreLocation CoreMedia CoreMotion CoreText CoreVideo Foundation GameController ImageIO \
   MediaPlayer Metal MetalFX MetalKit OpenGLES QuartzCore Security SystemConfiguration UIKit UniformTypeIdentifiers \
   VideoToolbox WebKit; do

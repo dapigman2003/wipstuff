@@ -65,6 +65,14 @@ if 'DiskArbitration' not in csproj or '<_LinkerFrameworks Remove="DiskArbitratio
     raise SystemExit('ERROR: proven Step 05 DiskArbitration filter was not preserved.')
 if 'Mono.Cecil' in csproj:
     raise SystemExit('ERROR: Step 15 must not add Mono.Cecil to the runtime project.')
+framework_match = re.search(r'<Frameworks>([^<]+)</Frameworks>', csproj)
+if not framework_match:
+    raise SystemExit('ERROR: Step 15 Godot NativeReference framework list missing.')
+link_frameworks = framework_match.group(1).split()
+if 'AudioToolbox' not in link_frameworks:
+    raise SystemExit('ERROR: Step 15 must retain AudioToolbox for Godot iOS audio symbols.')
+if 'AudioUnit' in link_frameworks:
+    raise SystemExit('ERROR: Step 15 must not request standalone AudioUnit.framework; Xcode 26.5 iPhoneOS link failed with framework not found.')
 
 bridge = Path('native/step15/godot_module/sts2_ios_host/step15_ios_host_bridge.mm').read_text()
 for marker in (
@@ -149,6 +157,8 @@ if 'nm -gU "$lib" 2>/dev/null | grep -q' in build_godot:
     raise SystemExit('ERROR: Step 15 archive validation must not use early-exit grep -q pipelines under pipefail.')
 if "grep -q '_apple_embedded_main'" in build_godot:
     raise SystemExit('ERROR: Step 15 must not assume apple_embedded_main has unmangled C linkage.')
+if re.search(r'Accelerate AudioToolbox\s+AudioUnit\s+AVFoundation', build_godot):
+    raise SystemExit('ERROR: Step 15 build-side framework sanity list must not classify AudioUnit as a standalone link framework.')
 
 smoke_project = Path('native/step15/smoke_project/project.godot').read_text()
 smoke_scene = Path('native/step15/smoke_project/Main.tscn').read_text()

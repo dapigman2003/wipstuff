@@ -18,7 +18,7 @@ The latest proven content inventory is Step 14 / `0.0.41 (41)`. On the installed
 
 The Step 14 evidence is triage only; it did not execute game code.
 
-**Current source candidate:** Step 15.0.1 — Godot Foundation archive-validation hotfix (runtime Step 15 unchanged).
+**Current source candidate:** Step 15.0.2 — Godot Foundation AudioUnit linker hotfix (runtime Step 15 unchanged).
 
 - App version: `0.0.42 (42)`
 - Codemagic workflow: `ios-step-15`
@@ -39,3 +39,5 @@ Step 15 does not load or execute StS2 game content and does not introduce Cecil/
 
 
 **Step 15.0.1 build note:** first Step 15 Codemagic run successfully built Godot 4.5.1-stable, then failed only in the local archive validator because it assumed unmangled C linkage for the Objective-C++ `apple_embedded_main` symbol and used `grep -q` pipelines under `pipefail`. Both validator issues are corrected; runtime remains 0.0.42 (42).
+
+**Step 15.0.2 build note:** the following Codemagic run passed the Godot build and archive validator, then failed at the .NET/iOS native link with `ld: framework 'AudioUnit' not found`. The Step 15 `NativeReference` framework list had incorrectly requested `AudioUnit` as a standalone link framework. Step 15.0.2 removes that one link item while retaining `AudioToolbox`; runtime remains 0.0.42 (42).
