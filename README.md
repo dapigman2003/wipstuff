@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 15.0.2 Godot Foundation Link Hotfix
+# StS2 Launcher iOS — Step 15.1 Godot Foundation Preflight / Stability Hardening
 
 Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
@@ -6,7 +6,7 @@ Experimental unofficial iOS launcher/compatibility-host project for users who le
 
 **Steps 01–14 are complete and closed on a physical iPhone.** Step 14 physically classified the installed public depot read-only: 428 files / 2,323,747,842 bytes, including 370 managed assemblies and 39 native binaries. It identified three broad iOS-risk classes for later work: desktop-native binaries, dynamic-code/JIT indicators, and platform-specific indicators. Those are triage signals, not proof that every marked path executes.
 
-This archive is **Step 15.0.2 source hotfix / runtime `0.0.42 (42)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
+This archive is **Step 15.1 preflight/stability hardening / runtime `0.0.43 (43)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
 
 ## Step 15 subsystem boundary — Godot Foundation
 
@@ -32,8 +32,8 @@ ios-step-15
 Expected app:
 
 ```text
-0.0.42 (42)
-STEP 15 — GODOT FOUNDATION
+0.0.43 (43)
+STEP 15.1 — GODOT FOUNDATION HARDENING
 ```
 
 Expected IPA:
@@ -61,5 +61,14 @@ The next Codemagic run passed the Godot source build and corrected archive valid
 
 ### Step 15.0.3 build hotfix
 
-The custom embedded host now supplies the two app-level Godot iOS plugin glue hooks (`godot_apple_embedded_plugins_initialize` / `deinitialize`) as intentional no-ops. A normal Godot-exported Xcode app generates these hooks from selected iOS plugins; Step 15 has no iOS plugins and does not use Godot's generated app wrapper. The archive validator now requires both C++ definitions before the .NET/iOS publish stage. Runtime version remains 0.0.42 (42).
+The custom embedded host now supplies the two app-level Godot iOS plugin glue hooks (`godot_apple_embedded_plugins_initialize` / `deinitialize`) as intentional no-ops. A normal Godot-exported Xcode app generates these hooks from selected iOS plugins; Step 15 has no iOS plugins and does not use Godot's generated app wrapper. The archive validator now requires both C++ definitions before the .NET/iOS publish stage. Runtime version remained 0.0.42 (42).
 
+
+## Step 15.0.4 native-link hotfix
+
+The Step 15.0.3 Codemagic run passed the Godot build, archive validation, AudioUnit correction, and embedded plugin-glue correction, then failed at the final Apple link with duplicate `__pcre2_ckd_smul` definitions from PCRE2 16-bit and 32-bit members inside the combined Godot archive. The app project had incorrectly marked the entire combined archive `ForceLoad=true`, which forces every member into the executable. Step 15.0.4 switches only the Godot `NativeReference` to normal static-archive member selection (`ForceLoad=false`, `SmartLink=false`) while retaining `-ObjC`, C++ linkage, all required Apple frameworks, and every prior Step 15 fix. Runtime version and Gate A-D behavior remained 0.0.42 (42).
+
+
+## Step 15.1 full preflight / stability audit
+
+Before another Codemagic run, Step 15 was reviewed end-to-end. The current candidate now pins the immutable Godot 4.5.1 commit, makes the Godot cache toolchain-aware and symlink-safe, selects the exact combined iOS archive, runs a standalone Xcode native-link preflight before .NET publish, audits every managed native export and final dynamic dependency, and blocks unsafe in-process retries once `apple_embedded_main` has touched Godot process-global state. The smoke render marker now waits for `RenderingServer.frame_post_draw`, so Gate C is tied to a completed renderer frame rather than only scene-tree processing. See `docs/STEP-15.1-PREFLIGHT-STABILITY.md`.
