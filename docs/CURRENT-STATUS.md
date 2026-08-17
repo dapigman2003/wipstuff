@@ -1,19 +1,38 @@
-# Current status
+# Current project status
 
-**Steps 01–13 are complete and closed on a physical iPhone.**
+**Steps 01–14 are complete and closed on a physical iPhone.**
 
-**Current physically proven baseline:** Step 13.0.1 runtime / `0.0.40 (40)`. The Step 13 local-only gate passed: the legitimate Step 12 managed install became `OfflineReady` without a Steam/session/network dependency, local corruption became `RepairRequired`, repair returned it to a good state, and the prior regressions passed.
+The latest proven content inventory is Step 14 / `0.0.41 (41)`. On the installed public depot it reported:
 
-**Current source candidate:** Step 14 — read-only compatibility inventory.
+- 428 files / 2,323,747,842 bytes;
+- 8 broad asset files / 1,911,841,071 bytes;
+- 1 Godot content file;
+- 370 managed assemblies / 164,655,448 bytes;
+- 39 native binaries / 247,031,344 bytes;
+- 6 Godot/GodotSharp indicator files;
+- 22 FMOD indicator files;
+- 9 Spine indicator files;
+- 98 dynamic-code/JIT indicator files;
+- 273 platform-specific indicator files;
+- three broad potential-iOS-blocker signal classes: desktop-native binaries, dynamic-code/JIT, and platform-specific paths/APIs.
 
-- App version: `0.0.41 (41)`
-- Codemagic workflow: `ios-step-14`
-- Expected IPA: `artifacts/StS2-Launcher-Step-14.ipa`
+The Step 14 evidence is triage only; it did not execute game code.
 
-Step 14 adds one capability only: re-prove `OfflineReady`, then inventory the receipt-backed installed depot for assets, Godot content, managed assemblies, native binaries, GodotSharp/FMOD/Spine indicators, reflection/dynamic-code indicators, and platform-specific pieces.
+**Current source candidate:** Step 15 — Godot Foundation.
 
-The Step 14 inspector has no Steam session/client/HTTP/CDN dependency, does not write the managed install, does not load game assemblies, and does not execute or launch game code.
+- App version: `0.0.42 (42)`
+- Codemagic workflow: `ios-step-15`
+- Godot source pin: `4.5.1-stable`
+- iOS Godot build: arm64 static archive, native Metal enabled, Vulkan/MoltenVK disabled for this foundation boundary
+- Test model: ordered gates A–D; stop at first failure
 
-**Step 14 is not complete until the physical-iPhone inventory gate in `docs/STEP-14-TEST.md` passes and the actual inventory findings are reviewed.**
+Step 15 gates:
 
-No Step 15 Godot-host work or later compatibility rewriting has started.
+A. statically linked Godot bridge/version availability;
+B. embedded engine initialization + CADisplayLink render-loop stop/start;
+C. visible project-owned Godot scene on a Metal rendering layer;
+D. physical touch + app focus/background/foreground forwarding.
+
+Step 15 does not load or execute StS2 game content and does not introduce Cecil/FMOD/Spine/game-runtime integration.
+
+**Step 15 is not complete until all four physical-iPhone gates pass and the existing Foundation 5/5 regression passes after relaunch.**

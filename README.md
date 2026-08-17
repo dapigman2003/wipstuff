@@ -1,58 +1,51 @@
-# StS2 Launcher iOS — Step 14 compatibility inventory
+# StS2 Launcher iOS — Step 15 Godot Foundation
 
 Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Project state
 
-**Steps 01–13 are complete and closed on a physical iPhone.** The physically proven Step 13 runtime is `0.0.40 (40)`: a valid Step 12 managed install can be re-hash-verified as `OfflineReady` with networking unavailable, while deliberately corrupted local content becomes `RepairRequired` and is recoverable through the existing online manager.
+**Steps 01–14 are complete and closed on a physical iPhone.** Step 14 physically classified the installed public depot read-only: 428 files / 2,323,747,842 bytes, including 370 managed assemblies and 39 native binaries. It identified three broad iOS-risk classes for later work: desktop-native binaries, dynamic-code/JIT indicators, and platform-specific indicators. Those are triage signals, not proof that every marked path executes.
 
-This archive is **Step 14 / `0.0.41 (41)`**.
+This archive is **Step 15 / `0.0.42 (42)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
 
-## Step 14 boundary
+## Step 15 subsystem boundary — Godot Foundation
 
-Step 14 adds exactly one capability: a **read-only compatibility inventory** of the already-managed StS2 depot.
+Step 15 builds **Godot 4.5.1-stable from source on the Codemagic macOS runner** as an arm64 iOS static archive and embeds a tiny project-owned Objective-C++ bridge. The normal Godot iOS `main()` symbol is renamed at build time so it cannot compete with the existing .NET/UIKit launcher entry point; Godot's `apple_embedded_main` embedded entry remains available.
 
-Before classifying anything, Step 14 reuses the Step 13 local inspector and requires the managed install to prove `OfflineReady`. It then reads the existing non-secret receipt and inventories the installed files without consulting Steam or modifying/launching the game.
+The physical-device gates are:
 
-The report includes:
+- **Gate A — Native availability:** managed `DllImport("__Internal")` resolves the statically linked bridge and it reports exactly Godot `4.5.1-stable`.
+- **Gate B — Engine/render-loop control:** initialize Godot against the launcher-owned smoke project, prove the CADisplayLink render loop can stop and restart, then leave it active.
+- **Gate C — Metal render:** wait for Godot setup to finish, require a Metal-backed rendering layer, and require the smoke scene's fresh render marker while the scene is visibly rendered.
+- **Gate D — Touch/lifecycle:** require a real `InputEventScreenTouch` marker plus focus/background/foreground callbacks forwarded into `OS_AppleEmbedded`.
 
-- total files/bytes and broad asset counts;
-- Godot content such as `.pck` / project-resource formats;
-- managed assembly candidates recognized by CLR metadata signature;
-- native binary candidates recognized by Mach-O/ELF/PE signatures and native-library paths;
-- Godot/GodotSharp dependency indicators;
-- FMOD indicators;
-- Spine indicators;
-- general reflection indicators;
-- dynamic-code/JIT indicators such as `System.Reflection.Emit`, `DynamicMethod`, builder APIs and `Expression.Compile`;
-- platform-specific file/API indicators;
-- concise potential-iOS-blocker signals and dependency notes.
-
-Managed assemblies are **not loaded or executed**. Step 14 scans only their raw metadata/string bytes for triage indicators. A hit means “inspect this in a later focused boundary”; it does not prove that the corresponding runtime path executes.
+The Step 15 bridge mirrors the lifecycle calls used by Godot's normal Apple-embedded app-delegate service, because this project intentionally keeps the already-proven .NET/UIKit app delegate instead of replacing it.
 
 ## Build
 
 Use Codemagic workflow:
 
 ```text
-ios-step-14
+ios-step-15
 ```
 
 Expected app:
 
 ```text
-0.0.41 (41)
-STEP 14 — COMPATIBILITY INVENTORY
+0.0.42 (42)
+STEP 15 — GODOT FOUNDATION
 ```
 
 Expected IPA:
 
 ```text
-artifacts/StS2-Launcher-Step-14.ipa
+artifacts/StS2-Launcher-Step-15.ipa
 ```
 
-See `docs/STEP-14-TEST.md` for the physical-iPhone gate.
+The first Codemagic run may take materially longer than previous steps because it compiles Godot from source. A fingerprinted Godot static archive is cached for later identical builds.
+
+See `docs/STEP-15-TEST.md` for the ordered physical-iPhone gates.
 
 ## Scope boundary
 
-Step 14 does **not** add Mono.Cecil, rewrite assemblies, compose multiple depots, build/start Godot, load game assemblies, execute native/managed game code, launch StS2, or add Cloud/Workshop features.
+Step 15 uses only the launcher-owned GDScript smoke project. It does **not** load, rewrite, or execute StS2 managed assemblies; it does not link the desktop StS2 native libraries; it does not add Mono.Cecil; and it does not implement FMOD, Spine, Steamworks-in-game integration, Cloud, Workshop, or actual game launch.

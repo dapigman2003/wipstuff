@@ -13,10 +13,10 @@ if ! command -v dotnet >/dev/null 2>&1; then
   exit 2
 fi
 
-echo "=== Step 13 host unit tests (Steps 01-12 regressions + offline state) ==="
+echo "=== Step 15 host unit tests (Steps 01-14 regressions + ordered Godot gate contract) ==="
 dotnet test "$TEST_PROJECT" \
   -c Release \
   --nologo \
   --results-directory "$RESULTS_DIR" \
-  --logger "trx;LogFileName=step12.4.1.trx" \
-  2>&1 | tee artifacts/logs/step12.4.1-unit-tests.log
+  --logger "trx;LogFileName=step15.trx" \
+  2>&1 | tee artifacts/logs/step15-unit-tests.log

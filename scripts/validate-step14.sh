@@ -8,7 +8,10 @@ STS2_VALIDATE_AS_PARENT=1 bash scripts/validate-step13.sh
 
 python3 - <<'PY'
 from pathlib import Path
+import os
 import plistlib
+
+parent_mode = os.environ.get('STS2_VALIDATE_AS_PARENT') == '1'
 
 inspection_path = Path('src/StS2Launcher.Core/SteamCompatibilityInventoryInspection.cs')
 result_path = Path('src/StS2Launcher.Core/SteamCompatibilityInventoryResult.cs')
@@ -28,19 +31,28 @@ tests = tests_path.read_text()
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.41' or str(plist.get('CFBundleVersion')) != '41':
-    raise SystemExit('ERROR: Step 14 must be version 0.0.41 (41).')
+if not parent_mode:
+    if plist.get('CFBundleShortVersionString') != '0.0.41' or str(plist.get('CFBundleVersion')) != '41':
+        raise SystemExit('ERROR: standalone Step 14 must be version 0.0.41 (41).')
+else:
+    build = int(str(plist.get('CFBundleVersion') or '0'))
+    if build < 41:
+        raise SystemExit('ERROR: later-step Step 14 regression validation requires build version >= 41.')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
-for marker in (
-    '<ApplicationVersion>41</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.41</ApplicationDisplayVersion>',
+project_markers = [
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
     '<TrimmerRootAssembly Include="protobuf-net.Core" />',
     '<_LinkerFrameworks Remove="DiskArbitration" />',
-):
+]
+if not parent_mode:
+    project_markers.extend([
+        '<ApplicationVersion>41</ApplicationVersion>',
+        '<ApplicationDisplayVersion>0.0.41</ApplicationDisplayVersion>',
+    ])
+for marker in project_markers:
     if marker not in csproj:
         raise SystemExit(f'ERROR: Step 14 project/regression marker missing: {marker}')
 
@@ -144,10 +156,7 @@ for marker in (
     if marker not in progress:
         raise SystemExit(f'ERROR: Step 14 progress marker missing: {marker}')
 
-for marker in (
-    'STEP 14 — COMPATIBILITY INVENTORY',
-    'Version 0.0.41',
-    'Steps 01–13 are complete on the physical iPhone.',
+ui_markers = [
     'Step 14 — read-only compatibility inventory',
     'Inventory Installed Game Compatibility (Read Only)',
     'RunCompatibilityInventoryAsync',
@@ -157,10 +166,18 @@ for marker in (
     'Network access attempted by Step 14:',
     'Managed install modified by Step 14:',
     'Game launch attempted:',
-    'Mono.Cecil rewrite / Godot host / game execution: NOT IMPLEMENTED',
+    'Step 14 evidence policy: metadata/path indicators are triage signals',
     'Verify Offline-Ready Install (Local Only)',
     'Run Foundation 5/5 Regression',
-):
+]
+if not parent_mode:
+    ui_markers.extend([
+        'STEP 14 — COMPATIBILITY INVENTORY',
+        'Version 0.0.41',
+        'Steps 01–13 are complete on the physical iPhone.',
+        'Mono.Cecil rewrite / Godot host / game execution: NOT IMPLEMENTED',
+    ])
+for marker in ui_markers:
     if marker not in root:
         raise SystemExit(f'ERROR: Step 14 UI/regression marker missing: {marker}')
 
@@ -194,15 +211,16 @@ for path in (inspection_path, result_path, progress_path):
         if forbidden in text:
             raise SystemExit(f'ERROR: Step 14 broadened into a later boundary: {path}: {forbidden}')
 
-codemagic = Path('codemagic.yaml').read_text()
-for marker in (
-    'ios-step-14:',
-    'Step 14 - compatibility inventory',
-    'artifacts/StS2-Launcher-Step-14.ipa',
-    'artifacts/step14-build-summary.txt',
-):
-    if marker not in codemagic:
-        raise SystemExit(f'ERROR: Step 14 Codemagic marker missing: {marker}')
+if not parent_mode:
+    codemagic = Path('codemagic.yaml').read_text()
+    for marker in (
+        'ios-step-14:',
+        'Step 14 - compatibility inventory',
+        'artifacts/StS2-Launcher-Step-14.ipa',
+        'artifacts/step14-build-summary.txt',
+    ):
+        if marker not in codemagic:
+            raise SystemExit(f'ERROR: Step 14 Codemagic marker missing: {marker}')
 
 for path in (
     Path('scripts/build-step14.sh'),
@@ -212,7 +230,7 @@ for path in (
     if not path.exists():
         raise SystemExit(f'ERROR: Step 14 build/test artifact missing: {path}')
 
-print('Step 14 compatibility-inventory source validation: PASS')
+print('Step 14 compatibility-inventory regression validation: PASS' if parent_mode else 'Step 14 compatibility-inventory source validation: PASS')
 print('  Steps 01-13 regression guards retained')
 print('  Step 13 OfflineReady is re-proven before compatibility classification')
 print('  Installed receipt/file tree is inspected read-only; no Steam/network dependency')
