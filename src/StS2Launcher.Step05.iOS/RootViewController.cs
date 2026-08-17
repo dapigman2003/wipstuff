@@ -22,6 +22,7 @@ public sealed class RootViewController : UIViewController
     private readonly SteamDownloadCacheMaintenance _downloadCacheMaintenance;
     private readonly SteamOfflineInstallInspection _offlineInstallInspection;
     private readonly SteamCompatibilityInventoryInspection _compatibilityInventoryInspection;
+    private readonly GodotFoundationGateSequence _godotFoundationGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -48,6 +49,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _offlineInstallDetailLabel;
     private UILabel? _compatibilityInventoryResultLabel;
     private UILabel? _compatibilityInventoryDetailLabel;
+    private UILabel? _godotFoundationResultLabel;
+    private UILabel? _godotFoundationDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -67,12 +70,16 @@ public sealed class RootViewController : UIViewController
     private UIButton? _prepareFreshDownloadTestButton;
     private UIButton? _offlineInstallButton;
     private UIButton? _compatibilityInventoryButton;
+    private UIButton? _godotFoundationStartButton;
+    private UIButton? _godotFoundationGateDButton;
+    private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
     private CancellationTokenSource? _operationCts;
     private bool _uiStartupPassed;
     private bool _lifecycleActive;
     private bool _automaticRestoreStarted;
+    private bool _godotSessionStarted;
 
     public RootViewController()
     {
@@ -144,22 +151,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 14 — COMPATIBILITY INVENTORY",
+            "STEP 15 — GODOT FOUNDATION",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.41",
+            "Version 0.0.42",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "APP ID 2868840 • READ-ONLY INSTALLED CONTENT INVENTORY",
+            "GODOT 4.5.1 • ORDERED NATIVE/ENGINE/METAL/INPUT GATES",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–13 are complete on the physical iPhone. Step 14 adds exactly one capability: inspect the already-verified managed StS2 content read-only and inventory assets, managed assemblies, Godot/GodotSharp indicators, native binaries, FMOD/Spine indicators, reflection/dynamic-code markers, and platform-specific pieces. It reuses Step 13 OfflineReady as a local trust precondition and does not contact Steam, modify game files, load game assemblies, launch the game, perform Cecil rewriting, or start Godot.",
+            "Steps 01–14 are complete on the physical iPhone. Starting with Step 15, closely related capabilities are grouped behind ordered gates: stop at the first failing gate and do not infer later gates. Step 15 embeds a source-built Godot 4.5.1-stable iOS host and tests only project-owned content: Gate A native availability, Gate B engine initialization + render-loop stop/restart, Gate C Metal rendering of a trivial scene, and Gate D touch + background/foreground lifecycle. No StS2 assembly is loaded or executed, no Cecil rewrite is performed, and the managed game install is untouched.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -464,6 +471,47 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_compatibilityInventoryDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 15 — Godot Foundation (ordered gates A–D)",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _godotFoundationStartButton = SystemButton("Run Gates A–C — Native → Engine Init → Metal Render", 17);
+        _godotFoundationStartButton.TouchUpInside += async (_, _) => await RunGodotFoundationGatesABCAsync();
+        content.AddArrangedSubview(_godotFoundationStartButton);
+
+        _godotFoundationResultLabel = Label(
+            "GODOT FOUNDATION: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_godotFoundationResultLabel);
+
+        _godotFoundationDetailLabel = Label(
+            "Ordered gate policy: A must pass before B, B before C, and C before D. Gates A–C start the embedded Godot 4.5.1 engine and a project-owned smoke scene. If C passes, tap the visible Godot panel, send the app to the background once, return, then verify Gate D. Once Godot has started, relaunch the launcher before running unrelated Steam/foundation regressions. Step 15 does not load or execute StS2 content.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_godotFoundationDetailLabel);
+
+        _godotHostContainer = new UIView
+        {
+            TranslatesAutoresizingMaskIntoConstraints = false,
+            BackgroundColor = UIColor.Black,
+            ClipsToBounds = true,
+            Hidden = true,
+        };
+        _godotHostContainer.Layer.CornerRadius = 12;
+        _godotHostContainer.Layer.BorderWidth = 1;
+        _godotHostContainer.Layer.BorderColor = UIColor.Separator.CGColor;
+        _godotHostContainer.HeightAnchor.ConstraintEqualTo(360).Active = true;
+        content.AddArrangedSubview(_godotHostContainer);
+
+        _godotFoundationGateDButton = SystemButton("Verify Gate D — Touch + Background / Foreground", 17);
+        _godotFoundationGateDButton.Enabled = false;
+        _godotFoundationGateDButton.TouchUpInside += (_, _) => VerifyGodotFoundationGateD();
+        content.AddArrangedSubview(_godotFoundationGateDButton);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -476,7 +524,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–13 COMPLETE on the physical iPhone. Step 14 is the current single-capability boundary: read-only compatibility inventory of the already-verified local StS2 install. No Cecil rewrite, Godot host, game launch, Cloud, Workshop, or other later boundary is included.",
+            "Status: Steps 01–14 COMPLETE on the physical iPhone. Step 15 is the first accelerated multi-gate subsystem boundary: project-owned Godot 4.5.1 native host → engine/render-loop control → Metal smoke scene → touch/lifecycle. Stop at the first failing gate. No StS2 game execution, Cecil rewriting, Cloud, or Workshop is included.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -495,7 +543,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 14: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 15: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1500,6 +1548,269 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunGodotFoundationGatesABCAsync()
+    {
+        if (_godotFoundationResultLabel is null ||
+            _godotFoundationDetailLabel is null ||
+            _godotFoundationStartButton is null ||
+            _godotFoundationGateDButton is null ||
+            _godotHostContainer is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        if (_godotSessionStarted)
+        {
+            _statusLabel.Text = "Step 15 Godot is already active in this process. Finish Gate D or force-quit/relaunch for a fresh run.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+            return;
+        }
+
+        BeginSteamOperation(allowCancel: false);
+        _godotFoundationGates.Reset();
+        _godotHostContainer.Hidden = false;
+        _godotFoundationResultLabel.Text = "GODOT FOUNDATION: GATE A RUNNING…";
+        _godotFoundationResultLabel.TextColor = UIColor.Label;
+        _godotFoundationDetailLabel.Text = "Gate A: resolving the statically linked Godot 4.5.1 native bridge. Later gates will not run if this gate fails.";
+        _statusLabel.Text = "STEP 15 GATE A — native Godot availability/linkage.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            string engineVersion;
+            try
+            {
+                engineVersion = GodotStep15NativeBridge.EngineVersion;
+            }
+            catch (Exception ex)
+            {
+                RecordGodotGate(GodotFoundationGate.NativeAvailability, false,
+                    $"Native bridge resolution failed: {ex.GetType().Name}: {ex.Message}");
+                return;
+            }
+
+            if (!string.Equals(engineVersion, "4.5.1-stable", StringComparison.Ordinal))
+            {
+                RecordGodotGate(GodotFoundationGate.NativeAvailability, false,
+                    $"Expected Godot 4.5.1-stable, native bridge reported '{engineVersion}'.");
+                return;
+            }
+
+            RecordGodotGate(GodotFoundationGate.NativeAvailability, true,
+                $"Native static bridge resolved and reported Godot {engineVersion}.");
+
+            _godotFoundationResultLabel.Text = "GODOT FOUNDATION: GATE B RUNNING…";
+            _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail(
+                "Gate B: initializing Godot with the project-owned smoke project, proving the render loop can stop and restart, then leaving it running for Gate C.");
+            _statusLabel.Text = "STEP 15 GATE B — engine initialize + render-loop stop/restart.";
+
+            var smokeProjectPath = Path.Combine(NSBundle.MainBundle.BundlePath, "Step15GodotSmokeProject");
+            if (!File.Exists(Path.Combine(smokeProjectPath, "project.godot")))
+            {
+                RecordGodotGate(GodotFoundationGate.EngineInitializeRenderLoop, false,
+                    $"Bundled smoke project missing: {smokeProjectPath}");
+                return;
+            }
+
+            var startResult = GodotStep15NativeBridge.Start(Handle, _godotHostContainer.Handle, smokeProjectPath);
+            if (startResult != 0 || !GodotStep15NativeBridge.IsEngineStarted)
+            {
+                RecordGodotGate(GodotFoundationGate.EngineInitializeRenderLoop, false,
+                    $"Native Godot start failed ({startResult}): {GodotStep15NativeBridge.LastError}");
+                return;
+            }
+
+            _godotSessionStarted = true;
+            var stopped = GodotStep15NativeBridge.StopRendering();
+            var restarted = GodotStep15NativeBridge.StartRendering();
+            if (!stopped || !restarted || !GodotStep15NativeBridge.IsRenderingActive)
+            {
+                RecordGodotGate(GodotFoundationGate.EngineInitializeRenderLoop, false,
+                    $"Engine started but render-loop control failed. stop={stopped}, restart={restarted}, active={GodotStep15NativeBridge.IsRenderingActive}.");
+                return;
+            }
+
+            RecordGodotGate(GodotFoundationGate.EngineInitializeRenderLoop, true,
+                "Godot initialized from the bundled project; CADisplayLink render loop stopped and restarted successfully.");
+
+            _godotFoundationResultLabel.Text = "GODOT FOUNDATION: GATE C RUNNING…";
+            _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail(
+                "Gate C: waiting for Godot setup2/start, a Metal-backed rendering layer, and the project-owned scene's fresh render marker.");
+            _statusLabel.Text = "STEP 15 GATE C — Metal smoke-scene render.";
+
+            var gateCReady = await WaitForGodotConditionAsync(
+                () => GodotStep15NativeBridge.IsSetupFinished &&
+                      GodotStep15NativeBridge.IsMetalLayerReady &&
+                      GodotStep15NativeBridge.IsRenderingActive &&
+                      GodotStep15NativeBridge.RenderMarkerReady,
+                TimeSpan.FromSeconds(30));
+
+            if (!gateCReady)
+            {
+                RecordGodotGate(GodotFoundationGate.MetalRender, false,
+                    $"Timed out waiting for Metal smoke scene. setup={GodotStep15NativeBridge.IsSetupFinished}, metal={GodotStep15NativeBridge.IsMetalLayerReady}, active={GodotStep15NativeBridge.IsRenderingActive}, marker={GodotStep15NativeBridge.RenderMarkerReady}, nativeError='{GodotStep15NativeBridge.LastError}'.");
+                return;
+            }
+
+            RecordGodotGate(GodotFoundationGate.MetalRender, true,
+                "Godot setup completed with a Metal rendering layer and the project-owned scene produced its render-ready marker.");
+
+            _godotFoundationResultLabel.Text = "GODOT FOUNDATION IN PROGRESS — 3/4";
+            _godotFoundationResultLabel.TextColor = UIColor.Label;
+            _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail(
+                "Gates A–C PASS. Gate D is manual: tap inside the visible Godot panel until it turns green, send the app to the background once, return, then tap Verify Gate D.");
+            _statusLabel.Text = "STEP 15 GATES A–C PASS. Complete the touch + background/foreground Gate D now. Do not run unrelated launcher tests until you relaunch after Step 15.";
+            _statusLabel.TextColor = UIColor.Label;
+        }
+        catch (Exception ex)
+        {
+            var nextGate = (GodotFoundationGate)Math.Min(_godotFoundationGates.Results.Count + 1, 4);
+            if (_godotFoundationGates.Snapshot().FirstFailingGate is null && _godotFoundationGates.Results.Count < 4)
+            {
+                try
+                {
+                    _godotFoundationGates.Record(nextGate, false, $"Unhandled {ex.GetType().Name}: {ex.Message}");
+                }
+                catch
+                {
+                    // Preserve the original exception in the UI if gate accounting itself cannot advance.
+                }
+            }
+            _godotFoundationResultLabel.Text = _godotFoundationGates.Snapshot().Summary;
+            _godotFoundationResultLabel.TextColor = UIColor.SystemRed;
+            _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail($"Unhandled Step 15 exception: {ex.GetType().Name}: {ex.Message}");
+            _statusLabel.Text = "STEP 15 FAIL: stop at the first failing Godot Foundation gate and report this screen.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
+        }
+    }
+
+    private void VerifyGodotFoundationGateD()
+    {
+        if (_godotFoundationResultLabel is null ||
+            _godotFoundationDetailLabel is null ||
+            _godotFoundationGateDButton is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        var snapshot = _godotFoundationGates.Snapshot();
+        if (!_godotSessionStarted || snapshot.FirstFailingGate is not null || snapshot.Results.Count != 3)
+        {
+            _statusLabel.Text = "Gate D is only available after Gates A–C pass in this process.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+            return;
+        }
+
+        try
+        {
+            var touch = GodotStep15NativeBridge.TouchMarkerReady;
+            var background = GodotStep15NativeBridge.BackgroundCount;
+            var foreground = GodotStep15NativeBridge.ForegroundCount;
+            var focusOut = GodotStep15NativeBridge.FocusOutCount;
+            var focusIn = GodotStep15NativeBridge.FocusInCount;
+
+            if (!touch || background < 1 || foreground < 1 || focusOut < 1 || focusIn < 1)
+            {
+                _godotFoundationResultLabel.Text = "GODOT FOUNDATION IN PROGRESS — 3/4";
+                _godotFoundationResultLabel.TextColor = UIColor.SystemOrange;
+                _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail(
+                    $"Gate D not complete yet. touch={YesNo(touch)}, background={background}, foreground={foreground}, focusOut={focusOut}, focusIn={focusIn}. Tap the Godot panel, background the app once, return, then verify again.");
+                _statusLabel.Text = "STEP 15 GATE D PENDING — missing touch or lifecycle evidence; no failure recorded yet.";
+                _statusLabel.TextColor = UIColor.SystemOrange;
+                return;
+            }
+
+            _godotFoundationGates.Record(
+                GodotFoundationGate.TouchLifecycle,
+                true,
+                $"Godot touch marker observed; lifecycle forwarding observed (background={background}, foreground={foreground}, focusOut={focusOut}, focusIn={focusIn}).");
+
+            snapshot = _godotFoundationGates.Snapshot();
+            _godotFoundationResultLabel.Text = snapshot.Summary;
+            _godotFoundationResultLabel.TextColor = UIColor.Label;
+            _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail(
+                "All four Step 15 ordered gates passed. Force-quit/relaunch before running the existing Foundation 5/5 regression; Step 15 does not attempt to execute any StS2 game content.");
+            _statusLabel.Text = "PASS: STEP 15 GODOT FOUNDATION — 4/4. Native availability, engine/render-loop control, Metal project render, touch, and lifecycle are proven on this iPhone.";
+            _statusLabel.TextColor = UIColor.Label;
+            _godotFoundationGateDButton.Enabled = false;
+        }
+        catch (Exception ex)
+        {
+            _godotFoundationGates.Record(
+                GodotFoundationGate.TouchLifecycle,
+                false,
+                $"Gate D native telemetry failed: {ex.GetType().Name}: {ex.Message}");
+            _godotFoundationResultLabel.Text = _godotFoundationGates.Snapshot().Summary;
+            _godotFoundationResultLabel.TextColor = UIColor.SystemRed;
+            _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail("Gate D failed while reading Godot touch/lifecycle telemetry.");
+            _statusLabel.Text = "STEP 15 FAIL at Gate D. Stop and report this result; later work is not proven.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+            _godotFoundationGateDButton.Enabled = false;
+        }
+    }
+
+    private void RecordGodotGate(GodotFoundationGate gate, bool passed, string detail)
+    {
+        _godotFoundationGates.Record(gate, passed, detail);
+        if (_godotFoundationResultLabel is not null)
+        {
+            _godotFoundationResultLabel.Text = _godotFoundationGates.Snapshot().Summary;
+            _godotFoundationResultLabel.TextColor = passed ? UIColor.Label : UIColor.SystemRed;
+        }
+        if (_godotFoundationDetailLabel is not null)
+            _godotFoundationDetailLabel.Text = FormatGodotFoundationDetail(detail);
+        if (!passed && _statusLabel is not null)
+        {
+            var letter = (char)('A' + (int)gate - 1);
+            _statusLabel.Text = $"STEP 15 FAIL at Gate {letter} ({gate}). Stop here; later Godot gates were not run.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+    }
+
+    private string FormatGodotFoundationDetail(string tail)
+    {
+        var lines = new List<string>();
+        foreach (var gate in _godotFoundationGates.Results)
+        {
+            var letter = (char)('A' + (int)gate.Gate - 1);
+            lines.Add($"Gate {letter} — {gate.Gate}: {(gate.Passed ? "PASS" : "FAIL")} — {gate.Detail}");
+        }
+
+        if (_godotSessionStarted)
+        {
+            lines.Add($"Native engine started: {YesNo(GodotStep15NativeBridge.IsEngineStarted)}");
+            lines.Add($"Setup finished: {YesNo(GodotStep15NativeBridge.IsSetupFinished)}");
+            lines.Add($"Metal layer ready: {YesNo(GodotStep15NativeBridge.IsMetalLayerReady)}");
+            lines.Add($"Render loop active: {YesNo(GodotStep15NativeBridge.IsRenderingActive)}");
+            lines.Add($"Render marker: {YesNo(GodotStep15NativeBridge.RenderMarkerReady)}");
+            lines.Add($"Touch marker: {YesNo(GodotStep15NativeBridge.TouchMarkerReady)}");
+            lines.Add($"Lifecycle counts: focusOut={GodotStep15NativeBridge.FocusOutCount}, background={GodotStep15NativeBridge.BackgroundCount}, foreground={GodotStep15NativeBridge.ForegroundCount}, focusIn={GodotStep15NativeBridge.FocusInCount}");
+        }
+
+        lines.Add("Step 15 project: launcher-owned smoke scene only; managed StS2 install is not loaded, rewritten, or executed.");
+        lines.Add("Audio/game runtime/Cecil/FMOD/Spine/Steamworks integration: NOT TESTED BY STEP 15");
+        lines.Add(tail);
+        return string.Join("\n", lines);
+    }
+
+    private static async Task<bool> WaitForGodotConditionAsync(Func<bool> condition, TimeSpan timeout)
+    {
+        var deadline = DateTimeOffset.UtcNow + timeout;
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            if (condition())
+                return true;
+            await Task.Delay(100);
+        }
+        return condition();
+    }
+
     private async Task PrepareRepairTestAsync()
     {
         if (_managedInstallResultLabel is null || _managedInstallDetailLabel is null || _statusLabel is null)
@@ -1712,28 +2023,39 @@ public sealed class RootViewController : UIViewController
         if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = false;
         if (_offlineInstallButton is not null) _offlineInstallButton.Enabled = false;
         if (_compatibilityInventoryButton is not null) _compatibilityInventoryButton.Enabled = false;
+        if (_godotFoundationStartButton is not null) _godotFoundationStartButton.Enabled = false;
+        if (_godotFoundationGateDButton is not null) _godotFoundationGateDButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = allowCancel;
     }
 
     private void EndSteamOperation()
     {
-        if (_foundationButton is not null) _foundationButton.Enabled = true;
-        if (_authButton is not null) _authButton.Enabled = true;
-        if (_resumeButton is not null) _resumeButton.Enabled = true;
-        if (_ownershipButton is not null) _ownershipButton.Enabled = true;
-        if (_discoveryButton is not null) _discoveryButton.Enabled = true;
-        if (_singleFileButton is not null) _singleFileButton.Enabled = true;
-        if (_fullDepotButton is not null) _fullDepotButton.Enabled = true;
-        if (_resumableDepotButton is not null) _resumableDepotButton.Enabled = true;
-        if (_managedInstallButton is not null) _managedInstallButton.Enabled = true;
-        if (_prepareRepairTestButton is not null) _prepareRepairTestButton.Enabled = true;
-        if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = true;
-        if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = true;
-        if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = true;
-        if (_offlineInstallButton is not null) _offlineInstallButton.Enabled = true;
-        if (_compatibilityInventoryButton is not null) _compatibilityInventoryButton.Enabled = true;
-        if (_signOutButton is not null) _signOutButton.Enabled = true;
+        var normalControlsEnabled = !_godotSessionStarted;
+        if (_foundationButton is not null) _foundationButton.Enabled = normalControlsEnabled;
+        if (_authButton is not null) _authButton.Enabled = normalControlsEnabled;
+        if (_resumeButton is not null) _resumeButton.Enabled = normalControlsEnabled;
+        if (_ownershipButton is not null) _ownershipButton.Enabled = normalControlsEnabled;
+        if (_discoveryButton is not null) _discoveryButton.Enabled = normalControlsEnabled;
+        if (_singleFileButton is not null) _singleFileButton.Enabled = normalControlsEnabled;
+        if (_fullDepotButton is not null) _fullDepotButton.Enabled = normalControlsEnabled;
+        if (_resumableDepotButton is not null) _resumableDepotButton.Enabled = normalControlsEnabled;
+        if (_managedInstallButton is not null) _managedInstallButton.Enabled = normalControlsEnabled;
+        if (_prepareRepairTestButton is not null) _prepareRepairTestButton.Enabled = normalControlsEnabled;
+        if (_prepareUpdateTestButton is not null) _prepareUpdateTestButton.Enabled = normalControlsEnabled;
+        if (_clearDownloadCacheButton is not null) _clearDownloadCacheButton.Enabled = normalControlsEnabled;
+        if (_prepareFreshDownloadTestButton is not null) _prepareFreshDownloadTestButton.Enabled = normalControlsEnabled;
+        if (_offlineInstallButton is not null) _offlineInstallButton.Enabled = normalControlsEnabled;
+        if (_compatibilityInventoryButton is not null) _compatibilityInventoryButton.Enabled = normalControlsEnabled;
+        if (_godotFoundationStartButton is not null) _godotFoundationStartButton.Enabled = !_godotSessionStarted;
+        if (_godotFoundationGateDButton is not null)
+        {
+            var snapshot = _godotFoundationGates.Snapshot();
+            _godotFoundationGateDButton.Enabled = _godotSessionStarted &&
+                snapshot.FirstFailingGate is null &&
+                snapshot.Results.Count == 3;
+        }
+        if (_signOutButton is not null) _signOutButton.Enabled = normalControlsEnabled;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }
 
@@ -2150,7 +2472,7 @@ public sealed class RootViewController : UIViewController
         AddEvidence(lines, "Platform-specific evidence", result.PlatformSpecificEvidence, 8);
 
         lines.Add("Step 14 evidence policy: metadata/path indicators are triage signals, not proof that an API path executes at runtime.");
-        lines.Add("Mono.Cecil rewrite / Godot host / game execution: NOT IMPLEMENTED");
+        lines.Add("Mono.Cecil rewrite / StS2 game execution: NOT IMPLEMENTED; Step 15 Godot Foundation is a separate launcher-owned smoke-host test.");
 
         if (!string.IsNullOrWhiteSpace(result.Error))
             lines.Add($"Error: {result.Error}");
