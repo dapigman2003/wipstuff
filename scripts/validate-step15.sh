@@ -23,6 +23,7 @@ required_paths = [
     Path('native/step15/godot_module/sts2_ios_host/register_types.h'),
     Path('native/step15/godot_module/sts2_ios_host/register_types.cpp'),
     Path('native/step15/godot_module/sts2_ios_host/step15_ios_host_bridge.mm'),
+    Path('native/step15/godot_module/sts2_ios_host/apple_embedded_plugin_stubs.cpp'),
     Path('native/step15/smoke_project/project.godot'),
     Path('native/step15/smoke_project/Main.tscn'),
     Path('native/step15/smoke_project/Step15Smoke.gd'),
@@ -137,6 +138,7 @@ for marker in (
     'int sts2_godot_template_main_disabled(int argc, char *argv[]) {',
     "text.count('int apple_embedded_main(int argc, char **argv) {') != 1",
     'godot-embedded-view-controller-service-patch=v1',
+    'godot-empty-ios-plugin-glue=v1',
     '+ (void)sts2_setEmbeddedViewController:(GDTViewController *)viewController;',
     'mainViewController = viewController;',
     'platform=ios',
@@ -148,6 +150,8 @@ for marker in (
     'lto=none',
     '_sts2_step15_get_engine_version',
     "grep -F 'apple_embedded_main' \"$symbols_file\" >/dev/null",
+    "grep -F 'godot_apple_embedded_plugins_initialize' \"$symbols_file\" >/dev/null",
+    "grep -F 'godot_apple_embedded_plugins_deinitialize' \"$symbols_file\" >/dev/null",
 ):
     if marker not in build_godot:
         raise SystemExit(f'ERROR: pinned Godot build marker missing: {marker}')
@@ -159,6 +163,26 @@ if "grep -q '_apple_embedded_main'" in build_godot:
     raise SystemExit('ERROR: Step 15 must not assume apple_embedded_main has unmangled C linkage.')
 if re.search(r'Accelerate AudioToolbox\s+AudioUnit\s+AVFoundation', build_godot):
     raise SystemExit('ERROR: Step 15 build-side framework sanity list must not classify AudioUnit as a standalone link framework.')
+
+plugin_glue = Path('native/step15/godot_module/sts2_ios_host/apple_embedded_plugin_stubs.cpp').read_text()
+for marker in (
+    'void godot_apple_embedded_plugins_initialize() {',
+    'void godot_apple_embedded_plugins_deinitialize() {',
+    '__attribute__((visibility("default")))',
+    'deliberately has zero iOS plugins',
+):
+    if marker not in plugin_glue:
+        raise SystemExit(f'ERROR: Step 15 no-plugin glue marker missing: {marker}')
+for forbidden in (
+    'extern "C"',
+    'plugin_init(',
+    'register_inappstore',
+    'register_gamecenter',
+    'SteamKit2',
+    'SlayTheSpire2',
+):
+    if forbidden in plugin_glue:
+        raise SystemExit(f'ERROR: Step 15 no-plugin glue broadened beyond empty plugin hooks: {forbidden}')
 
 smoke_project = Path('native/step15/smoke_project/project.godot').read_text()
 smoke_scene = Path('native/step15/smoke_project/Main.tscn').read_text()

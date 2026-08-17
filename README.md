@@ -58,3 +58,8 @@ The first Step 15 Codemagic attempt completed the pinned Godot iOS source build,
 ## Step 15.0.2 link hotfix
 
 The next Codemagic run passed the Godot source build and corrected archive validator, then reached the real .NET/iOS native link and failed with `ld: framework 'AudioUnit' not found`. The project-owned `NativeReference` list incorrectly treated the AudioUnit header surface as a standalone iPhoneOS link framework. Step 15.0.2 removes only `AudioUnit` from the app link list, retains `AudioToolbox`, and adds a static regression guard against reintroducing the failed standalone framework request. No launcher runtime/gate behavior changed.
+
+### Step 15.0.3 build hotfix
+
+The custom embedded host now supplies the two app-level Godot iOS plugin glue hooks (`godot_apple_embedded_plugins_initialize` / `deinitialize`) as intentional no-ops. A normal Godot-exported Xcode app generates these hooks from selected iOS plugins; Step 15 has no iOS plugins and does not use Godot's generated app wrapper. The archive validator now requires both C++ definitions before the .NET/iOS publish stage. Runtime version remains 0.0.42 (42).
+

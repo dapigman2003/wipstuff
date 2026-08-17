@@ -30,6 +30,7 @@ for marker in (
     f"godot-tag={tag}",
     "godot-main-symbol-patch=v1",
     "godot-embedded-view-controller-service-patch=v1",
+    "godot-empty-ios-plugin-glue=v1",
     "scons-options=platform=ios,target=template_release,arch=arm64,metal=yes,vulkan=no,opengl3=yes,lto=none",
 ):
     h.update(marker.encode("utf-8"))
@@ -94,6 +95,16 @@ validate_archive() {
   # defined symbol by its stable function-name fragment.
   if ! grep -F 'apple_embedded_main' "$symbols_file" >/dev/null; then
     echo "Godot archive validation: missing C++ apple_embedded_main definition." >&2
+    rm -f "$symbols_file"
+    return 1
+  fi
+  if ! grep -F 'godot_apple_embedded_plugins_initialize' "$symbols_file" >/dev/null; then
+    echo "Godot archive validation: missing Step 15 no-plugin initialize glue definition." >&2
+    rm -f "$symbols_file"
+    return 1
+  fi
+  if ! grep -F 'godot_apple_embedded_plugins_deinitialize' "$symbols_file" >/dev/null; then
+    echo "Godot archive validation: missing Step 15 no-plugin deinitialize glue definition." >&2
     rm -f "$symbols_file"
     return 1
   fi
