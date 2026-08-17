@@ -107,3 +107,8 @@ Optionally rerun the Step 14 inventory; it must still work and must not show tha
 ## Explicit non-goals
 
 Step 15 does not test StS2 startup, StS2 managed assemblies, Cecil rewriting, StS2 desktop-native libraries, FMOD, Spine, in-game Steamworks, audio, saves, Cloud, or Workshop.
+
+### Step 15.0.3 build hotfix
+
+The custom embedded host now supplies the two app-level Godot iOS plugin glue hooks (`godot_apple_embedded_plugins_initialize` / `deinitialize`) as intentional no-ops. A normal Godot-exported Xcode app generates these hooks from selected iOS plugins; Step 15 has no iOS plugins and does not use Godot's generated app wrapper. The archive validator now requires both C++ definitions before the .NET/iOS publish stage. Runtime version remains 0.0.42 (42).
+
