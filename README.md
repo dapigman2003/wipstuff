@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 15 Godot Foundation
+# StS2 Launcher iOS — Step 15.0.1 Godot Foundation Build Hotfix
 
 Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
@@ -6,7 +6,7 @@ Experimental unofficial iOS launcher/compatibility-host project for users who le
 
 **Steps 01–14 are complete and closed on a physical iPhone.** Step 14 physically classified the installed public depot read-only: 428 files / 2,323,747,842 bytes, including 370 managed assemblies and 39 native binaries. It identified three broad iOS-risk classes for later work: desktop-native binaries, dynamic-code/JIT indicators, and platform-specific indicators. Those are triage signals, not proof that every marked path executes.
 
-This archive is **Step 15 / `0.0.42 (42)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
+This archive is **Step 15.0.1 source hotfix / runtime `0.0.42 (42)`** and starts the accelerated testing model agreed after Step 14: one tightly related subsystem per version, several ordered gates, and no advancement past the first failing gate.
 
 ## Step 15 subsystem boundary — Godot Foundation
 
@@ -49,3 +49,8 @@ See `docs/STEP-15-TEST.md` for the ordered physical-iPhone gates.
 ## Scope boundary
 
 Step 15 uses only the launcher-owned GDScript smoke project. It does **not** load, rewrite, or execute StS2 managed assemblies; it does not link the desktop StS2 native libraries; it does not add Mono.Cecil; and it does not implement FMOD, Spine, Steamworks-in-game integration, Cloud, Workshop, or actual game launch.
+
+
+## Step 15.0.1 build hotfix
+
+The first Step 15 Codemagic attempt completed the pinned Godot iOS source build, then failed only in the project-owned archive-symbol validator. Step 15.0.1 corrects C++ symbol-mangling validation for `apple_embedded_main` and removes a `grep -q`/`pipefail` SIGPIPE hazard. Runtime code/version and the physical Gate A–D contract are unchanged.

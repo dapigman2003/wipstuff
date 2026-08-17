@@ -49,15 +49,62 @@ echo "Step 15 Godot source fingerprint: $FINGERPRINT" | tee "$LOG_DIR/step15-god
 
 validate_archive() {
   local lib="$1"
-  [[ -f "$lib" ]] || return 1
-  lipo -info "$lib" 2>/dev/null | grep -q 'arm64' || return 1
-  nm -gU "$lib" 2>/dev/null | grep -q '_sts2_step15_get_engine_version' || return 1
-  nm -gU "$lib" 2>/dev/null | grep -q '_sts2_step15_start' || return 1
-  nm -gU "$lib" 2>/dev/null | grep -q '_apple_embedded_main' || return 1
-  if nm -gU "$lib" 2>/dev/null | grep -Eq '[[:space:]]_main$'; then
-    echo "ERROR: Godot archive still exports its UIApplicationMain entry symbol; host patch did not isolate main()." >&2
+  if [[ ! -f "$lib" ]]; then
+    echo "Godot archive validation: archive missing: $lib" >&2
     return 1
   fi
+
+  local arch_info
+  if ! arch_info="$(lipo -info "$lib" 2>/dev/null)"; then
+    echo "Godot archive validation: lipo could not inspect archive: $lib" >&2
+    return 1
+  fi
+  if [[ "$arch_info" != *arm64* ]]; then
+    echo "Godot archive validation: arm64 architecture missing: $arch_info" >&2
+    return 1
+  fi
+
+  # Write nm output once instead of piping a very large archive through
+  # `grep -q` under `set -o pipefail`. An early grep exit can SIGPIPE nm and
+  # make a successful match look like a failed pipeline.
+  local symbols_file
+  symbols_file="$(mktemp "${TMPDIR:-/tmp}/sts2-step15-nm.XXXXXX")"
+  if ! nm -gU "$lib" >"$symbols_file" 2>/dev/null; then
+    echo "Godot archive validation: nm could not inspect exported symbols." >&2
+    rm -f "$symbols_file"
+    return 1
+  fi
+
+  if ! grep -F '_sts2_step15_get_engine_version' "$symbols_file" >/dev/null; then
+    echo "Godot archive validation: missing Step 15 engine-version bridge export." >&2
+    rm -f "$symbols_file"
+    return 1
+  fi
+  if ! grep -F '_sts2_step15_start' "$symbols_file" >/dev/null; then
+    echo "Godot archive validation: missing Step 15 start bridge export." >&2
+    rm -f "$symbols_file"
+    return 1
+  fi
+
+  # platform/ios/main_ios.mm is Objective-C++, and upstream declares
+  # apple_embedded_main without extern "C". Its Mach-O symbol is therefore
+  # C++-mangled (for example it contains `apple_embedded_main` rather than
+  # being the unmangled C symbol `_apple_embedded_main`). The project-owned
+  # Objective-C++ bridge uses the same C++ declaration, so validate the
+  # defined symbol by its stable function-name fragment.
+  if ! grep -F 'apple_embedded_main' "$symbols_file" >/dev/null; then
+    echo "Godot archive validation: missing C++ apple_embedded_main definition." >&2
+    rm -f "$symbols_file"
+    return 1
+  fi
+
+  if grep -E '[[:space:]]_main$' "$symbols_file" >/dev/null; then
+    echo "ERROR: Godot archive still exports its UIApplicationMain entry symbol; host patch did not isolate main()." >&2
+    rm -f "$symbols_file"
+    return 1
+  fi
+
+  rm -f "$symbols_file"
   return 0
 }
 

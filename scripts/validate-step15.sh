@@ -139,12 +139,16 @@ for marker in (
     'opengl3=yes',
     'lto=none',
     '_sts2_step15_get_engine_version',
-    '_apple_embedded_main',
+    "grep -F 'apple_embedded_main' \"$symbols_file\" >/dev/null",
 ):
     if marker not in build_godot:
         raise SystemExit(f'ERROR: pinned Godot build marker missing: {marker}')
 if 'generate_bundle=yes' in build_godot:
     raise SystemExit('ERROR: Step 15 should build only the static Godot archive, not a competing Godot app bundle.')
+if 'nm -gU "$lib" 2>/dev/null | grep -q' in build_godot:
+    raise SystemExit('ERROR: Step 15 archive validation must not use early-exit grep -q pipelines under pipefail.')
+if "grep -q '_apple_embedded_main'" in build_godot:
+    raise SystemExit('ERROR: Step 15 must not assume apple_embedded_main has unmangled C linkage.')
 
 smoke_project = Path('native/step15/smoke_project/project.godot').read_text()
 smoke_scene = Path('native/step15/smoke_project/Main.tscn').read_text()
