@@ -8,11 +8,13 @@ using Mono.Cecil.Cil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 19 boundary. Proves the library-level System.Linq.Expressions interpreter on the
-/// physical iOS/AOT host, clones a fresh receipt-backed ARM64/shared managed workspace,
-/// discovers real direct expression-tree Compile calls, and rewrites only structurally-safe
-/// parameterless/literal-false calls to request preferInterpretation=true. All game-file
-/// writes remain launcher-private and the trusted Step 12 install stays read-only.
+/// Step 19 boundary. Proves the iOS/AOT host runtime handles System.Linq.Expressions
+/// Compile(), Compile(false), and Compile(true) without dynamic-code support, clones a fresh
+/// receipt-backed ARM64/shared managed workspace, and classifies real Compile call sites by
+/// consumer/framework ownership and PE writeability. Because the host framework provides the
+/// AOT-aware implementation, Step 19.2 performs no Cecil writes to game or framework assemblies;
+/// its prepared tree is an audited byte-identical compatibility input snapshot. The trusted
+/// Step 12 install stays read-only.
 /// </summary>
 public sealed class ExpressionInterpreterCompatibility
 {
@@ -62,7 +64,7 @@ public sealed class ExpressionInterpreterCompatibility
                 0,
                 0,
                 null,
-                "Proving System.Linq.Expressions Compile(preferInterpretation: true) in the actual iOS/AOT launcher process before touching any game copy…"));
+                "Proving System.Linq.Expressions Compile(), Compile(false), and Compile(true) in the actual iOS/AOT launcher process before touching any game copy…"));
 
             var interpreterProbe = RunInterpreterProbe();
 
@@ -171,10 +173,14 @@ public sealed class ExpressionInterpreterCompatibility
 
             return Pass(
                 ExpressionInterpreterCompatibilityGate.InterpreterCapabilityAndWorkspaceClone,
-                "Physical-host expression interpreter capability and fresh compatibility workspace established.\n" +
-                $"Compile(preferInterpretation: true) probe result: {interpreterProbe.Result} (expected 42)\n" +
+                "Physical-host expression runtime fallback capability and fresh compatibility workspace established.\n" +
+                $"Compile() automatic-fallback probe result: {interpreterProbe.AutomaticResult} (expected 42)\n" +
+                $"Compile(preferInterpretation: false) probe result: {interpreterProbe.ExplicitFalseResult} (expected 42)\n" +
+                $"Compile(preferInterpretation: true) probe result: {interpreterProbe.ExplicitTrueResult} (expected 42)\n" +
                 $"RuntimeFeature.IsDynamicCodeSupported: {interpreterProbe.DynamicCodeSupported}\n" +
                 $"RuntimeFeature.IsDynamicCodeCompiled: {interpreterProbe.DynamicCodeCompiled}\n" +
+                $"Host System.Linq.Expressions identity: {interpreterProbe.HostExpressionsAssemblyFullName}\n" +
+                $"iOS no-dynamic-code fallback precondition proven: {interpreterProbe.IosNoDynamicCodeFallbackProven}\n" +
                 $"OfflineReady precondition: YES ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"macOS arm64 candidates copied: {arm64.Length:N0}\n" +
                 $"Architecture-neutral candidates copied: {shared.Length:N0}\n" +
@@ -216,12 +222,12 @@ public sealed class ExpressionInterpreterCompatibility
             long dynamicBoolean = 0;
             long unsafeParameterless = 0;
             long strongNamedSupported = 0;
-            long malformedStrongNameSupported = 0;
-            long rewriteSupported = 0;
+            long frameworkImplementationSupported = 0;
+            long nonIlOnlySupported = 0;
+            long nonFrameworkSupported = 0;
             long primarySupported = 0;
-            var strongNameSignedTargetAssemblies = 0;
 
-            stage = "real direct Compile call-site scan";
+            stage = "real direct Compile call-site scan + consumer/framework boundary classification";
             using var resolver = CreateWorkspaceResolver(workspace);
             foreach (var file in workspace.Files)
             {
@@ -237,10 +243,12 @@ public sealed class ExpressionInterpreterCompatibility
 
                     var stats = ScanCompileSites(module);
                     var strongName = CaptureStrongNameState(module);
-                    var supported = checked(stats.ParameterlessSafe + stats.LiteralFalse);
+                    var observedCompileSites = stats.TotalDirectCompileSites;
                     var isPrimary = relative.Equals(workspace.PrimaryRelativePath, StringComparison.OrdinalIgnoreCase);
+                    var isIlOnly = (module.Attributes & ModuleAttributes.ILOnly) != 0;
+                    var isFrameworkImplementation = IsPlatformFrameworkImplementationAssembly(module.Assembly.Name);
                     if (isPrimary)
-                        primarySupported = supported;
+                        primarySupported = observedCompileSites;
 
                     parameterlessSafe += stats.ParameterlessSafe;
                     literalFalse += stats.LiteralFalse;
@@ -248,22 +256,28 @@ public sealed class ExpressionInterpreterCompatibility
                     dynamicBoolean += stats.DynamicBoolean;
                     unsafeParameterless += stats.ParameterlessUnsafe;
                     if (strongName.HasPublicKey || strongName.StrongNameSigned)
-                        strongNamedSupported += supported;
-                    if (strongName.StrongNameSigned && !strongName.HasPublicKey)
-                        malformedStrongNameSupported += supported;
+                        strongNamedSupported += observedCompileSites;
+                    if (isFrameworkImplementation)
+                        frameworkImplementationSupported += observedCompileSites;
                     else
-                        rewriteSupported += supported;
-                    if (supported > 0 && strongName.StrongNameSigned)
-                        strongNameSignedTargetAssemblies++;
+                        nonFrameworkSupported += observedCompileSites;
+                    if (!isIlOnly)
+                        nonIlOnlySupported += observedCompileSites;
 
                     foreach (var sample in stats.Samples)
-                        AddSample(samples, $"{relative}: {sample}");
+                    {
+                        var owner = isFrameworkImplementation ? "FRAMEWORK" : "CONSUMER";
+                        var writable = isIlOnly ? "ILONLY" : "NON-ILONLY";
+                        AddSample(samples, $"{relative} [{owner}/{writable}]: {sample}");
+                    }
 
                     assemblies.Add(new TargetAssemblySnapshot(
                         relative,
                         module.Assembly.Name.FullName,
                         strongName,
-                        stats));
+                        stats,
+                        isIlOnly,
+                        isFrameworkImplementation));
                 }
                 catch (BadImageFormatException)
                 {
@@ -272,26 +286,14 @@ public sealed class ExpressionInterpreterCompatibility
             }
             RecordWorkspaceResolutions(resolver);
 
-            var rewriteTargets = assemblies
-                .Where(value => !(value.StrongName.StrongNameSigned && !value.StrongName.HasPublicKey) && value.Stats.SupportedRewrites > 0)
-                .OrderBy(value => value.RelativePath.Equals(workspace.PrimaryRelativePath, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-                .ThenBy(value => value.RelativePath, StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-
-            if (malformedStrongNameSupported > 0)
-            {
-                throw new InvalidDataException(
-                    "Step 19 found a structurally-safe Compile target in an assembly that sets StrongNameSigned without carrying a public key. " +
-                    $"Malformed strong-name supported sites={malformedStrongNameSupported}. The prepared-copy signature-disposition policy refuses this invalid identity shape.");
-            }
-
-            if (rewriteSupported <= 0 || rewriteTargets.Length == 0)
-            {
-                throw new InvalidDataException(
-                    "No structurally-safe direct System.Linq.Expressions Compile target is available for the Step 19 rewrite. " +
-                    $"Observed parameterless-safe={parameterlessSafe}, literal-false={literalFalse}, parameterless-unsafe={unsafeParameterless}, strong-name-identity-supported={strongNamedSupported}. " +
-                    "Do not broaden the call-shape matcher speculatively; choose the next evidence-backed incompatibility class from Step 17 instead.");
-            }
+            // Step 19.2 deliberately selects no assembly for mutation. The physical iOS host
+            // proves its own System.Linq.Expressions implementation automatically falls back
+            // when dynamic code is unsupported, so rewriting consumer call sites would be
+            // redundant and would introduce avoidable strong-name/control-flow/mixed-mode risk.
+            var rewriteTargets = Array.Empty<TargetAssemblySnapshot>();
+            const long rewriteSupported = 0;
+            const int strongNameSignedTargetAssemblies = 0;
+            const bool noRewriteRequired = true;
 
             _discovery = new DiscoverySnapshot(
                 parsedModules,
@@ -304,31 +306,38 @@ public sealed class ExpressionInterpreterCompatibility
                 dynamicBoolean,
                 unsafeParameterless,
                 strongNamedSupported,
-                malformedStrongNameSupported,
+                frameworkImplementationSupported,
+                nonIlOnlySupported,
+                0,
+                0,
                 rewriteSupported,
                 primarySupported,
                 strongNameSignedTargetAssemblies,
+                noRewriteRequired,
                 samples.ToArray());
 
             return Pass(
                 ExpressionInterpreterCompatibilityGate.RealCompileTargetDiscovery,
-                "Real direct expression-tree Compile call sites classified from the receipt-verified Step 19 source workspace.\n" +
+                "Real direct expression-tree Compile call sites classified from the receipt-verified Step 19 source workspace with an explicit host-framework boundary.\n" +
                 $"Managed modules parsed: {parsedModules:N0}\n" +
                 $"Non-managed .dll/.exe candidates skipped: {nonManagedCandidates:N0}\n" +
-                $"Structurally-safe parameterless Compile() sites: {parameterlessSafe:N0}\n" +
-                $"Literal Compile(false) sites: {literalFalse:N0}\n" +
-                $"Already-interpreted Compile(true) sites: {existingTrue:N0}\n" +
-                $"Dynamic/non-literal Compile(bool) sites left untouched: {dynamicBoolean:N0}\n" +
-                $"Parameterless sites skipped for branch/EH/prefix safety: {unsafeParameterless:N0}\n" +
-                $"Supported sites carrying strong-name identity: {strongNamedSupported:N0}\n" +
-                $"Malformed StrongNameSigned-without-public-key supported sites: {malformedStrongNameSupported:N0}\n" +
-                $"Eligible supported sites selected: {rewriteSupported:N0} across {rewriteTargets.Length:N0} assembly/assemblies\n" +
-                $"Selected assemblies with StrongNameSigned set: {strongNameSignedTargetAssemblies:N0}\n" +
-                $"Supported sites inside primary sts2.dll: {primarySupported:N0}\n" +
-                "Selected target assemblies:\n" + FormatTargetAssemblySamples(rewriteTargets) + "\n" +
-                "Sample real sites:\n" + FormatLineSamples(samples) + "\n\n" +
-                "Rewrite policy: direct LambdaExpression/Expression<TDelegate>.Compile() or literal Compile(false) calls are eligible when structurally safe. For modified strong-name identities, the prepared copy preserves name/version/culture/public key/public-key token and clears only StrongNameSigned; no private key is used. Arbitrary Compile(bool), malformed strong-name identities, control-flow-sensitive insertion points, Harmony/MonoMod, Reflection.Emit, Assembly.Load and native interop are not rewritten by Step 19.\n" +
-                "Assembly dependency resolver: SHA-1-verified Step 19 source workspace ONLY\nGame assembly loaded/executed: NO\nReal managed install modified: NO");
+                $"Direct Compile() sites structurally safe for the old insertion design: {parameterlessSafe:N0}\n" +
+                $"Direct Compile(false) literal sites: {literalFalse:N0}\n" +
+                $"Direct Compile(true) literal sites: {existingTrue:N0}\n" +
+                $"Direct Compile(bool) dynamic/non-literal sites: {dynamicBoolean:N0}\n" +
+                $"Parameterless sites with branch/EH/prefix insertion hazards (diagnostic only): {unsafeParameterless:N0}\n" +
+                $"Direct Compile sites carrying strong-name identity: {strongNamedSupported:N0}\n" +
+                $"Direct Compile sites inside System.* framework implementation assemblies: {frameworkImplementationSupported:N0}\n" +
+                $"Direct Compile sites inside non-System.* consumer assemblies: {nonFrameworkSupported:N0}\n" +
+                $"Direct Compile sites inside non-IL-only/ReadyToRun-or-mixed-mode images: {nonIlOnlySupported:N0}\n" +
+                $"Direct Compile sites inside primary sts2.dll: {primarySupported:N0}\n" +
+                "Assemblies selected for Cecil mutation: 0\n" +
+                "Gate B compatibility disposition: HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED\n" +
+                "Observed assembly/site samples:\n" + FormatLineSamples(samples) + "\n\n" +
+                "Policy: Step 19.2 does not rewrite Compile call sites. The iOS host System.Linq.Expressions implementation is the compatibility provider; copied desktop System.* framework/ReadyToRun images are diagnostic payload inputs only and must not be transformed or used as proof of iOS execution compatibility.\n" +
+                "Assembly dependency resolver for read-only classification: SHA-1-verified Step 19 source workspace ONLY\n" +
+                "Game assembly loaded/executed: NO\n" +
+                "Real managed install modified: NO");
         }
         catch (Exception ex)
         {
@@ -337,20 +346,24 @@ public sealed class ExpressionInterpreterCompatibility
         }
     }
 
-    public ExpressionInterpreterCompatibilityGateResult RunPreferInterpretationRewrite()
+    public ExpressionInterpreterCompatibilityGateResult RunHostFallbackPreparedCopy()
     {
         var stage = "initialization";
         try
         {
-            stage = "rewrite snapshot setup";
+            stage = "no-rewrite disposition setup";
             var workspace = RequireWorkspace();
-            var discovery = _discovery ?? throw new InvalidOperationException("Gate B must pass before the Step 19 compatibility rewrite.");
+            var discovery = _discovery ?? throw new InvalidOperationException("Gate B must pass before the Step 19 compatibility disposition gate.");
+            if (!discovery.NoRewriteRequired || discovery.RewriteTargets.Length != 0 || discovery.RewriteSupported != 0)
+                throw new InvalidDataException("Step 19.2 invariant violated: expression compatibility must not select any assembly for Cecil mutation.");
+
             var preparedRoot = Path.Combine(_workRoot, PreparedRootName);
             if (Directory.Exists(preparedRoot))
                 Directory.Delete(preparedRoot, recursive: true);
             Directory.CreateDirectory(preparedRoot);
 
-            stage = "full prepared-tree byte copy";
+            stage = "full prepared-tree byte copy + immediate SHA-1 equality proof";
+            ulong copiedBytes = 0;
             foreach (var file in workspace.Files)
             {
                 var relative = NormalizeRelative(file.RelativePath);
@@ -358,169 +371,42 @@ public sealed class ExpressionInterpreterCompatibility
                 var destinationPath = ResolveChildPath(preparedRoot, relative);
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
                 File.Copy(sourcePath, destinationPath, overwrite: false);
+
+                var sourceHash = ComputeSha1Hex(sourcePath);
+                if (!sourceHash.Equals(file.Sha1Hex, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException($"Step 19 source changed before no-op preparation: {relative}");
+                var preparedHash = ComputeSha1Hex(destinationPath);
+                if (!preparedHash.Equals(sourceHash, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException($"Step 19 no-op prepared copy differs from its verified source: {relative}");
+                checked { copiedBytes += (ulong)file.Length; }
             }
-
-            var rewrittenAssemblies = new List<PreparedAssemblySnapshot>();
-            long totalRewrittenSites = 0;
-            long totalParameterless = 0;
-            long totalLiteralFalse = 0;
-            var strongNameSignedFlagsCleared = 0;
-
-            foreach (var target in discovery.RewriteTargets)
-            {
-                stage = $"source SHA-1 recheck: {target.RelativePath}";
-                var receiptFile = GetReceiptFile(workspace, target.RelativePath);
-                var sourcePath = ResolveChildPath(workspace.SourceRoot, target.RelativePath);
-                var sourceHashBefore = ComputeSha1Hex(sourcePath);
-                if (!sourceHashBefore.Equals(receiptFile.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidDataException($"Step 19 source changed before rewrite: {target.RelativePath}");
-
-                stage = $"Cecil rewrite: {target.RelativePath}";
-                CompileSiteStats before;
-                ModuleFingerprint beforeFingerprint;
-                StrongNameSnapshot beforeStrongName;
-                int rewrittenParameterless;
-                int rewrittenLiteralFalse;
-                using (var resolver = CreateWorkspaceResolver(workspace))
-                using (var module = ReadModuleWithWorkspaceResolver(sourcePath, resolver, ReadingMode.Immediate))
-                {
-                    EnsureWorkspaceResolverBound(module, resolver);
-                    beforeStrongName = CaptureStrongNameState(module);
-                    if (beforeStrongName != target.StrongName)
-                        throw new InvalidDataException($"Step 19 target strong-name state changed between Gate B and Gate C for {target.RelativePath}.");
-                    if (beforeStrongName.StrongNameSigned && !beforeStrongName.HasPublicKey)
-                        throw new InvalidDataException($"Step 19 refuses malformed StrongNameSigned-without-public-key assembly: {target.RelativePath}");
-
-                    before = ScanCompileSites(module);
-                    beforeFingerprint = Fingerprint(module);
-                    if (!string.Equals(beforeFingerprint.AssemblyFullName, target.AssemblyFullName, StringComparison.Ordinal))
-                        throw new InvalidDataException($"Step 19 target assembly identity changed between Gate B and Gate C for {target.RelativePath}.");
-                    if (before.SupportedRewrites != target.Stats.SupportedRewrites)
-                    {
-                        throw new InvalidDataException(
-                            $"Step 19 target count changed between Gate B and Gate C for {target.RelativePath}: " +
-                            $"{before.SupportedRewrites} != {target.Stats.SupportedRewrites}.");
-                    }
-
-                    (rewrittenParameterless, rewrittenLiteralFalse) = ApplyPreferInterpretationRewrite(module);
-                    if (rewrittenParameterless != before.ParameterlessSafe || rewrittenLiteralFalse != before.LiteralFalse)
-                    {
-                        throw new InvalidDataException(
-                            $"Step 19 rewrite count mismatch for {target.RelativePath}: " +
-                            $"parameterless {rewrittenParameterless}/{before.ParameterlessSafe}, literal-false {rewrittenLiteralFalse}/{before.LiteralFalse}.");
-                    }
-
-                    if (beforeStrongName.StrongNameSigned)
-                    {
-                        module.Attributes &= ~ModuleAttributes.StrongNameSigned;
-                        strongNameSignedFlagsCleared++;
-                    }
-
-                    var outputPath = ResolveChildPath(preparedRoot, target.RelativePath);
-                    var temporaryPath = outputPath + ".step19tmp";
-                    DeleteIfExists(temporaryPath);
-                    module.Write(temporaryPath, new WriterParameters { WriteSymbols = false });
-                    DeleteIfExists(outputPath);
-                    File.Move(temporaryPath, outputPath);
-                    RecordWorkspaceResolutions(resolver);
-                }
-
-                stage = $"explicit-resolver prepared-output reopen: {target.RelativePath}";
-                var preparedPath = ResolveChildPath(preparedRoot, target.RelativePath);
-                CompileSiteStats after;
-                ModuleFingerprint afterFingerprint;
-                StrongNameSnapshot afterStrongName;
-                using (var resolver = CreateWorkspaceResolver(workspace))
-                using (var reopened = ReadModuleWithWorkspaceResolver(preparedPath, resolver, ReadingMode.Deferred))
-                {
-                    EnsureWorkspaceResolverBound(reopened, resolver);
-                    after = ScanCompileSites(reopened);
-                    afterFingerprint = Fingerprint(reopened);
-                    afterStrongName = CaptureStrongNameState(reopened);
-                    RecordWorkspaceResolutions(resolver);
-                }
-
-                VerifyPreparedStrongNameState(target.RelativePath, beforeStrongName, afterStrongName);
-
-                var rewrittenTotal = checked(rewrittenParameterless + rewrittenLiteralFalse);
-                if (!beforeFingerprint.MetadataEquivalentTo(afterFingerprint))
-                    throw new InvalidDataException($"Step 19 prepared output changed the structural metadata fingerprint for {target.RelativePath}. Before={beforeFingerprint}; After={afterFingerprint}.");
-                if (afterFingerprint.InstructionCount != checked(beforeFingerprint.InstructionCount + rewrittenParameterless))
-                    throw new InvalidDataException($"Step 19 prepared output instruction-count delta is not exactly the inserted parameterless Compile argument count for {target.RelativePath}.");
-                if (after.TotalDirectCompileSites != before.TotalDirectCompileSites)
-                    throw new InvalidDataException($"Step 19 changed the number of direct expression Compile call sites in {target.RelativePath}.");
-                if (after.ParameterlessSafe != 0 || after.LiteralFalse != 0)
-                    throw new InvalidDataException($"Prepared output still contains supported non-interpreted Compile sites in {target.RelativePath}.");
-                if (after.ParameterlessUnsafe != before.ParameterlessUnsafe || after.DynamicBoolean != before.DynamicBoolean)
-                    throw new InvalidDataException($"Step 19 changed an explicitly out-of-scope Compile-site class in {target.RelativePath}.");
-                if (after.LiteralTrue != checked(before.LiteralTrue + rewrittenTotal))
-                    throw new InvalidDataException($"Prepared output does not contain the expected Compile(true) count in {target.RelativePath}.");
-
-                var preparedHash = ComputeSha1Hex(preparedPath);
-                if (preparedHash.Equals(sourceHashBefore, StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidDataException($"Step 19 prepared output bytes did not change for {target.RelativePath}.");
-                var sourceHashAfter = ComputeSha1Hex(sourcePath);
-                if (!sourceHashAfter.Equals(receiptFile.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidDataException($"Step 19 source copy changed while writing prepared output: {target.RelativePath}");
-
-                rewrittenAssemblies.Add(new PreparedAssemblySnapshot(
-                    target.RelativePath,
-                    sourceHashBefore,
-                    preparedHash,
-                    rewrittenParameterless,
-                    rewrittenLiteralFalse,
-                    before,
-                    after,
-                    beforeFingerprint,
-                    afterFingerprint,
-                    beforeStrongName,
-                    afterStrongName));
-                totalRewrittenSites = checked(totalRewrittenSites + rewrittenTotal);
-                totalParameterless = checked(totalParameterless + rewrittenParameterless);
-                totalLiteralFalse = checked(totalLiteralFalse + rewrittenLiteralFalse);
-            }
-
-            if (totalRewrittenSites <= 0 || rewrittenAssemblies.Count == 0)
-                throw new InvalidDataException("Step 19 Gate C produced no real compatibility rewrite.");
-            if (totalRewrittenSites != discovery.RewriteSupported)
-                throw new InvalidDataException($"Step 19 did not rewrite the complete selected supported set: {totalRewrittenSites} != {discovery.RewriteSupported}.");
-            if (strongNameSignedFlagsCleared != discovery.StrongNameSignedTargetAssemblies)
-            {
-                throw new InvalidDataException(
-                    $"Step 19 strong-name signature-disposition accounting mismatch: cleared={strongNameSignedFlagsCleared}, " +
-                    $"selected StrongNameSigned assemblies={discovery.StrongNameSignedTargetAssemblies}.");
-            }
+            if (copiedBytes != workspace.ScopeBytes)
+                throw new InvalidDataException("Step 19 no-op prepared-tree byte accounting did not cover the complete workspace scope.");
 
             _rewrite = new RewriteSnapshot(
                 preparedRoot,
-                rewrittenAssemblies.ToArray(),
-                totalRewrittenSites,
-                totalParameterless,
-                totalLiteralFalse);
+                Array.Empty<PreparedAssemblySnapshot>(),
+                0,
+                0,
+                0);
 
             return Pass(
-                ExpressionInterpreterCompatibilityGate.PreferInterpretationRewrite,
-                "Real AOT compatibility rewrite applied to launcher-private prepared assembly copies.\n" +
-                $"Rewritten assemblies: {rewrittenAssemblies.Count:N0}\n" +
-                $"Direct parameterless Compile() sites converted to Compile(true): {totalParameterless:N0}\n" +
-                $"Literal Compile(false) sites converted to Compile(true): {totalLiteralFalse:N0}\n" +
-                $"Total real call sites rewritten: {totalRewrittenSites:N0}\n" +
-                "Every rewritten assembly reopened with explicit workspace assembly + metadata resolvers: YES\n" +
-                "Every rewritten assembly preserves structural metadata; instruction-count delta equals only inserted bool arguments: YES\n" +
-                "Every rewritten assembly has zero remaining structurally-safe parameterless/literal-false target sites: YES\n" +
-                $"Modified assemblies with StrongNameSigned cleared in prepared copy: {strongNameSignedFlagsCleared:N0}\n" +
-                "Strong-name public key/token/full assembly identity preserved across every rewritten output: YES\n" +
-                "Private strong-name signing key used: NO\n" +
-                "Dynamic Compile(bool) and unsafe branch/EH insertion sites preserved: YES\n" +
-                "All unchanged Step 19 prepared files remain byte-for-byte source copies: pending Gate D full audit\n" +
-                $"Workspace-only dependency resolutions observed: {_workspaceResolvedAssemblies.Count:N0}\n" +
-                "Source workspace receipt SHA-1 preserved for every rewritten source: YES\n" +
+                ExpressionInterpreterCompatibilityGate.HostFallbackPreparedCopy,
+                "Step 19.2 compatibility disposition intentionally performs NO IL rewrite. The physical iOS host runtime is the System.Linq.Expressions compatibility provider.\n" +
+                $"Prepared files copied byte-identically: {workspace.Files.Length:N0}/{workspace.Files.Length:N0} ({copiedBytes:N0} bytes)\n" +
+                "Cecil assembly writes performed by Gate C: 0\n" +
+                "Strong-name flags/public keys/tokens modified: NO\n" +
+                "System.* framework implementation assemblies written by Cecil: NO\n" +
+                "Non-IL-only/ReadyToRun-or-mixed-mode assemblies written by Cecil: NO\n" +
+                "Consumer/game assemblies rewritten: NO\n" +
+                "Compile(), Compile(false), and Compile(true) compatibility is supplied by the host runtime proven in Gate A; Gate D will independently re-hash source/prepared/live trees.\n" +
+                "Future execution must bind framework references to the iOS host runtime rather than execute copied desktop framework implementation images.\n" +
                 "Actual Step 12 install modified: NO\nGame assembly loaded/executed: NO");
         }
         catch (Exception ex)
         {
             _rewrite = null;
-            return Fail(ExpressionInterpreterCompatibilityGate.PreferInterpretationRewrite, stage, ex);
+            return Fail(ExpressionInterpreterCompatibilityGate.HostFallbackPreparedCopy, stage, ex);
         }
     }
 
@@ -535,6 +421,11 @@ public sealed class ExpressionInterpreterCompatibility
             var workspace = RequireWorkspace();
             var discovery = _discovery ?? throw new InvalidOperationException("Gate B must pass before the Step 19 isolation audit.");
             var rewrite = _rewrite ?? throw new InvalidOperationException("Gate C must pass before the Step 19 isolation audit.");
+            if (!discovery.NoRewriteRequired || discovery.RewriteSupported != 0 || discovery.RewriteTargets.Length != 0 ||
+                rewrite.TotalRewrittenSites != 0 || rewrite.Assemblies.Length != 0)
+            {
+                throw new InvalidDataException("Step 19.2 isolation invariant violated: this compatibility class must complete with zero managed assembly mutations.");
+            }
 
             var expectedPaths = workspace.Files
                 .Select(file => NormalizeRelative(file.RelativePath))
@@ -546,11 +437,9 @@ public sealed class ExpressionInterpreterCompatibility
             if (!expectedPaths.SetEquals(preparedPaths))
                 throw new InvalidDataException("Step 19 prepared workspace does not contain exactly the selected source file set.");
 
-            var rewrittenByPath = rewrite.Assemblies.ToDictionary(value => value.RelativePath, StringComparer.OrdinalIgnoreCase);
             ulong sourceVerifiedBytes = 0;
             ulong installVerifiedBytes = 0;
             var unchangedPreparedFiles = 0;
-            var rewrittenPreparedFiles = 0;
 
             for (var index = 0; index < workspace.Files.Length; index++)
             {
@@ -562,7 +451,7 @@ public sealed class ExpressionInterpreterCompatibility
                     index,
                     workspace.Files.Length,
                     relative,
-                    "Re-hashing Step 19 source, prepared output, and original managed install; rewritten outputs must be the only byte differences…"));
+                    "Re-hashing Step 19 source, byte-identical prepared output, and original managed install; no byte differences are permitted…"));
 
                 var sourcePath = ResolveChildPath(workspace.SourceRoot, relative);
                 var sourceHash = await ComputeSha1HexAsync(sourcePath, cancellationToken).ConfigureAwait(false);
@@ -578,91 +467,43 @@ public sealed class ExpressionInterpreterCompatibility
 
                 var preparedPath = ResolveChildPath(rewrite.PreparedRoot, relative);
                 var preparedHash = await ComputeSha1HexAsync(preparedPath, cancellationToken).ConfigureAwait(false);
-                if (rewrittenByPath.TryGetValue(relative, out var rewritten))
-                {
-                    if (!preparedHash.Equals(rewritten.PreparedSha1, StringComparison.OrdinalIgnoreCase))
-                        throw new InvalidDataException($"Step 19 rewritten prepared output changed after Gate C: {relative}");
-                    if (preparedHash.Equals(file.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                        throw new InvalidDataException($"Step 19 rewritten prepared output unexpectedly matches its source bytes: {relative}");
-                    rewrittenPreparedFiles++;
-                }
-                else
-                {
-                    if (!preparedHash.Equals(file.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                        throw new InvalidDataException($"Step 19 changed a non-target prepared file: {relative}");
-                    unchangedPreparedFiles++;
-                }
+                if (!preparedHash.Equals(file.Sha1Hex, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException($"Step 19.2 no-op prepared file differs from its receipt-backed source: {relative}");
+                unchangedPreparedFiles++;
             }
 
             if (sourceVerifiedBytes != workspace.ScopeBytes || installVerifiedBytes != workspace.ScopeBytes)
                 throw new InvalidDataException("Step 19 source/install audit byte accounting did not cover the complete selected scope.");
-            if (rewrittenPreparedFiles != rewrite.Assemblies.Length || unchangedPreparedFiles + rewrittenPreparedFiles != workspace.Files.Length)
-                throw new InvalidDataException("Step 19 prepared-tree target/non-target accounting is inconsistent.");
-
-            stage = "rewritten source/prepared assembly structural audit";
-            foreach (var rewritten in rewrite.Assemblies)
-            {
-                var sourcePath = ResolveChildPath(workspace.SourceRoot, rewritten.RelativePath);
-                using (var sourceResolver = CreateWorkspaceResolver(workspace))
-                using (var sourceModule = ReadModuleWithWorkspaceResolver(sourcePath, sourceResolver, ReadingMode.Deferred))
-                {
-                    EnsureWorkspaceResolverBound(sourceModule, sourceResolver);
-                    var sourceFingerprint = Fingerprint(sourceModule);
-                    var sourceStrongName = CaptureStrongNameState(sourceModule);
-                    if (sourceFingerprint != rewritten.BeforeFingerprint)
-                        throw new InvalidDataException($"Final Step 19 source structural fingerprint changed after Gate C: {rewritten.RelativePath}.");
-                    if (sourceStrongName != rewritten.BeforeStrongName)
-                        throw new InvalidDataException($"Final Step 19 source strong-name identity/signature state changed after Gate C: {rewritten.RelativePath}.");
-                    RecordWorkspaceResolutions(sourceResolver);
-                }
-
-                var path = ResolveChildPath(rewrite.PreparedRoot, rewritten.RelativePath);
-                using var resolver = CreateWorkspaceResolver(workspace);
-                using var module = ReadModuleWithWorkspaceResolver(path, resolver, ReadingMode.Deferred);
-                EnsureWorkspaceResolverBound(module, resolver);
-                var stats = ScanCompileSites(module);
-                var fingerprint = Fingerprint(module);
-                var strongName = CaptureStrongNameState(module);
-                if (fingerprint != rewritten.AfterFingerprint)
-                    throw new InvalidDataException($"Final Step 19 prepared structural fingerprint changed after Gate C: {rewritten.RelativePath}.");
-                if (strongName != rewritten.AfterStrongName)
-                    throw new InvalidDataException($"Final Step 19 prepared strong-name identity/signature disposition changed after Gate C: {rewritten.RelativePath}.");
-                if (stats.TotalDirectCompileSites != rewritten.After.TotalDirectCompileSites)
-                    throw new InvalidDataException($"Final Step 19 direct Compile-site count changed after Gate C: {rewritten.RelativePath}.");
-                if (stats.ParameterlessSafe != 0 || stats.LiteralFalse != 0)
-                    throw new InvalidDataException($"Final audit found an unconverted supported Compile site in {rewritten.RelativePath}.");
-                if (stats.LiteralTrue != rewritten.After.LiteralTrue || stats.DynamicBoolean != rewritten.After.DynamicBoolean || stats.ParameterlessUnsafe != rewritten.After.ParameterlessUnsafe)
-                    throw new InvalidDataException($"Final Step 19 structural counts changed after Gate C: {rewritten.RelativePath}.");
-                RecordWorkspaceResolutions(resolver);
-            }
-
-            if (rewrite.TotalRewrittenSites != discovery.RewriteSupported)
-                throw new InvalidDataException("Final Step 19 rewrite count no longer matches the Gate B selected target set.");
+            if (unchangedPreparedFiles != workspace.Files.Length)
+                throw new InvalidDataException("Step 19.2 no-op prepared-tree accounting did not cover every workspace file.");
+            if (rewrite.TotalRewrittenSites != 0 || rewrite.Assemblies.Length != 0 || discovery.RewriteSupported != 0)
+                throw new InvalidDataException("Final Step 19.2 audit found an unexpected managed rewrite record.");
 
             progress?.Report(new ExpressionInterpreterCompatibilityProgress(
                 ExpressionInterpreterCompatibilityGate.IsolationAudit,
                 workspace.Files.Length,
                 workspace.Files.Length,
                 workspace.PrimaryRelativePath,
-                "Step 19 isolation audit complete: source/install remain receipt-identical and only selected prepared assemblies differ."));
+                "Step 19.2 isolation audit complete: source/install/prepared trees are receipt-identical and no managed expression rewrite was performed."));
 
             return Pass(
                 ExpressionInterpreterCompatibilityGate.IsolationAudit,
-                "Step 19 prepared-payload isolation and structural audit passed.\n" +
+                "Step 19 expression compatibility disposition + prepared-payload isolation audit passed.\n" +
                 $"Source workspace receipt SHA-1s reverified: {workspace.Files.Length:N0}/{workspace.Files.Length:N0} ({sourceVerifiedBytes:N0} bytes)\n" +
                 $"Original managed-install receipt SHA-1s reverified: {workspace.Files.Length:N0}/{workspace.Files.Length:N0} ({installVerifiedBytes:N0} bytes)\n" +
-                $"Prepared files unchanged byte-for-byte: {unchangedPreparedFiles:N0}\n" +
-                $"Prepared assemblies intentionally rewritten: {rewrittenPreparedFiles:N0}\n" +
-                $"Total Compile sites forced to interpreter preference: {rewrite.TotalRewrittenSites:N0}\n" +
-                "Every rewritten prepared assembly reopens with the explicit verified-workspace resolver: YES\n" +
-                "No selected non-interpreted direct Compile target remains in rewritten outputs: YES\n" +
-                "Receipt-backed source strong-name state + prepared public keys/tokens/full identities/signature dispositions reverified: YES\n" +
+                $"Prepared files unchanged byte-for-byte: {unchangedPreparedFiles:N0}/{workspace.Files.Length:N0}\n" +
+                "Prepared assemblies intentionally rewritten: 0\n" +
+                $"Managed Compile call sites rewritten: {rewrite.TotalRewrittenSites:N0}\n" +
+                "Compatibility disposition: HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED\n" +
+                "System.* framework implementation / non-IL-only images rewritten: NO\n" +
+                "Strong-name flags/public keys/tokens modified: NO\n" +
+                "Gate C/Gate D managed assembly Cecil writes: 0\n" +
                 "Original Step 12 install unchanged: YES\n" +
                 $"Workspace-only dependency assemblies resolved by Cecil: {_workspaceResolvedAssemblies.Count:N0}\n" +
                 $"Only launcher-private {WorkRootName} source/prepared files were written: YES\n" +
                 "Fallback to runtime/system/live-install/network resolver paths: NO\n" +
                 "Game assembly loaded/executed: NO\nSteam session consulted: NO\nNetwork attempted: NO\n" +
-                "Step 19 result is a prepared managed compatibility payload only; Harmony/MonoMod, Reflection.Emit, dynamic Assembly.Load, native interop and game startup remain later evidence-driven subsystems.");
+                "Step 19 result proves the host expression runtime fallback capability and a zero-rewrite direct-call-site disposition without mutating consumer or desktop framework images. Framework substitution/rebinding for actual iOS execution, Harmony/MonoMod, Reflection.Emit, dynamic Assembly.Load, native interop and game startup remain later evidence-driven subsystems.");
         }
         catch (OperationCanceledException)
         {
@@ -676,24 +517,49 @@ public sealed class ExpressionInterpreterCompatibility
 
     private static InterpreterProbeSnapshot RunInterpreterProbe()
     {
-        var captured = 17;
-        Expression<Func<int, int>> expression = value => value + captured;
-        var interpreted = expression.Compile(preferInterpretation: true);
-        var result = interpreted(25);
-        if (result != 42)
-            throw new InvalidDataException($"Expression interpreter probe returned {result}; expected 42.");
+        var dynamicCodeSupported = RuntimeFeature.IsDynamicCodeSupported;
+        var dynamicCodeCompiled = RuntimeFeature.IsDynamicCodeCompiled;
+
+        static Expression<Func<int, int>> CreateExpression()
+        {
+            var captured = 17;
+            return value => value + captured;
+        }
+
+        var automatic = CreateExpression().Compile();
+        var automaticResult = automatic(25);
+        if (automaticResult != 42)
+            throw new InvalidDataException($"Expression Compile() automatic-fallback probe returned {automaticResult}; expected 42.");
+
+        var explicitFalse = CreateExpression().Compile(preferInterpretation: false);
+        var explicitFalseResult = explicitFalse(25);
+        if (explicitFalseResult != 42)
+            throw new InvalidDataException($"Expression Compile(false) probe returned {explicitFalseResult}; expected 42.");
+
+        var explicitTrue = CreateExpression().Compile(preferInterpretation: true);
+        var explicitTrueResult = explicitTrue(25);
+        if (explicitTrueResult != 42)
+            throw new InvalidDataException($"Expression Compile(true) probe returned {explicitTrueResult}; expected 42.");
+
+        var iosNoDynamicCodeFallbackProven = !dynamicCodeSupported && !dynamicCodeCompiled;
+        if (OperatingSystem.IsIOS() && !iosNoDynamicCodeFallbackProven)
+        {
+            throw new InvalidDataException(
+                "Step 19 requires RuntimeFeature.IsDynamicCodeSupported == false and RuntimeFeature.IsDynamicCodeCompiled == false on the physical iOS host so successful Compile()/Compile(false) proves an AOT-safe fallback rather than a dynamic-code path.");
+        }
 
         return new InterpreterProbeSnapshot(
-            result,
-            RuntimeFeature.IsDynamicCodeSupported,
-            RuntimeFeature.IsDynamicCodeCompiled);
+            automaticResult,
+            explicitFalseResult,
+            explicitTrueResult,
+            dynamicCodeSupported,
+            dynamicCodeCompiled,
+            typeof(Expression).Assembly.GetName().FullName ?? "System.Linq.Expressions",
+            iosNoDynamicCodeFallbackProven);
     }
 
     private WorkspaceSnapshot RequireWorkspace()
         => _workspace ?? throw new InvalidOperationException("Gate A must pass before later Step 19 gates run.");
-
-    private static SteamManagedInstallFile GetReceiptFile(WorkspaceSnapshot workspace, string relative)
-        => workspace.Files.Single(file => NormalizeRelative(file.RelativePath).Equals(relative, StringComparison.OrdinalIgnoreCase));
 
     private static CompileSiteStats ScanCompileSites(ModuleDefinition module)
     {
@@ -723,12 +589,12 @@ public sealed class ExpressionInterpreterCompatibility
                         if (hazard is not null)
                         {
                             stats.ParameterlessUnsafe++;
-                            AddSample(stats.Samples, $"UNSAFE Compile() [{hazard}]: {source}");
+                            AddSample(stats.Samples, $"Compile() with old insertion hazard [{hazard}] (diagnostic only; no rewrite planned): {source}");
                         }
                         else
                         {
                             stats.ParameterlessSafe++;
-                            AddSample(stats.Samples, $"Compile() -> eligible Compile(true): {source}");
+                            AddSample(stats.Samples, $"Compile() structurally safe under old insertion design (diagnostic only; host fallback means no rewrite): {source}");
                         }
                         continue;
                     }
@@ -740,23 +606,23 @@ public sealed class ExpressionInterpreterCompatibility
                             if (value == 0)
                             {
                                 stats.LiteralFalse++;
-                                AddSample(stats.Samples, $"Compile(false) -> eligible Compile(true): {source}");
+                                AddSample(stats.Samples, $"Compile(false) observed; host runtime fallback handles this call shape: {source}");
                             }
                             else if (value == 1)
                             {
                                 stats.LiteralTrue++;
-                                AddSample(stats.Samples, $"Compile(true) already interpreter-preferred: {source}");
+                                AddSample(stats.Samples, $"Compile(true) observed: {source}");
                             }
                             else
                             {
                                 stats.DynamicBoolean++;
-                                AddSample(stats.Samples, $"Compile(bool non-0/1 literal) left untouched: {source}");
+                                AddSample(stats.Samples, $"Compile(bool non-0/1 literal) observed; no call-site rewrite planned: {source}");
                             }
                         }
                         else
                         {
                             stats.DynamicBoolean++;
-                            AddSample(stats.Samples, $"Compile(dynamic bool) left untouched: {source}");
+                            AddSample(stats.Samples, $"Compile(dynamic bool) observed; no call-site rewrite planned: {source}");
                         }
                     }
                 }
@@ -764,69 +630,6 @@ public sealed class ExpressionInterpreterCompatibility
         }
 
         return stats.Freeze();
-    }
-
-    private static (int Parameterless, int LiteralFalse) ApplyPreferInterpretationRewrite(ModuleDefinition module)
-    {
-        var rewrittenParameterless = 0;
-        var rewrittenLiteralFalse = 0;
-
-        foreach (var type in EnumerateTypes(module.Types))
-        {
-            foreach (var method in type.Methods)
-            {
-                if (!method.HasBody)
-                    continue;
-
-                var protectedEntryPoints = CollectStructuralEntryPoints(method);
-                var originalInstructions = method.Body.Instructions.ToArray();
-                var il = method.Body.GetILProcessor();
-                for (var index = 0; index < originalInstructions.Length; index++)
-                {
-                    var instruction = originalInstructions[index];
-                    if (instruction.OpCode.Code is not (Code.Call or Code.Callvirt) || instruction.Operand is not MethodReference target)
-                        continue;
-                    if (!IsExpressionCompileMethod(target))
-                        continue;
-
-                    if (target.Parameters.Count == 0)
-                    {
-                        if (GetParameterlessInsertionHazard(method, instruction, index, protectedEntryPoints) is not null)
-                            continue;
-
-                        var overload = CreatePreferInterpretationOverload(module, target);
-                        il.InsertBefore(instruction, il.Create(OpCodes.Ldc_I4_1));
-                        instruction.Operand = overload;
-                        rewrittenParameterless++;
-                        continue;
-                    }
-
-                    if (target.Parameters.Count == 1 && IsBoolean(target.Parameters[0].ParameterType))
-                    {
-                        var previous = instruction.Previous;
-                        if (previous is not null && TryGetInt32Constant(previous, out var value) && value == 0)
-                        {
-                            SetInt32ConstantToOnePreservingEncoding(previous);
-                            rewrittenLiteralFalse++;
-                        }
-                    }
-                }
-            }
-        }
-
-        return (rewrittenParameterless, rewrittenLiteralFalse);
-    }
-
-    private static MethodReference CreatePreferInterpretationOverload(ModuleDefinition module, MethodReference original)
-    {
-        var overload = new MethodReference(original.Name, original.ReturnType, original.DeclaringType)
-        {
-            HasThis = original.HasThis,
-            ExplicitThis = original.ExplicitThis,
-            CallingConvention = original.CallingConvention,
-        };
-        overload.Parameters.Add(new ParameterDefinition(module.TypeSystem.Boolean));
-        return overload;
     }
 
     private static bool IsExpressionCompileMethod(MethodReference target)
@@ -899,25 +702,6 @@ public sealed class ExpressionInterpreterCompatibility
         return false;
     }
 
-    private static void SetInt32ConstantToOnePreservingEncoding(Instruction instruction)
-    {
-        switch (instruction.OpCode.Code)
-        {
-            case Code.Ldc_I4_0:
-                instruction.OpCode = OpCodes.Ldc_I4_1;
-                instruction.Operand = null;
-                return;
-            case Code.Ldc_I4_S:
-                instruction.Operand = (sbyte)1;
-                return;
-            case Code.Ldc_I4:
-                instruction.Operand = 1;
-                return;
-            default:
-                throw new InvalidDataException($"Expected an integer-zero literal encoding, got {instruction.OpCode.Code}.");
-        }
-    }
-
     private static bool IsPrefixInstruction(Instruction instruction)
         => instruction.OpCode.Code is Code.Constrained or Code.No or Code.Readonly or Code.Tail or Code.Unaligned or Code.Volatile;
 
@@ -978,6 +762,15 @@ public sealed class ExpressionInterpreterCompatibility
         }
     }
 
+    private static bool IsPlatformFrameworkImplementationAssembly(AssemblyNameDefinition name)
+    {
+        var simpleName = name.Name ?? string.Empty;
+        return simpleName.Equals("mscorlib", StringComparison.OrdinalIgnoreCase) ||
+               simpleName.Equals("netstandard", StringComparison.OrdinalIgnoreCase) ||
+               simpleName.Equals("System", StringComparison.OrdinalIgnoreCase) ||
+               simpleName.StartsWith("System.", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static StrongNameSnapshot CaptureStrongNameState(ModuleDefinition module)
     {
         var name = module.Assembly?.Name;
@@ -988,32 +781,6 @@ public sealed class ExpressionInterpreterCompatibility
             publicKey.Length > 0,
             Convert.ToHexString(publicKey).ToLowerInvariant(),
             Convert.ToHexString(publicKeyToken).ToLowerInvariant());
-    }
-
-    private static void VerifyPreparedStrongNameState(
-        string relativePath,
-        StrongNameSnapshot before,
-        StrongNameSnapshot after)
-    {
-        if (before.StrongNameSigned && !before.HasPublicKey)
-            throw new InvalidDataException($"Step 19 source strong-name state is malformed for {relativePath}.");
-        if (before.HasPublicKey != after.HasPublicKey ||
-            !before.PublicKeyHex.Equals(after.PublicKeyHex, StringComparison.OrdinalIgnoreCase) ||
-            !before.PublicKeyTokenHex.Equals(after.PublicKeyTokenHex, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidDataException($"Step 19 prepared output changed strong-name public-key identity for {relativePath}.");
-        }
-        if (after.StrongNameSigned)
-            throw new InvalidDataException($"Step 19 prepared output still claims StrongNameSigned after content modification: {relativePath}.");
-    }
-
-    private static string FormatTargetAssemblySamples(IReadOnlyList<TargetAssemblySnapshot> values)
-    {
-        if (values.Count == 0)
-            return "• none";
-        return string.Join("\n", values.Take(SampleLimit).Select(value =>
-            $"• {value.RelativePath} | {value.AssemblyFullName} | eligible={value.Stats.SupportedRewrites:N0} | " +
-            $"public-key={(value.StrongName.HasPublicKey ? "YES" : "NO")}, StrongNameSigned={(value.StrongName.StrongNameSigned ? "YES" : "NO")}"));
     }
 
     private static ModuleFingerprint Fingerprint(ModuleDefinition module)
@@ -1567,9 +1334,13 @@ public sealed class ExpressionInterpreterCompatibility
     }
 
     private sealed record InterpreterProbeSnapshot(
-        int Result,
+        int AutomaticResult,
+        int ExplicitFalseResult,
+        int ExplicitTrueResult,
         bool DynamicCodeSupported,
-        bool DynamicCodeCompiled);
+        bool DynamicCodeCompiled,
+        string HostExpressionsAssemblyFullName,
+        bool IosNoDynamicCodeFallbackProven);
 
     private sealed record WorkspaceSnapshot(
         string ManagedRoot,
@@ -1595,7 +1366,9 @@ public sealed class ExpressionInterpreterCompatibility
         string RelativePath,
         string AssemblyFullName,
         StrongNameSnapshot StrongName,
-        CompileSiteStats Stats);
+        CompileSiteStats Stats,
+        bool IsIlOnly,
+        bool IsFrameworkImplementation);
 
     private sealed record DiscoverySnapshot(
         int ParsedModules,
@@ -1608,10 +1381,14 @@ public sealed class ExpressionInterpreterCompatibility
         long DynamicBoolean,
         long UnsafeParameterless,
         long StrongNamedSupported,
+        long FrameworkImplementationSupported,
+        long NonIlOnlySupported,
+        long UnsafeNonFrameworkNonIlOnlySupported,
         long MalformedStrongNameSupported,
         long RewriteSupported,
         long PrimarySupported,
         int StrongNameSignedTargetAssemblies,
+        bool NoRewriteRequired,
         IReadOnlyList<string> Samples);
 
     private sealed record PreparedAssemblySnapshot(
