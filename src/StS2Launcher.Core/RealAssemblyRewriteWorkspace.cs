@@ -23,6 +23,7 @@ public sealed class RealAssemblyRewriteWorkspace
     private readonly SteamOfflineInstallInspection _offlineInspection;
     private WorkspaceSnapshot? _workspace;
     private RewriteSnapshot? _rewrite;
+    private readonly SortedSet<string> _workspaceResolvedAssemblies = new(StringComparer.Ordinal);
 
     public RealAssemblyRewriteWorkspace(string launcherDataRoot)
     {
@@ -38,6 +39,7 @@ public sealed class RealAssemblyRewriteWorkspace
     {
         _workspace = null;
         _rewrite = null;
+        _workspaceResolvedAssemblies.Clear();
     }
 
     public async Task<RealAssemblyRewriteGateResult> RunWorkspaceCloneAsync(
@@ -203,10 +205,12 @@ public sealed class RealAssemblyRewriteWorkspace
                 throw new InvalidDataException("Primary workspace source no longer matches its receipt SHA-1 before Cecil round-trip.");
 
             ModuleFingerprint before;
-            using (var module = ReadModuleImmediate(sourcePath))
+            using (var resolver = CreateWorkspaceResolver(workspace))
+            using (var module = ReadModuleImmediate(sourcePath, resolver))
             {
                 before = Fingerprint(module);
                 module.Write(outputPath, new WriterParameters { WriteSymbols = false });
+                RecordWorkspaceResolutions(resolver);
             }
 
             if (!File.Exists(outputPath) || new FileInfo(outputPath).Length <= 0)
@@ -225,7 +229,7 @@ public sealed class RealAssemblyRewriteWorkspace
 
             return Pass(
                 RealAssemblyRewriteGate.PrimaryRoundTrip,
-                "Mono.Cecil wrote and reopened a REAL StS2 assembly copy without resolving or loading dependencies.\n" +
+                "Mono.Cecil wrote and reopened a REAL StS2 assembly copy using only the verified Step 18 workspace for any writer-required dependency resolution.\n" +
                 $"Source: {WorkRootName}/{SourceRootName}/{workspace.PrimaryRelativePath}\n" +
                 $"Output: {WorkRootName}/{RoundTripRootName}/{workspace.PrimaryRelativePath}\n" +
                 $"Assembly: {before.AssemblyName} {before.AssemblyVersion}\n" +
@@ -234,7 +238,11 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Assembly/module references: {before.AssemblyReferenceCount:N0}/{before.ModuleReferenceCount:N0}\n" +
                 "Logical metadata fingerprint preserved after write/reopen: YES\n" +
                 "Workspace source receipt SHA-1 preserved: YES\n" +
-                "Assembly dependency resolution attempted: NO\nAssembly.Load attempted: NO\nReal managed install modified: NO");
+                $"Workspace-only dependency resolutions observed: {_workspaceResolvedAssemblies.Count:N0}" +
+                (_workspaceResolvedAssemblies.Count == 0 ? "\n" : $" ({string.Join(", ", _workspaceResolvedAssemblies.Take(8))}{(_workspaceResolvedAssemblies.Count > 8 ? ", …" : string.Empty)})\n") +
+                "Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY\nResolved dependency file SHA-1 rechecked immediately before Cecil open: YES\n" +
+                "Fallback to runtime/system/live-install/network resolver paths: NO\n" +
+                "Assembly.Load attempted: NO\nReal managed install modified: NO");
         }
         catch (Exception ex)
         {
@@ -263,7 +271,8 @@ public sealed class RealAssemblyRewriteWorkspace
             int originalInstructionCount;
             ModuleFingerprint sourceFingerprint;
 
-            using (var module = ReadModuleImmediate(sourcePath))
+            using (var resolver = CreateWorkspaceResolver(workspace))
+            using (var module = ReadModuleImmediate(sourcePath, resolver))
             {
                 sourceFingerprint = Fingerprint(module);
                 var method = SelectNeutralRewriteMethod(module);
@@ -276,6 +285,7 @@ public sealed class RealAssemblyRewriteWorkspace
                 originalFirstCode = first.OpCode.Code;
                 method.Body.GetILProcessor().InsertBefore(first, Instruction.Create(OpCodes.Nop));
                 module.Write(outputPath, new WriterParameters { WriteSymbols = false });
+                RecordWorkspaceResolutions(resolver);
             }
 
             if (!File.Exists(outputPath) || new FileInfo(outputPath).Length <= 0)
@@ -317,6 +327,8 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Output: {WorkRootName}/{RewrittenRootName}/{workspace.PrimaryRelativePath}\n" +
                 "Rewritten output differs from source bytes: YES\n" +
                 "Workspace source receipt SHA-1 preserved: YES\n" +
+                $"Workspace-only dependency resolutions observed across Gates B/C: {_workspaceResolvedAssemblies.Count:N0}\n" +
+                "Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY\nResolved dependency file SHA-1 rechecked immediately before Cecil open: YES\n" +
                 "Behaviorally significant game fix attempted: NO\nGame assembly loaded/executed: NO\nReal managed install modified: NO");
         }
         catch (Exception ex)
@@ -418,7 +430,10 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Neutral NOP rewrite still present after reopen: YES ({rewrite.MethodFullName})\n" +
                 "Only launcher-private Step18-RealAssemblyRewrite outputs were written: YES\n" +
                 "Original Step 12 install unchanged: YES\n" +
-                "Assembly dependency resolution attempted: NO\nSteam session consulted: NO\nNetwork attempted: NO\nGame assembly loaded/executed: NO\n" +
+                $"Workspace-only dependency assemblies resolved by Cecil: {_workspaceResolvedAssemblies.Count:N0}\n" +
+                "Every dependency resolution was constrained to Step18-RealAssemblyRewrite/source: YES\nResolved dependency file SHA-1 rechecked immediately before Cecil open: YES\n" +
+                "Fallback to runtime/system/live-install/network resolver paths: NO\n" +
+                "Steam session consulted: NO\nNetwork attempted: NO\nGame assembly loaded/executed: NO\n" +
                 "Next-step policy: behavioral compatibility rewrites may now be developed against workspace copies, one evidence-backed incompatibility class at a time.");
         }
         catch (OperationCanceledException)
@@ -491,6 +506,140 @@ public sealed class RealAssemblyRewriteWorkspace
             ReadSymbols = false,
             ReadingMode = ReadingMode.Immediate,
         });
+
+    private static ModuleDefinition ReadModuleImmediate(string path, IAssemblyResolver resolver)
+        => ModuleDefinition.ReadModule(path, new ReaderParameters
+        {
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Immediate,
+            AssemblyResolver = resolver,
+        });
+
+    private static WorkspaceOnlyAssemblyResolver CreateWorkspaceResolver(WorkspaceSnapshot workspace)
+    {
+        var primaryDirectory = Path.GetDirectoryName(ResolveChildPath(workspace.SourceRoot, workspace.PrimaryRelativePath))
+            ?? throw new InvalidDataException("The Step 18 primary assembly has no workspace directory.");
+
+        var directories = workspace.Files
+            .Select(file => Path.GetDirectoryName(ResolveChildPath(workspace.SourceRoot, NormalizeRelative(file.RelativePath))))
+            .Where(directory => !string.IsNullOrWhiteSpace(directory))
+            .Select(directory => Path.GetFullPath(directory!))
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(directory => directory.Equals(primaryDirectory, StringComparison.Ordinal) ? 0 : 1)
+            .ThenBy(directory => directory, StringComparer.Ordinal)
+            .ToArray();
+
+        var trustedFiles = workspace.Files.ToDictionary(
+            file => Path.GetFullPath(ResolveChildPath(workspace.SourceRoot, NormalizeRelative(file.RelativePath))),
+            file => file.Sha1Hex,
+            StringComparer.Ordinal);
+
+        return new WorkspaceOnlyAssemblyResolver(workspace.SourceRoot, directories, trustedFiles);
+    }
+
+    private void RecordWorkspaceResolutions(WorkspaceOnlyAssemblyResolver resolver)
+    {
+        foreach (var name in resolver.ResolvedAssemblyNames)
+            _workspaceResolvedAssemblies.Add(name);
+    }
+
+    private sealed class WorkspaceOnlyAssemblyResolver : IAssemblyResolver
+    {
+        private readonly string _rootPrefix;
+        private readonly string[] _directories;
+        private readonly Dictionary<string, AssemblyDefinition> _cache = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, string> _trustedFileSha1;
+        private readonly SortedSet<string> _resolvedAssemblyNames = new(StringComparer.Ordinal);
+        private bool _disposed;
+
+        public WorkspaceOnlyAssemblyResolver(
+            string root,
+            IEnumerable<string> directories,
+            IReadOnlyDictionary<string, string> trustedFileSha1)
+        {
+            var fullRoot = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar);
+            _rootPrefix = fullRoot + Path.DirectorySeparatorChar;
+            _directories = directories
+                .Select(Path.GetFullPath)
+                .Where(path => path.Equals(fullRoot, StringComparison.Ordinal) || path.StartsWith(_rootPrefix, StringComparison.Ordinal))
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            _trustedFileSha1 = trustedFileSha1.ToDictionary(
+                pair => Path.GetFullPath(pair.Key),
+                pair => pair.Value,
+                StringComparer.Ordinal);
+            if (_directories.Length == 0 || _trustedFileSha1.Count == 0)
+                throw new InvalidDataException("The Step 18 workspace-only resolver has no trusted receipt-backed search scope.");
+        }
+
+        public IReadOnlyCollection<string> ResolvedAssemblyNames => _resolvedAssemblyNames;
+
+        public AssemblyDefinition Resolve(AssemblyNameReference name)
+            => Resolve(name, new ReaderParameters());
+
+        public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(WorkspaceOnlyAssemblyResolver));
+            ArgumentNullException.ThrowIfNull(name);
+            ArgumentNullException.ThrowIfNull(parameters);
+
+            if (_cache.TryGetValue(name.FullName, out var cached))
+                return cached;
+
+            foreach (var directory in _directories)
+            {
+                foreach (var extension in new[] { ".dll", ".exe" })
+                {
+                    var candidate = Path.GetFullPath(Path.Combine(directory, name.Name + extension));
+                    if (!candidate.StartsWith(_rootPrefix, StringComparison.Ordinal) ||
+                        !_trustedFileSha1.TryGetValue(candidate, out var expectedSha1) ||
+                        !File.Exists(candidate))
+                    {
+                        continue;
+                    }
+
+                    var actualSha1 = RealAssemblyRewriteWorkspace.ComputeSha1Hex(candidate);
+                    if (!actualSha1.Equals(expectedSha1, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidDataException(
+                            $"Step 18 workspace dependency changed after Gate A SHA-1 verification: {Path.GetFileName(candidate)}");
+                    }
+
+                    var reader = new ReaderParameters
+                    {
+                        ReadSymbols = false,
+                        ReadingMode = ReadingMode.Immediate,
+                        InMemory = true,
+                        AssemblyResolver = this,
+                    };
+                    var module = ModuleDefinition.ReadModule(candidate, reader);
+                    var assembly = module.Assembly;
+                    if (assembly is null || !assembly.Name.Name.Equals(name.Name, StringComparison.Ordinal))
+                    {
+                        module.Dispose();
+                        continue;
+                    }
+
+                    _cache[name.FullName] = assembly;
+                    _resolvedAssemblyNames.Add(assembly.Name.Name);
+                    return assembly;
+                }
+            }
+
+            throw new AssemblyResolutionException(name);
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+            _disposed = true;
+            foreach (var assembly in _cache.Values.Distinct())
+                assembly.Dispose();
+            _cache.Clear();
+        }
+    }
 
     private async Task<SteamManagedInstallReceipt> ReadReceiptAsync(string managedRoot, CancellationToken cancellationToken)
     {

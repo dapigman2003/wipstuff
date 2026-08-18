@@ -170,12 +170,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 18 — REAL ASSEMBLY REWRITE WORKSPACE",
+            "STEP 18.1 — REAL ASSEMBLY REWRITE WORKSPACE",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.47",
+            "Version 0.0.48",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
