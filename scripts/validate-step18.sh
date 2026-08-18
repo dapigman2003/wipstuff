@@ -26,6 +26,7 @@ required = [
     Path('docs/STEP-18-TEST.md'),
     Path('docs/STEP-18.1.1-HOST-TEST-CECIL-API-FIX.md'),
     Path('docs/STEP-18.2-WORKSPACE-IDENTITY-RESOLVER-FIX.md'),
+    Path('docs/STEP-18.3-WORKSPACE-VERSION-UNIFICATION-RESOLVER-FIX.md'),
 ]
 for path in required:
     if not path.exists():
@@ -33,13 +34,13 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.49' or str(plist.get('CFBundleVersion')) != '49':
-    raise SystemExit('ERROR: Step 18.2 must be version 0.0.49 (49).')
+if plist.get('CFBundleShortVersionString') != '0.0.50' or str(plist.get('CFBundleVersion')) != '50':
+    raise SystemExit('ERROR: Step 18.3 must be version 0.0.50 (50).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 for marker in (
-    '<ApplicationVersion>49</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.49</ApplicationDisplayVersion>',
+    '<ApplicationVersion>50</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.50</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -79,6 +80,9 @@ for marker in (
     'Resolved dependency file SHA-1 rechecked immediately before Cecil open: YES',
     'WorkspaceAssemblyCandidate[]? _catalog'
     , 'AssemblyIdentityMatches(name, candidate)'
+    , 'AssemblyIdentityMatchesIgnoringVersion(name, candidate)'
+    , '[workspace version-unified]'
+    , 'multiple version-distinct identity candidates'
     , 'MetadataResolver = metadataResolver'
     , 'RejectingCatalogProbeResolver'
     , 'Workspace identity candidates:'
@@ -134,7 +138,7 @@ if 'isValueType:' in tests:
     raise SystemExit('ERROR: Step 18 host test uses unsupported Mono.Cecil 0.11.6 TypeReference named argument isValueType:.')
 for marker in (
     'TypeReference constructor argument',
-    'dependencyReference,\n            true);',
+    'godotReference,\n            true);',
 ):
     if marker not in tests:
         raise SystemExit(f'ERROR: Step 18.1.1 Mono.Cecil TypeReference API hotfix marker missing: {marker}')
@@ -145,9 +149,12 @@ for marker in (
     'data_sts2_macos_arm64/sts2.dll',
     'data_sts2_macos_x86_64/sts2.dll',
     'insert one IL NOP at method entry',
-    'WriteSyntheticAssemblyWithExternalEnumDefault',
+    'WriteSyntheticAssemblyWithExternalEnumDefaults',
     'GodotSharp',
     'godot-runtime-payload.dll',
+    'runtime-contract-payload.dll',
+    'System.Runtime',
+    '[workspace version-unified]',
     'ASSEMBLY IDENTITY',
     'Workspace-only dependency resolutions observed:',
     'Original Step 12 install unchanged: YES',
@@ -157,8 +164,8 @@ for marker in (
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 for marker in (
-    'STEP 18.2 — REAL ASSEMBLY REWRITE WORKSPACE',
-    'Version 0.0.49',
+    'STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Version 0.0.50',
     'Steps 01–17 are complete on the physical iPhone.',
     'Step 18 — Real Assembly Rewrite Workspace (ordered gates A–D)',
     'Run Gates A–D — Clone ARM64 → Real Roundtrip → Neutral NOP → Isolation Audit',
@@ -189,22 +196,22 @@ for marker in (
 
 verify = Path('scripts/verify-step18-ipa.sh').read_text()
 for marker in (
-    '0.0.49',
-    'BUILD_VERSION" == "49"',
+    '0.0.50',
+    'BUILD_VERSION" == "50"',
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-    'Expected device UI: STEP 18.2 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Expected device UI: STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE',
 ):
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 18 IPA verification marker missing: {marker}')
 
 codemagic = Path('codemagic.yaml').read_text()
 for marker in (
-    'ios-step-18-2:',
-    'Step 18.2 - Workspace Identity Resolver Fix',
+    'ios-step-18-3:',
+    'Step 18.3 - Workspace Version-Unification Resolver Fix',
     'max_build_duration: 120',
     '$HOME/.cache/sts2launcher/godot-step15',
     'bash scripts/codemagic-build-step18.sh',
