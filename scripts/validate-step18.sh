@@ -8,7 +8,10 @@ STS2_VALIDATE_AS_PARENT=1 bash scripts/validate-step17.sh
 
 python3 - <<'PY'
 from pathlib import Path
+import os
 import plistlib
+
+parent_mode = os.environ.get("STS2_VALIDATE_AS_PARENT") == "1"
 
 required = [
     Path('src/StS2Launcher.Core/RealAssemblyRewriteGate.cs'),
@@ -35,13 +38,23 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.51' or str(plist.get('CFBundleVersion')) != '51':
-    raise SystemExit('ERROR: Step 18.4 must be version 0.0.51 (51).')
+if parent_mode:
+    try:
+        build_number = int(str(plist.get('CFBundleVersion')))
+    except ValueError as exc:
+        raise SystemExit('ERROR: Step 18 parent validation requires a numeric build version.') from exc
+    if build_number < 51:
+        raise SystemExit('ERROR: Step 18 parent validation requires build >= 51.')
+else:
+    if plist.get('CFBundleShortVersionString') != '0.0.51' or str(plist.get('CFBundleVersion')) != '51':
+        raise SystemExit('ERROR: Step 18.4 must be version 0.0.51 (51).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
-for marker in (
+version_markers = () if parent_mode else (
     '<ApplicationVersion>51</ApplicationVersion>',
     '<ApplicationDisplayVersion>0.0.51</ApplicationDisplayVersion>',
+)
+for marker in version_markers + (
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -180,10 +193,12 @@ for marker in (
         raise SystemExit(f'ERROR: Step 18 host-test marker missing: {marker}')
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
-for marker in (
+standalone_ui_markers = () if parent_mode else (
     'STEP 18.4 — REAL ASSEMBLY REWRITE WORKSPACE',
     'Version 0.0.51',
     'Steps 01–17 are complete on the physical iPhone.',
+)
+for marker in standalone_ui_markers + (
     'Step 18 — Real Assembly Rewrite Workspace (ordered gates A–D)',
     'Run Gates A–D — Clone ARM64 → Real Roundtrip → Neutral NOP → Isolation Audit',
     'RunRealAssemblyRewriteWorkspaceAsync',
@@ -225,20 +240,21 @@ for marker in (
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 18 IPA verification marker missing: {marker}')
 
-codemagic = Path('codemagic.yaml').read_text()
-for marker in (
-    'ios-step-18-4:',
-    'Step 18.4 - Explicit Cecil Reopen Resolver Fix',
-    'max_build_duration: 120',
-    '$HOME/.cache/sts2launcher/godot-step15',
-    'bash scripts/codemagic-build-step18.sh',
-    'artifacts/StS2-Launcher-Step-18.ipa',
-    'artifacts/step18-build-summary.txt',
-):
-    if marker not in codemagic:
-        raise SystemExit(f'ERROR: Step 18 Codemagic marker missing: {marker}')
+if not parent_mode:
+    codemagic = Path('codemagic.yaml').read_text()
+    for marker in (
+        'ios-step-18-4:',
+        'Step 18.4 - Explicit Cecil Reopen Resolver Fix',
+        'max_build_duration: 120',
+        '$HOME/.cache/sts2launcher/godot-step15',
+        'bash scripts/codemagic-build-step18.sh',
+        'artifacts/StS2-Launcher-Step-18.ipa',
+        'artifacts/step18-build-summary.txt',
+    ):
+        if marker not in codemagic:
+            raise SystemExit(f'ERROR: Step 18 Codemagic marker missing: {marker}')
 
-print('Step 18 Real Assembly Rewrite Workspace source validation: PASS')
+print('Step 18 Real Assembly Rewrite Workspace source validation: PASS' + (' (parent regression mode)' if parent_mode else ''))
 print('  Steps 01-17 regression guards retained')
 print('  Gate A: receipt-backed macOS arm64/shared managed payload cloned into launcher-private workspace')
 print('  Gate B: real copied primary sts2.dll Cecil write + explicit-resolver deferred output reopen')
