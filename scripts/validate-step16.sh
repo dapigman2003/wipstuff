@@ -8,8 +8,11 @@ STS2_VALIDATE_AS_PARENT=1 bash scripts/validate-step15.sh
 
 python3 - <<'PY'
 from pathlib import Path
+import os
 import plistlib
 import re
+
+parent_mode = os.environ.get('STS2_VALIDATE_AS_PARENT') == '1'
 
 required = [
     Path('src/StS2Launcher.Core/ManagedPreparationGate.cs'),
@@ -34,13 +37,15 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.45' or str(plist.get('CFBundleVersion')) != '45':
-    raise SystemExit('ERROR: Step 16.1 must be version 0.0.45 (45).')
+if not parent_mode:
+    if plist.get('CFBundleShortVersionString') != '0.0.45' or str(plist.get('CFBundleVersion')) != '45':
+        raise SystemExit('ERROR: standalone Step 16.1 must be version 0.0.45 (45).')
+else:
+    if int(str(plist.get('CFBundleVersion') or '0')) < 45:
+        raise SystemExit('ERROR: later-step Step 16 regression validation requires build version >= 45.')
 
 iosproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
-for marker in (
-    '<ApplicationVersion>45</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.45</ApplicationDisplayVersion>',
+project_markers = [
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -48,7 +53,13 @@ for marker in (
     '<_LinkerFrameworks Remove="DiskArbitration" />',
     '<ForceLoad>false</ForceLoad>',
     '<SmartLink>false</SmartLink>',
-):
+]
+if not parent_mode:
+    project_markers.extend([
+        '<ApplicationVersion>45</ApplicationVersion>',
+        '<ApplicationDisplayVersion>0.0.45</ApplicationDisplayVersion>',
+    ])
+for marker in project_markers:
     if marker not in iosproj:
         raise SystemExit(f'ERROR: Step 16 iOS regression marker missing: {marker}')
 if '<TrimmerRootAssembly Include="Mono.Cecil" />' in iosproj:
@@ -171,10 +182,7 @@ for marker in (
         raise SystemExit(f'ERROR: Step 16 host-test marker missing: {marker}')
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
-for marker in (
-    'STEP 16.1 — MANAGED PREPARATION FOUNDATION',
-    'Version 0.0.45',
-    'Steps 01–15 are complete on the physical iPhone.',
+root_markers = [
     'Step 16 — Managed Preparation Foundation (ordered gates A–D)',
     'Run Gates A–D — Cecil Fixture → IL Rewrite → Real StS2 Metadata',
     'RunManagedPreparationFoundationAsync',
@@ -187,7 +195,14 @@ for marker in (
     'PASS: STEP 16 MANAGED PREPARATION — 4/4',
     'Verify Offline-Ready Install (Local Only)',
     'Run Foundation 5/5 Regression',
-):
+]
+if not parent_mode:
+    root_markers.extend([
+        'STEP 16.1 — MANAGED PREPARATION FOUNDATION',
+        'Version 0.0.45',
+        'Steps 01–15 are complete on the physical iPhone.',
+    ])
+for marker in root_markers:
     if marker not in root:
         raise SystemExit(f'ERROR: Step 16 UI/gate marker missing: {marker}')
 if 'Assembly.Load(' in root:
@@ -212,37 +227,43 @@ if build.index('dotnet publish "$PROJECT"') > build.index('cp "$FIXTURE_DLL" "$F
     raise SystemExit('ERROR: Step 16 fixture must be copied into the finished app after publish, not fed into iOS AOT.')
 
 verify = Path('scripts/verify-step16-ipa.sh').read_text()
-for marker in (
-    '0.0.45',
-    'BUILD_VERSION" == "45"',
+verify_markers = [
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'bundled Step 16 fixture differs from the exact project-owned fixture built earlier in this Codemagic run',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-):
+]
+if not parent_mode:
+    verify_markers.extend(['0.0.45', 'BUILD_VERSION" == "45"'])
+for marker in verify_markers:
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 16 IPA verification marker missing: {marker}')
 if '(mono\\.cecil' in verify.lower():
     raise SystemExit('ERROR: Step 16 IPA verifier must no longer reject the intentional Mono.Cecil runtime dependency.')
 
-codemagic = Path('codemagic.yaml').read_text()
-for marker in (
-    'ios-step-16-1:',
-    'Step 16.1 - Managed Preparation Foundation Hotfix',
-    'max_build_duration: 120',
-    '$HOME/.cache/sts2launcher/godot-step15',
-    'bash scripts/codemagic-build-step16.sh',
-    'artifacts/StS2-Launcher-Step-16.1.ipa',
-    'artifacts/step16-build-summary.txt',
-):
-    if marker not in codemagic:
-        raise SystemExit(f'ERROR: Step 16 Codemagic marker missing: {marker}')
+if not parent_mode:
+    codemagic = Path('codemagic.yaml').read_text()
+    for marker in (
+        'ios-step-16-1:',
+        'Step 16.1 - Managed Preparation Foundation Hotfix',
+        'max_build_duration: 120',
+        '$HOME/.cache/sts2launcher/godot-step15',
+        'bash scripts/codemagic-build-step16.sh',
+        'artifacts/StS2-Launcher-Step-16.1.ipa',
+        'artifacts/step16-build-summary.txt',
+    ):
+        if marker not in codemagic:
+            raise SystemExit(f'ERROR: Step 16 Codemagic marker missing: {marker}')
 
 third_party = Path('THIRD_PARTY.md').read_text()
-if '### Mono.Cecil 0.11.6' not in third_party or 'Step 16 now intentionally uses Mono.Cecil at runtime' not in third_party:
-    raise SystemExit('ERROR: Step 16 runtime Mono.Cecil attribution/scope documentation missing.')
+if '### Mono.Cecil 0.11.6' not in third_party:
+    raise SystemExit('ERROR: Step 16 runtime Mono.Cecil attribution missing.')
+if not parent_mode and 'Step 16 now intentionally uses Mono.Cecil at runtime' not in third_party:
+    raise SystemExit('ERROR: standalone Step 16 runtime Mono.Cecil scope documentation missing.')
+if parent_mode and 'Mono.Cecil at runtime' not in third_party:
+    raise SystemExit('ERROR: later-step source no longer documents runtime Mono.Cecil usage.')
 
 print('Step 16 Managed Preparation Foundation source validation: PASS')
 print('  Steps 01-15 regression guards retained')
