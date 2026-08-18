@@ -27,6 +27,7 @@ required = [
     Path('docs/STEP-18.1.1-HOST-TEST-CECIL-API-FIX.md'),
     Path('docs/STEP-18.2-WORKSPACE-IDENTITY-RESOLVER-FIX.md'),
     Path('docs/STEP-18.3-WORKSPACE-VERSION-UNIFICATION-RESOLVER-FIX.md'),
+    Path('docs/STEP-18.4-EXPLICIT-CECIL-REOPEN-RESOLVER-FIX.md'),
 ]
 for path in required:
     if not path.exists():
@@ -34,13 +35,13 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.50' or str(plist.get('CFBundleVersion')) != '50':
-    raise SystemExit('ERROR: Step 18.3 must be version 0.0.50 (50).')
+if plist.get('CFBundleShortVersionString') != '0.0.51' or str(plist.get('CFBundleVersion')) != '51':
+    raise SystemExit('ERROR: Step 18.4 must be version 0.0.51 (51).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 for marker in (
-    '<ApplicationVersion>50</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.50</ApplicationDisplayVersion>',
+    '<ApplicationVersion>51</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.51</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -87,7 +88,12 @@ for marker in (
     , 'RejectingCatalogProbeResolver'
     , 'Workspace identity candidates:'
     , 'EnsureWorkspaceResolverBound(module, resolver)'
-    , 'Cecil assembly + metadata resolver explicitly bound to workspace identity catalog: YES',
+    , 'Primary source read resolver explicitly bound to workspace identity catalog: YES',
+    'Generated-output reopen resolver explicitly bound to workspace identity catalog: YES',
+    'Generated-output verification uses deferred Cecil reading: YES',
+    'ReadModuleWithWorkspaceResolver',
+    'ReadingMode.Deferred',
+    'Stage: {stage}',
     'Game assembly loaded/executed: NO',
 ):
     if marker not in workspace:
@@ -109,6 +115,17 @@ for forbidden in (
 ):
     if forbidden in workspace:
         raise SystemExit(f'ERROR: Step 18 rewrite workspace gained forbidden runtime/network behavior: {forbidden}')
+
+# Step 18.4: no generated-output verification read may omit the explicit workspace resolver.
+for forbidden_read in (
+    'ReadModuleImmediate(outputPath)',
+    'ReadModuleImmediate(roundTripPath)',
+    'ReadModuleImmediate(rewrittenPath)',
+):
+    if forbidden_read in workspace:
+        raise SystemExit(f'ERROR: Step 18.4 generated-output Cecil read escaped the explicit workspace resolver: {forbidden_read}')
+if workspace.count('ModuleDefinition.ReadModule(path, new ReaderParameters') != 2:
+    raise SystemExit('ERROR: Step 18.4 expected exactly two centralized direct Cecil ReadModule(path, ReaderParameters) sites (bound helper + resolver open).')
 
 # Guard the critical isolation shape: real-install paths are only opened for receipt reads/hashes;
 # all Cecil writes target outputPath beneath the project-owned Step 18 work root.
@@ -164,8 +181,8 @@ for marker in (
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 for marker in (
-    'STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE',
-    'Version 0.0.50',
+    'STEP 18.4 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Version 0.0.51',
     'Steps 01–17 are complete on the physical iPhone.',
     'Step 18 — Real Assembly Rewrite Workspace (ordered gates A–D)',
     'Run Gates A–D — Clone ARM64 → Real Roundtrip → Neutral NOP → Isolation Audit',
@@ -196,22 +213,22 @@ for marker in (
 
 verify = Path('scripts/verify-step18-ipa.sh').read_text()
 for marker in (
-    '0.0.50',
-    'BUILD_VERSION" == "50"',
+    '0.0.51',
+    'BUILD_VERSION" == "51"',
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-    'Expected device UI: STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Expected device UI: STEP 18.4 — REAL ASSEMBLY REWRITE WORKSPACE',
 ):
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 18 IPA verification marker missing: {marker}')
 
 codemagic = Path('codemagic.yaml').read_text()
 for marker in (
-    'ios-step-18-3:',
-    'Step 18.3 - Workspace Version-Unification Resolver Fix',
+    'ios-step-18-4:',
+    'Step 18.4 - Explicit Cecil Reopen Resolver Fix',
     'max_build_duration: 120',
     '$HOME/.cache/sts2launcher/godot-step15',
     'bash scripts/codemagic-build-step18.sh',
@@ -224,8 +241,8 @@ for marker in (
 print('Step 18 Real Assembly Rewrite Workspace source validation: PASS')
 print('  Steps 01-17 regression guards retained')
 print('  Gate A: receipt-backed macOS arm64/shared managed payload cloned into launcher-private workspace')
-print('  Gate B: real copied primary sts2.dll Cecil write/reopen using strict workspace-only dependency resolution')
-print('  Gate C: semantics-neutral one-NOP IL rewrite on copied primary assembly only')
-print('  Gate D: complete workspace-source + original-install SHA-1 isolation audit')
+print('  Gate B: real copied primary sts2.dll Cecil write + explicit-resolver deferred output reopen')
+print('  Gate C: semantics-neutral one-NOP IL rewrite + explicit-resolver deferred verification reopen')
+print('  Gate D: complete source/install SHA-1 audit + explicit-resolver output reopens')
 print('  Cecil writer-required dependency resolution is allowed only inside the verified Step 18 workspace; no runtime/system/live-install/network fallback, Assembly.Load/game execution, FMOD/Spine runtime integration, Cloud or Workshop added')
 PY

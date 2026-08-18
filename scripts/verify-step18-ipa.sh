@@ -31,8 +31,8 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "0.0.50" ]] || { echo "ERROR: wrong Step 18 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "50" ]] || { echo "ERROR: wrong Step 18 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$VERSION" == "0.0.51" ]] || { echo "ERROR: wrong Step 18 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "51" ]] || { echo "ERROR: wrong Step 18 build version: $BUILD_VERSION" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 
@@ -155,5 +155,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  Project-owned Step 16 regression fixture: bundled as inert raw assembly data"
   echo "  Real StS2/proprietary payload in IPA: none"
   echo "  Dynamic dependency audit: system or bundled only"
-  echo "  Expected device UI: STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE"
+  echo "  Expected device UI: STEP 18.4 — REAL ASSEMBLY REWRITE WORKSPACE"
 } | tee artifacts/logs/step18-ipa-verification-summary.log
