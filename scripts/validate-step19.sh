@@ -3,8 +3,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-# Step 19 is allowed to add one compatibility subsystem only. The physically closed
-# Step 18 boundary (and everything beneath it) must remain regression-protected.
+# Step 19.2 may add only the expression-host compatibility subsystem. Keep the
+# physically closed Step 18 boundary and everything beneath it regression-protected.
 STS2_VALIDATE_AS_PARENT=1 bash scripts/validate-step18.sh
 
 python3 - <<'PY'
@@ -26,14 +26,14 @@ required = [
     Path('scripts/verify-step19-ipa.sh'),
     Path('docs/STEP-19-DESIGN.md'),
     Path('docs/STEP-19-TEST.md'),
-    Path('docs/STEP-19.1-STRONG-NAME-IDENTITY-FIX.md'),
+    Path('docs/STEP-19.2-FRAMEWORK-BOUNDARY-FIX.md'),
 ]
 for path in required:
     if not path.exists():
         raise SystemExit(f'ERROR: Step 19 artifact missing: {path}')
 
-# Exact hashes protect the most important physically proven Step 18/17 implementation
-# files from accidental edits while Step 19 is being developed.
+# Exact hashes protect the physically proven Step 18/17 implementation from
+# accidental edits while Step 19.2 evolves.
 protected_hashes = {
     Path('src/StS2Launcher.Core/RealAssemblyRewriteWorkspace.cs'):
         'eea878b5674f8cb81d6c925072a1273fef7128b8e1d1122c768ae9d8aba948b6',
@@ -49,13 +49,13 @@ for path, expected in protected_hashes.items():
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.53' or str(plist.get('CFBundleVersion')) != '53':
-    raise SystemExit('ERROR: Step 19 must be version 0.0.53 (53).')
+if plist.get('CFBundleShortVersionString') != '0.0.54' or str(plist.get('CFBundleVersion')) != '54':
+    raise SystemExit('ERROR: Step 19.2 must be version 0.0.54 (54).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 for marker in (
-    '<ApplicationVersion>53</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.53</ApplicationDisplayVersion>',
+    '<ApplicationVersion>54</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.54</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -65,9 +65,9 @@ for marker in (
     '<SmartLink>false</SmartLink>',
 ):
     if marker not in csproj:
-        raise SystemExit(f'ERROR: Step 19 iOS/regression marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 iOS/regression marker missing: {marker}')
 if '<TrimmerRootAssembly Include="Mono.Cecil" />' in csproj:
-    raise SystemExit('ERROR: Step 19 must preserve the physically proven full-trim Mono.Cecil path; do not blanket-root Cecil.')
+    raise SystemExit('ERROR: preserve the physically proven full-trim Mono.Cecil path; do not blanket-root Cecil.')
 
 core = Path('src/StS2Launcher.Core/ExpressionInterpreterCompatibility.cs').read_text()
 for marker in (
@@ -77,12 +77,17 @@ for marker in (
     'PreparedRootName = "prepared"',
     'RunInterpreterCapabilityAndWorkspaceCloneAsync',
     'RunRealCompileTargetDiscovery',
-    'RunPreferInterpretationRewrite',
+    'RunHostFallbackPreparedCopy',
     'RunIsolationAuditAsync',
     'var captured = 17;',
+    'CreateExpression().Compile();',
+    'Compile(preferInterpretation: false)',
     'Compile(preferInterpretation: true)',
     'RuntimeFeature.IsDynamicCodeSupported',
     'RuntimeFeature.IsDynamicCodeCompiled',
+    'OperatingSystem.IsIOS()',
+    'iOS no-dynamic-code fallback precondition proven:',
+    'Host System.Linq.Expressions identity:',
     'SteamOfflineInstallInspection',
     'data_sts2_macos_arm64',
     'data_sts2_macos_x86_64',
@@ -90,32 +95,29 @@ for marker in (
     'IsExpressionCompileMethod',
     'System.Linq.Expressions.LambdaExpression',
     'System.Linq.Expressions.Expression`1',
-    'Dynamic/non-literal Compile(bool) sites left untouched',
     'CaptureStrongNameState(module)',
-    'StrongNameSigned && !strongName.HasPublicKey',
-    'module.Attributes &= ~ModuleAttributes.StrongNameSigned',
-    'VerifyPreparedStrongNameState',
-    'Strong-name public key/token/full assembly identity preserved across every rewritten output: YES',
-    'strongNameSignedFlagsCleared != discovery.StrongNameSignedTargetAssemblies',
-    'Receipt-backed source strong-name state + prepared public keys/tokens/full identities/signature dispositions reverified: YES',
-    'GetParameterlessInsertionHazard',
-    'branch/exception-handler entry point',
-    'crossing short branch would change displacement',
-    'OperandType.ShortInlineBrTarget',
-    'SetInt32ConstantToOnePreservingEncoding',
-    'case Code.Ldc_I4_0:',
-    'case Code.Ldc_I4_S:',
-    'case Code.Ldc_I4:',
-    'CreatePreferInterpretationOverload',
-    'new ParameterDefinition(module.TypeSystem.Boolean)',
-    'il.InsertBefore(instruction, il.Create(OpCodes.Ldc_I4_1))',
-    'module.Write(temporaryPath, new WriterParameters { WriteSymbols = false })',
-    'ReadModuleWithWorkspaceResolver(preparedPath, resolver, ReadingMode.Deferred)',
-    'MetadataEquivalentTo(afterFingerprint)',
-    'after.TotalDirectCompileSites != before.TotalDirectCompileSites',
-    'afterFingerprint.InstructionCount != checked(beforeFingerprint.InstructionCount + rewrittenParameterless)',
-    'Original managed install no longer matches receipt SHA-1 after Step 19',
-    'Step 19 changed a non-target prepared file',
+    'IsPlatformFrameworkImplementationAssembly',
+    'ModuleAttributes.ILOnly',
+    'var rewriteTargets = Array.Empty<TargetAssemblySnapshot>();',
+    'const long rewriteSupported = 0;',
+    'const bool noRewriteRequired = true;',
+    'Assemblies selected for Cecil mutation: 0',
+    'Gate B compatibility disposition: HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED',
+    'copied desktop System.* framework/ReadyToRun images are diagnostic payload inputs only',
+    'Step 19.2 invariant violated: expression compatibility must not select any assembly for Cecil mutation.',
+    'File.Copy(sourcePath, destinationPath, overwrite: false);',
+    'Step 19 no-op prepared copy differs from its verified source:',
+    'Cecil assembly writes performed by Gate C: 0',
+    'Strong-name flags/public keys/tokens modified: NO',
+    'System.* framework implementation assemblies written by Cecil: NO',
+    'Non-IL-only/ReadyToRun-or-mixed-mode assemblies written by Cecil: NO',
+    'Consumer/game assemblies rewritten: NO',
+    'Step 19.2 isolation invariant violated: this compatibility class must complete with zero managed assembly mutations.',
+    'Step 19.2 no-op prepared file differs from its receipt-backed source:',
+    'Prepared assemblies intentionally rewritten: 0',
+    'Gate C/Gate D managed assembly Cecil writes: 0',
+    'Compatibility disposition: HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED',
+    'Original Step 12 install unchanged: YES',
     'WorkspaceOnlyAssemblyResolver',
     'AssemblyIdentityMatches(name, candidate)',
     'AssemblyIdentityMatchesIgnoringVersion(name, candidate)',
@@ -128,13 +130,20 @@ for marker in (
     'Stage: {stage}',
 ):
     if marker not in core:
-        raise SystemExit(f'ERROR: Step 19 compatibility marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 compatibility marker missing: {marker}')
 
-# Every game-facing Cecil module open is centralized through the bound helper or the
-# workspace identity resolver. The catalog probe is separately hard-rejected from resolving.
-if core.count('ModuleDefinition.ReadModule(') != 3:
-    raise SystemExit('ERROR: Step 19 expected exactly three direct Cecil ReadModule call sites (bound read helper + workspace dependency open + rejecting catalog probe).')
+# The production Step 19.2 implementation is intentionally read-only from Cecil's
+# perspective. If this changes, the subsystem has regressed back toward the 19.1
+# mixed-mode/framework mutation failure.
 for forbidden in (
+    '.Write(',
+    'module.Attributes &= ~ModuleAttributes.StrongNameSigned',
+    'ApplyPreferInterpretationRewrite',
+    'CreatePreferInterpretationOverload',
+    'SetInt32ConstantToOnePreservingEncoding',
+    'StrongNameKeyPair',
+    'StrongNameKeyBlob',
+    'StrongNameKeyContainer',
     'DefaultAssemblyResolver',
     'Assembly.Load(',
     'Assembly.LoadFrom(',
@@ -148,25 +157,24 @@ for forbidden in (
     'ClientWebSocket',
     'SteamContentDiscoveryAttempt',
     'SteamResumableDepotDownloadAttempt',
-    'module.Write(sourcePath',
-    'module.Write(installPath',
-    'StrongNameKeyPair',
-    'StrongNameKeyBlob',
-    'StrongNameKeyContainer',
 ):
     if forbidden in core:
-        raise SystemExit(f'ERROR: Step 19 gained forbidden runtime/network/live-install behavior: {forbidden}')
+        raise SystemExit(f'ERROR: Step 19.2 gained forbidden mutation/runtime/network behavior: {forbidden}')
 
-# Prepared outputs may differ; source and live install are only read/copied/hashed.
+# Game-facing Cecil opens stay centralized through the Step 18-proven explicit
+# resolver helper plus strict workspace dependency/catalog probes.
+if core.count('ModuleDefinition.ReadModule(') != 3:
+    raise SystemExit('ERROR: Step 19.2 expected exactly three direct Cecil ReadModule call sites (bound read helper + workspace dependency open + rejecting catalog probe).')
+
 for marker in (
     'var preparedRoot = Path.Combine(_workRoot, PreparedRootName);',
     'var sourcePath = ResolveChildPath(workspace.SourceRoot, relative);',
     'var installPath = ResolveChildPath(workspace.ManagedRoot, relative);',
-    'File.Copy(sourcePath, destinationPath, overwrite: false);',
-    'var temporaryPath = outputPath + ".step19tmp";',
+    'var preparedHash = ComputeSha1Hex(destinationPath);',
+    'if (!preparedHash.Equals(sourceHash, StringComparison.OrdinalIgnoreCase))',
 ):
     if marker not in core:
-        raise SystemExit(f'ERROR: Step 19 launcher-private isolation marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 byte-identical isolation marker missing: {marker}')
 
 seq = Path('src/StS2Launcher.Core/ExpressionInterpreterCompatibilityGateSequence.cs').read_text()
 summary = Path('src/StS2Launcher.Core/ExpressionInterpreterCompatibilitySummary.cs').read_text()
@@ -177,18 +185,22 @@ for marker in (
     'EXPRESSION INTERPRETER COMPATIBILITY PASS — {PassedGates}/4',
 ):
     if marker not in seq + summary:
-        raise SystemExit(f'ERROR: Step 19 ordered-gate contract missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 ordered-gate contract missing: {marker}')
 
 testproj = Path('tests/StS2Launcher.Core.Tests/StS2Launcher.Core.Tests.csproj').read_text()
 if '<PackageReference Include="Mono.Cecil" Version="0.11.6" />' not in testproj:
-    raise SystemExit('ERROR: Step 19 host tests must keep the direct Mono.Cecil 0.11.6 pin.')
+    raise SystemExit('ERROR: Step 19.2 host tests must keep the direct Mono.Cecil 0.11.6 pin.')
 
 tests = Path('tests/StS2Launcher.Core.Tests/ExpressionInterpreterCompatibilityTests.cs').read_text()
 for marker in (
     'OrderedExpressionInterpreterGatesReachFourOfFourPass',
     'ExpressionInterpreterGatesStopAfterFirstFailure',
-    'RealWorkspaceExpressionCompileCallsAreForcedToInterpretationAndInstallStaysUntouched',
-    'NoSupportedExpressionCompileTargetFailsAtGateBWithoutPreparedOutput',
+    'RealWorkspaceExpressionCompileCallsUseHostFallbackAndPreparedTreeStaysByteIdentical',
+    'StrongNameConsumerTargetRemainsByteIdenticalWithIdentityAndSignatureStateUntouched',
+    'NoConsumerExpressionCompileTargetPassesAsNoRewriteRequiredAndPreparedTreeStaysIdentical',
+    'FrameworkImplementationCompileSitesAreDiagnosticOnlyAndNeverRewritten',
+    'NonFrameworkNonIlOnlyConsumerIsClassifiedReadOnlyAndNeverWritten',
+    'ClearIlOnlyCorFlag',
     'GenericParameterless',
     'LiteralFalseShort',
     'LiteralFalseLong',
@@ -196,36 +208,39 @@ for marker in (
     'CrossingShortBranchParameterless',
     'OpCodes.Ldc_I4_S, (sbyte)0',
     'OpCodes.Ldc_I4, 0',
-    'Parameterless sites skipped for branch/EH/prefix safety: 2',
-    'Eligible supported sites selected: 5',
-    'StrongNameIdentityTargetIsRewrittenWithPublicKeyIdentityPreservedAndSignedFlagCleared',
-    'Selected assemblies with StrongNameSigned set: 1',
-    'Modified assemblies with StrongNameSigned cleared in prepared copy: 1',
-    'Consumer strong-name reference no longer matches the preserved prepared target identity.',
-    'Total real call sites rewritten: 5',
+    'Direct Compile() sites structurally safe for the old insertion design: 2',
+    'Direct Compile sites inside non-System.* consumer assemblies: 9',
+    'Direct Compile sites inside System.* framework implementation assemblies: 9',
+    'Direct Compile sites inside non-IL-only/ReadyToRun-or-mixed-mode images: 9',
+    'Assemblies selected for Cecil mutation: 0',
+    'Cecil assembly writes performed by Gate C: 0',
+    'HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED',
     'Original Step 12 install unchanged: YES',
 ):
     if marker not in tests:
-        raise SystemExit(f'ERROR: Step 19 host-test marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 host-test marker missing: {marker}')
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 for marker in (
-    'STEP 19.1 — EXPRESSION INTERPRETER COMPATIBILITY',
-    'Version 0.0.53',
+    'STEP 19.2 — EXPRESSION INTERPRETER COMPATIBILITY',
+    'Version 0.0.54',
+    'MONO.CECIL 0.11.6 • HOST RUNTIME FALLBACK / FRAMEWORK BOUNDARY / ZERO-WRITE ISOLATION',
     'Steps 01–18 are complete on the physical iPhone.',
-    'Step 19.1 — Expression Interpreter Compatibility (ordered gates A–D)',
-    'Run Gates A–D — Interpreter Probe → Real Compile Targets → Rewrite → Isolation Audit',
+    'Step 19.2 — Expression Interpreter Compatibility (ordered gates A–D)',
+    'Run Gates A–D — Host Fallback → Framework Boundary → Zero-Write Prep → Isolation Audit',
+    'Compile(), Compile(preferInterpretation: false), and Compile(preferInterpretation: true)',
     'RunExpressionInterpreterCompatibilityAsync',
     '_expressionInterpreterCompatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync',
     '_expressionInterpreterCompatibility.RunRealCompileTargetDiscovery',
-    '_expressionInterpreterCompatibility.RunPreferInterpretationRewrite',
+    '_expressionInterpreterCompatibility.RunHostFallbackPreparedCopy',
     '_expressionInterpreterCompatibility.RunIsolationAuditAsync',
-    'PASS: STEP 19.1 EXPRESSION INTERPRETER COMPATIBILITY — 4/4',
+    'STEP 19.2 GATE C — zero Cecil writes; build byte-identical prepared tree and prove immediate SHA-1 equality.',
+    'PASS: STEP 19.2 EXPRESSION INTERPRETER COMPATIBILITY — 4/4',
     'Step 18 remains closed/protected',
     'Run Foundation 5/5 Regression',
 ):
     if marker not in root:
-        raise SystemExit(f'ERROR: Step 19 UI/gate marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 UI/gate marker missing: {marker}')
 
 build = Path('scripts/build-step19.sh').read_text()
 for marker in (
@@ -238,21 +253,21 @@ for marker in (
     'StS2-Launcher-Step-19.ipa',
 ):
     if marker not in build:
-        raise SystemExit(f'ERROR: Step 19 build-wrapper marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 build-wrapper marker missing: {marker}')
 
 verify = Path('scripts/verify-step19-ipa.sh').read_text()
 for marker in (
-    '0.0.53',
-    'BUILD_VERSION" == "53"',
+    '0.0.54',
+    'BUILD_VERSION" == "54"',
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-    'Expected device UI: STEP 19.1 — EXPRESSION INTERPRETER COMPATIBILITY',
+    'Expected device UI: STEP 19.2 — EXPRESSION INTERPRETER COMPATIBILITY',
 ):
     if marker not in verify:
-        raise SystemExit(f'ERROR: Step 19 IPA verification marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 IPA verification marker missing: {marker}')
 
 run_tests = Path('scripts/run-unit-tests-step19.sh').read_text()
 for marker in (
@@ -261,7 +276,7 @@ for marker in (
     'step19-unit-tests.log',
 ):
     if marker not in run_tests:
-        raise SystemExit(f'ERROR: Step 19 host-test runner marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 host-test runner marker missing: {marker}')
 
 cm_script = Path('scripts/codemagic-build-step19.sh').read_text()
 for marker in (
@@ -275,12 +290,12 @@ for marker in (
     'artifacts/step19-build-summary.txt',
 ):
     if marker not in cm_script:
-        raise SystemExit(f'ERROR: Step 19 Codemagic-build marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 Codemagic-build marker missing: {marker}')
 
 codemagic = Path('codemagic.yaml').read_text()
 for marker in (
-    'ios-step-19-1:',
-    'Step 19.1 - Strong-Name Identity Expression Compatibility',
+    'ios-step-19-2:',
+    'Step 19.2 - Host Expression Fallback and Framework Boundary',
     'max_build_duration: 120',
     '$HOME/.cache/sts2launcher/godot-step15',
     'bash scripts/codemagic-build-step19.sh',
@@ -288,23 +303,23 @@ for marker in (
     'artifacts/step19-build-summary.txt',
 ):
     if marker not in codemagic:
-        raise SystemExit(f'ERROR: Step 19 Codemagic workflow marker missing: {marker}')
+        raise SystemExit(f'ERROR: Step 19.2 Codemagic workflow marker missing: {marker}')
 
-# Source archives must not ship game/proprietary payloads. Historical docs may mention
-# names, so inspect file names rather than arbitrary text.
+# Source archives must not ship game/proprietary payloads. Historical docs may
+# mention names, so inspect file names rather than arbitrary text.
 for path in Path('.').rglob('*'):
     if not path.is_file():
         continue
     normalized = str(path).replace('\\', '/').lower()
     name = path.name.lower()
     if name == 'sts2.dll' or 'slaythespire2.app/' in normalized or name.startswith('libfmod') or 'spine_godot' in name:
-        raise SystemExit(f'ERROR: Step 19 source archive contains forbidden game/proprietary payload: {path}')
+        raise SystemExit(f'ERROR: Step 19.2 source archive contains forbidden game/proprietary payload: {path}')
 
-print('Step 19.1 Expression Interpreter Compatibility source validation: PASS')
+print('Step 19.2 Expression Interpreter Compatibility source validation: PASS')
 print('  Steps 01-18 regression guards retained; critical Step 17/18 implementation hashes unchanged')
-print('  Gate A: captured-expression interpreter proof + fresh receipt-backed arm64/shared workspace')
-print('  Gate B: real direct Compile call-site discovery + strong-name identity/signature-state classification')
-print('  Gate C: structurally-safe sites -> preferInterpretation=true; modified strong-name copies preserve public-key identity and clear only StrongNameSigned')
-print('  Gate D: complete source/prepared/live-install SHA-1 isolation audit; only selected prepared assemblies may differ')
-print('  Dynamic Compile(bool), malformed strong-name/control-flow-sensitive sites, game execution, Harmony/MonoMod, broad Reflection.Emit replacement, FMOD/Spine runtime integration, Cloud and Workshop remain out of scope')
+print('  Gate A: Compile()/Compile(false)/Compile(true) host proof + dynamic-code flags + fresh receipt-backed arm64/shared workspace')
+print('  Gate B: read-only direct Compile classification across consumer/framework and IL-only/ReadyToRun boundaries; zero mutation targets')
+print('  Gate C: zero Cecil assembly writes; complete prepared tree must remain byte-identical to verified source')
+print('  Gate D: complete source/prepared/live-install SHA-1 isolation audit with zero managed mutations')
+print('  Copied desktop framework mutation, game execution, Harmony/MonoMod, broad Reflection.Emit replacement, FMOD/Spine runtime integration, Cloud and Workshop remain out of scope')
 PY

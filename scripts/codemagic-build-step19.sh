@@ -21,7 +21,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 19.1 Expression Interpreter Compatibility environment ==="
+  echo "=== StS2 Launcher Step 19.2 Expression Interpreter Compatibility environment ==="
   date -u
   uname -a
   xcodebuild -version
@@ -79,7 +79,7 @@ bash scripts/verify-step19-ipa.sh artifacts/StS2-Launcher-Step-19.ipa \
   2>&1 | tee artifacts/logs/step19-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 19.1 Expression Interpreter Compatibility"
+  echo "StS2 Launcher iOS — Step 19.2 Expression Interpreter Compatibility"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -94,10 +94,10 @@ bash scripts/verify-step19-ipa.sh artifacts/StS2-Launcher-Step-19.ipa \
   echo "Step 16 regression: managed-preparation 4/4 retained"
   echo "Step 17 regression: compatibility call-site analysis 4/4 source boundary retained"
   echo "Step 18 regression: real assembly rewrite workspace 4/4 + OfflineReady + Foundation closure retained"
-  echo "Step 19 gate A: physical System.Linq.Expressions interpreter probe + fresh receipt-backed arm64/shared workspace clone"
-  echo "Step 19 gate B: real direct LambdaExpression/Expression<TDelegate>.Compile target discovery with structural safety classification"
-  echo "Step 19 gate C: structurally-safe Compile()/literal Compile(false) sites rewritten to preferInterpretation=true; modified strong-name copies preserve public-key identity and clear only StrongNameSigned; explicit workspace-resolver reopen/validation"
-  echo "Step 19 gate D: source/prepared/live SHA-1 + structural isolation audit; only selected prepared assemblies may differ"
+  echo "Step 19 gate A: physical Compile()/Compile(false)/Compile(true) host fallback proof + dynamic-code flags + fresh receipt-backed arm64/shared workspace clone"
+  echo "Step 19 gate B: read-only direct Compile discovery + consumer/framework ownership + ILOnly/ReadyToRun classification; zero mutation targets"
+  echo "Step 19 gate C: zero Cecil assembly writes; byte-identical prepared tree with immediate SHA-1 equality proof"
+  echo "Step 19 gate D: source/prepared/live full SHA-1 isolation audit; zero managed mutations are a hard invariant"
   echo "Game-data policy: no StS2 game files/assemblies or proprietary FMOD/Spine binaries in IPA"
   echo "Still absent: game execution, Harmony/MonoMod detours, Reflection.Emit replacement, FMOD/Spine runtime integration, Cloud, Workshop"
   echo "IPA: artifacts/StS2-Launcher-Step-19.ipa"

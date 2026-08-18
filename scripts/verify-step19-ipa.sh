@@ -31,8 +31,8 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "0.0.53" ]] || { echo "ERROR: wrong Step 19 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "53" ]] || { echo "ERROR: wrong Step 19 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$VERSION" == "0.0.54" ]] || { echo "ERROR: wrong Step 19 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "54" ]] || { echo "ERROR: wrong Step 19 build version: $BUILD_VERSION" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 
@@ -151,9 +151,9 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
   echo "  Godot 4.5.1 Step 15 regression host: retained"
-  echo "  Mono.Cecil 0.11.6 compatibility-rewrite dependency: linked/AOT input"
+  echo "  Mono.Cecil 0.11.6 compatibility-analysis dependency: linked/AOT input"
   echo "  Project-owned Step 16 regression fixture: bundled as inert raw assembly data"
   echo "  Real StS2/proprietary payload in IPA: none"
   echo "  Dynamic dependency audit: system or bundled only"
-  echo "  Expected device UI: STEP 19.1 — EXPRESSION INTERPRETER COMPATIBILITY"
+  echo "  Expected device UI: STEP 19.2 — EXPRESSION INTERPRETER COMPATIBILITY"
 } | tee artifacts/logs/step19-ipa-verification-summary.log
