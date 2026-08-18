@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Reflection.PortableExecutable;
 using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Mono.Cecil;
@@ -16,7 +17,7 @@ public sealed class ExpressionInterpreterCompatibilityTests
         var gates = new ExpressionInterpreterCompatibilityGateSequence();
         gates.Record(ExpressionInterpreterCompatibilityGate.InterpreterCapabilityAndWorkspaceClone, true, "probe/clone");
         gates.Record(ExpressionInterpreterCompatibilityGate.RealCompileTargetDiscovery, true, "targets");
-        gates.Record(ExpressionInterpreterCompatibilityGate.PreferInterpretationRewrite, true, "rewrite");
+        gates.Record(ExpressionInterpreterCompatibilityGate.HostFallbackPreparedCopy, true, "prepared-copy");
         gates.Record(ExpressionInterpreterCompatibilityGate.IsolationAudit, true, "audit");
 
         var summary = gates.Snapshot();
@@ -32,12 +33,12 @@ public sealed class ExpressionInterpreterCompatibilityTests
         gates.Record(ExpressionInterpreterCompatibilityGate.InterpreterCapabilityAndWorkspaceClone, true, "probe/clone");
         gates.Record(ExpressionInterpreterCompatibilityGate.RealCompileTargetDiscovery, false, "no target");
         Assert.ThrowsExactly<InvalidOperationException>(() =>
-            gates.Record(ExpressionInterpreterCompatibilityGate.PreferInterpretationRewrite, true, "must not advance"));
+            gates.Record(ExpressionInterpreterCompatibilityGate.HostFallbackPreparedCopy, true, "must not advance"));
         Assert.AreEqual(ExpressionInterpreterCompatibilityGate.RealCompileTargetDiscovery, gates.Snapshot().FirstFailingGate);
     }
 
     [TestMethod]
-    public async Task RealWorkspaceExpressionCompileCallsAreForcedToInterpretationAndInstallStaysUntouched()
+    public async Task RealWorkspaceExpressionCompileCallsUseHostFallbackAndPreparedTreeStaysByteIdentical()
     {
         using var temp = new TemporaryDirectory();
         var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
@@ -85,7 +86,7 @@ public sealed class ExpressionInterpreterCompatibilityTests
         var compatibility = new ExpressionInterpreterCompatibility(temp.Path);
         var gateA = await compatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync();
         var gateB = compatibility.RunRealCompileTargetDiscovery();
-        var gateC = compatibility.RunPreferInterpretationRewrite();
+        var gateC = compatibility.RunHostFallbackPreparedCopy();
         var gateD = await compatibility.RunIsolationAuditAsync();
         var installAfter = SHA256.HashData(await File.ReadAllBytesAsync(arm64Path));
 
@@ -95,16 +96,21 @@ public sealed class ExpressionInterpreterCompatibilityTests
         Assert.IsTrue(gateD.Passed, gateD.Detail);
         CollectionAssert.AreEqual(installBefore, installAfter);
 
+        StringAssert.Contains(gateA.Detail, "Compile() automatic-fallback probe result: 42");
+        StringAssert.Contains(gateA.Detail, "Compile(preferInterpretation: false) probe result: 42");
         StringAssert.Contains(gateA.Detail, "Compile(preferInterpretation: true) probe result: 42");
         StringAssert.Contains(gateA.Detail, "macOS x86_64 duplicates excluded: 1");
-        StringAssert.Contains(gateB.Detail, "Structurally-safe parameterless Compile() sites: 2");
-        StringAssert.Contains(gateB.Detail, "Literal Compile(false) sites: 3");
-        StringAssert.Contains(gateB.Detail, "Already-interpreted Compile(true) sites: 1");
-        StringAssert.Contains(gateB.Detail, "Dynamic/non-literal Compile(bool) sites left untouched: 1");
-        StringAssert.Contains(gateB.Detail, "Parameterless sites skipped for branch/EH/prefix safety: 2");
-        StringAssert.Contains(gateB.Detail, "Eligible supported sites selected: 5");
-        StringAssert.Contains(gateC.Detail, "Total real call sites rewritten: 5");
-        StringAssert.Contains(gateD.Detail, "Total Compile sites forced to interpreter preference: 5");
+        StringAssert.Contains(gateB.Detail, "Direct Compile() sites structurally safe for the old insertion design: 2");
+        StringAssert.Contains(gateB.Detail, "Direct Compile(false) literal sites: 3");
+        StringAssert.Contains(gateB.Detail, "Direct Compile(true) literal sites: 1");
+        StringAssert.Contains(gateB.Detail, "Direct Compile(bool) dynamic/non-literal sites: 1");
+        StringAssert.Contains(gateB.Detail, "Parameterless sites with branch/EH/prefix insertion hazards (diagnostic only): 2");
+        StringAssert.Contains(gateB.Detail, "Direct Compile sites inside non-System.* consumer assemblies: 9");
+        StringAssert.Contains(gateB.Detail, "Assemblies selected for Cecil mutation: 0");
+        StringAssert.Contains(gateB.Detail, "HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED");
+        StringAssert.Contains(gateC.Detail, "Cecil assembly writes performed by Gate C: 0");
+        StringAssert.Contains(gateD.Detail, "Managed Compile call sites rewritten: 0");
+        StringAssert.Contains(gateD.Detail, "Prepared files unchanged byte-for-byte: 2/2");
         StringAssert.Contains(gateD.Detail, "Original Step 12 install unchanged: YES");
 
         var sourceCopy = Path.Combine(
@@ -118,7 +124,7 @@ public sealed class ExpressionInterpreterCompatibilityTests
             ExpressionInterpreterCompatibility.PreparedRootName,
             arm64Relative.Replace('/', Path.DirectorySeparatorChar));
         CollectionAssert.AreEqual(await File.ReadAllBytesAsync(arm64Path), await File.ReadAllBytesAsync(sourceCopy));
-        Assert.IsFalse((await File.ReadAllBytesAsync(sourceCopy)).SequenceEqual(await File.ReadAllBytesAsync(preparedCopy)));
+        CollectionAssert.AreEqual(await File.ReadAllBytesAsync(sourceCopy), await File.ReadAllBytesAsync(preparedCopy), "Step 19.2 must not rewrite consumer IL when the host expression runtime provides the AOT fallback.");
 
         using var prepared = ModuleDefinition.ReadModule(preparedCopy, new ReaderParameters
         {
@@ -134,13 +140,13 @@ public sealed class ExpressionInterpreterCompatibilityTests
             .Where(instruction => instruction.Operand is MethodReference method && method.Name == "Compile")
             .ToArray();
         Assert.AreEqual(9, calls.Length);
-        Assert.AreEqual(2, calls.Count(instruction => ((MethodReference)instruction.Operand).Parameters.Count == 0));
-        Assert.AreEqual(6, calls.Count(IsImmediatelyPrecededByTrueLiteral));
+        Assert.AreEqual(4, calls.Count(instruction => ((MethodReference)instruction.Operand).Parameters.Count == 0));
+        Assert.AreEqual(1, calls.Count(IsImmediatelyPrecededByTrueLiteral));
 
         var expressionUser = prepared.GetType("Synthetic.ExpressionUser")!;
-        AssertConstantEncoding(expressionUser, "LiteralFalse", Code.Ldc_I4_1, null);
-        AssertConstantEncoding(expressionUser, "LiteralFalseShort", Code.Ldc_I4_S, (sbyte)1);
-        AssertConstantEncoding(expressionUser, "LiteralFalseLong", Code.Ldc_I4, 1);
+        AssertConstantEncoding(expressionUser, "LiteralFalse", Code.Ldc_I4_0, null);
+        AssertConstantEncoding(expressionUser, "LiteralFalseShort", Code.Ldc_I4_S, (sbyte)0);
+        AssertConstantEncoding(expressionUser, "LiteralFalseLong", Code.Ldc_I4, 0);
         var unsafeMethod = expressionUser.Methods.Single(method => method.Name == "UnsafeBranchTargetParameterless");
         Assert.AreEqual(0, ((MethodReference)unsafeMethod.Body.Instructions.Single(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt).Operand).Parameters.Count);
         var crossingShortBranchMethod = expressionUser.Methods.Single(method => method.Name == "CrossingShortBranchParameterless");
@@ -148,7 +154,7 @@ public sealed class ExpressionInterpreterCompatibilityTests
     }
 
     [TestMethod]
-    public async Task StrongNameIdentityTargetIsRewrittenWithPublicKeyIdentityPreservedAndSignedFlagCleared()
+    public async Task StrongNameConsumerTargetRemainsByteIdenticalWithIdentityAndSignatureStateUntouched()
     {
         using var temp = new TemporaryDirectory();
         var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
@@ -195,18 +201,18 @@ public sealed class ExpressionInterpreterCompatibilityTests
         var compatibility = new ExpressionInterpreterCompatibility(temp.Path);
         var gateA = await compatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync();
         var gateB = compatibility.RunRealCompileTargetDiscovery();
-        var gateC = compatibility.RunPreferInterpretationRewrite();
+        var gateC = compatibility.RunHostFallbackPreparedCopy();
         var gateD = await compatibility.RunIsolationAuditAsync();
 
         Assert.IsTrue(gateA.Passed, gateA.Detail);
         Assert.IsTrue(gateB.Passed, gateB.Detail);
         Assert.IsTrue(gateC.Passed, gateC.Detail);
         Assert.IsTrue(gateD.Passed, gateD.Detail);
-        StringAssert.Contains(gateB.Detail, "Supported sites carrying strong-name identity: 5");
-        StringAssert.Contains(gateB.Detail, "Eligible supported sites selected: 5");
-        StringAssert.Contains(gateB.Detail, "Selected assemblies with StrongNameSigned set: 1");
-        StringAssert.Contains(gateC.Detail, "Modified assemblies with StrongNameSigned cleared in prepared copy: 1");
-        StringAssert.Contains(gateC.Detail, "Strong-name public key/token/full assembly identity preserved across every rewritten output: YES");
+        StringAssert.Contains(gateB.Detail, "Direct Compile sites carrying strong-name identity: 9");
+        StringAssert.Contains(gateB.Detail, "Direct Compile sites inside non-System.* consumer assemblies: 9");
+        StringAssert.Contains(gateB.Detail, "Assemblies selected for Cecil mutation: 0");
+        StringAssert.Contains(gateC.Detail, "Strong-name flags/public keys/tokens modified: NO");
+        StringAssert.Contains(gateD.Detail, "Strong-name flags/public keys/tokens modified: NO");
 
         var sourceCopy = Path.Combine(
             temp.Path,
@@ -239,8 +245,9 @@ public sealed class ExpressionInterpreterCompatibilityTests
         CollectionAssert.AreEqual(sourceToken, sourceAfter.Assembly.Name.PublicKeyToken.ToArray(), "Source public-key token changed.");
         CollectionAssert.AreEqual(sourceToken, prepared.Assembly.Name.PublicKeyToken.ToArray(), "Prepared public-key token changed.");
         Assert.IsTrue((sourceAfter.Attributes & ModuleAttributes.StrongNameSigned) != 0, "Receipt-backed source must retain StrongNameSigned.");
-        Assert.IsFalse((prepared.Attributes & ModuleAttributes.StrongNameSigned) != 0, "Modified prepared copy must not claim an obsolete strong-name signature.");
+        Assert.IsTrue((prepared.Attributes & ModuleAttributes.StrongNameSigned) != 0, "Byte-identical prepared copy must retain the original StrongNameSigned state.");
         CollectionAssert.AreEqual(await File.ReadAllBytesAsync(arm64Path), await File.ReadAllBytesAsync(sourceCopy), "Receipt-backed source copy changed.");
+        CollectionAssert.AreEqual(await File.ReadAllBytesAsync(sourceCopy), await File.ReadAllBytesAsync(preparedCopy), "Strong-name target should remain byte-identical in Step 19.2.");
 
         var preparedConsumer = Path.Combine(
             temp.Path,
@@ -258,7 +265,7 @@ public sealed class ExpressionInterpreterCompatibilityTests
     }
 
     [TestMethod]
-    public async Task NoSupportedExpressionCompileTargetFailsAtGateBWithoutPreparedOutput()
+    public async Task NoConsumerExpressionCompileTargetPassesAsNoRewriteRequiredAndPreparedTreeStaysIdentical()
     {
         using var temp = new TemporaryDirectory();
         var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
@@ -267,28 +274,133 @@ public sealed class ExpressionInterpreterCompatibilityTests
         Directory.CreateDirectory(Path.GetDirectoryName(arm64Path)!);
         WriteSyntheticExpressionAssembly(arm64Path, "sts2", includeTargets: false);
 
-        var bytes = await File.ReadAllBytesAsync(arm64Path);
-        var receipt = new SteamManagedInstallReceipt(
-            SteamManagedInstallReceipt.CurrentSchemaVersion,
-            2868840,
-            2868842,
-            992UL,
-            "public",
-            DateTimeOffset.UtcNow,
-            [new SteamManagedInstallFile(arm64Relative, bytes.LongLength, Convert.ToHexString(SHA1.HashData(bytes)).ToLowerInvariant())]);
-        await using (var stream = File.Create(Path.Combine(managedPath, SteamManagedInstallReceipt.FileName)))
-        {
-            await JsonSerializer.SerializeAsync(stream, receipt, SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt);
-        }
+        await WriteReceiptAsync(managedPath, 992UL, [(arm64Relative, arm64Path)]);
 
         var compatibility = new ExpressionInterpreterCompatibility(temp.Path);
         var gateA = await compatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync();
         var gateB = compatibility.RunRealCompileTargetDiscovery();
+        var gateC = compatibility.RunHostFallbackPreparedCopy();
+        var gateD = await compatibility.RunIsolationAuditAsync();
 
         Assert.IsTrue(gateA.Passed, gateA.Detail);
-        Assert.IsFalse(gateB.Passed);
-        StringAssert.Contains(gateB.Detail, "No structurally-safe direct System.Linq.Expressions Compile target");
-        Assert.IsFalse(Directory.Exists(Path.Combine(temp.Path, ExpressionInterpreterCompatibility.WorkRootName, ExpressionInterpreterCompatibility.PreparedRootName)));
+        Assert.IsTrue(gateB.Passed, gateB.Detail);
+        Assert.IsTrue(gateC.Passed, gateC.Detail);
+        Assert.IsTrue(gateD.Passed, gateD.Detail);
+        StringAssert.Contains(gateB.Detail, "HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED");
+        StringAssert.Contains(gateC.Detail, "intentionally performs NO IL rewrite");
+        StringAssert.Contains(gateD.Detail, "HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED");
+
+        var sourceCopy = Path.Combine(temp.Path, ExpressionInterpreterCompatibility.WorkRootName, ExpressionInterpreterCompatibility.SourceRootName, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        var preparedCopy = Path.Combine(temp.Path, ExpressionInterpreterCompatibility.WorkRootName, ExpressionInterpreterCompatibility.PreparedRootName, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        CollectionAssert.AreEqual(await File.ReadAllBytesAsync(arm64Path), await File.ReadAllBytesAsync(sourceCopy));
+        CollectionAssert.AreEqual(await File.ReadAllBytesAsync(sourceCopy), await File.ReadAllBytesAsync(preparedCopy));
+    }
+
+    [TestMethod]
+    public async Task FrameworkImplementationCompileSitesAreDiagnosticOnlyAndNeverRewritten()
+    {
+        using var temp = new TemporaryDirectory();
+        var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
+        var arm64Relative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll";
+        var frameworkRelative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/System.Linq.Expressions.dll";
+        var arm64Path = Path.Combine(managedPath, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        var frameworkPath = Path.Combine(managedPath, frameworkRelative.Replace('/', Path.DirectorySeparatorChar));
+        Directory.CreateDirectory(Path.GetDirectoryName(arm64Path)!);
+        WriteSyntheticExpressionAssembly(arm64Path, "sts2", includeTargets: false);
+        WriteSyntheticExpressionAssembly(frameworkPath, "System.Linq.Expressions", includeTargets: true, strongNameIdentity: true);
+
+        await WriteReceiptAsync(managedPath, 994UL, [(arm64Relative, arm64Path), (frameworkRelative, frameworkPath)]);
+        var frameworkBefore = await File.ReadAllBytesAsync(frameworkPath);
+
+        var compatibility = new ExpressionInterpreterCompatibility(temp.Path);
+        var gateA = await compatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync();
+        var gateB = compatibility.RunRealCompileTargetDiscovery();
+        var gateC = compatibility.RunHostFallbackPreparedCopy();
+        var gateD = await compatibility.RunIsolationAuditAsync();
+
+        Assert.IsTrue(gateA.Passed, gateA.Detail);
+        Assert.IsTrue(gateB.Passed, gateB.Detail);
+        Assert.IsTrue(gateC.Passed, gateC.Detail);
+        Assert.IsTrue(gateD.Passed, gateD.Detail);
+        StringAssert.Contains(gateB.Detail, "Direct Compile sites inside System.* framework implementation assemblies: 9");
+        StringAssert.Contains(gateB.Detail, "Assemblies selected for Cecil mutation: 0");
+        StringAssert.Contains(gateB.Detail, "HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED");
+        StringAssert.Contains(gateC.Detail, "System.* framework implementation assemblies written by Cecil: NO");
+
+        var preparedFramework = Path.Combine(temp.Path, ExpressionInterpreterCompatibility.WorkRootName, ExpressionInterpreterCompatibility.PreparedRootName, frameworkRelative.Replace('/', Path.DirectorySeparatorChar));
+        CollectionAssert.AreEqual(frameworkBefore, await File.ReadAllBytesAsync(preparedFramework), "Framework implementation assembly must remain byte-identical in the prepared tree.");
+    }
+
+    [TestMethod]
+    public async Task NonFrameworkNonIlOnlyConsumerIsClassifiedReadOnlyAndNeverWritten()
+    {
+        using var temp = new TemporaryDirectory();
+        var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
+        var arm64Relative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll";
+        var arm64Path = Path.Combine(managedPath, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        Directory.CreateDirectory(Path.GetDirectoryName(arm64Path)!);
+        WriteSyntheticExpressionAssembly(arm64Path, "sts2", includeTargets: true);
+        ClearIlOnlyCorFlag(arm64Path);
+
+        await WriteReceiptAsync(managedPath, 995UL, [(arm64Relative, arm64Path)]);
+
+        var compatibility = new ExpressionInterpreterCompatibility(temp.Path);
+        var gateA = await compatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync();
+        var gateB = compatibility.RunRealCompileTargetDiscovery();
+        var gateC = compatibility.RunHostFallbackPreparedCopy();
+        var gateD = await compatibility.RunIsolationAuditAsync();
+
+        Assert.IsTrue(gateA.Passed, gateA.Detail);
+        Assert.IsTrue(gateB.Passed, gateB.Detail);
+        Assert.IsTrue(gateC.Passed, gateC.Detail);
+        Assert.IsTrue(gateD.Passed, gateD.Detail);
+        StringAssert.Contains(gateB.Detail, "Direct Compile sites inside non-IL-only/ReadyToRun-or-mixed-mode images: 9");
+        StringAssert.Contains(gateB.Detail, "Assemblies selected for Cecil mutation: 0");
+        StringAssert.Contains(gateC.Detail, "Non-IL-only/ReadyToRun-or-mixed-mode assemblies written by Cecil: NO");
+
+        var sourceCopy = Path.Combine(temp.Path, ExpressionInterpreterCompatibility.WorkRootName, ExpressionInterpreterCompatibility.SourceRootName, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        var preparedCopy = Path.Combine(temp.Path, ExpressionInterpreterCompatibility.WorkRootName, ExpressionInterpreterCompatibility.PreparedRootName, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        CollectionAssert.AreEqual(await File.ReadAllBytesAsync(sourceCopy), await File.ReadAllBytesAsync(preparedCopy), "Non-IL-only consumer must remain byte-identical.");
+    }
+
+    private static async Task WriteReceiptAsync(string managedPath, ulong manifestId, IReadOnlyList<(string Relative, string Path)> files)
+    {
+        var receiptFiles = new List<SteamManagedInstallFile>();
+        foreach (var (relative, path) in files)
+        {
+            var bytes = await File.ReadAllBytesAsync(path);
+            receiptFiles.Add(new SteamManagedInstallFile(relative, bytes.LongLength, Convert.ToHexString(SHA1.HashData(bytes)).ToLowerInvariant()));
+        }
+
+        var receipt = new SteamManagedInstallReceipt(
+            SteamManagedInstallReceipt.CurrentSchemaVersion,
+            2868840,
+            2868842,
+            manifestId,
+            "public",
+            DateTimeOffset.UtcNow,
+            receiptFiles);
+        await using var stream = File.Create(Path.Combine(managedPath, SteamManagedInstallReceipt.FileName));
+        await JsonSerializer.SerializeAsync(stream, receipt, SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt);
+    }
+
+    private static void ClearIlOnlyCorFlag(string path)
+    {
+        int corHeaderOffset;
+        using (var stream = File.OpenRead(path))
+        using (var pe = new PEReader(stream))
+        {
+            corHeaderOffset = pe.PEHeaders.CorHeaderStartOffset;
+        }
+        if (corHeaderOffset < 0)
+            throw new InvalidDataException("Synthetic managed PE has no CLR header.");
+
+        var bytes = File.ReadAllBytes(path);
+        var flagsOffset = checked(corHeaderOffset + 16); // IMAGE_COR20_HEADER.Flags
+        var flags = BitConverter.ToUInt32(bytes, flagsOffset);
+        flags &= ~0x00000001u; // COMIMAGE_FLAGS_ILONLY
+        BitConverter.GetBytes(flags).CopyTo(bytes, flagsOffset);
+        File.WriteAllBytes(path, bytes);
     }
 
     private static bool IsImmediatelyPrecededByTrueLiteral(Instruction instruction)

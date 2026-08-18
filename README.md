@@ -1,49 +1,33 @@
-# StS2 Launcher iOS — Step 19.1 Expression Interpreter Compatibility
+# StS2 Launcher iOS — Step 19.2 Expression Interpreter Compatibility
 
-Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
+**Version:** `0.0.54 (54)`  
+**Codemagic workflow:** `ios-step-19-2`
 
-## Project state
+Steps 01–18 are physically complete and closed. Step 19 investigates one AOT-sensitive class: direct `System.Linq.Expressions` `Compile` usage.
 
-**Steps 01–18 are complete and closed on a physical iPhone.** Step 18.4 / `0.0.51 (51)` passed all four Real Assembly Rewrite Workspace gates, then also passed the reserved OfflineReady and Foundation 5/5 closure regressions. The protected baseline can therefore clone, write, rewrite, reopen, and audit the real receipt-backed ARM64 StS2 managed payload without modifying the trusted installation.
+## Physical evidence that led to 19.2
 
-This archive is **Step 19.1 / `0.0.53 (53)`**. Step 19 is the first behaviorally meaningful managed compatibility preparation. It targets one narrow AOT-sensitive API shape: direct `System.Linq.Expressions` `Compile()` calls that can explicitly request interpretation instead of runtime code generation.
+- Step 19 / `0.0.52`: Gate A proved `Compile(preferInterpretation: true)` executes on the physical iPhone while `RuntimeFeature.IsDynamicCodeSupported` and `RuntimeFeature.IsDynamicCodeCompiled` are both false. Gate B observed 8 structurally-safe parameterless direct `Compile()` sites and 2 unsafe sites, but the first policy rejected the safe sites because their containing assemblies carried strong-name identity.
+- Step 19.1 / `0.0.53`: strong-name handling was widened for prepared copies. Gate C then failed while attempting to write copied `System.Linq.Expressions.dll` with Mono.Cecil: `NotSupportedException: Writing mixed-mode assemblies is not supported`.
 
-## Step 19 subsystem — Expression Interpreter Compatibility
+The 19.1 failure exposed a target-ownership error: direct calls *inside the copied desktop framework implementation* are not evidence that StS2/application IL itself needs rewriting. The copied macOS `System.Linq.Expressions.dll` is also a non-IL-only/ReadyToRun-or-mixed-mode image from Cecil's perspective, so forcing it through Cecil's writer would cross the wrong compatibility boundary.
 
-Ordered gates:
+Modern `System.Linq.Expressions` already routes `LambdaExpression.Compile()` through the interpreter when dynamic code is unavailable. `Compile(false)` falls through the same `Compile()` path when IL compilation is unavailable. Step 19.2 therefore proves those behaviors directly in the actual iOS host instead of modifying copied desktop framework images.
 
-- **Gate A — InterpreterCapabilityAndWorkspaceClone:** run a launcher-owned captured-expression probe using `Compile(preferInterpretation: true)` in the actual iOS/AOT process; re-prove OfflineReady; clone and receipt-SHA-1-verify a fresh macOS ARM64 + architecture-neutral managed workspace while excluding x86_64 duplicates.
-- **Gate B — RealCompileTargetDiscovery:** scan every managed module in that verified workspace for real direct `LambdaExpression.Compile` / `Expression<TDelegate>.Compile` calls; classify parameterless, literal-false, already-true, dynamic-bool, structurally unsafe, and strong-name identity/signature state. Gate B requires at least one structurally-safe real target and rejects malformed `StrongNameSigned`-without-public-key identities rather than guessing.
-- **Gate C — PreferInterpretationRewrite:** rewrite only the selected structurally-safe sites: parameterless `Compile()` becomes `Compile(true)`, and immediate literal `Compile(false)` becomes `Compile(true)` without changing the original constant instruction width. Reopen each generated assembly with the explicit verified-workspace Cecil resolver and prove structural invariants.
-- **Gate D — IsolationAudit:** re-hash every Step 19 source copy and corresponding live Step 12 install file against the receipt; prove non-target prepared files are byte-identical; prove only selected prepared assemblies changed; reopen and structurally revalidate every rewritten output.
+## Step 19.2 gates
 
-Step 19.1 permits a modified strong-name-identity assembly only under an identity-preserving prepared-copy policy: name/version/culture/public key/public-key token remain unchanged, and a stale `StrongNameSigned` bit is cleared because the original signature cannot remain valid after rewriting. It still skips malformed strong-name identities, dynamic/non-literal `Compile(bool)` arguments, prefix/branch/EH-sensitive parameterless insertion points, and short-branch crossings whose displacement could be changed by inserting a byte of IL.
+A. **InterpreterCapabilityAndWorkspaceClone** — execute and verify all three host paths: `Compile()`, `Compile(preferInterpretation: false)`, and `Compile(preferInterpretation: true)`; record dynamic-code feature flags and the host `System.Linq.Expressions` identity; re-prove OfflineReady; clone and SHA-1 verify the ARM64/shared managed workspace.
 
-The physical `0.0.52` run already proved Gate A and found 8 structurally-safe real parameterless `Compile()` sites (plus 2 unsafe sites); all 8 safe sites were excluded only by the original strong-name guard. Step 19.1 is therefore a targeted policy correction around those observed real sites, not a speculative expansion of the call matcher.
+B. **RealCompileTargetDiscovery** — read-only scan real direct expression `Compile` sites. Classify caller ownership (`System.*` framework versus non-framework consumer), strong-name identity, IL-only versus non-IL-only/ReadyToRun/mixed-mode shape, primary `sts2.dll` pressure, and old branch/EH insertion hazards. **Select zero assemblies for mutation.**
 
-## Build
+C. **HostFallbackPreparedCopy** — Step 19.2 performs **zero Cecil assembly writes**. Copy the complete prepared tree byte-for-byte and immediately prove every prepared SHA-1 equals the verified source/receipt.
 
-Use Codemagic workflow:
+D. **IsolationAudit** — independently re-hash source, prepared, and live-install trees. Every prepared file must remain receipt-identical; zero rewrite records are an invariant.
 
-```text
-ios-step-19-1
-```
-
-Expected app:
+A 4/4 pass closes this direct expression-Compile compatibility class as:
 
 ```text
-0.0.53 (53)
-STEP 19.1 — EXPRESSION INTERPRETER COMPATIBILITY
+HOST RUNTIME FALLBACK — NO GAME/APPLICATION IL REWRITE REQUIRED
 ```
 
-Expected IPA:
-
-```text
-artifacts/StS2-Launcher-Step-19.ipa
-```
-
-See `docs/STEP-19-DESIGN.md` and `docs/STEP-19-TEST.md`.
-
-## Scope boundary
-
-Step 19 does **not** load or execute StS2 assemblies, implement Harmony/MonoMod detours, replace Reflection.Emit generally, integrate FMOD/Spine, launch the game, add Cloud, or add Workshop. All game-file writes remain under launcher-private `Step19-ExpressionInterpreterCompatibility`; the receipt-backed live installation remains read-only.
+This does not claim StS2 executes yet. A later runtime-payload subsystem still has to prove that game/framework references are bound to the iOS host runtime rather than copied desktop framework implementation images.
