@@ -25,6 +25,7 @@ required = [
     Path('docs/STEP-18-DESIGN.md'),
     Path('docs/STEP-18-TEST.md'),
     Path('docs/STEP-18.1.1-HOST-TEST-CECIL-API-FIX.md'),
+    Path('docs/STEP-18.2-WORKSPACE-IDENTITY-RESOLVER-FIX.md'),
 ]
 for path in required:
     if not path.exists():
@@ -32,13 +33,13 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.48' or str(plist.get('CFBundleVersion')) != '48':
-    raise SystemExit('ERROR: Step 18 must be version 0.0.48 (48).')
+if plist.get('CFBundleShortVersionString') != '0.0.49' or str(plist.get('CFBundleVersion')) != '49':
+    raise SystemExit('ERROR: Step 18.2 must be version 0.0.49 (49).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 for marker in (
-    '<ApplicationVersion>48</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.48</ApplicationDisplayVersion>',
+    '<ApplicationVersion>49</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.49</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -76,7 +77,13 @@ for marker in (
     'Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY',
     'Fallback to runtime/system/live-install/network resolver paths: NO',
     'Resolved dependency file SHA-1 rechecked immediately before Cecil open: YES',
-    '_trustedFileSha1.TryGetValue(candidate, out var expectedSha1)',
+    'WorkspaceAssemblyCandidate[]? _catalog'
+    , 'AssemblyIdentityMatches(name, candidate)'
+    , 'MetadataResolver = metadataResolver'
+    , 'RejectingCatalogProbeResolver'
+    , 'Workspace identity candidates:'
+    , 'EnsureWorkspaceResolverBound(module, resolver)'
+    , 'Cecil assembly + metadata resolver explicitly bound to workspace identity catalog: YES',
     'Game assembly loaded/executed: NO',
 ):
     if marker not in workspace:
@@ -84,6 +91,7 @@ for marker in (
 
 # The Step 18 class is local-file/Cecil only. Steam/network/runtime loading remains forbidden.
 for forbidden in (
+    'name.Name + extension',
     'DefaultAssemblyResolver',
     'Assembly.Load(',
     'Activator.CreateInstance(',
@@ -139,6 +147,8 @@ for marker in (
     'insert one IL NOP at method entry',
     'WriteSyntheticAssemblyWithExternalEnumDefault',
     'GodotSharp',
+    'godot-runtime-payload.dll',
+    'ASSEMBLY IDENTITY',
     'Workspace-only dependency resolutions observed:',
     'Original Step 12 install unchanged: YES',
 ):
@@ -147,8 +157,8 @@ for marker in (
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 for marker in (
-    'STEP 18.1 — REAL ASSEMBLY REWRITE WORKSPACE',
-    'Version 0.0.48',
+    'STEP 18.2 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Version 0.0.49',
     'Steps 01–17 are complete on the physical iPhone.',
     'Step 18 — Real Assembly Rewrite Workspace (ordered gates A–D)',
     'Run Gates A–D — Clone ARM64 → Real Roundtrip → Neutral NOP → Isolation Audit',
@@ -179,22 +189,22 @@ for marker in (
 
 verify = Path('scripts/verify-step18-ipa.sh').read_text()
 for marker in (
-    '0.0.48',
-    'BUILD_VERSION" == "48"',
+    '0.0.49',
+    'BUILD_VERSION" == "49"',
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-    'Expected device UI: STEP 18.1 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Expected device UI: STEP 18.2 — REAL ASSEMBLY REWRITE WORKSPACE',
 ):
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 18 IPA verification marker missing: {marker}')
 
 codemagic = Path('codemagic.yaml').read_text()
 for marker in (
-    'ios-step-18-1:',
-    'Step 18.1 - Workspace-Only Dependency Resolution',
+    'ios-step-18-2:',
+    'Step 18.2 - Workspace Identity Resolver Fix',
     'max_build_duration: 120',
     '$HOME/.cache/sts2launcher/godot-step15',
     'bash scripts/codemagic-build-step18.sh',
