@@ -6,7 +6,7 @@ Experimental unofficial iOS launcher/compatibility-host project for users who le
 
 **Steps 01–17 are complete and closed on a physical iPhone.** Step 15 physically proved the independent Godot 4.5.1 Metal/touch/lifecycle host. Step 16.1 physically proved Mono.Cecil read/write/reopen and real StS2 read-only metadata inspection. Step 17 physically passed the receipt-backed ARM64 actual-IL/native/dependency analysis subsystem.
 
-This archive is **Step 18.1 / runtime `0.0.48 (48)`**, continuing the accelerated model of one related subsystem with several ordered gates.
+This archive is **Step 18.1.1 source hotfix / runtime Step 18.1 `0.0.48 (48)`**, continuing the accelerated model of one related subsystem with several ordered gates. Step 18.1.1 fixes only the host-test Mono.Cecil API compile error discovered by Codemagic; runtime behavior is unchanged.
 
 ## Step 18 subsystem — Real Assembly Rewrite Workspace
 

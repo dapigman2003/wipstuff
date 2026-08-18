@@ -173,12 +173,15 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         var module = assembly.MainModule;
         var dependencyReference = new AssemblyNameReference("GodotSharp", new Version(4, 5, 10, 0));
         module.AssemblyReferences.Add(dependencyReference);
+        // Mono.Cecil 0.11.6 exposes the value-type flag as the fifth positional
+        // TypeReference constructor argument. Keep this positional so the host
+        // regression test compiles against the exact pinned Cecil API.
         var externalEnum = new TypeReference(
             "Synthetic.Dependency",
             "ExternalMode",
             module,
             dependencyReference,
-            isValueType: true);
+            true);
 
         var type = new TypeDefinition("Synthetic", "GameType", TypeAttributes.Public | TypeAttributes.Class, module.TypeSystem.Object);
         module.Types.Add(type);
