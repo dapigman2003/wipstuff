@@ -102,7 +102,7 @@ public sealed class ExpressionInterpreterCompatibilityTests
         StringAssert.Contains(gateB.Detail, "Already-interpreted Compile(true) sites: 1");
         StringAssert.Contains(gateB.Detail, "Dynamic/non-literal Compile(bool) sites left untouched: 1");
         StringAssert.Contains(gateB.Detail, "Parameterless sites skipped for branch/EH/prefix safety: 2");
-        StringAssert.Contains(gateB.Detail, "Writable supported sites selected: 5");
+        StringAssert.Contains(gateB.Detail, "Eligible supported sites selected: 5");
         StringAssert.Contains(gateC.Detail, "Total real call sites rewritten: 5");
         StringAssert.Contains(gateD.Detail, "Total Compile sites forced to interpreter preference: 5");
         StringAssert.Contains(gateD.Detail, "Original Step 12 install unchanged: YES");
@@ -148,6 +148,116 @@ public sealed class ExpressionInterpreterCompatibilityTests
     }
 
     [TestMethod]
+    public async Task StrongNameIdentityTargetIsRewrittenWithPublicKeyIdentityPreservedAndSignedFlagCleared()
+    {
+        using var temp = new TemporaryDirectory();
+        var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
+        var arm64Relative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll";
+        var consumerRelative = "SlayTheSpire2.app/Contents/Resources/strong-name-consumer.dll";
+        var arm64Path = Path.Combine(managedPath, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        var consumerPath = Path.Combine(managedPath, consumerRelative.Replace('/', Path.DirectorySeparatorChar));
+        Directory.CreateDirectory(Path.GetDirectoryName(arm64Path)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(consumerPath)!);
+        WriteSyntheticExpressionAssembly(arm64Path, "sts2", includeTargets: true, strongNameIdentity: true);
+        WriteSyntheticConsumerAssembly(consumerPath, arm64Path);
+
+        var files = new List<SteamManagedInstallFile>();
+        foreach (var (relative, path) in new[] { (arm64Relative, arm64Path), (consumerRelative, consumerPath) })
+        {
+            var fileBytes = await File.ReadAllBytesAsync(path);
+            files.Add(new SteamManagedInstallFile(relative, fileBytes.LongLength, Convert.ToHexString(SHA1.HashData(fileBytes)).ToLowerInvariant()));
+        }
+        var receipt = new SteamManagedInstallReceipt(
+            SteamManagedInstallReceipt.CurrentSchemaVersion,
+            2868840,
+            2868842,
+            993UL,
+            "public",
+            DateTimeOffset.UtcNow,
+            files);
+        await using (var stream = File.Create(Path.Combine(managedPath, SteamManagedInstallReceipt.FileName)))
+        {
+            await JsonSerializer.SerializeAsync(stream, receipt, SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt);
+        }
+
+        using var sourceBefore = ModuleDefinition.ReadModule(arm64Path, new ReaderParameters
+        {
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = RejectingTestResolver.Instance,
+            MetadataResolver = RejectingTestResolver.Instance,
+        });
+        var sourceFullName = sourceBefore.Assembly.Name.FullName;
+        var sourcePublicKey = sourceBefore.Assembly.Name.PublicKey.ToArray();
+        var sourceToken = sourceBefore.Assembly.Name.PublicKeyToken.ToArray();
+        Assert.IsTrue(sourcePublicKey.Length > 0, "Synthetic source must carry a strong-name public key.");
+        Assert.IsTrue((sourceBefore.Attributes & ModuleAttributes.StrongNameSigned) != 0, "Synthetic source must present as StrongNameSigned.");
+
+        var compatibility = new ExpressionInterpreterCompatibility(temp.Path);
+        var gateA = await compatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync();
+        var gateB = compatibility.RunRealCompileTargetDiscovery();
+        var gateC = compatibility.RunPreferInterpretationRewrite();
+        var gateD = await compatibility.RunIsolationAuditAsync();
+
+        Assert.IsTrue(gateA.Passed, gateA.Detail);
+        Assert.IsTrue(gateB.Passed, gateB.Detail);
+        Assert.IsTrue(gateC.Passed, gateC.Detail);
+        Assert.IsTrue(gateD.Passed, gateD.Detail);
+        StringAssert.Contains(gateB.Detail, "Supported sites carrying strong-name identity: 5");
+        StringAssert.Contains(gateB.Detail, "Eligible supported sites selected: 5");
+        StringAssert.Contains(gateB.Detail, "Selected assemblies with StrongNameSigned set: 1");
+        StringAssert.Contains(gateC.Detail, "Modified assemblies with StrongNameSigned cleared in prepared copy: 1");
+        StringAssert.Contains(gateC.Detail, "Strong-name public key/token/full assembly identity preserved across every rewritten output: YES");
+
+        var sourceCopy = Path.Combine(
+            temp.Path,
+            ExpressionInterpreterCompatibility.WorkRootName,
+            ExpressionInterpreterCompatibility.SourceRootName,
+            arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+        var preparedCopy = Path.Combine(
+            temp.Path,
+            ExpressionInterpreterCompatibility.WorkRootName,
+            ExpressionInterpreterCompatibility.PreparedRootName,
+            arm64Relative.Replace('/', Path.DirectorySeparatorChar));
+
+        using var sourceAfter = ModuleDefinition.ReadModule(sourceCopy, new ReaderParameters
+        {
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = RejectingTestResolver.Instance,
+            MetadataResolver = RejectingTestResolver.Instance,
+        });
+        using var prepared = ModuleDefinition.ReadModule(preparedCopy, new ReaderParameters
+        {
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = RejectingTestResolver.Instance,
+            MetadataResolver = RejectingTestResolver.Instance,
+        });
+
+        Assert.AreEqual(sourceFullName, sourceAfter.Assembly.Name.FullName, "Source assembly identity changed.");
+        Assert.AreEqual(sourceFullName, prepared.Assembly.Name.FullName, "Prepared assembly full identity must remain unchanged.");
+        CollectionAssert.AreEqual(sourcePublicKey, sourceAfter.Assembly.Name.PublicKey.ToArray(), "Source public key changed.");
+        CollectionAssert.AreEqual(sourcePublicKey, prepared.Assembly.Name.PublicKey.ToArray(), "Prepared public key changed.");
+        CollectionAssert.AreEqual(sourceToken, sourceAfter.Assembly.Name.PublicKeyToken.ToArray(), "Source public-key token changed.");
+        CollectionAssert.AreEqual(sourceToken, prepared.Assembly.Name.PublicKeyToken.ToArray(), "Prepared public-key token changed.");
+        Assert.IsTrue((sourceAfter.Attributes & ModuleAttributes.StrongNameSigned) != 0, "Receipt-backed source must retain StrongNameSigned.");
+        Assert.IsFalse((prepared.Attributes & ModuleAttributes.StrongNameSigned) != 0, "Modified prepared copy must not claim an obsolete strong-name signature.");
+        CollectionAssert.AreEqual(await File.ReadAllBytesAsync(arm64Path), await File.ReadAllBytesAsync(sourceCopy), "Receipt-backed source copy changed.");
+
+        var preparedConsumer = Path.Combine(
+            temp.Path,
+            ExpressionInterpreterCompatibility.WorkRootName,
+            ExpressionInterpreterCompatibility.PreparedRootName,
+            consumerRelative.Replace('/', Path.DirectorySeparatorChar));
+        CollectionAssert.AreEqual(await File.ReadAllBytesAsync(consumerPath), await File.ReadAllBytesAsync(preparedConsumer), "Non-target consumer assembly changed.");
+        using var consumer = ModuleDefinition.ReadModule(preparedConsumer, new ReaderParameters
+        {
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = RejectingTestResolver.Instance,
+            MetadataResolver = RejectingTestResolver.Instance,
+        });
+        Assert.IsTrue(consumer.AssemblyReferences.Any(reference => reference.FullName == sourceFullName), "Consumer strong-name reference no longer matches the preserved prepared target identity.");
+    }
+
+    [TestMethod]
     public async Task NoSupportedExpressionCompileTargetFailsAtGateBWithoutPreparedOutput()
     {
         using var temp = new TemporaryDirectory();
@@ -177,7 +287,7 @@ public sealed class ExpressionInterpreterCompatibilityTests
 
         Assert.IsTrue(gateA.Passed, gateA.Detail);
         Assert.IsFalse(gateB.Passed);
-        StringAssert.Contains(gateB.Detail, "No structurally-safe unsigned direct System.Linq.Expressions Compile target");
+        StringAssert.Contains(gateB.Detail, "No structurally-safe direct System.Linq.Expressions Compile target");
         Assert.IsFalse(Directory.Exists(Path.Combine(temp.Path, ExpressionInterpreterCompatibility.WorkRootName, ExpressionInterpreterCompatibility.PreparedRootName)));
     }
 
@@ -208,13 +318,21 @@ public sealed class ExpressionInterpreterCompatibilityTests
             Assert.AreEqual(expectedOperand, constant.Operand, $"Unexpected constant operand in {methodName}.");
     }
 
-    private static void WriteSyntheticExpressionAssembly(string path, string assemblyName, bool includeTargets)
+    private static void WriteSyntheticExpressionAssembly(string path, string assemblyName, bool includeTargets, bool strongNameIdentity = false)
     {
         using var assembly = AssemblyDefinition.CreateAssembly(
             new AssemblyNameDefinition(assemblyName, new Version(1, 0, 0, 0)),
             assemblyName,
             ModuleKind.Dll);
         var module = assembly.MainModule;
+        if (strongNameIdentity)
+        {
+            var publicKey = typeof(object).Assembly.GetName().GetPublicKey();
+            if (publicKey is not { Length: > 0 })
+                throw new InvalidOperationException("The host core library did not expose a strong-name public key for the Step 19 test fixture.");
+            assembly.Name.PublicKey = publicKey;
+            module.Attributes |= ModuleAttributes.StrongNameSigned;
+        }
         var type = new TypeDefinition("Synthetic", "ExpressionUser", TypeAttributes.Public | TypeAttributes.Class, module.TypeSystem.Object);
         module.Types.Add(type);
 
@@ -249,6 +367,34 @@ public sealed class ExpressionInterpreterCompatibilityTests
         AddCompileMethod(type, "DynamicBool", lambdaType, compileBool, argumentKind: 3);
         AddUnsafeBranchTargetCompileMethod(type, lambdaType, compileNoArgs);
         AddCrossingShortBranchCompileMethod(type, lambdaType, compileNoArgs);
+        assembly.Write(path);
+    }
+
+    private static void WriteSyntheticConsumerAssembly(string path, string targetPath)
+    {
+        using var target = ModuleDefinition.ReadModule(targetPath, new ReaderParameters
+        {
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = RejectingTestResolver.Instance,
+            MetadataResolver = RejectingTestResolver.Instance,
+        });
+        var targetName = target.Assembly.Name;
+        var targetReference = new AssemblyNameReference(targetName.Name, targetName.Version)
+        {
+            Culture = targetName.Culture,
+            PublicKeyToken = targetName.PublicKeyToken.ToArray(),
+        };
+
+        using var assembly = AssemblyDefinition.CreateAssembly(
+            new AssemblyNameDefinition("strong-name-consumer", new Version(1, 0, 0, 0)),
+            "strong-name-consumer",
+            ModuleKind.Dll);
+        var module = assembly.MainModule;
+        module.AssemblyReferences.Add(targetReference);
+        var consumerType = new TypeDefinition("Synthetic", "StrongNameConsumer", TypeAttributes.Public | TypeAttributes.Class, module.TypeSystem.Object);
+        module.Types.Add(consumerType);
+        var targetType = new TypeReference("Synthetic", "ExpressionUser", module, targetReference);
+        consumerType.Fields.Add(new FieldDefinition("Target", FieldAttributes.Public | FieldAttributes.Static, targetType));
         assembly.Write(path);
     }
 
