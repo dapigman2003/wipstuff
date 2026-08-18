@@ -3,14 +3,14 @@
 Build Codemagic workflow:
 
 ```text
-ios-step-18-3
+ios-step-18-4
 ```
 
 Expected app header:
 
 ```text
-STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE
-Version 0.0.50
+STEP 18.4 — REAL ASSEMBLY REWRITE WORKSPACE
+Version 0.0.51
 ```
 
 Start from a fresh launcher process if the Step 15 Godot host has been started in the current process.
@@ -33,8 +33,8 @@ Important Gate D lines:
 
 ```text
 Original managed-install receipt SHA-1s reverified: <all>/<all>
-Primary Cecil round-trip output reopens: YES
-Neutral NOP rewrite still present after reopen: YES
+Primary Cecil round-trip output reopens with explicit workspace resolver: YES
+Neutral NOP rewrite still present after explicit-resolver reopen: YES
 Only launcher-private Step18-RealAssemblyRewrite outputs were written: YES
 Original Step 12 install unchanged: YES
 Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY
@@ -54,6 +54,8 @@ Run Foundation 5/5 Regression
 Step 18 is not a game-execution or behavioral compatibility-fix boundary.
 
 
-### Step 18.3 Gate B diagnostic expectation
+### Step 18.4 Gate B diagnostic expectation
 
-Gate B should continue resolving `GodotSharp` by verified metadata identity rather than filename. For the newly observed runtime-contract case, an exact identity remains preferred; if only the version differs and the verified workspace contains exactly one candidate with the same name/culture/public-key token, the resolution trace should show `[workspace version-unified]`. Multiple version-distinct identities or byte-distinct duplicates must still fail explicitly. No runtime/system/live-install/network fallback is permitted.
+The 0.0.50 physical failure returned to a plain `AssemblyResolutionException` for `GodotSharp` only after Step 18.3 had handled the preceding `System.Runtime 8.0.0.0 -> 9.0.0.0` writer-resolution boundary. Step 18.4 removes the unbound generated-output reopen path. A passing Gate B must now report `Generated-output reopen resolver explicitly bound to workspace identity catalog: YES` and `Generated-output verification uses deferred Cecil reading: YES`.
+
+If Gate B still fails, the detail begins with `Stage:` and must identify whether the failure happened during the primary source read, writer, generated-output reopen, fingerprint verification, or hash postflight. Do not retry unchanged; capture that complete staged diagnostic. Exact identity remains preferred, the existing unambiguous version-only workspace rule remains available, and runtime/system/live-install/network fallback remains forbidden.

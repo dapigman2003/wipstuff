@@ -1,3 +1,4 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Mono.Cecil;
@@ -112,6 +113,8 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         StringAssert.Contains(gateA.Detail, "macOS x86_64 duplicates excluded from rewrite workspace: 1");
         StringAssert.Contains(gateB.Detail, "REAL StS2 assembly copy");
         StringAssert.Contains(gateB.Detail, "Logical metadata fingerprint preserved after write/reopen: YES");
+        StringAssert.Contains(gateB.Detail, "Generated-output reopen resolver explicitly bound to workspace identity catalog: YES");
+        StringAssert.Contains(gateB.Detail, "Generated-output verification uses deferred Cecil reading: YES");
         StringAssert.Contains(gateB.Detail, "Workspace-only dependency resolutions observed:");
         StringAssert.Contains(gateB.Detail, "GodotSharp, Version=4.5.10.0");
         StringAssert.Contains(gateB.Detail, "System.Runtime, Version=8.0.0.0");
@@ -121,8 +124,11 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         Assert.IsFalse(File.Exists(Path.Combine(Path.GetDirectoryName(arm64Path)!, "System.Runtime.dll")));
         StringAssert.Contains(gateB.Detail, "Fallback to runtime/system/live-install/network resolver paths: NO");
         StringAssert.Contains(gateC.Detail, "insert one IL NOP at method entry");
+        StringAssert.Contains(gateC.Detail, "Generated-output reopen resolver explicitly bound to workspace identity catalog: YES");
         StringAssert.Contains(gateC.Detail, "Behaviorally significant game fix attempted: NO");
         StringAssert.Contains(gateD.Detail, "Original Step 12 install unchanged: YES");
+        StringAssert.Contains(gateD.Detail, "Primary Cecil round-trip output reopens with explicit workspace resolver: YES");
+        StringAssert.Contains(gateD.Detail, "Generated-output audit reopens use deferred Cecil reading: YES");
         StringAssert.Contains(gateD.Detail, "Every dependency resolution was constrained to Step18-RealAssemblyRewrite/source: YES");
         StringAssert.Contains(gateD.Detail, "Game assembly loaded/executed: NO");
 
@@ -141,7 +147,12 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         var rewrittenBytes = await File.ReadAllBytesAsync(rewrittenCopy);
         Assert.IsFalse(sourceBytes.SequenceEqual(rewrittenBytes));
 
-        using var rewritten = ModuleDefinition.ReadModule(rewrittenCopy, new ReaderParameters { ReadingMode = ReadingMode.Immediate });
+        using var rewritten = ModuleDefinition.ReadModule(rewrittenCopy, new ReaderParameters
+        {
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = RejectingTestResolver.Instance,
+            MetadataResolver = RejectingTestResolver.Instance,
+        });
         var target = rewritten.Types.SelectMany(type => type.Methods).Single(method => method.Name == "Target");
         Assert.AreEqual(Code.Nop, target.Body.Instructions[0].OpCode.Code);
         Assert.AreEqual(Code.Ldc_I4_7, target.Body.Instructions[1].OpCode.Code);
@@ -285,6 +296,24 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         il.Append(il.Create(OpCodes.Ldc_I4_7));
         il.Append(il.Create(OpCodes.Ret));
         assembly.Write(path);
+    }
+
+
+    private sealed class RejectingTestResolver : IAssemblyResolver, IMetadataResolver
+    {
+        public static RejectingTestResolver Instance { get; } = new();
+        private RejectingTestResolver() { }
+        public AssemblyDefinition Resolve(AssemblyNameReference name)
+            => throw new AssertFailedException($"Verification-only test unexpectedly resolved assembly {name.FullName}.");
+        public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
+            => Resolve(name);
+        TypeDefinition IMetadataResolver.Resolve(TypeReference type)
+            => throw new AssertFailedException($"Verification-only test unexpectedly resolved type {type.FullName}.");
+        FieldDefinition IMetadataResolver.Resolve(FieldReference field)
+            => throw new AssertFailedException($"Verification-only test unexpectedly resolved field {field.FullName}.");
+        MethodDefinition IMetadataResolver.Resolve(MethodReference method)
+            => throw new AssertFailedException($"Verification-only test unexpectedly resolved method {method.FullName}.");
+        public void Dispose() { }
     }
 
     private sealed class TemporaryDirectory : IDisposable

@@ -80,3 +80,20 @@ Step 18.2 physically advanced Gate B beyond the prior `GodotSharp` failure. The 
 The Step 18.2 resolver was therefore stricter than Cecil's ordinary same-directory resolver semantics: it required an exact version even though Cecil normally opens the located same-name assembly and uses it as metadata input. Step 18.3 preserves the closed workspace trust boundary while allowing version-only unification when there is exactly one same-name/culture/token candidate identity. Exact matches still win; multiple version-distinct identities and byte-distinct duplicates still fail rather than being guessed. The selected file is SHA-1 rechecked immediately before opening, and its opened identity must still match the catalog entry.
 
 This is metadata-only writer support. It does not rewrite the original `AssemblyRef`, create a runtime binding redirect, load a system assembly from the app runtime, or execute StS2.
+
+
+## Step 18.4 physical-device correction
+
+The Step 18.3 / 0.0.50 physical run passed Gate A and again failed Gate B with a plain Cecil `AssemblyResolutionException` for `GodotSharp`. This looked like a regression until the Gate B implementation was audited by stage. The source module was opened and written with the strict workspace resolver, but the generated `roundtrip` output was then reopened through a helper that supplied only `ReadingMode.Immediate`. That let Cecil lazily create its implicit default assembly resolver. Gate C's generated rewrite verification and Gate D's two final audit reopens had the same escape hatch.
+
+Step 18.4 makes the resolver boundary symmetric across the subsystem:
+
+- every real StS2 source read explicitly binds both `AssemblyResolver` and `MetadataResolver`;
+- every generated round-trip/rewritten/audit reopen does the same;
+- generated-output verification uses `ReadingMode.Deferred` so only metadata needed by the gate is materialized;
+- workspace dependency modules are also opened deferred to avoid unnecessary eager transitive metadata pressure;
+- the existing SHA-1 identity catalog and exact-first / unambiguous-version-only policy are retained;
+- no generated output becomes a new trusted dependency source: dependency lookup remains rooted only in receipt-verified `Step18-RealAssemblyRewrite/source`;
+- Gate B/C/D failures include an exact `Stage:` label so writer failures cannot be confused with verification-reopen failures.
+
+This correction does not add a platform/runtime resolver, CLR load, system assembly fallback, or behavioral StS2 patch. It closes an accidental Cecil verification path that escaped the Step 18 trust model.
