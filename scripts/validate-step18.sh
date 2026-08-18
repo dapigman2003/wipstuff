@@ -24,6 +24,7 @@ required = [
     Path('scripts/verify-step18-ipa.sh'),
     Path('docs/STEP-18-DESIGN.md'),
     Path('docs/STEP-18-TEST.md'),
+    Path('docs/STEP-18.1.1-HOST-TEST-CECIL-API-FIX.md'),
 ]
 for path in required:
     if not path.exists():
@@ -121,6 +122,14 @@ for marker in (
         raise SystemExit(f'ERROR: Step 18 ordered-gate contract missing: {marker}')
 
 tests = Path('tests/StS2Launcher.Core.Tests/RealAssemblyRewriteWorkspaceTests.cs').read_text()
+if 'isValueType:' in tests:
+    raise SystemExit('ERROR: Step 18 host test uses unsupported Mono.Cecil 0.11.6 TypeReference named argument isValueType:.')
+for marker in (
+    'TypeReference constructor argument',
+    'dependencyReference,\n            true);',
+):
+    if marker not in tests:
+        raise SystemExit(f'ERROR: Step 18.1.1 Mono.Cecil TypeReference API hotfix marker missing: {marker}')
 for marker in (
     'OrderedRealAssemblyRewriteGatesReachFourOfFourPass',
     'RealAssemblyRewriteGatesStopAfterFirstFailure',

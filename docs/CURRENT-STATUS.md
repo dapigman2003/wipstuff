@@ -1,5 +1,7 @@
 # Current project status
 
+**Source hotfix:** Step 18.1.1 fixes a host-test-only Mono.Cecil `TypeReference` constructor API compile error. Runtime remains Step 18.1 / `0.0.48 (48)`.
+
 **Steps 01–17 are complete and closed on a physical iPhone.**
 
 Step 15 / runtime `0.0.43 (43)` physically proved the independent source-built Godot 4.5.1-stable iOS host through native availability, engine/render-loop control, Metal rendering, and physical touch/lifecycle forwarding. A small initial-orientation/panel-layout quirk remains recorded as non-blocking.
@@ -8,7 +10,7 @@ Step 16.1 / runtime `0.0.45 (45)` physically passed all four Managed Preparation
 
 Step 17 / runtime `0.0.46 (46)` physically passed all four Compatibility Call-Site Analysis gates: receipt-backed ARM64/shared scope selection, concrete IL call-site scanning, native/platform interop classification, and a primary ARM64 `sts2.dll` dependency-pressure map. Step 17 remained read-only.
 
-**Current source candidate:** Step 18.1 — Real Assembly Rewrite Workspace.
+**Current source candidate:** Step 18.1.1 source hotfix — Real Assembly Rewrite Workspace (runtime remains Step 18.1).
 
 - App version: `0.0.48 (48)`
 - Codemagic workflow: `ios-step-18-1`
