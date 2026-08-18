@@ -63,3 +63,11 @@ AssemblyResolutionException: Failed to resolve assembly: GodotSharp, Version=4.5
 ```
 
 This did not mean the game assembly was missing or corrupt. Cecil can require referenced type metadata while writing an otherwise unchanged module (for example enum-typed constants/default parameters). Step 18.1 therefore supplies an `IAssemblyResolver` that is intentionally restricted to the already receipt-verified `Step18-RealAssemblyRewrite/source` tree. The resolver never searches the live install, the launcher runtime, trusted platform assemblies/GAC, network locations, or arbitrary filesystem paths.
+
+## Step 18.2 physical-device correction
+
+Step 18.1 still failed Gate B on the real iPhone with `AssemblyResolutionException` for `GodotSharp`. The first custom resolver was workspace-confined, but it still guessed dependency filenames from the requested assembly simple name (`GodotSharp` => `GodotSharp.dll`). Step 18.2 removes that filename convention entirely.
+
+The resolver now catalogs the actual `AssemblyNameDefinition` identity stored in each SHA-1-verified workspace managed file, matches the requested `AssemblyNameReference` by metadata identity, and explicitly binds both Cecil `AssemblyResolver` and `MetadataResolver` to that catalog. The selected dependency is SHA-1 rechecked immediately before every metadata probe/open. Non-managed `.dll/.exe` filename candidates are ignored by the identity catalog rather than treated as dependencies.
+
+The regression fixture deliberately stores the synthetic `GodotSharp` assembly under a nonmatching filename so a return to filename-derived resolution cannot pass host tests.

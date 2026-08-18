@@ -41,15 +41,20 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         using var temp = new TemporaryDirectory();
         var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
         var arm64Relative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll";
-        var godotSharpRelative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/GodotSharp.dll";
+        var godotSharpRelative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/godot-runtime-payload.dll";
         var x86Relative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_x86_64/sts2.dll";
         var sharedRelative = "SlayTheSpire2.app/Contents/Resources/shared-helper.dll";
 
         var arm64Path = Path.Combine(managedPath, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
         var godotSharpPath = Path.Combine(managedPath, godotSharpRelative.Replace('/', Path.DirectorySeparatorChar));
         Directory.CreateDirectory(Path.GetDirectoryName(arm64Path)!);
-        WriteSyntheticEnumDependencyAssembly(godotSharpPath);
+        // Create the dependency under the conventional filename only long enough to build the
+        // synthetic primary assembly with Cecil's default resolver, then rename it. Gate B must
+        // resolve by ASSEMBLY IDENTITY, not by assuming GodotSharp => GodotSharp.dll.
+        var setupGodotSharpPath = Path.Combine(Path.GetDirectoryName(arm64Path)!, "GodotSharp.dll");
+        WriteSyntheticEnumDependencyAssembly(setupGodotSharpPath);
         WriteSyntheticAssemblyWithExternalEnumDefault(arm64Path, Path.GetDirectoryName(arm64Path)!);
+        File.Move(setupGodotSharpPath, godotSharpPath);
 
         var x86Path = Path.Combine(managedPath, x86Relative.Replace('/', Path.DirectorySeparatorChar));
         Directory.CreateDirectory(Path.GetDirectoryName(x86Path)!);
@@ -102,7 +107,8 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         StringAssert.Contains(gateB.Detail, "REAL StS2 assembly copy");
         StringAssert.Contains(gateB.Detail, "Logical metadata fingerprint preserved after write/reopen: YES");
         StringAssert.Contains(gateB.Detail, "Workspace-only dependency resolutions observed:");
-        StringAssert.Contains(gateB.Detail, "GodotSharp");
+        StringAssert.Contains(gateB.Detail, "GodotSharp, Version=4.5.10.0");
+        Assert.IsFalse(File.Exists(Path.Combine(Path.GetDirectoryName(arm64Path)!, "GodotSharp.dll")));
         StringAssert.Contains(gateB.Detail, "Fallback to runtime/system/live-install/network resolver paths: NO");
         StringAssert.Contains(gateC.Detail, "insert one IL NOP at method entry");
         StringAssert.Contains(gateC.Detail, "Behaviorally significant game fix attempted: NO");

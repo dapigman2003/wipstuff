@@ -6,7 +6,7 @@ Experimental unofficial iOS launcher/compatibility-host project for users who le
 
 **Steps 01–17 are complete and closed on a physical iPhone.** Step 15 physically proved the independent Godot 4.5.1 Metal/touch/lifecycle host. Step 16.1 physically proved Mono.Cecil read/write/reopen and real StS2 read-only metadata inspection. Step 17 physically passed the receipt-backed ARM64 actual-IL/native/dependency analysis subsystem.
 
-This archive is **Step 18.1.1 source hotfix / runtime Step 18.1 `0.0.48 (48)`**, continuing the accelerated model of one related subsystem with several ordered gates. Step 18.1.1 fixes only the host-test Mono.Cecil API compile error discovered by Codemagic; runtime behavior is unchanged.
+This archive is **Step 18.2 / `0.0.49 (49)`**, correcting the real-device Gate B dependency resolver after Step 18.1 still failed to resolve `GodotSharp`. Step 18.2 resolves dependencies by verified workspace **assembly identity**, not guessed filenames, and explicitly binds Cecil's assembly and metadata resolver layers to the same strict workspace-only catalog.
 
 ## Step 18 subsystem — Real Assembly Rewrite Workspace
 
@@ -26,14 +26,14 @@ Step 18 writes only under launcher-private Step 18 scratch storage. It never wri
 Use Codemagic workflow:
 
 ```text
-ios-step-18-1
+ios-step-18-2
 ```
 
 Expected app:
 
 ```text
-0.0.48 (48)
-STEP 18.1 — REAL ASSEMBLY REWRITE WORKSPACE
+0.0.49 (49)
+STEP 18.2 — REAL ASSEMBLY REWRITE WORKSPACE
 ```
 
 Expected IPA:
