@@ -3,14 +3,14 @@
 Build Codemagic workflow:
 
 ```text
-ios-step-18-2
+ios-step-18-3
 ```
 
 Expected app header:
 
 ```text
-STEP 18.2 — REAL ASSEMBLY REWRITE WORKSPACE
-Version 0.0.49
+STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE
+Version 0.0.50
 ```
 
 Start from a fresh launcher process if the Step 15 Godot host has been started in the current process.
@@ -54,6 +54,6 @@ Run Foundation 5/5 Regression
 Step 18 is not a game-execution or behavioral compatibility-fix boundary.
 
 
-### Step 18.2 Gate B diagnostic expectation
+### Step 18.3 Gate B diagnostic expectation
 
-Gate B should no longer depend on a file literally named `GodotSharp.dll`. The Step 18 resolver catalogs verified workspace assembly identities and explicitly binds Cecil's metadata resolver to the same workspace-only resolver. If a requested identity is missing or ambiguous, the detail should now say `Step 18 workspace identity resolver...` and list any same-name identity candidates instead of falling through to the generic Cecil default resolver.
+Gate B should continue resolving `GodotSharp` by verified metadata identity rather than filename. For the newly observed runtime-contract case, an exact identity remains preferred; if only the version differs and the verified workspace contains exactly one candidate with the same name/culture/public-key token, the resolution trace should show `[workspace version-unified]`. Multiple version-distinct identities or byte-distinct duplicates must still fail explicitly. No runtime/system/live-install/network fallback is permitted.

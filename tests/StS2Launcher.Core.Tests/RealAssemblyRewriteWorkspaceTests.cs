@@ -42,19 +42,25 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
         var arm64Relative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll";
         var godotSharpRelative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/godot-runtime-payload.dll";
+        var systemRuntimeRelative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/runtime-contract-payload.dll";
         var x86Relative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_x86_64/sts2.dll";
         var sharedRelative = "SlayTheSpire2.app/Contents/Resources/shared-helper.dll";
 
         var arm64Path = Path.Combine(managedPath, arm64Relative.Replace('/', Path.DirectorySeparatorChar));
         var godotSharpPath = Path.Combine(managedPath, godotSharpRelative.Replace('/', Path.DirectorySeparatorChar));
+        var systemRuntimePath = Path.Combine(managedPath, systemRuntimeRelative.Replace('/', Path.DirectorySeparatorChar));
         Directory.CreateDirectory(Path.GetDirectoryName(arm64Path)!);
-        // Create the dependency under the conventional filename only long enough to build the
-        // synthetic primary assembly with Cecil's default resolver, then rename it. Gate B must
-        // resolve by ASSEMBLY IDENTITY, not by assuming GodotSharp => GodotSharp.dll.
+        // Create dependencies under conventional filenames only long enough to build the synthetic
+        // primary assembly with Cecil's default resolver, then rename them. Gate B must resolve
+        // GodotSharp by ASSEMBLY IDENTITY and must also permit the unambiguous System.Runtime
+        // 8.0.0.0 -> 9.0.0.0 workspace version-unification case observed on the physical iPhone.
         var setupGodotSharpPath = Path.Combine(Path.GetDirectoryName(arm64Path)!, "GodotSharp.dll");
+        var setupSystemRuntimePath = Path.Combine(Path.GetDirectoryName(arm64Path)!, "System.Runtime.dll");
         WriteSyntheticEnumDependencyAssembly(setupGodotSharpPath);
-        WriteSyntheticAssemblyWithExternalEnumDefault(arm64Path, Path.GetDirectoryName(arm64Path)!);
+        WriteSyntheticRuntimeContractAssembly(setupSystemRuntimePath);
+        WriteSyntheticAssemblyWithExternalEnumDefaults(arm64Path, Path.GetDirectoryName(arm64Path)!);
         File.Move(setupGodotSharpPath, godotSharpPath);
+        File.Move(setupSystemRuntimePath, systemRuntimePath);
 
         var x86Path = Path.Combine(managedPath, x86Relative.Replace('/', Path.DirectorySeparatorChar));
         Directory.CreateDirectory(Path.GetDirectoryName(x86Path)!);
@@ -65,7 +71,7 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         WriteSyntheticAssembly(sharedPath, "shared-helper");
 
         var files = new List<SteamManagedInstallFile>();
-        foreach (var relative in new[] { arm64Relative, godotSharpRelative, x86Relative, sharedRelative })
+        foreach (var relative in new[] { arm64Relative, godotSharpRelative, systemRuntimeRelative, x86Relative, sharedRelative })
         {
             var path = Path.Combine(managedPath, relative.Replace('/', Path.DirectorySeparatorChar));
             var bytes = await File.ReadAllBytesAsync(path);
@@ -102,13 +108,17 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         Assert.IsTrue(gateD.Passed, gateD.Detail);
         CollectionAssert.AreEqual(installBefore, installAfter);
 
-        StringAssert.Contains(gateA.Detail, "macOS arm64 candidates copied: 2");
+        StringAssert.Contains(gateA.Detail, "macOS arm64 candidates copied: 3");
         StringAssert.Contains(gateA.Detail, "macOS x86_64 duplicates excluded from rewrite workspace: 1");
         StringAssert.Contains(gateB.Detail, "REAL StS2 assembly copy");
         StringAssert.Contains(gateB.Detail, "Logical metadata fingerprint preserved after write/reopen: YES");
         StringAssert.Contains(gateB.Detail, "Workspace-only dependency resolutions observed:");
         StringAssert.Contains(gateB.Detail, "GodotSharp, Version=4.5.10.0");
+        StringAssert.Contains(gateB.Detail, "System.Runtime, Version=8.0.0.0");
+        StringAssert.Contains(gateB.Detail, "System.Runtime, Version=9.0.0.0");
+        StringAssert.Contains(gateB.Detail, "[workspace version-unified]");
         Assert.IsFalse(File.Exists(Path.Combine(Path.GetDirectoryName(arm64Path)!, "GodotSharp.dll")));
+        Assert.IsFalse(File.Exists(Path.Combine(Path.GetDirectoryName(arm64Path)!, "System.Runtime.dll")));
         StringAssert.Contains(gateB.Detail, "Fallback to runtime/system/live-install/network resolver paths: NO");
         StringAssert.Contains(gateC.Detail, "insert one IL NOP at method entry");
         StringAssert.Contains(gateC.Detail, "Behaviorally significant game fix attempted: NO");
@@ -164,7 +174,34 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         assembly.Write(path);
     }
 
-    private static void WriteSyntheticAssemblyWithExternalEnumDefault(string path, string dependencyDirectory)
+    private static void WriteSyntheticRuntimeContractAssembly(string path)
+    {
+        using var assembly = AssemblyDefinition.CreateAssembly(
+            new AssemblyNameDefinition("System.Runtime", new Version(9, 0, 0, 0)),
+            "System.Runtime",
+            ModuleKind.Dll);
+        var module = assembly.MainModule;
+        var enumType = new TypeDefinition(
+            "Synthetic.Runtime",
+            "RuntimeMode",
+            TypeAttributes.Public | TypeAttributes.Sealed,
+            module.ImportReference(typeof(Enum)));
+        module.Types.Add(enumType);
+        enumType.Fields.Add(new FieldDefinition(
+            "value__",
+            FieldAttributes.Public | FieldAttributes.SpecialName | FieldAttributes.RTSpecialName,
+            module.TypeSystem.Int32));
+        enumType.Fields.Add(new FieldDefinition(
+            "One",
+            FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.Literal | FieldAttributes.HasDefault,
+            enumType)
+        {
+            Constant = 1,
+        });
+        assembly.Write(path);
+    }
+
+    private static void WriteSyntheticAssemblyWithExternalEnumDefaults(string path, string dependencyDirectory)
     {
         using var setupResolver = new DefaultAssemblyResolver();
         setupResolver.AddSearchDirectory(dependencyDirectory);
@@ -177,16 +214,24 @@ public sealed class RealAssemblyRewriteWorkspaceTests
                 AssemblyResolver = setupResolver,
             });
         var module = assembly.MainModule;
-        var dependencyReference = new AssemblyNameReference("GodotSharp", new Version(4, 5, 10, 0));
-        module.AssemblyReferences.Add(dependencyReference);
+        var godotReference = new AssemblyNameReference("GodotSharp", new Version(4, 5, 10, 0));
+        var runtimeReference = new AssemblyNameReference("System.Runtime", new Version(8, 0, 0, 0));
+        module.AssemblyReferences.Add(godotReference);
+        module.AssemblyReferences.Add(runtimeReference);
         // Mono.Cecil 0.11.6 exposes the value-type flag as the fifth positional
         // TypeReference constructor argument. Keep this positional so the host
         // regression test compiles against the exact pinned Cecil API.
-        var externalEnum = new TypeReference(
+        var godotEnum = new TypeReference(
             "Synthetic.Dependency",
             "ExternalMode",
             module,
-            dependencyReference,
+            godotReference,
+            true);
+        var runtimeEnum = new TypeReference(
+            "Synthetic.Runtime",
+            "RuntimeMode",
+            module,
+            runtimeReference,
             true);
 
         var type = new TypeDefinition("Synthetic", "GameType", TypeAttributes.Public | TypeAttributes.Class, module.TypeSystem.Object);
@@ -195,7 +240,14 @@ public sealed class RealAssemblyRewriteWorkspaceTests
         target.Parameters.Add(new ParameterDefinition(
             "mode",
             ParameterAttributes.Optional | ParameterAttributes.HasDefault,
-            externalEnum)
+            godotEnum)
+        {
+            Constant = 1,
+        });
+        target.Parameters.Add(new ParameterDefinition(
+            "runtimeMode",
+            ParameterAttributes.Optional | ParameterAttributes.HasDefault,
+            runtimeEnum)
         {
             Constant = 1,
         });
