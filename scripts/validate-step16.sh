@@ -34,13 +34,13 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.44' or str(plist.get('CFBundleVersion')) != '44':
-    raise SystemExit('ERROR: Step 16 must be version 0.0.44 (44).')
+if plist.get('CFBundleShortVersionString') != '0.0.45' or str(plist.get('CFBundleVersion')) != '45':
+    raise SystemExit('ERROR: Step 16.1 must be version 0.0.45 (45).')
 
 iosproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 for marker in (
-    '<ApplicationVersion>44</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.44</ApplicationDisplayVersion>',
+    '<ApplicationVersion>45</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.45</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -92,7 +92,8 @@ for marker in (
     'Step16-ManagedPreparation',
     'SteamOfflineInstallInspection',
     'SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt',
-    'Path.GetFileName(relative).Equals("sts2.dll", StringComparison.OrdinalIgnoreCase)',
+    'SelectPrimaryStS2AssemblyRelativePath(sts2Candidates)',
+    'data_sts2_macos_arm64/sts2.dll',
     'ModuleDefinition.ReadModule',
     'ValidateReceiptSnapshot(receipt, offline);',
     'offline.Outcome == SteamOfflineInstallOutcome.Cancelled',
@@ -160,6 +161,7 @@ for marker in (
     'ManagedPreparationRejectsOutOfOrderGate',
     'ProjectOwnedFixtureReadRoundTripAndRewritePass',
     'RealAssemblyInspectionUsesReceiptBackedInstallReadOnly',
+    'RealAssemblyInspectionSelectsMacOsArm64Sts2WhenDepotContainsBothArchitectures',
     'Assert.ThrowsExactly<InvalidOperationException>',
     'RewriteMe 7 → 42',
     'Real managed install modified: NO',
@@ -170,8 +172,8 @@ for marker in (
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 for marker in (
-    'STEP 16 — MANAGED PREPARATION FOUNDATION',
-    'Version 0.0.44',
+    'STEP 16.1 — MANAGED PREPARATION FOUNDATION',
+    'Version 0.0.45',
     'Steps 01–15 are complete on the physical iPhone.',
     'Step 16 — Managed Preparation Foundation (ordered gates A–D)',
     'Run Gates A–D — Cecil Fixture → IL Rewrite → Real StS2 Metadata',
@@ -201,7 +203,7 @@ for marker in (
     'Step15GodotSmokeProject',
     'Step16Fixtures',
     'StS2Launcher.Step16.Fixture.dll',
-    'StS2-Launcher-Step-16.ipa',
+    'StS2-Launcher-Step-16.1.ipa',
 ):
     if marker not in build:
         raise SystemExit(f'ERROR: Step 16 build-wrapper marker missing: {marker}')
@@ -211,11 +213,11 @@ if build.index('dotnet publish "$PROJECT"') > build.index('cp "$FIXTURE_DLL" "$F
 
 verify = Path('scripts/verify-step16-ipa.sh').read_text()
 for marker in (
-    '0.0.44',
-    'BUILD_VERSION" == "44"',
+    '0.0.45',
+    'BUILD_VERSION" == "45"',
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
-    'STEP16_CECIL_FIXTURE_V1',
-    'Step 16 fixture identity marker missing',
+    'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
+    'bundled Step 16 fixture differs from the exact project-owned fixture built earlier in this Codemagic run',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
@@ -227,12 +229,12 @@ if '(mono\\.cecil' in verify.lower():
 
 codemagic = Path('codemagic.yaml').read_text()
 for marker in (
-    'ios-step-16:',
-    'Step 16 - Managed Preparation Foundation',
+    'ios-step-16-1:',
+    'Step 16.1 - Managed Preparation Foundation Hotfix',
     'max_build_duration: 120',
     '$HOME/.cache/sts2launcher/godot-step15',
     'bash scripts/codemagic-build-step16.sh',
-    'artifacts/StS2-Launcher-Step-16.ipa',
+    'artifacts/StS2-Launcher-Step-16.1.ipa',
     'artifacts/step16-build-summary.txt',
 ):
     if marker not in codemagic:

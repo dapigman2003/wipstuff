@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-IPA="${1:-artifacts/StS2-Launcher-Step-16.ipa}"
+IPA="${1:-artifacts/StS2-Launcher-Step-16.1.ipa}"
 
 if [[ ! -f "$IPA" ]]; then
   echo "ERROR: IPA not found: $IPA" >&2
@@ -31,8 +31,8 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "0.0.44" ]] || { echo "ERROR: wrong Step 16 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "44" ]] || { echo "ERROR: wrong Step 16 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$VERSION" == "0.0.45" ]] || { echo "ERROR: wrong Step 16 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "45" ]] || { echo "ERROR: wrong Step 16 build version: $BUILD_VERSION" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 
@@ -47,8 +47,10 @@ done
 FIXTURE="$APP/Step16Fixtures/StS2Launcher.Step16.Fixture.dll"
 [[ -f "$FIXTURE" ]] || { echo "ERROR: Step 16 fixture assembly missing from IPA." >&2; exit 5; }
 [[ -s "$FIXTURE" ]] || { echo "ERROR: Step 16 fixture assembly is empty." >&2; exit 5; }
-if ! grep -aFq 'STEP16_CECIL_FIXTURE_V1' "$FIXTURE"; then
-  echo "ERROR: Step 16 fixture identity marker missing from bundled assembly." >&2
+FIXTURE_SOURCE="$ROOT/fixtures/StS2Launcher.Step16.Fixture/bin/Release/net9.0/StS2Launcher.Step16.Fixture.dll"
+[[ -f "$FIXTURE_SOURCE" ]] || { echo "ERROR: just-built Step 16 source fixture missing for IPA byte-for-byte verification." >&2; exit 5; }
+if ! cmp -s "$FIXTURE_SOURCE" "$FIXTURE"; then
+  echo "ERROR: bundled Step 16 fixture differs from the exact project-owned fixture built earlier in this Codemagic run." >&2
   exit 5
 fi
 
@@ -153,5 +155,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  Project-owned Step 16 fixture: bundled as inert raw assembly data"
   echo "  Real StS2/proprietary payload in IPA: none"
   echo "  Dynamic dependency audit: system or bundled only"
-  echo "  Expected device UI: STEP 16 — MANAGED PREPARATION FOUNDATION"
+  echo "  Expected device UI: STEP 16.1 — MANAGED PREPARATION FOUNDATION"
 } | tee artifacts/logs/step16-ipa-verification-summary.log

@@ -21,7 +21,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 {
-  echo "=== StS2 Launcher Step 16 Managed Preparation Foundation environment ==="
+  echo "=== StS2 Launcher Step 16.1 Managed Preparation Foundation environment ==="
   date -u
   uname -a
   xcodebuild -version
@@ -75,11 +75,11 @@ rm -rf "$WORKLOAD_CWD"
 trap - EXIT
 
 bash scripts/build-step16.sh 2>&1 | tee artifacts/logs/step16-wrapper.log
-bash scripts/verify-step16-ipa.sh artifacts/StS2-Launcher-Step-16.ipa \
+bash scripts/verify-step16-ipa.sh artifacts/StS2-Launcher-Step-16.1.ipa \
   2>&1 | tee artifacts/logs/step16-ipa-verification.log
 
 {
-  echo "StS2 Launcher iOS — Step 16 Managed Preparation Foundation"
+  echo "StS2 Launcher iOS — Step 16.1 Managed Preparation Foundation"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -97,9 +97,9 @@ bash scripts/verify-step16-ipa.sh artifacts/StS2-Launcher-Step-16.ipa \
   echo "Step 16 gate D: real receipt-backed StS2 managed metadata read-only inspection"
   echo "Game-data policy: no StS2 game files/assemblies or proprietary FMOD/Spine binaries in IPA"
   echo "Still absent: real StS2 rewrite/execution, FMOD/Spine integration, Cloud, Workshop"
-  echo "IPA: artifacts/StS2-Launcher-Step-16.ipa"
+  echo "IPA: artifacts/StS2-Launcher-Step-16.1.ipa"
   if command -v shasum >/dev/null 2>&1; then
-    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-16.ipa | awk '{print $1}')"
+    echo "IPA SHA-256: $(shasum -a 256 artifacts/StS2-Launcher-Step-16.1.ipa | awk '{print $1}')"
   fi
 } > artifacts/step16-build-summary.txt
 

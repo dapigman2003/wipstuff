@@ -15,7 +15,7 @@ rm -rf artifacts/publish artifacts/Payload
 mkdir -p artifacts/publish artifacts/logs
 
 APP="$ROOT/artifacts/publish/StS2Launcher.Step05.iOS.app"
-IPA="$ROOT/artifacts/StS2-Launcher-Step-16.ipa"
+IPA="$ROOT/artifacts/StS2-Launcher-Step-16.1.ipa"
 PROJECT="src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj"
 PATCHER="tools/StS2Launcher.SteamKitIosPatcher/StS2Launcher.SteamKitIosPatcher.csproj"
 FIXTURE_PROJECT="fixtures/StS2Launcher.Step16.Fixture/StS2Launcher.Step16.Fixture.csproj"
@@ -142,8 +142,8 @@ mkdir -p artifacts/Payload
 cp -R "$APP" artifacts/Payload/
 (
   cd artifacts
-  rm -f StS2-Launcher-Step-16.ipa
-  /usr/bin/zip -qry StS2-Launcher-Step-16.ipa Payload
+  rm -f StS2-Launcher-Step-16.1.ipa
+  /usr/bin/zip -qry StS2-Launcher-Step-16.1.ipa Payload
 )
 
 echo "Created $IPA"

@@ -113,6 +113,42 @@ public sealed class ManagedPreparationFoundationTests
         StringAssert.Contains(result.Detail, "Game assembly loaded/executed: NO");
     }
 
+    [TestMethod]
+    public async Task RealAssemblyInspectionSelectsMacOsArm64Sts2WhenDepotContainsBothArchitectures()
+    {
+        using var temp = new TemporaryDirectory();
+        var managedPath = System.IO.Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
+        var paths = new[]
+        {
+            "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll",
+            "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_x86_64/sts2.dll",
+        };
+        var files = new List<SteamManagedInstallFile>();
+        foreach (var relative in paths)
+        {
+            var target = System.IO.Path.Combine(managedPath, relative.Replace('/', System.IO.Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target)!);
+            File.Copy(typeof(FixtureTarget).Assembly.Location, target, overwrite: true);
+            var bytes = await File.ReadAllBytesAsync(target);
+            files.Add(new SteamManagedInstallFile(relative, bytes.LongLength, Convert.ToHexString(SHA1.HashData(bytes)).ToLowerInvariant()));
+        }
+
+        var receipt = new SteamManagedInstallReceipt(
+            SteamManagedInstallReceipt.CurrentSchemaVersion, 2868840, 2868842, 123456789UL, "public", DateTimeOffset.UtcNow, files);
+        await using (var stream = File.Create(System.IO.Path.Combine(managedPath, SteamManagedInstallReceipt.FileName)))
+        {
+            await JsonSerializer.SerializeAsync(stream, receipt, SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt);
+        }
+
+        var foundation = new ManagedPreparationFoundation(temp.Path);
+        var result = await foundation.RunRealStS2MetadataInspectionAsync();
+
+        Assert.IsTrue(result.Passed, result.Detail);
+        StringAssert.Contains(result.Detail, "sts2.dll candidates discovered: 2");
+        StringAssert.Contains(result.Detail, "Selected primary StS2 assembly: SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll");
+        StringAssert.Contains(result.Detail, "Post-inspection candidate SHA-1s reverified: 2/2");
+    }
+
     private sealed class TemporaryDirectory : IDisposable
     {
         public TemporaryDirectory()
