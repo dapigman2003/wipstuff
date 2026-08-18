@@ -1,6 +1,6 @@
 workflows:
-  ios-step-16:
-    name: Step 16 - Managed Preparation Foundation
+  ios-step-16-1:
+    name: Step 16.1 - Managed Preparation Foundation Hotfix
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -23,7 +23,7 @@ workflows:
           bash scripts/codemagic-build-step16.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-16.ipa
+      - artifacts/StS2-Launcher-Step-16.1.ipa
       - artifacts/step16-build-summary.txt
       - artifacts/test-results/**
       - artifacts/logs/**

@@ -1,16 +1,16 @@
-# Step 16 — Physical iPhone Test
+# Step 16.1 — Physical iPhone Test
 
 Build Codemagic workflow:
 
 ```text
-ios-step-16
+ios-step-16-1
 ```
 
 Expected app:
 
 ```text
-STEP 16 — MANAGED PREPARATION FOUNDATION
-Version 0.0.44
+STEP 16.1 — MANAGED PREPARATION FOUNDATION
+Version 0.0.45
 ```
 
 ## Precondition
@@ -64,7 +64,8 @@ Expect:
 
 - OfflineReady precondition = YES;
 - non-zero managed-module candidates and parsed modules;
-- real `sts2.dll` located and parsed;
+- both architecture-specific `sts2.dll` receipt entries may be discovered;
+- the unique `data_sts2_macos_arm64/sts2.dll` is selected as the primary iPhone/AOT analysis target;
 - main assembly identity/version/runtime/type/method/reference telemetry;
 - post-inspection candidate SHA-1s reverified = all candidates;
 - `sts2.dll` receipt SHA-1 preserved after inspection = YES;
