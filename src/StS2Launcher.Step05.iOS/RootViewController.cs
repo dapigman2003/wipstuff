@@ -170,12 +170,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 18.2 — REAL ASSEMBLY REWRITE WORKSPACE",
+            "STEP 18.3 — REAL ASSEMBLY REWRITE WORKSPACE",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.49",
+            "Version 0.0.50",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -595,7 +595,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_realAssemblyRewriteResultLabel);
 
         _realAssemblyRewriteDetailLabel = Label(
-            "Gate A re-proves OfflineReady and copies only the receipt-backed macOS arm64 + architecture-neutral managed payload into launcher-private Step18-RealAssemblyRewrite/source storage. Gate B writes/reopens the copied primary arm64 sts2.dll with Cecil. Gate C inserts exactly one semantics-neutral NOP at the entry of a deterministic copied method and verifies it after reopen. Gate D re-hashes every workspace source and every corresponding original install file, proving only launcher-private copies changed. No dependency Resolve(), Assembly.Load, StS2 execution, or behaviorally significant game fix is attempted.",
+            "Gate A re-proves OfflineReady and copies only the receipt-backed macOS arm64 + architecture-neutral managed payload into launcher-private Step18-RealAssemblyRewrite/source storage. Gate B writes/reopens the copied primary arm64 sts2.dll with Cecil. Gate C inserts exactly one semantics-neutral NOP at the entry of a deterministic copied method and verifies it after reopen. Gate D re-hashes every workspace source and every corresponding original install file, proving only launcher-private copies changed. Cecil writer-required dependency resolution is permitted only inside the SHA-1-verified Step 18 workspace; Assembly.Load, StS2 execution, and behaviorally significant game fixes remain forbidden.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_realAssemblyRewriteDetailLabel);
@@ -2225,7 +2225,7 @@ public sealed class RootViewController : UIViewController
 
         lines.Add("Step 18 write scope: launcher-private Step18-RealAssemblyRewrite copies only; the Step 12 receipt-backed managed install stays read-only.");
         lines.Add("Gate C transformation is intentionally semantics-neutral: one IL NOP inserted into a deterministic method of the copied primary arm64 sts2.dll.");
-        lines.Add("No dependency Resolve(), Assembly.Load, StS2 execution, FMOD/Spine runtime integration, Cloud, or Workshop is advanced by Step 18.");
+        lines.Add("Cecil writer-required dependency resolution stays confined to the SHA-1-verified Step 18 workspace; Assembly.Load, StS2 execution, FMOD/Spine runtime integration, Cloud, or Workshop is not advanced by Step 18.");
         lines.Add("Step 15 orientation presentation quirk remains a known non-blocking cleanup item.");
         lines.Add(tail);
         return string.Join("\n", lines);

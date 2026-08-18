@@ -239,6 +239,7 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Assembly/module references: {before.AssemblyReferenceCount:N0}/{before.ModuleReferenceCount:N0}\n" +
                 "Logical metadata fingerprint preserved after write/reopen: YES\n" +
                 "Cecil assembly + metadata resolver explicitly bound to workspace identity catalog: YES\n" +
+                "Resolver policy: exact identity first; one unambiguous workspace version-only identity may be used when name/culture/token match: YES\n" +
                 "Workspace source receipt SHA-1 preserved: YES\n" +
                 $"Workspace-only dependency resolutions observed: {_workspaceResolvedAssemblies.Count:N0}" +
                 (_workspaceResolvedAssemblies.Count == 0 ? "\n" : $" ({string.Join(", ", _workspaceResolvedAssemblies.Take(8))}{(_workspaceResolvedAssemblies.Count > 8 ? ", …" : string.Empty)})\n") +
@@ -611,7 +612,37 @@ public sealed class RealAssemblyRewriteWorkspace
                 .ThenBy(candidate => candidate.Path, StringComparer.OrdinalIgnoreCase)
                 .ToArray();
 
-            if (exactMatches.Length == 0)
+            var matches = exactMatches;
+            var versionRelaxed = false;
+            if (matches.Length == 0)
+            {
+                // Mono.Cecil's normal directory resolver opens a same-name assembly without
+                // enforcing the requested AssemblyRef version. Keep Step 18 stricter than that:
+                // permit version unification only when name, culture and public-key token still
+                // match and the verified workspace offers exactly one candidate identity.
+                var versionCompatible = simpleMatches
+                    .Where(candidate => AssemblyIdentityMatchesIgnoringVersion(name, candidate))
+                    .OrderBy(candidate => IsPrimaryDirectory(candidate.Path) ? 0 : 1)
+                    .ThenBy(candidate => candidate.Path, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+                var distinctCompatibleIdentities = versionCompatible
+                    .Select(candidate => candidate.FullName)
+                    .Distinct(StringComparer.Ordinal)
+                    .ToArray();
+                if (distinctCompatibleIdentities.Length == 1)
+                {
+                    matches = versionCompatible;
+                    versionRelaxed = matches.Length > 0;
+                }
+                else if (distinctCompatibleIdentities.Length > 1)
+                {
+                    throw new InvalidDataException(
+                        $"Step 18 workspace identity resolver found multiple version-distinct identity candidates for '{name.FullName}': " +
+                        string.Join(" | ", versionCompatible.Select(candidate => $"{candidate.FullName} @ {Path.GetFileName(candidate.Path)}")));
+                }
+            }
+
+            if (matches.Length == 0)
             {
                 var available = simpleMatches.Length == 0
                     ? "none with that simple name"
@@ -620,7 +651,7 @@ public sealed class RealAssemblyRewriteWorkspace
                     $"Step 18 workspace identity resolver could not match requested assembly '{name.FullName}'. Workspace identity candidates: {available}.");
             }
 
-            var distinctHashes = exactMatches
+            var distinctHashes = matches
                 .Select(candidate => candidate.ExpectedSha1)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
@@ -628,10 +659,10 @@ public sealed class RealAssemblyRewriteWorkspace
             {
                 throw new InvalidDataException(
                     $"Step 18 workspace identity resolver found multiple byte-distinct files for '{name.FullName}': " +
-                    string.Join(" | ", exactMatches.Select(candidate => candidate.Path)));
+                    string.Join(" | ", matches.Select(candidate => candidate.Path)));
             }
 
-            var selected = exactMatches[0];
+            var selected = matches[0];
             VerifyTrustedFileImmediatelyBeforeOpen(selected.Path, selected.ExpectedSha1);
 
             var metadataResolver = new MetadataResolver(this);
@@ -645,7 +676,10 @@ public sealed class RealAssemblyRewriteWorkspace
             };
             var module = ModuleDefinition.ReadModule(selected.Path, reader);
             var assembly = module.Assembly;
-            if (assembly is null || !AssemblyIdentityMatches(name, ToCandidate(selected.Path, selected.ExpectedSha1, assembly.Name)))
+            var openedCandidate = assembly is null
+                ? null
+                : ToCandidate(selected.Path, selected.ExpectedSha1, assembly.Name);
+            if (openedCandidate is null || openedCandidate != selected)
             {
                 module.Dispose();
                 throw new InvalidDataException(
@@ -653,7 +687,9 @@ public sealed class RealAssemblyRewriteWorkspace
             }
 
             _cache[name.FullName] = assembly;
-            _resolvedAssemblyNames.Add(assembly.Name.FullName);
+            _resolvedAssemblyNames.Add(versionRelaxed
+                ? $"{name.FullName} -> {assembly.Name.FullName} [workspace version-unified]"
+                : assembly.Name.FullName);
             return assembly;
         }
 
@@ -740,10 +776,12 @@ public sealed class RealAssemblyRewriteWorkspace
                 identity.FullName);
 
         private static bool AssemblyIdentityMatches(AssemblyNameReference requested, WorkspaceAssemblyCandidate candidate)
+            => AssemblyIdentityMatchesIgnoringVersion(requested, candidate) &&
+               (requested.Version is null || candidate.Version == requested.Version);
+
+        private static bool AssemblyIdentityMatchesIgnoringVersion(AssemblyNameReference requested, WorkspaceAssemblyCandidate candidate)
         {
             if (!candidate.Name.Equals(requested.Name, StringComparison.Ordinal))
-                return false;
-            if (requested.Version is not null && candidate.Version != requested.Version)
                 return false;
             if (!string.Equals(candidate.Culture, requested.Culture ?? string.Empty, StringComparison.OrdinalIgnoreCase))
                 return false;
