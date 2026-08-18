@@ -208,6 +208,7 @@ public sealed class RealAssemblyRewriteWorkspace
             using (var resolver = CreateWorkspaceResolver(workspace))
             using (var module = ReadModuleImmediate(sourcePath, resolver))
             {
+                EnsureWorkspaceResolverBound(module, resolver);
                 before = Fingerprint(module);
                 module.Write(outputPath, new WriterParameters { WriteSymbols = false });
                 RecordWorkspaceResolutions(resolver);
@@ -237,6 +238,7 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Types/methods: {before.TypeCount:N0}/{before.MethodCount:N0}\n" +
                 $"Assembly/module references: {before.AssemblyReferenceCount:N0}/{before.ModuleReferenceCount:N0}\n" +
                 "Logical metadata fingerprint preserved after write/reopen: YES\n" +
+                "Cecil assembly + metadata resolver explicitly bound to workspace identity catalog: YES\n" +
                 "Workspace source receipt SHA-1 preserved: YES\n" +
                 $"Workspace-only dependency resolutions observed: {_workspaceResolvedAssemblies.Count:N0}" +
                 (_workspaceResolvedAssemblies.Count == 0 ? "\n" : $" ({string.Join(", ", _workspaceResolvedAssemblies.Take(8))}{(_workspaceResolvedAssemblies.Count > 8 ? ", …" : string.Empty)})\n") +
@@ -274,6 +276,7 @@ public sealed class RealAssemblyRewriteWorkspace
             using (var resolver = CreateWorkspaceResolver(workspace))
             using (var module = ReadModuleImmediate(sourcePath, resolver))
             {
+                EnsureWorkspaceResolverBound(module, resolver);
                 sourceFingerprint = Fingerprint(module);
                 var method = SelectNeutralRewriteMethod(module);
                 methodFullName = method.FullName;
@@ -327,6 +330,7 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Output: {WorkRootName}/{RewrittenRootName}/{workspace.PrimaryRelativePath}\n" +
                 "Rewritten output differs from source bytes: YES\n" +
                 "Workspace source receipt SHA-1 preserved: YES\n" +
+                "Cecil assembly + metadata resolver explicitly bound to workspace identity catalog: YES\n" +
                 $"Workspace-only dependency resolutions observed across Gates B/C: {_workspaceResolvedAssemblies.Count:N0}\n" +
                 "Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY\nResolved dependency file SHA-1 rechecked immediately before Cecil open: YES\n" +
                 "Behaviorally significant game fix attempted: NO\nGame assembly loaded/executed: NO\nReal managed install modified: NO");
@@ -507,34 +511,44 @@ public sealed class RealAssemblyRewriteWorkspace
             ReadingMode = ReadingMode.Immediate,
         });
 
+    private static void EnsureWorkspaceResolverBound(ModuleDefinition module, WorkspaceOnlyAssemblyResolver resolver)
+    {
+        if (!ReferenceEquals(module.AssemblyResolver, resolver))
+            throw new InvalidDataException("Cecil primary module is not using the Step 18 workspace assembly resolver.");
+        if (module.MetadataResolver is not MetadataResolver metadataResolver ||
+            !ReferenceEquals(metadataResolver.AssemblyResolver, resolver))
+        {
+            throw new InvalidDataException("Cecil primary module is not using the Step 18 workspace metadata resolver.");
+        }
+    }
+
     private static ModuleDefinition ReadModuleImmediate(string path, IAssemblyResolver resolver)
-        => ModuleDefinition.ReadModule(path, new ReaderParameters
+    {
+        // Bind BOTH resolver layers explicitly. Cecil's writer can call TypeReference.Resolve()
+        // while re-emitting metadata (for example enum-typed default values). That path uses
+        // ModuleDefinition.MetadataResolver, so make the workspace-only policy explicit instead
+        // of relying on lazy construction from AssemblyResolver.
+        var metadataResolver = new MetadataResolver(resolver);
+        return ModuleDefinition.ReadModule(path, new ReaderParameters
         {
             ReadSymbols = false,
             ReadingMode = ReadingMode.Immediate,
             AssemblyResolver = resolver,
+            MetadataResolver = metadataResolver,
         });
+    }
 
     private static WorkspaceOnlyAssemblyResolver CreateWorkspaceResolver(WorkspaceSnapshot workspace)
     {
         var primaryDirectory = Path.GetDirectoryName(ResolveChildPath(workspace.SourceRoot, workspace.PrimaryRelativePath))
             ?? throw new InvalidDataException("The Step 18 primary assembly has no workspace directory.");
 
-        var directories = workspace.Files
-            .Select(file => Path.GetDirectoryName(ResolveChildPath(workspace.SourceRoot, NormalizeRelative(file.RelativePath))))
-            .Where(directory => !string.IsNullOrWhiteSpace(directory))
-            .Select(directory => Path.GetFullPath(directory!))
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(directory => directory.Equals(primaryDirectory, StringComparison.Ordinal) ? 0 : 1)
-            .ThenBy(directory => directory, StringComparer.Ordinal)
-            .ToArray();
-
         var trustedFiles = workspace.Files.ToDictionary(
             file => Path.GetFullPath(ResolveChildPath(workspace.SourceRoot, NormalizeRelative(file.RelativePath))),
             file => file.Sha1Hex,
-            StringComparer.Ordinal);
+            StringComparer.OrdinalIgnoreCase);
 
-        return new WorkspaceOnlyAssemblyResolver(workspace.SourceRoot, directories, trustedFiles);
+        return new WorkspaceOnlyAssemblyResolver(workspace.SourceRoot, primaryDirectory, trustedFiles);
     }
 
     private void RecordWorkspaceResolutions(WorkspaceOnlyAssemblyResolver resolver)
@@ -546,29 +560,29 @@ public sealed class RealAssemblyRewriteWorkspace
     private sealed class WorkspaceOnlyAssemblyResolver : IAssemblyResolver
     {
         private readonly string _rootPrefix;
-        private readonly string[] _directories;
+        private readonly string _primaryDirectory;
         private readonly Dictionary<string, AssemblyDefinition> _cache = new(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _trustedFileSha1;
         private readonly SortedSet<string> _resolvedAssemblyNames = new(StringComparer.Ordinal);
+        private WorkspaceAssemblyCandidate[]? _catalog;
         private bool _disposed;
 
         public WorkspaceOnlyAssemblyResolver(
             string root,
-            IEnumerable<string> directories,
+            string primaryDirectory,
             IReadOnlyDictionary<string, string> trustedFileSha1)
         {
             var fullRoot = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar);
             _rootPrefix = fullRoot + Path.DirectorySeparatorChar;
-            _directories = directories
-                .Select(Path.GetFullPath)
-                .Where(path => path.Equals(fullRoot, StringComparison.Ordinal) || path.StartsWith(_rootPrefix, StringComparison.Ordinal))
-                .Distinct(StringComparer.Ordinal)
-                .ToArray();
+            _primaryDirectory = Path.GetFullPath(primaryDirectory);
+            if (!_primaryDirectory.StartsWith(_rootPrefix, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("The Step 18 primary assembly directory escaped the workspace resolver root.");
+
             _trustedFileSha1 = trustedFileSha1.ToDictionary(
                 pair => Path.GetFullPath(pair.Key),
                 pair => pair.Value,
-                StringComparer.Ordinal);
-            if (_directories.Length == 0 || _trustedFileSha1.Count == 0)
+                StringComparer.OrdinalIgnoreCase);
+            if (_trustedFileSha1.Count == 0)
                 throw new InvalidDataException("The Step 18 workspace-only resolver has no trusted receipt-backed search scope.");
         }
 
@@ -587,47 +601,156 @@ public sealed class RealAssemblyRewriteWorkspace
             if (_cache.TryGetValue(name.FullName, out var cached))
                 return cached;
 
-            foreach (var directory in _directories)
+            var catalog = GetOrBuildCatalog();
+            var simpleMatches = catalog
+                .Where(candidate => candidate.Name.Equals(name.Name, StringComparison.Ordinal))
+                .ToArray();
+            var exactMatches = simpleMatches
+                .Where(candidate => AssemblyIdentityMatches(name, candidate))
+                .OrderBy(candidate => IsPrimaryDirectory(candidate.Path) ? 0 : 1)
+                .ThenBy(candidate => candidate.Path, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            if (exactMatches.Length == 0)
             {
-                foreach (var extension in new[] { ".dll", ".exe" })
+                var available = simpleMatches.Length == 0
+                    ? "none with that simple name"
+                    : string.Join(" | ", simpleMatches.Select(candidate => $"{candidate.FullName} @ {Path.GetFileName(candidate.Path)}"));
+                throw new InvalidDataException(
+                    $"Step 18 workspace identity resolver could not match requested assembly '{name.FullName}'. Workspace identity candidates: {available}.");
+            }
+
+            var distinctHashes = exactMatches
+                .Select(candidate => candidate.ExpectedSha1)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            if (distinctHashes.Length > 1)
+            {
+                throw new InvalidDataException(
+                    $"Step 18 workspace identity resolver found multiple byte-distinct files for '{name.FullName}': " +
+                    string.Join(" | ", exactMatches.Select(candidate => candidate.Path)));
+            }
+
+            var selected = exactMatches[0];
+            VerifyTrustedFileImmediatelyBeforeOpen(selected.Path, selected.ExpectedSha1);
+
+            var metadataResolver = new MetadataResolver(this);
+            var reader = new ReaderParameters
+            {
+                ReadSymbols = false,
+                ReadingMode = ReadingMode.Immediate,
+                InMemory = true,
+                AssemblyResolver = this,
+                MetadataResolver = metadataResolver,
+            };
+            var module = ModuleDefinition.ReadModule(selected.Path, reader);
+            var assembly = module.Assembly;
+            if (assembly is null || !AssemblyIdentityMatches(name, ToCandidate(selected.Path, selected.ExpectedSha1, assembly.Name)))
+            {
+                module.Dispose();
+                throw new InvalidDataException(
+                    $"Step 18 workspace dependency identity changed between catalog and Cecil open for '{name.FullName}'.");
+            }
+
+            _cache[name.FullName] = assembly;
+            _resolvedAssemblyNames.Add(assembly.Name.FullName);
+            return assembly;
+        }
+
+        private WorkspaceAssemblyCandidate[] GetOrBuildCatalog()
+        {
+            if (_catalog is not null)
+                return _catalog;
+
+            var candidates = new List<WorkspaceAssemblyCandidate>();
+            foreach (var pair in _trustedFileSha1.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase))
+            {
+                var path = pair.Key;
+                var extension = Path.GetExtension(path);
+                if (!extension.Equals(".dll", StringComparison.OrdinalIgnoreCase) &&
+                    !extension.Equals(".exe", StringComparison.OrdinalIgnoreCase))
                 {
-                    var candidate = Path.GetFullPath(Path.Combine(directory, name.Name + extension));
-                    if (!candidate.StartsWith(_rootPrefix, StringComparison.Ordinal) ||
-                        !_trustedFileSha1.TryGetValue(candidate, out var expectedSha1) ||
-                        !File.Exists(candidate))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var actualSha1 = RealAssemblyRewriteWorkspace.ComputeSha1Hex(candidate);
-                    if (!actualSha1.Equals(expectedSha1, StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new InvalidDataException(
-                            $"Step 18 workspace dependency changed after Gate A SHA-1 verification: {Path.GetFileName(candidate)}");
-                    }
+                if (!IsWithinRoot(path) || !File.Exists(path))
+                    continue;
 
-                    var reader = new ReaderParameters
+                // The catalog is built from the receipt-backed workspace, not filenames. Recheck
+                // the hash before even reading assembly metadata so a mutated workspace file can
+                // never influence resolution.
+                VerifyTrustedFileImmediatelyBeforeOpen(path, pair.Value);
+                try
+                {
+                    using var probe = ModuleDefinition.ReadModule(path, new ReaderParameters
                     {
                         ReadSymbols = false,
-                        ReadingMode = ReadingMode.Immediate,
+                        ReadingMode = ReadingMode.Deferred,
                         InMemory = true,
-                        AssemblyResolver = this,
-                    };
-                    var module = ModuleDefinition.ReadModule(candidate, reader);
-                    var assembly = module.Assembly;
-                    if (assembly is null || !assembly.Name.Name.Equals(name.Name, StringComparison.Ordinal))
-                    {
-                        module.Dispose();
-                        continue;
-                    }
-
-                    _cache[name.FullName] = assembly;
-                    _resolvedAssemblyNames.Add(assembly.Name.Name);
-                    return assembly;
+                        AssemblyResolver = RejectingCatalogProbeResolver.Instance,
+                        MetadataResolver = RejectingCatalogProbeResolver.Instance,
+                    });
+                    if (probe.Assembly?.Name is { } identity)
+                        candidates.Add(ToCandidate(path, pair.Value, identity));
+                }
+                catch (BadImageFormatException)
+                {
+                    // A receipt-backed .dll/.exe filename is not necessarily a managed PE. Such
+                    // files are irrelevant to Cecil assembly resolution and stay out of the catalog.
                 }
             }
 
-            throw new AssemblyResolutionException(name);
+            if (candidates.Count == 0)
+                throw new InvalidDataException("The Step 18 workspace identity catalog contains no managed assemblies.");
+
+            _catalog = candidates.ToArray();
+            return _catalog;
+        }
+
+        private void VerifyTrustedFileImmediatelyBeforeOpen(string path, string expectedSha1)
+        {
+            var fullPath = Path.GetFullPath(path);
+            if (!IsWithinRoot(fullPath) || !_trustedFileSha1.TryGetValue(fullPath, out var trustedSha1))
+                throw new InvalidDataException($"Step 18 attempted to resolve outside the trusted workspace: {path}");
+            if (!trustedSha1.Equals(expectedSha1, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException($"Step 18 workspace catalog trust metadata changed for {Path.GetFileName(path)}.");
+
+            var actualSha1 = RealAssemblyRewriteWorkspace.ComputeSha1Hex(fullPath);
+            if (!actualSha1.Equals(expectedSha1, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException(
+                    $"Step 18 workspace dependency changed after Gate A SHA-1 verification: {Path.GetFileName(path)}");
+            }
+        }
+
+        private bool IsWithinRoot(string path)
+            => Path.GetFullPath(path).StartsWith(_rootPrefix, StringComparison.OrdinalIgnoreCase);
+
+        private bool IsPrimaryDirectory(string path)
+            => string.Equals(Path.GetDirectoryName(Path.GetFullPath(path)), _primaryDirectory, StringComparison.OrdinalIgnoreCase);
+
+        private static WorkspaceAssemblyCandidate ToCandidate(string path, string sha1, AssemblyNameReference identity)
+            => new(
+                path,
+                sha1,
+                identity.Name,
+                identity.Version,
+                identity.Culture ?? string.Empty,
+                identity.PublicKeyToken is { Length: > 0 } token ? Convert.ToHexString(token).ToLowerInvariant() : string.Empty,
+                identity.FullName);
+
+        private static bool AssemblyIdentityMatches(AssemblyNameReference requested, WorkspaceAssemblyCandidate candidate)
+        {
+            if (!candidate.Name.Equals(requested.Name, StringComparison.Ordinal))
+                return false;
+            if (requested.Version is not null && candidate.Version != requested.Version)
+                return false;
+            if (!string.Equals(candidate.Culture, requested.Culture ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                return false;
+            var requestedToken = requested.PublicKeyToken is { Length: > 0 } token
+                ? Convert.ToHexString(token).ToLowerInvariant()
+                : string.Empty;
+            return candidate.PublicKeyToken.Equals(requestedToken, StringComparison.OrdinalIgnoreCase);
         }
 
         public void Dispose()
@@ -638,6 +761,33 @@ public sealed class RealAssemblyRewriteWorkspace
             foreach (var assembly in _cache.Values.Distinct())
                 assembly.Dispose();
             _cache.Clear();
+            _catalog = null;
+        }
+
+        private sealed record WorkspaceAssemblyCandidate(
+            string Path,
+            string ExpectedSha1,
+            string Name,
+            Version Version,
+            string Culture,
+            string PublicKeyToken,
+            string FullName);
+
+        private sealed class RejectingCatalogProbeResolver : IAssemblyResolver, IMetadataResolver
+        {
+            public static RejectingCatalogProbeResolver Instance { get; } = new();
+            private RejectingCatalogProbeResolver() { }
+            public AssemblyDefinition Resolve(AssemblyNameReference name)
+                => throw new InvalidOperationException($"Step 18 identity catalog unexpectedly attempted dependency resolution while probing {name.FullName}.");
+            public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
+                => Resolve(name);
+            TypeDefinition IMetadataResolver.Resolve(TypeReference type)
+                => throw new InvalidOperationException($"Step 18 identity catalog unexpectedly attempted type resolution while probing {type.FullName}.");
+            FieldDefinition IMetadataResolver.Resolve(FieldReference field)
+                => throw new InvalidOperationException($"Step 18 identity catalog unexpectedly attempted field resolution while probing {field.FullName}.");
+            MethodDefinition IMetadataResolver.Resolve(MethodReference method)
+                => throw new InvalidOperationException($"Step 18 identity catalog unexpectedly attempted method resolution while probing {method.FullName}.");
+            public void Dispose() { }
         }
     }
 
