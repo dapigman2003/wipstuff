@@ -20,7 +20,7 @@ It does **not** apply a real compatibility fix yet.
 
 Open the launcher-private copy of the primary ARM64 `sts2.dll` with Cecil, write it to the `roundtrip` output tree, reopen it, and compare a logical metadata fingerprint (assembly/version/runtime/type/method/reference counts).
 
-No dependency resolution or CLR load is allowed.
+Cecil writer-required dependency resolution is allowed only through a strict resolver rooted in the SHA-1-verified Step 18 workspace. CLR loading and fallback to runtime/system/live-install/network paths remain forbidden.
 
 ### Gate C — NeutralIlRewrite
 
@@ -48,8 +48,18 @@ Step 18 does not:
 
 - rewrite the live managed install;
 - fix Harmony/Reflection.Emit/PInvoke/GodotSharp/Steamworks behavior;
-- resolve referenced assemblies;
+- resolve dependencies from outside the SHA-1-verified Step 18 workspace;
 - load StS2 assemblies into the CLR;
 - execute StS2;
 - integrate FMOD/Spine;
 - add Cloud or Workshop.
+
+## Step 18.1 physical-device correction
+
+The initial Step 18 device run passed Gate A but Gate B failed while Cecil emitted metadata for the real `sts2.dll`:
+
+```text
+AssemblyResolutionException: Failed to resolve assembly: GodotSharp, Version=4.5.10...
+```
+
+This did not mean the game assembly was missing or corrupt. Cecil can require referenced type metadata while writing an otherwise unchanged module (for example enum-typed constants/default parameters). Step 18.1 therefore supplies an `IAssemblyResolver` that is intentionally restricted to the already receipt-verified `Step18-RealAssemblyRewrite/source` tree. The resolver never searches the live install, the launcher runtime, trusted platform assemblies/GAC, network locations, or arbitrary filesystem paths.

@@ -3,14 +3,14 @@
 Build Codemagic workflow:
 
 ```text
-ios-step-18
+ios-step-18-1
 ```
 
 Expected app header:
 
 ```text
-STEP 18 — REAL ASSEMBLY REWRITE WORKSPACE
-Version 0.0.47
+STEP 18.1 — REAL ASSEMBLY REWRITE WORKSPACE
+Version 0.0.48
 ```
 
 Start from a fresh launcher process if the Step 15 Godot host has been started in the current process.
@@ -37,7 +37,8 @@ Primary Cecil round-trip output reopens: YES
 Neutral NOP rewrite still present after reopen: YES
 Only launcher-private Step18-RealAssemblyRewrite outputs were written: YES
 Original Step 12 install unchanged: YES
-Assembly dependency resolution attempted: NO
+Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY
+Resolved dependency file SHA-1 rechecked immediately before Cecil open: YES
 Steam session consulted: NO
 Network attempted: NO
 Game assembly loaded/executed: NO
