@@ -216,8 +216,10 @@ public sealed class ExpressionInterpreterCompatibility
             long dynamicBoolean = 0;
             long unsafeParameterless = 0;
             long strongNamedSupported = 0;
-            long writableSupported = 0;
+            long malformedStrongNameSupported = 0;
+            long rewriteSupported = 0;
             long primarySupported = 0;
+            var strongNameSignedTargetAssemblies = 0;
 
             stage = "real direct Compile call-site scan";
             using var resolver = CreateWorkspaceResolver(workspace);
@@ -234,7 +236,7 @@ public sealed class ExpressionInterpreterCompatibility
                     parsedModules++;
 
                     var stats = ScanCompileSites(module);
-                    var strongNamed = IsStrongNamed(module);
+                    var strongName = CaptureStrongNameState(module);
                     var supported = checked(stats.ParameterlessSafe + stats.LiteralFalse);
                     var isPrimary = relative.Equals(workspace.PrimaryRelativePath, StringComparison.OrdinalIgnoreCase);
                     if (isPrimary)
@@ -245,10 +247,14 @@ public sealed class ExpressionInterpreterCompatibility
                     existingTrue += stats.LiteralTrue;
                     dynamicBoolean += stats.DynamicBoolean;
                     unsafeParameterless += stats.ParameterlessUnsafe;
-                    if (strongNamed)
+                    if (strongName.HasPublicKey || strongName.StrongNameSigned)
                         strongNamedSupported += supported;
+                    if (strongName.StrongNameSigned && !strongName.HasPublicKey)
+                        malformedStrongNameSupported += supported;
                     else
-                        writableSupported += supported;
+                        rewriteSupported += supported;
+                    if (supported > 0 && strongName.StrongNameSigned)
+                        strongNameSignedTargetAssemblies++;
 
                     foreach (var sample in stats.Samples)
                         AddSample(samples, $"{relative}: {sample}");
@@ -256,7 +262,7 @@ public sealed class ExpressionInterpreterCompatibility
                     assemblies.Add(new TargetAssemblySnapshot(
                         relative,
                         module.Assembly.Name.FullName,
-                        strongNamed,
+                        strongName,
                         stats));
                 }
                 catch (BadImageFormatException)
@@ -266,33 +272,42 @@ public sealed class ExpressionInterpreterCompatibility
             }
             RecordWorkspaceResolutions(resolver);
 
-            var writableTargets = assemblies
-                .Where(value => !value.StrongNamed && value.Stats.SupportedRewrites > 0)
+            var rewriteTargets = assemblies
+                .Where(value => !(value.StrongName.StrongNameSigned && !value.StrongName.HasPublicKey) && value.Stats.SupportedRewrites > 0)
                 .OrderBy(value => value.RelativePath.Equals(workspace.PrimaryRelativePath, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
                 .ThenBy(value => value.RelativePath, StringComparer.OrdinalIgnoreCase)
                 .ToArray();
 
-            if (writableSupported <= 0 || writableTargets.Length == 0)
+            if (malformedStrongNameSupported > 0)
             {
                 throw new InvalidDataException(
-                    "No structurally-safe unsigned direct System.Linq.Expressions Compile target is available for the Step 19 rewrite. " +
-                    $"Observed parameterless-safe={parameterlessSafe}, literal-false={literalFalse}, parameterless-unsafe={unsafeParameterless}, strong-named-supported={strongNamedSupported}. " +
-                    "Do not broaden the rewrite speculatively; choose the next evidence-backed incompatibility class from Step 17 instead.");
+                    "Step 19 found a structurally-safe Compile target in an assembly that sets StrongNameSigned without carrying a public key. " +
+                    $"Malformed strong-name supported sites={malformedStrongNameSupported}. The prepared-copy signature-disposition policy refuses this invalid identity shape.");
+            }
+
+            if (rewriteSupported <= 0 || rewriteTargets.Length == 0)
+            {
+                throw new InvalidDataException(
+                    "No structurally-safe direct System.Linq.Expressions Compile target is available for the Step 19 rewrite. " +
+                    $"Observed parameterless-safe={parameterlessSafe}, literal-false={literalFalse}, parameterless-unsafe={unsafeParameterless}, strong-name-identity-supported={strongNamedSupported}. " +
+                    "Do not broaden the call-shape matcher speculatively; choose the next evidence-backed incompatibility class from Step 17 instead.");
             }
 
             _discovery = new DiscoverySnapshot(
                 parsedModules,
                 nonManagedCandidates,
                 assemblies.ToArray(),
-                writableTargets,
+                rewriteTargets,
                 parameterlessSafe,
                 literalFalse,
                 existingTrue,
                 dynamicBoolean,
                 unsafeParameterless,
                 strongNamedSupported,
-                writableSupported,
+                malformedStrongNameSupported,
+                rewriteSupported,
                 primarySupported,
+                strongNameSignedTargetAssemblies,
                 samples.ToArray());
 
             return Pass(
@@ -305,11 +320,14 @@ public sealed class ExpressionInterpreterCompatibility
                 $"Already-interpreted Compile(true) sites: {existingTrue:N0}\n" +
                 $"Dynamic/non-literal Compile(bool) sites left untouched: {dynamicBoolean:N0}\n" +
                 $"Parameterless sites skipped for branch/EH/prefix safety: {unsafeParameterless:N0}\n" +
-                $"Supported sites in strong-named assemblies deliberately skipped: {strongNamedSupported:N0}\n" +
-                $"Writable supported sites selected: {writableSupported:N0} across {writableTargets.Length:N0} assembly/assemblies\n" +
+                $"Supported sites carrying strong-name identity: {strongNamedSupported:N0}\n" +
+                $"Malformed StrongNameSigned-without-public-key supported sites: {malformedStrongNameSupported:N0}\n" +
+                $"Eligible supported sites selected: {rewriteSupported:N0} across {rewriteTargets.Length:N0} assembly/assemblies\n" +
+                $"Selected assemblies with StrongNameSigned set: {strongNameSignedTargetAssemblies:N0}\n" +
                 $"Supported sites inside primary sts2.dll: {primarySupported:N0}\n" +
+                "Selected target assemblies:\n" + FormatTargetAssemblySamples(rewriteTargets) + "\n" +
                 "Sample real sites:\n" + FormatLineSamples(samples) + "\n\n" +
-                "Rewrite policy: only direct LambdaExpression/Expression<TDelegate>.Compile() or literal Compile(false) calls are eligible; arbitrary Compile(bool), strong-named assemblies, control-flow-sensitive insertion points, Harmony/MonoMod, Reflection.Emit, Assembly.Load and native interop are not rewritten by Step 19.\n" +
+                "Rewrite policy: direct LambdaExpression/Expression<TDelegate>.Compile() or literal Compile(false) calls are eligible when structurally safe. For modified strong-name identities, the prepared copy preserves name/version/culture/public key/public-key token and clears only StrongNameSigned; no private key is used. Arbitrary Compile(bool), malformed strong-name identities, control-flow-sensitive insertion points, Harmony/MonoMod, Reflection.Emit, Assembly.Load and native interop are not rewritten by Step 19.\n" +
                 "Assembly dependency resolver: SHA-1-verified Step 19 source workspace ONLY\nGame assembly loaded/executed: NO\nReal managed install modified: NO");
         }
         catch (Exception ex)
@@ -346,8 +364,9 @@ public sealed class ExpressionInterpreterCompatibility
             long totalRewrittenSites = 0;
             long totalParameterless = 0;
             long totalLiteralFalse = 0;
+            var strongNameSignedFlagsCleared = 0;
 
-            foreach (var target in discovery.WritableTargets)
+            foreach (var target in discovery.RewriteTargets)
             {
                 stage = $"source SHA-1 recheck: {target.RelativePath}";
                 var receiptFile = GetReceiptFile(workspace, target.RelativePath);
@@ -359,14 +378,18 @@ public sealed class ExpressionInterpreterCompatibility
                 stage = $"Cecil rewrite: {target.RelativePath}";
                 CompileSiteStats before;
                 ModuleFingerprint beforeFingerprint;
+                StrongNameSnapshot beforeStrongName;
                 int rewrittenParameterless;
                 int rewrittenLiteralFalse;
                 using (var resolver = CreateWorkspaceResolver(workspace))
                 using (var module = ReadModuleWithWorkspaceResolver(sourcePath, resolver, ReadingMode.Immediate))
                 {
                     EnsureWorkspaceResolverBound(module, resolver);
-                    if (IsStrongNamed(module))
-                        throw new InvalidDataException($"Step 19 refuses to rewrite strong-named assembly: {target.RelativePath}");
+                    beforeStrongName = CaptureStrongNameState(module);
+                    if (beforeStrongName != target.StrongName)
+                        throw new InvalidDataException($"Step 19 target strong-name state changed between Gate B and Gate C for {target.RelativePath}.");
+                    if (beforeStrongName.StrongNameSigned && !beforeStrongName.HasPublicKey)
+                        throw new InvalidDataException($"Step 19 refuses malformed StrongNameSigned-without-public-key assembly: {target.RelativePath}");
 
                     before = ScanCompileSites(module);
                     beforeFingerprint = Fingerprint(module);
@@ -387,6 +410,12 @@ public sealed class ExpressionInterpreterCompatibility
                             $"parameterless {rewrittenParameterless}/{before.ParameterlessSafe}, literal-false {rewrittenLiteralFalse}/{before.LiteralFalse}.");
                     }
 
+                    if (beforeStrongName.StrongNameSigned)
+                    {
+                        module.Attributes &= ~ModuleAttributes.StrongNameSigned;
+                        strongNameSignedFlagsCleared++;
+                    }
+
                     var outputPath = ResolveChildPath(preparedRoot, target.RelativePath);
                     var temporaryPath = outputPath + ".step19tmp";
                     DeleteIfExists(temporaryPath);
@@ -400,14 +429,18 @@ public sealed class ExpressionInterpreterCompatibility
                 var preparedPath = ResolveChildPath(preparedRoot, target.RelativePath);
                 CompileSiteStats after;
                 ModuleFingerprint afterFingerprint;
+                StrongNameSnapshot afterStrongName;
                 using (var resolver = CreateWorkspaceResolver(workspace))
                 using (var reopened = ReadModuleWithWorkspaceResolver(preparedPath, resolver, ReadingMode.Deferred))
                 {
                     EnsureWorkspaceResolverBound(reopened, resolver);
                     after = ScanCompileSites(reopened);
                     afterFingerprint = Fingerprint(reopened);
+                    afterStrongName = CaptureStrongNameState(reopened);
                     RecordWorkspaceResolutions(resolver);
                 }
+
+                VerifyPreparedStrongNameState(target.RelativePath, beforeStrongName, afterStrongName);
 
                 var rewrittenTotal = checked(rewrittenParameterless + rewrittenLiteralFalse);
                 if (!beforeFingerprint.MetadataEquivalentTo(afterFingerprint))
@@ -439,7 +472,9 @@ public sealed class ExpressionInterpreterCompatibility
                     before,
                     after,
                     beforeFingerprint,
-                    afterFingerprint));
+                    afterFingerprint,
+                    beforeStrongName,
+                    afterStrongName));
                 totalRewrittenSites = checked(totalRewrittenSites + rewrittenTotal);
                 totalParameterless = checked(totalParameterless + rewrittenParameterless);
                 totalLiteralFalse = checked(totalLiteralFalse + rewrittenLiteralFalse);
@@ -447,8 +482,14 @@ public sealed class ExpressionInterpreterCompatibility
 
             if (totalRewrittenSites <= 0 || rewrittenAssemblies.Count == 0)
                 throw new InvalidDataException("Step 19 Gate C produced no real compatibility rewrite.");
-            if (totalRewrittenSites != discovery.WritableSupported)
-                throw new InvalidDataException($"Step 19 did not rewrite the complete selected supported set: {totalRewrittenSites} != {discovery.WritableSupported}.");
+            if (totalRewrittenSites != discovery.RewriteSupported)
+                throw new InvalidDataException($"Step 19 did not rewrite the complete selected supported set: {totalRewrittenSites} != {discovery.RewriteSupported}.");
+            if (strongNameSignedFlagsCleared != discovery.StrongNameSignedTargetAssemblies)
+            {
+                throw new InvalidDataException(
+                    $"Step 19 strong-name signature-disposition accounting mismatch: cleared={strongNameSignedFlagsCleared}, " +
+                    $"selected StrongNameSigned assemblies={discovery.StrongNameSignedTargetAssemblies}.");
+            }
 
             _rewrite = new RewriteSnapshot(
                 preparedRoot,
@@ -467,7 +508,10 @@ public sealed class ExpressionInterpreterCompatibility
                 "Every rewritten assembly reopened with explicit workspace assembly + metadata resolvers: YES\n" +
                 "Every rewritten assembly preserves structural metadata; instruction-count delta equals only inserted bool arguments: YES\n" +
                 "Every rewritten assembly has zero remaining structurally-safe parameterless/literal-false target sites: YES\n" +
-                "Dynamic Compile(bool), unsafe branch/EH insertion sites and strong-named assemblies preserved: YES\n" +
+                $"Modified assemblies with StrongNameSigned cleared in prepared copy: {strongNameSignedFlagsCleared:N0}\n" +
+                "Strong-name public key/token/full assembly identity preserved across every rewritten output: YES\n" +
+                "Private strong-name signing key used: NO\n" +
+                "Dynamic Compile(bool) and unsafe branch/EH insertion sites preserved: YES\n" +
                 "All unchanged Step 19 prepared files remain byte-for-byte source copies: pending Gate D full audit\n" +
                 $"Workspace-only dependency resolutions observed: {_workspaceResolvedAssemblies.Count:N0}\n" +
                 "Source workspace receipt SHA-1 preserved for every rewritten source: YES\n" +
@@ -555,17 +599,34 @@ public sealed class ExpressionInterpreterCompatibility
             if (rewrittenPreparedFiles != rewrite.Assemblies.Length || unchangedPreparedFiles + rewrittenPreparedFiles != workspace.Files.Length)
                 throw new InvalidDataException("Step 19 prepared-tree target/non-target accounting is inconsistent.");
 
-            stage = "rewritten prepared assembly structural audit";
+            stage = "rewritten source/prepared assembly structural audit";
             foreach (var rewritten in rewrite.Assemblies)
             {
+                var sourcePath = ResolveChildPath(workspace.SourceRoot, rewritten.RelativePath);
+                using (var sourceResolver = CreateWorkspaceResolver(workspace))
+                using (var sourceModule = ReadModuleWithWorkspaceResolver(sourcePath, sourceResolver, ReadingMode.Deferred))
+                {
+                    EnsureWorkspaceResolverBound(sourceModule, sourceResolver);
+                    var sourceFingerprint = Fingerprint(sourceModule);
+                    var sourceStrongName = CaptureStrongNameState(sourceModule);
+                    if (sourceFingerprint != rewritten.BeforeFingerprint)
+                        throw new InvalidDataException($"Final Step 19 source structural fingerprint changed after Gate C: {rewritten.RelativePath}.");
+                    if (sourceStrongName != rewritten.BeforeStrongName)
+                        throw new InvalidDataException($"Final Step 19 source strong-name identity/signature state changed after Gate C: {rewritten.RelativePath}.");
+                    RecordWorkspaceResolutions(sourceResolver);
+                }
+
                 var path = ResolveChildPath(rewrite.PreparedRoot, rewritten.RelativePath);
                 using var resolver = CreateWorkspaceResolver(workspace);
                 using var module = ReadModuleWithWorkspaceResolver(path, resolver, ReadingMode.Deferred);
                 EnsureWorkspaceResolverBound(module, resolver);
                 var stats = ScanCompileSites(module);
                 var fingerprint = Fingerprint(module);
+                var strongName = CaptureStrongNameState(module);
                 if (fingerprint != rewritten.AfterFingerprint)
-                    throw new InvalidDataException($"Final Step 19 structural fingerprint changed after Gate C: {rewritten.RelativePath}.");
+                    throw new InvalidDataException($"Final Step 19 prepared structural fingerprint changed after Gate C: {rewritten.RelativePath}.");
+                if (strongName != rewritten.AfterStrongName)
+                    throw new InvalidDataException($"Final Step 19 prepared strong-name identity/signature disposition changed after Gate C: {rewritten.RelativePath}.");
                 if (stats.TotalDirectCompileSites != rewritten.After.TotalDirectCompileSites)
                     throw new InvalidDataException($"Final Step 19 direct Compile-site count changed after Gate C: {rewritten.RelativePath}.");
                 if (stats.ParameterlessSafe != 0 || stats.LiteralFalse != 0)
@@ -575,7 +636,7 @@ public sealed class ExpressionInterpreterCompatibility
                 RecordWorkspaceResolutions(resolver);
             }
 
-            if (rewrite.TotalRewrittenSites != discovery.WritableSupported)
+            if (rewrite.TotalRewrittenSites != discovery.RewriteSupported)
                 throw new InvalidDataException("Final Step 19 rewrite count no longer matches the Gate B selected target set.");
 
             progress?.Report(new ExpressionInterpreterCompatibilityProgress(
@@ -595,6 +656,7 @@ public sealed class ExpressionInterpreterCompatibility
                 $"Total Compile sites forced to interpreter preference: {rewrite.TotalRewrittenSites:N0}\n" +
                 "Every rewritten prepared assembly reopens with the explicit verified-workspace resolver: YES\n" +
                 "No selected non-interpreted direct Compile target remains in rewritten outputs: YES\n" +
+                "Receipt-backed source strong-name state + prepared public keys/tokens/full identities/signature dispositions reverified: YES\n" +
                 "Original Step 12 install unchanged: YES\n" +
                 $"Workspace-only dependency assemblies resolved by Cecil: {_workspaceResolvedAssemblies.Count:N0}\n" +
                 $"Only launcher-private {WorkRootName} source/prepared files were written: YES\n" +
@@ -916,11 +978,42 @@ public sealed class ExpressionInterpreterCompatibility
         }
     }
 
-    private static bool IsStrongNamed(ModuleDefinition module)
+    private static StrongNameSnapshot CaptureStrongNameState(ModuleDefinition module)
     {
-        if ((module.Attributes & ModuleAttributes.StrongNameSigned) != 0)
-            return true;
-        return module.Assembly?.Name?.PublicKey is { Length: > 0 };
+        var name = module.Assembly?.Name;
+        var publicKey = name?.PublicKey is { Length: > 0 } key ? key : Array.Empty<byte>();
+        var publicKeyToken = name?.PublicKeyToken is { Length: > 0 } token ? token : Array.Empty<byte>();
+        return new StrongNameSnapshot(
+            (module.Attributes & ModuleAttributes.StrongNameSigned) != 0,
+            publicKey.Length > 0,
+            Convert.ToHexString(publicKey).ToLowerInvariant(),
+            Convert.ToHexString(publicKeyToken).ToLowerInvariant());
+    }
+
+    private static void VerifyPreparedStrongNameState(
+        string relativePath,
+        StrongNameSnapshot before,
+        StrongNameSnapshot after)
+    {
+        if (before.StrongNameSigned && !before.HasPublicKey)
+            throw new InvalidDataException($"Step 19 source strong-name state is malformed for {relativePath}.");
+        if (before.HasPublicKey != after.HasPublicKey ||
+            !before.PublicKeyHex.Equals(after.PublicKeyHex, StringComparison.OrdinalIgnoreCase) ||
+            !before.PublicKeyTokenHex.Equals(after.PublicKeyTokenHex, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidDataException($"Step 19 prepared output changed strong-name public-key identity for {relativePath}.");
+        }
+        if (after.StrongNameSigned)
+            throw new InvalidDataException($"Step 19 prepared output still claims StrongNameSigned after content modification: {relativePath}.");
+    }
+
+    private static string FormatTargetAssemblySamples(IReadOnlyList<TargetAssemblySnapshot> values)
+    {
+        if (values.Count == 0)
+            return "• none";
+        return string.Join("\n", values.Take(SampleLimit).Select(value =>
+            $"• {value.RelativePath} | {value.AssemblyFullName} | eligible={value.Stats.SupportedRewrites:N0} | " +
+            $"public-key={(value.StrongName.HasPublicKey ? "YES" : "NO")}, StrongNameSigned={(value.StrongName.StrongNameSigned ? "YES" : "NO")}"));
     }
 
     private static ModuleFingerprint Fingerprint(ModuleDefinition module)
@@ -1492,25 +1585,33 @@ public sealed class ExpressionInterpreterCompatibility
         ulong ScopeBytes,
         InterpreterProbeSnapshot InterpreterProbe);
 
+    private sealed record StrongNameSnapshot(
+        bool StrongNameSigned,
+        bool HasPublicKey,
+        string PublicKeyHex,
+        string PublicKeyTokenHex);
+
     private sealed record TargetAssemblySnapshot(
         string RelativePath,
         string AssemblyFullName,
-        bool StrongNamed,
+        StrongNameSnapshot StrongName,
         CompileSiteStats Stats);
 
     private sealed record DiscoverySnapshot(
         int ParsedModules,
         int NonManagedCandidates,
         TargetAssemblySnapshot[] Assemblies,
-        TargetAssemblySnapshot[] WritableTargets,
+        TargetAssemblySnapshot[] RewriteTargets,
         long ParameterlessSafe,
         long LiteralFalse,
         long ExistingTrue,
         long DynamicBoolean,
         long UnsafeParameterless,
         long StrongNamedSupported,
-        long WritableSupported,
+        long MalformedStrongNameSupported,
+        long RewriteSupported,
         long PrimarySupported,
+        int StrongNameSignedTargetAssemblies,
         IReadOnlyList<string> Samples);
 
     private sealed record PreparedAssemblySnapshot(
@@ -1522,7 +1623,9 @@ public sealed class ExpressionInterpreterCompatibility
         CompileSiteStats Before,
         CompileSiteStats After,
         ModuleFingerprint BeforeFingerprint,
-        ModuleFingerprint AfterFingerprint);
+        ModuleFingerprint AfterFingerprint,
+        StrongNameSnapshot BeforeStrongName,
+        StrongNameSnapshot AfterStrongName);
 
     private sealed record ModuleFingerprint(
         string AssemblyFullName,

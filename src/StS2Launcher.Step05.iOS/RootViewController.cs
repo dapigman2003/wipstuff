@@ -176,12 +176,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 19 — EXPRESSION INTERPRETER COMPATIBILITY",
+            "STEP 19.1 — EXPRESSION INTERPRETER COMPATIBILITY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.52",
+            "Version 0.0.53",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -191,7 +191,7 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–18 are complete on the physical iPhone. Step 18 proved a closed, receipt-verified real-assembly rewrite workspace and passed its OfflineReady + Foundation closure regressions. Step 19 is the first behaviorally meaningful compatibility preparation: Gate A proves the library-level System.Linq.Expressions interpreter in the actual iOS/AOT launcher and clones a fresh ARM64/shared workspace; Gate B discovers only real direct expression-tree Compile sites; Gate C rewrites structurally-safe unsigned Compile()/literal Compile(false) calls to Compile(preferInterpretation: true); Gate D proves the trusted source/install stayed receipt-identical and only selected launcher-private prepared assemblies changed. No game assembly is loaded or executed.",
+            "Steps 01–18 are complete on the physical iPhone. Step 18 proved a closed, receipt-verified real-assembly rewrite workspace and passed its OfflineReady + Foundation closure regressions. Step 19 is the first behaviorally meaningful compatibility preparation: Gate A proves the library-level System.Linq.Expressions interpreter in the actual iOS/AOT launcher and clones a fresh ARM64/shared workspace; Gate B discovers only real direct expression-tree Compile sites; Gate C rewrites structurally-safe Compile()/literal Compile(false) calls, including strong-name-identity prepared copies with identity-preserving signature disposition to Compile(preferInterpretation: true); Gate D proves the trusted source/install stayed receipt-identical and only selected launcher-private prepared assemblies changed. No game assembly is loaded or executed.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -609,7 +609,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 19 — Expression Interpreter Compatibility (ordered gates A–D)",
+            "Step 19.1 — Expression Interpreter Compatibility (ordered gates A–D)",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
@@ -624,7 +624,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(_expressionInterpreterCompatibilityResultLabel);
 
         _expressionInterpreterCompatibilityDetailLabel = Label(
-            "Gate A first proves Expression<T>.Compile(preferInterpretation: true) can create and execute an interpreted delegate in this fully trimmed/AOT iOS process, then re-proves OfflineReady and clones a fresh receipt-backed ARM64/shared workspace. Gate B scans real direct LambdaExpression/Expression<T>.Compile call sites and selects only structurally-safe unsigned targets; strong-named assemblies, dynamic Compile(bool) arguments, branch/EH-sensitive insertion points, Harmony/MonoMod, Reflection.Emit and Assembly.Load remain out of scope. Gate C changes only eligible Compile() / literal Compile(false) calls to request interpretation and reopens every output with the verified-workspace Cecil resolver. Gate D re-hashes source, prepared, and live install trees so only the selected launcher-private prepared assemblies may differ.",
+            "Gate A first proves Expression<T>.Compile(preferInterpretation: true) can create and execute an interpreted delegate in this fully trimmed/AOT iOS process, then re-proves OfflineReady and clones a fresh receipt-backed ARM64/shared workspace. Gate B scans real direct LambdaExpression/Expression<T>.Compile call sites and selects structurally-safe targets and classifies strong-name state; modified strong-name targets preserve their public-key identity while clearing only the stale StrongNameSigned bit in the prepared copy. Dynamic Compile(bool) arguments, malformed strong-name identities, branch/EH-sensitive insertion points, Harmony/MonoMod, Reflection.Emit and Assembly.Load remain out of scope. Gate C changes only eligible Compile() / literal Compile(false) calls to request interpretation and reopens every output with the verified-workspace Cecil resolver. Gate D re-hashes source, prepared, and live install trees so only the selected launcher-private prepared assemblies may differ.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_expressionInterpreterCompatibilityDetailLabel);
@@ -641,7 +641,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–18 COMPLETE and closed on the physical iPhone. Step 19 begins the first evidence-backed behavioral compatibility preparation: prove the expression-tree interpreter on-device → discover real direct Compile targets → force only safe unsigned calls to prefer interpretation → audit source/prepared/live isolation. Stop at the first failing gate. Game execution, Harmony/MonoMod detours, Reflection.Emit replacement, native runtime integration, Cloud, and Workshop remain later subsystems.",
+            "Status: Steps 01–18 COMPLETE and closed on the physical iPhone. Step 19 begins the first evidence-backed behavioral compatibility preparation: prove the expression-tree interpreter on-device → discover real direct Compile targets → force only structurally-safe calls to prefer interpretation while preserving strong-name public-key identity in prepared copies → audit source/prepared/live isolation. Stop at the first failing gate. Game execution, Harmony/MonoMod detours, Reflection.Emit replacement, native runtime integration, Cloud, and Workshop remain later subsystems.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -2283,7 +2283,7 @@ public sealed class RootViewController : UIViewController
         _expressionInterpreterCompatibilityResultLabel.Text = "EXPRESSION INTERPRETER COMPATIBILITY: GATE A RUNNING…";
         _expressionInterpreterCompatibilityResultLabel.TextColor = UIColor.Label;
         _expressionInterpreterCompatibilityDetailLabel.Text = "Gate A: proving the System.Linq.Expressions interpreter in this physical AOT process, then cloning a fresh receipt-backed ARM64/shared Step 19 workspace.";
-        _statusLabel.Text = "STEP 19 GATE A — interpreter capability + receipt-backed workspace clone.";
+        _statusLabel.Text = "STEP 19.1 GATE A — interpreter capability + receipt-backed workspace clone.";
         _statusLabel.TextColor = UIColor.Label;
 
         try
@@ -2304,19 +2304,19 @@ public sealed class RootViewController : UIViewController
                 return;
 
             _expressionInterpreterCompatibilityResultLabel.Text = "EXPRESSION INTERPRETER COMPATIBILITY: GATE B RUNNING…";
-            _statusLabel.Text = "STEP 19 GATE B — discover real direct expression Compile targets.";
+            _statusLabel.Text = "STEP 19.1 GATE B — discover real direct expression Compile targets.";
             var gateB = await Task.Run(() => _expressionInterpreterCompatibility.RunRealCompileTargetDiscovery(), token);
             if (!RecordExpressionInterpreterCompatibilityGate(gateB))
                 return;
 
             _expressionInterpreterCompatibilityResultLabel.Text = "EXPRESSION INTERPRETER COMPATIBILITY: GATE C RUNNING…";
-            _statusLabel.Text = "STEP 19 GATE C — force safe direct Compile sites to prefer interpretation.";
+            _statusLabel.Text = "STEP 19.1 GATE C — force safe direct Compile sites to prefer interpretation.";
             var gateC = await Task.Run(() => _expressionInterpreterCompatibility.RunPreferInterpretationRewrite(), token);
             if (!RecordExpressionInterpreterCompatibilityGate(gateC))
                 return;
 
             _expressionInterpreterCompatibilityResultLabel.Text = "EXPRESSION INTERPRETER COMPATIBILITY: GATE D RUNNING…";
-            _statusLabel.Text = "STEP 19 GATE D — source/prepared/live SHA-1 + structural isolation audit.";
+            _statusLabel.Text = "STEP 19.1 GATE D — source/prepared/live SHA-1 + structural isolation audit.";
             var gateD = await _expressionInterpreterCompatibility.RunIsolationAuditAsync(progress, token);
             if (!RecordExpressionInterpreterCompatibilityGate(gateD))
                 return;
@@ -2325,8 +2325,8 @@ public sealed class RootViewController : UIViewController
             _expressionInterpreterCompatibilityResultLabel.Text = snapshot.Summary;
             _expressionInterpreterCompatibilityResultLabel.TextColor = UIColor.Label;
             _expressionInterpreterCompatibilityDetailLabel.Text = FormatExpressionInterpreterCompatibilityDetail(
-                "All four Step 19 gates passed. The physical launcher proved the expression-tree interpreter, found evidence-backed real Compile targets, rewrote only the safe unsigned selected sites to prefer interpretation, reopened/validated the prepared outputs, and proved the trusted source/live install remained receipt-identical.");
-            _statusLabel.Text = "PASS: STEP 19 EXPRESSION INTERPRETER COMPATIBILITY — 4/4. First behaviorally meaningful managed compatibility rewrite is prepared and isolated; no game assembly was executed.";
+                "All four Step 19 gates passed. The physical launcher proved the expression-tree interpreter, found evidence-backed real Compile targets, rewrote only the structurally-safe selected sites to prefer interpretation, preserving strong-name public-key identity while clearing stale StrongNameSigned flags in modified prepared copies, reopened/validated the prepared outputs, and proved the trusted source/live install remained receipt-identical.");
+            _statusLabel.Text = "PASS: STEP 19.1 EXPRESSION INTERPRETER COMPATIBILITY — 4/4. First behaviorally meaningful managed compatibility rewrite is prepared and isolated; no game assembly was executed.";
             _statusLabel.TextColor = UIColor.Label;
         }
         catch (OperationCanceledException)
@@ -2335,7 +2335,7 @@ public sealed class RootViewController : UIViewController
             _expressionInterpreterCompatibilityResultLabel.TextColor = UIColor.SecondaryLabel;
             _expressionInterpreterCompatibilityDetailLabel.Text = FormatExpressionInterpreterCompatibilityDetail(
                 "Step 19 was cancelled. Gate A recreates the launcher-private Step 19 workspace from scratch on the next run; the real managed install is never an intended write target.");
-            _statusLabel.Text = "STEP 19 CANCELLED — no later gate is considered proven.";
+            _statusLabel.Text = "STEP 19.1 CANCELLED — no later gate is considered proven.";
             _statusLabel.TextColor = UIColor.SecondaryLabel;
         }
         catch (Exception ex)
@@ -2343,7 +2343,7 @@ public sealed class RootViewController : UIViewController
             _expressionInterpreterCompatibilityResultLabel.Text = "EXPRESSION INTERPRETER COMPATIBILITY: EXCEPTION";
             _expressionInterpreterCompatibilityResultLabel.TextColor = UIColor.SystemRed;
             _expressionInterpreterCompatibilityDetailLabel.Text = FormatExpressionInterpreterCompatibilityDetail($"Unhandled Step 19 exception: {ex.GetType().Name}: {ex.Message}");
-            _statusLabel.Text = "STEP 19 FAIL: stop at the current expression-interpreter compatibility gate and report this screen.";
+            _statusLabel.Text = "STEP 19.1 FAIL: stop at the current expression-interpreter compatibility gate and report this screen.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
         finally
@@ -2365,7 +2365,7 @@ public sealed class RootViewController : UIViewController
         if (!result.Passed && _statusLabel is not null)
         {
             var letter = (char)('A' + (int)result.Gate - 1);
-            _statusLabel.Text = $"STEP 19 FAIL at Gate {letter} ({result.Gate}). Stop here; later expression-interpreter compatibility gates were not run.";
+            _statusLabel.Text = $"STEP 19.1 FAIL at Gate {letter} ({result.Gate}). Stop here; later expression-interpreter compatibility gates were not run.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
         return result.Passed;
@@ -2383,8 +2383,8 @@ public sealed class RootViewController : UIViewController
         }
 
         lines.Add("Step 19 write scope: launcher-private Step19-ExpressionInterpreterCompatibility/source + prepared only; the Step 12 receipt-backed managed install stays read-only.");
-        lines.Add("Behavioral rewrite scope: direct System.Linq.Expressions LambdaExpression/Expression<T>.Compile() and literal Compile(false) calls only, converted to interpreter preference when structurally safe and unsigned.");
-        lines.Add("Out of scope: dynamic Compile(bool) arguments, strong-named assemblies, branch/EH-sensitive insertion points, Harmony/MonoMod runtime detours, Reflection.Emit replacement, Assembly.Load, native runtime integration, StS2 execution, Cloud, and Workshop.");
+        lines.Add("Behavioral rewrite scope: direct System.Linq.Expressions LambdaExpression/Expression<T>.Compile() and literal Compile(false) calls only, converted to interpreter preference when structurally safe; modified strong-name targets preserve public-key identity and clear only stale StrongNameSigned in prepared copies.");
+        lines.Add("Out of scope: dynamic Compile(bool) arguments, malformed strong-name identities, branch/EH-sensitive insertion points, Harmony/MonoMod runtime detours, Reflection.Emit replacement, Assembly.Load, native runtime integration, StS2 execution, Cloud, and Workshop.");
         lines.Add("Step 18 remains closed/protected; its verified-workspace resolver principles are preserved in Step 19.");
         lines.Add("Step 15 orientation presentation quirk remains a known non-blocking cleanup item.");
         lines.Add(tail);
