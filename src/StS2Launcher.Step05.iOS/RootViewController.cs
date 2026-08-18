@@ -25,6 +25,8 @@ public sealed class RootViewController : UIViewController
     private readonly GodotFoundationGateSequence _godotFoundationGates = new();
     private readonly ManagedPreparationFoundation _managedPreparationFoundation;
     private readonly ManagedPreparationGateSequence _managedPreparationGates = new();
+    private readonly CompatibilityCallSiteAnalysis _compatibilityCallSiteAnalysis;
+    private readonly CompatibilityCallSiteGateSequence _compatibilityCallSiteGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -55,6 +57,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _godotFoundationDetailLabel;
     private UILabel? _managedPreparationResultLabel;
     private UILabel? _managedPreparationDetailLabel;
+    private UILabel? _compatibilityCallSiteResultLabel;
+    private UILabel? _compatibilityCallSiteDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -77,6 +81,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _godotFoundationStartButton;
     private UIButton? _godotFoundationGateDButton;
     private UIButton? _managedPreparationButton;
+    private UIButton? _compatibilityCallSiteButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -113,6 +118,7 @@ public sealed class RootViewController : UIViewController
         _offlineInstallInspection = new SteamOfflineInstallInspection(launcherDataRoot);
         _compatibilityInventoryInspection = new SteamCompatibilityInventoryInspection(launcherDataRoot);
         _managedPreparationFoundation = new ManagedPreparationFoundation(launcherDataRoot);
+        _compatibilityCallSiteAnalysis = new CompatibilityCallSiteAnalysis(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -158,22 +164,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 16.1 — MANAGED PREPARATION FOUNDATION",
+            "STEP 17 — COMPATIBILITY CALL-SITE ANALYSIS",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.45",
+            "Version 0.0.46",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "MONO.CECIL 0.11.6 • ORDERED FIXTURE/IL/REAL-METADATA GATES",
+            "MONO.CECIL 0.11.6 • ARM64 ACTUAL-IL / NATIVE-INTEROP / DEPENDENCY MAP",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–15 are complete on the physical iPhone. Step 15 proved the independent Godot 4.5.1 Metal/touch/lifecycle host; its small initial-orientation presentation quirk is recorded as non-blocking and is not changed here. Step 16 is the next accelerated subsystem: Gate A reads a project-owned managed fixture with Mono.Cecil, Gate B writes/reopens that fixture, Gate C performs one controlled fixture-only IL rewrite, and Gate D parses the real receipt-backed StS2 managed assemblies read-only. No real game assembly is rewritten, loaded, or executed.",
+            "Steps 01–16 are complete on the physical iPhone. Step 16 proved Mono.Cecil read/write/reopen, a controlled project-owned IL rewrite, and read-only real StS2 managed metadata inspection under iOS AOT. Step 17 now turns Step 14's broad indicator counts into concrete macOS-arm64 IL evidence: Gate A selects the receipt-backed iOS-relevant managed scope, Gate B scans actual method-reference instructions, Gate C classifies native/platform interop, and Gate D maps direct dependency pressure from the primary arm64 sts2.dll. No real game assembly is rewritten, loaded, or executed.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -542,6 +548,29 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_managedPreparationDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 17 — Compatibility Call-Site Analysis (ordered gates A–D)",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _compatibilityCallSiteButton = SystemButton("Run Gates A–D — ARM64 Scope → Actual IL Calls → Native/Platform → Dependency Map", 17);
+        _compatibilityCallSiteButton.TouchUpInside += async (_, _) => await RunCompatibilityCallSiteAnalysisAsync();
+        content.AddArrangedSubview(_compatibilityCallSiteButton);
+
+        _compatibilityCallSiteResultLabel = Label(
+            "COMPATIBILITY CALL-SITE ANALYSIS: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_compatibilityCallSiteResultLabel);
+
+        _compatibilityCallSiteDetailLabel = Label(
+            "Gate A re-proves OfflineReady and selects the macOS arm64 + architecture-neutral managed scope while excluding x86_64 duplicates. Gate B reads concrete IL method-reference instructions and records dynamic/AOT-sensitive call sites. Gate C classifies P/Invoke/native modules and platform-sensitive managed APIs. Gate D builds a direct dependency-pressure map for the primary arm64 sts2.dll and re-hashes every scanned candidate. No dependency Resolve(), Assembly.Load, game execution, or game-file writes are allowed.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_compatibilityCallSiteDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -554,7 +583,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–15 COMPLETE on the physical iPhone. Step 16 is the managed-preparation multi-gate boundary: Cecil fixture read → fixture write/reopen → controlled fixture-only IL rewrite → read-only real StS2 assembly metadata inspection. Stop at the first failing gate. No real game rewrite, game execution, Cloud, or Workshop is included.",
+            "Status: Steps 01–16 COMPLETE on the physical iPhone. Step 17 is a read-only compatibility-evidence subsystem: receipt-backed ARM64 scope → actual IL call sites → native/platform interop → primary sts2.dll dependency pressure map. Stop at the first failing gate. No real game rewrite, runtime integration, game execution, Cloud, or Workshop is included.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -573,7 +602,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 16: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 17: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -1949,6 +1978,136 @@ public sealed class RootViewController : UIViewController
         {
             EndSteamOperation();
         }
+    }
+
+    private async Task RunCompatibilityCallSiteAnalysisAsync()
+    {
+        if (_compatibilityCallSiteResultLabel is null ||
+            _compatibilityCallSiteDetailLabel is null ||
+            _compatibilityCallSiteButton is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        if (_godotProcessRequiresRestart)
+        {
+            _statusLabel.Text = "Step 15 Godot process-global state is still active. Force-quit/relaunch before Step 17 so the read-only compatibility evidence is isolated from the Godot session.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+            return;
+        }
+
+        BeginSteamOperation(allowCancel: true);
+        _compatibilityCallSiteGates.Reset();
+        _compatibilityCallSiteAnalysis.Reset();
+        _compatibilityCallSiteResultLabel.Text = "COMPATIBILITY CALL-SITE ANALYSIS: GATE A RUNNING…";
+        _compatibilityCallSiteResultLabel.TextColor = UIColor.Label;
+        _compatibilityCallSiteDetailLabel.Text = "Gate A: re-proving OfflineReady and selecting the receipt-backed macOS arm64 + architecture-neutral managed scope without opening game assemblies.";
+        _statusLabel.Text = "STEP 17 GATE A — ARM64 managed scope + local integrity.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var token = _operationCts?.Token ?? CancellationToken.None;
+            var progress = new Progress<CompatibilityCallSiteProgress>(value =>
+            {
+                var count = value.TotalItems > 0
+                    ? $" ({value.ProcessedItems:N0}/{value.TotalItems:N0})"
+                    : string.Empty;
+                _compatibilityCallSiteDetailLabel.Text = FormatCompatibilityCallSiteDetail(
+                    $"Gate {(char)('A' + (int)value.Gate - 1)} progress{count}: {value.Detail}" +
+                    (string.IsNullOrWhiteSpace(value.CurrentPath) ? string.Empty : $"\nCurrent: {value.CurrentPath}"));
+            });
+
+            var gateA = await _compatibilityCallSiteAnalysis.RunArm64ManagedScopeAsync(progress, token);
+            if (!RecordCompatibilityCallSiteGate(gateA))
+                return;
+
+            _compatibilityCallSiteResultLabel.Text = "COMPATIBILITY CALL-SITE ANALYSIS: GATE B RUNNING…";
+            _statusLabel.Text = "STEP 17 GATE B — actual IL method-reference scan.";
+            var gateB = await _compatibilityCallSiteAnalysis.RunActualIlCallSiteScanAsync(progress, token);
+            if (!RecordCompatibilityCallSiteGate(gateB))
+                return;
+
+            _compatibilityCallSiteResultLabel.Text = "COMPATIBILITY CALL-SITE ANALYSIS: GATE C RUNNING…";
+            _statusLabel.Text = "STEP 17 GATE C — native/platform interop classification.";
+            var gateC = await Task.Run(() => _compatibilityCallSiteAnalysis.RunNativePlatformInteropClassification(), token);
+            if (!RecordCompatibilityCallSiteGate(gateC))
+                return;
+
+            _compatibilityCallSiteResultLabel.Text = "COMPATIBILITY CALL-SITE ANALYSIS: GATE D RUNNING…";
+            _statusLabel.Text = "STEP 17 GATE D — primary sts2.dll dependency pressure map + post-scan hashes.";
+            var gateD = await _compatibilityCallSiteAnalysis.RunPrimaryDependencyPressureMapAsync(progress, token);
+            if (!RecordCompatibilityCallSiteGate(gateD))
+                return;
+
+            var snapshot = _compatibilityCallSiteGates.Snapshot();
+            _compatibilityCallSiteResultLabel.Text = snapshot.Summary;
+            _compatibilityCallSiteResultLabel.TextColor = UIColor.Label;
+            _compatibilityCallSiteDetailLabel.Text = FormatCompatibilityCallSiteDetail(
+                "All four Step 17 gates passed. The broad Step 14 indicators have been narrowed to concrete arm64 IL/native/dependency evidence, while every scanned file still matches its Step 12 receipt SHA-1.");
+            _statusLabel.Text = "PASS: STEP 17 COMPATIBILITY CALL-SITE ANALYSIS — 4/4. Upload the Gate B–D evidence so the next compatibility target can be chosen from actual IL rather than string indicators.";
+            _statusLabel.TextColor = UIColor.Label;
+        }
+        catch (OperationCanceledException)
+        {
+            _compatibilityCallSiteResultLabel.Text = "COMPATIBILITY CALL-SITE ANALYSIS: CANCELLED";
+            _compatibilityCallSiteResultLabel.TextColor = UIColor.SecondaryLabel;
+            _compatibilityCallSiteDetailLabel.Text = FormatCompatibilityCallSiteDetail(
+                "Step 17 was cancelled. The analysis is read-only; no game-file write or runtime load was intentionally performed.");
+            _statusLabel.Text = "STEP 17 CANCELLED — no later gate is considered proven.";
+            _statusLabel.TextColor = UIColor.SecondaryLabel;
+        }
+        catch (Exception ex)
+        {
+            _compatibilityCallSiteResultLabel.Text = "COMPATIBILITY CALL-SITE ANALYSIS: EXCEPTION";
+            _compatibilityCallSiteResultLabel.TextColor = UIColor.SystemRed;
+            _compatibilityCallSiteDetailLabel.Text = FormatCompatibilityCallSiteDetail($"Unhandled Step 17 exception: {ex.GetType().Name}: {ex.Message}");
+            _statusLabel.Text = "STEP 17 FAIL: stop at the current call-site-analysis gate and report this screen.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
+        }
+    }
+
+    private bool RecordCompatibilityCallSiteGate(CompatibilityCallSiteGateResult result)
+    {
+        _compatibilityCallSiteGates.Record(result.Gate, result.Passed, result.Detail);
+        if (_compatibilityCallSiteResultLabel is not null)
+        {
+            _compatibilityCallSiteResultLabel.Text = _compatibilityCallSiteGates.Snapshot().Summary;
+            _compatibilityCallSiteResultLabel.TextColor = result.Passed ? UIColor.Label : UIColor.SystemRed;
+        }
+        if (_compatibilityCallSiteDetailLabel is not null)
+            _compatibilityCallSiteDetailLabel.Text = FormatCompatibilityCallSiteDetail(result.Detail);
+        if (!result.Passed && _statusLabel is not null)
+        {
+            var letter = (char)('A' + (int)result.Gate - 1);
+            _statusLabel.Text = $"STEP 17 FAIL at Gate {letter} ({result.Gate}). Stop here; later compatibility-analysis gates were not run.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        return result.Passed;
+    }
+
+    private string FormatCompatibilityCallSiteDetail(string tail)
+    {
+        var lines = new List<string>();
+        foreach (var gate in _compatibilityCallSiteGates.Results)
+        {
+            var letter = (char)('A' + (int)gate.Gate - 1);
+            lines.Add($"Gate {letter} — {gate.Gate}: {(gate.Passed ? "PASS" : "FAIL")}");
+            lines.Add(gate.Detail);
+            lines.Add(string.Empty);
+        }
+
+        lines.Add("Step 17 scope: receipt-backed macOS arm64 + architecture-neutral managed files only; x86_64 duplicate managed payload excluded from compatibility prioritization.");
+        lines.Add("Evidence: actual Cecil IL operands/PInvoke metadata; no dependency Resolve(), Assembly.Load, game execution, or game-file write.");
+        lines.Add("Step 15 orientation presentation quirk remains a known non-blocking cleanup item; Step 17 does not alter the Godot host.");
+        lines.Add("Real compatibility rewrite / StS2 execution / FMOD / Spine / Cloud / Workshop: NOT ADVANCED BY STEP 17");
+        lines.Add(tail);
+        return string.Join("\n", lines);
     }
 
     private bool RecordManagedPreparationGate(ManagedPreparationGateResult result)

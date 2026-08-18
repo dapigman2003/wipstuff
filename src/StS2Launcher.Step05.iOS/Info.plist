@@ -7,9 +7,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.community.sts2launcher</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0.45</string>
+	<string>0.0.46</string>
 	<key>CFBundleVersion</key>
-	<string>45</string>
+	<string>46</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchScreen</key>
