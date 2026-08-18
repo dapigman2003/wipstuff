@@ -27,6 +27,8 @@ public sealed class RootViewController : UIViewController
     private readonly ManagedPreparationGateSequence _managedPreparationGates = new();
     private readonly CompatibilityCallSiteAnalysis _compatibilityCallSiteAnalysis;
     private readonly CompatibilityCallSiteGateSequence _compatibilityCallSiteGates = new();
+    private readonly RealAssemblyRewriteWorkspace _realAssemblyRewriteWorkspace;
+    private readonly RealAssemblyRewriteGateSequence _realAssemblyRewriteGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -59,6 +61,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _managedPreparationDetailLabel;
     private UILabel? _compatibilityCallSiteResultLabel;
     private UILabel? _compatibilityCallSiteDetailLabel;
+    private UILabel? _realAssemblyRewriteResultLabel;
+    private UILabel? _realAssemblyRewriteDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -82,6 +86,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _godotFoundationGateDButton;
     private UIButton? _managedPreparationButton;
     private UIButton? _compatibilityCallSiteButton;
+    private UIButton? _realAssemblyRewriteButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -119,6 +124,7 @@ public sealed class RootViewController : UIViewController
         _compatibilityInventoryInspection = new SteamCompatibilityInventoryInspection(launcherDataRoot);
         _managedPreparationFoundation = new ManagedPreparationFoundation(launcherDataRoot);
         _compatibilityCallSiteAnalysis = new CompatibilityCallSiteAnalysis(launcherDataRoot);
+        _realAssemblyRewriteWorkspace = new RealAssemblyRewriteWorkspace(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -164,22 +170,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 17 — COMPATIBILITY CALL-SITE ANALYSIS",
+            "STEP 18 — REAL ASSEMBLY REWRITE WORKSPACE",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.46",
+            "Version 0.0.47",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "MONO.CECIL 0.11.6 • ARM64 ACTUAL-IL / NATIVE-INTEROP / DEPENDENCY MAP",
+            "MONO.CECIL 0.11.6 • REAL ARM64 COPY / WRITE-REOPEN / NOP REWRITE / ISOLATION AUDIT",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–16 are complete on the physical iPhone. Step 16 proved Mono.Cecil read/write/reopen, a controlled project-owned IL rewrite, and read-only real StS2 managed metadata inspection under iOS AOT. Step 17 now turns Step 14's broad indicator counts into concrete macOS-arm64 IL evidence: Gate A selects the receipt-backed iOS-relevant managed scope, Gate B scans actual method-reference instructions, Gate C classifies native/platform interop, and Gate D maps direct dependency pressure from the primary arm64 sts2.dll. No real game assembly is rewritten, loaded, or executed.",
+            "Steps 01–17 are complete on the physical iPhone. Step 17 proved receipt-backed macOS-arm64 scope selection and concrete IL/native/dependency analysis. Step 18 now proves the next safety boundary before any behaviorally significant compatibility patch: Gate A creates a launcher-private copy of the ARM64/shared managed payload, Gate B Cecil-writes/reopens the real copied sts2.dll, Gate C inserts one semantics-neutral IL NOP into a COPY only, and Gate D re-hashes both workspace sources and the original managed install to prove isolation. The real Step 12 install remains read-only and no game assembly is loaded or executed.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -571,6 +577,29 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_compatibilityCallSiteDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 18 — Real Assembly Rewrite Workspace (ordered gates A–D)",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _realAssemblyRewriteButton = SystemButton("Run Gates A–D — Clone ARM64 → Real Roundtrip → Neutral NOP → Isolation Audit", 17);
+        _realAssemblyRewriteButton.TouchUpInside += async (_, _) => await RunRealAssemblyRewriteWorkspaceAsync();
+        content.AddArrangedSubview(_realAssemblyRewriteButton);
+
+        _realAssemblyRewriteResultLabel = Label(
+            "REAL ASSEMBLY REWRITE WORKSPACE: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_realAssemblyRewriteResultLabel);
+
+        _realAssemblyRewriteDetailLabel = Label(
+            "Gate A re-proves OfflineReady and copies only the receipt-backed macOS arm64 + architecture-neutral managed payload into launcher-private Step18-RealAssemblyRewrite/source storage. Gate B writes/reopens the copied primary arm64 sts2.dll with Cecil. Gate C inserts exactly one semantics-neutral NOP at the entry of a deterministic copied method and verifies it after reopen. Gate D re-hashes every workspace source and every corresponding original install file, proving only launcher-private copies changed. No dependency Resolve(), Assembly.Load, StS2 execution, or behaviorally significant game fix is attempted.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_realAssemblyRewriteDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -583,7 +612,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–16 COMPLETE on the physical iPhone. Step 17 is a read-only compatibility-evidence subsystem: receipt-backed ARM64 scope → actual IL call sites → native/platform interop → primary sts2.dll dependency pressure map. Stop at the first failing gate. No real game rewrite, runtime integration, game execution, Cloud, or Workshop is included.",
+            "Status: Steps 01–17 COMPLETE on the physical iPhone. Step 18 proves a real-assembly rewrite workspace without touching the managed install: receipt-backed ARM64 clone → Cecil real-copy roundtrip → semantics-neutral NOP rewrite on a copy → full source/install isolation audit. Stop at the first failing gate. No behaviorally significant StS2 compatibility patch, runtime integration, game execution, Cloud, or Workshop is included.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -602,7 +631,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 17: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 18: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -2070,6 +2099,136 @@ public sealed class RootViewController : UIViewController
         {
             EndSteamOperation();
         }
+    }
+
+    private async Task RunRealAssemblyRewriteWorkspaceAsync()
+    {
+        if (_realAssemblyRewriteResultLabel is null ||
+            _realAssemblyRewriteDetailLabel is null ||
+            _realAssemblyRewriteButton is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        if (_godotProcessRequiresRestart)
+        {
+            _statusLabel.Text = "Step 15 Godot process-global state is still active. Force-quit/relaunch before Step 18 so Cecil real-copy rewrite testing is isolated from the Godot session.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+            return;
+        }
+
+        BeginSteamOperation(allowCancel: true);
+        _realAssemblyRewriteGates.Reset();
+        _realAssemblyRewriteWorkspace.Reset();
+        _realAssemblyRewriteResultLabel.Text = "REAL ASSEMBLY REWRITE WORKSPACE: GATE A RUNNING…";
+        _realAssemblyRewriteResultLabel.TextColor = UIColor.Label;
+        _realAssemblyRewriteDetailLabel.Text = "Gate A: re-proving OfflineReady and cloning the receipt-backed ARM64/shared managed scope into launcher-private Step 18 scratch storage with per-file SHA-1 verification.";
+        _statusLabel.Text = "STEP 18 GATE A — clone receipt-backed ARM64 compatibility workspace.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var token = _operationCts?.Token ?? CancellationToken.None;
+            var progress = new Progress<RealAssemblyRewriteProgress>(value =>
+            {
+                var count = value.TotalItems > 0
+                    ? $" ({value.ProcessedItems:N0}/{value.TotalItems:N0})"
+                    : string.Empty;
+                _realAssemblyRewriteDetailLabel.Text = FormatRealAssemblyRewriteDetail(
+                    $"Gate {(char)('A' + (int)value.Gate - 1)} progress{count}: {value.Detail}" +
+                    (string.IsNullOrWhiteSpace(value.CurrentPath) ? string.Empty : $"\nCurrent: {value.CurrentPath}"));
+            });
+
+            var gateA = await _realAssemblyRewriteWorkspace.RunWorkspaceCloneAsync(progress, token);
+            if (!RecordRealAssemblyRewriteGate(gateA))
+                return;
+
+            _realAssemblyRewriteResultLabel.Text = "REAL ASSEMBLY REWRITE WORKSPACE: GATE B RUNNING…";
+            _statusLabel.Text = "STEP 18 GATE B — Cecil write/reopen of copied primary sts2.dll.";
+            var gateB = await Task.Run(() => _realAssemblyRewriteWorkspace.RunPrimaryRoundTrip(), token);
+            if (!RecordRealAssemblyRewriteGate(gateB))
+                return;
+
+            _realAssemblyRewriteResultLabel.Text = "REAL ASSEMBLY REWRITE WORKSPACE: GATE C RUNNING…";
+            _statusLabel.Text = "STEP 18 GATE C — semantics-neutral NOP rewrite on copied sts2.dll only.";
+            var gateC = await Task.Run(() => _realAssemblyRewriteWorkspace.RunNeutralIlRewrite(), token);
+            if (!RecordRealAssemblyRewriteGate(gateC))
+                return;
+
+            _realAssemblyRewriteResultLabel.Text = "REAL ASSEMBLY REWRITE WORKSPACE: GATE D RUNNING…";
+            _statusLabel.Text = "STEP 18 GATE D — source/install SHA-1 isolation audit.";
+            var gateD = await _realAssemblyRewriteWorkspace.RunIsolationAuditAsync(progress, token);
+            if (!RecordRealAssemblyRewriteGate(gateD))
+                return;
+
+            var snapshot = _realAssemblyRewriteGates.Snapshot();
+            _realAssemblyRewriteResultLabel.Text = snapshot.Summary;
+            _realAssemblyRewriteResultLabel.TextColor = UIColor.Label;
+            _realAssemblyRewriteDetailLabel.Text = FormatRealAssemblyRewriteDetail(
+                "All four Step 18 gates passed. A receipt-identical ARM64 managed workspace was created, Cecil round-tripped the real copied sts2.dll, one neutral NOP was written/reopened in a copy, and every original managed file in scope still matched its trusted receipt SHA-1.");
+            _statusLabel.Text = "PASS: STEP 18 REAL ASSEMBLY REWRITE WORKSPACE — 4/4. Real copied-assembly writing is proven; the actual managed install remained unchanged.";
+            _statusLabel.TextColor = UIColor.Label;
+        }
+        catch (OperationCanceledException)
+        {
+            _realAssemblyRewriteResultLabel.Text = "REAL ASSEMBLY REWRITE WORKSPACE: CANCELLED";
+            _realAssemblyRewriteResultLabel.TextColor = UIColor.SecondaryLabel;
+            _realAssemblyRewriteDetailLabel.Text = FormatRealAssemblyRewriteDetail(
+                "Step 18 was cancelled. Gate A recreates its launcher-private workspace from scratch on the next run; no write to the real managed install is intentional." );
+            _statusLabel.Text = "STEP 18 CANCELLED — no later gate is considered proven.";
+            _statusLabel.TextColor = UIColor.SecondaryLabel;
+        }
+        catch (Exception ex)
+        {
+            _realAssemblyRewriteResultLabel.Text = "REAL ASSEMBLY REWRITE WORKSPACE: EXCEPTION";
+            _realAssemblyRewriteResultLabel.TextColor = UIColor.SystemRed;
+            _realAssemblyRewriteDetailLabel.Text = FormatRealAssemblyRewriteDetail($"Unhandled Step 18 exception: {ex.GetType().Name}: {ex.Message}");
+            _statusLabel.Text = "STEP 18 FAIL: stop at the current real-assembly rewrite gate and report this screen.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
+        }
+    }
+
+    private bool RecordRealAssemblyRewriteGate(RealAssemblyRewriteGateResult result)
+    {
+        _realAssemblyRewriteGates.Record(result.Gate, result.Passed, result.Detail);
+        if (_realAssemblyRewriteResultLabel is not null)
+        {
+            _realAssemblyRewriteResultLabel.Text = _realAssemblyRewriteGates.Snapshot().Summary;
+            _realAssemblyRewriteResultLabel.TextColor = result.Passed ? UIColor.Label : UIColor.SystemRed;
+        }
+        if (_realAssemblyRewriteDetailLabel is not null)
+            _realAssemblyRewriteDetailLabel.Text = FormatRealAssemblyRewriteDetail(result.Detail);
+        if (!result.Passed && _statusLabel is not null)
+        {
+            var letter = (char)('A' + (int)result.Gate - 1);
+            _statusLabel.Text = $"STEP 18 FAIL at Gate {letter} ({result.Gate}). Stop here; later real-assembly rewrite gates were not run.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        return result.Passed;
+    }
+
+    private string FormatRealAssemblyRewriteDetail(string tail)
+    {
+        var lines = new List<string>();
+        foreach (var gate in _realAssemblyRewriteGates.Results)
+        {
+            var letter = (char)('A' + (int)gate.Gate - 1);
+            lines.Add($"Gate {letter} — {gate.Gate}: {(gate.Passed ? "PASS" : "FAIL")}");
+            lines.Add(gate.Detail);
+            lines.Add(string.Empty);
+        }
+
+        lines.Add("Step 18 write scope: launcher-private Step18-RealAssemblyRewrite copies only; the Step 12 receipt-backed managed install stays read-only.");
+        lines.Add("Gate C transformation is intentionally semantics-neutral: one IL NOP inserted into a deterministic method of the copied primary arm64 sts2.dll.");
+        lines.Add("No dependency Resolve(), Assembly.Load, StS2 execution, FMOD/Spine runtime integration, Cloud, or Workshop is advanced by Step 18.");
+        lines.Add("Step 15 orientation presentation quirk remains a known non-blocking cleanup item.");
+        lines.Add(tail);
+        return string.Join("\n", lines);
     }
 
     private bool RecordCompatibilityCallSiteGate(CompatibilityCallSiteGateResult result)
