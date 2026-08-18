@@ -8,7 +8,10 @@ STS2_VALIDATE_AS_PARENT=1 bash scripts/validate-step16.sh
 
 python3 - <<'PY'
 from pathlib import Path
+import os
 import plistlib
+
+parent_mode = os.environ.get('STS2_VALIDATE_AS_PARENT') == '1'
 
 required = [
     Path('src/StS2Launcher.Core/CompatibilityCallSiteGate.cs'),
@@ -31,13 +34,15 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.46' or str(plist.get('CFBundleVersion')) != '46':
-    raise SystemExit('ERROR: Step 17 must be version 0.0.46 (46).')
+if not parent_mode:
+    if plist.get('CFBundleShortVersionString') != '0.0.46' or str(plist.get('CFBundleVersion')) != '46':
+        raise SystemExit('ERROR: standalone Step 17 must be version 0.0.46 (46).')
+else:
+    if int(str(plist.get('CFBundleVersion') or '0')) < 46:
+        raise SystemExit('ERROR: later-step Step 17 regression validation requires build version >= 46.')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
-for marker in (
-    '<ApplicationVersion>46</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.46</ApplicationDisplayVersion>',
+project_markers = [
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -45,7 +50,13 @@ for marker in (
     '<_LinkerFrameworks Remove="DiskArbitration" />',
     '<ForceLoad>false</ForceLoad>',
     '<SmartLink>false</SmartLink>',
-):
+]
+if not parent_mode:
+    project_markers.extend([
+        '<ApplicationVersion>46</ApplicationVersion>',
+        '<ApplicationDisplayVersion>0.0.46</ApplicationDisplayVersion>',
+    ])
+for marker in project_markers:
     if marker not in csproj:
         raise SystemExit(f'ERROR: Step 17 iOS/regression marker missing: {marker}')
 if '<TrimmerRootAssembly Include="Mono.Cecil" />' in csproj:
@@ -143,10 +154,7 @@ for marker in (
         raise SystemExit(f'ERROR: Step 17 host-test marker missing: {marker}')
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
-for marker in (
-    'STEP 17 — COMPATIBILITY CALL-SITE ANALYSIS',
-    'Version 0.0.46',
-    'Steps 01–16 are complete on the physical iPhone.',
+root_markers = [
     'Step 17 — Compatibility Call-Site Analysis (ordered gates A–D)',
     'Run Gates A–D — ARM64 Scope → Actual IL Calls → Native/Platform → Dependency Map',
     'RunCompatibilityCallSiteAnalysisAsync',
@@ -157,7 +165,14 @@ for marker in (
     'PASS: STEP 17 COMPATIBILITY CALL-SITE ANALYSIS — 4/4',
     'Run Gates A–D — Cecil Fixture → IL Rewrite → Real StS2 Metadata',
     'Run Foundation 5/5 Regression',
-):
+]
+if not parent_mode:
+    root_markers.extend([
+        'STEP 17 — COMPATIBILITY CALL-SITE ANALYSIS',
+        'Version 0.0.46',
+        'Steps 01–16 are complete on the physical iPhone.',
+    ])
+for marker in root_markers:
     if marker not in root:
         raise SystemExit(f'ERROR: Step 17 UI/gate marker missing: {marker}')
 
@@ -175,31 +190,36 @@ for marker in (
         raise SystemExit(f'ERROR: Step 17 build-wrapper marker missing: {marker}')
 
 verify = Path('scripts/verify-step17-ipa.sh').read_text()
-for marker in (
-    '0.0.46',
-    'BUILD_VERSION" == "46"',
+verify_markers = [
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-    'Expected device UI: STEP 17 — COMPATIBILITY CALL-SITE ANALYSIS',
-):
+]
+if not parent_mode:
+    verify_markers.extend([
+        '0.0.46',
+        'BUILD_VERSION" == "46"',
+        'Expected device UI: STEP 17 — COMPATIBILITY CALL-SITE ANALYSIS',
+    ])
+for marker in verify_markers:
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 17 IPA verification marker missing: {marker}')
 
-codemagic = Path('codemagic.yaml').read_text()
-for marker in (
-    'ios-step-17:',
-    'Step 17 - Compatibility Call-Site Analysis',
-    'max_build_duration: 120',
-    '$HOME/.cache/sts2launcher/godot-step15',
-    'bash scripts/codemagic-build-step17.sh',
-    'artifacts/StS2-Launcher-Step-17.ipa',
-    'artifacts/step17-build-summary.txt',
-):
-    if marker not in codemagic:
-        raise SystemExit(f'ERROR: Step 17 Codemagic marker missing: {marker}')
+if not parent_mode:
+    codemagic = Path('codemagic.yaml').read_text()
+    for marker in (
+        'ios-step-17:',
+        'Step 17 - Compatibility Call-Site Analysis',
+        'max_build_duration: 120',
+        '$HOME/.cache/sts2launcher/godot-step15',
+        'bash scripts/codemagic-build-step17.sh',
+        'artifacts/StS2-Launcher-Step-17.ipa',
+        'artifacts/step17-build-summary.txt',
+    ):
+        if marker not in codemagic:
+            raise SystemExit(f'ERROR: Step 17 Codemagic marker missing: {marker}')
 
 print('Step 17 Compatibility Call-Site Analysis source validation: PASS')
 print('  Steps 01-16 regression guards retained')
