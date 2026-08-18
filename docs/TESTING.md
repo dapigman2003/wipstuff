@@ -1,4 +1,4 @@
-# Testing strategy — through Step 13 offline launcher state
+# Testing strategy — through Step 17 compatibility call-site analysis
 
 Codemagic performs source-policy validation, host unit tests, the iOS AOT/native build and IPA structure verification before device testing.
 
@@ -31,3 +31,14 @@ Step 12.4.1 download-cache clear and forced fresh-CDN regression: `docs/STEP-12.
 
 
 Step 13 offline launcher-state gate: `docs/STEP-13-TEST.md`.
+
+
+## Steps 14–17
+
+Step 14 read-only compatibility inventory: `docs/STEP-14-TEST.md`.
+
+Step 15 Godot Foundation ordered native/render/touch/lifecycle gates: `docs/STEP-15-TEST.md`.
+
+Step 16 Managed Preparation ordered Cecil fixture/read-write-rewrite + real metadata gates: `docs/STEP-16-TEST.md`.
+
+Step 17 concrete ARM64 IL/native/dependency analysis: `docs/STEP-17-TEST.md`.

@@ -1,4 +1,4 @@
-# Third-Party Components — Step 16
+# Third-Party Components — Step 17
 
 ## Runtime
 
@@ -16,7 +16,7 @@ The pinned Godot Engine `4.5.1-stable` source is built on the Codemagic macOS ru
 
 ### Mono.Cecil 0.11.6
 
-Step 16 now intentionally uses Mono.Cecil at runtime for managed metadata/IL **file** inspection and controlled project-owned fixture rewriting. The same pinned version remains used by the build-only SteamKit compatibility patcher. Step 16 does not use Cecil to rewrite real StS2 assemblies yet.
+Steps 16–17 intentionally use Mono.Cecil at runtime for managed metadata/IL **file** inspection. Step 16 also proves controlled rewriting only on a project-owned fixture; Step 17 uses Cecil read-only to scan concrete call sites in the receipt-backed macOS arm64 managed payload. The same pinned version remains used by the build-only SteamKit compatibility patcher. No real StS2 assembly is rewritten yet.
 
 ## Build-only
 
@@ -34,4 +34,4 @@ Installed into a temporary Python virtual environment by Codemagic and used only
 
 ## Repository policy
 
-This repository contains no Slay the Spire 2 game files, Steam credentials, Apple signing secrets, or proprietary FMOD/Spine assets. The Step 16 fixture is a tiny project-owned assembly built from source during CI and bundled only as inert test data.
+This repository contains no Slay the Spire 2 game files, Steam credentials, Apple signing secrets, or proprietary FMOD/Spine assets. The Step 16 regression fixture is a tiny project-owned assembly built from source during CI and bundled only as inert test data. Step 17 adds no third-party or game payload.
