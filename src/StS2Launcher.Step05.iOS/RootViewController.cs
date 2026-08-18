@@ -158,12 +158,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 16 — MANAGED PREPARATION FOUNDATION",
+            "STEP 16.1 — MANAGED PREPARATION FOUNDATION",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.44",
+            "Version 0.0.45",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 

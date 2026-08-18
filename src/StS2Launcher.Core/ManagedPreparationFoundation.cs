@@ -223,6 +223,16 @@ public sealed class ManagedPreparationFoundation
             if (candidates.Length == 0)
                 throw new InvalidDataException("The verified install receipt contains no managed-module filename candidates.");
 
+            // The macOS depot legitimately contains architecture-specific copies
+            // of sts2.dll (arm64 and x86_64). Gate D is an iPhone/AOT preparation
+            // boundary, so prefer the unique macOS arm64 game assembly while still
+            // reading/re-hashing every receipt-backed managed candidate read-only.
+            var sts2Candidates = candidates
+                .Select(file => file.RelativePath.Replace('\\', '/'))
+                .Where(relative => Path.GetFileName(relative).Equals("sts2.dll", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            var primaryStS2RelativePath = SelectPrimaryStS2AssemblyRelativePath(sts2Candidates);
+
             ulong candidateBytes = 0;
             foreach (var candidate in candidates)
                 checked { candidateBytes += (ulong)candidate.Length; }
@@ -264,7 +274,7 @@ public sealed class ManagedPreparationFoundation
                     "Reading real installed managed metadata with Mono.Cecil; no assembly is resolved, loaded, executed, or written…"));
 
                 var path = ResolveChildPath(managedPath, relative);
-                var isMain = Path.GetFileName(relative).Equals("sts2.dll", StringComparison.OrdinalIgnoreCase);
+                var isMain = relative.Equals(primaryStS2RelativePath, StringComparison.OrdinalIgnoreCase);
                 try
                 {
                     // Read exactly this receipt-backed file as one CLI module. Using
@@ -315,7 +325,7 @@ public sealed class ManagedPreparationFoundation
                     if (isMain)
                     {
                         if (mainFound)
-                            throw new InvalidDataException("More than one receipt-backed sts2.dll was discovered.");
+                            throw new InvalidDataException("The selected primary sts2.dll was encountered more than once.");
                         if (module.Assembly?.Name is null)
                             throw new InvalidDataException("Receipt-backed sts2.dll is a managed module but does not contain an assembly manifest.");
 
@@ -384,6 +394,8 @@ public sealed class ManagedPreparationFoundation
                 $"Managed-module filename candidates: {candidates.Length:N0} / {candidateBytes:N0} bytes\n" +
                 $"Managed modules parsed by Cecil: {parsedModules:N0}\n" +
                 $"Non-managed .dll/.exe candidates skipped: {nonManagedCandidates:N0}\n" +
+                $"sts2.dll candidates discovered: {sts2Candidates.Length:N0}\n" +
+                $"Selected primary StS2 assembly: {mainRelativePath}\n" +
                 $"Post-inspection candidate SHA-1s reverified: {postInspectionSha1Verified:N0}/{candidates.Length:N0}\n" +
                 $"Total parsed types / methods: {totalTypes:N0} / {totalMethods:N0}\n" +
                 $"Total P/Invoke methods: {totalPInvokeMethods:N0}\n" +
@@ -409,6 +421,33 @@ public sealed class ManagedPreparationFoundation
         {
             return Fail(ManagedPreparationGate.RealStS2MetadataInspection, ex);
         }
+    }
+
+
+    private static string SelectPrimaryStS2AssemblyRelativePath(IReadOnlyList<string> sts2Candidates)
+    {
+        if (sts2Candidates.Count == 0)
+            throw new InvalidDataException("The verified install receipt contains no sts2.dll candidate.");
+
+        var arm64 = sts2Candidates
+            .Where(IsMacOsArm64StS2Path)
+            .ToArray();
+        if (arm64.Length == 1)
+            return arm64[0];
+        if (arm64.Length > 1)
+            throw new InvalidDataException($"More than one macOS arm64 receipt-backed sts2.dll was discovered: {FormatSample(arm64)}");
+
+        if (sts2Candidates.Count == 1)
+            return sts2Candidates[0];
+
+        throw new InvalidDataException(
+            $"Multiple receipt-backed sts2.dll candidates were discovered but no unique macOS arm64 candidate could be selected: {FormatSample(sts2Candidates)}");
+    }
+
+    private static bool IsMacOsArm64StS2Path(string relativePath)
+    {
+        var normalized = "/" + relativePath.Replace('\\', '/').TrimStart('/');
+        return normalized.EndsWith("/data_sts2_macos_arm64/sts2.dll", StringComparison.OrdinalIgnoreCase);
     }
 
     private static AssemblyDefinition ReadAssembly(string path, ReadingMode mode)
