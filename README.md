@@ -1,49 +1,47 @@
-# StS2 Launcher iOS — Step 18 Real Assembly Rewrite Workspace
+# StS2 Launcher iOS — Step 19 Expression Interpreter Compatibility
 
 Experimental unofficial iOS launcher/compatibility-host project for users who legitimately own Slay the Spire 2 on Steam.
 
 ## Project state
 
-**Steps 01–17 are complete and closed on a physical iPhone.** Step 15 physically proved the independent Godot 4.5.1 Metal/touch/lifecycle host. Step 16.1 physically proved Mono.Cecil read/write/reopen and real StS2 read-only metadata inspection. Step 17 physically passed the receipt-backed ARM64 actual-IL/native/dependency analysis subsystem.
+**Steps 01–18 are complete and closed on a physical iPhone.** Step 18.4 / `0.0.51 (51)` passed all four Real Assembly Rewrite Workspace gates, then also passed the reserved OfflineReady and Foundation 5/5 closure regressions. The protected baseline can therefore clone, write, rewrite, reopen, and audit the real receipt-backed ARM64 StS2 managed payload without modifying the trusted installation.
 
-This archive is **Step 18.4 / `0.0.51 (51)`**. Step 18.3 physically advanced the writer past the `System.Runtime 8.0.0.0` versus workspace `9.0.0.0` version boundary, but Gate B then surfaced `AssemblyResolutionException` for `GodotSharp` again. Source review found a separate resolver escape: the real source write used the strict workspace resolver, while Gate B's generated-output reopen (and the equivalent Gate C/Gate D audit reopens) called Cecil without resolver parameters. Step 18.4 removes every such generated-output escape, binds both Cecil resolver layers for source **and output** reads, uses deferred reads for verification/dependency metadata, and reports the exact failing stage.
+This archive is **Step 19 / `0.0.52 (52)`**. Step 19 is the first behaviorally meaningful managed compatibility preparation. It targets one narrow AOT-sensitive API shape: direct `System.Linq.Expressions` `Compile()` calls that can explicitly request interpretation instead of runtime code generation.
 
-## Step 18 subsystem — Real Assembly Rewrite Workspace
-
-Step 18 proves that the real StS2 ARM64 managed payload can be prepared and rewritten safely **outside the live installation** before any behaviorally significant compatibility transformation is attempted.
+## Step 19 subsystem — Expression Interpreter Compatibility
 
 Ordered gates:
 
-- **Gate A — workspace clone:** re-prove OfflineReady, select the Step 17 macOS arm64 + architecture-neutral managed scope, exclude x86_64 duplicates, copy it to launcher-private `Step18-RealAssemblyRewrite/source`, and SHA-1 verify every copy against the Step 12 receipt.
-- **Gate B — real primary round-trip:** Cecil-write the copied ARM64 `sts2.dll`, then reopen the generated output with a fresh explicitly bound workspace resolver (never Cecil's implicit default resolver), and verify its logical metadata fingerprint remains stable.
-- **Gate C — semantics-neutral rewrite:** insert one IL `nop` at the entry of a deterministic method in the copied primary `sts2.dll`, write it, reopen the generated output through the explicit workspace resolver, and verify the original first opcode remains immediately after the NOP.
-- **Gate D — isolation audit:** re-hash every source workspace file and every corresponding original managed-install file against the receipt, then re-prove both generated outputs using explicit-resolver deferred reopens.
+- **Gate A — InterpreterCapabilityAndWorkspaceClone:** run a launcher-owned captured-expression probe using `Compile(preferInterpretation: true)` in the actual iOS/AOT process; re-prove OfflineReady; clone and receipt-SHA-1-verify a fresh macOS ARM64 + architecture-neutral managed workspace while excluding x86_64 duplicates.
+- **Gate B — RealCompileTargetDiscovery:** scan every managed module in that verified workspace for real direct `LambdaExpression.Compile` / `Expression<TDelegate>.Compile` calls; classify parameterless, literal-false, already-true, dynamic-bool, structurally unsafe, and strong-named sites. Gate B fails rather than broadening the rewrite if no safe unsigned real target exists.
+- **Gate C — PreferInterpretationRewrite:** rewrite only the selected safe unsigned sites: parameterless `Compile()` becomes `Compile(true)`, and immediate literal `Compile(false)` becomes `Compile(true)` without changing the original constant instruction width. Reopen each generated assembly with the explicit verified-workspace Cecil resolver and prove structural invariants.
+- **Gate D — IsolationAudit:** re-hash every Step 19 source copy and corresponding live Step 12 install file against the receipt; prove non-target prepared files are byte-identical; prove only selected prepared assemblies changed; reopen and structurally revalidate every rewritten output.
 
-Step 18 writes only under launcher-private Step 18 scratch storage. It never writes the Step 12 managed install, loads StS2 into the CLR, or executes the game. Cecil writer-required dependency resolution is permitted only inside the SHA-1-verified Step 18 source workspace; there is no fallback to runtime/system/live-install/network locations.
+Step 19 deliberately skips strong-named assemblies, dynamic/non-literal `Compile(bool)` arguments, prefix/branch/EH-sensitive parameterless insertion points, and short-branch crossings whose displacement could be changed by inserting a byte of IL.
 
 ## Build
 
 Use Codemagic workflow:
 
 ```text
-ios-step-18-4
+ios-step-19
 ```
 
 Expected app:
 
 ```text
-0.0.51 (51)
-STEP 18.4 — REAL ASSEMBLY REWRITE WORKSPACE
+0.0.52 (52)
+STEP 19 — EXPRESSION INTERPRETER COMPATIBILITY
 ```
 
 Expected IPA:
 
 ```text
-artifacts/StS2-Launcher-Step-18.ipa
+artifacts/StS2-Launcher-Step-19.ipa
 ```
 
-See `docs/STEP-18-TEST.md` for physical-iPhone testing.
+See `docs/STEP-19-DESIGN.md` and `docs/STEP-19-TEST.md`.
 
 ## Scope boundary
 
-Step 18 does **not** apply a behaviorally significant StS2 compatibility fix, execute `sts2.dll`, integrate FMOD/Spine runtimes, launch the game, add Cloud, or add Workshop support.
+Step 19 does **not** load or execute StS2 assemblies, implement Harmony/MonoMod detours, replace Reflection.Emit generally, integrate FMOD/Spine, launch the game, add Cloud, or add Workshop. All game-file writes remain under launcher-private `Step19-ExpressionInterpreterCompatibility`; the receipt-backed live installation remains read-only.

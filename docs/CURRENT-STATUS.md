@@ -1,28 +1,26 @@
 # Current project status
 
-**Current correction:** Step 18.4 / `0.0.51 (51)` preserves the Step 18.2 identity catalog and Step 18.3 controlled version-unification policy, but fixes a separate resolver escape exposed by the physical 0.0.50 run: generated round-trip/rewrite/audit outputs were reopened through Cecil without explicit resolver parameters. Step 18.4 binds both assembly and metadata resolution to the verified source-workspace resolver for every real-game source/output read, uses deferred verification reads, and adds exact gate-stage diagnostics.
+**Steps 01–18 are complete and closed on a physical iPhone.** Step 18.4 / runtime `0.0.51 (51)` passed `REAL ASSEMBLY REWRITE WORKSPACE PASS — 4/4`, followed by `Verify Offline-Ready Install (Local Only)` and `Run Foundation 5/5 Regression`. That physically closes the safe real-assembly rewrite-workspace boundary.
 
-**Steps 01–17 are complete and closed on a physical iPhone.**
+The protected foundation now includes Steam authentication/content acquisition, atomic managed installation, offline verification, compatibility inventory, the source-built Godot 4.5.1 iOS Metal/touch/lifecycle host, Mono.Cecil 0.11.6 AOT read/write/IL editing, real IL/native/dependency analysis, and a closed SHA-1-verified real-game rewrite workspace with explicit assembly/metadata resolver control.
 
-Step 15 / runtime `0.0.43 (43)` physically proved the independent source-built Godot 4.5.1-stable iOS host through native availability, engine/render-loop control, Metal rendering, and physical touch/lifecycle forwarding. A small initial-orientation/panel-layout quirk remains recorded as non-blocking.
+**Current source candidate:** Step 19 — Expression Interpreter Compatibility.
 
-Step 16.1 / runtime `0.0.45 (45)` physically passed all four Managed Preparation gates. Mono.Cecil 0.11.6 successfully read/write/reopened a project-owned fixture, performed a controlled IL rewrite, and inspected the real receipt-backed StS2 managed metadata read-only.
-
-Step 17 / runtime `0.0.46 (46)` physically passed all four Compatibility Call-Site Analysis gates: receipt-backed ARM64/shared scope selection, concrete IL call-site scanning, native/platform interop classification, and a primary ARM64 `sts2.dll` dependency-pressure map. Step 17 remained read-only.
-
-**Current source candidate:** Step 18.4 — Real Assembly Rewrite Workspace explicit generated-output resolver correction.
-
-- App version: `0.0.51 (51)`
-- Codemagic workflow: `ios-step-18-4`
+- App version: `0.0.52 (52)`
+- Codemagic workflow: `ios-step-19`
 - Mono.Cecil runtime pin: `0.11.6`
-- Godot 4.5.1 Step 15 host: retained as a regression-protected foundation
-- Test model: ordered gates A–D; stop at first failure
+- Godot host pin: `4.5.1-stable`
+- Test model: one tightly related subsystem, ordered Gates A–D, stop at first failure
 
-Step 18 gates:
+Step 19 is the first behaviorally meaningful compatibility preparation. It does not guess that expression compilation is present: Gate B scans the freshly verified ARM64/shared managed payload and requires real direct `System.Linq.Expressions` `Compile` call sites before any rewrite is allowed.
 
-A. re-prove OfflineReady and clone the receipt-backed macOS arm64 + architecture-neutral managed scope into launcher-private Step 18 storage;
-B. Cecil-write/reopen the real copied primary ARM64 `sts2.dll` and compare its logical metadata fingerprint;
-C. insert one semantics-neutral IL NOP into a deterministic method of the copied primary assembly and verify it after reopen;
-D. re-hash every workspace source and corresponding original managed-install file, proving the live Step 12 install remained unchanged.
+Step 19 gates:
 
-**Step 18.4 does not apply a behaviorally significant compatibility fix and does not load or execute StS2 assemblies. Cecil writer-required resolution is restricted to the SHA-1-verified launcher-private Step 18 workspace; runtime/system/live-install/network fallback is forbidden.**
+A. prove a captured `System.Linq.Expressions` expression can execute through `Compile(preferInterpretation: true)` in the actual launcher process, then create a fresh receipt-backed ARM64/shared Step 19 source workspace;
+B. discover and classify real direct `LambdaExpression.Compile` / `Expression<TDelegate>.Compile` call sites, rejecting strong-named and structurally unsafe rewrite candidates;
+C. rewrite only safe unsigned parameterless/literal-false sites to explicitly prefer interpretation, then reopen with the proven closed-workspace resolver and validate metadata/instruction invariants;
+D. audit source, prepared output, and the original managed install so only the selected launcher-private prepared assemblies may differ.
+
+The parameterless rewrite is intentionally conservative around IL prefixes, branch/EH entry points, and crossing short branches. Literal `false` constants are mutated in place while preserving their original instruction encoding/size. Dynamic `Compile(bool)` arguments are left untouched rather than having runtime semantics guessed.
+
+**Still out of scope:** game assembly loading/execution, Harmony/MonoMod runtime detours, broad Reflection.Emit replacement, native FMOD/Spine integration, first-frame/main-menu execution, Cloud, and Workshop.
