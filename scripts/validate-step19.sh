@@ -26,6 +26,7 @@ required = [
     Path('scripts/verify-step19-ipa.sh'),
     Path('docs/STEP-19-DESIGN.md'),
     Path('docs/STEP-19-TEST.md'),
+    Path('docs/STEP-19.1-STRONG-NAME-IDENTITY-FIX.md'),
 ]
 for path in required:
     if not path.exists():
@@ -48,13 +49,13 @@ for path, expected in protected_hashes.items():
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.52' or str(plist.get('CFBundleVersion')) != '52':
-    raise SystemExit('ERROR: Step 19 must be version 0.0.52 (52).')
+if plist.get('CFBundleShortVersionString') != '0.0.53' or str(plist.get('CFBundleVersion')) != '53':
+    raise SystemExit('ERROR: Step 19 must be version 0.0.53 (53).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 for marker in (
-    '<ApplicationVersion>52</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.52</ApplicationDisplayVersion>',
+    '<ApplicationVersion>53</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.53</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -90,7 +91,13 @@ for marker in (
     'System.Linq.Expressions.LambdaExpression',
     'System.Linq.Expressions.Expression`1',
     'Dynamic/non-literal Compile(bool) sites left untouched',
-    'IsStrongNamed(module)',
+    'CaptureStrongNameState(module)',
+    'StrongNameSigned && !strongName.HasPublicKey',
+    'module.Attributes &= ~ModuleAttributes.StrongNameSigned',
+    'VerifyPreparedStrongNameState',
+    'Strong-name public key/token/full assembly identity preserved across every rewritten output: YES',
+    'strongNameSignedFlagsCleared != discovery.StrongNameSignedTargetAssemblies',
+    'Receipt-backed source strong-name state + prepared public keys/tokens/full identities/signature dispositions reverified: YES',
     'GetParameterlessInsertionHazard',
     'branch/exception-handler entry point',
     'crossing short branch would change displacement',
@@ -143,6 +150,9 @@ for forbidden in (
     'SteamResumableDepotDownloadAttempt',
     'module.Write(sourcePath',
     'module.Write(installPath',
+    'StrongNameKeyPair',
+    'StrongNameKeyBlob',
+    'StrongNameKeyContainer',
 ):
     if forbidden in core:
         raise SystemExit(f'ERROR: Step 19 gained forbidden runtime/network/live-install behavior: {forbidden}')
@@ -187,7 +197,11 @@ for marker in (
     'OpCodes.Ldc_I4_S, (sbyte)0',
     'OpCodes.Ldc_I4, 0',
     'Parameterless sites skipped for branch/EH/prefix safety: 2',
-    'Writable supported sites selected: 5',
+    'Eligible supported sites selected: 5',
+    'StrongNameIdentityTargetIsRewrittenWithPublicKeyIdentityPreservedAndSignedFlagCleared',
+    'Selected assemblies with StrongNameSigned set: 1',
+    'Modified assemblies with StrongNameSigned cleared in prepared copy: 1',
+    'Consumer strong-name reference no longer matches the preserved prepared target identity.',
     'Total real call sites rewritten: 5',
     'Original Step 12 install unchanged: YES',
 ):
@@ -196,17 +210,17 @@ for marker in (
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 for marker in (
-    'STEP 19 — EXPRESSION INTERPRETER COMPATIBILITY',
-    'Version 0.0.52',
+    'STEP 19.1 — EXPRESSION INTERPRETER COMPATIBILITY',
+    'Version 0.0.53',
     'Steps 01–18 are complete on the physical iPhone.',
-    'Step 19 — Expression Interpreter Compatibility (ordered gates A–D)',
+    'Step 19.1 — Expression Interpreter Compatibility (ordered gates A–D)',
     'Run Gates A–D — Interpreter Probe → Real Compile Targets → Rewrite → Isolation Audit',
     'RunExpressionInterpreterCompatibilityAsync',
     '_expressionInterpreterCompatibility.RunInterpreterCapabilityAndWorkspaceCloneAsync',
     '_expressionInterpreterCompatibility.RunRealCompileTargetDiscovery',
     '_expressionInterpreterCompatibility.RunPreferInterpretationRewrite',
     '_expressionInterpreterCompatibility.RunIsolationAuditAsync',
-    'PASS: STEP 19 EXPRESSION INTERPRETER COMPATIBILITY — 4/4',
+    'PASS: STEP 19.1 EXPRESSION INTERPRETER COMPATIBILITY — 4/4',
     'Step 18 remains closed/protected',
     'Run Foundation 5/5 Regression',
 ):
@@ -228,14 +242,14 @@ for marker in (
 
 verify = Path('scripts/verify-step19-ipa.sh').read_text()
 for marker in (
-    '0.0.52',
-    'BUILD_VERSION" == "52"',
+    '0.0.53',
+    'BUILD_VERSION" == "53"',
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-    'Expected device UI: STEP 19 — EXPRESSION INTERPRETER COMPATIBILITY',
+    'Expected device UI: STEP 19.1 — EXPRESSION INTERPRETER COMPATIBILITY',
 ):
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 19 IPA verification marker missing: {marker}')
@@ -265,8 +279,8 @@ for marker in (
 
 codemagic = Path('codemagic.yaml').read_text()
 for marker in (
-    'ios-step-19:',
-    'Step 19 - Expression Interpreter Compatibility',
+    'ios-step-19-1:',
+    'Step 19.1 - Strong-Name Identity Expression Compatibility',
     'max_build_duration: 120',
     '$HOME/.cache/sts2launcher/godot-step15',
     'bash scripts/codemagic-build-step19.sh',
@@ -286,11 +300,11 @@ for path in Path('.').rglob('*'):
     if name == 'sts2.dll' or 'slaythespire2.app/' in normalized or name.startswith('libfmod') or 'spine_godot' in name:
         raise SystemExit(f'ERROR: Step 19 source archive contains forbidden game/proprietary payload: {path}')
 
-print('Step 19 Expression Interpreter Compatibility source validation: PASS')
+print('Step 19.1 Expression Interpreter Compatibility source validation: PASS')
 print('  Steps 01-18 regression guards retained; critical Step 17/18 implementation hashes unchanged')
 print('  Gate A: captured-expression interpreter proof + fresh receipt-backed arm64/shared workspace')
-print('  Gate B: real direct LambdaExpression/Expression<TDelegate>.Compile call-site discovery with conservative safety classification')
-print('  Gate C: safe unsigned parameterless/literal-false sites -> preferInterpretation=true; explicit workspace-resolver reopen + structural proof')
+print('  Gate B: real direct Compile call-site discovery + strong-name identity/signature-state classification')
+print('  Gate C: structurally-safe sites -> preferInterpretation=true; modified strong-name copies preserve public-key identity and clear only StrongNameSigned')
 print('  Gate D: complete source/prepared/live-install SHA-1 isolation audit; only selected prepared assemblies may differ')
-print('  Dynamic Compile(bool), strong-named/control-flow-sensitive sites, game execution, Harmony/MonoMod, broad Reflection.Emit replacement, FMOD/Spine runtime integration, Cloud and Workshop remain out of scope')
+print('  Dynamic Compile(bool), malformed strong-name/control-flow-sensitive sites, game execution, Harmony/MonoMod, broad Reflection.Emit replacement, FMOD/Spine runtime integration, Cloud and Workshop remain out of scope')
 PY
