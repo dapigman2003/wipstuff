@@ -31,13 +31,13 @@ for path in required:
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.47' or str(plist.get('CFBundleVersion')) != '47':
-    raise SystemExit('ERROR: Step 18 must be version 0.0.47 (47).')
+if plist.get('CFBundleShortVersionString') != '0.0.48' or str(plist.get('CFBundleVersion')) != '48':
+    raise SystemExit('ERROR: Step 18 must be version 0.0.48 (48).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
 for marker in (
-    '<ApplicationVersion>47</ApplicationVersion>',
-    '<ApplicationDisplayVersion>0.0.47</ApplicationDisplayVersion>',
+    '<ApplicationVersion>48</ApplicationVersion>',
+    '<ApplicationDisplayVersion>0.0.48</ApplicationDisplayVersion>',
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -71,7 +71,11 @@ for marker in (
     'Original Step 12 install unchanged: YES',
     'ResolveChildPath(workspace.ManagedRoot, relative)',
     'ComputeSha1HexAsync(installPath, cancellationToken)',
-    'Assembly dependency resolution attempted: NO',
+    'WorkspaceOnlyAssemblyResolver',
+    'Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY',
+    'Fallback to runtime/system/live-install/network resolver paths: NO',
+    'Resolved dependency file SHA-1 rechecked immediately before Cecil open: YES',
+    '_trustedFileSha1.TryGetValue(candidate, out var expectedSha1)',
     'Game assembly loaded/executed: NO',
 ):
     if marker not in workspace:
@@ -79,7 +83,7 @@ for marker in (
 
 # The Step 18 class is local-file/Cecil only. Steam/network/runtime loading remains forbidden.
 for forbidden in (
-    '.Resolve(',
+    'DefaultAssemblyResolver',
     'Assembly.Load(',
     'Activator.CreateInstance(',
     'MethodInfo.Invoke',
@@ -124,6 +128,9 @@ for marker in (
     'data_sts2_macos_arm64/sts2.dll',
     'data_sts2_macos_x86_64/sts2.dll',
     'insert one IL NOP at method entry',
+    'WriteSyntheticAssemblyWithExternalEnumDefault',
+    'GodotSharp',
+    'Workspace-only dependency resolutions observed:',
     'Original Step 12 install unchanged: YES',
 ):
     if marker not in tests:
@@ -131,8 +138,8 @@ for marker in (
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
 for marker in (
-    'STEP 18 — REAL ASSEMBLY REWRITE WORKSPACE',
-    'Version 0.0.47',
+    'STEP 18.1 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Version 0.0.48',
     'Steps 01–17 are complete on the physical iPhone.',
     'Step 18 — Real Assembly Rewrite Workspace (ordered gates A–D)',
     'Run Gates A–D — Clone ARM64 → Real Roundtrip → Neutral NOP → Isolation Audit',
@@ -163,22 +170,22 @@ for marker in (
 
 verify = Path('scripts/verify-step18-ipa.sh').read_text()
 for marker in (
-    '0.0.47',
-    'BUILD_VERSION" == "47"',
+    '0.0.48',
+    'BUILD_VERSION" == "48"',
     'Step16Fixtures/StS2Launcher.Step16.Fixture.dll',
     'cmp -s "$FIXTURE_SOURCE" "$FIXTURE"',
     'Real StS2/proprietary payload in IPA: none',
     'DiskArbitration',
     'AudioUnit.framework',
-    'Expected device UI: STEP 18 — REAL ASSEMBLY REWRITE WORKSPACE',
+    'Expected device UI: STEP 18.1 — REAL ASSEMBLY REWRITE WORKSPACE',
 ):
     if marker not in verify:
         raise SystemExit(f'ERROR: Step 18 IPA verification marker missing: {marker}')
 
 codemagic = Path('codemagic.yaml').read_text()
 for marker in (
-    'ios-step-18:',
-    'Step 18 - Real Assembly Rewrite Workspace',
+    'ios-step-18-1:',
+    'Step 18.1 - Workspace-Only Dependency Resolution',
     'max_build_duration: 120',
     '$HOME/.cache/sts2launcher/godot-step15',
     'bash scripts/codemagic-build-step18.sh',
@@ -191,8 +198,8 @@ for marker in (
 print('Step 18 Real Assembly Rewrite Workspace source validation: PASS')
 print('  Steps 01-17 regression guards retained')
 print('  Gate A: receipt-backed macOS arm64/shared managed payload cloned into launcher-private workspace')
-print('  Gate B: real copied primary sts2.dll Cecil write/reopen')
+print('  Gate B: real copied primary sts2.dll Cecil write/reopen using strict workspace-only dependency resolution')
 print('  Gate C: semantics-neutral one-NOP IL rewrite on copied primary assembly only')
 print('  Gate D: complete workspace-source + original-install SHA-1 isolation audit')
-print('  No dependency resolution, behaviorally significant game rewrite, Assembly.Load/game execution, FMOD/Spine runtime integration, Cloud or Workshop added')
+print('  Cecil writer-required dependency resolution is allowed only inside the verified Step 18 workspace; no runtime/system/live-install/network fallback, Assembly.Load/game execution, FMOD/Spine runtime integration, Cloud or Workshop added')
 PY
