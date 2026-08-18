@@ -190,8 +190,10 @@ public sealed class RealAssemblyRewriteWorkspace
 
     public RealAssemblyRewriteGateResult RunPrimaryRoundTrip()
     {
+        var stage = "initialization";
         try
         {
+            stage = "workspace/source path setup";
             var workspace = RequireWorkspace();
             var sourcePath = ResolveChildPath(workspace.SourceRoot, workspace.PrimaryRelativePath);
             var roundTripRoot = Path.Combine(_workRoot, RoundTripRootName);
@@ -199,38 +201,56 @@ public sealed class RealAssemblyRewriteWorkspace
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
             DeleteIfExists(outputPath);
 
+            stage = "source receipt SHA-1 preflight";
             var sourceHashBefore = ComputeSha1Hex(sourcePath);
             var expectedHash = GetReceiptFile(workspace, workspace.PrimaryRelativePath).Sha1Hex;
             if (!sourceHashBefore.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Primary workspace source no longer matches its receipt SHA-1 before Cecil round-trip.");
 
             ModuleFingerprint before;
+            stage = "primary Cecil source read";
             using (var resolver = CreateWorkspaceResolver(workspace))
-            using (var module = ReadModuleImmediate(sourcePath, resolver))
+            using (var module = ReadModuleWithWorkspaceResolver(sourcePath, resolver, ReadingMode.Immediate))
             {
                 EnsureWorkspaceResolverBound(module, resolver);
+                stage = "primary metadata fingerprint";
                 before = Fingerprint(module);
+                stage = "primary Cecil writer";
                 module.Write(outputPath, new WriterParameters { WriteSymbols = false });
                 RecordWorkspaceResolutions(resolver);
             }
 
+            stage = "round-trip output existence check";
             if (!File.Exists(outputPath) || new FileInfo(outputPath).Length <= 0)
                 throw new InvalidDataException("Cecil returned without creating a non-empty real-assembly round-trip output.");
 
+            // Critical Step 18.4 correction: generated outputs must never be reopened through
+            // ModuleDefinition's lazy implicit resolver. Reopen them with a fresh instance
+            // of the same SHA-1-verified source-workspace resolver, and use Deferred reading so
+            // verification only materializes metadata actually needed by the gate.
             ModuleFingerprint after;
-            using (var reopened = ReadModuleImmediate(outputPath))
+            stage = "round-trip output Cecil reopen";
+            using (var verificationResolver = CreateWorkspaceResolver(workspace))
+            using (var reopened = ReadModuleWithWorkspaceResolver(outputPath, verificationResolver, ReadingMode.Deferred))
+            {
+                EnsureWorkspaceResolverBound(reopened, verificationResolver);
+                stage = "round-trip output metadata fingerprint";
                 after = Fingerprint(reopened);
+                RecordWorkspaceResolutions(verificationResolver);
+            }
 
+            stage = "round-trip fingerprint comparison";
             if (before != after)
                 throw new InvalidDataException($"Real-assembly round-trip metadata fingerprint changed. Before={before}; After={after}.");
 
+            stage = "source receipt SHA-1 postflight";
             var sourceHashAfter = ComputeSha1Hex(sourcePath);
             if (!sourceHashAfter.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Primary workspace source changed during Cecil round-trip.");
 
             return Pass(
                 RealAssemblyRewriteGate.PrimaryRoundTrip,
-                "Mono.Cecil wrote and reopened a REAL StS2 assembly copy using only the verified Step 18 workspace for any writer-required dependency resolution.\n" +
+                "Mono.Cecil wrote and reopened a REAL StS2 assembly copy using only the verified Step 18 workspace for any writer/reopen-required dependency resolution.\n" +
                 $"Source: {WorkRootName}/{SourceRootName}/{workspace.PrimaryRelativePath}\n" +
                 $"Output: {WorkRootName}/{RoundTripRootName}/{workspace.PrimaryRelativePath}\n" +
                 $"Assembly: {before.AssemblyName} {before.AssemblyVersion}\n" +
@@ -238,7 +258,9 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Types/methods: {before.TypeCount:N0}/{before.MethodCount:N0}\n" +
                 $"Assembly/module references: {before.AssemblyReferenceCount:N0}/{before.ModuleReferenceCount:N0}\n" +
                 "Logical metadata fingerprint preserved after write/reopen: YES\n" +
-                "Cecil assembly + metadata resolver explicitly bound to workspace identity catalog: YES\n" +
+                "Primary source read resolver explicitly bound to workspace identity catalog: YES\n" +
+                "Generated-output reopen resolver explicitly bound to workspace identity catalog: YES\n" +
+                "Generated-output verification uses deferred Cecil reading: YES\n" +
                 "Resolver policy: exact identity first; one unambiguous workspace version-only identity may be used when name/culture/token match: YES\n" +
                 "Workspace source receipt SHA-1 preserved: YES\n" +
                 $"Workspace-only dependency resolutions observed: {_workspaceResolvedAssemblies.Count:N0}" +
@@ -249,14 +271,16 @@ public sealed class RealAssemblyRewriteWorkspace
         }
         catch (Exception ex)
         {
-            return Fail(RealAssemblyRewriteGate.PrimaryRoundTrip, ex);
+            return Fail(RealAssemblyRewriteGate.PrimaryRoundTrip, stage, ex);
         }
     }
 
     public RealAssemblyRewriteGateResult RunNeutralIlRewrite()
     {
+        var stage = "initialization";
         try
         {
+            stage = "workspace/source path setup";
             var workspace = RequireWorkspace();
             var sourcePath = ResolveChildPath(workspace.SourceRoot, workspace.PrimaryRelativePath);
             var rewriteRoot = Path.Combine(_workRoot, RewrittenRootName);
@@ -264,6 +288,7 @@ public sealed class RealAssemblyRewriteWorkspace
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
             DeleteIfExists(outputPath);
 
+            stage = "source receipt SHA-1 preflight";
             var expectedHash = GetReceiptFile(workspace, workspace.PrimaryRelativePath).Sha1Hex;
             var sourceHashBefore = ComputeSha1Hex(sourcePath);
             if (!sourceHashBefore.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
@@ -274,10 +299,12 @@ public sealed class RealAssemblyRewriteWorkspace
             int originalInstructionCount;
             ModuleFingerprint sourceFingerprint;
 
+            stage = "primary Cecil source read";
             using (var resolver = CreateWorkspaceResolver(workspace))
-            using (var module = ReadModuleImmediate(sourcePath, resolver))
+            using (var module = ReadModuleWithWorkspaceResolver(sourcePath, resolver, ReadingMode.Immediate))
             {
                 EnsureWorkspaceResolverBound(module, resolver);
+                stage = "neutral rewrite method selection";
                 sourceFingerprint = Fingerprint(module);
                 var method = SelectNeutralRewriteMethod(module);
                 methodFullName = method.FullName;
@@ -285,22 +312,30 @@ public sealed class RealAssemblyRewriteWorkspace
                 if (originalInstructionCount <= 0)
                     throw new InvalidDataException("Selected neutral-rewrite method unexpectedly has no IL instructions.");
 
+                stage = "neutral NOP insertion";
                 var first = method.Body.Instructions[0];
                 originalFirstCode = first.OpCode.Code;
                 method.Body.GetILProcessor().InsertBefore(first, Instruction.Create(OpCodes.Nop));
+                stage = "rewritten Cecil writer";
                 module.Write(outputPath, new WriterParameters { WriteSymbols = false });
                 RecordWorkspaceResolutions(resolver);
             }
 
+            stage = "rewritten output existence check";
             if (!File.Exists(outputPath) || new FileInfo(outputPath).Length <= 0)
                 throw new InvalidDataException("Cecil returned without creating a non-empty neutral-rewrite output.");
 
-            using (var reopened = ReadModuleImmediate(outputPath))
+            stage = "rewritten output Cecil reopen";
+            using (var verificationResolver = CreateWorkspaceResolver(workspace))
+            using (var reopened = ReadModuleWithWorkspaceResolver(outputPath, verificationResolver, ReadingMode.Deferred))
             {
+                EnsureWorkspaceResolverBound(reopened, verificationResolver);
+                stage = "rewritten output metadata fingerprint";
                 var reopenedFingerprint = Fingerprint(reopened);
                 if (reopenedFingerprint != sourceFingerprint)
                     throw new InvalidDataException("Neutral rewrite unexpectedly changed the primary assembly logical metadata fingerprint.");
 
+                stage = "rewritten output NOP proof";
                 var method = FindMethodByFullName(reopened, methodFullName)
                     ?? throw new InvalidDataException($"Rewritten target method was not found after reopen: {methodFullName}");
                 if (!method.HasBody || method.Body.Instructions.Count != originalInstructionCount + 1)
@@ -309,12 +344,15 @@ public sealed class RealAssemblyRewriteWorkspace
                     throw new InvalidDataException("Rewritten method does not begin with the Step 18 semantics-neutral NOP marker.");
                 if (method.Body.Instructions[1].OpCode.Code != originalFirstCode)
                     throw new InvalidDataException("The original first IL opcode was not preserved immediately after the inserted NOP.");
+                RecordWorkspaceResolutions(verificationResolver);
             }
 
+            stage = "source receipt SHA-1 postflight";
             var sourceHashAfter = ComputeSha1Hex(sourcePath);
             if (!sourceHashAfter.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Primary workspace source changed during neutral rewrite.");
 
+            stage = "rewritten output byte-difference proof";
             var rewrittenHash = ComputeSha1Hex(outputPath);
             if (rewrittenHash.Equals(sourceHashBefore, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Neutral rewrite output is byte-identical to the source; expected the inserted NOP to produce a distinct copy.");
@@ -331,7 +369,9 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Output: {WorkRootName}/{RewrittenRootName}/{workspace.PrimaryRelativePath}\n" +
                 "Rewritten output differs from source bytes: YES\n" +
                 "Workspace source receipt SHA-1 preserved: YES\n" +
-                "Cecil assembly + metadata resolver explicitly bound to workspace identity catalog: YES\n" +
+                "Primary source read resolver explicitly bound to workspace identity catalog: YES\n" +
+                "Generated-output reopen resolver explicitly bound to workspace identity catalog: YES\n" +
+                "Generated-output verification uses deferred Cecil reading: YES\n" +
                 $"Workspace-only dependency resolutions observed across Gates B/C: {_workspaceResolvedAssemblies.Count:N0}\n" +
                 "Dependency resolver scope: SHA-1-verified Step 18 workspace ONLY\nResolved dependency file SHA-1 rechecked immediately before Cecil open: YES\n" +
                 "Behaviorally significant game fix attempted: NO\nGame assembly loaded/executed: NO\nReal managed install modified: NO");
@@ -339,7 +379,7 @@ public sealed class RealAssemblyRewriteWorkspace
         catch (Exception ex)
         {
             _rewrite = null;
-            return Fail(RealAssemblyRewriteGate.NeutralIlRewrite, ex);
+            return Fail(RealAssemblyRewriteGate.NeutralIlRewrite, stage, ex);
         }
     }
 
@@ -347,8 +387,10 @@ public sealed class RealAssemblyRewriteWorkspace
         IProgress<RealAssemblyRewriteProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
+        var stage = "initialization";
         try
         {
+            stage = "workspace/isolation snapshot setup";
             var workspace = RequireWorkspace();
             var rewrite = _rewrite ?? throw new InvalidOperationException("Gate C must pass before the Step 18 isolation audit.");
 
@@ -396,14 +438,21 @@ public sealed class RealAssemblyRewriteWorkspace
             if (!File.Exists(roundTripPath) || !File.Exists(rewrittenPath))
                 throw new InvalidDataException("Step 18 output directories are missing the expected primary round-trip/rewrite copies.");
 
-            using (var roundTripModule = ReadModuleImmediate(roundTripPath))
+            stage = "isolation audit round-trip Cecil reopen";
+            using (var roundTripResolver = CreateWorkspaceResolver(workspace))
+            using (var roundTripModule = ReadModuleWithWorkspaceResolver(roundTripPath, roundTripResolver, ReadingMode.Deferred))
             {
+                EnsureWorkspaceResolverBound(roundTripModule, roundTripResolver);
                 if (roundTripModule.Assembly?.Name?.Name is null)
                     throw new InvalidDataException("Round-trip output no longer opens as an assembly.");
+                RecordWorkspaceResolutions(roundTripResolver);
             }
 
-            using (var rewrittenModule = ReadModuleImmediate(rewrittenPath))
+            stage = "isolation audit rewritten Cecil reopen/NOP proof";
+            using (var rewrittenResolver = CreateWorkspaceResolver(workspace))
+            using (var rewrittenModule = ReadModuleWithWorkspaceResolver(rewrittenPath, rewrittenResolver, ReadingMode.Deferred))
             {
+                EnsureWorkspaceResolverBound(rewrittenModule, rewrittenResolver);
                 var method = FindMethodByFullName(rewrittenModule, rewrite.MethodFullName)
                     ?? throw new InvalidDataException("Neutral-rewrite target method is missing during final isolation audit.");
                 if (!method.HasBody || method.Body.Instructions.Count != rewrite.OriginalInstructionCount + 1 ||
@@ -412,6 +461,7 @@ public sealed class RealAssemblyRewriteWorkspace
                 {
                     throw new InvalidDataException("Neutral-rewrite proof did not survive final reopen/isolation audit.");
                 }
+                RecordWorkspaceResolutions(rewrittenResolver);
             }
 
             var finalRewriteHash = await ComputeSha1HexAsync(rewrittenPath, cancellationToken).ConfigureAwait(false);
@@ -431,8 +481,9 @@ public sealed class RealAssemblyRewriteWorkspace
                 $"Workspace source set exact: {actualRelativePaths.Count:N0}/{workspace.Files.Length:N0}\n" +
                 $"Workspace source receipt SHA-1s reverified: {workspace.Files.Length:N0}/{workspace.Files.Length:N0} ({sourceVerifiedBytes:N0} bytes)\n" +
                 $"Original managed-install receipt SHA-1s reverified: {workspace.Files.Length:N0}/{workspace.Files.Length:N0} ({installVerifiedBytes:N0} bytes)\n" +
-                "Primary Cecil round-trip output reopens: YES\n" +
-                $"Neutral NOP rewrite still present after reopen: YES ({rewrite.MethodFullName})\n" +
+                "Primary Cecil round-trip output reopens with explicit workspace resolver: YES\n" +
+                $"Neutral NOP rewrite still present after explicit-resolver reopen: YES ({rewrite.MethodFullName})\n" +
+                "Generated-output audit reopens use deferred Cecil reading: YES\n" +
                 "Only launcher-private Step18-RealAssemblyRewrite outputs were written: YES\n" +
                 "Original Step 12 install unchanged: YES\n" +
                 $"Workspace-only dependency assemblies resolved by Cecil: {_workspaceResolvedAssemblies.Count:N0}\n" +
@@ -447,7 +498,7 @@ public sealed class RealAssemblyRewriteWorkspace
         }
         catch (Exception ex)
         {
-            return Fail(RealAssemblyRewriteGate.IsolationAudit, ex);
+            return Fail(RealAssemblyRewriteGate.IsolationAudit, stage, ex);
         }
     }
 
@@ -505,13 +556,6 @@ public sealed class RealAssemblyRewriteWorkspace
             module.ModuleReferences.Count);
     }
 
-    private static ModuleDefinition ReadModuleImmediate(string path)
-        => ModuleDefinition.ReadModule(path, new ReaderParameters
-        {
-            ReadSymbols = false,
-            ReadingMode = ReadingMode.Immediate,
-        });
-
     private static void EnsureWorkspaceResolverBound(ModuleDefinition module, WorkspaceOnlyAssemblyResolver resolver)
     {
         if (!ReferenceEquals(module.AssemblyResolver, resolver))
@@ -523,17 +567,21 @@ public sealed class RealAssemblyRewriteWorkspace
         }
     }
 
-    private static ModuleDefinition ReadModuleImmediate(string path, IAssemblyResolver resolver)
+    private static ModuleDefinition ReadModuleWithWorkspaceResolver(
+        string path,
+        IAssemblyResolver resolver,
+        ReadingMode readingMode)
     {
-        // Bind BOTH resolver layers explicitly. Cecil's writer can call TypeReference.Resolve()
-        // while re-emitting metadata (for example enum-typed default values). That path uses
-        // ModuleDefinition.MetadataResolver, so make the workspace-only policy explicit instead
-        // of relying on lazy construction from AssemblyResolver.
+        // Bind BOTH resolver layers explicitly for every real-game source AND generated-output
+        // read. Cecil lazily creates an implicit default assembly resolver when ModuleDefinition has no
+        // assembly resolver. Step 18 must never permit that implicit escape hatch: even a pure
+        // verification reopen can materialize metadata that asks to resolve an external type.
         var metadataResolver = new MetadataResolver(resolver);
         return ModuleDefinition.ReadModule(path, new ReaderParameters
         {
             ReadSymbols = false,
-            ReadingMode = ReadingMode.Immediate,
+            ReadingMode = readingMode,
+            InMemory = true,
             AssemblyResolver = resolver,
             MetadataResolver = metadataResolver,
         });
@@ -669,7 +717,10 @@ public sealed class RealAssemblyRewriteWorkspace
             var reader = new ReaderParameters
             {
                 ReadSymbols = false,
-                ReadingMode = ReadingMode.Immediate,
+                // Dependencies are metadata inputs, not rewrite targets. Deferred reading avoids
+                // eagerly materializing unrelated custom-attribute/type metadata and therefore
+                // avoids manufacturing extra transitive resolver pressure during Gate B/C.
+                ReadingMode = ReadingMode.Deferred,
                 InMemory = true,
                 AssemblyResolver = this,
                 MetadataResolver = metadataResolver,
@@ -985,6 +1036,14 @@ public sealed class RealAssemblyRewriteWorkspace
 
     private static RealAssemblyRewriteGateResult Fail(RealAssemblyRewriteGate gate, Exception ex)
         => new(gate, false, $"{ex.GetType().Name}: {ex.Message}");
+
+    private static RealAssemblyRewriteGateResult Fail(RealAssemblyRewriteGate gate, string stage, Exception ex)
+    {
+        var detail = $"Stage: {stage}\n{ex.GetType().Name}: {ex.Message}";
+        if (ex.InnerException is not null)
+            detail += $"\nInner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
+        return new RealAssemblyRewriteGateResult(gate, false, detail);
+    }
 
     private sealed class CallbackProgress<T> : IProgress<T>
     {
