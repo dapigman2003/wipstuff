@@ -1,5 +1,8 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
+using System.Text;
 using System.Text.Json;
 
 namespace StS2Launcher.Core;
@@ -25,38 +28,53 @@ public sealed class HostFrameworkClosureFoundation
     public HostFrameworkClosureGateResult RunRootedHostAvailabilityProbe()
     {
         const string stage = "rooted host framework availability probe";
+        var reportPath = Path.Combine(_launcherDataRoot, "Step22.1-HostFrameworkAvailabilityDiagnostics.txt");
         try
         {
             EnsureNoStS2AssemblyLoaded();
-            var observations = new List<string>();
-            foreach (var spec in HostFrameworkClosureRootSet.ExpectedHostClosure)
-            {
-                var requested = new AssemblyName
-                {
-                    Name = spec.Name,
-                    Version = spec.MinimumVersion,
-                    CultureName = string.Empty,
-                };
-                requested.SetPublicKeyToken(Convert.FromHexString(spec.PublicKeyToken));
+            Directory.CreateDirectory(_launcherDataRoot);
 
-                var assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(requested);
-                var actual = assembly.GetName();
-                var actualName = actual.Name ?? string.Empty;
-                var actualVersion = actual.Version ?? new Version(0, 0, 0, 0);
-                var actualToken = TokenHex(actual.GetPublicKeyToken());
-                if (!actualName.Equals(spec.Name, StringComparison.OrdinalIgnoreCase))
-                    throw new FileLoadException($"Host returned '{actualName}' for requested framework root '{spec.Name}'.");
-                if (actualVersion.CompareTo(spec.MinimumVersion) < 0)
-                    throw new FileLoadException($"Host framework '{spec.Name}' is too old: required >= {spec.MinimumVersion}, actual {actualVersion}.");
-                if (!actualToken.Equals(spec.PublicKeyToken, StringComparison.OrdinalIgnoreCase))
-                    throw new FileLoadException($"Host framework '{spec.Name}' public-key-token mismatch: expected {spec.PublicKeyToken}, actual {actualToken}.");
-                observations.Add($"{spec.Name} -> {actualVersion}");
+            var initiallyLoaded = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly => assembly.GetName())
+                .Where(name => !string.IsNullOrWhiteSpace(name.Name))
+                .GroupBy(name => name.Name!, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.OrderByDescending(name => name.Version ?? new Version(0, 0, 0, 0)).First(),
+                    StringComparer.OrdinalIgnoreCase);
+
+            var observations = new List<HostProbeObservation>();
+            foreach (var spec in HostFrameworkClosureRootSet.ExpectedHostClosure)
+                observations.Add(ProbeHostFrameworkExact(spec, initiallyLoaded));
+
+            // Do not let diagnostic fallback loads influence any exact-identity result. Only after
+            // all 44 exact probes are finished do we ask whether each failed simple name is
+            // nevertheless loadable, which distinguishes absence from identity mismatch.
+            for (var i = 0; i < observations.Count; i++)
+            {
+                if (!observations[i].Passed)
+                    observations[i] = AddSimpleNameDiagnostic(observations[i]);
             }
+
             EnsureNoStS2AssemblyLoaded();
-            var sample = string.Join("\n", observations.Take(14).Select(item => "  " + item));
+            WriteHostAvailabilityReport(reportPath, observations, initiallyLoaded.Values);
+
+            var passed = observations.Count(item => item.Passed);
+            var failed = observations.Count - passed;
+            if (failed != 0)
+            {
+                var first = observations.First(item => !item.Passed);
+                throw new FileLoadException(
+                    $"Host framework closure incomplete: {passed}/{observations.Count} qualified, {failed} failed. " +
+                    $"First failure: {first.Spec.Name}: {first.FailureType}: {first.FailureMessage}. " +
+                    $"Complete report written to Files-visible Documents as '{Path.GetFileName(reportPath)}'.");
+            }
+
+            var sample = string.Join("\n", observations.Take(14).Select(item => $"  {item.Spec.Name} -> {item.ActualVersion}"));
             return Pass(HostFrameworkClosureGate.RootedHostAvailability,
-                $"Step 21.1 framework frontier host-loadable: {observations.Count:N0}/{HostFrameworkClosureRootSet.ExpectedHostClosure.Count:N0}\n" +
+                $"Step 21.1 framework frontier host-loadable: {passed:N0}/{HostFrameworkClosureRootSet.ExpectedHostClosure.Count:N0}\n" +
                 $"Direct TrimmerRootAssembly seeds compiled into Step 22: {HostFrameworkClosureRootSet.DirectTrimmerRoots.Count:N0}\n" +
+                $"Complete Gate A report: Files → On My iPhone → StS2 Launcher → StS2Launcher → {Path.GetFileName(reportPath)}\n" +
                 "Transitive framework closure is supplied by the iOS/.NET host, not copied macOS System.* images.\n" +
                 "Host binding sample:\n" + sample + "\n" +
                 "StS2 assembly loaded/executed: NO\nReal managed install modified: NO");
@@ -66,6 +84,169 @@ public sealed class HostFrameworkClosureFoundation
             return Fail(HostFrameworkClosureGate.RootedHostAvailability, stage, ex);
         }
     }
+
+    private static HostProbeObservation ProbeHostFrameworkExact(
+        HostFrameworkClosureSpec spec,
+        IReadOnlyDictionary<string, AssemblyName> initiallyLoaded)
+    {
+        var requested = new AssemblyName
+        {
+            Name = spec.Name,
+            Version = spec.MinimumVersion,
+            CultureName = string.Empty,
+        };
+        requested.SetPublicKeyToken(Convert.FromHexString(spec.PublicKeyToken));
+        var alreadyLoaded = initiallyLoaded.TryGetValue(spec.Name, out var initialIdentity);
+
+        try
+        {
+            var assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(requested);
+            var actual = assembly.GetName();
+            var actualName = actual.Name ?? string.Empty;
+            var actualVersion = actual.Version ?? new Version(0, 0, 0, 0);
+            var actualToken = TokenHex(actual.GetPublicKeyToken());
+            string? qualificationFailure = null;
+            if (!actualName.Equals(spec.Name, StringComparison.OrdinalIgnoreCase))
+                qualificationFailure = $"Host returned '{actualName}' for requested framework root '{spec.Name}'.";
+            else if (actualVersion.CompareTo(spec.MinimumVersion) < 0)
+                qualificationFailure = $"Host framework is too old: required >= {spec.MinimumVersion}, actual {actualVersion}.";
+            else if (!actualToken.Equals(spec.PublicKeyToken, StringComparison.OrdinalIgnoreCase))
+                qualificationFailure = $"Public-key-token mismatch: expected {spec.PublicKeyToken}, actual {actualToken}.";
+
+            return new HostProbeObservation(
+                spec,
+                qualificationFailure is null,
+                HostFrameworkClosureRootSet.DirectTrimmerRoots.Contains(spec.Name, StringComparer.OrdinalIgnoreCase),
+                alreadyLoaded,
+                initialIdentity?.FullName,
+                actual.FullName,
+                actualVersion,
+                actualToken,
+                qualificationFailure is null ? null : nameof(FileLoadException),
+                qualificationFailure,
+                null,
+                null);
+        }
+        catch (Exception ex)
+        {
+            return new HostProbeObservation(
+                spec,
+                false,
+                HostFrameworkClosureRootSet.DirectTrimmerRoots.Contains(spec.Name, StringComparer.OrdinalIgnoreCase),
+                alreadyLoaded,
+                initialIdentity?.FullName,
+                null,
+                null,
+                null,
+                ex.GetType().Name,
+                ex.Message,
+                null,
+                null);
+        }
+    }
+
+    private static HostProbeObservation AddSimpleNameDiagnostic(HostProbeObservation observation)
+    {
+        try
+        {
+            var simple = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(observation.Spec.Name));
+            return observation with { SimpleNameProbeIdentity = simple.GetName().FullName, SimpleNameProbeFailure = null };
+        }
+        catch (Exception ex)
+        {
+            return observation with { SimpleNameProbeIdentity = null, SimpleNameProbeFailure = $"{ex.GetType().Name}: {ex.Message}" };
+        }
+    }
+
+    private static void WriteHostAvailabilityReport(
+        string reportPath,
+        IReadOnlyList<HostProbeObservation> observations,
+        IEnumerable<AssemblyName> initiallyLoaded)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("StS2 Launcher — Step 22.1 Host Framework Availability Diagnostics");
+        sb.AppendLine("Report format: 1");
+        sb.AppendLine("Purpose: complete physical-iPhone Gate A probe of the Step 21.1 measured framework frontier.");
+        sb.AppendLine("Trust note: output only; this text file is never consumed as trusted runtime input.");
+        sb.AppendLine("Secret note: contains framework assembly metadata only; no Steam credentials/tokens or Apple signing secrets.");
+        sb.AppendLine();
+        sb.AppendLine("RUNTIME");
+        sb.AppendLine($"Generated UTC: {DateTimeOffset.UtcNow:O}");
+        sb.AppendLine($"Framework: {RuntimeInformation.FrameworkDescription}");
+        sb.AppendLine($"OS architecture: {RuntimeInformation.OSArchitecture}");
+        sb.AppendLine($"Process architecture: {RuntimeInformation.ProcessArchitecture}");
+        sb.AppendLine($"RuntimeFeature.IsDynamicCodeSupported: {RuntimeFeature.IsDynamicCodeSupported}");
+        sb.AppendLine($"RuntimeFeature.IsDynamicCodeCompiled: {RuntimeFeature.IsDynamicCodeCompiled}");
+        sb.AppendLine();
+        sb.AppendLine("SUMMARY");
+        sb.AppendLine($"Expected framework identities: {observations.Count}");
+        sb.AppendLine($"Direct TrimmerRootAssembly seeds: {HostFrameworkClosureRootSet.DirectTrimmerRoots.Count}");
+        sb.AppendLine($"Qualified: {observations.Count(item => item.Passed)}");
+        sb.AppendLine($"Failed: {observations.Count(item => !item.Passed)}");
+        sb.AppendLine($"Direct roots failed: {observations.Count(item => !item.Passed && item.DirectRoot)}");
+        sb.AppendLine($"Transitive-only expectations failed: {observations.Count(item => !item.Passed && !item.DirectRoot)}");
+        sb.AppendLine();
+
+        sb.AppendLine("FAILURES");
+        var failures = observations.Where(item => !item.Passed).ToArray();
+        if (failures.Length == 0)
+            sb.AppendLine("  none");
+        else
+        {
+            foreach (var item in failures)
+            {
+                sb.AppendLine($"- {item.Spec.Name}");
+                sb.AppendLine($"  requested: {item.Spec.Name}, Version>={item.Spec.MinimumVersion}, Culture=neutral, PublicKeyToken={item.Spec.PublicKeyToken}");
+                sb.AppendLine($"  direct trimmer root: {(item.DirectRoot ? "YES" : "NO")}");
+                sb.AppendLine($"  already loaded before Gate A: {(item.AlreadyLoaded ? "YES" : "NO")}");
+                if (!string.IsNullOrWhiteSpace(item.InitialIdentity)) sb.AppendLine($"  initial identity: {item.InitialIdentity}");
+                sb.AppendLine($"  exact-identity probe failure: {item.FailureType}: {item.FailureMessage}");
+                if (!string.IsNullOrWhiteSpace(item.SimpleNameProbeIdentity))
+                    sb.AppendLine($"  simple-name fallback probe: LOADABLE as {item.SimpleNameProbeIdentity}");
+                else
+                    sb.AppendLine($"  simple-name fallback probe: FAILED — {item.SimpleNameProbeFailure}");
+            }
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("COMPLETE PROBE RESULTS");
+        for (var i = 0; i < observations.Count; i++)
+        {
+            var item = observations[i];
+            sb.AppendLine($"{i + 1:000}. {(item.Passed ? "PASS" : "FAIL")} {item.Spec.Name}");
+            sb.AppendLine($"     requested minimum version: {item.Spec.MinimumVersion}");
+            sb.AppendLine($"     requested token: {item.Spec.PublicKeyToken}");
+            sb.AppendLine($"     direct trimmer root: {(item.DirectRoot ? "YES" : "NO")}");
+            sb.AppendLine($"     loaded before probe: {(item.AlreadyLoaded ? "YES" : "NO")}");
+            if (!string.IsNullOrWhiteSpace(item.ActualIdentity)) sb.AppendLine($"     actual: {item.ActualIdentity}");
+            if (!item.Passed) sb.AppendLine($"     failure: {item.FailureType}: {item.FailureMessage}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("INITIAL DEFAULT-CONTEXT ASSEMBLIES (framework-shaped only)");
+        foreach (var name in initiallyLoaded
+                     .Where(name => !string.IsNullOrWhiteSpace(name.Name) && IsHostFrameworkShape(name.Name!))
+                     .OrderBy(name => name.Name, StringComparer.OrdinalIgnoreCase))
+            sb.AppendLine("  " + name.FullName);
+
+        sb.AppendLine();
+        sb.AppendLine("END OF STEP 22.1 HOST FRAMEWORK AVAILABILITY DIAGNOSTICS");
+        File.WriteAllText(reportPath, sb.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+    }
+
+    private sealed record HostProbeObservation(
+        HostFrameworkClosureSpec Spec,
+        bool Passed,
+        bool DirectRoot,
+        bool AlreadyLoaded,
+        string? InitialIdentity,
+        string? ActualIdentity,
+        Version? ActualVersion,
+        string? ActualToken,
+        string? FailureType,
+        string? FailureMessage,
+        string? SimpleNameProbeIdentity,
+        string? SimpleNameProbeFailure);
 
     public async Task<HostFrameworkClosureGateResult> RunBindingClosureRecomputeAsync(
         IProgress<RuntimeFrameworkBindingProgress>? progress = null,
