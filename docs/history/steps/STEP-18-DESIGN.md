@@ -1,0 +1,99 @@
+# Step 18 — Real Assembly Rewrite Workspace
+
+## Boundary
+
+Step 18 is the first boundary that allows Mono.Cecil to **write a real StS2 managed assembly**, but only after that assembly has been copied out of the receipt-backed Step 12 installation into launcher-private scratch storage.
+
+It does **not** apply a real compatibility fix yet.
+
+## Ordered gates
+
+### Gate A — WorkspaceClone
+
+1. Re-prove Step 13 `OfflineReady`.
+2. Read the trusted Step 12 install receipt.
+3. Select the same iOS-relevant managed scope proven by Step 17: `data_sts2_macos_arm64` plus any architecture-neutral managed candidates, excluding `data_sts2_macos_x86_64` duplicates.
+4. Recreate `Documents/StS2Launcher/Step18-RealAssemblyRewrite/source` from scratch.
+5. Copy each selected file and SHA-1 verify the copy against the trusted receipt.
+
+### Gate B — PrimaryRoundTrip
+
+Open the launcher-private copy of the primary ARM64 `sts2.dll` with Cecil, write it to the `roundtrip` output tree, reopen it, and compare a logical metadata fingerprint (assembly/version/runtime/type/method/reference counts).
+
+Cecil writer-required dependency resolution is allowed only through a strict resolver rooted in the SHA-1-verified Step 18 workspace. CLR loading and fallback to runtime/system/live-install/network paths remain forbidden.
+
+### Gate C — NeutralIlRewrite
+
+Select one deterministic real method body in the copied ARM64 `sts2.dll` and insert exactly one `nop` before its original first instruction. Write to the separate `rewritten` output tree and reopen it.
+
+Required proof:
+
+- first instruction is the inserted NOP;
+- original first opcode immediately follows it;
+- instruction count increased by exactly one;
+- source copy still matches receipt SHA-1;
+- rewritten output differs byte-for-byte from the source.
+
+The NOP is deliberately semantics-neutral. This proves the real rewrite machinery without claiming any iOS compatibility issue has been fixed.
+
+### Gate D — IsolationAudit
+
+Re-hash every selected source copy and every corresponding original Step 12 managed-install file against the receipt. Reopen both generated outputs and re-prove the NOP transformation.
+
+The gate passes only if the original managed installation remains receipt-identical.
+
+## Non-goals
+
+Step 18 does not:
+
+- rewrite the live managed install;
+- fix Harmony/Reflection.Emit/PInvoke/GodotSharp/Steamworks behavior;
+- resolve dependencies from outside the SHA-1-verified Step 18 workspace;
+- load StS2 assemblies into the CLR;
+- execute StS2;
+- integrate FMOD/Spine;
+- add Cloud or Workshop.
+
+## Step 18.1 physical-device correction
+
+The initial Step 18 device run passed Gate A but Gate B failed while Cecil emitted metadata for the real `sts2.dll`:
+
+```text
+AssemblyResolutionException: Failed to resolve assembly: GodotSharp, Version=4.5.10...
+```
+
+This did not mean the game assembly was missing or corrupt. Cecil can require referenced type metadata while writing an otherwise unchanged module (for example enum-typed constants/default parameters). Step 18.1 therefore supplies an `IAssemblyResolver` that is intentionally restricted to the already receipt-verified `Step18-RealAssemblyRewrite/source` tree. The resolver never searches the live install, the launcher runtime, trusted platform assemblies/GAC, network locations, or arbitrary filesystem paths.
+
+## Step 18.2 physical-device correction
+
+Step 18.1 still failed Gate B on the real iPhone with `AssemblyResolutionException` for `GodotSharp`. The first custom resolver was workspace-confined, but it still guessed dependency filenames from the requested assembly simple name (`GodotSharp` => `GodotSharp.dll`). Step 18.2 removes that filename convention entirely.
+
+The resolver now catalogs the actual `AssemblyNameDefinition` identity stored in each SHA-1-verified workspace managed file, matches the requested `AssemblyNameReference` by metadata identity, and explicitly binds both Cecil `AssemblyResolver` and `MetadataResolver` to that catalog. The selected dependency is SHA-1 rechecked immediately before every metadata probe/open. Non-managed `.dll/.exe` filename candidates are ignored by the identity catalog rather than treated as dependencies.
+
+The regression fixture deliberately stores the synthetic `GodotSharp` assembly under a nonmatching filename so a return to filename-derived resolution cannot pass host tests.
+
+
+## Step 18.3 physical-device correction
+
+Step 18.2 physically advanced Gate B beyond the prior `GodotSharp` failure. The next deterministic iPhone error requested `System.Runtime, Version=8.0.0.0, PublicKeyToken=b03f5f7f11d50a3a`, while the verified workspace identity catalog contained `System.Runtime, Version=9.0.0.0` with the same name, culture, and token.
+
+The Step 18.2 resolver was therefore stricter than Cecil's ordinary same-directory resolver semantics: it required an exact version even though Cecil normally opens the located same-name assembly and uses it as metadata input. Step 18.3 preserves the closed workspace trust boundary while allowing version-only unification when there is exactly one same-name/culture/token candidate identity. Exact matches still win; multiple version-distinct identities and byte-distinct duplicates still fail rather than being guessed. The selected file is SHA-1 rechecked immediately before opening, and its opened identity must still match the catalog entry.
+
+This is metadata-only writer support. It does not rewrite the original `AssemblyRef`, create a runtime binding redirect, load a system assembly from the app runtime, or execute StS2.
+
+
+## Step 18.4 physical-device correction
+
+The Step 18.3 / 0.0.50 physical run passed Gate A and again failed Gate B with a plain Cecil `AssemblyResolutionException` for `GodotSharp`. This looked like a regression until the Gate B implementation was audited by stage. The source module was opened and written with the strict workspace resolver, but the generated `roundtrip` output was then reopened through a helper that supplied only `ReadingMode.Immediate`. That let Cecil lazily create its implicit default assembly resolver. Gate C's generated rewrite verification and Gate D's two final audit reopens had the same escape hatch.
+
+Step 18.4 makes the resolver boundary symmetric across the subsystem:
+
+- every real StS2 source read explicitly binds both `AssemblyResolver` and `MetadataResolver`;
+- every generated round-trip/rewritten/audit reopen does the same;
+- generated-output verification uses `ReadingMode.Deferred` so only metadata needed by the gate is materialized;
+- workspace dependency modules are also opened deferred to avoid unnecessary eager transitive metadata pressure;
+- the existing SHA-1 identity catalog and exact-first / unambiguous-version-only policy are retained;
+- no generated output becomes a new trusted dependency source: dependency lookup remains rooted only in receipt-verified `Step18-RealAssemblyRewrite/source`;
+- Gate B/C/D failures include an exact `Stage:` label so writer failures cannot be confused with verification-reopen failures.
+
+This correction does not add a platform/runtime resolver, CLR load, system assembly fallback, or behavioral StS2 patch. It closes an accidental Cecil verification path that escaped the Step 18 trust model.
