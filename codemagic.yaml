@@ -1,6 +1,6 @@
 workflows:
-  ios-step-22-4-2:
-    name: Step 22.4.2 - Canonical Foundation Regression Correction
+  ios-step-23:
+    name: Step 23 - First Real StS2 CLR Load Boundary
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -16,14 +16,14 @@ workflows:
         - $HOME/.cache/sts2launcher/godot-step15
 
     scripts:
-      - name: Validate, test, build, and verify Step 22.4.2
+      - name: Validate, test, build, and verify Step 23
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-22.4.2.ipa
+      - artifacts/StS2-Launcher-Step-23.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**

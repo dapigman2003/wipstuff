@@ -27,3 +27,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `STEP-22.4.1-MSTEST-V4-CODEMAGIC-FIX.md`
 
 - `STEP-22.4.2-STEP19-REGRESSION-CONTRACT-CORRECTION.md`
+
+## First real managed-game load
+
+- `STEP-23-FIRST-REAL-CLR-LOAD.md`
+- `STEP-23-TEST.md`

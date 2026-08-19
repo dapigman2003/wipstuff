@@ -1,51 +1,40 @@
-# Release Checklist — Canonical Foundation
+# Release Checklist — Step 23
 
-## Source structure
+## Source/package
 
-- Live iOS project is exactly `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`.
-- No live `src/StS2Launcher.Step05.iOS` directory exists.
-- Active scripts do not reference `history.zip` or legacy Step05 project paths.
-- Historical step docs remain readable under `docs/history/steps/`.
-- `history.zip`, if present, is reference-only and not required by validation/build.
+- canonical live iOS project is `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`;
+- no live legacy `StS2Launcher.Step05.iOS` path;
+- `history.zip` is optional/inert and not needed by validation or build;
+- no game payload, Steam reusable secrets, Apple signing secrets, or proprietary native game binaries in source/archive;
+- Step 22.4.2 protected behavior remains intact;
+- Step 23 adds only the explicit first-real-load subsystem, host tests, UI/reporting, and current docs/tooling updates.
 
-## Runtime policy
+## Static/host build
 
-- `TrimMode=full`.
-- `MtouchInterpreter=-all`.
-- `UseInterpreter=true` rejected.
-- NativeAOT/`PublishAot=true` rejected.
-- SteamKit/protobuf trimmer roots retained.
-- exact 22 measured Step 22 direct framework roots retained.
-- DiskArbitration removal retained.
-- Godot 4.5.1 native bridge/link policy retained.
+- `bash scripts/validate.sh` passes;
+- `bash scripts/test.sh` passes;
+- Godot build/preflight passes on Codemagic/macOS;
+- iOS publish succeeds with `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
+- IPA verification passes;
+- expected version is 0.0.65 (65);
+- workflow is `ios-step-23`.
 
-## Security/content
+## Device
 
-- no StS2 game payload in source/IPA;
-- no Steam credentials/tokens/Guard secrets in source;
-- no Apple signing credentials/private keys in source;
-- no proprietary FMOD/Spine payloads;
-- dynamic test fixtures remain project-owned post-publish test data, not app/AOT project references.
+- header `STEP 23 — FIRST REAL STS2 CLR LOAD BOUNDARY`;
+- start from a fresh process;
+- Step 23 Gate A requires zero module initializers and zero binding blockers;
+- Gate B first real `sts2.dll` CLR load passes;
+- Gate C planned managed dependency closure resolves with zero rejected/unplanned and zero native requests;
+- Gate D load isolation/byte/OfflineReady audit passes;
+- Step 23 = 4/4;
+- `Reports/Step23-FirstRealGameLoad.txt` exists;
+- OfflineReady = PASS;
+- Foundation 5/5 = PASS.
 
-## Build acceptance
+## Stop conditions
 
-- static validation PASS;
-- host unit tests PASS;
-- Godot build/native preflight PASS;
-- iOS publish PASS;
-- runtime-policy telemetry reports `MtouchInterpreter=-all` and no broad interpreter/NativeAOT;
-- final IPA verification PASS;
-- expected version is 0.0.64 (64).
-- current Step 19 regression does not require `IsDynamicCodeSupported=false`; on iOS it requires successful expression execution and `IsDynamicCodeCompiled=false`.
-- static validation rejects the stale pre-Step-20 Step 19 assertion.
-
-## Physical acceptance
-
-- header `STEP 22.4.2 — CANONICAL FOUNDATION`;
-- Step 19 A–D 4/4 under the current post-Step-20 non-JIT contract;
-- Step 22 A–D 4/4;
-- blockers 0;
-- runtime closure ready YES;
-- OfflineReady PASS;
-- Foundation 5/5 PASS;
-- text reports present in Files.
+- If Gate A reports any module initializer, stop before loading and send the report.
+- If Gate B fails, do not continue to dependency probes; send the report and force-quit before retrying.
+- If Gate C produces an unplanned managed request or native request, stop; do not broaden resolver/native search paths speculatively.
+- If any gate after B fails, force-quit before rerunning Step 21/22 pre-load regressions.

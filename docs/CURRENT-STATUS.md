@@ -1,68 +1,103 @@
-# Current Status — Step 22.4.2 Canonical Foundation Regression Correction
+# Current Status — Step 23 First Real StS2 CLR Load Boundary
 
 ## Physically closed boundary
 
-**Steps 01–22 are closed on a physical iPhone.** The authoritative runtime/framework-binding closure remains Step 22.2:
+**Steps 01–22 are closed on a physical iPhone, and Step 22.4.2 is the accepted canonical foundation baseline.**
 
-- Step 22 A–D: 4/4;
-- 22/22 required host-binding roots qualified;
-- explicit binding blockers: 0;
+The final Step 22.4.2 acceptance was completely green:
+
+- canonical Codemagic build/test/package path succeeded;
+- Step 19 A–D: PASS after the post-Step-20 regression-contract correction;
+- Step 22 A–D: PASS;
+- explicit runtime-binding blockers: 0;
 - runtime closure ready for first real CLR load: YES;
 - OfflineReady regression: PASS;
-- Foundation 5/5 regression: PASS.
+- Foundation 5/5 regression: PASS;
+- all other current user-run tests passed;
+- current long diagnostics are available as Files-visible text reports.
 
-The wider 44-name diagnostic still contains 18 transitive-only desktop/workspace implementation names that are not independent private-runtime requirements.
+This establishes version **0.0.64 (64)** as the protected pre-game-load foundation.
 
-## Canonical-foundation acceptance history
+## Active candidate — Step 23
 
-Step 22.4 established the canonical source/document/history architecture and passed Codemagic static validation 122/122. Codemagic then stopped compiling one additive report-writer unit test because the installed MSTest 4.x API uses `Assert.ThrowsExactlyAsync` rather than the removed `ThrowsExceptionAsync` API.
+Step 23 crosses exactly one new runtime boundary: the first real CLR load of the receipt-backed prepared `sts2.dll`.
 
-Step 22.4.1 corrected that host-test API mismatch. Codemagic built and the resulting physical iPhone regression run was healthy except for **Step 19 Gate A**. Every other test run by the user passed.
-
-The Step 19 failure was traced to a stale historical assertion, not a launcher/runtime regression. Step 19 was originally physically proven before Step 20 enabled the Mono interpreter, when the iPhone reported:
-
-- `RuntimeFeature.IsDynamicCodeSupported = false`
-- `RuntimeFeature.IsDynamicCodeCompiled = false`
-
-Step 20 intentionally established the canonical `MtouchInterpreter=-all` runtime. Later physical diagnostics report:
-
-- `RuntimeFeature.IsDynamicCodeSupported = true`
-- `RuntimeFeature.IsDynamicCodeCompiled = false`
-
-The old Step 19 regression incorrectly required both values to stay false forever, even though Step 20 deliberately changed the first value.
-
-## Active candidate — Step 22.4.2
-
-Step 22.4.2 corrects the **current regression contract** while preserving the historical Step 19 documentation.
-
-- Version: **0.0.64 (64)**
-- Codemagic workflow: **`ios-step-22-4-2`**
+- Version: **0.0.65 (65)**
+- Codemagic workflow: **`ios-step-23`**
 - Live iOS project: **`src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`**
-- Real StS2 CLR load/execution: **still intentionally not attempted**
+- Trusted game source: existing Step 12 receipt-backed managed install
+- Execution input: existing Step 21/22 zero-blocker prepared runtime + persisted binding plan
+- Game entry point/method invocation: **out of scope**
+- Godot/game initialization: **out of scope**
+- Native game-library resolution: **explicitly refused/out of scope**
 
-Current Step 19 Gate A now requires:
+### Gate A — PreparedLoadPreflight
 
-1. `Compile()` returns and executes to `42`;
-2. `Compile(preferInterpretation: false)` returns and executes to `42`;
-3. `Compile(preferInterpretation: true)` returns and executes to `42`;
-4. on iOS, `RuntimeFeature.IsDynamicCodeCompiled == false`;
-5. `RuntimeFeature.IsDynamicCodeSupported` is recorded diagnostically and may be either `false` (historical pre-Step-20 mode) or `true` (canonical interpreter-enabled Step-20+ mode).
+Before any real game CLR load:
 
-A new pure `ExpressionRuntimeCompatibilityPolicy` makes this distinction explicit and unit-testable. Static validation rejects reintroduction of the obsolete `IsDynamicCodeSupported == false` current-runtime assertion.
+1. re-prove exact OfflineReady;
+2. require the persisted Step 21/22 plan to match the current depot/manifest/branch;
+3. require `RuntimeClosureReady=true`, zero blockers, and no blocker edges;
+4. require exactly one primary `sts2` assembly;
+5. require the complete prepared file set to match the plan exactly;
+6. SHA-1/length reverify every prepared assembly and corresponding trusted live-install file;
+7. require every prepared private assembly to be IL-only and identity-identical to the plan;
+8. require the persisted plan edges to exactly cover every prepared assembly's Cecil `AssemblyRef` metadata;
+9. require no framework-shaped `System.*`/`netstandard` assembly in the private set;
+10. inspect module/PInvoke metadata with Cecil;
+11. **reject the load if any prepared private assembly has `<Module>..cctor`**, because the load-only step must not silently cross a module-initialization boundary;
+12. require no prepared private/game assembly already loaded in the process;
+13. preserve the canonical iOS `RuntimeFeature.IsDynamicCodeCompiled=false` contract.
 
-No Steam/install/Godot/runtime-binding behavior changed. The only physically proven Step 22.2 Core behavior file intentionally modified is `ExpressionInterpreterCompatibility.cs`, and that delta is separately hash-pinned; the other 96 baseline Core behavior files remain byte-for-byte protected.
+### Gate B — PrimaryAssemblyLoad
 
-## Acceptance required before Step 23
+- SHA-1 recheck the prepared primary immediately before load;
+- create one dedicated private `AssemblyLoadContext`;
+- call `LoadFromStream` on the real prepared `sts2.dll`;
+- require exact assembly identity;
+- require the assembly to belong to the dedicated Step 23 context;
+- do not inspect game types/members, entry point, custom attributes, or invoke any game method;
+- do not intentionally resolve native libraries.
+
+### Gate C — PlannedDependencyResolution
+
+For every unique dependency identity in the persisted zero-blocker plan:
+
+- `HostFramework` must resolve from `AssemblyLoadContext.Default` to the exact planned actual host identity;
+- `WorkspaceExact` / `WorkspaceVersionUnified` must resolve from the exact receipt-hashed prepared set in the Step 23 private context;
+- unplanned non-framework fallback is rejected;
+- no downloaded desktop framework implementation fallback is permitted;
+- the final private context assembly set must equal the prepared plan exactly;
+- any unmanaged-library resolution attempt fails the gate.
+
+### Gate D — LoadIsolationAudit
+
+After the real managed load:
+
+- re-hash the persisted plan;
+- re-hash every prepared and live-install assembly;
+- re-prove OfflineReady;
+- require exactly one real `sts2` assembly and require it to remain in the dedicated context;
+- require exact private-context membership;
+- require zero native load attempts and zero rejected/unplanned managed requests;
+- record explicitly that no game entry point, game member reflection, method invocation, Godot initialization, or native game load was requested.
+
+The loaded Step 23 game context is intentionally process-resident in production. Force-quit before rerunning Step 21/22 gates that require no real game assembly in the CLR.
+
+## Acceptance required for Step 23 closure
 
 Codemagic must pass static validation, host unit tests, Godot/native build/preflight, iOS publish, and IPA verification.
 
-On device:
+On device, from a fresh process:
 
-1. confirm `STEP 22.4.2 — CANONICAL FOUNDATION`, version `0.0.64`;
-2. run Step 19 A–D and require 4/4; on the canonical runtime expect `IsDynamicCodeSupported=true` and `IsDynamicCodeCompiled=false` unless the runtime implementation changes while still satisfying the non-JIT contract;
-3. run Step 22 A–D and require 4/4, explicit binding blockers 0, runtime closure ready YES;
-4. run `Verify Offline-Ready Install (Local Only)` and require PASS;
-5. run Foundation 5/5 and require PASS;
-6. confirm the corresponding `.txt` reports are created in Files.
+1. confirm `STEP 23 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.65`;
+2. run Step 23 A–D and stop at the first failure;
+3. require Gate A module initializers = 0;
+4. require Gate B first real `sts2.dll` CLR load = PASS;
+5. require Gate C complete planned managed closure resolution = PASS with zero native attempts;
+6. require Gate D = PASS and Step 23 summary 4/4;
+7. run OfflineReady and require PASS;
+8. run Foundation 5/5 and require PASS;
+9. share `Reports/Step23-FirstRealGameLoad.txt` on any failure or unexpected diagnostic.
 
-Only after this completely green canonical-foundation acceptance should Step 23 begin.
+Only after this is green should controlled type/member access or broader managed initialization begin.

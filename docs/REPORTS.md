@@ -14,6 +14,12 @@ and are visible through:
 
 Specialized full diagnostics may use stable files directly under `Documents/StS2Launcher/`, for example the runtime-binding or framework-frontier reports.
 
+The current Step 23 first-load report is:
+
+`Documents/StS2Launcher/Reports/Step23-FirstRealGameLoad.txt`
+
+It contains the ordered A–D result, preflight module-initializer/PInvoke counts, real primary load identity/context, planned host/private binding counts, native-resolution count, byte/OfflineReady audit, and the explicit no-entry-point/no-member-invocation boundary.
+
 A current verification overwrites its deterministic latest report. Reports are output-only and are never treated as trusted runtime input.
 
 ## Build/host reports

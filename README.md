@@ -1,10 +1,10 @@
-# StS2 Launcher iOS — Canonical Foundation
+# StS2 Launcher iOS — Step 23 First Real StS2 CLR Load Boundary
 
 Experimental unofficial iOS launcher/compatibility host for **Slay the Spire 2** for legitimate owners. The repository does not include game payloads, Steam secrets, Apple signing secrets, or proprietary FMOD/Spine payloads.
 
 ## Current boundary
 
-Steps 01–22 are physically closed on iPhone. Step 22.4.2 is the final canonical-foundation regression-correction candidate before the first controlled real `sts2.dll` CLR load. It preserves the Step 22 runtime boundary and corrects the stale pre-Step-20 Step 19 dynamic-code assertion.
+Steps 01–22 and the Step 22.4.2 canonical foundation are physically closed on iPhone. Step 23 crosses the first real managed-game boundary: load the receipt-verified prepared `sts2.dll` into a dedicated private `AssemblyLoadContext`, resolve the already-audited zero-blocker managed dependency plan, and stop before game entry-point/member invocation, Godot/game initialization, or native game-library resolution.
 
 Read **`docs/MASTER-PLAN.md` first** for architecture, roadmap, safety rules, and the resumption protocol. `docs/CURRENT-STATUS.md` contains the current physical/candidate state.
 
@@ -12,7 +12,7 @@ Read **`docs/MASTER-PLAN.md` first** for architecture, roadmap, safety rules, an
 
 Codemagic workflow:
 
-`ios-step-22-4-2`
+`ios-step-23`
 
 Authoritative pipeline entry point:
 

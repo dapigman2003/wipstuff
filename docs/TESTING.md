@@ -1,4 +1,4 @@
-# Testing — Canonical Foundation
+# Testing — Step 23 First Real StS2 CLR Load Boundary
 
 ## Current principle
 
@@ -28,6 +28,8 @@ Output:
 
 Detailed test results remain under `artifacts/test-results/`.
 
+Step 23 host tests use synthetic project-owned IL and a collectible load context so the test process can return to a clean state. The production Step 23 context is intentionally non-collectible/process-resident.
+
 ## Godot native preflight
 
 On macOS/Xcode:
@@ -51,12 +53,12 @@ bash scripts/build-ios.sh
 
 Expected IPA:
 
-`artifacts/StS2-Launcher-Step-22.4.2.ipa`
+`artifacts/StS2-Launcher-Step-23.ipa`
 
 ## IPA verification
 
 ```sh
-bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-22.4.2.ipa
+bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-23.ipa
 ```
 
 Output:
@@ -67,7 +69,7 @@ Output:
 
 Workflow:
 
-`ios-step-22-4-2`
+`ios-step-23`
 
 Authoritative entry point:
 
@@ -75,26 +77,40 @@ Authoritative entry point:
 bash scripts/codemagic.sh
 ```
 
-The pipeline runs static validation, host tests, iOS workload setup, Godot build/preflight, iOS publish, and final IPA verification.
+The pipeline runs static validation, host tests, iOS workload setup, Godot build/preflight, iOS publish, and final IPA verification. Build/CI never contains or loads the proprietary game payload; the Step 23 real load occurs only from the user's receipt-backed on-device install.
 
-## Physical acceptance for Step 22.4.2
+## Physical acceptance for Step 23
 
-Install version `0.0.64` and require:
+Install version `0.0.65` and start from a fresh process. Do not start the Step 15 Godot host first.
 
-1. Step 19 A–D = 4/4;
-   - `Compile()` = 42;
-   - `Compile(false)` = 42;
-   - `Compile(true)` = 42;
-   - on iOS, `RuntimeFeature.IsDynamicCodeCompiled=false`;
-   - `RuntimeFeature.IsDynamicCodeSupported` is diagnostic and may be true in the canonical Step-20+ interpreter-enabled runtime;
-2. Step 22 A–D = 4/4;
-3. explicit binding blockers = 0;
-4. runtime closure ready for first real CLR load = YES;
-5. OfflineReady = PASS;
-6. Foundation 5/5 = PASS.
+Run Step 23 A–D and require:
 
-Confirm the corresponding reports exist in Files under `On My iPhone → StS2 Launcher → StS2Launcher`.
+1. Gate A = PASS;
+   - OfflineReady exact-tree = YES;
+   - runtime closure ready = YES;
+   - explicit blockers = 0;
+   - module initializers = 0;
+   - prepared/live SHA-1s match;
+   - persisted plan exactly covers prepared AssemblyRef metadata;
+   - no prepared private/game assembly was already loaded;
+2. Gate B = PASS;
+   - first real `sts2.dll` CLR load succeeds;
+   - exact `sts2` identity and dedicated `StS2Launcher-Step23-Game` context;
+   - no entry-point/member/method invocation;
+   - no native resolution;
+3. Gate C = PASS;
+   - all unique planned managed identities resolve;
+   - host framework requirements resolve from `AssemblyLoadContext.Default`;
+   - private requirements resolve only from the exact prepared set;
+   - rejected/unplanned requests = 0;
+   - native load attempts = 0;
+4. Gate D = PASS;
+   - plan/prepared/live bytes unchanged;
+   - post-load OfflineReady = YES;
+   - private context membership exactly matches the plan;
+   - no native/game initialization occurred;
+5. Step 23 summary = 4/4;
+6. OfflineReady regression = PASS;
+7. Foundation 5/5 regression = PASS.
 
-If Step 19 fails, send `Reports/Step19-ExpressionInterpreter.txt` rather than relying on a screenshot.
-
-Do not begin the real `sts2.dll` load subsystem until this acceptance passes.
+Share `Reports/Step23-FirstRealGameLoad.txt` on any failure. After Gate B, force-quit before rerunning Step 21/22 pre-load gates.
