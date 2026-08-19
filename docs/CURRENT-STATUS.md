@@ -1,29 +1,47 @@
 # Current status
 
-Steps **01–19 are physically complete and closed on the iPhone**.
+Steps **01–20 are physically complete and closed on the iPhone**.
 
-Current candidate: **Step 20 — Dynamic Managed Execution Foundation**.
+Current candidate: **Step 21 — Prepared Runtime / Framework Binding**.
 
-- App version: `0.0.55 (55)`
-- Workflow: `ios-step-20`
-- Protected baseline: Step 19.2 / `0.0.54`, which passed A–D plus OfflineReady and Foundation 5/5.
-- Step 20 physical status: **not yet tested**.
+- App version: `0.0.56 (56)`
+- Workflow: `ios-step-21`
+- Protected baseline: Step 20 / `0.0.55`, which passed A–D plus OfflineReady and Foundation 5/5.
+- Step 21 physical status: **not yet tested**.
 
-## Why Step 20 comes before runtime/framework binding
+## Step 21 objective
 
-The launcher is intended to acquire the legitimate StS2 payload after installation. Before spending a subsystem on binding the game's dependency graph to the iOS host, the project must prove that the Release iOS process can execute managed IL that was not available to the AOT compiler when the IPA was built.
+Build the first authoritative execution-oriented managed dependency set for the real receipt-backed ARM64 StS2 payload without CLR-loading the game.
 
-Step 20 keeps all build-time launcher assemblies on the AOT path with `MtouchInterpreter=-all`, while retaining the Mono interpreter for runtime/dynamic managed code. Its fixture DLLs are copied into the `.app` only after `dotnet publish`, so Gate B cannot be satisfied by a normal build-time project/AOT reference.
+The downloaded macOS payload contains both private/game assemblies and desktop runtime/framework implementations. Step 19.2 proved copied desktop `System.*` framework binaries should not be mutated merely to recreate behavior already supplied by the iOS host. Step 20 then proved runtime-loaded IL + one exact private dependency hop works on the physical iPhone.
 
-Target completion:
+Step 21 therefore classifies each reachable real AssemblyRef as:
 
 ```text
-A — FixtureIntegrityAndOfflineReady
-B — DynamicFixtureExecution
-C — PrivateDependencyResolution
-D — IsolationAudit
-
-DYNAMIC MANAGED EXECUTION FOUNDATION PASS — 4/4
+iOS host framework binding
+verified private/workspace binding
+explicit blocker
 ```
 
-Closure still requires OfflineReady + Foundation 5/5 after the 4/4 result. No real StS2 CLR load occurs in Step 20.
+and creates a byte-identical prepared set containing only reachable IL-only private/game assemblies.
+
+Target gates:
+
+```text
+A — RuntimePayloadClassification
+B — HostFrameworkBindingPlan
+C — PreparedRuntimeAssemblySet
+D — ClosureAudit
+
+PREPARED RUNTIME / FRAMEWORK BINDING PASS — 4/4
+```
+
+The separate readiness line is decisive for the next subsystem:
+
+```text
+Runtime closure ready for first real CLR load: YES/NO
+```
+
+Step 21 4/4 means the plan and isolation are trustworthy. It does not override `Runtime closure ready: NO`.
+
+Closure still requires OfflineReady + Foundation 5/5 after 4/4. Real `sts2.dll` CLR loading/execution remains forbidden in Step 21.

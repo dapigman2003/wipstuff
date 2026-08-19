@@ -1,6 +1,6 @@
 workflows:
-  ios-step-20:
-    name: Step 20 - Dynamic Managed Execution Foundation
+  ios-step-21:
+    name: Step 21 - Prepared Runtime / Framework Binding
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -16,14 +16,14 @@ workflows:
         - $HOME/.cache/sts2launcher/godot-step15
 
     scripts:
-      - name: Test + build Step 20 unsigned IPA
+      - name: Test + build Step 21 unsigned IPA
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
-          bash scripts/codemagic-build-step20.sh
+          bash scripts/codemagic-build-step21.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-20.ipa
-      - artifacts/step20-build-summary.txt
+      - artifacts/StS2-Launcher-Step-21.ipa
+      - artifacts/step21-build-summary.txt
       - artifacts/test-results/**
       - artifacts/logs/**

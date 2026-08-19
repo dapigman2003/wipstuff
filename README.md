@@ -1,36 +1,38 @@
-# StS2 Launcher iOS — Step 20 Dynamic Managed Execution Foundation
+# StS2 Launcher iOS — Step 21 Prepared Runtime / Framework Binding
 
-**Version:** `0.0.55 (55)`  
-**Codemagic workflow:** `ios-step-20`
+**Version:** `0.0.56 (56)`  
+**Codemagic workflow:** `ios-step-21`
 
-Steps **01–19 are physically complete and closed** on the iPhone, including the Step 19.2 expression-interpreter/framework-boundary result plus OfflineReady and Foundation 5/5 closure regressions.
+Steps **01–20 are physically complete and closed** on the iPhone. Step 20 proved that the Release iOS host can execute post-publish managed IL through the Mono interpreter and resolve one exact verified private dependency while keeping build-time launcher assemblies on their AOT path.
 
-Step 20 proves the next prerequisite for a launcher that obtains the game after the IPA is installed: the Release iOS host must be able to load and execute managed IL that was **not present as an AOT input when the IPA was built**.
+Step 21 returns to the real user-owned StS2 managed payload but remains a **no-game-CLR-load** subsystem. It builds an execution-oriented dependency/binding plan beginning at the real receipt-backed ARM64 `sts2.dll`.
 
-The build keeps all build-time launcher assemblies AOT-targeted with:
+The key rule is:
 
-```xml
-<MtouchInterpreter>-all</MtouchInterpreter>
-```
-
-Microsoft documents this configuration as AOT-compiling all build-time assemblies while retaining the Mono interpreter for runtime/dynamic managed code. The three Step 20 fixture DLLs are deliberately built separately and copied into the `.app` **only after `dotnet publish` completes**. They are never project references, content/resource items, or AOT/link inputs.
+> Prefer a compatible framework contract supplied by the actual iOS host; use the verified ARM64/shared workspace for private/game assemblies; preserve every missing, ambiguous, lower-version or non-IL-only edge as an explicit blocker instead of hiding it with broad fallback.
 
 ## Ordered gates
 
-A. **FixtureIntegrityAndOfflineReady** — re-prove OfflineReady; validate the bundled SHA-256 manifest; require all three project-owned fixtures to be pure IL with a tightly bounded assembly-reference graph; Cecil-probe their exact identities; copy them into launcher-private Step 20 storage and re-hash them.
+A. **RuntimePayloadClassification** — re-prove OfflineReady; clone and SHA-1 verify the ARM64/shared managed filename scope; catalog real assembly identities, AssemblyRefs/ModuleRefs, and IL-only versus ReadyToRun/mixed-mode shape; exclude x86_64 duplicates; require the primary ARM64 `sts2.dll` to be IL-only.
 
-B. **DynamicFixtureExecution** — create a fresh dedicated `AssemblyLoadContext`, load the standalone fixture from exact verified bytes, reflect its public `Run()` probe, and require deterministic result `42`. The fixture exercises loops, generics, and exception-finally IL. No private dependency is allowed at this gate.
+B. **HostFrameworkBindingPlan** — walk the real `sts2.dll` AssemblyRef graph. Framework-shaped references are first tested against the default iOS host runtime. Private dependencies resolve only through exact or one controlled higher/equal version workspace identity. Every unresolved/ambiguous/non-IL-only edge is recorded as a structured blocker.
 
-C. **PrivateDependencyResolution** — create another fresh load context, load a root fixture from verified bytes, and satisfy its one project-owned dependency only from the SHA-256-verified private fixture directory. The requested name/version/culture/public-key-token must exactly match the Cecil-probed identity and the dependency is re-hashed immediately before load. Result must again be `42`. Unknown non-framework fallback is rejected.
+C. **PreparedRuntimeAssemblySet** — perform zero Cecil writes; byte-copy only reachable IL-only private/game assemblies into `Step21-PreparedRuntimeBinding/prepared`; persist the deterministic `runtime-binding-plan.json` containing host bindings, private bindings, dependency edges and blockers.
 
-D. **IsolationAudit** — re-hash all private fixtures and the manifest, re-prove the complete OfflineReady managed-install tree, verify the managed-install identity did not change, and explicitly assert that no assembly named `sts2` entered the CLR during Step 20.
+D. **ClosureAudit** — independently re-hash source/prepared/live trees, re-open prepared metadata, verify plan integrity, reject host/private simple-name duplication, re-prove OfflineReady, and assert that no real StS2 assembly entered the CLR.
 
 Target device result:
 
 ```text
-DYNAMIC MANAGED EXECUTION FOUNDATION PASS — 4/4
+PREPARED RUNTIME / FRAMEWORK BINDING PASS — 4/4
 ```
 
-After 4/4, run **Verify Offline-Ready Install (Local Only)** and **Foundation 5/5 Regression** before closing Step 20.
+Step 21 deliberately separates **gate success** from **execution readiness**. The important plan signal is:
 
-Step 20 intentionally does **not** load or execute any StS2 assembly, bind GodotSharp/game framework references, run Harmony/MonoMod, integrate FMOD/Spine, or add Cloud/Workshop. If Step 20 closes, Step 21 can address the prepared runtime/framework binding boundary with the dynamic managed-execution mechanism physically proven first.
+```text
+Runtime closure ready for first real CLR load: YES/NO
+```
+
+A `NO` can still accompany a valid 4/4 Step 21 result; it means Step 22 has precise binding blockers to solve before any real game CLR load.
+
+After 4/4, run **Verify Offline-Ready Install (Local Only)** and **Foundation 5/5 Regression** before closing Step 21.
