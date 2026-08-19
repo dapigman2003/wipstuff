@@ -51,12 +51,12 @@ bash scripts/build-ios.sh
 
 Expected IPA:
 
-`artifacts/StS2-Launcher-Step-22.4.ipa`
+`artifacts/StS2-Launcher-Step-22.4.1.ipa`
 
 ## IPA verification
 
 ```sh
-bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-22.4.ipa
+bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-22.4.1.ipa
 ```
 
 Output:
@@ -67,7 +67,7 @@ Output:
 
 Workflow:
 
-`ios-step-22-4`
+`ios-step-22-4-1`
 
 Authoritative entry point:
 
@@ -77,9 +77,9 @@ bash scripts/codemagic.sh
 
 The pipeline runs static validation, host tests, iOS workload setup, Godot build/preflight, iOS publish, and final IPA verification.
 
-## Physical acceptance for Step 22.4
+## Physical acceptance for Step 22.4.1
 
-Install version `0.0.62` and require:
+Install version `0.0.63` and require:
 
 1. Step 22 A–D = 4/4;
 2. explicit binding blockers = 0;

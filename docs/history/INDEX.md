@@ -21,3 +21,7 @@ The current architecture and plan always live one level up in `docs/`.
 ## Selected raw reports
 
 `reports/` retains diagnostic outputs when they materially explain a later architectural decision.
+
+## Canonical-foundation build fixes
+
+- `STEP-22.4.1-MSTEST-V4-CODEMAGIC-FIX.md`

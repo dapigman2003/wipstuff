@@ -35,11 +35,11 @@
 - iOS publish PASS;
 - runtime-policy telemetry reports `MtouchInterpreter=-all` and no broad interpreter/NativeAOT;
 - final IPA verification PASS;
-- expected version is 0.0.62 (62).
+- expected version is 0.0.63 (63).
 
 ## Physical acceptance
 
-- header `STEP 22.4 — CANONICAL FOUNDATION`;
+- header `STEP 22.4.1 — CANONICAL FOUNDATION`;
 - Step 22 A–D 4/4;
 - blockers 0;
 - runtime closure ready YES;
