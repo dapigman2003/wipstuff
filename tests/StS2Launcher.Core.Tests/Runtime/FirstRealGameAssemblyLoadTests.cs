@@ -135,12 +135,25 @@ public sealed class FirstRealGameAssemblyLoadTests
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static async Task<GateResults> RunSyntheticLoadAndDisposeAsync(string launcherRoot)
     {
-        using var foundation = new FirstRealGameAssemblyLoad(launcherRoot, collectibleLoadContext: true);
-        var gateA = await foundation.RunPreparedLoadPreflightAsync();
-        var gateB = foundation.RunPrimaryAssemblyLoad();
-        var gateC = foundation.RunPlannedDependencyResolution();
-        var gateD = await foundation.RunLoadIsolationAuditAsync();
-        return new GateResults(gateA, gateB, gateC, gateD);
+        // Async state-machine locals can remain strongly referenced by the completed Task long
+        // enough to delay collectible AssemblyLoadContext unloading on some CI runtimes. Keep
+        // the foundation in an explicitly nullable field and clear it in finally so subsequent
+        // Step 23 tests never depend on GC/JIT lifetime heuristics from this helper.
+        FirstRealGameAssemblyLoad? foundation = null;
+        try
+        {
+            foundation = new FirstRealGameAssemblyLoad(launcherRoot, collectibleLoadContext: true);
+            var gateA = await foundation.RunPreparedLoadPreflightAsync();
+            var gateB = foundation.RunPrimaryAssemblyLoad();
+            var gateC = foundation.RunPlannedDependencyResolution();
+            var gateD = await foundation.RunLoadIsolationAuditAsync();
+            return new GateResults(gateA, gateB, gateC, gateD);
+        }
+        finally
+        {
+            foundation?.Dispose();
+            foundation = null;
+        }
     }
 
     private static async Task<SyntheticPreparedRuntime> CreateSyntheticPreparedRuntimeAsync(
@@ -300,11 +313,26 @@ public sealed class FirstRealGameAssemblyLoadTests
 
     private static void ForceCollectibleContexts()
     {
-        for (var i = 0; i < 4; i++)
+        // Collectible ALC unloading is GC-driven. Wait for the observable Step 23 synthetic
+        // assembly to disappear instead of assuming a fixed small number of collections is enough.
+        // This is host-test isolation only; the physical iOS Step 23 context remains non-collectible.
+        for (var i = 0; i < 16; i++)
         {
-            GC.Collect();
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
             GC.WaitForPendingFinalizers();
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
+
+            if (!AppDomain.CurrentDomain.GetAssemblies().Any(assembly =>
+                    string.Equals(assembly.GetName().Name, FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase) &&
+                    AssemblyLoadContext.GetLoadContext(assembly)?.IsCollectible == true))
+            {
+                return;
+            }
+
+            Thread.Sleep(10);
         }
+
+        Assert.Fail("A collectible synthetic Step 23 sts2 assembly remained loaded after forced cleanup; host tests must not depend on test ordering or collectible ALC GC timing.");
     }
 
     private sealed record AssemblyReferenceSpec(string Name, Version Version, string PublicKeyTokenHex);
