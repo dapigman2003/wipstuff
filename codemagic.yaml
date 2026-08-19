@@ -1,0 +1,145 @@
+workflows:
+  ios-step-21:
+    name: Step 21 - Prepared Runtime / Framework Binding
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    environment:
+      xcode: 26.5
+      vars:
+        DOTNET_SDK_VERSION: "9.0.314"
+        DOTNET_WORKLOAD_SET: "9.0.314.3"
+
+    cache:
+      cache_paths:
+        - $HOME/.nuget/packages
+        - $HOME/.cache/sts2launcher/godot-step15
+
+    scripts:
+      - name: Test + build Step 21 unsigned IPA
+        script: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          bash scripts/codemagic-build-step21.sh
+
+    artifacts:
+      - artifacts/StS2-Launcher-Step-21.ipa
+      - artifacts/step21-build-summary.txt
+      - artifacts/test-results/**
+      - artifacts/logs/**
+
+  ios-step-21-1:
+    name: Step 21.1 - Binding Diagnostic Export
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    environment:
+      xcode: 26.5
+      vars:
+        DOTNET_SDK_VERSION: "9.0.314"
+        DOTNET_WORKLOAD_SET: "9.0.314.3"
+
+    cache:
+      cache_paths:
+        - $HOME/.nuget/packages
+        - $HOME/.cache/sts2launcher/godot-step15
+
+    scripts:
+      - name: Test + build Step 21.1 unsigned IPA
+        script: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          bash scripts/codemagic-build-step21-1.sh
+
+    artifacts:
+      - artifacts/StS2-Launcher-Step-21.1.ipa
+      - artifacts/step21-1-build-summary.txt
+      - artifacts/test-results/**
+      - artifacts/logs/**
+
+  ios-step-22:
+    name: Step 22 - Host Framework Closure Foundation
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    environment:
+      xcode: 26.5
+      vars:
+        DOTNET_SDK_VERSION: "9.0.314"
+        DOTNET_WORKLOAD_SET: "9.0.314.3"
+
+    cache:
+      cache_paths:
+        - $HOME/.nuget/packages
+        - $HOME/.cache/sts2launcher/godot-step15
+
+    scripts:
+      - name: Test + build Step 22 unsigned IPA
+        script: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          bash scripts/codemagic-build-step22.sh
+
+    artifacts:
+      - artifacts/StS2-Launcher-Step-22.ipa
+      - artifacts/step22-build-summary.txt
+      - artifacts/test-results/**
+      - artifacts/logs/**
+
+  ios-step-22-1:
+    name: Step 22.1 - Host Framework Availability Diagnostics
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    environment:
+      xcode: 26.5
+      vars:
+        DOTNET_SDK_VERSION: "9.0.314"
+        DOTNET_WORKLOAD_SET: "9.0.314.3"
+
+    cache:
+      cache_paths:
+        - $HOME/.nuget/packages
+        - $HOME/.cache/sts2launcher/godot-step15
+
+    scripts:
+      - name: Test + build Step 22 unsigned IPA
+        script: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          bash scripts/codemagic-build-step22-1.sh
+
+    artifacts:
+      - artifacts/StS2-Launcher-Step-22.1.ipa
+      - artifacts/step22-1-build-summary.txt
+      - artifacts/test-results/**
+      - artifacts/logs/**
+
+  ios-step-22-2:
+    name: Step 22.2 - Host Binding Frontier Correction
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    environment:
+      xcode: 26.5
+      vars:
+        DOTNET_SDK_VERSION: "9.0.314"
+        DOTNET_WORKLOAD_SET: "9.0.314.3"
+
+    cache:
+      cache_paths:
+        - $HOME/.nuget/packages
+        - $HOME/.cache/sts2launcher/godot-step15
+
+    scripts:
+      - name: Test + build Step 22.2 unsigned IPA
+        script: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          bash scripts/codemagic-build-step22-2.sh
+
+    artifacts:
+      - artifacts/StS2-Launcher-Step-22.2.ipa
+      - artifacts/step22-2-build-summary.txt
+      - artifacts/test-results/**
+      - artifacts/logs/**
