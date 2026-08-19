@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 22.4 Canonical Foundation static validation")
+print("StS2 Launcher — Step 22.4.1 Canonical Foundation Test Fix static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>62</ApplicationVersion>" in project_text, "build version is 62")
-require("<ApplicationDisplayVersion>0.0.62</ApplicationDisplayVersion>" in project_text, "display version is 0.0.62")
-require(plist.get("CFBundleVersion") == "62", "Info.plist build version is 62")
-require(plist.get("CFBundleShortVersionString") == "0.0.62", "Info.plist display version is 0.0.62")
+require("<ApplicationVersion>63</ApplicationVersion>" in project_text, "build version is 63")
+require("<ApplicationDisplayVersion>0.0.63</ApplicationDisplayVersion>" in project_text, "display version is 0.0.63")
+require(plist.get("CFBundleVersion") == "63", "Info.plist build version is 63")
+require(plist.get("CFBundleShortVersionString") == "0.0.63", "Info.plist display version is 0.0.63")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -202,7 +202,7 @@ require("<TrimMode>full</TrimMode>" in project_text, "full trimming policy retai
 require("<MtouchInterpreter>-all</MtouchInterpreter>" in project_text, "Step 20 interpreter policy retained")
 require("'$(UseInterpreter)' == 'true'" in project_text, "build guard rejects broad UseInterpreter=true")
 require("'$(PublishAot)' == 'true'" in project_text, "build guard rejects NativeAOT")
-require("STEP22.4 RUNTIME POLICY" in project_text, "runtime policy emits Step 22.4 build telemetry")
+require("STEP22.4.1 RUNTIME POLICY" in project_text, "runtime policy emits Step 22.4.1 build telemetry")
 
 all_roots = re.findall(r'<TrimmerRootAssembly Include="([^"]+)"\s*/>', project_text)
 step22_roots = [
@@ -278,10 +278,10 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-22.4.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.62",
-    "STS2_BUILD_VERSION": "62",
-    "STS2_RUNTIME_POLICY_MARKER": "STEP22.4 RUNTIME POLICY:",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-22.4.1.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.63",
+    "STS2_BUILD_VERSION": "63",
+    "STS2_RUNTIME_POLICY_MARKER": "STEP22.4.1 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
 
@@ -331,6 +331,10 @@ require((ROOT / "tests/StS2Launcher.Core.Tests/TestSupport/TempTestDirectory.cs"
 all_test_text = "\n".join(p.read_text() for p in (ROOT / "tests/StS2Launcher.Core.Tests").rglob("*.cs"))
 require("private sealed class TemporaryDirectory" not in all_test_text, "duplicated per-test TemporaryDirectory helpers remain removed")
 require((ROOT / "tests/StS2Launcher.Core.Tests/Runtime/DeviceTestReportWriterTests.cs").is_file(), "device report writer has host unit tests")
+report_test_source = read("tests/StS2Launcher.Core.Tests/Runtime/DeviceTestReportWriterTests.cs")
+require("ThrowsExceptionAsync" not in report_test_source, "report writer tests avoid removed MSTest v4 ThrowsExceptionAsync API")
+require("Assert.ThrowsExactlyAsync<ArgumentException>" in report_test_source, "report writer tests use MSTest v4 ThrowsExactlyAsync")
+require("DataTestMethod" not in report_test_source, "report writer data rows use TestMethod instead of obsolete DataTestMethod")
 
 for script_name, report_marker in [
     ("test.sh", "artifacts/reports/host-unit-tests.txt"),
@@ -375,7 +379,7 @@ require(len(history_steps) >= 58, "historical documentation set is comprehensive
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-22-4:" in codemagic, "Codemagic exposes Step 22.4 workflow")
+require("ios-step-22-4-1:" in codemagic, "Codemagic exposes Step 22.4.1 workflow")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")

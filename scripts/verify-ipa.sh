@@ -39,8 +39,8 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 22.4 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 22.4 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 22.4.1 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 22.4.1 build version: $BUILD_VERSION" >&2; exit 4; }
 [[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 22 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
 [[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 22 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
@@ -202,7 +202,7 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
 }
 
 {
-  echo "Step 22.4 IPA verification passed."
+  echo "Step 22.4.1 IPA verification passed."
   echo "  Bundle ID: $BUNDLE_ID"
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
@@ -216,5 +216,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 22.4 — CANONICAL FOUNDATION"
+  echo "  Expected device UI: STEP 22.4.1 — CANONICAL FOUNDATION"
 } | tee artifacts/logs/step22-4-ipa-verification-summary.log

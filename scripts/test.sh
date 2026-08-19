@@ -15,7 +15,7 @@ FIXTURE_DIR="artifacts/host-step20-fixtures"
 
 command -v dotnet >/dev/null 2>&1 || { echo "ERROR: dotnet is required to run host tests."; exit 2; }
 
-echo "StS2 Launcher — Step 22.4 host regression tests"
+echo "StS2 Launcher — Step 22.4.1 host regression tests"
 echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo ".NET: $(dotnet --version)"
 

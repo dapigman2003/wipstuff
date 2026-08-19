@@ -62,7 +62,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Step 22.4 Canonical Foundation..."
+echo "Publishing Step 22.4.1 Canonical Foundation Test Fix..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \

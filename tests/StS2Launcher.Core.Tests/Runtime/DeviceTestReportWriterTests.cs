@@ -45,7 +45,7 @@ public sealed class DeviceTestReportWriterTests
         Assert.AreEqual(0, Directory.EnumerateFiles(writer.ReportsRoot, "*.tmp-*").Count());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("../escape.txt")]
     [DataRow("subdir/report.txt")]
     [DataRow("report.log")]
@@ -55,7 +55,7 @@ public sealed class DeviceTestReportWriterTests
         using var temp = new TempTestDirectory("sts2-device-report-invalid");
         var writer = new DeviceTestReportWriter(temp.Path);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() =>
+        await Assert.ThrowsExactlyAsync<ArgumentException>(() =>
             writer.WriteLatestAsync(fileName, "title", "PASS", "detail"));
     }
 }
