@@ -31,6 +31,8 @@ public sealed class RootViewController : UIViewController
     private readonly RealAssemblyRewriteGateSequence _realAssemblyRewriteGates = new();
     private readonly ExpressionInterpreterCompatibility _expressionInterpreterCompatibility;
     private readonly ExpressionInterpreterCompatibilityGateSequence _expressionInterpreterCompatibilityGates = new();
+    private readonly DynamicManagedExecutionFoundation _dynamicManagedExecutionFoundation;
+    private readonly DynamicManagedExecutionGateSequence _dynamicManagedExecutionGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -67,6 +69,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _realAssemblyRewriteDetailLabel;
     private UILabel? _expressionInterpreterCompatibilityResultLabel;
     private UILabel? _expressionInterpreterCompatibilityDetailLabel;
+    private UILabel? _dynamicManagedExecutionResultLabel;
+    private UILabel? _dynamicManagedExecutionDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -92,6 +96,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _compatibilityCallSiteButton;
     private UIButton? _realAssemblyRewriteButton;
     private UIButton? _expressionInterpreterCompatibilityButton;
+    private UIButton? _dynamicManagedExecutionButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -131,6 +136,9 @@ public sealed class RootViewController : UIViewController
         _compatibilityCallSiteAnalysis = new CompatibilityCallSiteAnalysis(launcherDataRoot);
         _realAssemblyRewriteWorkspace = new RealAssemblyRewriteWorkspace(launcherDataRoot);
         _expressionInterpreterCompatibility = new ExpressionInterpreterCompatibility(launcherDataRoot);
+        _dynamicManagedExecutionFoundation = new DynamicManagedExecutionFoundation(
+            launcherDataRoot,
+            Path.Combine(NSBundle.MainBundle.BundlePath, DynamicManagedExecutionFoundation.BundleFixtureDirectoryName));
     }
 
     public override void ViewDidLoad()
@@ -176,22 +184,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 19.2 — EXPRESSION INTERPRETER COMPATIBILITY",
+            "STEP 20 — DYNAMIC MANAGED EXECUTION FOUNDATION",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.54",
+            "Version 0.0.55",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "MONO.CECIL 0.11.6 • HOST RUNTIME FALLBACK / FRAMEWORK BOUNDARY / ZERO-WRITE ISOLATION",
+            "MONO INTERPRETER • EXTERNAL IL LOAD / PRIVATE DEPENDENCY / ISOLATION",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–18 are complete on the physical iPhone. Step 18 proved a closed, receipt-verified real-assembly rewrite workspace and passed its OfflineReady + Foundation closure regressions. Step 19.2 corrects the expression-compatibility boundary: Gate A proves Compile(), Compile(false), and Compile(true) all execute in the actual no-dynamic-code iOS host and clones a fresh ARM64/shared workspace; Gate B read-only classifies real Compile call sites by consumer/framework ownership and IL-only versus ReadyToRun/mixed-mode image shape; Gate C performs zero Cecil writes and creates a byte-identical prepared tree because the host System.Linq.Expressions runtime is the compatibility provider; Gate D re-hashes source, prepared, and live-install trees. Copied desktop framework assemblies are diagnostic inputs only and are never forced through Cecil's writer. No game assembly is loaded or executed.",
+            "Steps 01–19 are complete and closed on the physical iPhone. Step 20 proves the execution mechanism required by a post-install game launcher before any real StS2 runtime load: Gate A re-proves OfflineReady and SHA-256 verifies project-owned external fixture assemblies copied into the IPA only as data; Gate B loads and executes one such non-AOT fixture through a dedicated AssemblyLoadContext; Gate C proves one exact private managed dependency resolution hop from launcher-private verified storage; Gate D re-hashes the fixtures and re-proves the complete managed install. The Release build keeps all build-time launcher assemblies AOT-targeted while retaining the Mono interpreter for runtime/dynamic managed code. No StS2 assembly is loaded or executed in Step 20.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -628,6 +636,29 @@ public sealed class RootViewController : UIViewController
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_expressionInterpreterCompatibilityDetailLabel);
+
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 20 — Dynamic Managed Execution Foundation (ordered gates A–D)",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _dynamicManagedExecutionButton = SystemButton("Run Gates A–D — Fixture Integrity → External IL Execute → Private Dependency → Isolation Audit", 17);
+        _dynamicManagedExecutionButton.TouchUpInside += async (_, _) => await RunDynamicManagedExecutionFoundationAsync();
+        content.AddArrangedSubview(_dynamicManagedExecutionButton);
+
+        _dynamicManagedExecutionResultLabel = Label(
+            "DYNAMIC MANAGED EXECUTION FOUNDATION: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_dynamicManagedExecutionResultLabel);
+
+        _dynamicManagedExecutionDetailLabel = Label(
+            "Gate A re-proves OfflineReady, validates the bundled Step 20 fixture manifest, SHA-256 verifies all three project-owned fixture DLLs, probes their Cecil identities, and copies them into launcher-private storage. Gate B uses a new AssemblyLoadContext to load the basic fixture from verified bytes and requires its non-AOT IL to execute to result 42. Gate C loads a second fixture whose exact dependency is resolved only from the verified private fixture directory and also must execute to 42. Gate D re-hashes every fixture, re-proves OfflineReady, and asserts no sts2 assembly entered the CLR. Step 20 deliberately permits AssemblyLoadContext only for project-owned fixtures; real StS2 CLR loading remains out of scope.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_dynamicManagedExecutionDetailLabel);
 
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
@@ -2352,6 +2383,130 @@ public sealed class RootViewController : UIViewController
         }
     }
 
+    private async Task RunDynamicManagedExecutionFoundationAsync()
+    {
+        if (_dynamicManagedExecutionResultLabel is null ||
+            _dynamicManagedExecutionDetailLabel is null ||
+            _dynamicManagedExecutionButton is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        if (_godotProcessRequiresRestart)
+        {
+            _statusLabel.Text = "Step 15 Godot process-global state is still active. Force-quit/relaunch before Step 20 so the external managed-execution proof runs in a clean host process.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+            return;
+        }
+
+        BeginSteamOperation(allowCancel: true);
+        _dynamicManagedExecutionGates.Reset();
+        _dynamicManagedExecutionFoundation.Reset();
+        _dynamicManagedExecutionResultLabel.Text = "DYNAMIC MANAGED EXECUTION FOUNDATION: GATE A RUNNING…";
+        _dynamicManagedExecutionResultLabel.TextColor = UIColor.Label;
+        _dynamicManagedExecutionDetailLabel.Text = "Gate A: re-proving OfflineReady and validating/copying the exact-hash project-owned external managed fixtures without loading them.";
+        _statusLabel.Text = "STEP 20 GATE A — fixture integrity + OfflineReady.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var token = _operationCts?.Token ?? CancellationToken.None;
+            var progress = new Progress<DynamicManagedExecutionProgress>(value =>
+            {
+                var count = value.TotalItems > 0 ? $" ({value.ProcessedItems:N0}/{value.TotalItems:N0})" : string.Empty;
+                _dynamicManagedExecutionDetailLabel.Text = FormatDynamicManagedExecutionDetail(
+                    $"Gate {(char)('A' + (int)value.Gate - 1)} progress{count}: {value.Detail}" +
+                    (string.IsNullOrWhiteSpace(value.CurrentPath) ? string.Empty : $"\nCurrent: {value.CurrentPath}"));
+            });
+
+            var gateA = await _dynamicManagedExecutionFoundation.RunFixtureIntegrityAndOfflineReadyAsync(progress, token);
+            if (!RecordDynamicManagedExecutionGate(gateA)) return;
+
+            _dynamicManagedExecutionResultLabel.Text = "DYNAMIC MANAGED EXECUTION FOUNDATION: GATE B RUNNING…";
+            _statusLabel.Text = "STEP 20 GATE B — load and execute non-AOT project-owned IL from verified bytes.";
+            var gateB = await Task.Run(() => _dynamicManagedExecutionFoundation.RunDynamicFixtureExecution(), token);
+            if (!RecordDynamicManagedExecutionGate(gateB)) return;
+
+            _dynamicManagedExecutionResultLabel.Text = "DYNAMIC MANAGED EXECUTION FOUNDATION: GATE C RUNNING…";
+            _statusLabel.Text = "STEP 20 GATE C — exact private managed dependency resolution + transitive execution.";
+            var gateC = await Task.Run(() => _dynamicManagedExecutionFoundation.RunPrivateDependencyResolution(), token);
+            if (!RecordDynamicManagedExecutionGate(gateC)) return;
+
+            _dynamicManagedExecutionResultLabel.Text = "DYNAMIC MANAGED EXECUTION FOUNDATION: GATE D RUNNING…";
+            _statusLabel.Text = "STEP 20 GATE D — fixture + managed-install isolation audit.";
+            var gateD = await _dynamicManagedExecutionFoundation.RunIsolationAuditAsync(progress, token);
+            if (!RecordDynamicManagedExecutionGate(gateD)) return;
+
+            var snapshot = _dynamicManagedExecutionGates.Snapshot();
+            _dynamicManagedExecutionResultLabel.Text = snapshot.Summary;
+            _dynamicManagedExecutionResultLabel.TextColor = UIColor.Label;
+            _dynamicManagedExecutionDetailLabel.Text = FormatDynamicManagedExecutionDetail(
+                "All four Step 20 gates passed. A managed DLL that was not linked/AOT-compiled into the IPA executed from verified bytes, a second runtime-loaded fixture resolved and executed one verified private dependency, and the receipt-backed StS2 install stayed untouched. Run OfflineReady + Foundation 5/5 to close Step 20.");
+            _statusLabel.Text = "PASS: STEP 20 DYNAMIC MANAGED EXECUTION FOUNDATION — 4/4. External IL execution + private dependency resolution are physically proven; no StS2 assembly was loaded.";
+            _statusLabel.TextColor = UIColor.Label;
+        }
+        catch (OperationCanceledException)
+        {
+            _dynamicManagedExecutionResultLabel.Text = "DYNAMIC MANAGED EXECUTION FOUNDATION: CANCELLED";
+            _dynamicManagedExecutionResultLabel.TextColor = UIColor.SecondaryLabel;
+            _dynamicManagedExecutionDetailLabel.Text = FormatDynamicManagedExecutionDetail("Step 20 was cancelled. Rerunning Gate A recreates only the launcher-private fixture workspace; the managed game install is never an intended write target.");
+            _statusLabel.Text = "STEP 20 CANCELLED — no later gate is considered proven.";
+            _statusLabel.TextColor = UIColor.SecondaryLabel;
+        }
+        catch (Exception ex)
+        {
+            _dynamicManagedExecutionResultLabel.Text = "DYNAMIC MANAGED EXECUTION FOUNDATION: EXCEPTION";
+            _dynamicManagedExecutionResultLabel.TextColor = UIColor.SystemRed;
+            _dynamicManagedExecutionDetailLabel.Text = FormatDynamicManagedExecutionDetail($"Unhandled Step 20 exception: {ex.GetType().Name}: {ex.Message}");
+            _statusLabel.Text = "STEP 20 FAIL: stop at the current dynamic-managed-execution gate and report this screen.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
+        }
+    }
+
+    private bool RecordDynamicManagedExecutionGate(DynamicManagedExecutionGateResult result)
+    {
+        _dynamicManagedExecutionGates.Record(result.Gate, result.Passed, result.Detail);
+        if (_dynamicManagedExecutionResultLabel is not null)
+        {
+            _dynamicManagedExecutionResultLabel.Text = _dynamicManagedExecutionGates.Snapshot().Summary;
+            _dynamicManagedExecutionResultLabel.TextColor = result.Passed ? UIColor.Label : UIColor.SystemRed;
+        }
+        if (_dynamicManagedExecutionDetailLabel is not null)
+            _dynamicManagedExecutionDetailLabel.Text = FormatDynamicManagedExecutionDetail(result.Detail);
+        if (!result.Passed && _statusLabel is not null)
+        {
+            var letter = (char)('A' + (int)result.Gate - 1);
+            _statusLabel.Text = $"STEP 20 FAIL at Gate {letter} ({result.Gate}). Stop here; later dynamic-managed-execution gates were not run.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        return result.Passed;
+    }
+
+    private string FormatDynamicManagedExecutionDetail(string tail)
+    {
+        var lines = new List<string>();
+        foreach (var gate in _dynamicManagedExecutionGates.Results)
+        {
+            var letter = (char)('A' + (int)gate.Gate - 1);
+            lines.Add($"Gate {letter} — {gate.Gate}: {(gate.Passed ? "PASS" : "FAIL")}");
+            lines.Add(gate.Detail);
+            lines.Add(string.Empty);
+        }
+
+        lines.Add("Step 20 write scope: launcher-private Step20-DynamicManagedExecution/fixtures only; the Step 12 receipt-backed managed install stays read-only.");
+        lines.Add("Dynamic execution scope: project-owned exact-hash fixtures only. AssemblyLoadContext/reflective invocation are intentionally permitted here solely to prove non-AOT IL execution and one controlled private dependency hop.");
+        lines.Add("Out of scope: Assembly.Load/AssemblyLoadContext for sts2.dll or any game assembly, game static initialization, GodotSharp binding, native game integration, Harmony/MonoMod, FMOD/Spine, Cloud, and Workshop.");
+        lines.Add("Steps 01–19 remain closed/protected. Step 20 retains AOT for build-time assemblies while adding interpreter availability for runtime/dynamic managed code; closure therefore requires OfflineReady + Foundation 5/5 after a 4/4 pass.");
+        lines.Add("Step 15 orientation presentation quirk remains a known non-blocking cleanup item.");
+        lines.Add(tail);
+        return string.Join("\n", lines);
+    }
+
     private bool RecordExpressionInterpreterCompatibilityGate(ExpressionInterpreterCompatibilityGateResult result)
     {
         _expressionInterpreterCompatibilityGates.Record(result.Gate, result.Passed, result.Detail);
@@ -2704,6 +2859,7 @@ public sealed class RootViewController : UIViewController
         if (_compatibilityCallSiteButton is not null) _compatibilityCallSiteButton.Enabled = false;
         if (_realAssemblyRewriteButton is not null) _realAssemblyRewriteButton.Enabled = false;
         if (_expressionInterpreterCompatibilityButton is not null) _expressionInterpreterCompatibilityButton.Enabled = false;
+        if (_dynamicManagedExecutionButton is not null) _dynamicManagedExecutionButton.Enabled = false;
         if (_signOutButton is not null) _signOutButton.Enabled = false;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = allowCancel;
     }
@@ -2738,6 +2894,7 @@ public sealed class RootViewController : UIViewController
         if (_compatibilityCallSiteButton is not null) _compatibilityCallSiteButton.Enabled = normalControlsEnabled;
         if (_realAssemblyRewriteButton is not null) _realAssemblyRewriteButton.Enabled = normalControlsEnabled;
         if (_expressionInterpreterCompatibilityButton is not null) _expressionInterpreterCompatibilityButton.Enabled = normalControlsEnabled;
+        if (_dynamicManagedExecutionButton is not null) _dynamicManagedExecutionButton.Enabled = normalControlsEnabled;
         if (_signOutButton is not null) _signOutButton.Enabled = normalControlsEnabled;
         if (_cancelOperationButton is not null) _cancelOperationButton.Enabled = false;
     }

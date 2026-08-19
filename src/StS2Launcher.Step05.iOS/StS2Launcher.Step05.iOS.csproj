@@ -8,8 +8,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>54</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.54</ApplicationDisplayVersion>
+    <ApplicationVersion>55</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.55</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -21,6 +21,17 @@
       the initial ClientHello path.
     -->
     <TrimMode>full</TrimMode>
+
+    <!--
+      Step 20 Dynamic Managed Execution Foundation: keep every build-time launcher assembly on
+      the already-proven AOT path while linking the Mono interpreter into the Release host for
+      runtime/dynamic managed code. Microsoft documents MtouchInterpreter=-all as "AOT compile
+      all assemblies, while still allowing the interpreter to perform dynamic code generation".
+      The Step 20 fixture DLLs are copied only after dotnet publish and are never project/content
+      references, so physical Gate B is the authority for whether post-publish IL can execute.
+      PublishAot/NativeAOT remains disabled.
+    -->
+    <MtouchInterpreter>-all</MtouchInterpreter>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +43,17 @@
     <TrimmerRootAssembly Include="protobuf-net" />
     <TrimmerRootAssembly Include="protobuf-net.Core" />
   </ItemGroup>
+
+  <Target Name="Step20ValidateInterpreterPolicy" BeforeTargets="PrepareForBuild">
+    <Message Importance="High"
+             Text="STEP20 INTERPRETER POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+    <Error Condition="'$(MtouchInterpreter)' != '-all'"
+           Text="Step 20 requires MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
+    <Error Condition="'$(UseInterpreter)' == 'true'"
+           Text="Step 20 forbids UseInterpreter=true because it is the broader interpret-all build-time policy." />
+    <Error Condition="'$(PublishAot)' == 'true'"
+           Text="Step 20 requires the Mono runtime; NativeAOT is incompatible with the Mono interpreter proof." />
+  </Target>
 
   <!--
     Step 15 Godot Foundation: Codemagic builds a pinned Godot 4.5.1-stable
