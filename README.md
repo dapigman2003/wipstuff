@@ -4,7 +4,7 @@ Experimental unofficial iOS launcher/compatibility host for **Slay the Spire 2**
 
 ## Current boundary
 
-Steps 01–22 are physically closed on iPhone. Step 22.4.1 is a behavior-neutral canonicalization candidate before the first controlled real `sts2.dll` CLR load.
+Steps 01–22 are physically closed on iPhone. Step 22.4.2 is the final canonical-foundation regression-correction candidate before the first controlled real `sts2.dll` CLR load. It preserves the Step 22 runtime boundary and corrects the stale pre-Step-20 Step 19 dynamic-code assertion.
 
 Read **`docs/MASTER-PLAN.md` first** for architecture, roadmap, safety rules, and the resumption protocol. `docs/CURRENT-STATUS.md` contains the current physical/candidate state.
 
@@ -12,7 +12,7 @@ Read **`docs/MASTER-PLAN.md` first** for architecture, roadmap, safety rules, an
 
 Codemagic workflow:
 
-`ios-step-22-4-1`
+`ios-step-22-4-2`
 
 Authoritative pipeline entry point:
 
