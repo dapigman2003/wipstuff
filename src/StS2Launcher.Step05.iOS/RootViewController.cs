@@ -197,12 +197,12 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 22 — HOST FRAMEWORK CLOSURE FOUNDATION",
+            "STEP 22.1 — HOST FRAMEWORK AVAILABILITY DIAGNOSTICS",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.58",
+            "Version 0.0.59",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -2541,7 +2541,7 @@ public sealed class RootViewController : UIViewController
         _hostFrameworkClosureFoundation.Reset();
         _runtimeFrameworkBindingResultLabel.Text = "HOST FRAMEWORK CLOSURE FOUNDATION: GATE A RUNNING…";
         _runtimeFrameworkBindingResultLabel.TextColor = UIColor.Label;
-        _runtimeFrameworkBindingDetailLabel.Text = "Gate A: loading the complete 44-name Step 21.1 framework frontier from the rooted iOS/.NET host. No StS2 assembly is loaded.";
+        _runtimeFrameworkBindingDetailLabel.Text = "Gate A: probing all 44 Step 21.1 framework identities from the rooted iOS/.NET host and writing the complete success/failure frontier to Files. No StS2 assembly is loaded.";
         _statusLabel.Text = "STEP 22 GATE A — rooted host framework availability.";
         _statusLabel.TextColor = UIColor.Label;
 
