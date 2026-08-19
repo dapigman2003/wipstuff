@@ -11,7 +11,7 @@ export DOTNET_ROOT PATH="$DOTNET_ROOT:$PATH" DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNE
 [[ "$(uname -s)" == "Darwin" ]] || { echo "ERROR: Codemagic iOS build must run on macOS." >&2; exit 2; }
 
 {
-  echo "StS2 Launcher — Step 22.4.2 Canonical Foundation Regression Correction build environment"
+  echo "StS2 Launcher — Step 23 First Real StS2 CLR Load Boundary build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -50,7 +50,7 @@ STS2_SKIP_STATIC_VALIDATION=1 bash scripts/build-ios.sh 2>&1 | tee artifacts/rep
 bash scripts/verify-ipa.sh "$STS2_IPA_REL"
 
 {
-  echo "StS2 Launcher iOS — Step 22.4.2 Canonical Foundation Regression Correction"
+  echo "StS2 Launcher iOS — Step 23 First Real StS2 CLR Load Boundary"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -62,7 +62,7 @@ bash scripts/verify-ipa.sh "$STS2_IPA_REL"
   echo "IPA verification: PASS"
   echo "Physically proven Step 22.2 Core behavior: byte-for-byte protected by manifest"
   echo "Device text reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "Real StS2 CLR load/execution: still NOT attempted"
+  echo "Step 23 production behavior: first real sts2.dll CLR load is available only as an explicit on-device gate; build/CI never bundles or loads game payload"
   echo "IPA: $STS2_IPA_REL"
   echo "IPA SHA-256: $(shasum -a 256 "$STS2_IPA_REL" | awk '{print $1}')"
 } | tee artifacts/reports/build-summary.txt
