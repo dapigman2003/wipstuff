@@ -192,12 +192,12 @@ public sealed partial class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 22.4 — CANONICAL FOUNDATION",
+            "STEP 22.4.1 — CANONICAL FOUNDATION",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.62",
+            "Version 0.0.63",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -207,7 +207,7 @@ public sealed partial class RootViewController : UIViewController
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 22.2 physically closed the runtime/framework binding boundary: all 22 required host roots qualified, the recomputed real sts2.dll graph reached zero explicit blockers, Runtime closure ready=YES, and OfflineReady + Foundation 5/5 both passed afterward. Step 22.4 changes no compatibility behavior. It establishes the canonical StS2Launcher.iOS project, durable docs/master-plan structure, inert historical archive policy, consolidated tooling, and shareable text reporting before the first real game CLR-load subsystem. StS2 is still never CLR-loaded or executed in this foundation build.",
+            "Step 22.2 physically closed the runtime/framework binding boundary: all 22 required host roots qualified, the recomputed real sts2.dll graph reached zero explicit blockers, Runtime closure ready=YES, and OfflineReady + Foundation 5/5 both passed afterward. Step 22.4.1 changes no compatibility behavior; it only corrects the canonical host-reporting tests for MSTest v4 after the 22.4 Codemagic compile stop. It establishes the canonical StS2Launcher.iOS project, durable docs/master-plan structure, inert historical archive policy, consolidated tooling, and shareable text reporting before the first real game CLR-load subsystem. StS2 is still never CLR-loaded or executed in this foundation build.",
             UIFont.SystemFontOfSize(15),
             UIColor.Label));
 
@@ -723,7 +723,7 @@ public sealed partial class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–22 are physically closed on this iPhone baseline. Step 22.4 is the canonical foundation candidate: live source uses StS2Launcher.iOS, history is non-authoritative, and current tests write shareable Files reports under Documents/StS2Launcher/Reports. Real StS2 CLR loading remains intentionally deferred until the next subsystem.",
+            "Status: Steps 01–22 are physically closed on this iPhone baseline. Step 22.4.1 is the canonical foundation candidate: live source uses StS2Launcher.iOS, history is non-authoritative, and current tests write shareable Files reports under Documents/StS2Launcher/Reports. Real StS2 CLR loading remains intentionally deferred until the next subsystem.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -742,7 +742,7 @@ public sealed partial class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 22.4 canonical foundation: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 22.4.1 canonical foundation test fix: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
