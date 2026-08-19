@@ -1,50 +1,19 @@
-# StS2 Launcher iOS — Step 21.1 Binding Diagnostic Export
+# StS2 Launcher iOS — Step 22 Host Framework Closure Foundation
 
-**Version:** `0.0.57 (57)`  
-**Codemagic workflow:** `ios-step-21-1`
+**Version:** `0.0.58 (58)`  
+**Codemagic workflow:** `ios-step-22`
 
-Steps **01–20 are physically complete and closed** on the iPhone. Step 21 then physically passed all four Prepared Runtime / Framework Binding gates and produced an authoritative plan with:
+This candidate preserves the physically proven launcher foundation through Step 20 and the Step 21/21.1 binding planner/exporter. Step 21.1 showed that all 47 remaining binding blockers were framework-shaped edges whose only workspace fallback was a non-IL-only macOS runtime image. Step 22 roots a measured 22-assembly iOS/.NET host seed set and physically requires the complete 44-name observed framework frontier before recomputing the real `sts2.dll` binding plan.
 
-```text
-Explicit binding blockers: 47
-Runtime closure ready for first real CLR load: NO
-```
+Success target:
 
-Step 21.1 is a **reporting/export-only hotfix**. The physically passed Step 21 binding/preparation implementation and host tests are hash-protected and unchanged.
+`HOST FRAMEWORK CLOSURE FOUNDATION PASS — 4/4`
 
-## What Step 21.1 adds
+with:
 
-- Reads the already persisted Step 21 `runtime-binding-plan.json`.
-- Writes a complete share-safe text report:
-  `Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt`.
-- Includes grouped blocker counts, unique requested identities, every blocker row, host framework identities, prepared assembly identities, and the plan SHA-256.
-- Excludes Steam credentials/tokens, Steam Guard material, Apple signing secrets, and host absolute assembly paths.
-- Enables `UIFileSharingEnabled` and `LSSupportsOpeningDocumentsInPlace` so the report can be retrieved through iOS Files.
-- Adds an **Export Complete Step 21 Binding Diagnostics to Files** button that can use the existing Step 21 plan immediately after app update; A–D do not need to be rerun merely to export if the plan persisted.
+- `Explicit binding blockers: 0`
+- `Runtime closure ready for first real CLR load: YES`
+- no private prepared `System.*` / `netstandard` assemblies
+- no StS2 CLR load or execution
 
-Files path:
-
-```text
-Files
-→ On My iPhone
-→ StS2 Launcher
-→ StS2Launcher
-→ Step21.1-RuntimeBindingDiagnostics.txt
-```
-
-The exported `.txt` is output only and is never consumed by the launcher as trusted input.
-
-## Preserved Step 21 boundary
-
-Step 21 A–D remain available unchanged:
-
-```text
-A — RuntimePayloadClassification
-B — HostFrameworkBindingPlan
-C — PreparedRuntimeAssemblySet
-D — ClosureAudit
-```
-
-No real StS2 CLR load should be attempted while the authoritative plan still reports `Runtime closure ready: NO`.
-
-See `docs/STEP-21.1-DIAGNOSTIC-EXPORT.md` and `docs/STEP-21.1-TEST.md`.
+See `docs/STEP-22-HOST-FRAMEWORK-CLOSURE.md` and `docs/STEP-22-TEST.md`.
