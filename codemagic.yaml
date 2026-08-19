@@ -1,6 +1,6 @@
 workflows:
-  ios-step-23:
-    name: Step 23 - First Real StS2 CLR Load Boundary
+  ios-step-23-1:
+    name: Step 23.1 - First Real StS2 CLR Load Boundary Host-Test Isolation Fix
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -23,7 +23,7 @@ workflows:
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-23.ipa
+      - artifacts/StS2-Launcher-Step-23.1.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**

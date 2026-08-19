@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 23 First Real StS2 CLR Load Boundary
+# StS2 Launcher iOS — Step 23.1 First Real StS2 CLR Load Boundary
 
 Experimental unofficial iOS launcher/compatibility host for **Slay the Spire 2** for legitimate owners. The repository does not include game payloads, Steam secrets, Apple signing secrets, or proprietary FMOD/Spine payloads.
 
@@ -12,7 +12,7 @@ Read **`docs/MASTER-PLAN.md` first** for architecture, roadmap, safety rules, an
 
 Codemagic workflow:
 
-`ios-step-23`
+`ios-step-23-1`
 
 Authoritative pipeline entry point:
 
