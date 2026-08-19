@@ -40,6 +40,8 @@ public sealed partial class RootViewController : UIViewController
     private readonly RuntimeFrameworkBindingGateSequence _runtimeFrameworkBindingGates = new();
     private readonly HostFrameworkClosureFoundation _hostFrameworkClosureFoundation;
     private readonly HostFrameworkClosureGateSequence _hostFrameworkClosureGates = new();
+    private readonly FirstRealGameAssemblyLoad _firstRealGameAssemblyLoad;
+    private readonly FirstRealGameAssemblyLoadGateSequence _firstRealGameAssemblyLoadGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -81,6 +83,8 @@ public sealed partial class RootViewController : UIViewController
     private UILabel? _runtimeFrameworkBindingResultLabel;
     private UILabel? _runtimeFrameworkBindingDetailLabel;
     private UILabel? _runtimeBindingDiagnosticsExportResultLabel;
+    private UILabel? _firstRealGameAssemblyLoadResultLabel;
+    private UILabel? _firstRealGameAssemblyLoadDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -109,6 +113,7 @@ public sealed partial class RootViewController : UIViewController
     private UIButton? _dynamicManagedExecutionButton;
     private UIButton? _runtimeFrameworkBindingButton;
     private UIButton? _runtimeBindingDiagnosticsExportButton;
+    private UIButton? _firstRealGameAssemblyLoadButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -147,6 +152,7 @@ public sealed partial class RootViewController : UIViewController
         _preparedRuntimeFrameworkBinding = new PreparedRuntimeFrameworkBinding(_launcherDataRoot);
         _runtimeBindingDiagnosticsExporter = new RuntimeBindingDiagnosticsExporter(_launcherDataRoot);
         _hostFrameworkClosureFoundation = new HostFrameworkClosureFoundation(_launcherDataRoot);
+        _firstRealGameAssemblyLoad = new FirstRealGameAssemblyLoad(_launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -192,22 +198,22 @@ public sealed partial class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 22.4.2 — CANONICAL FOUNDATION",
+            "STEP 23 — FIRST REAL STS2 CLR LOAD BOUNDARY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.64",
+            "Version 0.0.65",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "STEPS 01–22 PHYSICALLY CLOSED • CONSOLIDATED REPORTS • NO GAME CLR LOAD",
+            "STEPS 01–22 PHYSICALLY CLOSED • FIRST REAL GAME CLR LOAD IS THE ONLY NEW BOUNDARY",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 22.2 physically closed the runtime/framework binding boundary: all 22 required host roots qualified, the recomputed real sts2.dll graph reached zero explicit blockers, Runtime closure ready=YES, and OfflineReady + Foundation 5/5 both passed afterward. Step 22.4.2 preserves the canonical foundation and corrects one stale Step 19 regression contract exposed by the post-Step-20 Mono interpreter: IsDynamicCodeSupported is now diagnostic, while successful Compile()/Compile(false)/Compile(true) execution plus IsDynamicCodeCompiled=false remains required on iOS. It also adds a pure runtime-policy test and static guards so historical intermediate runtime assumptions cannot become false current regressions. StS2 is still never CLR-loaded or executed in this foundation build.",
+            "Step 22.4.2 is the fully green canonical foundation: Step 19, Step 22, OfflineReady, Foundation 5/5, and all other current regressions passed on the physical iPhone. Step 23 crosses exactly one new boundary: it loads the receipt-verified prepared real sts2.dll into a dedicated private AssemblyLoadContext and resolves the already-audited managed dependency plan. It does not intentionally inspect game types/members, invoke an entry point or method, initialize Godot/game state, or resolve native game libraries. Gate A refuses to load if any prepared private assembly contains a module initializer, so the load-only boundary remains explicit.",
             UIFont.SystemFontOfSize(15),
             UIColor.Label));
 
@@ -711,6 +717,29 @@ public sealed partial class RootViewController : UIViewController
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 23 — First Real StS2 CLR Load Boundary (ordered gates A–D)",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _firstRealGameAssemblyLoadButton = SystemButton("Run Step 23 A–D — Preflight → Load sts2.dll → Resolve Managed Closure → Audit", 17);
+        _firstRealGameAssemblyLoadButton.TouchUpInside += async (_, _) => await RunFirstRealGameAssemblyLoadAsync();
+        content.AddArrangedSubview(_firstRealGameAssemblyLoadButton);
+
+        _firstRealGameAssemblyLoadResultLabel = Label(
+            "FIRST REAL STS2 CLR LOAD BOUNDARY: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_firstRealGameAssemblyLoadResultLabel);
+
+        _firstRealGameAssemblyLoadDetailLabel = Label(
+            "Gate A re-proves OfflineReady, validates the persisted zero-blocker Step 21/22 plan and every prepared/live SHA-1, and uses Cecil to require IL-only private assemblies with zero <Module> module initializers before loading anything. Gate B performs the first real sts2.dll LoadFromStream into a dedicated private AssemblyLoadContext and stops after identity/context verification. Gate C asks that context to resolve every unique managed dependency identity in the audited plan: host frameworks must come from the default iOS/.NET context, private assemblies only from the exact prepared set, and unplanned fallback is refused. Gate D re-hashes plan/prepared/live state, re-proves OfflineReady, audits load-context ownership, and requires zero native resolution attempts. No game entry point, game type/member reflection, method invocation, Godot startup, or native game load is part of Step 23.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_firstRealGameAssemblyLoadDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -723,7 +752,7 @@ public sealed partial class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–22 are physically closed on this iPhone baseline. Step 22.4.2 is the canonical foundation candidate: live source uses StS2Launcher.iOS, history is non-authoritative, and current tests write shareable Files reports under Documents/StS2Launcher/Reports. Real StS2 CLR loading remains intentionally deferred until the next subsystem.",
+            "Status: Steps 01–22 are physically closed and Step 22.4.2 is the canonical foundation baseline. Step 23 is the first real sts2.dll CLR-load candidate. Run it only in a fresh process; after a successful load, the game assembly remains resident until force-quit. Long results are written to Files under Documents/StS2Launcher/Reports.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -742,7 +771,7 @@ public sealed partial class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 22.4.2 canonical foundation regression correction: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 23 first real StS2 CLR load boundary: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
