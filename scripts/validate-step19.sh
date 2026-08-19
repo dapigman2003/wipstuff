@@ -10,7 +10,10 @@ STS2_VALIDATE_AS_PARENT=1 bash scripts/validate-step18.sh
 python3 - <<'PY'
 from pathlib import Path
 import hashlib
+import os
 import plistlib
+
+parent_mode = os.environ.get("STS2_VALIDATE_AS_PARENT") == "1"
 
 required = [
     Path('src/StS2Launcher.Core/ExpressionInterpreterCompatibility.cs'),
@@ -49,13 +52,23 @@ for path, expected in protected_hashes.items():
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.54' or str(plist.get('CFBundleVersion')) != '54':
-    raise SystemExit('ERROR: Step 19.2 must be version 0.0.54 (54).')
+if parent_mode:
+    try:
+        build_number = int(str(plist.get('CFBundleVersion')))
+    except ValueError as exc:
+        raise SystemExit('ERROR: Step 19 parent validation requires a numeric build version.') from exc
+    if build_number < 54:
+        raise SystemExit('ERROR: Step 19 parent validation requires build >= 54.')
+else:
+    if plist.get('CFBundleShortVersionString') != '0.0.54' or str(plist.get('CFBundleVersion')) != '54':
+        raise SystemExit('ERROR: Step 19.2 must be version 0.0.54 (54).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
-for marker in (
+version_markers = () if parent_mode else (
     '<ApplicationVersion>54</ApplicationVersion>',
     '<ApplicationDisplayVersion>0.0.54</ApplicationDisplayVersion>',
+)
+for marker in version_markers + (
     '<TrimMode>full</TrimMode>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
     '<TrimmerRootAssembly Include="protobuf-net" />',
@@ -221,11 +234,13 @@ for marker in (
         raise SystemExit(f'ERROR: Step 19.2 host-test marker missing: {marker}')
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
-for marker in (
+standalone_ui_markers = () if parent_mode else (
     'STEP 19.2 — EXPRESSION INTERPRETER COMPATIBILITY',
     'Version 0.0.54',
     'MONO.CECIL 0.11.6 • HOST RUNTIME FALLBACK / FRAMEWORK BOUNDARY / ZERO-WRITE ISOLATION',
     'Steps 01–18 are complete on the physical iPhone.',
+)
+for marker in standalone_ui_markers + (
     'Step 19.2 — Expression Interpreter Compatibility (ordered gates A–D)',
     'Run Gates A–D — Host Fallback → Framework Boundary → Zero-Write Prep → Isolation Audit',
     'Compile(), Compile(preferInterpretation: false), and Compile(preferInterpretation: true)',
@@ -292,18 +307,19 @@ for marker in (
     if marker not in cm_script:
         raise SystemExit(f'ERROR: Step 19.2 Codemagic-build marker missing: {marker}')
 
-codemagic = Path('codemagic.yaml').read_text()
-for marker in (
-    'ios-step-19-2:',
-    'Step 19.2 - Host Expression Fallback and Framework Boundary',
-    'max_build_duration: 120',
-    '$HOME/.cache/sts2launcher/godot-step15',
-    'bash scripts/codemagic-build-step19.sh',
-    'artifacts/StS2-Launcher-Step-19.ipa',
-    'artifacts/step19-build-summary.txt',
-):
-    if marker not in codemagic:
-        raise SystemExit(f'ERROR: Step 19.2 Codemagic workflow marker missing: {marker}')
+if not parent_mode:
+    codemagic = Path('codemagic.yaml').read_text()
+    for marker in (
+        'ios-step-19-2:',
+        'Step 19.2 - Host Expression Fallback and Framework Boundary',
+        'max_build_duration: 120',
+        '$HOME/.cache/sts2launcher/godot-step15',
+        'bash scripts/codemagic-build-step19.sh',
+        'artifacts/StS2-Launcher-Step-19.ipa',
+        'artifacts/step19-build-summary.txt',
+    ):
+        if marker not in codemagic:
+            raise SystemExit(f'ERROR: Step 19.2 Codemagic workflow marker missing: {marker}')
 
 # Source archives must not ship game/proprietary payloads. Historical docs may
 # mention names, so inspect file names rather than arbitrary text.
@@ -315,7 +331,7 @@ for path in Path('.').rglob('*'):
     if name == 'sts2.dll' or 'slaythespire2.app/' in normalized or name.startswith('libfmod') or 'spine_godot' in name:
         raise SystemExit(f'ERROR: Step 19.2 source archive contains forbidden game/proprietary payload: {path}')
 
-print('Step 19.2 Expression Interpreter Compatibility source validation: PASS')
+print('Step 19.2 Expression Interpreter Compatibility source validation: PASS' + (' (parent regression mode)' if parent_mode else ''))
 print('  Steps 01-18 regression guards retained; critical Step 17/18 implementation hashes unchanged')
 print('  Gate A: Compile()/Compile(false)/Compile(true) host proof + dynamic-code flags + fresh receipt-backed arm64/shared workspace')
 print('  Gate B: read-only direct Compile classification across consumer/framework and IL-only/ReadyToRun boundaries; zero mutation targets')
