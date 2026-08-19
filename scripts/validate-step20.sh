@@ -10,8 +10,11 @@ STS2_VALIDATE_AS_PARENT=1 bash scripts/validate-step19.sh
 python3 - <<'PY'
 from pathlib import Path
 import hashlib
+import os
 import plistlib
 import re
+
+parent_mode = os.environ.get("STS2_VALIDATE_AS_PARENT") == "1"
 
 required = [
     Path('src/StS2Launcher.Core/DynamicManagedExecutionFoundation.cs'),
@@ -57,13 +60,23 @@ for path, expected in protected_hashes.items():
 
 with Path('src/StS2Launcher.Step05.iOS/Info.plist').open('rb') as f:
     plist = plistlib.load(f)
-if plist.get('CFBundleShortVersionString') != '0.0.55' or str(plist.get('CFBundleVersion')) != '55':
-    raise SystemExit('ERROR: Step 20 must be version 0.0.55 (55).')
+if parent_mode:
+    try:
+        build_number = int(str(plist.get('CFBundleVersion')))
+    except ValueError as exc:
+        raise SystemExit('ERROR: Step 20 parent validation requires a numeric build version.') from exc
+    if build_number < 55:
+        raise SystemExit('ERROR: Step 20 parent validation requires build >= 55.')
+else:
+    if plist.get('CFBundleShortVersionString') != '0.0.55' or str(plist.get('CFBundleVersion')) != '55':
+        raise SystemExit('ERROR: Step 20 must be version 0.0.55 (55).')
 
 csproj = Path('src/StS2Launcher.Step05.iOS/StS2Launcher.Step05.iOS.csproj').read_text()
-for marker in (
+version_markers = () if parent_mode else (
     '<ApplicationVersion>55</ApplicationVersion>',
     '<ApplicationDisplayVersion>0.0.55</ApplicationDisplayVersion>',
+)
+for marker in version_markers + (
     '<TrimMode>full</TrimMode>',
     '<MtouchInterpreter>-all</MtouchInterpreter>',
     '<TrimmerRootAssembly Include="SteamKit2" />',
@@ -204,11 +217,13 @@ for marker in (
         raise SystemExit(f'ERROR: Step 20 host-test marker missing: {marker}')
 
 root = Path('src/StS2Launcher.Step05.iOS/RootViewController.cs').read_text()
-for marker in (
+standalone_ui_markers = () if parent_mode else (
     'STEP 20 — DYNAMIC MANAGED EXECUTION FOUNDATION',
     'Version 0.0.55',
     'MONO INTERPRETER • EXTERNAL IL LOAD / PRIVATE DEPENDENCY / ISOLATION',
     'Steps 01–19 are complete and closed on the physical iPhone.',
+)
+for marker in standalone_ui_markers + (
     'Step 20 — Dynamic Managed Execution Foundation (ordered gates A–D)',
     'Run Gates A–D — Fixture Integrity → External IL Execute → Private Dependency → Isolation Audit',
     'RunDynamicManagedExecutionFoundationAsync',
@@ -222,72 +237,73 @@ for marker in (
     if marker not in root:
         raise SystemExit(f'ERROR: Step 20 UI/gate marker missing: {marker}')
 
-build = Path('scripts/build-step20.sh').read_text()
-for marker in (
-    'bash scripts/validate-step20.sh',
-    'dotnet publish "$PROJECT"',
-    'Building project-owned Step 20 external managed fixtures as data-only payload',
-    'Step20DynamicFixtures',
-    'step20-fixtures.sha256',
-    'StS2-Launcher-Step-20.ipa',
-):
-    if marker not in build:
-        raise SystemExit(f'ERROR: Step 20 build-wrapper marker missing: {marker}')
-# Fixture copy must happen after publish completes.
-if build.index('dotnet publish "$PROJECT"') > build.index('STEP20_FIXTURE_DIR="$APP/Step20DynamicFixtures"'):
-    raise SystemExit('ERROR: Step 20 fixture payload must be inserted only after dotnet publish, never as an AOT/link input.')
+if not parent_mode:
+    build = Path('scripts/build-step20.sh').read_text()
+    for marker in (
+        'bash scripts/validate-step20.sh',
+        'dotnet publish "$PROJECT"',
+        'Building project-owned Step 20 external managed fixtures as data-only payload',
+        'Step20DynamicFixtures',
+        'step20-fixtures.sha256',
+        'StS2-Launcher-Step-20.ipa',
+    ):
+        if marker not in build:
+            raise SystemExit(f'ERROR: Step 20 build-wrapper marker missing: {marker}')
+    # Fixture copy must happen after publish completes.
+    if build.index('dotnet publish "$PROJECT"') > build.index('STEP20_FIXTURE_DIR="$APP/Step20DynamicFixtures"'):
+        raise SystemExit('ERROR: Step 20 fixture payload must be inserted only after dotnet publish, never as an AOT/link input.')
 
-run_tests = Path('scripts/run-unit-tests-step20.sh').read_text()
-for marker in (
-    'STS2_STEP20_FIXTURE_ROOT',
-    'step20-fixtures.sha256',
-    'dotnet test "$TEST_PROJECT"',
-    'LogFileName=step20.trx',
-    'step20-unit-tests.log',
-):
-    if marker not in run_tests:
-        raise SystemExit(f'ERROR: Step 20 host-test runner marker missing: {marker}')
+    run_tests = Path('scripts/run-unit-tests-step20.sh').read_text()
+    for marker in (
+        'STS2_STEP20_FIXTURE_ROOT',
+        'step20-fixtures.sha256',
+        'dotnet test "$TEST_PROJECT"',
+        'LogFileName=step20.trx',
+        'step20-unit-tests.log',
+    ):
+        if marker not in run_tests:
+            raise SystemExit(f'ERROR: Step 20 host-test runner marker missing: {marker}')
 
-cm = Path('scripts/codemagic-build-step20.sh').read_text()
-for marker in (
-    'DOTNET_SDK_VERSION="${DOTNET_SDK_VERSION:-9.0.314}"',
-    'DOTNET_WORKLOAD_SET="${DOTNET_WORKLOAD_SET:-9.0.314.3}"',
-    'bash scripts/validate-step20.sh',
-    'bash scripts/run-unit-tests-step20.sh',
-    'bash scripts/build-step20.sh',
-    'bash scripts/verify-step20-ipa.sh artifacts/StS2-Launcher-Step-20.ipa',
-    'artifacts/step20-build-summary.txt',
-):
-    if marker not in cm:
-        raise SystemExit(f'ERROR: Step 20 Codemagic-build marker missing: {marker}')
+    cm = Path('scripts/codemagic-build-step20.sh').read_text()
+    for marker in (
+        'DOTNET_SDK_VERSION="${DOTNET_SDK_VERSION:-9.0.314}"',
+        'DOTNET_WORKLOAD_SET="${DOTNET_WORKLOAD_SET:-9.0.314.3}"',
+        'bash scripts/validate-step20.sh',
+        'bash scripts/run-unit-tests-step20.sh',
+        'bash scripts/build-step20.sh',
+        'bash scripts/verify-step20-ipa.sh artifacts/StS2-Launcher-Step-20.ipa',
+        'artifacts/step20-build-summary.txt',
+    ):
+        if marker not in cm:
+            raise SystemExit(f'ERROR: Step 20 Codemagic-build marker missing: {marker}')
 
-verify = Path('scripts/verify-step20-ipa.sh').read_text()
-for marker in (
-    '0.0.55',
-    'BUILD_VERSION" == "55"',
-    'Step20DynamicFixtures',
-    'StS2Launcher.Step20.DynamicFixture.dll',
-    'StS2Launcher.Step20.DependencyFixture.dll',
-    'StS2Launcher.Step20.RootFixture.dll',
-    'step20-fixtures.sha256',
-    'shasum -a 256 -c step20-fixtures.sha256',
-    'Expected device UI: STEP 20 — DYNAMIC MANAGED EXECUTION FOUNDATION',
-):
-    if marker not in verify:
-        raise SystemExit(f'ERROR: Step 20 IPA verification marker missing: {marker}')
+    verify = Path('scripts/verify-step20-ipa.sh').read_text()
+    for marker in (
+        '0.0.55',
+        'BUILD_VERSION" == "55"',
+        'Step20DynamicFixtures',
+        'StS2Launcher.Step20.DynamicFixture.dll',
+        'StS2Launcher.Step20.DependencyFixture.dll',
+        'StS2Launcher.Step20.RootFixture.dll',
+        'step20-fixtures.sha256',
+        'shasum -a 256 -c step20-fixtures.sha256',
+        'Expected device UI: STEP 20 — DYNAMIC MANAGED EXECUTION FOUNDATION',
+    ):
+        if marker not in verify:
+            raise SystemExit(f'ERROR: Step 20 IPA verification marker missing: {marker}')
 
-codemagic = Path('codemagic.yaml').read_text()
-for marker in (
-    'ios-step-20:',
-    'Step 20 - Dynamic Managed Execution Foundation',
-    'max_build_duration: 120',
-    '$HOME/.cache/sts2launcher/godot-step15',
-    'bash scripts/codemagic-build-step20.sh',
-    'artifacts/StS2-Launcher-Step-20.ipa',
-    'artifacts/step20-build-summary.txt',
-):
-    if marker not in codemagic:
-        raise SystemExit(f'ERROR: Step 20 Codemagic workflow marker missing: {marker}')
+    codemagic = Path('codemagic.yaml').read_text()
+    for marker in (
+        'ios-step-20:',
+        'Step 20 - Dynamic Managed Execution Foundation',
+        'max_build_duration: 120',
+        '$HOME/.cache/sts2launcher/godot-step15',
+        'bash scripts/codemagic-build-step20.sh',
+        'artifacts/StS2-Launcher-Step-20.ipa',
+        'artifacts/step20-build-summary.txt',
+    ):
+        if marker not in codemagic:
+            raise SystemExit(f'ERROR: Step 20 Codemagic workflow marker missing: {marker}')
 
 # Repository source must never contain game/proprietary payloads. Generated bin/obj/artifacts
 # directories are allowed during Codemagic because build-step20 re-runs validation after host tests.
@@ -300,7 +316,7 @@ for path in Path('.').rglob('*'):
     if name == 'sts2.dll' or 'slaythespire2.app/' in normalized or name.startswith('libfmod') or 'spine_godot' in name:
         raise SystemExit(f'ERROR: Step 20 source archive contains forbidden game/proprietary payload: {path}')
 
-print('Step 20 Dynamic Managed Execution Foundation source validation: PASS')
+print('Step 20 Dynamic Managed Execution Foundation source validation: PASS' + (' (parent regression mode)' if parent_mode else ''))
 print('  Steps 01-19 parent regression validation retained; Step 17/18/19 implementation hashes protected')
 print('  Build-time launcher assemblies remain AOT-targeted via MtouchInterpreter=-all; interpreter remains linked for runtime/dynamic managed code')
 print('  Gate A: OfflineReady + exact SHA-256/Cecil identity/pure-IL/reference-boundary verification of project-owned external fixtures')
