@@ -35,11 +35,14 @@
 - iOS publish PASS;
 - runtime-policy telemetry reports `MtouchInterpreter=-all` and no broad interpreter/NativeAOT;
 - final IPA verification PASS;
-- expected version is 0.0.63 (63).
+- expected version is 0.0.64 (64).
+- current Step 19 regression does not require `IsDynamicCodeSupported=false`; on iOS it requires successful expression execution and `IsDynamicCodeCompiled=false`.
+- static validation rejects the stale pre-Step-20 Step 19 assertion.
 
 ## Physical acceptance
 
-- header `STEP 22.4.1 — CANONICAL FOUNDATION`;
+- header `STEP 22.4.2 — CANONICAL FOUNDATION`;
+- Step 19 A–D 4/4 under the current post-Step-20 non-JIT contract;
 - Step 22 A–D 4/4;
 - blockers 0;
 - runtime closure ready YES;

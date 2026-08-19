@@ -1,4 +1,4 @@
-# Current Status — Step 22.4.1 Canonical Foundation Candidate
+# Current Status — Step 22.4.2 Canonical Foundation Regression Correction
 
 ## Physically closed boundary
 
@@ -13,31 +13,44 @@
 
 The wider 44-name diagnostic still contains 18 transitive-only desktop/workspace implementation names that are not independent private-runtime requirements.
 
-## Foundation consolidation history
+## Canonical-foundation acceptance history
 
-Step 22.3 never reached C# compilation because its first static validator incorrectly treated historical material as a build dependency.
+Step 22.4 established the canonical source/document/history architecture and passed Codemagic static validation 122/122. Codemagic then stopped compiling one additive report-writer unit test because the installed MSTest 4.x API uses `Assert.ThrowsExactlyAsync` rather than the removed `ThrowsExceptionAsync` API.
 
-Step 22.4 fixed the canonical source/document/history architecture and **passed Codemagic static validation 122/122**. Codemagic then built the external fixtures and reached the host test-project compilation. The first real compile error was limited to the additive report-writer unit test: MSTest 4.3.2 no longer exposes `Assert.ThrowsExceptionAsync`, and `DataTestMethod` is obsolete.
+Step 22.4.1 corrected that host-test API mismatch. Codemagic built and the resulting physical iPhone regression run was healthy except for **Step 19 Gate A**. Every other test run by the user passed.
 
-No Core/iOS/runtime compatibility regression was observed before that stop.
+The Step 19 failure was traced to a stale historical assertion, not a launcher/runtime regression. Step 19 was originally physically proven before Step 20 enabled the Mono interpreter, when the iPhone reported:
 
-## Active candidate — Step 22.4.1
+- `RuntimeFeature.IsDynamicCodeSupported = false`
+- `RuntimeFeature.IsDynamicCodeCompiled = false`
 
-Step 22.4.1 is the same behavior-neutral canonical foundation with only the MSTest v4 test-source correction.
+Step 20 intentionally established the canonical `MtouchInterpreter=-all` runtime. Later physical diagnostics report:
 
-- Version: **0.0.63 (63)**
-- Codemagic workflow: **`ios-step-22-4-1`**
+- `RuntimeFeature.IsDynamicCodeSupported = true`
+- `RuntimeFeature.IsDynamicCodeCompiled = false`
+
+The old Step 19 regression incorrectly required both values to stay false forever, even though Step 20 deliberately changed the first value.
+
+## Active candidate — Step 22.4.2
+
+Step 22.4.2 corrects the **current regression contract** while preserving the historical Step 19 documentation.
+
+- Version: **0.0.64 (64)**
+- Codemagic workflow: **`ios-step-22-4-2`**
 - Live iOS project: **`src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`**
 - Real StS2 CLR load/execution: **still intentionally not attempted**
 
-Changes from 22.4:
+Current Step 19 Gate A now requires:
 
-- `Assert.ThrowsExactlyAsync<ArgumentException>` replaces removed `ThrowsExceptionAsync` in the report-writer test;
-- `[TestMethod]` replaces obsolete `[DataTestMethod]` while retaining the same `DataRow` cases;
-- canonical validation now enforces those MSTest v4-compatible forms;
-- release/version identifiers are bumped so the Codemagic/device result is unambiguous.
+1. `Compile()` returns and executes to `42`;
+2. `Compile(preferInterpretation: false)` returns and executes to `42`;
+3. `Compile(preferInterpretation: true)` returns and executes to `42`;
+4. on iOS, `RuntimeFeature.IsDynamicCodeCompiled == false`;
+5. `RuntimeFeature.IsDynamicCodeSupported` is recorded diagnostically and may be either `false` (historical pre-Step-20 mode) or `true` (canonical interpreter-enabled Step-20+ mode).
 
-Production compatibility behavior is unchanged.
+A new pure `ExpressionRuntimeCompatibilityPolicy` makes this distinction explicit and unit-testable. Static validation rejects reintroduction of the obsolete `IsDynamicCodeSupported == false` current-runtime assertion.
+
+No Steam/install/Godot/runtime-binding behavior changed. The only physically proven Step 22.2 Core behavior file intentionally modified is `ExpressionInterpreterCompatibility.cs`, and that delta is separately hash-pinned; the other 96 baseline Core behavior files remain byte-for-byte protected.
 
 ## Acceptance required before Step 23
 
@@ -45,10 +58,11 @@ Codemagic must pass static validation, host unit tests, Godot/native build/prefl
 
 On device:
 
-1. confirm `STEP 22.4.1 — CANONICAL FOUNDATION`, version `0.0.63`;
-2. run Step 22 A–D and require 4/4, explicit binding blockers 0, runtime closure ready YES;
-3. run `Verify Offline-Ready Install (Local Only)` and require PASS;
-4. run Foundation 5/5 and require PASS;
-5. confirm the expected `.txt` reports are created in Files.
+1. confirm `STEP 22.4.2 — CANONICAL FOUNDATION`, version `0.0.64`;
+2. run Step 19 A–D and require 4/4; on the canonical runtime expect `IsDynamicCodeSupported=true` and `IsDynamicCodeCompiled=false` unless the runtime implementation changes while still satisfying the non-JIT contract;
+3. run Step 22 A–D and require 4/4, explicit binding blockers 0, runtime closure ready YES;
+4. run `Verify Offline-Ready Install (Local Only)` and require PASS;
+5. run Foundation 5/5 and require PASS;
+6. confirm the corresponding `.txt` reports are created in Files.
 
-Only after that acceptance should Step 23 begin.
+Only after this completely green canonical-foundation acceptance should Step 23 begin.

@@ -1,0 +1,64 @@
+# Regression Contracts
+
+This document defines how historical physical proofs are translated into **current** regression expectations.
+
+## Rule: validate the canonical present state, preserve the historical state in history
+
+A compatibility step may intentionally change a runtime characteristic that an earlier step observed. When that happens:
+
+- the historical step document remains unchanged as evidence of what was proven at the time;
+- the current regression must test the capability that still matters, not an incidental intermediate value;
+- any intentionally changed assertion must be documented in `CURRENT-STATUS.md` and a history record;
+- static/unit tests should encode the new contract so a stale historical assertion cannot silently return.
+
+This rule prevents a later improvement from making an earlier regression permanently red even though the underlying capability remains healthy.
+
+## Step 19 — expression runtime compatibility
+
+Historical Step 19.2 ran before the dynamic-managed-execution foundation and physically observed:
+
+- `RuntimeFeature.IsDynamicCodeSupported=false`;
+- `RuntimeFeature.IsDynamicCodeCompiled=false`;
+- `Compile()`, `Compile(false)`, and `Compile(true)` all executed successfully.
+
+Step 20 intentionally enabled the Mono interpreter with `MtouchInterpreter=-all`. The canonical Step-20+ runtime may therefore report dynamic-code **support** while still performing no dynamic native-code/JIT compilation.
+
+Current Step 19 regression contract:
+
+- all three expression compile call shapes execute successfully and return the expected value;
+- on iOS, `RuntimeFeature.IsDynamicCodeCompiled` must be `false`;
+- `RuntimeFeature.IsDynamicCodeSupported` is diagnostic;
+- `supported=false, compiled=false` is accepted as the historical no-dynamic-code fallback mode;
+- `supported=true, compiled=false` is accepted as the canonical interpreter-enabled mode;
+- any iOS state with `compiled=true` fails the regression.
+
+The current production policy is centralized in `ExpressionRuntimeCompatibilityPolicy` and covered by host unit tests.
+
+## Step 20 — dynamic managed execution
+
+The canonical build keeps `MtouchInterpreter=-all`: build-time assemblies remain AOT-targeted while interpreter capability remains available for post-publish managed IL and dynamic-code scenarios.
+
+Step 20 regression remains authoritative for actual post-publish IL execution and private dependency resolution.
+
+## Step 22 — host framework binding closure
+
+The current contract remains:
+
+- exactly the measured 22 direct framework roots are preserved;
+- Step 22 A–D pass;
+- explicit binding blockers are zero;
+- runtime closure readiness is YES;
+- no real StS2 CLR load occurs during the Step 22 foundation.
+
+The wider 44-name host probe is diagnostic; transitive-only desktop implementation names are not independent private-runtime requirements.
+
+## Changing a contract later
+
+Before changing one of these contracts:
+
+1. identify the later step that intentionally changed the runtime behavior;
+2. preserve the older physical evidence under `docs/history/steps/`;
+3. define the capability-level invariant that remains important;
+4. add or update a pure unit-testable policy where possible;
+5. update static validation to reject the obsolete assertion;
+6. require a new physical regression pass before advancing the project boundary.

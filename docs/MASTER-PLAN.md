@@ -9,8 +9,9 @@ A new engineer or a new ChatGPT session should be able to resume the project wit
 1. `docs/MASTER-PLAN.md` — architecture, invariants, roadmap, and engineering rules.
 2. `docs/CURRENT-STATUS.md` — the current physically proven boundary and active candidate.
 3. `docs/ARCHITECTURE.md` — canonical source/runtime structure.
-4. `docs/TESTING.md` and `docs/REPORTS.md` — authoritative validation loop and diagnostics.
-5. `docs/history/INDEX.md` — chronological evidence and step-specific records when deeper context is needed.
+4. `docs/REGRESSION-CONTRACTS.md` — current capability-level regression semantics when later steps intentionally change an earlier intermediate runtime state.
+5. `docs/TESTING.md` and `docs/REPORTS.md` — authoritative validation loop and diagnostics.
+6. `docs/history/INDEX.md` — chronological evidence and step-specific records when deeper context is needed.
 
 A handoff document may still be generated for convenience, but it is not an authoritative project dependency.
 
@@ -184,10 +185,11 @@ A step/subsystem is closed only when:
 
 - `MASTER-PLAN.md`: change rarely; only architecture, scope, rules, or major roadmap changes.
 - `CURRENT-STATUS.md`: change every meaningful candidate/physical closure.
+- `REGRESSION-CONTRACTS.md`: change only when a later subsystem intentionally changes the current meaning of an earlier regression.
 - `ARCHITECTURE.md`, `TESTING.md`, `REPORTS.md`, `RELEASE-CHECKLIST.md`: change when the canonical implementation/process changes.
 - `docs/history/steps/`: append evidence/design records; do not rewrite old records to pretend they were created with newer knowledge.
 - `history.zip`: optional reference only; never authoritative.
 
 ## Resumption rule
 
-If conversation state is lost, do **not** infer the current boundary from version numbers or old scripts. Read `CURRENT-STATUS.md`, then use the latest physical text reports/artifacts. The current source and physical-device evidence override historical plans.
+If conversation state is lost, do **not** infer the current boundary from version numbers or old scripts. Read `CURRENT-STATUS.md`, then `REGRESSION-CONTRACTS.md`, then use the latest physical text reports/artifacts. The current source and physical-device evidence override historical plans.
