@@ -1,19 +1,19 @@
-# StS2 Launcher iOS — Step 22 Host Framework Closure Foundation
+# StS2 Launcher iOS — Step 22.2 Host Binding Frontier Correction
 
-**Version:** `0.0.58 (58)`  
-**Codemagic workflow:** `ios-step-22`
+**Version:** `0.0.60 (60)`  
+**Codemagic workflow:** `ios-step-22-2`
 
-This candidate preserves the physically proven launcher foundation through Step 20 and the Step 21/21.1 binding planner/exporter. Step 21.1 showed that all 47 remaining binding blockers were framework-shaped edges whose only workspace fallback was a non-IL-only macOS runtime image. Step 22 roots a measured 22-assembly iOS/.NET host seed set and physically requires the complete 44-name observed framework frontier before recomputing the real `sts2.dll` binding plan.
+Step 22.1 physically proved all 22 measured direct host-framework roots are present on the iPhone. Its Gate A
+failed only because it additionally required 22 transitive/implementation probes; 18 of those are not separately
+loadable. Step 22.2 corrects that boundary without adding framework roots: Gate A requires the actual 22-name
+host-binding frontier, keeps the wider 44-name probe diagnostic, and lets the unchanged Step 21 planner determine
+whether any real dependency blockers remain.
 
 Success target:
 
 `HOST FRAMEWORK CLOSURE FOUNDATION PASS — 4/4`
 
-with:
+with zero explicit binding blockers, `Runtime closure ready for first real CLR load: YES`, no private prepared
+`System.*`/`netstandard` assemblies, and still no StS2 CLR load or execution.
 
-- `Explicit binding blockers: 0`
-- `Runtime closure ready for first real CLR load: YES`
-- no private prepared `System.*` / `netstandard` assemblies
-- no StS2 CLR load or execution
-
-See `docs/STEP-22-HOST-FRAMEWORK-CLOSURE.md` and `docs/STEP-22-TEST.md`.
+See `docs/STEP-22.2-HOST-BINDING-FRONTIER-CORRECTION.md` and `docs/STEP-22.2-TEST.md`.
