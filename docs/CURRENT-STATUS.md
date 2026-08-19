@@ -2,46 +2,35 @@
 
 Steps **01–20 are physically complete and closed on the iPhone**.
 
-Current candidate: **Step 21 — Prepared Runtime / Framework Binding**.
-
-- App version: `0.0.56 (56)`
-- Workflow: `ios-step-21`
-- Protected baseline: Step 20 / `0.0.55`, which passed A–D plus OfflineReady and Foundation 5/5.
-- Step 21 physical status: **not yet tested**.
-
-## Step 21 objective
-
-Build the first authoritative execution-oriented managed dependency set for the real receipt-backed ARM64 StS2 payload without CLR-loading the game.
-
-The downloaded macOS payload contains both private/game assemblies and desktop runtime/framework implementations. Step 19.2 proved copied desktop `System.*` framework binaries should not be mutated merely to recreate behavior already supplied by the iOS host. Step 20 then proved runtime-loaded IL + one exact private dependency hop works on the physical iPhone.
-
-Step 21 therefore classifies each reachable real AssemblyRef as:
+Step 21 physically passed A–D and produced an audited prepared-runtime/framework-binding plan with:
 
 ```text
-iOS host framework binding
-verified private/workspace binding
-explicit blocker
+Explicit binding blockers: 47
+Runtime closure ready for first real CLR load: NO
 ```
 
-and creates a byte-identical prepared set containing only reachable IL-only private/game assemblies.
+Current candidate: **Step 21.1 — Binding Diagnostic Export**.
 
-Target gates:
+- App version: `0.0.57 (57)`
+- Workflow: `ios-step-21-1`
+- Step 21 A–D production implementation: **hash-protected and unchanged**.
+- Step 21.1 objective: export the full persisted blocker frontier to a Files-accessible UTF-8 text report.
+- Real StS2 CLR load/execution: **still forbidden**.
 
-```text
-A — RuntimePayloadClassification
-B — HostFrameworkBindingPlan
-C — PreparedRuntimeAssemblySet
-D — ClosureAudit
+## Report
 
-PREPARED RUNTIME / FRAMEWORK BINDING PASS — 4/4
-```
+The existing Step 21 plan is persisted at:
 
-The separate readiness line is decisive for the next subsystem:
+`Documents/StS2Launcher/Step21-PreparedRuntimeBinding/plan/runtime-binding-plan.json`
 
-```text
-Runtime closure ready for first real CLR load: YES/NO
-```
+Step 21.1 writes:
 
-Step 21 4/4 means the plan and isolation are trustworthy. It does not override `Runtime closure ready: NO`.
+`Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt`
 
-Closure still requires OfflineReady + Foundation 5/5 after 4/4. Real `sts2.dll` CLR loading/execution remains forbidden in Step 21.
+The report contains every blocker plus grouped/unique summaries and can be retrieved from:
+
+`Files → On My iPhone → StS2 Launcher → StS2Launcher`
+
+If the plan survived the app update, tap **Export Complete Step 21 Binding Diagnostics to Files** immediately. If it did not, rerun Step 21 A–D once and export afterward.
+
+The next real engineering subsystem must be chosen from the complete blocker report rather than from the count `47` alone.
