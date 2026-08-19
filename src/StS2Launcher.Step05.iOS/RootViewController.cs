@@ -34,6 +34,7 @@ public sealed class RootViewController : UIViewController
     private readonly DynamicManagedExecutionFoundation _dynamicManagedExecutionFoundation;
     private readonly DynamicManagedExecutionGateSequence _dynamicManagedExecutionGates = new();
     private readonly PreparedRuntimeFrameworkBinding _preparedRuntimeFrameworkBinding;
+    private readonly RuntimeBindingDiagnosticsExporter _runtimeBindingDiagnosticsExporter;
     private readonly RuntimeFrameworkBindingGateSequence _runtimeFrameworkBindingGates = new();
 
     private UILabel? _foundationResultLabel;
@@ -75,6 +76,7 @@ public sealed class RootViewController : UIViewController
     private UILabel? _dynamicManagedExecutionDetailLabel;
     private UILabel? _runtimeFrameworkBindingResultLabel;
     private UILabel? _runtimeFrameworkBindingDetailLabel;
+    private UILabel? _runtimeBindingDiagnosticsExportResultLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -102,6 +104,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _expressionInterpreterCompatibilityButton;
     private UIButton? _dynamicManagedExecutionButton;
     private UIButton? _runtimeFrameworkBindingButton;
+    private UIButton? _runtimeBindingDiagnosticsExportButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -145,6 +148,7 @@ public sealed class RootViewController : UIViewController
             launcherDataRoot,
             Path.Combine(NSBundle.MainBundle.BundlePath, DynamicManagedExecutionFoundation.BundleFixtureDirectoryName));
         _preparedRuntimeFrameworkBinding = new PreparedRuntimeFrameworkBinding(launcherDataRoot);
+        _runtimeBindingDiagnosticsExporter = new RuntimeBindingDiagnosticsExporter(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -190,22 +194,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 21 — PREPARED RUNTIME / FRAMEWORK BINDING",
+            "STEP 21.1 — BINDING DIAGNOSTIC EXPORT",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.56",
+            "Version 0.0.57",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "REAL DEPENDENCY GRAPH • HOST FRAMEWORK MAP • PREPARED IL SET • CLOSURE AUDIT",
+            "STEP 21 LOGIC PRESERVED • FULL BLOCKER REPORT • FILES APP EXPORT",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–20 are complete and closed on the physical iPhone. Step 21 builds the first execution-oriented dependency/binding plan for the real receipt-backed ARM64 StS2 managed payload without CLR-loading the game. Gate A re-proves OfflineReady, clones the ARM64/shared managed scope and catalogs real assembly identities plus IL-only image shape. Gate B walks the real sts2.dll AssemblyRef graph, prefers proven iOS-host framework bindings over copied desktop System.* implementations, resolves private dependencies only from the SHA-1-verified workspace, and records every unresolved/ambiguous/non-IL-only edge as an explicit blocker. Gate C byte-copies only reachable IL-only private/game assemblies into a prepared set and persists the deterministic binding plan. Gate D re-hashes source/prepared/live trees and audits plan closure. A 4/4 pass proves the plan is trustworthy; the separate Runtime closure ready signal determines whether the next step may attempt a real CLR load.",
+            "Step 21 physically passed A–D and produced an authoritative binding plan with 47 explicit blockers and Runtime closure ready: NO. Step 21.1 is a reporting-only hotfix: the physically proven Step 21 binding/preparation implementation is unchanged. It reads the already persisted runtime-binding-plan.json and writes a complete plain-text blocker report under Documents/StS2Launcher. iOS local file sharing is enabled so the report can be retrieved from Files instead of screenshotting long diagnostics. If the existing plan survived the app update, you can export it immediately without rerunning A–D.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -689,6 +693,21 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_runtimeFrameworkBindingDetailLabel);
 
+        _runtimeBindingDiagnosticsExportButton = SystemButton("Export Complete Step 21 Binding Diagnostics to Files", 17);
+        _runtimeBindingDiagnosticsExportButton.TouchUpInside += async (_, _) => await RunRuntimeBindingDiagnosticsExportAsync();
+        content.AddArrangedSubview(_runtimeBindingDiagnosticsExportButton);
+
+        _runtimeBindingDiagnosticsExportResultLabel = Label(
+            "DIAGNOSTIC EXPORT: NOT RUN — existing Step 21 plan may be exported immediately",
+            UIFont.BoldSystemFontOfSize(17),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_runtimeBindingDiagnosticsExportResultLabel);
+
+        content.AddArrangedSubview(Label(
+            "Files location after export: On My iPhone → StS2 Launcher → StS2Launcher → Step21.1-RuntimeBindingDiagnostics.txt. The report contains the complete blocker list, grouped blocker counts, unique requested identities, host bindings, prepared assembly identities, and the persisted plan SHA-256. It intentionally omits Steam credentials/tokens and host absolute file locations. The exported text is diagnostic output only and is never trusted as launcher input. Because iOS exposes the app Documents directory for this hotfix, avoid editing or deleting other StS2Launcher files in Files.",
+            UIFont.SystemFontOfSize(14),
+            UIColor.SecondaryLabel));
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -701,7 +720,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–20 COMPLETE and closed on the physical iPhone. Step 21 builds an authoritative real StS2 dependency/framework binding plan and an execution-oriented IL-only prepared assembly set without CLR-loading the game. Stop at the first failing gate. A Step 21 4/4 pass proves planning/isolation; Runtime closure ready determines whether Step 22 can begin a controlled real assembly-load probe or must first address explicit framework/private dependency blockers.",
+            "Status: Step 21 A–D physically passed with 47 explicit binding blockers and Runtime closure ready: NO. Step 21.1 preserves that binding logic and exports the complete persisted plan to a Files-accessible text report so the blocker frontier can be analyzed before Step 22. No real StS2 CLR load should be attempted yet.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -2552,11 +2571,13 @@ public sealed class RootViewController : UIViewController
             var gateD = await _preparedRuntimeFrameworkBinding.RunClosureAuditAsync(progress, token);
             if (!RecordRuntimeFrameworkBindingGate(gateD)) return;
 
+            await TryExportRuntimeBindingDiagnosticsAsync(automatic: true, token);
+
             var snapshot = _runtimeFrameworkBindingGates.Snapshot();
             _runtimeFrameworkBindingResultLabel.Text = snapshot.Summary;
             _runtimeFrameworkBindingResultLabel.TextColor = UIColor.Label;
             _runtimeFrameworkBindingDetailLabel.Text = FormatRuntimeFrameworkBindingDetail(
-                "All four Step 21 gates passed. The real managed dependency graph has an audited host/private binding plan and byte-identical prepared IL set. Read Gate B/D's Runtime closure ready signal before Step 22. Run OfflineReady + Foundation 5/5 to close Step 21.");
+                "All four Step 21 gates passed. The real managed dependency graph has an audited host/private binding plan and byte-identical prepared IL set. Step 21.1 also attempted to refresh the Files-accessible full diagnostic report. Read Gate B/D's Runtime closure ready signal before Step 22.");
             _statusLabel.Text = "PASS: STEP 21 PREPARED RUNTIME / FRAMEWORK BINDING — 4/4. Binding plan is physically audited; inspect Runtime closure ready YES/NO before the next subsystem.";
             _statusLabel.TextColor = UIColor.Label;
         }
@@ -2579,6 +2600,58 @@ public sealed class RootViewController : UIViewController
         finally
         {
             EndSteamOperation();
+        }
+    }
+
+    private async Task RunRuntimeBindingDiagnosticsExportAsync()
+    {
+        await TryExportRuntimeBindingDiagnosticsAsync(automatic: false, CancellationToken.None);
+    }
+
+    private async Task TryExportRuntimeBindingDiagnosticsAsync(bool automatic, CancellationToken cancellationToken)
+    {
+        if (_runtimeBindingDiagnosticsExportResultLabel is null)
+            return;
+
+        try
+        {
+            _runtimeBindingDiagnosticsExportResultLabel.Text = automatic
+                ? "DIAGNOSTIC EXPORT: refreshing complete report after Gate D…"
+                : "DIAGNOSTIC EXPORT: reading persisted Step 21 plan and writing Files report…";
+            _runtimeBindingDiagnosticsExportResultLabel.TextColor = UIColor.Label;
+
+            var result = await _runtimeBindingDiagnosticsExporter.ExportAsync(cancellationToken);
+            _runtimeBindingDiagnosticsExportResultLabel.Text =
+                $"DIAGNOSTIC EXPORT: PASS — {result.BlockerCount:N0} blockers / {result.UniqueBlockedRequestedIdentityCount:N0} unique requested identities\n" +
+                $"Files: On My iPhone → StS2 Launcher → StS2Launcher → {RuntimeBindingDiagnosticsExporter.ReportFileName}\n" +
+                $"Runtime closure ready: {(result.RuntimeClosureReady ? "YES" : "NO")}\n" +
+                $"Plan SHA-256: {result.PlanSha256}\nReport SHA-256: {result.ReportSha256}";
+            _runtimeBindingDiagnosticsExportResultLabel.TextColor = UIColor.Label;
+
+            if (!automatic && _statusLabel is not null)
+            {
+                _statusLabel.Text = $"STEP 21.1 DIAGNOSTIC EXPORT PASS — open Files and send {RuntimeBindingDiagnosticsExporter.ReportFileName}. No game CLR load was attempted.";
+                _statusLabel.TextColor = UIColor.Label;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            if (automatic)
+                throw;
+            _runtimeBindingDiagnosticsExportResultLabel.Text = "DIAGNOSTIC EXPORT: CANCELLED";
+            _runtimeBindingDiagnosticsExportResultLabel.TextColor = UIColor.SecondaryLabel;
+        }
+        catch (Exception ex)
+        {
+            _runtimeBindingDiagnosticsExportResultLabel.Text =
+                $"DIAGNOSTIC EXPORT: FAIL — {ex.GetType().Name}: {ex.Message}\n" +
+                "If the persisted Step 21 plan is missing, rerun Step 21 A–D once and then tap Export again.";
+            _runtimeBindingDiagnosticsExportResultLabel.TextColor = UIColor.SystemRed;
+            if (!automatic && _statusLabel is not null)
+            {
+                _statusLabel.Text = "STEP 21.1 DIAGNOSTIC EXPORT FAIL — no binding policy was changed; report the export error.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            }
         }
     }
 

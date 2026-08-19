@@ -8,8 +8,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>56</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.56</ApplicationDisplayVersion>
+    <ApplicationVersion>57</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.57</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -46,11 +46,11 @@
 
   <Target Name="Step21ValidateInterpreterPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
-             Text="STEP21 INTERPRETER POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+             Text="STEP21.1 INTERPRETER POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Error Condition="'$(MtouchInterpreter)' != '-all'"
-           Text="Step 21 requires MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
+           Text="Step 21.1 preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
     <Error Condition="'$(UseInterpreter)' == 'true'"
-           Text="Step 21 forbids UseInterpreter=true because it is the broader interpret-all build-time policy." />
+           Text="Step 21.1 preserves the Step 20/21 prohibition on UseInterpreter=true because it is the broader interpret-all build-time policy." />
     <Error Condition="'$(PublishAot)' == 'true'"
            Text="Step 21 requires the Mono runtime; NativeAOT is incompatible with the Mono interpreter proof." />
   </Target>

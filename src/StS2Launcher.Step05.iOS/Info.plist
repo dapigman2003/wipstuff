@@ -7,9 +7,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.community.sts2launcher</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0.56</string>
+	<string>0.0.57</string>
 	<key>CFBundleVersion</key>
-	<string>56</string>
+	<string>57</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchScreen</key>
@@ -41,5 +41,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 </dict>
 </plist>
