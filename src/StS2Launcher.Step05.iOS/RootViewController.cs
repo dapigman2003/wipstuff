@@ -36,6 +36,8 @@ public sealed class RootViewController : UIViewController
     private readonly PreparedRuntimeFrameworkBinding _preparedRuntimeFrameworkBinding;
     private readonly RuntimeBindingDiagnosticsExporter _runtimeBindingDiagnosticsExporter;
     private readonly RuntimeFrameworkBindingGateSequence _runtimeFrameworkBindingGates = new();
+    private readonly HostFrameworkClosureFoundation _hostFrameworkClosureFoundation;
+    private readonly HostFrameworkClosureGateSequence _hostFrameworkClosureGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -149,6 +151,7 @@ public sealed class RootViewController : UIViewController
             Path.Combine(NSBundle.MainBundle.BundlePath, DynamicManagedExecutionFoundation.BundleFixtureDirectoryName));
         _preparedRuntimeFrameworkBinding = new PreparedRuntimeFrameworkBinding(launcherDataRoot);
         _runtimeBindingDiagnosticsExporter = new RuntimeBindingDiagnosticsExporter(launcherDataRoot);
+        _hostFrameworkClosureFoundation = new HostFrameworkClosureFoundation(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -194,24 +197,24 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 21.1 — BINDING DIAGNOSTIC EXPORT",
+            "STEP 22 — HOST FRAMEWORK CLOSURE FOUNDATION",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.57",
+            "Version 0.0.58",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "STEP 21 LOGIC PRESERVED • FULL BLOCKER REPORT • FILES APP EXPORT",
+            "MEASURED BCL ROOTS • ZERO DESKTOP FRAMEWORK FALLBACK • NO GAME CLR LOAD",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 21 physically passed A–D and produced an authoritative binding plan with 47 explicit blockers and Runtime closure ready: NO. Step 21.1 is a reporting-only hotfix: the physically proven Step 21 binding/preparation implementation is unchanged. It reads the already persisted runtime-binding-plan.json and writes a complete plain-text blocker report under Documents/StS2Launcher. iOS local file sharing is enabled so the report can be retrieved from Files instead of screenshotting long diagnostics. If the existing plan survived the app update, you can export it immediately without rerunning A–D.",
-            UIFont.SystemFontOfSize(14),
-            UIColor.SecondaryLabel));
+            "Step 21/21.1 physically proved the binding planner and exported the complete dependency frontier: all 47 blockers are NonIlOnlyWorkspaceAssembly framework edges, covering 32 blocked framework simple names plus 12 System.*/netstandard assemblies that had been selected as private IL fallbacks. Step 22 roots 22 measured iOS/.NET framework seed assemblies at build time; ILLink preserves their statically understood dependencies. Gate A requires the complete 44-name observed framework frontier to load from the iOS host. Gates B–D then rerun the physically proven Step 21 planner/preparer/audit and require zero blockers, no private System.*/netstandard assemblies, and Runtime closure ready=YES. StS2 is still never CLR-loaded or executed in this step.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.Label));
 
         content.AddArrangedSubview(Separator());
 
@@ -673,32 +676,32 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 21 — Prepared Runtime / Framework Binding (ordered gates A–D)",
+            "Step 22 — Host Framework Closure Foundation (ordered gates A–D)",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
-        _runtimeFrameworkBindingButton = SystemButton("Run Gates A–D — Classify Runtime → Bind Host Frameworks → Prepare IL Set → Closure Audit", 17);
-        _runtimeFrameworkBindingButton.TouchUpInside += async (_, _) => await RunPreparedRuntimeFrameworkBindingAsync();
+        _runtimeFrameworkBindingButton = SystemButton("Run Step 22 A–D — Root Host BCL → Recompute Closure → Prepare Host-Bound Set → Audit", 17);
+        _runtimeFrameworkBindingButton.TouchUpInside += async (_, _) => await RunHostFrameworkClosureFoundationAsync();
         content.AddArrangedSubview(_runtimeFrameworkBindingButton);
 
         _runtimeFrameworkBindingResultLabel = Label(
-            "PREPARED RUNTIME / FRAMEWORK BINDING: NOT RUN",
+            "HOST FRAMEWORK CLOSURE FOUNDATION: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_runtimeFrameworkBindingResultLabel);
 
         _runtimeFrameworkBindingDetailLabel = Label(
-            "Gate A re-proves OfflineReady, clones and SHA-1 verifies the real ARM64/shared managed filename scope, and catalogs actual managed identities plus IL-only versus ReadyToRun/mixed-mode shape without Cecil dependency resolution. Gate B starts at the real ARM64 sts2.dll and classifies every reachable AssemblyRef as an iOS-host framework binding, an exact/controlled-version verified private workspace binding, or an explicit blocker; copied desktop System.* implementations are never preferred when the host can satisfy the contract. Gate C performs zero Cecil writes and byte-copies only reachable IL-only private/game assemblies into Step21-PreparedRuntimeBinding/prepared, then writes runtime-binding-plan.json. Gate D independently audits source/prepared/live hashes, plan integrity, host/private simple-name isolation, and confirms no real StS2 assembly entered the CLR. Step 21 can pass 4/4 with Runtime closure ready: NO; that means the plan is authoritative and Step 22 must solve the recorded blockers before any game CLR load.",
+            "Gate A requires the complete 44-name framework frontier measured by Step 21.1 to load from the iOS/.NET default host after 22 exact TrimmerRootAssembly seed roots are applied; this catches any platform/runtime-pack assembly that cannot be preserved on iOS before touching the game dependency plan. Gate B reruns the physically proven Step 21 real sts2.dll classification/binding engine and reports the new blocker frontier without failing solely on residual blockers. Gate C persists the recomputed plan, then requires Explicit binding blockers: 0, Runtime closure ready: YES, and no System.*/netstandard framework implementation in private storage; no Cecil writes occur. Gate D reruns the independent Step 21 source/prepared/live/plan audit and re-qualifies zero blockers. The trusted install remains read-only and StS2 is still never CLR-loaded or executed.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_runtimeFrameworkBindingDetailLabel);
 
-        _runtimeBindingDiagnosticsExportButton = SystemButton("Export Complete Step 21 Binding Diagnostics to Files", 17);
+        _runtimeBindingDiagnosticsExportButton = SystemButton("Export Current Runtime Binding Diagnostics to Files", 17);
         _runtimeBindingDiagnosticsExportButton.TouchUpInside += async (_, _) => await RunRuntimeBindingDiagnosticsExportAsync();
         content.AddArrangedSubview(_runtimeBindingDiagnosticsExportButton);
 
         _runtimeBindingDiagnosticsExportResultLabel = Label(
-            "DIAGNOSTIC EXPORT: NOT RUN — existing Step 21 plan may be exported immediately",
+            "DIAGNOSTIC EXPORT: NOT RUN — after Step 22 Gate C/D this report reflects the recomputed closure plan",
             UIFont.BoldSystemFontOfSize(17),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_runtimeBindingDiagnosticsExportResultLabel);
@@ -2514,6 +2517,123 @@ public sealed class RootViewController : UIViewController
         {
             EndSteamOperation();
         }
+    }
+
+    private async Task RunHostFrameworkClosureFoundationAsync()
+    {
+        if (_runtimeFrameworkBindingResultLabel is null ||
+            _runtimeFrameworkBindingDetailLabel is null ||
+            _runtimeFrameworkBindingButton is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        if (_godotProcessRequiresRestart)
+        {
+            _statusLabel.Text = "Step 15 Godot process-global state is still active. Force-quit/relaunch before Step 22 so host-framework availability is measured in a clean process.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+            return;
+        }
+
+        BeginSteamOperation(allowCancel: true);
+        _hostFrameworkClosureGates.Reset();
+        _hostFrameworkClosureFoundation.Reset();
+        _runtimeFrameworkBindingResultLabel.Text = "HOST FRAMEWORK CLOSURE FOUNDATION: GATE A RUNNING…";
+        _runtimeFrameworkBindingResultLabel.TextColor = UIColor.Label;
+        _runtimeFrameworkBindingDetailLabel.Text = "Gate A: loading the complete 44-name Step 21.1 framework frontier from the rooted iOS/.NET host. No StS2 assembly is loaded.";
+        _statusLabel.Text = "STEP 22 GATE A — rooted host framework availability.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var token = _operationCts?.Token ?? CancellationToken.None;
+            var progress = new Progress<RuntimeFrameworkBindingProgress>(value =>
+            {
+                var count = value.TotalItems > 0 ? $" ({value.ProcessedItems:N0}/{value.TotalItems:N0})" : string.Empty;
+                _runtimeFrameworkBindingDetailLabel.Text = FormatHostFrameworkClosureDetail(
+                    $"Nested Step 21 progress{count}: {value.Detail}" +
+                    (string.IsNullOrWhiteSpace(value.CurrentPath) ? string.Empty : $"\nCurrent: {value.CurrentPath}"));
+            });
+
+            var gateA = await Task.Run(() => _hostFrameworkClosureFoundation.RunRootedHostAvailabilityProbe(), token);
+            if (!RecordHostFrameworkClosureGate(gateA)) return;
+
+            _runtimeFrameworkBindingResultLabel.Text = "HOST FRAMEWORK CLOSURE FOUNDATION: GATE B RUNNING…";
+            _statusLabel.Text = "STEP 22 GATE B — recompute real sts2.dll host/private dependency closure.";
+            var gateB = await _hostFrameworkClosureFoundation.RunBindingClosureRecomputeAsync(progress, token);
+            if (!RecordHostFrameworkClosureGate(gateB)) return;
+
+            _runtimeFrameworkBindingResultLabel.Text = "HOST FRAMEWORK CLOSURE FOUNDATION: GATE C RUNNING…";
+            _statusLabel.Text = "STEP 22 GATE C — persist the recomputed plan and qualify zero-blocker host-only framework closure.";
+            var gateC = await _hostFrameworkClosureFoundation.RunHostOnlyFrameworkPreparedSetAsync(progress, token);
+            if (!RecordHostFrameworkClosureGate(gateC)) return;
+
+            _runtimeFrameworkBindingResultLabel.Text = "HOST FRAMEWORK CLOSURE FOUNDATION: GATE D RUNNING…";
+            _statusLabel.Text = "STEP 22 GATE D — independent source/prepared/live/plan isolation audit.";
+            var gateD = await _hostFrameworkClosureFoundation.RunIsolationAuditAsync(progress, token);
+            if (!RecordHostFrameworkClosureGate(gateD)) return;
+
+            await TryExportRuntimeBindingDiagnosticsAsync(automatic: true, token);
+
+            var snapshot = _hostFrameworkClosureGates.Snapshot();
+            _runtimeFrameworkBindingResultLabel.Text = snapshot.Summary;
+            _runtimeFrameworkBindingResultLabel.TextColor = UIColor.Label;
+            _runtimeFrameworkBindingDetailLabel.Text = FormatHostFrameworkClosureDetail(
+                "All four Step 22 gates passed. The complete measured framework frontier is supplied by the iOS/.NET host, the real Step 21 dependency graph has zero explicit blockers, no desktop System.*/netstandard assembly is in the private prepared set, and the audited plan reports Runtime closure ready=YES. StS2 still has not been CLR-loaded or executed.");
+            _statusLabel.Text = "PASS: STEP 22 HOST FRAMEWORK CLOSURE FOUNDATION — 4/4. Runtime dependency closure is now eligible for a later first real CLR-load probe.";
+            _statusLabel.TextColor = UIColor.Label;
+        }
+        catch (OperationCanceledException)
+        {
+            _runtimeFrameworkBindingResultLabel.Text = "HOST FRAMEWORK CLOSURE FOUNDATION: CANCELLED";
+            _runtimeFrameworkBindingResultLabel.TextColor = UIColor.SecondaryLabel;
+            _runtimeFrameworkBindingDetailLabel.Text = FormatHostFrameworkClosureDetail("Step 22 was cancelled. No StS2 CLR load is part of this subsystem and the trusted managed install remains read-only.");
+            _statusLabel.Text = "STEP 22 CANCELLED — no later gate is considered proven.";
+            _statusLabel.TextColor = UIColor.SecondaryLabel;
+        }
+        catch (Exception ex)
+        {
+            _runtimeFrameworkBindingResultLabel.Text = "HOST FRAMEWORK CLOSURE FOUNDATION: EXCEPTION";
+            _runtimeFrameworkBindingResultLabel.TextColor = UIColor.SystemRed;
+            _runtimeFrameworkBindingDetailLabel.Text = FormatHostFrameworkClosureDetail($"Unhandled Step 22 exception: {ex.GetType().Name}: {ex.Message}");
+            _statusLabel.Text = "STEP 22 FAIL: stop at the current host-framework-closure gate and report/export the diagnostic plan if available.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
+        }
+    }
+
+    private bool RecordHostFrameworkClosureGate(HostFrameworkClosureGateResult result)
+    {
+        _hostFrameworkClosureGates.Record(result);
+        if (_runtimeFrameworkBindingResultLabel is not null)
+        {
+            _runtimeFrameworkBindingResultLabel.Text = _hostFrameworkClosureGates.Snapshot().Summary;
+            _runtimeFrameworkBindingResultLabel.TextColor = result.Passed ? UIColor.Label : UIColor.SystemRed;
+        }
+        if (_runtimeFrameworkBindingDetailLabel is not null)
+            _runtimeFrameworkBindingDetailLabel.Text = FormatHostFrameworkClosureDetail(result.Detail);
+        if (!result.Passed && _statusLabel is not null)
+        {
+            var letter = (char)('A' + (int)result.Gate - 1);
+            _statusLabel.Text = $"STEP 22 FAIL at Gate {letter} ({result.Gate}). Stop here; later closure gates were not run.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        return result.Passed;
+    }
+
+    private string FormatHostFrameworkClosureDetail(string tail)
+    {
+        var lines = new List<string>();
+        foreach (var gate in _hostFrameworkClosureGates.Results)
+            lines.Add($"{(char)('A' + (int)gate.Gate - 1)} — {gate.Gate}: {(gate.Passed ? "PASS" : "FAIL")}");
+        if (lines.Count > 0)
+            lines.Add(string.Empty);
+        lines.Add(tail);
+        return string.Join("\n", lines);
     }
 
     private async Task RunPreparedRuntimeFrameworkBindingAsync()

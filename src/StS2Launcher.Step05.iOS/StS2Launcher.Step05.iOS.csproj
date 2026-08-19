@@ -8,8 +8,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>57</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.57</ApplicationDisplayVersion>
+    <ApplicationVersion>58</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.58</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -44,15 +44,48 @@
     <TrimmerRootAssembly Include="protobuf-net.Core" />
   </ItemGroup>
 
-  <Target Name="Step21ValidateInterpreterPolicy" BeforeTargets="PrepareForBuild">
+  <!--
+    Step 22 Host Framework Closure Foundation. The physical Step 21.1 report showed that every
+    remaining dependency blocker was a framework-shaped assembly whose only workspace fallback
+    was a non-IL-only macOS runtime image. These 22 measured seed roots keep the corresponding
+    iOS/.NET host framework contracts (and their statically understood dependencies) in the
+    fully-trimmed Release app. The larger 44-name observed frontier is verified on-device before
+    the Step 21 binding plan is recomputed. No downloaded System.* implementation is added here.
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="netstandard" />
+    <TrimmerRootAssembly Include="System.Data.Common" />
+    <TrimmerRootAssembly Include="System.Diagnostics.Contracts" />
+    <TrimmerRootAssembly Include="System.Diagnostics.StackTrace" />
+    <TrimmerRootAssembly Include="System.Diagnostics.TraceSource" />
+    <TrimmerRootAssembly Include="System.Diagnostics.Tracing" />
+    <TrimmerRootAssembly Include="System.IO.FileSystem.DriveInfo" />
+    <TrimmerRootAssembly Include="System.IO.MemoryMappedFiles" />
+    <TrimmerRootAssembly Include="System.Net.Ping" />
+    <TrimmerRootAssembly Include="System.Net.Quic" />
+    <TrimmerRootAssembly Include="System.Numerics.Vectors" />
+    <TrimmerRootAssembly Include="System.Reflection.Metadata" />
+    <TrimmerRootAssembly Include="System.Runtime.CompilerServices.Unsafe" />
+    <TrimmerRootAssembly Include="System.Runtime.Loader" />
+    <TrimmerRootAssembly Include="System.Runtime.Serialization.Json" />
+    <TrimmerRootAssembly Include="System.Runtime.Serialization.Primitives" />
+    <TrimmerRootAssembly Include="System.Runtime.Serialization.Xml" />
+    <TrimmerRootAssembly Include="System.Threading.Tasks.Parallel" />
+    <TrimmerRootAssembly Include="System.Threading.ThreadPool" />
+    <TrimmerRootAssembly Include="System.Xml.XDocument" />
+    <TrimmerRootAssembly Include="System.Xml.XmlSerializer" />
+    <TrimmerRootAssembly Include="System.Xml.XPath" />
+  </ItemGroup>
+
+  <Target Name="Step22ValidateInterpreterAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
-             Text="STEP21.1 INTERPRETER POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+             Text="STEP22 INTERPRETER POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Error Condition="'$(MtouchInterpreter)' != '-all'"
-           Text="Step 21.1 preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
+           Text="Step 22 preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
     <Error Condition="'$(UseInterpreter)' == 'true'"
-           Text="Step 21.1 preserves the Step 20/21 prohibition on UseInterpreter=true because it is the broader interpret-all build-time policy." />
+           Text="Step 22 preserves the Step 20/21 prohibition on UseInterpreter=true because it is the broader interpret-all build-time policy." />
     <Error Condition="'$(PublishAot)' == 'true'"
-           Text="Step 21 requires the Mono runtime; NativeAOT is incompatible with the Mono interpreter proof." />
+           Text="Step 22 requires the Mono runtime; NativeAOT is incompatible with the Mono interpreter proof." />
   </Target>
 
   <!--
