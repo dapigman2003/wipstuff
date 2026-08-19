@@ -8,8 +8,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>55</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.55</ApplicationDisplayVersion>
+    <ApplicationVersion>56</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.56</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -23,7 +23,7 @@
     <TrimMode>full</TrimMode>
 
     <!--
-      Step 20 Dynamic Managed Execution Foundation: keep every build-time launcher assembly on
+      Step 21 retains the physically proven Step 20 Dynamic Managed Execution Foundation interpreter policy: keep every build-time launcher assembly on
       the already-proven AOT path while linking the Mono interpreter into the Release host for
       runtime/dynamic managed code. Microsoft documents MtouchInterpreter=-all as "AOT compile
       all assemblies, while still allowing the interpreter to perform dynamic code generation".
@@ -44,15 +44,15 @@
     <TrimmerRootAssembly Include="protobuf-net.Core" />
   </ItemGroup>
 
-  <Target Name="Step20ValidateInterpreterPolicy" BeforeTargets="PrepareForBuild">
+  <Target Name="Step21ValidateInterpreterPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
-             Text="STEP20 INTERPRETER POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+             Text="STEP21 INTERPRETER POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Error Condition="'$(MtouchInterpreter)' != '-all'"
-           Text="Step 20 requires MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
+           Text="Step 21 requires MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
     <Error Condition="'$(UseInterpreter)' == 'true'"
-           Text="Step 20 forbids UseInterpreter=true because it is the broader interpret-all build-time policy." />
+           Text="Step 21 forbids UseInterpreter=true because it is the broader interpret-all build-time policy." />
     <Error Condition="'$(PublishAot)' == 'true'"
-           Text="Step 20 requires the Mono runtime; NativeAOT is incompatible with the Mono interpreter proof." />
+           Text="Step 21 requires the Mono runtime; NativeAOT is incompatible with the Mono interpreter proof." />
   </Target>
 
   <!--

@@ -33,6 +33,8 @@ public sealed class RootViewController : UIViewController
     private readonly ExpressionInterpreterCompatibilityGateSequence _expressionInterpreterCompatibilityGates = new();
     private readonly DynamicManagedExecutionFoundation _dynamicManagedExecutionFoundation;
     private readonly DynamicManagedExecutionGateSequence _dynamicManagedExecutionGates = new();
+    private readonly PreparedRuntimeFrameworkBinding _preparedRuntimeFrameworkBinding;
+    private readonly RuntimeFrameworkBindingGateSequence _runtimeFrameworkBindingGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -71,6 +73,8 @@ public sealed class RootViewController : UIViewController
     private UILabel? _expressionInterpreterCompatibilityDetailLabel;
     private UILabel? _dynamicManagedExecutionResultLabel;
     private UILabel? _dynamicManagedExecutionDetailLabel;
+    private UILabel? _runtimeFrameworkBindingResultLabel;
+    private UILabel? _runtimeFrameworkBindingDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -97,6 +101,7 @@ public sealed class RootViewController : UIViewController
     private UIButton? _realAssemblyRewriteButton;
     private UIButton? _expressionInterpreterCompatibilityButton;
     private UIButton? _dynamicManagedExecutionButton;
+    private UIButton? _runtimeFrameworkBindingButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -139,6 +144,7 @@ public sealed class RootViewController : UIViewController
         _dynamicManagedExecutionFoundation = new DynamicManagedExecutionFoundation(
             launcherDataRoot,
             Path.Combine(NSBundle.MainBundle.BundlePath, DynamicManagedExecutionFoundation.BundleFixtureDirectoryName));
+        _preparedRuntimeFrameworkBinding = new PreparedRuntimeFrameworkBinding(launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -184,22 +190,22 @@ public sealed class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 20 — DYNAMIC MANAGED EXECUTION FOUNDATION",
+            "STEP 21 — PREPARED RUNTIME / FRAMEWORK BINDING",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.55",
+            "Version 0.0.56",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "MONO INTERPRETER • EXTERNAL IL LOAD / PRIVATE DEPENDENCY / ISOLATION",
+            "REAL DEPENDENCY GRAPH • HOST FRAMEWORK MAP • PREPARED IL SET • CLOSURE AUDIT",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Steps 01–19 are complete and closed on the physical iPhone. Step 20 proves the execution mechanism required by a post-install game launcher before any real StS2 runtime load: Gate A re-proves OfflineReady and SHA-256 verifies project-owned external fixture assemblies copied into the IPA only as data; Gate B loads and executes one such non-AOT fixture through a dedicated AssemblyLoadContext; Gate C proves one exact private managed dependency resolution hop from launcher-private verified storage; Gate D re-hashes the fixtures and re-proves the complete managed install. The Release build keeps all build-time launcher assemblies AOT-targeted while retaining the Mono interpreter for runtime/dynamic managed code. No StS2 assembly is loaded or executed in Step 20.",
+            "Steps 01–20 are complete and closed on the physical iPhone. Step 21 builds the first execution-oriented dependency/binding plan for the real receipt-backed ARM64 StS2 managed payload without CLR-loading the game. Gate A re-proves OfflineReady, clones the ARM64/shared managed scope and catalogs real assembly identities plus IL-only image shape. Gate B walks the real sts2.dll AssemblyRef graph, prefers proven iOS-host framework bindings over copied desktop System.* implementations, resolves private dependencies only from the SHA-1-verified workspace, and records every unresolved/ambiguous/non-IL-only edge as an explicit blocker. Gate C byte-copies only reachable IL-only private/game assemblies into a prepared set and persists the deterministic binding plan. Gate D re-hashes source/prepared/live trees and audits plan closure. A 4/4 pass proves the plan is trustworthy; the separate Runtime closure ready signal determines whether the next step may attempt a real CLR load.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
@@ -660,6 +666,29 @@ public sealed class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_dynamicManagedExecutionDetailLabel);
 
+        content.AddArrangedSubview(Separator());
+
+        content.AddArrangedSubview(Label(
+            "Step 21 — Prepared Runtime / Framework Binding (ordered gates A–D)",
+            UIFont.BoldSystemFontOfSize(25),
+            UIColor.Label));
+
+        _runtimeFrameworkBindingButton = SystemButton("Run Gates A–D — Classify Runtime → Bind Host Frameworks → Prepare IL Set → Closure Audit", 17);
+        _runtimeFrameworkBindingButton.TouchUpInside += async (_, _) => await RunPreparedRuntimeFrameworkBindingAsync();
+        content.AddArrangedSubview(_runtimeFrameworkBindingButton);
+
+        _runtimeFrameworkBindingResultLabel = Label(
+            "PREPARED RUNTIME / FRAMEWORK BINDING: NOT RUN",
+            UIFont.BoldSystemFontOfSize(21),
+            UIColor.Label);
+        content.AddArrangedSubview(_runtimeFrameworkBindingResultLabel);
+
+        _runtimeFrameworkBindingDetailLabel = Label(
+            "Gate A re-proves OfflineReady, clones and SHA-1 verifies the real ARM64/shared managed filename scope, and catalogs actual managed identities plus IL-only versus ReadyToRun/mixed-mode shape without Cecil dependency resolution. Gate B starts at the real ARM64 sts2.dll and classifies every reachable AssemblyRef as an iOS-host framework binding, an exact/controlled-version verified private workspace binding, or an explicit blocker; copied desktop System.* implementations are never preferred when the host can satisfy the contract. Gate C performs zero Cecil writes and byte-copies only reachable IL-only private/game assemblies into Step21-PreparedRuntimeBinding/prepared, then writes runtime-binding-plan.json. Gate D independently audits source/prepared/live hashes, plan integrity, host/private simple-name isolation, and confirms no real StS2 assembly entered the CLR. Step 21 can pass 4/4 with Runtime closure ready: NO; that means the plan is authoritative and Step 22 must solve the recorded blockers before any game CLR load.",
+            UIFont.SystemFontOfSize(15),
+            UIColor.SecondaryLabel);
+        content.AddArrangedSubview(_runtimeFrameworkBindingDetailLabel);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -672,7 +701,7 @@ public sealed class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–18 COMPLETE and closed on the physical iPhone. Step 19 begins the first evidence-backed behavioral compatibility preparation: prove the expression-tree interpreter on-device → discover real direct Compile targets → force only structurally-safe calls to prefer interpretation while preserving strong-name public-key identity in prepared copies → audit source/prepared/live isolation. Stop at the first failing gate. Game execution, Harmony/MonoMod detours, Reflection.Emit replacement, native runtime integration, Cloud, and Workshop remain later subsystems.",
+            "Status: Steps 01–20 COMPLETE and closed on the physical iPhone. Step 21 builds an authoritative real StS2 dependency/framework binding plan and an execution-oriented IL-only prepared assembly set without CLR-loading the game. Stop at the first failing gate. A Step 21 4/4 pass proves planning/isolation; Runtime closure ready determines whether Step 22 can begin a controlled real assembly-load probe or must first address explicit framework/private dependency blockers.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -691,7 +720,7 @@ public sealed class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 19: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 21: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
@@ -2466,6 +2495,132 @@ public sealed class RootViewController : UIViewController
         {
             EndSteamOperation();
         }
+    }
+
+    private async Task RunPreparedRuntimeFrameworkBindingAsync()
+    {
+        if (_runtimeFrameworkBindingResultLabel is null ||
+            _runtimeFrameworkBindingDetailLabel is null ||
+            _runtimeFrameworkBindingButton is null ||
+            _statusLabel is null)
+        {
+            return;
+        }
+
+        if (_godotProcessRequiresRestart)
+        {
+            _statusLabel.Text = "Step 15 Godot process-global state is still active. Force-quit/relaunch before Step 21 so the real dependency/binding plan is measured in a clean host process.";
+            _statusLabel.TextColor = UIColor.SystemOrange;
+            return;
+        }
+
+        BeginSteamOperation(allowCancel: true);
+        _runtimeFrameworkBindingGates.Reset();
+        _preparedRuntimeFrameworkBinding.Reset();
+        _runtimeFrameworkBindingResultLabel.Text = "PREPARED RUNTIME / FRAMEWORK BINDING: GATE A RUNNING…";
+        _runtimeFrameworkBindingResultLabel.TextColor = UIColor.Label;
+        _runtimeFrameworkBindingDetailLabel.Text = "Gate A: re-proving OfflineReady and cloning/classifying the real receipt-backed ARM64/shared managed scope without CLR-loading StS2.";
+        _statusLabel.Text = "STEP 21 GATE A — runtime payload classification.";
+        _statusLabel.TextColor = UIColor.Label;
+
+        try
+        {
+            var token = _operationCts?.Token ?? CancellationToken.None;
+            var progress = new Progress<RuntimeFrameworkBindingProgress>(value =>
+            {
+                var count = value.TotalItems > 0 ? $" ({value.ProcessedItems:N0}/{value.TotalItems:N0})" : string.Empty;
+                _runtimeFrameworkBindingDetailLabel.Text = FormatRuntimeFrameworkBindingDetail(
+                    $"Gate {(char)('A' + (int)value.Gate - 1)} progress{count}: {value.Detail}" +
+                    (string.IsNullOrWhiteSpace(value.CurrentPath) ? string.Empty : $"\nCurrent: {value.CurrentPath}"));
+            });
+
+            var gateA = await _preparedRuntimeFrameworkBinding.RunRuntimePayloadClassificationAsync(progress, token);
+            if (!RecordRuntimeFrameworkBindingGate(gateA)) return;
+
+            _runtimeFrameworkBindingResultLabel.Text = "PREPARED RUNTIME / FRAMEWORK BINDING: GATE B RUNNING…";
+            _statusLabel.Text = "STEP 21 GATE B — real AssemblyRef graph + iOS host framework/private binding plan.";
+            var gateB = await Task.Run(() => _preparedRuntimeFrameworkBinding.RunHostFrameworkBindingPlan(), token);
+            if (!RecordRuntimeFrameworkBindingGate(gateB)) return;
+
+            _runtimeFrameworkBindingResultLabel.Text = "PREPARED RUNTIME / FRAMEWORK BINDING: GATE C RUNNING…";
+            _statusLabel.Text = "STEP 21 GATE C — byte-identical execution-oriented IL-only prepared set + persisted binding plan.";
+            var gateC = await _preparedRuntimeFrameworkBinding.RunPreparedRuntimeAssemblySetAsync(progress, token);
+            if (!RecordRuntimeFrameworkBindingGate(gateC)) return;
+
+            _runtimeFrameworkBindingResultLabel.Text = "PREPARED RUNTIME / FRAMEWORK BINDING: GATE D RUNNING…";
+            _statusLabel.Text = "STEP 21 GATE D — source/prepared/live/plan closure audit.";
+            var gateD = await _preparedRuntimeFrameworkBinding.RunClosureAuditAsync(progress, token);
+            if (!RecordRuntimeFrameworkBindingGate(gateD)) return;
+
+            var snapshot = _runtimeFrameworkBindingGates.Snapshot();
+            _runtimeFrameworkBindingResultLabel.Text = snapshot.Summary;
+            _runtimeFrameworkBindingResultLabel.TextColor = UIColor.Label;
+            _runtimeFrameworkBindingDetailLabel.Text = FormatRuntimeFrameworkBindingDetail(
+                "All four Step 21 gates passed. The real managed dependency graph has an audited host/private binding plan and byte-identical prepared IL set. Read Gate B/D's Runtime closure ready signal before Step 22. Run OfflineReady + Foundation 5/5 to close Step 21.");
+            _statusLabel.Text = "PASS: STEP 21 PREPARED RUNTIME / FRAMEWORK BINDING — 4/4. Binding plan is physically audited; inspect Runtime closure ready YES/NO before the next subsystem.";
+            _statusLabel.TextColor = UIColor.Label;
+        }
+        catch (OperationCanceledException)
+        {
+            _runtimeFrameworkBindingResultLabel.Text = "PREPARED RUNTIME / FRAMEWORK BINDING: CANCELLED";
+            _runtimeFrameworkBindingResultLabel.TextColor = UIColor.SecondaryLabel;
+            _runtimeFrameworkBindingDetailLabel.Text = FormatRuntimeFrameworkBindingDetail("Step 21 was cancelled. Rerunning Gate A recreates only the launcher-private Step 21 workspace; the receipt-backed managed install is never an intended write target.");
+            _statusLabel.Text = "STEP 21 CANCELLED — no later gate is considered proven.";
+            _statusLabel.TextColor = UIColor.SecondaryLabel;
+        }
+        catch (Exception ex)
+        {
+            _runtimeFrameworkBindingResultLabel.Text = "PREPARED RUNTIME / FRAMEWORK BINDING: EXCEPTION";
+            _runtimeFrameworkBindingResultLabel.TextColor = UIColor.SystemRed;
+            _runtimeFrameworkBindingDetailLabel.Text = FormatRuntimeFrameworkBindingDetail($"Unhandled Step 21 exception: {ex.GetType().Name}: {ex.Message}");
+            _statusLabel.Text = "STEP 21 FAIL: stop at the current runtime/framework-binding gate and report this screen.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        finally
+        {
+            EndSteamOperation();
+        }
+    }
+
+    private bool RecordRuntimeFrameworkBindingGate(RuntimeFrameworkBindingGateResult result)
+    {
+        _runtimeFrameworkBindingGates.Record(result.Gate, result.Passed, result.Detail);
+        if (_runtimeFrameworkBindingResultLabel is not null)
+        {
+            _runtimeFrameworkBindingResultLabel.Text = _runtimeFrameworkBindingGates.Snapshot().Summary;
+            _runtimeFrameworkBindingResultLabel.TextColor = result.Passed ? UIColor.Label : UIColor.SystemRed;
+        }
+        if (_runtimeFrameworkBindingDetailLabel is not null)
+            _runtimeFrameworkBindingDetailLabel.Text = FormatRuntimeFrameworkBindingDetail(result.Detail);
+        if (!result.Passed && _statusLabel is not null)
+        {
+            var letter = (char)('A' + (int)result.Gate - 1);
+            _statusLabel.Text = $"STEP 21 FAIL at Gate {letter} ({result.Gate}). Stop here; later runtime/framework-binding gates were not run.";
+            _statusLabel.TextColor = UIColor.SystemRed;
+        }
+        return result.Passed;
+    }
+
+    private string FormatRuntimeFrameworkBindingDetail(string tail)
+    {
+        var lines = new List<string>();
+        foreach (var gate in _runtimeFrameworkBindingGates.Results)
+        {
+            var letter = (char)('A' + (int)gate.Gate - 1);
+            lines.Add($"Gate {letter} — {gate.Gate}: {(gate.Passed ? "PASS" : "FAIL")}");
+            lines.Add(gate.Detail);
+            lines.Add(string.Empty);
+        }
+
+        lines.Add("Step 21 write scope: launcher-private Step21-PreparedRuntimeBinding/source + prepared + plan only; the Step 12 receipt-backed managed install stays read-only.");
+        lines.Add("CLR load scope: iOS host framework contracts only. Real sts2.dll/GodotSharp/game assemblies are inspected with Cecil as data but are never loaded into the CLR in Step 21.");
+        lines.Add("Binding policy: prefer a compatible iOS-host framework assembly for System/platform contracts; otherwise resolve only exact/controlled-version identities from the verified ARM64/shared workspace. Missing, ambiguous, lower-version and non-IL-only edges become explicit blockers—never broad fallback.");
+        lines.Add("Step 21 4/4 means the plan/prepared set is trustworthy. It does NOT override Runtime closure ready: NO; blockers must be addressed before any first real game CLR load.");
+        lines.Add("Steps 01–20 remain closed/protected. Closure requires OfflineReady + Foundation 5/5 after a 4/4 pass.");
+        lines.Add("Out of scope: game static initialization/execution, GodotSharp behavioral integration, native game loading, Harmony/MonoMod, FMOD/Spine, Cloud, and Workshop.");
+        lines.Add("Step 15 orientation presentation quirk remains a known non-blocking cleanup item.");
+        lines.Add(tail);
+        return string.Join("\n", lines);
     }
 
     private bool RecordDynamicManagedExecutionGate(DynamicManagedExecutionGateResult result)
