@@ -1,0 +1,111 @@
+using SteamKit2;
+
+namespace StS2Launcher.Core;
+
+public enum SteamFullDepotDownloadOutcome
+{
+    Failed = 0,
+    NoSavedSession = 1,
+    InvalidLocalSession = 2,
+    SessionRejected = 3,
+    IdentityMismatch = 4,
+    OwnershipNotProven = 5,
+    PicsAccessTokenDenied = 6,
+    ProductInfoUnavailable = 7,
+    MissingPicsToken = 8,
+    NoSuitableDepot = 9,
+    DepotKeyDenied = 10,
+    ManifestRequestCodeUnavailable = 11,
+    NoCdnServers = 12,
+    ManifestDownloadFailed = 13,
+    InvalidManifest = 14,
+    OutputAlreadyExists = 15,
+    FileDownloadFailed = 16,
+    FileHashMismatch = 17,
+    FileWriteFailed = 18,
+    CommitFailed = 19,
+    Downloaded = 20,
+    Cancelled = 21,
+    TimedOut = 22,
+}
+
+/// <summary>
+/// Step 10 result contract. Keys, access tokens, request codes, manifest payloads,
+/// chunk buffers and file bytes are deliberately absent.
+/// </summary>
+public sealed record SteamFullDepotDownloadResult(
+    SteamFullDepotDownloadOutcome Outcome,
+    uint TargetAppId,
+    bool SavedSessionFound,
+    bool CmConnected,
+    bool LoggedOnCallbackReceived,
+    EResult? LogonResult,
+    EResult? ExtendedLogonResult,
+    bool IdentityMatched,
+    bool OwnershipTicketCallbackReceived,
+    EResult? OwnershipResult,
+    int OwnershipTicketLength,
+    bool OwnershipProven,
+    bool PicsAccessTokenCallbackReceived,
+    bool PicsAccessTokenReceived,
+    bool PicsProductInfoCallbackReceived,
+    bool PicsAppInfoFound,
+    bool PicsMissingToken,
+    uint? SelectedDepotId,
+    ulong? SelectedManifestId,
+    string? SelectedBranch,
+    string? SelectedDepotOsList,
+    bool DepotKeyRequested,
+    EResult? DepotKeyResult,
+    bool DepotKeyReceived,
+    bool ManifestRequestCodeRequested,
+    bool ManifestRequestCodeReceived,
+    int EligibleCdnServerCount,
+    bool ManifestDownloaded,
+    int PlannedFileCount,
+    int PlannedChunkCount,
+    ulong PlannedBytes,
+    int CompletedFileCount,
+    int VerifiedFileCount,
+    int DownloadedChunkCount,
+    ulong DownloadedUncompressedBytes,
+    bool CdnAuthTokenRequested,
+    bool CdnAuthTokenReceived,
+    bool StagingDirectoryCreated,
+    bool StagingDirectoryCleaned,
+    bool FinalDirectoryCommitted,
+    string? OutputRelativePath,
+    string? AccountName,
+    string? SteamId64,
+    string? CurrentEndPoint,
+    TimeSpan Elapsed,
+    string? Error,
+    uint? LoginId = null)
+{
+    public bool DownloadProven => Outcome == SteamFullDepotDownloadOutcome.Downloaded;
+
+    public string Summary => Outcome switch
+    {
+        SteamFullDepotDownloadOutcome.Downloaded =>
+            $"DEPOT PASS — {CompletedFileCount}/{PlannedFileCount} files ({PlannedBytes} bytes)",
+        SteamFullDepotDownloadOutcome.NoSavedSession => "DEPOT — no saved session",
+        SteamFullDepotDownloadOutcome.InvalidLocalSession => "DEPOT BLOCKED — invalid saved session",
+        SteamFullDepotDownloadOutcome.SessionRejected => "DEPOT BLOCKED — saved session rejected",
+        SteamFullDepotDownloadOutcome.IdentityMismatch => "DEPOT BLOCKED — identity mismatch",
+        SteamFullDepotDownloadOutcome.OwnershipNotProven => "DEPOT BLOCKED — ownership not proven",
+        SteamFullDepotDownloadOutcome.NoSuitableDepot => "DEPOT FAIL — no suitable direct public depot",
+        SteamFullDepotDownloadOutcome.DepotKeyDenied => "DEPOT FAIL — depot key unavailable",
+        SteamFullDepotDownloadOutcome.ManifestRequestCodeUnavailable => "DEPOT FAIL — manifest request code unavailable",
+        SteamFullDepotDownloadOutcome.NoCdnServers => "DEPOT FAIL — no CDN servers",
+        SteamFullDepotDownloadOutcome.ManifestDownloadFailed => "DEPOT FAIL — manifest download failed",
+        SteamFullDepotDownloadOutcome.InvalidManifest => "DEPOT FAIL — manifest is unsafe/unsupported",
+        SteamFullDepotDownloadOutcome.OutputAlreadyExists => "DEPOT BLOCKED — final manifest directory already exists",
+        SteamFullDepotDownloadOutcome.FileDownloadFailed => "DEPOT FAIL — file/chunk download failed",
+        SteamFullDepotDownloadOutcome.FileHashMismatch => "DEPOT FAIL — file SHA-1 mismatch",
+        SteamFullDepotDownloadOutcome.FileWriteFailed => "DEPOT FAIL — staging write failed",
+        SteamFullDepotDownloadOutcome.CommitFailed => "DEPOT FAIL — atomic directory commit failed",
+        SteamFullDepotDownloadOutcome.TimedOut => "DEPOT TIMEOUT — no final commit",
+        SteamFullDepotDownloadOutcome.Cancelled => "DEPOT CANCELLED — no final commit",
+        _ => "DEPOT FAIL",
+    };
+}
