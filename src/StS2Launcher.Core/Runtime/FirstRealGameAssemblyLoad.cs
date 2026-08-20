@@ -27,6 +27,8 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
     private readonly string _planPath;
     private readonly SteamOfflineInstallInspection _offlineInspection;
     private readonly bool _collectibleLoadContext;
+    private readonly string _expectedPrimarySimpleName;
+    private readonly HashSet<string> _freshProcessAssemblyNames;
 
     private PreflightSnapshot? _preflight;
     private PrimaryLoadSnapshot? _primaryLoad;
@@ -35,9 +37,26 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
     private bool _disposed;
 
     public FirstRealGameAssemblyLoad(string launcherDataRoot, bool collectibleLoadContext = false)
+        : this(
+            launcherDataRoot,
+            collectibleLoadContext,
+            ExpectedPrimarySimpleName,
+            [ExpectedPrimarySimpleName, "SlayTheSpire2"])
+    {
+    }
+
+    internal FirstRealGameAssemblyLoad(
+        string launcherDataRoot,
+        bool collectibleLoadContext,
+        string expectedPrimarySimpleName,
+        IReadOnlyCollection<string> freshProcessAssemblyNames)
     {
         if (string.IsNullOrWhiteSpace(launcherDataRoot))
             throw new ArgumentException("Launcher data root is required.", nameof(launcherDataRoot));
+        if (string.IsNullOrWhiteSpace(expectedPrimarySimpleName))
+            throw new ArgumentException("Expected primary simple name is required.", nameof(expectedPrimarySimpleName));
+        if (freshProcessAssemblyNames is null || freshProcessAssemblyNames.Count == 0)
+            throw new ArgumentException("At least one fresh-process assembly name is required.", nameof(freshProcessAssemblyNames));
 
         _launcherDataRoot = Path.GetFullPath(launcherDataRoot);
         _step21WorkRoot = Path.Combine(_launcherDataRoot, PreparedRuntimeFrameworkBinding.WorkRootName);
@@ -48,6 +67,12 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             PreparedRuntimeFrameworkBinding.PlanFileName);
         _offlineInspection = new SteamOfflineInstallInspection(_launcherDataRoot);
         _collectibleLoadContext = collectibleLoadContext;
+        _expectedPrimarySimpleName = expectedPrimarySimpleName.Trim();
+        _freshProcessAssemblyNames = freshProcessAssemblyNames
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        _freshProcessAssemblyNames.Add(_expectedPrimarySimpleName);
     }
 
     public void Reset()
@@ -572,7 +597,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             context.Unload();
     }
 
-    private static void ValidatePlanForFirstLoad(RuntimeFrameworkBindingPlanDocument plan, SteamOfflineInstallResult offline)
+    private void ValidatePlanForFirstLoad(RuntimeFrameworkBindingPlanDocument plan, SteamOfflineInstallResult offline)
     {
         if (plan.SchemaVersion != RuntimeFrameworkBindingPlanDocument.CurrentSchemaVersion)
             throw new InvalidDataException($"Unsupported Step 21/22 runtime-binding plan schema: {plan.SchemaVersion}");
@@ -601,8 +626,8 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             throw new InvalidDataException("Step 23 primary prepared entry does not match the plan's primary identity/path.");
         }
         var primaryIdentity = new AssemblyName(plan.PrimaryAssemblyFullName);
-        if (!string.Equals(primaryIdentity.Name, ExpectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException($"Step 23 expected primary simple name '{ExpectedPrimarySimpleName}', found '{primaryIdentity.Name}'.");
+        if (!string.Equals(primaryIdentity.Name, _expectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException($"Step 23 expected primary simple name '{_expectedPrimarySimpleName}', found '{primaryIdentity.Name}'.");
 
         var preparedSimpleNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var prepared in plan.PreparedAssemblies)
@@ -689,7 +714,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
         }
     }
 
-    private static void EnsureNoRealGameAssemblyLoaded()
+    private void EnsureNoRealGameAssemblyLoaded()
     {
         var matches = AppDomain.CurrentDomain.GetAssemblies()
             .Where(IsRealGameAssembly)
@@ -704,11 +729,10 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             throw new InvalidDataException("Step 23 requires a fresh process before Gate A; a real game assembly is already loaded: " + string.Join(" | ", matches));
     }
 
-    private static bool IsRealGameAssembly(Assembly assembly)
+    private bool IsRealGameAssembly(Assembly assembly)
     {
         var name = assembly.GetName().Name ?? string.Empty;
-        return name.Equals(ExpectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase) ||
-               name.Equals("SlayTheSpire2", StringComparison.OrdinalIgnoreCase);
+        return _freshProcessAssemblyNames.Contains(name);
     }
 
     private static bool IsHostFrameworkContractName(string name)
