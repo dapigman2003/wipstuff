@@ -219,8 +219,9 @@ public sealed class ControlledManagedInitialization : IDisposable
             if (target.InitializerHazards.Count != 0)
             {
                 throw new InvalidDataException(
-                    "Step 24 Gate A refuses automatic initialization because the bounded Cecil call-graph audit found a prohibited execution edge:\n" +
-                    string.Join("\n", target.InitializerHazards));
+                    "Step 24 Gate A refuses automatic initialization because the bounded Cecil call-graph audit found a prohibited or unresolved execution edge:\n" +
+                    string.Join("\n", target.InitializerHazards) + "\n" +
+                    "Audited automatic-initialization IL:\n" + string.Join("\n", target.AutomaticInitializerAudits));
             }
 
             stage = "plan digest";
@@ -643,16 +644,15 @@ public sealed class ControlledManagedInitialization : IDisposable
                 MethodDefinition? resolved = null;
                 if (scopeName.Equals(module.Assembly.Name.Name, StringComparison.OrdinalIgnoreCase))
                 {
-                    try
-                    {
-                        resolved = called.Resolve();
-                    }
-                    catch (Exception ex)
-                    {
-                        // Fail closed: any Cecil resolution failure makes this initializer unsafe for
-                        // the current candidate instead of broadening search paths or guessing.
-                        hazards.Add($"Unresolved same-assembly call ({ex.GetType().Name}): {method.FullName} -> {called.FullName}");
-                    }
+                    // Do not call MethodReference.Resolve() here. Cecil's resolver may walk external
+                    // type/base/member metadata while resolving an otherwise local MemberRef. On the
+                    // physical Step 24.0.2 target that caused Gate A to abort while trying to resolve
+                    // GodotSharp even though Gate A is supposed to be a self-contained metadata audit.
+                    // Resolve only from definitions already present in this module. If a same-assembly
+                    // reference cannot be matched unambiguously from local metadata, fail closed below.
+                    resolved = ResolveSameAssemblyMethodFromLocalMetadata(module, called, typesByFullName);
+                    if (resolved is null)
+                        hazards.Add($"Unresolved same-assembly call (local metadata only): {method.FullName} -> {called.FullName}");
                 }
 
                 if (resolved is not null)
@@ -686,6 +686,67 @@ public sealed class ControlledManagedInitialization : IDisposable
             .Select(FormatMethodAudit)
             .ToArray();
         return new PreparedMetadataSnapshot(moduleInitializers.Length, automaticInitializers.Count, audits, visited.Count, hazards.ToArray());
+    }
+
+
+    private static MethodDefinition? ResolveSameAssemblyMethodFromLocalMetadata(
+        ModuleDefinition module,
+        MethodReference called,
+        IReadOnlyDictionary<string, TypeDefinition> typesByFullName)
+    {
+        // MethodDef operands are already the exact local definition and require no resolver.
+        if (called is MethodDefinition direct && ReferenceEquals(direct.Module, module))
+            return direct;
+
+        var elementMethod = called.GetElementMethod();
+        if (elementMethod is MethodDefinition elementDefinition && ReferenceEquals(elementDefinition.Module, module))
+            return elementDefinition;
+
+        // A MethodDef token can be recovered directly from the current module. MemberRef/MethodSpec
+        // tokens intentionally do not trigger Cecil assembly resolution here.
+        try
+        {
+            if (module.LookupToken(called.MetadataToken) is MethodDefinition tokenDefinition)
+                return tokenDefinition;
+        }
+        catch (ArgumentException)
+        {
+            // Invalid/non-local token for this module: continue to deterministic local matching.
+        }
+
+        var declaringTypeName = called.DeclaringType.GetElementType().FullName;
+        if (!typesByFullName.TryGetValue(declaringTypeName, out var declaringType))
+            return null;
+
+        var reference = elementMethod;
+        var candidates = declaringType.Methods
+            .Where(candidate =>
+                candidate.Name.Equals(reference.Name, StringComparison.Ordinal) &&
+                candidate.Parameters.Count == reference.Parameters.Count &&
+                candidate.GenericParameters.Count == reference.GenericParameters.Count)
+            .ToArray();
+        if (candidates.Length == 1)
+            return candidates[0];
+
+        // When overloads exist, use the metadata signature text only. This is deliberately
+        // resolver-free. If generic substitution prevents an unambiguous match, return null and
+        // let Gate A fail closed rather than resolving external assemblies or guessing.
+        var exact = candidates
+            .Where(candidate => MetadataSignatureEquals(candidate, reference))
+            .ToArray();
+        return exact.Length == 1 ? exact[0] : null;
+    }
+
+    private static bool MetadataSignatureEquals(MethodReference definition, MethodReference reference)
+    {
+        if (!definition.ReturnType.FullName.Equals(reference.ReturnType.FullName, StringComparison.Ordinal))
+            return false;
+        for (var i = 0; i < definition.Parameters.Count; i++)
+        {
+            if (!definition.Parameters[i].ParameterType.FullName.Equals(reference.Parameters[i].ParameterType.FullName, StringComparison.Ordinal))
+                return false;
+        }
+        return true;
     }
 
     private static void QueueAutomaticTypeInitializer(

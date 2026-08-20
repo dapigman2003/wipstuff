@@ -11,6 +11,7 @@
 - Step 24 is additive: controlled initialization subsystem, host tests, isolated UI/reporting, release wiring, and current documentation/tooling updates;
 - Step 24.0.1 corrected only the OfflineReady inspection API used by the Step 24 subsystem.
 - Step 24.0.2 corrects the Gate A same-assembly P/Invoke audit blind spot exposed by the 0.0.74 host suite; no gate ordering, initializer target, resolver, module-constructor, Harmony/game invocation, or native-load policy broadening is allowed.
+- Step 24.0.3 corrects the physical 0.0.75 Gate A Cecil-resolution failure by forbidding external assembly resolution during same-assembly initializer traversal. Local calls are matched only against definitions already present in the audited module; unresolved local metadata and genuine non-framework edges still fail closed.
 
 ## Static/host build
 
@@ -19,7 +20,7 @@
 - Godot build/preflight passes on Codemagic/macOS;
 - iOS publish succeeds with `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is `0.0.75 (75)`;
+- expected version is `0.0.76 (76)`;
 - workflow is `ios-step-24`;
 - expected IPA is `artifacts/StS2-Launcher-Step-24.ipa`.
 
@@ -38,7 +39,7 @@
 
 ## Stop conditions
 
-- If Gate A finds a second initializer-bearing dependency, identity/version drift, a reachable P/Invoke/`calli`/function-pointer or delegate indirection/native-loader/explicit runtime-constructor/reflection-dynamic edge, an unmeasured implicit type initializer, or any accepted Step 23 preflight regression, stop before Step 24 CLR loading and send the report.
+- If Gate A finds a second initializer-bearing dependency, identity/version drift, an unresolved same-assembly call, a reachable P/Invoke/`calli`/function-pointer or delegate indirection/native-loader/explicit runtime-constructor/reflection-dynamic/non-framework edge, an unmeasured implicit type initializer, any Cecil external assembly-resolution attempt, or any accepted Step 23 preflight regression, stop before Step 24 CLR loading and send the report.
 - If Gate B fails to reproduce the exact Step 23 inert context, stop; do not admit `0Harmony`.
 - If Gate C throws, requests native code, makes an unplanned managed request, or admits another initializer-bearing assembly, stop; do not broaden resolver/native policy or call a Harmony API.
 - If Gate D detects byte/plan/OfflineReady/context drift, treat Step 24 as unclosed.

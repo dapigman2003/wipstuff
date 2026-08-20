@@ -31,7 +31,7 @@ Step 23 did not intentionally invoke a game entry point, inspect/invoke game typ
 
 ## Active candidate — Step 24
 
-- Version: **0.0.75 (75)**
+- Version: **0.0.76 (76)**
 - Codemagic workflow: **`ios-step-24`**
 - IPA: **`artifacts/StS2-Launcher-Step-24.ipa`**
 - Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
@@ -43,7 +43,9 @@ Step 24.0 / `0.0.73 (73)` did **not** reach host tests or iOS build. Codemagic s
 
 Step 24.0.1 / `0.0.74 (74)` corrected that compile issue and reached the full host suite. Canonical static validation passed **287/287** and Core/test compilation succeeded, but host tests finished **160/162**. The two failures were both intentional Gate A safety assertions: `GateARejectsReachablePInvokeBeforeAnyStep24ClrLoad` and `GateARejectsImplicitTypeInitializerPInvokeBeforeAnyStep24ClrLoad`. The fixtures correctly encoded P/Invoke; the production audit resolved the same-assembly native stub but then skipped it because P/Invoke methods have no managed `MethodBody`. No IPA was produced and no physical Step 24 evidence exists for build 74.
 
-Step 24.0.2 / `0.0.75 (75)` is the minimal production audit correction. After resolving a same-assembly call, Gate A now checks P/Invoke metadata before applying the managed-body traversal filter. Reachable P/Invoke stubs fail closed immediately; any other reachable same-assembly method with no managed IL body also fails closed as an unmeasured execution edge. Gate ordering, target identity, resolver policy, module-constructor barrier, and the no-Harmony/game/native-execution boundary are unchanged.
+Step 24.0.2 / `0.0.75 (75)` corrected the P/Invoke audit and reached a physical iPhone. Gate A stopped safely at `prepared target classification` before any Step 24 CLR load with `AssemblyResolutionException: Failed to resolve assembly: 'GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null'`. The failure came from using Cecil `MethodReference.Resolve()` while recursively traversing a nominally same-assembly initializer call: Cecil resolution can walk external type/base/member metadata, which violates Gate A's intended self-contained metadata-only audit. Step 23 remained the latest physically closed boundary; no Gate B/C/D evidence was generated.
+
+Step 24.0.3 / `0.0.76 (76)` is the minimal metadata-resolution correction. Gate A no longer invokes Cecil external assembly resolution for same-assembly initializer calls. It resolves only against MethodDefs and type/method metadata already present in the audited module, and fails closed if a local reference cannot be matched unambiguously. Genuine external non-framework calls such as `GodotSharp` remain prohibited; if one is actually reachable, Gate A will stop with the explicit call edge and the audited automatic-initialization IL rather than an `AssemblyResolutionException`. Gate ordering, target identity, resolver policy, module-constructor barrier, and the no-Harmony/game/native-execution boundary are unchanged.
 
 ### Gate A — InitializationPreflight
 
@@ -56,8 +58,8 @@ Before any Step 24 game/Harmony CLR load:
 5. classify initializer-bearing prepared dependencies;
 6. require exactly one initializer-bearing dependency;
 7. require it to be exactly `0Harmony 2.4.2.0` with exactly one `<Module>..cctor`;
-8. export the module initializer plus the bounded same-assembly automatic-initialization closure, including same-assembly type constructors that static calls/fields could implicitly trigger;
-9. fail closed if the reachable closure contains P/Invoke, `calli`, function/delegate indirection, direct native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, or an unexpected non-framework execution edge.
+8. export the module initializer plus the bounded same-assembly automatic-initialization closure, including same-assembly type constructors that static calls/fields could implicitly trigger, resolving same-assembly calls only from definitions already present in the audited module;
+9. fail closed if a same-assembly call cannot be matched unambiguously from local metadata, or if the reachable closure contains P/Invoke, `calli`, function/delegate indirection, direct native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, or an unexpected non-framework execution edge.
 
 Gate A is metadata-only. No Step 24 real game/Harmony assembly is loaded.
 
@@ -108,7 +110,7 @@ After controlled module initialization:
 
 From a fresh process:
 
-1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.75`;
+1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.76`;
 2. run Step 24 A–D and stop at the first failing gate;
 3. Gate A: exact sole target = `0Harmony 2.4.2.0`, one module initializer, bounded automatic-initialization closure fully measured, hazards = 0;
 4. Gate B: accepted Step 23 initializer-free state reproduced, `0Harmony` absent;

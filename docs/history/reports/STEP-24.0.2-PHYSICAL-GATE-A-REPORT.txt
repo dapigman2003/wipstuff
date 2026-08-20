@@ -1,0 +1,34 @@
+StS2 Launcher — Step 24 Controlled 0Harmony Module Initialization Boundary
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-08-20T20:28:07.7857530+00:00
+
+RESULT
+CONTROLLED MANAGED INITIALIZATION BOUNDARY FAIL — 0/4, first failure: InitializationPreflight
+
+METADATA
+App version: 0.0.75 (75)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Gate A — InitializationPreflight: FAIL
+Stage: prepared target classification
+AssemblyResolutionException: Failed to resolve assembly: 'GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null'
+
+Step 24 prerequisite: physical Step 23.4.3 is closed — Gates A–D PASS, OfflineReady PASS, Foundation 5/5 PASS.
+Gate A is metadata-only and fail-closed: exactly one deferred initializer-bearing dependency is permitted, exactly 0Harmony 2.4.2.0 with one <Module>..cctor. The bounded same-assembly automatic-initialization closure must contain no P/Invoke/calli/function-pointer or delegate indirection/native loader/explicit runtime-constructor, reflection/dynamic invocation, or unexpected non-framework execution edge; implicitly triggerable same-assembly type constructors are included in the audit.
+Gate B reproduces the accepted Step 23 initializer-free managed closure in the same dedicated context used by Gate C; 0Harmony must still be absent after Gate B.
+Gate C is the only new execution boundary: exactly 0Harmony may enter the context, and RuntimeHelpers.RunModuleConstructor is the explicit module-constructor completion barrier. The strict resolver still refuses every native and unplanned managed request.
+Gate D requires the private context to equal the Step 23 initializer-free closure plus exactly 0Harmony, while all plan/prepared/live hashes and OfflineReady remain unchanged.
+Still forbidden: explicit Harmony APIs/patching, sts2 game entry point or type/member reflection/invocation, Activator/CreateInstance, broad reflection/dynamic invocation, Godot/game startup, and native game-library loading.
+After Gate B, managed game assemblies remain process-resident until force-quit. Do not rerun Step 21/22/23 fresh-process regressions in the same process.
+Stage: prepared target classification
+AssemblyResolutionException: Failed to resolve assembly: 'GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null'
+
+END OF REPORT

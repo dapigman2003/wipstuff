@@ -13,7 +13,7 @@ Step 24 advances exactly to the sole deferred automatic-execution boundary obser
 The candidate remains intentionally narrower than “use Harmony”:
 
 - Gate A replays the accepted Step 23 preflight and requires exactly one initializer-bearing dependency, exactly `0Harmony 2.4.2.0` with one `<Module>..cctor`.
-- A bounded Cecil same-assembly automatic-initialization audit runs before any Step 24 CLR load. It follows direct same-assembly calls plus implicitly triggerable same-assembly type constructors, and rejects P/Invoke, `calli`, function/delegate indirection, native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, and unexpected non-framework execution edges.
+- A bounded Cecil same-assembly automatic-initialization audit runs before any Step 24 CLR load. It follows direct same-assembly calls plus implicitly triggerable same-assembly type constructors, resolves local calls only from metadata already present in the audited module, and rejects P/Invoke, `calli`, function/delegate indirection, native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, unresolved local calls, and unexpected non-framework execution edges.
 - Gate B recreates the physically proven Step 23 initializer-free private context in the same Step 24 load context.
 - Gate C admits exactly `0Harmony`, loads the receipt-hashed prepared bytes, and calls `RuntimeHelpers.RunModuleConstructor` as the explicit completion barrier for the module constructor.
 - The strict private resolver still rejects all native-library resolution, unplanned managed loads, and any untargeted initializer-bearing dependency.
@@ -21,7 +21,7 @@ The candidate remains intentionally narrower than “use Harmony”:
 
 Step 24 does **not** call Harmony patch APIs, inspect or invoke StS2 game types/members, invoke a game entry point, start Godot/game state, or permit native game-library loading.
 
-Step 24.0 / `0.0.73 (73)` was rejected by Codemagic at Core compilation before host tests because the new subsystem referenced the wrong OfflineReady inspection method. Step 24.0.1 / `0.0.74 (74)` compiled and ran the full host suite, where two Gate A safety tests exposed that reachable same-assembly P/Invoke stubs were skipped because they have no managed method body. The active Step 24.0.2 / `0.0.75 (75)` candidate fixes that production metadata-audit blind spot without broadening the execution boundary.
+Step 24.0 / `0.0.73 (73)` was rejected by Codemagic at Core compilation before host tests because the new subsystem referenced the wrong OfflineReady inspection method. Step 24.0.1 / `0.0.74 (74)` compiled and ran the full host suite, where two Gate A safety tests exposed that reachable same-assembly P/Invoke stubs were skipped because they have no managed method body. Step 24.0.2 / `0.0.75 (75)` corrected that issue and reached a physical iPhone, where Gate A failed safely during prepared-target classification because Cecil attempted to resolve `GodotSharp` while traversing a nominally same-assembly method reference. No Step 24 CLR load occurred. The active Step 24.0.3 / `0.0.76 (76)` candidate removes external Cecil assembly resolution from the initializer audit: same-assembly traversal is resolved only from definitions already present in the target module, while genuine external `GodotSharp` or other non-framework execution edges remain prohibited and will be reported explicitly.
 
 ## Codemagic
 
@@ -29,7 +29,7 @@ Use workflow:
 
 `ios-step-24`
 
-Expected app version: `0.0.75 (75)`.
+Expected app version: `0.0.76 (76)`.
 
 ## Documentation
 

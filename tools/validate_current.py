@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>75</ApplicationVersion>" in project_text, "build version is 75")
-require("<ApplicationDisplayVersion>0.0.75</ApplicationDisplayVersion>" in project_text, "display version is 0.0.75")
-require(plist.get("CFBundleVersion") == "75", "Info.plist build version is 75")
-require(plist.get("CFBundleShortVersionString") == "0.0.75", "Info.plist display version is 0.0.75")
+require("<ApplicationVersion>76</ApplicationVersion>" in project_text, "build version is 76")
+require("<ApplicationDisplayVersion>0.0.76</ApplicationDisplayVersion>" in project_text, "display version is 0.0.76")
+require(plist.get("CFBundleVersion") == "76", "Info.plist build version is 76")
+require(plist.get("CFBundleShortVersionString") == "0.0.76", "Info.plist display version is 0.0.76")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -303,8 +303,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-24.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.75",
-    "STS2_BUILD_VERSION": "75",
+    "STS2_DISPLAY_VERSION": "0.0.76",
+    "STS2_BUILD_VERSION": "76",
     "STS2_RUNTIME_POLICY_MARKER": "STEP24 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -569,6 +569,10 @@ require("No real game/Harmony assembly was loaded by Step 24 Gate A: YES" in ste
 require("indirect function/delegate target reachable" in step24_source and "implicit automatic-execution edge" in step24_source, "Step 24 Gate A measures implicit type initialization and rejects indirect execution targets")
 require("resolved.IsPInvokeImpl || resolved.PInvokeInfo is not null" in step24_source, "Step 24 Gate A inspects resolved bodyless P/Invoke stubs before managed-body traversal")
 require("Same-assembly method without managed IL body reachable" in step24_source and "else if (!resolved.HasBody)" in step24_source, "Step 24 Gate A fails closed on other reachable same-assembly bodyless execution edges")
+require("ResolveSameAssemblyMethodFromLocalMetadata" in step24_source and "module.LookupToken(called.MetadataToken)" in step24_source, "Step 24 Gate A resolves same-assembly initializer calls only from current-module metadata")
+require("resolved = called.Resolve();" not in step24_source, "Step 24 Gate A does not invoke Cecil external assembly resolution while traversing same-assembly calls")
+require("Unresolved same-assembly call (local metadata only)" in step24_source, "Step 24 Gate A fails closed when local metadata cannot unambiguously resolve a same-assembly call")
+require("prohibited or unresolved execution edge" in step24_source and "Audited automatic-initialization IL:" in step24_source, "Step 24 Gate A hazard failures preserve actionable initializer IL evidence")
 require("Explicit Harmony patching/API invocation: NO" in step24_source, "Step 24 final audit explicitly preserves the no-Harmony-API boundary")
 require(step24_source.count("_offlineInspection.RunAsync(") == 2, "Step 24 uses the established OfflineReady RunAsync contract at both pre/post checks")
 require("_offlineInspection.InspectAsync(" not in step24_source and "offline.OfflineReady" not in step24_source, "Step 24 contains no nonexistent OfflineReady inspection API references")
@@ -603,6 +607,8 @@ required_docs = [
     "docs/history/steps/STEP-23.4.1-CECIL-IL-AUDIT-COMPILE-FIX.md",
     "docs/history/steps/STEP-23.4.2-SYNTHETIC-CORELIB-FIXTURE-NORMALIZATION.md",
     "docs/history/steps/STEP-23.4.3-CECIL-CORELIB-SCOPE-CONSTRUCTION-FIX.md",
+    "docs/history/steps/STEP-24.0.3-CECIL-LOCAL-METADATA-RESOLUTION-FIX.md",
+    "docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt",
     "docs/history/steps/STEP-23.4.3-PHYSICAL-CLOSURE.md",
     "docs/history/steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md",
     "docs/history/steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md",

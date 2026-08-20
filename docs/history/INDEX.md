@@ -22,6 +22,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 `reports/` retains diagnostic outputs when they materially explain a later architectural decision.
 
+- `reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt` — physical build 75 stopped at Gate A before any Step 24 CLR load because Cecil attempted to resolve `GodotSharp`; this is the direct evidence for Step 24.0.3.
+
 ## Canonical-foundation build fixes
 
 - `STEP-22.4.1-MSTEST-V4-CODEMAGIC-FIX.md`
@@ -48,4 +50,5 @@ The current architecture and plan always live one level up in `docs/`.
 - [Step 23.4.3 — Physical Closure](steps/STEP-23.4.3-PHYSICAL-CLOSURE.md) — all A–D gates, OfflineReady, and Foundation 5/5 passed on physical iPhone; Step 23 closed.
 - [Step 24 — Controlled 0Harmony Module Initialization Boundary](steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md) — active controlled automatic-initialization candidate after physical Step 23 closure.
 - `steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md` — build-73 compile-only correction to the established OfflineReady inspection API; build 74 subsequently reached host tests.
-- `steps/STEP-24.0.2-PINVOKE-AUDIT-FIX.md` — build-74 host tests exposed a same-assembly P/Invoke audit blind spot; active candidate is 0.0.75 (75).
+- `steps/STEP-24.0.2-PINVOKE-AUDIT-FIX.md` — build-74 host tests exposed a same-assembly P/Invoke audit blind spot; build 75 corrected it and reached physical Gate A.
+- `steps/STEP-24.0.3-CECIL-LOCAL-METADATA-RESOLUTION-FIX.md` — physical build 75 stopped safely in Gate A because Cecil tried to resolve `GodotSharp`; active candidate 0.0.76 (76) makes the initializer audit resolver-free outside the target module.

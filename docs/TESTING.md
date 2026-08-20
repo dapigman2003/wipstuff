@@ -83,7 +83,9 @@ The pipeline runs static validation, host tests, iOS workload setup, Godot build
 
 Build `0.0.73 (73)` is not a physical-test candidate: Codemagic rejected it at Core compilation before host tests. Build `0.0.74 (74)` is also not a physical-test candidate: it compiled and reached the full host suite, but two Step 24 Gate A P/Invoke safety tests failed (160/162), so no IPA was produced.
 
-Install version `0.0.75 (75)` only after Codemagic host tests and IPA verification are fully green, then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
+Build `0.0.75 (75)` reached the physical iPhone but failed safely in Gate A during metadata classification because Cecil attempted to resolve `GodotSharp`; no Step 24 CLR load occurred.
+
+Install version `0.0.76 (76)` only after Codemagic host tests and IPA verification are fully green. Build 76 must retain Gate A's no-external-resolution rule: an actually reachable `GodotSharp` call is expected to fail as an explicit prohibited edge with audited IL, while Cecil must not abort merely because external assembly resolution is unavailable. Then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
 
 Run Step 24 A–D in order and require:
 
