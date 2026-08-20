@@ -38,3 +38,5 @@ The current architecture and plan always live one level up in `docs/`.
 - [Step 23.3 — Synthetic Fixture Binding-Plan Coverage Fix](steps/STEP-23.3-SYNTHETIC-FIXTURE-PLAN-COVERAGE-FIX.md)
 
 - [Step 23.4 — Deferred Dependency Module-Initializer Boundary](steps/STEP-23.4-DEFERRED-DEPENDENCY-MODULE-INITIALIZER-BOUNDARY.md)
+
+- `steps/STEP-23.4.1-CECIL-IL-AUDIT-COMPILE-FIX.md` — compile-only missing Cecil.Cil namespace correction.

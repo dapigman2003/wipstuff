@@ -1,4 +1,4 @@
-# Current Status — Step 23.4 First Real StS2 CLR Load Boundary
+# Current Status — Step 23.4.1 First Real StS2 CLR Load Boundary
 
 ## Physically closed boundary
 
@@ -20,14 +20,19 @@ Physical Step 23.3 / 0.0.68 result:
 
 This proves the Step 23 load-only policy found an automatic-execution boundary in a dependency, not in the primary game assembly.
 
-## Active candidate — Step 23.4
+## Active candidate — Step 23.4.1
 
-- Version: **0.0.69 (69)**
-- Codemagic workflow: **`ios-step-23-4`**
+- Version: **0.0.70 (69)**
+- Codemagic workflow: **`ios-step-23-4-1`**
 - Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
 - Trusted source: Step 12 receipt-backed managed install
 - Execution input: Step 21/22 zero-blocker prepared runtime + persisted binding plan
 - Entry point, game type/member reflection, game method invocation, Godot startup, native game libraries: **still out of scope**
+
+
+### Step 23.4 Codemagic compile result
+
+The Step 23.4 Codemagic run passed canonical static validation **203/203** and built the Step 20 external fixtures, but Core compilation stopped before host tests because `FirstRealGameAssemblyLoad.cs` referenced Cecil `Instruction` in the new metadata-only IL audit without importing `Mono.Cecil.Cil`. Step 23.4.1 adds only that missing namespace import plus release bookkeeping; the deferred-initializer runtime policy is unchanged.
 
 ### Gate A — PreparedLoadPreflight
 
@@ -66,7 +71,7 @@ A Step 23.4 4/4 pass therefore means: **the real `sts2.dll` plus the maximal aut
 
 From a fresh process:
 
-1. confirm `STEP 23.4 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.69`;
+1. confirm `STEP 23.4.1 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.70`;
 2. run Step 23 A–D and stop at the first failure;
 3. Gate A: primary module initializers = 0; deferred initializer-bearing dependencies may be nonzero and must be reported;
 4. Gate B: first real `sts2.dll` CLR load = PASS;
