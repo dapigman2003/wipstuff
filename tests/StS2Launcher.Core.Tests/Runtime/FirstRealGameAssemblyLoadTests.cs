@@ -229,6 +229,13 @@ public sealed class FirstRealGameAssemblyLoadTests
         var primaryFullName = primaryInfo.AssemblyFullName;
         var dependencyFullName = dependencyInfo.AssemblyFullName;
 
+        var syntheticPlan = BuildSyntheticBindingPlan(
+            preparedPrimary,
+            primaryFullName,
+            preparedDependency,
+            dependencyFullName,
+            systemLinqFullName);
+
         var plan = new RuntimeFrameworkBindingPlanDocument(
             RuntimeFrameworkBindingPlanDocument.CurrentSchemaVersion,
             SteamOfflineInstallInspection.TargetAppId,
@@ -239,13 +246,9 @@ public sealed class FirstRealGameAssemblyLoadTests
             primaryRelative,
             primaryFullName,
             [primaryInfo, dependencyInfo],
-            [new RuntimeBindingHostFramework(systemLinqFullName, systemLinqFullName, string.Empty, 2)],
+            syntheticPlan.HostFrameworkBindings,
             [],
-            [
-                new RuntimeBindingEdge(primaryFullName, systemLinqFullName, "HostFramework", systemLinqFullName),
-                new RuntimeBindingEdge(primaryFullName, dependencyFullName, "WorkspaceExact", dependencyFullName),
-                new RuntimeBindingEdge(dependencyFullName, systemLinqFullName, "HostFramework", systemLinqFullName),
-            ],
+            syntheticPlan.Edges,
             true);
 
         var planPath = Path.Combine(planRoot, PreparedRuntimeFrameworkBinding.PlanFileName);
@@ -258,6 +261,78 @@ public sealed class FirstRealGameAssemblyLoadTests
             await File.AppendAllTextAsync(preparedPrimary, "tamper");
 
         return new SyntheticPreparedRuntime(preparedPrimary, planPath);
+    }
+
+
+    private static SyntheticBindingPlan BuildSyntheticBindingPlan(
+        string preparedPrimary,
+        string primaryFullName,
+        string preparedDependency,
+        string dependencyFullName,
+        string systemLinqFullName)
+    {
+        var edges = new List<RuntimeBindingEdge>();
+        AddSyntheticEdges(preparedPrimary, primaryFullName, dependencyFullName, systemLinqFullName, edges);
+        AddSyntheticEdges(preparedDependency, dependencyFullName, dependencyFullName, systemLinqFullName, edges);
+
+        var hostBindings = edges
+            .Where(edge => edge.BindingKind.Equals("HostFramework", StringComparison.Ordinal))
+            .GroupBy(edge => (edge.RequestedFullName, edge.Target))
+            .OrderBy(group => group.Key.RequestedFullName, StringComparer.Ordinal)
+            .Select(group => new RuntimeBindingHostFramework(
+                group.Key.RequestedFullName,
+                group.Key.Target,
+                string.Empty,
+                group.Count()))
+            .ToArray();
+
+        return new SyntheticBindingPlan(
+            hostBindings,
+            edges.OrderBy(edge => edge.SourceAssemblyFullName, StringComparer.Ordinal)
+                .ThenBy(edge => edge.RequestedFullName, StringComparer.Ordinal)
+                .ToArray());
+    }
+
+    private static void AddSyntheticEdges(
+        string assemblyPath,
+        string sourceFullName,
+        string dependencyFullName,
+        string systemLinqFullName,
+        ICollection<RuntimeBindingEdge> edges)
+    {
+        using var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+        });
+
+        foreach (var reference in module.AssemblyReferences)
+        {
+            if (reference.Name.Equals("Game.Dependency", StringComparison.OrdinalIgnoreCase))
+            {
+                edges.Add(new RuntimeBindingEdge(sourceFullName, reference.FullName, "WorkspaceExact", dependencyFullName));
+                continue;
+            }
+
+            if (reference.Name.Equals("System.Linq", StringComparison.OrdinalIgnoreCase))
+            {
+                edges.Add(new RuntimeBindingEdge(sourceFullName, reference.FullName, "HostFramework", systemLinqFullName));
+                continue;
+            }
+
+            if (reference.Name.Equals("mscorlib", StringComparison.OrdinalIgnoreCase))
+            {
+                var hostCoreLib = typeof(object).Assembly.GetName().FullName
+                    ?? throw new AssertFailedException("Host System.Private.CoreLib has no FullName.");
+                edges.Add(new RuntimeBindingEdge(sourceFullName, reference.FullName, "HostFramework", hostCoreLib));
+                continue;
+            }
+
+            throw new AssertFailedException(
+                $"Synthetic Step 23 fixture emitted an unexpected AssemblyRef '{reference.FullName}'. " +
+                "Update the fixture binding-plan builder rather than weakening Gate A metadata coverage.");
+        }
     }
 
     private static RuntimeBindingPreparedAssembly BuildPreparedPlanItem(string path, string relativePath, bool isPrimary)
@@ -309,6 +384,7 @@ public sealed class FirstRealGameAssemblyLoadTests
     }
 
     private sealed record AssemblyReferenceSpec(string Name, Version Version, string PublicKeyTokenHex);
+    private sealed record SyntheticBindingPlan(RuntimeBindingHostFramework[] HostFrameworkBindings, RuntimeBindingEdge[] Edges);
     private sealed record SyntheticPreparedRuntime(string PreparedPrimaryPath, string PlanPath);
     private sealed record GateResults(
         FirstRealGameAssemblyLoadGateResult GateA,

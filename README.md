@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 23.2 First Real StS2 CLR Load Boundary
+# StS2 Launcher iOS — Step 23.3 First Real StS2 CLR Load Boundary
 
 Experimental unofficial iOS launcher/compatibility host for **Slay the Spire 2** for legitimate owners. The repository does not include game payloads, Steam secrets, Apple signing secrets, or proprietary FMOD/Spine payloads.
 
@@ -8,11 +8,13 @@ Steps 01–22 and the Step 22.4.2 canonical foundation are physically closed on 
 
 Read **`docs/MASTER-PLAN.md` first** for architecture, roadmap, safety rules, and the resumption protocol. `docs/CURRENT-STATUS.md` contains the current physical/candidate state.
 
+Step 23.3 is a host-test fixture correction only: production first-load code is unchanged from Step 23.2; the synthetic binding plan now reflects its actual post-write Cecil AssemblyRefs so the module-initializer negative test reaches the intended Gate A stop.
+
 ## Build
 
 Codemagic workflow:
 
-`ios-step-23-2`
+`ios-step-23-3`
 
 Authoritative pipeline entry point:
 
