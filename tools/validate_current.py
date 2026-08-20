@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 23.1 First Real StS2 CLR Load Boundary host-test isolation static validation")
+print("StS2 Launcher — Step 23.2 First Real StS2 CLR Load Boundary deterministic host-test isolation static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>66</ApplicationVersion>" in project_text, "build version is 66")
-require("<ApplicationDisplayVersion>0.0.66</ApplicationDisplayVersion>" in project_text, "display version is 0.0.66")
-require(plist.get("CFBundleVersion") == "66", "Info.plist build version is 66")
-require(plist.get("CFBundleShortVersionString") == "0.0.66", "Info.plist display version is 0.0.66")
+require("<ApplicationVersion>67</ApplicationVersion>" in project_text, "build version is 67")
+require("<ApplicationDisplayVersion>0.0.67</ApplicationDisplayVersion>" in project_text, "display version is 0.0.67")
+require(plist.get("CFBundleVersion") == "67", "Info.plist build version is 67")
+require(plist.get("CFBundleShortVersionString") == "0.0.67", "Info.plist display version is 0.0.67")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -302,9 +302,9 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-23.1.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.66",
-    "STS2_BUILD_VERSION": "66",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-23.2.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.67",
+    "STS2_BUILD_VERSION": "67",
     "STS2_RUNTIME_POLICY_MARKER": "STEP23 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -446,9 +446,11 @@ require("SyntheticZeroBlockerPreparedRuntimeLoadsAndResolvesWithoutInvokingGameC
 require("GateARejectsPreparedByteDriftBeforeAnyRealClrLoad" in step23_tests, "Step 23 host tests prove prepared-byte drift stops before CLR load")
 require("GateARejectsPersistedPlanThatDoesNotCoverPreparedAssemblyReferences" in step23_tests, "Step 23 host tests prove stale/incomplete binding plans stop before CLR load")
 require("collectibleLoadContext: true" in step23_tests, "Step 23 host tests use collectible contexts while production remains process-resident")
-require("foundation = null;" in step23_tests, "Step 23 async host helper explicitly clears collectible foundation strong reference")
-require("AssemblyLoadContext.GetLoadContext(assembly)?.IsCollectible == true" in step23_tests, "Step 23 host cleanup observes collectible synthetic game contexts")
-require("host tests must not depend on test ordering or collectible ALC GC timing" in step23_tests, "Step 23 host cleanup fails locally instead of contaminating later tests")
+require("CreateSyntheticPrimarySimpleName" in step23_tests, "Step 23 host tests allocate unique synthetic primary identities")
+require("expectedPrimarySimpleName: primarySimpleName" in step23_tests and "freshProcessAssemblyNames: [primarySimpleName]" in step23_tests, "Step 23 host tests scope freshness checks to their unique synthetic identity")
+require("ForceCollectibleContexts" not in step23_tests, "Step 23 host tests do not depend on collectible ALC GC timing")
+require("InternalsVisibleTo(\"StS2Launcher.Core.Tests\")" in read("src/StS2Launcher.Core/Properties/AssemblyInfo.cs"), "Step 23 test-only identity seam is limited to the host test assembly")
+require("[ExpectedPrimarySimpleName, \"SlayTheSpire2\"]" in step23_source, "Step 23 production constructor preserves the physical fresh-process game identity policy")
 
 candidate_manifest = ROOT / "tools/validation/candidate-step23-load-boundary.sha256"
 require(candidate_manifest.is_file(), "Step 23 candidate boundary hash manifest exists")
@@ -473,6 +475,7 @@ required_docs = [
     "docs/history/steps/STEP-22.4.2-STEP19-REGRESSION-CONTRACT-CORRECTION.md",
     "docs/history/steps/STEP-23-FIRST-REAL-CLR-LOAD.md",
     "docs/history/steps/STEP-23-TEST.md",
+    "docs/history/steps/STEP-23.2-DETERMINISTIC-HOST-TEST-IDENTITY-ISOLATION.md",
 ]
 for doc in required_docs:
     require((ROOT / doc).is_file(), f"authoritative documentation exists: {doc}")
@@ -498,7 +501,7 @@ require(len(history_steps) >= 60, "historical documentation set is comprehensive
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-23-1:" in codemagic, "Codemagic exposes Step 23.1 workflow")
+require("ios-step-23-2:" in codemagic, "Codemagic exposes Step 23.2 workflow")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")

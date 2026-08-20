@@ -1,0 +1,210 @@
+StS2 Launcher — canonical static validation entry point
+UTC: 2026-08-19T20:34:37Z
+Checking active shell syntax...
+PASS: shell syntax — scripts/build-godot.sh
+PASS: shell syntax — scripts/build-ios.sh
+PASS: shell syntax — scripts/codemagic.sh
+PASS: shell syntax — scripts/lib/current-release.sh
+PASS: shell syntax — scripts/preflight-godot-link.sh
+PASS: shell syntax — scripts/test.sh
+PASS: shell syntax — scripts/validate.sh
+PASS: shell syntax — scripts/verify-ipa.sh
+PASS: Python validator compiles
+StS2 Launcher — Step 23.2 First Real StS2 CLR Load Boundary deterministic host-test isolation static validation
+Root: /mnt/data/StS2Launcher-23.2
+PASS: all 8 project/props/targets XML files parse
+PASS: global.json parses
+PASS: lexical delimiter scan passes for 156 C# files
+PASS: canonical iOS project exists
+PASS: canonical iOS Info.plist exists
+PASS: legacy Step05 iOS project is absent from live src
+PASS: src contains exactly one live iOS application project
+PASS: iOS csproj parses as XML
+PASS: Info.plist parses
+PASS: build version is 67
+PASS: display version is 0.0.67
+PASS: Info.plist build version is 67
+PASS: Info.plist display version is 0.0.67
+PASS: iOS Files sharing remains enabled
+PASS: open-in-place Documents access remains enabled
+PASS: canonical iOS root namespace is explicit
+PASS: canonical iOS assembly name is explicit
+PASS: live iOS source contains no legacy Step05 namespace
+PASS: live iOS source uses canonical namespace
+PASS: full trimming policy retained
+PASS: Step 20 interpreter policy retained
+PASS: build guard rejects broad UseInterpreter=true
+PASS: build guard rejects NativeAOT
+PASS: runtime policy emits Step 23 build telemetry
+PASS: all 22 physically proven Step 22 direct host roots remain rooted
+PASS: Step 22 direct root set contains exactly 22 unique roots
+PASS: SteamKit/protobuf reflection roots remain protected
+PASS: DiskArbitration-only linker framework filter remains present
+PASS: all 97 physically proven Step 22.2 Core source files are retained
+PASS: 96 baseline Step 22.2 Core behavior files remain byte-for-byte unchanged and the one approved Step 19 regression delta is exact
+PASS: approved Step 22.4.2 regression delta is hash-pinned: src/StS2Launcher.Core/Compatibility/ExpressionInterpreterCompatibility.cs
+PASS: approved Step 22.4.2 regression delta is hash-pinned: src/StS2Launcher.Core/Compatibility/ExpressionRuntimeCompatibilityPolicy.cs
+PASS: approved Step 22.4.2 regression delta is hash-pinned: tests/StS2Launcher.Core.Tests/Compatibility/ExpressionInterpreterCompatibilityTests.cs
+PASS: additive device report writer remains isolated in Diagnostics
+PASS: physically proven iOS platform/native files are retained at canonical paths
+PASS: platform/native behavior is unchanged except canonical managed namespace
+PASS: Core source remains organized by subsystem
+PASS: Core root contains no loose implementation .cs files
+PASS: RootViewController remains split into focused partial files
+PASS: no RootViewController partial exceeds 50 KB
+PASS: RootViewController retains sealed partial structure
+PASS: active scripts are exactly seven canonical entry points
+PASS: active script filenames are not historical-step named
+PASS: canonical shell release configuration exists
+PASS: release config pins STS2_IOS_PROJECT
+PASS: release config pins STS2_APP_BUNDLE_NAME
+PASS: release config pins STS2_IPA_REL
+PASS: release config pins STS2_DISPLAY_VERSION
+PASS: release config pins STS2_BUILD_VERSION
+PASS: release config pins STS2_RUNTIME_POLICY_MARKER
+PASS: active source/tooling has no dependency on legacy paths or history archive
+PASS: no live history/ directory exists
+INFO: optional history.zip is absent; canonical validation is intentionally unaffected
+PASS: device reports use atomic temporary-file replacement
+PASS: device report file names are constrained to local .txt files
+PASS: all current on-device verification/test paths have deterministic text-report outputs
+PASS: report schema documents credential exclusions
+PASS: shared report writer never reads credential UI fields
+PASS: unit tests use shared temporary-directory helper
+PASS: duplicated per-test TemporaryDirectory helpers remain removed
+PASS: device report writer has host unit tests
+PASS: report writer tests avoid removed MSTest v4 ThrowsExceptionAsync API
+PASS: report writer tests use MSTest v4 ThrowsExactlyAsync
+PASS: report writer data rows use TestMethod instead of obsolete DataTestMethod
+PASS: current Step 19 regression no longer carries the stale pre-Step-20 fallback flag
+PASS: current Step 19 regression does not require IsDynamicCodeSupported=false
+PASS: Step 19 Gate A uses centralized runtime compatibility policy
+PASS: Step 19 policy rejects dynamically compiled code on iOS
+PASS: Step 19 policy recognizes both historical and post-Step-20 valid iOS modes
+PASS: Step 19 runtime policy has explicit host unit coverage
+PASS: Step 19 tests cover canonical interpreter-enabled and historical fallback modes
+PASS: Step 19 tests reject iOS dynamic-code compilation
+PASS: active test.sh exists
+PASS: test.sh emits a shareable text report
+PASS: active validate.sh exists
+PASS: validate.sh emits a shareable text report
+PASS: active verify-ipa.sh exists
+PASS: verify-ipa.sh emits a shareable text report
+PASS: active preflight-godot-link.sh exists
+PASS: preflight-godot-link.sh emits a shareable text report
+PASS: active codemagic.sh exists
+PASS: codemagic.sh emits a shareable text report
+PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoad.cs
+PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoadGate.cs
+PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoadGateResult.cs
+PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoadProgress.cs
+PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoadSummary.cs
+PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoadGateSequence.cs
+PASS: Step 23 boundary has host unit tests
+PASS: Step 23 boundary has isolated iOS UI/report partial
+PASS: Step 23 production boundary contains required safety invariant: LoadFromStream(stream)
+PASS: Step 23 production boundary contains required safety invariant: AssemblyLoadContext.Default.LoadFromAssemblyName
+PASS: Step 23 production boundary contains required safety invariant: LoadUnmanagedDll(string unmanagedDllName)
+PASS: Step 23 production boundary contains required safety invariant: RuntimeClosureReady
+PASS: Step 23 production boundary contains required safety invariant: plan.Blockers.Length != 0
+PASS: Step 23 production boundary contains required safety invariant: type.Name.Equals("<Module>"
+PASS: Step 23 production boundary contains required safety invariant: method.Name.Equals(".cctor"
+PASS: Step 23 production boundary contains required safety invariant: Persisted plan exactly covers prepared AssemblyRef metadata: YES
+PASS: Step 23 production boundary contains required safety invariant: RuntimeFeature.IsDynamicCodeCompiled
+PASS: Step 23 production boundary contains required safety invariant: ComputeSha1Hex(primary.PreparedPath)
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: .EntryPoint
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: .GetTypes(
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: assembly.GetType(
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: .GetMethod(
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: .GetMethods(
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: .Invoke(
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: Activator.
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: RuntimeHelpers.RunClassConstructor
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: CreateInstance(
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: GetCustomAttributes(
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: LoadUnmanagedDllFromPath
+PASS: Step 23 load-only production boundary forbids intentional execution/native API: NativeLibrary.Load
+PASS: Step 23 production boundary never mutates prepared/live install bytes: File.Copy(
+PASS: Step 23 production boundary never mutates prepared/live install bytes: File.Move(
+PASS: Step 23 production boundary never mutates prepared/live install bytes: File.Write
+PASS: Step 23 production boundary never mutates prepared/live install bytes: File.Create(
+PASS: Step 23 production boundary never mutates prepared/live install bytes: Directory.CreateDirectory(
+PASS: Step 23 refuses all native library resolution
+PASS: Step 23 strict resolver audits and rejects unplanned managed bindings
+PASS: Step 23 on-device run emits a Files-visible text report
+PASS: Step 23 host tests prove module initializer preflight stop
+PASS: Step 23 host tests cover synthetic 4/4 load-only closure
+PASS: Step 23 host tests prove prepared-byte drift stops before CLR load
+PASS: Step 23 host tests prove stale/incomplete binding plans stop before CLR load
+PASS: Step 23 host tests use collectible contexts while production remains process-resident
+PASS: Step 23 host tests allocate unique synthetic primary identities
+PASS: Step 23 host tests scope freshness checks to their unique synthetic identity
+PASS: Step 23 host tests do not depend on collectible ALC GC timing
+PASS: Step 23 test-only identity seam is limited to the host test assembly
+PASS: Step 23 production constructor preserves the physical fresh-process game identity policy
+PASS: Step 23 candidate boundary hash manifest exists
+PASS: Step 23 candidate load-boundary implementation is hash-pinned
+PASS: authoritative documentation exists: README.md
+PASS: authoritative documentation exists: docs/README.md
+PASS: authoritative documentation exists: docs/MASTER-PLAN.md
+PASS: authoritative documentation exists: docs/CURRENT-STATUS.md
+PASS: authoritative documentation exists: docs/ARCHITECTURE.md
+PASS: authoritative documentation exists: docs/TESTING.md
+PASS: authoritative documentation exists: docs/REGRESSION-CONTRACTS.md
+PASS: authoritative documentation exists: docs/REPORTS.md
+PASS: authoritative documentation exists: docs/RELEASE-CHECKLIST.md
+PASS: authoritative documentation exists: docs/history/INDEX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-22.4.2-STEP19-REGRESSION-CONTRACT-CORRECTION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23-FIRST-REAL-CLR-LOAD.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23-TEST.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23.2-DETERMINISTIC-HOST-TEST-IDENTITY-ISOLATION.md
+PASS: master plan contains durable section: Product objective
+PASS: master plan contains durable section: Non-negotiable security and content boundaries
+PASS: master plan contains durable section: Authority model
+PASS: master plan contains durable section: Canonical source architecture
+PASS: master plan contains durable section: Major roadmap
+PASS: master plan contains durable section: Definition of a closed step
+PASS: master plan contains durable section: Resumption rule
+PASS: master plan defines self-contained resumption path
+PASS: top-level docs are durable/current; step records live under docs/history/steps
+PASS: readable historical documentation retained for Step 01
+PASS: readable historical documentation retained for Step 02
+PASS: readable historical documentation retained for Step 03
+PASS: readable historical documentation retained for Step 04
+PASS: readable historical documentation retained for Step 05
+PASS: readable historical documentation retained for Step 06
+PASS: readable historical documentation retained for Step 07
+PASS: readable historical documentation retained for Step 08
+PASS: readable historical documentation retained for Step 09
+PASS: readable historical documentation retained for Step 10
+PASS: readable historical documentation retained for Step 11
+PASS: readable historical documentation retained for Step 12
+PASS: readable historical documentation retained for Step 13
+PASS: readable historical documentation retained for Step 14
+PASS: readable historical documentation retained for Step 15
+PASS: readable historical documentation retained for Step 16
+PASS: readable historical documentation retained for Step 17
+PASS: readable historical documentation retained for Step 18
+PASS: readable historical documentation retained for Step 19
+PASS: readable historical documentation retained for Step 20
+PASS: readable historical documentation retained for Step 21
+PASS: readable historical documentation retained for Step 22
+PASS: readable historical documentation retained for Step 23
+PASS: Step 22.4 design/history record is present
+PASS: Step 23 design/test records are present
+PASS: historical documentation set is comprehensive
+PASS: Codemagic exposes Step 23.2 workflow
+PASS: Codemagic contains one active launcher workflow
+PASS: Codemagic calls the consolidated build entry point
+PASS: Codemagic workflow has no history dependency
+PASS: iOS build sources canonical release configuration
+PASS: iOS build uses canonical project variable
+PASS: iOS build uses canonical Godot wrapper
+PASS: IPA verifier enforces release-config version
+PASS: IPA verifier reads native bridge from canonical project path
+PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
+PASS: authoritative source tree contains no StS2/proprietary runtime payload
+PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
+
+VALIDATION PASS: 193 checks

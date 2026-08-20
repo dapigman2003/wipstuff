@@ -1,6 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -43,12 +41,11 @@ public sealed class FirstRealGameAssemblyLoadTests
     [TestMethod]
     public async Task SyntheticZeroBlockerPreparedRuntimeLoadsAndResolvesWithoutInvokingGameCode()
     {
-        ForceCollectibleContexts();
+        var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        await CreateSyntheticPreparedRuntimeAsync(temp.Path, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
+        await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
 
-        var results = await RunSyntheticLoadAndDisposeAsync(temp.Path);
-        ForceCollectibleContexts();
+        var results = await RunSyntheticLoadAndDisposeAsync(temp.Path, primarySimpleName);
 
         Assert.IsTrue(results.GateA.Passed, results.GateA.Detail);
         Assert.IsTrue(results.GateB.Passed, results.GateB.Detail);
@@ -66,25 +63,24 @@ public sealed class FirstRealGameAssemblyLoadTests
     [TestMethod]
     public async Task GateARejectsModuleInitializerBeforeAnyRealClrLoad()
     {
-        ForceCollectibleContexts();
+        var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        await CreateSyntheticPreparedRuntimeAsync(temp.Path, includeModuleInitializer: true, tamperPreparedAfterPlan: false);
+        await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: true, tamperPreparedAfterPlan: false);
 
-        using var foundation = new FirstRealGameAssemblyLoad(temp.Path, collectibleLoadContext: true);
+        using var foundation = CreateSyntheticFoundation(temp.Path, primarySimpleName);
         var gateA = await foundation.RunPreparedLoadPreflightAsync();
 
         Assert.IsFalse(gateA.Passed);
         StringAssert.Contains(gateA.Detail, "<Module>..cctor module initializer");
-        Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly =>
-            string.Equals(assembly.GetName().Name, FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase)));
+        AssertSyntheticPrimaryNotLoaded(primarySimpleName);
     }
 
     [TestMethod]
     public async Task GateARejectsPersistedPlanThatDoesNotCoverPreparedAssemblyReferences()
     {
-        ForceCollectibleContexts();
+        var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
+        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
 
         RuntimeFrameworkBindingPlanDocument plan;
         await using (var input = File.OpenRead(synthetic.PlanPath))
@@ -106,58 +102,59 @@ public sealed class FirstRealGameAssemblyLoadTests
                 RuntimeFrameworkBindingJsonContext.Default.RuntimeFrameworkBindingPlanDocument);
         }
 
-        using var foundation = new FirstRealGameAssemblyLoad(temp.Path, collectibleLoadContext: true);
+        using var foundation = CreateSyntheticFoundation(temp.Path, primarySimpleName);
         var gateA = await foundation.RunPreparedLoadPreflightAsync();
 
         Assert.IsFalse(gateA.Passed);
         StringAssert.Contains(gateA.Detail, "does not exactly cover the Cecil AssemblyRef metadata");
-        Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly =>
-            string.Equals(assembly.GetName().Name, FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase)));
+        AssertSyntheticPrimaryNotLoaded(primarySimpleName);
     }
 
     [TestMethod]
     public async Task GateARejectsPreparedByteDriftBeforeAnyRealClrLoad()
     {
-        ForceCollectibleContexts();
+        var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
+        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
         await File.AppendAllTextAsync(synthetic.PreparedPrimaryPath, "tamper");
 
-        using var foundation = new FirstRealGameAssemblyLoad(temp.Path, collectibleLoadContext: true);
+        using var foundation = CreateSyntheticFoundation(temp.Path, primarySimpleName);
         var gateA = await foundation.RunPreparedLoadPreflightAsync();
 
         Assert.IsFalse(gateA.Passed);
         StringAssert.Contains(gateA.Detail, "file length mismatch");
-        Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly =>
-            string.Equals(assembly.GetName().Name, FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase)));
+        AssertSyntheticPrimaryNotLoaded(primarySimpleName);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static async Task<GateResults> RunSyntheticLoadAndDisposeAsync(string launcherRoot)
+    private static async Task<GateResults> RunSyntheticLoadAndDisposeAsync(string launcherRoot, string primarySimpleName)
     {
-        // Async state-machine locals can remain strongly referenced by the completed Task long
-        // enough to delay collectible AssemblyLoadContext unloading on some CI runtimes. Keep
-        // the foundation in an explicitly nullable field and clear it in finally so subsequent
-        // Step 23 tests never depend on GC/JIT lifetime heuristics from this helper.
-        FirstRealGameAssemblyLoad? foundation = null;
-        try
-        {
-            foundation = new FirstRealGameAssemblyLoad(launcherRoot, collectibleLoadContext: true);
-            var gateA = await foundation.RunPreparedLoadPreflightAsync();
-            var gateB = foundation.RunPrimaryAssemblyLoad();
-            var gateC = foundation.RunPlannedDependencyResolution();
-            var gateD = await foundation.RunLoadIsolationAuditAsync();
-            return new GateResults(gateA, gateB, gateC, gateD);
-        }
-        finally
-        {
-            foundation?.Dispose();
-            foundation = null;
-        }
+        using var foundation = CreateSyntheticFoundation(launcherRoot, primarySimpleName);
+        var gateA = await foundation.RunPreparedLoadPreflightAsync();
+        var gateB = foundation.RunPrimaryAssemblyLoad();
+        var gateC = foundation.RunPlannedDependencyResolution();
+        var gateD = await foundation.RunLoadIsolationAuditAsync();
+        return new GateResults(gateA, gateB, gateC, gateD);
     }
+
+    private static FirstRealGameAssemblyLoad CreateSyntheticFoundation(string launcherRoot, string primarySimpleName)
+        => new(
+            launcherRoot,
+            collectibleLoadContext: true,
+            expectedPrimarySimpleName: primarySimpleName,
+            freshProcessAssemblyNames: [primarySimpleName]);
+
+    private static string CreateSyntheticPrimarySimpleName()
+        => "StS2Launcher.Step23.SyntheticPrimary." + Guid.NewGuid().ToString("N");
+
+    private static void AssertSyntheticPrimaryNotLoaded(string primarySimpleName)
+        => Assert.IsFalse(
+            AppDomain.CurrentDomain.GetAssemblies().Any(assembly =>
+                string.Equals(assembly.GetName().Name, primarySimpleName, StringComparison.OrdinalIgnoreCase)),
+            $"Synthetic primary '{primarySimpleName}' was loaded before the intended Step 23 CLR-load boundary.");
 
     private static async Task<SyntheticPreparedRuntime> CreateSyntheticPreparedRuntimeAsync(
         string launcherRoot,
+        string primarySimpleName,
         bool includeModuleInitializer,
         bool tamperPreparedAfterPlan)
     {
@@ -187,7 +184,7 @@ public sealed class FirstRealGameAssemblyLoadTests
             includeModuleInitializer: false);
         WriteAssembly(
             livePrimary,
-            "sts2",
+            primarySimpleName,
             new Version(0, 1, 0, 0),
             [systemLinqReference, new AssemblyReferenceSpec("Game.Dependency", new Version(1, 0, 0, 0), string.Empty)],
             includeModuleInitializer);
@@ -309,30 +306,6 @@ public sealed class FirstRealGameAssemblyLoadTests
         }
 
         assembly.Write(path);
-    }
-
-    private static void ForceCollectibleContexts()
-    {
-        // Collectible ALC unloading is GC-driven. Wait for the observable Step 23 synthetic
-        // assembly to disappear instead of assuming a fixed small number of collections is enough.
-        // This is host-test isolation only; the physical iOS Step 23 context remains non-collectible.
-        for (var i = 0; i < 16; i++)
-        {
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
-            GC.WaitForPendingFinalizers();
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
-
-            if (!AppDomain.CurrentDomain.GetAssemblies().Any(assembly =>
-                    string.Equals(assembly.GetName().Name, FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, StringComparison.OrdinalIgnoreCase) &&
-                    AssemblyLoadContext.GetLoadContext(assembly)?.IsCollectible == true))
-            {
-                return;
-            }
-
-            Thread.Sleep(10);
-        }
-
-        Assert.Fail("A collectible synthetic Step 23 sts2 assembly remained loaded after forced cleanup; host tests must not depend on test ordering or collectible ALC GC timing.");
     }
 
     private sealed record AssemblyReferenceSpec(string Name, Version Version, string PublicKeyTokenHex);
