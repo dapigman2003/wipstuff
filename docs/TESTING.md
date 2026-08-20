@@ -53,12 +53,12 @@ bash scripts/build-ios.sh
 
 Expected IPA:
 
-`artifacts/StS2-Launcher-Step-23.1.ipa`
+`artifacts/StS2-Launcher-Step-23.2.ipa`
 
 ## IPA verification
 
 ```sh
-bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-23.1.ipa
+bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-23.2.ipa
 ```
 
 Output:
@@ -69,7 +69,7 @@ Output:
 
 Workflow:
 
-`ios-step-23-1`
+`ios-step-23-2`
 
 Authoritative entry point:
 
@@ -81,7 +81,7 @@ The pipeline runs static validation, host tests, iOS workload setup, Godot build
 
 ## Physical acceptance for Step 23
 
-Install version `0.0.66` and start from a fresh process. Do not start the Step 15 Godot host first.
+Install version `0.0.67` and start from a fresh process. Do not start the Step 15 Godot host first.
 
 Run Step 23 A–D and require:
 

@@ -34,3 +34,4 @@ The current architecture and plan always live one level up in `docs/`.
 - `STEP-23-TEST.md`
 
 - [Step 23.1 — Host-Test Isolation Fix](steps/STEP-23.1-HOST-TEST-ISOLATION-FIX.md)
+- [Step 23.2 — Deterministic Host-Test Identity Isolation](steps/STEP-23.2-DETERMINISTIC-HOST-TEST-IDENTITY-ISOLATION.md)

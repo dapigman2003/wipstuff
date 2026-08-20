@@ -1,4 +1,4 @@
-# Current Status — Step 23.1 First Real StS2 CLR Load Boundary
+# Current Status — Step 23.2 First Real StS2 CLR Load Boundary
 
 ## Physically closed boundary
 
@@ -18,12 +18,12 @@ The final Step 22.4.2 acceptance was completely green:
 
 This establishes version **0.0.64 (64)** as the protected pre-game-load foundation.
 
-## Active candidate — Step 23.1
+## Active candidate — Step 23.2
 
 Step 23 crosses exactly one new runtime boundary: the first real CLR load of the receipt-backed prepared `sts2.dll`.
 
-- Version: **0.0.66 (66)**
-- Codemagic workflow: **`ios-step-23-1`**
+- Version: **0.0.67 (67)**
+- Codemagic workflow: **`ios-step-23-2`**
 - Live iOS project: **`src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`**
 - Trusted game source: existing Step 12 receipt-backed managed install
 - Execution input: existing Step 21/22 zero-blocker prepared runtime + persisted binding plan
@@ -90,7 +90,7 @@ Codemagic must pass static validation, host unit tests, Godot/native build/prefl
 
 On device, from a fresh process:
 
-1. confirm `STEP 23.1 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.66`;
+1. confirm `STEP 23.2 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.67`;
 2. run Step 23 A–D and stop at the first failure;
 3. require Gate A module initializers = 0;
 4. require Gate B first real `sts2.dll` CLR load = PASS;
@@ -102,6 +102,10 @@ On device, from a fresh process:
 
 Only after this is green should controlled type/member access or broader managed initialization begin.
 
-### Step 23.1 Codemagic host-test isolation correction
+### Step 23.1 Codemagic host-test isolation result
 
-The first Step 23 Codemagic run reached the host test suite: static validation passed 187/187, Core compiled, and 153/154 tests passed. The sole failure was test-only collectible `AssemblyLoadContext` GC timing: the positive synthetic `sts2` load could remain visible in `AppDomain.GetAssemblies()` long enough for the following module-initializer preflight test to hit the fresh-process guard first. Step 23.1 clears the async helper's strong reference explicitly in `finally` and waits for the collectible synthetic `sts2` context to disappear, making host tests independent of test order and CI GC timing. Production Step 23 remains non-collectible and unchanged.
+The first Step 23 Codemagic run reached the host test suite with 153/154 passing. Step 23.1 tried to make collectible synthetic `sts2` unloading deterministic by clearing strong references and forcing GC. The next Codemagic run proved that approach was still timing-dependent: 147/154 passed and seven tests failed because a collectible synthetic assembly named `sts2` remained visible in the shared test process. Three older Step 21 binding tests were also contaminated by that same synthetic identity. Production Step 23 was not implicated.
+
+### Step 23.2 deterministic host-test identity isolation
+
+Step 23.2 removes GC/unload timing from host-test correctness. Every synthetic Step 23 test now creates a unique primary assembly identity and uses an internal test-only identity policy. The public production constructor is unchanged and still recognizes only the real game identities `sts2` and `SlayTheSpire2` for its fresh-process guard. Synthetic contexts remain collectible as hygiene, but no test result depends on when the runtime actually collects them. This prevents Step 23 tests from contaminating each other or older Step 21 tests even if collectible ALC reclamation is delayed indefinitely.
