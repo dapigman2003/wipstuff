@@ -161,9 +161,9 @@ public sealed class ControlledManagedInitialization : IDisposable
             if (!plan.RuntimeClosureReady || plan.Blockers.Length != 0)
                 throw new InvalidDataException("Step 24 requires the physically proven zero-blocker Step 21/22 runtime plan.");
 
-            var offline = await _offlineInspection.InspectAsync(null, cancellationToken).ConfigureAwait(false);
-            if (!offline.OfflineReady)
-                throw new InvalidDataException("Step 24 requires OfflineReady before any CLR load.");
+            var offline = await _offlineInspection.RunAsync(null, cancellationToken).ConfigureAwait(false);
+            if (!offline.Success || !offline.ExactManagedTreeVerified || string.IsNullOrWhiteSpace(offline.ManagedInstallRelativePath))
+                throw new InvalidDataException(offline.Error ?? "Step 24 requires an exact OfflineReady managed install before any CLR load.");
             if (offline.DepotId != plan.DepotId || offline.InstalledManifestId != plan.ManifestId)
                 throw new InvalidDataException("Step 24 runtime-binding plan depot/manifest no longer matches the OfflineReady install.");
 
@@ -483,9 +483,9 @@ public sealed class ControlledManagedInitialization : IDisposable
             }
 
             stage = "OfflineReady postcondition";
-            var offline = await _offlineInspection.InspectAsync(null, cancellationToken).ConfigureAwait(false);
-            if (!offline.OfflineReady)
-                throw new InvalidDataException("OfflineReady failed after Step 24 controlled initialization.");
+            var offline = await _offlineInspection.RunAsync(null, cancellationToken).ConfigureAwait(false);
+            if (!offline.Success || !offline.ExactManagedTreeVerified || offline.InstalledManifestId != preflight.Plan.ManifestId)
+                throw new InvalidDataException(offline.Error ?? "OfflineReady exact-tree verification failed after Step 24 controlled initialization.");
 
             stage = "private context membership audit";
             var expected = preflight.PreparedAssemblies

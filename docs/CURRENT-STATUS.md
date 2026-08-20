@@ -31,13 +31,15 @@ Step 23 did not intentionally invoke a game entry point, inspect/invoke game typ
 
 ## Active candidate — Step 24
 
-- Version: **0.0.73 (73)**
+- Version: **0.0.74 (74)**
 - Codemagic workflow: **`ios-step-24`**
 - IPA: **`artifacts/StS2-Launcher-Step-24.ipa`**
 - Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
 - Trusted source: Step 12 receipt-backed managed install
 - Execution input: physically proven Step 21/22 zero-blocker prepared runtime and persisted binding plan
 - Closed prerequisite: physical Step 23.4.3 4/4 + OfflineReady + Foundation 5/5
+
+Step 24.0 / `0.0.73 (73)` did **not** reach host tests or iOS build. Codemagic static validation passed 281/281, then Core compilation failed because the new Step 24 subsystem called a nonexistent `SteamOfflineInstallInspection.InspectAsync` API at its pre/post OfflineReady checks. Step 24.0.1 / `0.0.74 (74)` is the minimal compile correction: it uses the established `RunAsync` result contract (`Success` + `ExactManagedTreeVerified`) without changing any Step 24 gate, resolver, initialization, or execution policy.
 
 ### Gate A — InitializationPreflight
 
@@ -102,7 +104,7 @@ After controlled module initialization:
 
 From a fresh process:
 
-1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.73`;
+1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.74`;
 2. run Step 24 A–D and stop at the first failing gate;
 3. Gate A: exact sole target = `0Harmony 2.4.2.0`, one module initializer, bounded automatic-initialization closure fully measured, hazards = 0;
 4. Gate B: accepted Step 23 initializer-free state reproduced, `0Harmony` absent;

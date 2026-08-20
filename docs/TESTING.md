@@ -81,7 +81,9 @@ The pipeline runs static validation, host tests, iOS workload setup, Godot build
 
 ## Physical acceptance for Step 24
 
-Install version `0.0.73 (73)` and start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
+Build `0.0.73 (73)` is not a physical-test candidate: Codemagic rejected it at Core compilation before host tests.
+
+Install version `0.0.74 (74)` and start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
 
 Run Step 24 A–D in order and require:
 

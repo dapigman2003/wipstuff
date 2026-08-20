@@ -21,13 +21,15 @@ The candidate remains intentionally narrower than “use Harmony”:
 
 Step 24 does **not** call Harmony patch APIs, inspect or invoke StS2 game types/members, invoke a game entry point, start Godot/game state, or permit native game-library loading.
 
+Step 24.0 / `0.0.73 (73)` was rejected by Codemagic at Core compilation before host tests because the new subsystem referenced the wrong OfflineReady inspection method. The active `0.0.74 (74)` candidate changes only that API call/result check; the Step 24 experiment itself is unchanged.
+
 ## Codemagic
 
 Use workflow:
 
 `ios-step-24`
 
-Expected app version: `0.0.73 (73)`.
+Expected app version: `0.0.74 (74)`.
 
 ## Documentation
 

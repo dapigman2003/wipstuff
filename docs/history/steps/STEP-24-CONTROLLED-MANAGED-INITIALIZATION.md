@@ -30,9 +30,14 @@ Permit exactly `0Harmony`, load its exact prepared bytes, and use `RuntimeHelper
 
 Re-hash the plan and every prepared/live file, re-prove OfflineReady, and require exact context membership: Step 23 initializer-free closure plus exactly `0Harmony`. Native attempts and rejected/unplanned managed requests must remain zero.
 
+## Candidate lineage
+
+- Step 24.0 / `0.0.73 (73)`: Codemagic static validation passed 281/281, but Core compilation failed before host tests because `ControlledManagedInitialization` referenced nonexistent `SteamOfflineInstallInspection.InspectAsync` / `OfflineReady` members. No IPA or physical Step 24 evidence exists for build 73.
+- Step 24.0.1 / `0.0.74 (74)`: compile-only correction to the established OfflineReady `RunAsync` result contract; Step 24 execution policy is unchanged.
+
 ## Candidate identity
 
-- version: `0.0.73 (73)`
+- active corrected version: `0.0.74 (74)`
 - workflow: `ios-step-24`
 - IPA: `artifacts/StS2-Launcher-Step-24.ipa`
 - device report: `Documents/StS2Launcher/Reports/Step24-ControlledManagedInitialization.txt`

@@ -47,3 +47,4 @@ The current architecture and plan always live one level up in `docs/`.
 
 - [Step 23.4.3 — Physical Closure](steps/STEP-23.4.3-PHYSICAL-CLOSURE.md) — all A–D gates, OfflineReady, and Foundation 5/5 passed on physical iPhone; Step 23 closed.
 - [Step 24 — Controlled 0Harmony Module Initialization Boundary](steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md) — active controlled automatic-initialization candidate after physical Step 23 closure.
+- `steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md` — build-73 compile-only correction to the established OfflineReady inspection API; active candidate is 0.0.74 (74).

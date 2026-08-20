@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>73</ApplicationVersion>" in project_text, "build version is 73")
-require("<ApplicationDisplayVersion>0.0.73</ApplicationDisplayVersion>" in project_text, "display version is 0.0.73")
-require(plist.get("CFBundleVersion") == "73", "Info.plist build version is 73")
-require(plist.get("CFBundleShortVersionString") == "0.0.73", "Info.plist display version is 0.0.73")
+require("<ApplicationVersion>74</ApplicationVersion>" in project_text, "build version is 74")
+require("<ApplicationDisplayVersion>0.0.74</ApplicationDisplayVersion>" in project_text, "display version is 0.0.74")
+require(plist.get("CFBundleVersion") == "74", "Info.plist build version is 74")
+require(plist.get("CFBundleShortVersionString") == "0.0.74", "Info.plist display version is 0.0.74")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -303,8 +303,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-24.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.73",
-    "STS2_BUILD_VERSION": "73",
+    "STS2_DISPLAY_VERSION": "0.0.74",
+    "STS2_BUILD_VERSION": "74",
     "STS2_RUNTIME_POLICY_MARKER": "STEP24 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -568,6 +568,9 @@ require('[FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, "SlayTheSpire2", 
 require("No real game/Harmony assembly was loaded by Step 24 Gate A: YES" in step24_source, "Step 24 Gate A remains metadata-only for the new boundary")
 require("indirect function/delegate target reachable" in step24_source and "implicit automatic-execution edge" in step24_source, "Step 24 Gate A measures implicit type initialization and rejects indirect execution targets")
 require("Explicit Harmony patching/API invocation: NO" in step24_source, "Step 24 final audit explicitly preserves the no-Harmony-API boundary")
+require(step24_source.count("_offlineInspection.RunAsync(") == 2, "Step 24 uses the established OfflineReady RunAsync contract at both pre/post checks")
+require("_offlineInspection.InspectAsync(" not in step24_source and "offline.OfflineReady" not in step24_source, "Step 24 contains no nonexistent OfflineReady inspection API references")
+require("offline.Success" in step24_source and "offline.ExactManagedTreeVerified" in step24_source, "Step 24 fail-closes on the canonical OfflineReady result contract")
 
 step24_manifest = ROOT / "tools/validation/candidate-step24-initialization-boundary.sha256"
 require(step24_manifest.is_file(), "Step 24 candidate boundary hash manifest exists")
@@ -600,6 +603,7 @@ required_docs = [
     "docs/history/steps/STEP-23.4.3-CECIL-CORELIB-SCOPE-CONSTRUCTION-FIX.md",
     "docs/history/steps/STEP-23.4.3-PHYSICAL-CLOSURE.md",
     "docs/history/steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md",
+    "docs/history/steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md",
 ]
 for doc in required_docs:
     require((ROOT / doc).is_file(), f"authoritative documentation exists: {doc}")
@@ -629,6 +633,8 @@ require(len(history_steps) >= 60, "historical documentation set is comprehensive
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
 require("ios-step-24:" in codemagic, "Codemagic exposes the Step 24 workflow")
+require("Step 24 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 24")
+require("Step 24 Controlled 0Harmony Module Initialization Boundary build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 24")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
