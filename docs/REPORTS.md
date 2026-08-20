@@ -14,11 +14,15 @@ and are visible through:
 
 Specialized full diagnostics may use stable files directly under `Documents/StS2Launcher/`, for example the runtime-binding or framework-frontier reports.
 
-The current Step 23 first-load report is:
+The active Step 24 report is:
+
+`Documents/StS2Launcher/Reports/Step24-ControlledManagedInitialization.txt`
+
+It records the ordered A–D result, accepted Step 23 preflight replay, exact initializer target/IL and bounded automatic-initialization-closure audit, exact replayed private context, target load/module-constructor completion barrier, managed/native resolver observations, post-initialization context membership, plan/file hashes, OfflineReady audit, and the explicit no-Harmony-patch/no-game-invocation/no-Godot/no-native-game boundary.
+
+The physically closed Step 23 regression report remains available as:
 
 `Documents/StS2Launcher/Reports/Step23-FirstRealGameLoad.txt`
-
-It contains the ordered A–D result, preflight module-initializer/PInvoke counts, real primary load identity/context, planned host/private binding counts, native-resolution count, byte/OfflineReady audit, and the explicit no-entry-point/no-member-invocation boundary.
 
 A current verification overwrites its deterministic latest report. Reports are output-only and are never treated as trusted runtime input.
 

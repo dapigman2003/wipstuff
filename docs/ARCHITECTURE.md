@@ -12,7 +12,7 @@ Platform-neutral logic. Subsystems:
 - `Steam` — authentication, ownership, content, download, install/update/repair, offline state;
 - `Compatibility` — Cecil preparation/analysis/rewrite boundaries;
 - `Godot` — managed gate model for the source-built Godot host;
-- `Runtime` — dynamic managed execution, runtime binding, framework closure, and the controlled first real game assembly load boundary;
+- `Runtime` — dynamic managed execution, runtime binding/framework closure, the physically proven first real game assembly load boundary, and the explicit controlled managed-initialization boundary;
 - `Diagnostics` — shareable report infrastructure.
 
 ### `src/StS2Launcher.iOS`
@@ -76,6 +76,8 @@ The canonicalization does not change:
 - `MtouchInterpreter=-all`;
 - the exact measured 22 Step 22 direct framework roots;
 - Files-based diagnostic sharing;
-- the Step 23 rule that real StS2 CLR loading occurs only in the explicit dedicated private load subsystem, with member invocation/native resolution still deferred.
+- the Step 23 rule that real StS2 CLR loading occurs only in the explicit dedicated private load subsystem;
+- initializer-bearing prepared dependencies remain excluded until an explicit controlled-initialization boundary admits a measured exact identity;
+- strict managed-plan resolution and native-load refusal remain in force while crossing controlled initialization; Harmony patch APIs, StS2 member invocation, Godot/game startup, and native game loading remain later boundaries.
 
 See `MASTER-PLAN.md` for rationale and roadmap.

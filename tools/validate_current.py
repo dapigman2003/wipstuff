@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 23.4.3 Cecil core-library scope construction static validation")
+print("StS2 Launcher — Step 24 controlled managed initialization static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>72</ApplicationVersion>" in project_text, "build version is 72")
-require("<ApplicationDisplayVersion>0.0.72</ApplicationDisplayVersion>" in project_text, "display version is 0.0.72")
-require(plist.get("CFBundleVersion") == "72", "Info.plist build version is 72")
-require(plist.get("CFBundleShortVersionString") == "0.0.72", "Info.plist display version is 0.0.72")
+require("<ApplicationVersion>73</ApplicationVersion>" in project_text, "build version is 73")
+require("<ApplicationDisplayVersion>0.0.73</ApplicationDisplayVersion>" in project_text, "display version is 0.0.73")
+require(plist.get("CFBundleVersion") == "73", "Info.plist build version is 73")
+require(plist.get("CFBundleShortVersionString") == "0.0.73", "Info.plist display version is 0.0.73")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -202,7 +202,7 @@ require("<TrimMode>full</TrimMode>" in project_text, "full trimming policy retai
 require("<MtouchInterpreter>-all</MtouchInterpreter>" in project_text, "Step 20 interpreter policy retained")
 require("'$(UseInterpreter)' == 'true'" in project_text, "build guard rejects broad UseInterpreter=true")
 require("'$(PublishAot)' == 'true'" in project_text, "build guard rejects NativeAOT")
-require("STEP23 RUNTIME POLICY" in project_text, "runtime policy emits Step 23 build telemetry")
+require("STEP24 RUNTIME POLICY" in project_text, "runtime policy emits Step 24 build telemetry")
 
 all_roots = re.findall(r'<TrimmerRootAssembly Include="([^"]+)"\s*/>', project_text)
 step22_roots = [
@@ -302,10 +302,10 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-23.4.3.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.72",
-    "STS2_BUILD_VERSION": "72",
-    "STS2_RUNTIME_POLICY_MARKER": "STEP23 RUNTIME POLICY:",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-24.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.73",
+    "STS2_BUILD_VERSION": "73",
+    "STS2_RUNTIME_POLICY_MARKER": "STEP24 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
 
@@ -344,7 +344,7 @@ required_report_files = {
     "Step14-CompatibilityInventory.txt", "Step15-GodotFoundation.txt", "Step16-ManagedPreparation.txt",
     "Step17-CompatibilityCallSites.txt", "Step18-RealAssemblyRewrite.txt", "Step19-ExpressionInterpreter.txt",
     "Step20-DynamicManagedExecution.txt", "Step21-RuntimeFrameworkBinding.txt", "Step22-HostBindingFrontier.txt",
-    "Step23-FirstRealGameLoad.txt",
+    "Step23-FirstRealGameLoad.txt", "Step24-ControlledManagedInitialization.txt",
     "TestSetup-Repair.txt", "TestSetup-Update.txt", "TestSetup-DownloadCacheClear.txt", "TestSetup-FreshDownload.txt",
 }
 ui_text = "\n".join(p.read_text() for p in ui_files)
@@ -461,18 +461,18 @@ require("Update the fixture binding-plan builder rather than weakening Gate A me
 require("InternalsVisibleTo(\"StS2Launcher.Core.Tests\")" in read("src/StS2Launcher.Core/Properties/AssemblyInfo.cs"), "Step 23 test-only identity seam is limited to the host test assembly")
 require("[ExpectedPrimarySimpleName, \"SlayTheSpire2\"]" in step23_source, "Step 23 production constructor preserves the physical fresh-process game identity policy")
 
-candidate_manifest = ROOT / "tools/validation/candidate-step23-load-boundary.sha256"
-require(candidate_manifest.is_file(), "Step 23 candidate boundary hash manifest exists")
-if candidate_manifest.is_file():
-    candidate_mismatches: list[str] = []
-    for line in candidate_manifest.read_text().splitlines():
+step23_manifest = ROOT / "tools/validation/protected-step23.4.3-load-boundary.sha256"
+require(step23_manifest.is_file(), "physically closed Step 23.4.3 boundary hash manifest exists")
+if step23_manifest.is_file():
+    step23_mismatches: list[str] = []
+    for line in step23_manifest.read_text().splitlines():
         if not line.strip():
             continue
         digest, relative = line.split("  ", 1)
         path = ROOT / relative
         if not path.is_file() or sha256(path) != digest:
-            candidate_mismatches.append(relative)
-    require(not candidate_mismatches, "Step 23 candidate load-boundary implementation is hash-pinned", ", ".join(candidate_mismatches))
+            step23_mismatches.append(relative)
+    require(not step23_mismatches, "physically closed Step 23.4.3 load-boundary implementation remains hash-pinned", ", ".join(step23_mismatches))
 
 
 # Step 23.4.3 host-fixture invariant: construct a modern core-library scope before
@@ -495,6 +495,94 @@ require("ReadingMode = ReadingMode.Immediate" in step23_tests and "CollectionAss
 require("MetadataType.Void" in step23_tests and 'initializer.ReturnType.Scope?.Name' in step23_tests, "Step 23 fixture verifies primitive void metadata and System.Runtime scope after reopen")
 
 # ---------------------------------------------------------------------------
+# Step 24 controlled managed initialization boundary
+# ---------------------------------------------------------------------------
+step24_core_files = [
+    "src/StS2Launcher.Core/Runtime/ControlledManagedInitialization.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledManagedInitializationGate.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledManagedInitializationGateResult.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledManagedInitializationProgress.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledManagedInitializationSummary.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledManagedInitializationGateSequence.cs",
+]
+for relative in step24_core_files:
+    require((ROOT / relative).is_file(), f"Step 24 controlled-initialization source exists: {relative}")
+step24_test_path = ROOT / "tests/StS2Launcher.Core.Tests/Runtime/ControlledManagedInitializationTests.cs"
+step24_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.Initialization.cs"
+require(step24_test_path.is_file(), "Step 24 boundary has host unit tests")
+require(step24_ui_path.is_file(), "Step 24 boundary has isolated iOS UI/report partial")
+step24_source = read("src/StS2Launcher.Core/Runtime/ControlledManagedInitialization.cs")
+step24_tests = step24_test_path.read_text() if step24_test_path.is_file() else ""
+step24_ui = step24_ui_path.read_text() if step24_ui_path.is_file() else ""
+
+for required in [
+    'TargetSimpleName = "0Harmony"',
+    "TargetVersion = new(2, 4, 2, 0)",
+    "RunPreparedLoadPreflightAsync",
+    "initializerBearing.Length != 1",
+    "target.ModuleInitializerCount != 1",
+    "Initializer call graph exceeded the Step 24.0 bound of 512",
+    "P/Invoke reachable",
+    "Code.Calli",
+    "Code.Ldftn",
+    "Code.Ldvirtftn",
+    "QueueAutomaticTypeInitializer",
+    "AutomaticInitializerCount",
+    "System.Runtime.InteropServices.NativeLibrary",
+    "System.Reflection.Emit.",
+    "RunClassConstructor",
+    "AllowedInitializerAssemblyFullName",
+    "RuntimeHelpers.RunModuleConstructor(targetAssembly.ManifestModule.ModuleHandle)",
+    "RejectedManagedRequests",
+    "throw new DllNotFoundException",
+    "ComputeSha1Hex(preflight.Target.PreparedPath)",
+]:
+    require(required in step24_source, f"Step 24 production boundary contains required fail-closed invariant: {required}")
+
+for forbidden in [
+    "HarmonyLib.Harmony",
+    ".Patch(",
+    ".PatchAll(",
+    ".Unpatch(",
+    ".EntryPoint",
+    "assembly.GetType(",
+    ".GetMethod(",
+    ".Invoke(",
+    "Activator.",
+    "LoadUnmanagedDllFromPath",
+]:
+    require(forbidden not in step24_source, f"Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: {forbidden}")
+
+for forbidden_write in ["File.Copy(", "File.Move(", "File.Write", "File.Create(", "Directory.CreateDirectory("]:
+    require(forbidden_write not in step24_source, f"Step 24 production boundary never mutates prepared/live install bytes: {forbidden_write}")
+
+require("Step24-ControlledManagedInitialization.txt" in step24_ui, "Step 24 on-device run emits a Files-visible text report")
+require("OrderedInitializationGatesReachFourOfFourPass" in step24_tests and "InitializationGatesStopAfterFirstFailure" in step24_tests, "Step 24 host tests enforce ordered fail-fast gates")
+require("SyntheticDeferredModuleInitializerCompletesAndAuditPasses" in step24_tests, "Step 24 host tests cover a successful inert module-initializer boundary")
+require("GateARejectsReachablePInvokeBeforeAnyStep24ClrLoad" in step24_tests, "Step 24 Gate A host test rejects reachable P/Invoke before Step 24 CLR load")
+require("GateARejectsFunctionPointerIndirectionBeforeAnyStep24ClrLoad" in step24_tests, "Step 24 Gate A host test rejects unbounded function-pointer/delegate indirection before CLR load")
+require("GateARejectsImplicitTypeInitializerPInvokeBeforeAnyStep24ClrLoad" in step24_tests, "Step 24 Gate A host test audits implicitly triggerable type constructors before CLR load")
+require("GateCReportsThrowingModuleInitializerAndDoesNotAdvance" in step24_tests, "Step 24 Gate C host test records a throwing initializer and stops")
+require("collectibleLoadContext: true" in step24_tests and "Guid.NewGuid()" in step24_tests, "Step 24 host tests isolate synthetic runtime identities in collectible contexts")
+require('[FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, "SlayTheSpire2", TargetSimpleName]' in step24_source, "Step 24 production constructor requires a fresh process for game + target identities")
+require("No real game/Harmony assembly was loaded by Step 24 Gate A: YES" in step24_source, "Step 24 Gate A remains metadata-only for the new boundary")
+require("indirect function/delegate target reachable" in step24_source and "implicit automatic-execution edge" in step24_source, "Step 24 Gate A measures implicit type initialization and rejects indirect execution targets")
+require("Explicit Harmony patching/API invocation: NO" in step24_source, "Step 24 final audit explicitly preserves the no-Harmony-API boundary")
+
+step24_manifest = ROOT / "tools/validation/candidate-step24-initialization-boundary.sha256"
+require(step24_manifest.is_file(), "Step 24 candidate boundary hash manifest exists")
+if step24_manifest.is_file():
+    step24_mismatches: list[str] = []
+    for line in step24_manifest.read_text().splitlines():
+        if not line.strip():
+            continue
+        digest, relative = line.split("  ", 1)
+        path = ROOT / relative
+        if not path.is_file() or sha256(path) != digest:
+            step24_mismatches.append(relative)
+    require(not step24_mismatches, "Step 24 candidate controlled-initialization implementation is hash-pinned", ", ".join(step24_mismatches))
+
+# ---------------------------------------------------------------------------
 # Documentation model
 # ---------------------------------------------------------------------------
 required_docs = [
@@ -510,6 +598,8 @@ required_docs = [
     "docs/history/steps/STEP-23.4.1-CECIL-IL-AUDIT-COMPILE-FIX.md",
     "docs/history/steps/STEP-23.4.2-SYNTHETIC-CORELIB-FIXTURE-NORMALIZATION.md",
     "docs/history/steps/STEP-23.4.3-CECIL-CORELIB-SCOPE-CONSTRUCTION-FIX.md",
+    "docs/history/steps/STEP-23.4.3-PHYSICAL-CLOSURE.md",
+    "docs/history/steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md",
 ]
 for doc in required_docs:
     require((ROOT / doc).is_file(), f"authoritative documentation exists: {doc}")
@@ -518,24 +608,27 @@ master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
     require(heading in master, f"master plan contains durable section: {heading}")
 require("docs/CURRENT-STATUS.md" in master and "docs/REGRESSION-CONTRACTS.md" in master and "docs/history/INDEX.md" in master, "master plan defines self-contained resumption path")
+require("Step 23 closed the first-real-load boundary" in master and "This is the active major phase" in master, "master plan advances durable roadmap from closed first load to controlled initialization")
+require("several adjacent sequential gates" in master and "saves build/device cycles" in master, "master plan codifies gate batching for speed without losing discrete proof")
 
 top_level_step_docs = [p.name for p in (ROOT / "docs").glob("STEP-*.md")]
 require(not top_level_step_docs, "top-level docs are durable/current; step records live under docs/history/steps", ", ".join(top_level_step_docs))
 
 history_steps = list((ROOT / "docs/history/steps").glob("*.md"))
 history_names = [p.name for p in history_steps]
-for major in range(1, 24):
+for major in range(1, 25):
     prefix = f"STEP-{major:02d}"
     require(any(name.startswith(prefix) for name in history_names), f"readable historical documentation retained for Step {major:02d}")
 require(any(name.startswith("STEP-22.4") for name in history_names), "Step 22.4 design/history record is present")
-require(any(name.startswith("STEP-23") for name in history_names), "Step 23 design/test records are present")
+require(any(name.startswith("STEP-23") for name in history_names), "Step 23 design/test/closure records are present")
+require(any(name.startswith("STEP-24") for name in history_names), "Step 24 design/candidate record is present")
 require(len(history_steps) >= 60, "historical documentation set is comprehensive", f"count={len(history_steps)}")
 
 # ---------------------------------------------------------------------------
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-23-4-3:" in codemagic, "Codemagic exposes Step 23.4.3 workflow")
+require("ios-step-24:" in codemagic, "Codemagic exposes the Step 24 workflow")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")

@@ -1,8 +1,8 @@
-# Testing — Step 23 First Real StS2 CLR Load Boundary
+# Testing — Step 24 Controlled Managed Initialization Boundary
 
 ## Current principle
 
-Text files are the primary handoff format for long diagnostics. Screenshots are useful for short UI state only.
+Text files are the primary handoff format for long diagnostics. Screenshots are useful for short UI state only. Ordered gates intentionally let one physical candidate test several adjacent questions without losing the first failing boundary.
 
 ## Static validation
 
@@ -14,7 +14,7 @@ Output:
 
 `artifacts/reports/static-validation.txt`
 
-The validator checks only authoritative current source/docs/tooling. It must **not** depend on `history.zip` or any legacy `StS2Launcher.Step05.iOS` path.
+The validator checks only authoritative current source/docs/tooling. It must **not** depend on `history.zip` or any legacy `StS2Launcher.Step05.iOS` path. It protects the closed Step 23 boundary while separately pinning the active Step 24 candidate.
 
 ## Host unit tests
 
@@ -28,7 +28,7 @@ Output:
 
 Detailed test results remain under `artifacts/test-results/`.
 
-Step 23 host tests use synthetic project-owned IL and a collectible load context so the test process can return to a clean state. The production Step 23 context is intentionally non-collectible/process-resident.
+Step 24 host tests use project-owned synthetic IL, unique synthetic assembly identities, and collectible load contexts. They cover ordered-gate behavior, a successful inert module initializer, Gate-A rejection of direct P/Invoke, implicitly type-initializer-reachable P/Invoke, and function-pointer/delegate indirection, plus Gate-C reporting when an initializer throws. Production Step 24 remains process-resident on device.
 
 ## Godot native preflight
 
@@ -53,12 +53,12 @@ bash scripts/build-ios.sh
 
 Expected IPA:
 
-`artifacts/StS2-Launcher-Step-23.4.3.ipa`
+`artifacts/StS2-Launcher-Step-24.ipa`
 
 ## IPA verification
 
 ```sh
-bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-23.4.3.ipa
+bash scripts/verify-ipa.sh artifacts/StS2-Launcher-Step-24.ipa
 ```
 
 Output:
@@ -69,7 +69,7 @@ Output:
 
 Workflow:
 
-`ios-step-23-4-3`
+`ios-step-24`
 
 Authoritative entry point:
 
@@ -77,43 +77,48 @@ Authoritative entry point:
 bash scripts/codemagic.sh
 ```
 
-The pipeline runs static validation, host tests, iOS workload setup, Godot build/preflight, iOS publish, and final IPA verification. Build/CI never contains or loads the proprietary game payload; the Step 23 real load occurs only from the user's receipt-backed on-device install.
+The pipeline runs static validation, host tests, iOS workload setup, Godot build/preflight, iOS publish, and final IPA verification. Build/CI never contains or loads the proprietary game payload; real Step 24 initialization occurs only from the user's receipt-backed on-device prepared runtime.
 
-## Physical acceptance for Step 23
+## Physical acceptance for Step 24
 
-Install version `0.0.72` and start from a fresh process. Do not start the Step 15 Godot host first.
+Install version `0.0.73 (73)` and start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
 
-Run Step 23 A–D and require:
+Run Step 24 A–D in order and require:
 
-1. Gate A = PASS;
-   - OfflineReady exact-tree = YES;
-   - runtime closure ready = YES;
-   - explicit blockers = 0;
-   - primary `sts2.dll` module initializers = 0;
-   - initializer-bearing dependencies may be nonzero but must be explicitly deferred and audited;
-   - prepared/live SHA-1s match;
-   - persisted plan exactly covers prepared AssemblyRef metadata;
-   - no prepared private/game assembly was already loaded;
-2. Gate B = PASS;
-   - first real `sts2.dll` CLR load succeeds;
-   - exact `sts2` identity and dedicated `StS2Launcher-Step23-Game` context;
-   - no entry-point/member/method invocation;
-   - no native resolution;
-3. Gate C = PASS;
-   - all planned host framework identities resolve from `AssemblyLoadContext.Default`;
-   - initializer-free private requirements resolve only from the exact prepared set;
-   - initializer-bearing private requirements are deferred and not loaded;
-   - rejected/unplanned requests = 0;
-   - deferred-initializer resolver requests = 0;
-   - native load attempts = 0;
-4. Gate D = PASS;
-   - plan/prepared/live bytes unchanged;
-   - post-load OfflineReady = YES;
-   - private context membership exactly matches the initializer-free prepared set;
-   - deferred initializer-bearing dependencies remain outside the CLR;
-   - no native/game initialization occurred;
-5. Step 23 summary = 4/4;
-6. OfflineReady regression = PASS;
-7. Foundation 5/5 regression = PASS.
+1. **Gate A — InitializationPreflight = PASS**
+   - accepted Step 23 Gate A replay still passes;
+   - OfflineReady and runtime plan depot/manifest match;
+   - primary remains initializer-free;
+   - exactly one initializer-bearing dependency exists;
+   - exact target is `0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null`;
+   - exactly one `<Module>..cctor`;
+   - bounded same-assembly automatic-initialization closure (including implicitly triggerable type constructors) is fully measured and hazards = 0;
+   - no Step 24 real game/Harmony CLR load yet.
+2. **Gate B — ProvenLoadStateReplay = PASS**
+   - one dedicated Step 24 private context is created;
+   - the accepted Step 23 initializer-free private closure is reproduced exactly;
+   - planned host bindings resolve exactly;
+   - `0Harmony` remains outside the CLR;
+   - native attempts = 0 and rejected/unplanned managed requests = 0.
+3. **Gate C — DeferredModuleInitialization = PASS**
+   - exact prepared `0Harmony` hash matches immediately before load;
+   - only that initializer-bearing identity is admitted;
+   - exact target loads in the Step 24 context;
+   - `RuntimeHelpers.RunModuleConstructor(targetAssembly.ManifestModule.ModuleHandle)` completes;
+   - native attempts = 0;
+   - rejected/unplanned managed requests = 0;
+   - no other initializer-bearing private assembly enters;
+   - prepared target hash remains unchanged after initialization.
+4. **Gate D — PostInitializationAudit = PASS**
+   - persisted plan hash is unchanged;
+   - every prepared and receipt-backed live managed file re-hashes correctly;
+   - OfflineReady re-proves;
+   - private context equals the accepted Step 23 inert closure plus exactly `0Harmony`;
+   - native attempts = 0;
+   - rejected/unplanned managed requests = 0;
+   - explicit Harmony patching/game invocation/Godot startup/native game loading remain NO.
+5. Step 24 summary = **4/4**.
+6. OfflineReady regression = **PASS**.
+7. Foundation regression = **5/5 PASS**.
 
-Share `Reports/Step23-FirstRealGameLoad.txt` on any failure. After Gate B, force-quit before rerunning Step 21/22 pre-load gates.
+Share `Reports/Step24-ControlledManagedInitialization.txt` on any failure. Stop at the first failing gate. Once Gate B has loaded the real game context, force-quit before rerunning fresh-process Step 21/22/23 regressions or Step 24 itself.

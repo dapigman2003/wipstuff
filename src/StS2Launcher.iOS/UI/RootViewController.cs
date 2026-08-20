@@ -42,6 +42,8 @@ public sealed partial class RootViewController : UIViewController
     private readonly HostFrameworkClosureGateSequence _hostFrameworkClosureGates = new();
     private readonly FirstRealGameAssemblyLoad _firstRealGameAssemblyLoad;
     private readonly FirstRealGameAssemblyLoadGateSequence _firstRealGameAssemblyLoadGates = new();
+    private readonly ControlledManagedInitialization _controlledManagedInitialization;
+    private readonly ControlledManagedInitializationGateSequence _controlledManagedInitializationGates = new();
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -85,6 +87,8 @@ public sealed partial class RootViewController : UIViewController
     private UILabel? _runtimeBindingDiagnosticsExportResultLabel;
     private UILabel? _firstRealGameAssemblyLoadResultLabel;
     private UILabel? _firstRealGameAssemblyLoadDetailLabel;
+    private UILabel? _controlledManagedInitializationResultLabel;
+    private UILabel? _controlledManagedInitializationDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -114,6 +118,7 @@ public sealed partial class RootViewController : UIViewController
     private UIButton? _runtimeFrameworkBindingButton;
     private UIButton? _runtimeBindingDiagnosticsExportButton;
     private UIButton? _firstRealGameAssemblyLoadButton;
+    private UIButton? _controlledManagedInitializationButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -153,6 +158,7 @@ public sealed partial class RootViewController : UIViewController
         _runtimeBindingDiagnosticsExporter = new RuntimeBindingDiagnosticsExporter(_launcherDataRoot);
         _hostFrameworkClosureFoundation = new HostFrameworkClosureFoundation(_launcherDataRoot);
         _firstRealGameAssemblyLoad = new FirstRealGameAssemblyLoad(_launcherDataRoot);
+        _controlledManagedInitialization = new ControlledManagedInitialization(_launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -198,22 +204,22 @@ public sealed partial class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 23.4.3 — FIRST REAL STS2 CLR LOAD BOUNDARY",
+            "STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.72",
+            "Version 0.0.73",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "STEPS 01–22 PHYSICALLY CLOSED • FIRST REAL GAME CLR LOAD IS THE ONLY NEW BOUNDARY",
+            "STEPS 01–23 PHYSICALLY CLOSED • CONTROLLED MANAGED INITIALIZATION IS THE ONLY NEW BOUNDARY",
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 22.4.2 is the fully green canonical foundation: Step 19, Step 22, OfflineReady, Foundation 5/5, and all other current regressions passed on the physical iPhone. Step 23 crosses exactly one new boundary: it loads the receipt-verified prepared real sts2.dll into a dedicated private AssemblyLoadContext and resolves the already-audited managed dependency plan. It does not intentionally inspect game types/members, invoke an entry point or method, initialize Godot/game state, or resolve native game libraries. Gate A refuses to load if any prepared private assembly contains a module initializer, so the load-only boundary remains explicit.",
+            "Step 23.4.3 is now physically closed: the real receipt-backed sts2.dll plus the maximal initializer-free managed closure loaded successfully on iPhone, with all Step 23 gates, OfflineReady, and Foundation 5/5 passing. Step 24 advances exactly to the deferred 0Harmony 2.4.2.0 <Module>..cctor boundary. Gate A audits the initializer and bounded same-assembly automatic-initialization closure, including implicitly triggerable type constructors, before any Step 24 CLR load; Gate B recreates the accepted Step 23 load state; Gate C admits only 0Harmony and explicitly ensures its module constructor completes; Gate D re-proves byte, plan, context, native-isolation, and OfflineReady invariants. Harmony patch APIs, game member invocation, Godot startup, and native game libraries remain out of scope.",
             UIFont.SystemFontOfSize(15),
             UIColor.Label));
 
@@ -720,7 +726,7 @@ public sealed partial class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(
-            "Step 23 — First Real StS2 CLR Load Boundary (ordered gates A–D)",
+            "Step 23 — First Real StS2 CLR Load Boundary (physically closed regression, ordered gates A–D)",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
 
@@ -740,6 +746,8 @@ public sealed partial class RootViewController : UIViewController
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_firstRealGameAssemblyLoadDetailLabel);
 
+        AddControlledManagedInitializationControls(content);
+
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();
         content.AddArrangedSubview(_signOutButton);
@@ -752,7 +760,7 @@ public sealed partial class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–22 are physically closed and Step 22.4.2 is the canonical foundation baseline. Step 23 is the first real sts2.dll CLR-load candidate. Run it only in a fresh process; after a successful load, the game assembly remains resident until force-quit. Long results are written to Files under Documents/StS2Launcher/Reports.",
+            "Status: Steps 01–23 are physically closed. Step 23.4.3 proved the real sts2.dll plus initializer-free managed closure on iPhone. Step 24 is the active controlled 0Harmony module-initialization candidate. Run Step 24 only in a fresh process; after Gate B/C, the private game/Harmony context remains resident until force-quit. Long results are written to Files under Documents/StS2Launcher/Reports.",
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -771,7 +779,7 @@ public sealed partial class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 23 first real StS2 CLR load boundary: RootViewController.ViewDidLoad complete");
+        Console.WriteLine("Step 24 controlled managed initialization boundary: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)

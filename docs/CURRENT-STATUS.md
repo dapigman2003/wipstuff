@@ -1,112 +1,118 @@
-# Current Status — Step 23.4.3 First Real StS2 CLR Load Boundary
+# Current Status — Step 24 Controlled 0Harmony Module Initialization Boundary
 
 ## Physically closed boundary
 
-**Steps 01–22 are closed on a physical iPhone. Step 22.4.2 / 0.0.64 is the accepted canonical pre-game-load foundation.**
+**Steps 01–23 are closed on a physical iPhone.**
 
-The canonical foundation is fully green: Step 19 A–D, Step 22 A–D, zero runtime-binding blockers, runtime closure ready = YES, OfflineReady = PASS, Foundation 5/5 = PASS, and all other current regressions pass.
+The latest closed runtime boundary is **Step 23.4.3 / 0.0.72 (72)**.
 
-## Step 23 physical evidence
+Physical Step 23.4.3 evidence:
 
-Codemagic host-test iterations 23.0–23.3 isolated test-only issues without weakening production safeguards. Step 23.3 then reached the intended physical pre-load safety boundary.
+- Gate A — PreparedLoadPreflight: **PASS**;
+- Gate B — PrimaryAssemblyLoad: **PASS**;
+- Gate C — PlannedDependencyResolution: **PASS**;
+- Gate D — LoadIsolationAudit: **PASS**;
+- Step 23 summary: **4/4 PASS**;
+- OfflineReady after Step 23: **PASS**;
+- Foundation after Step 23: **5/5 PASS**.
 
-Physical Step 23.3 / 0.0.68 result:
+This closes the first-real-load boundary. The receipt-backed real `sts2.dll` plus the maximal initializer-free prepared managed closure are physically proven CLR-loadable in one dedicated private iPhone load context. The known initializer-bearing dependency remained outside the CLR during Step 23.
 
-- Gate A: FAIL before any real CLR load;
-- stage: module-initializer safety after exact binding-plan metadata coverage;
-- offender: `0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null`;
-- `<Module>..cctor` count: 1;
-- no real `sts2.dll` CLR load occurred.
+## Proven Step 23 frontier
 
-This proves the first automatic-execution boundary is in a dependency, not the primary game assembly.
+The sole deferred initializer-bearing prepared dependency observed by Step 23 is:
 
-## Recent Codemagic fixture evidence
+- `0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null`;
+- `<Module>..cctor` count: **1**.
 
-Step 23.4 introduced deferred handling for initializer-bearing dependencies while preserving a strict zero-initializer requirement for the primary `sts2.dll`.
+The primary `sts2.dll` has zero module initializers under the accepted Step 23 plan.
 
-Step 23.4.1 fixed a compile-only missing `Mono.Cecil.Cil` import.
+Step 23 did not intentionally invoke a game entry point, inspect/invoke game types or members, call Harmony APIs, start Godot/game state, or resolve a native game library.
 
-Step 23.4.2 / 0.0.71 passed canonical static validation and Core compilation, then reached **153/155 host tests PASS**. Both failures were synthetic module-initializer tests:
+## Active candidate — Step 24
 
-- `GateARejectsPrimaryModuleInitializerBeforeAnyRealClrLoad`;
-- `DependencyModuleInitializerIsDeferredWhilePrimaryAndSafeClosureLoad`.
-
-Both failed for the same fixture-only reason: Cecil's `MainModule.TypeSystem.Void` had been accessed while the synthetic module had no recognized core-library AssemblyRef. Cecil therefore embedded a legacy `mscorlib, Version=4.0.0.0` scope in the initializer signature. Clearing the module's `AssemblyReferences` collection afterward did not remove that embedded type scope, so the writer recreated `mscorlib` in the final file. Production Step 23 logic did not fail and remains unchanged.
-
-## Active candidate — Step 23.4.3
-
-- Version: **0.0.72 (72)**
-- Codemagic workflow: **`ios-step-23-4-3`**
+- Version: **0.0.73 (73)**
+- Codemagic workflow: **`ios-step-24`**
+- IPA: **`artifacts/StS2-Launcher-Step-24.ipa`**
 - Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
 - Trusted source: Step 12 receipt-backed managed install
-- Execution input: Step 21/22 zero-blocker prepared runtime + persisted binding plan
-- Entry point, game type/member reflection, game method invocation, Godot startup, native game libraries: **still out of scope**
+- Execution input: physically proven Step 21/22 zero-blocker prepared runtime and persisted binding plan
+- Closed prerequisite: physical Step 23.4.3 4/4 + OfflineReady + Foundation 5/5
 
-### Step 23.4.3 fixture correction
+### Gate A — InitializationPreflight
 
-The synthetic fixture now constructs metadata in the correct order instead of trying to repair it after construction:
+Before any Step 24 game/Harmony CLR load:
 
-1. obtain the actual .NET 9 `System.Runtime` identity from the host;
-2. add every declared AssemblyRef, including `System.Runtime` for initializer-bearing fixtures, **before** touching Cecil `TypeSystem.Void`;
-3. only then create `<Module>..cctor` using `MainModule.TypeSystem.Void`;
-4. assert Cecil selected the predeclared `System.Runtime` reference as the primitive void scope;
-5. write and reopen in `ReadingMode.Immediate`;
-6. require the persisted AssemblyRef set to equal the declared set exactly;
-7. require no `mscorlib` reference;
-8. require the reopened initializer return type to be `MetadataType.Void` with scope `System.Runtime`.
+1. require a fresh process;
+2. replay the accepted Step 23 Gate A preflight unchanged;
+3. reload the persisted zero-blocker runtime plan;
+4. require OfflineReady and matching depot/manifest identity;
+5. classify initializer-bearing prepared dependencies;
+6. require exactly one initializer-bearing dependency;
+7. require it to be exactly `0Harmony 2.4.2.0` with exactly one `<Module>..cctor`;
+8. export the module initializer plus the bounded same-assembly automatic-initialization closure, including same-assembly type constructors that static calls/fields could implicitly trigger;
+9. fail closed if the reachable closure contains P/Invoke, `calli`, function/delegate indirection, direct native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, or an unexpected non-framework execution edge.
 
-This follows Cecil's own core-library selection behavior: if a recognized core-library reference such as `System.Runtime` already exists, `TypeSystem.Void` uses it; only an otherwise-unscoped synthetic module falls back to legacy `mscorlib`.
+Gate A is metadata-only. No Step 24 real game/Harmony assembly is loaded.
 
-**No production core-library alias is added. Production Step 23 resolver/binding behavior is unchanged and remains strict.**
+### Gate B — ProvenLoadStateReplay
 
-### Gate A — PreparedLoadPreflight
+Create the dedicated Step 24 private `AssemblyLoadContext` and reproduce the already-proven Step 23 load-only state in that same context:
 
-Before any real game CLR load, re-prove OfflineReady, plan/manifest identity, zero blockers, exact prepared/live hashes, IL-only identities, and exact Cecil `AssemblyRef` plan coverage.
+- load the real prepared `sts2.dll`;
+- resolve every planned host binding from `AssemblyLoadContext.Default`;
+- load the maximal initializer-free private prepared closure;
+- keep every initializer-bearing dependency deferred;
+- require exact private-context membership;
+- require zero native loads and zero rejected/unplanned managed requests;
+- require `0Harmony` to remain absent.
 
-Boundary-specific module-initializer policy:
+Gate B crosses no new architectural frontier; it establishes the proven Step 23 state inside the exact context that Gate C will advance.
 
-- the **primary `sts2.dll` must have zero `<Module>..cctor` initializers**;
-- any initializer-bearing dependency is statically audited and added to a deferred set;
-- Gate A records compact Cecil IL for each deferred initializer in `Reports/Step23-FirstRealGameLoad.txt`;
-- no deferred assembly is loaded.
+### Gate C — DeferredModuleInitialization
 
-### Gate B — PrimaryAssemblyLoad
+This is the only new Step 24 execution boundary.
 
-SHA-1 recheck the real prepared primary, create the dedicated private `AssemblyLoadContext`, and call `LoadFromStream` on `sts2.dll` only. Require exact identity/context ownership and exactly one real game assembly. If the CLR unexpectedly requests a deferred initializer-bearing dependency during primary load, the resolver refuses it and Gate B fails.
+1. re-hash the exact prepared `0Harmony` target immediately before load;
+2. permit exactly that initializer-bearing identity in the Step 24 resolver;
+3. load `0Harmony` from the receipt-hashed prepared bytes;
+4. require exact identity and Step 24 context ownership;
+5. call `RuntimeHelpers.RunModuleConstructor(targetAssembly.ManifestModule.ModuleHandle)` as the explicit module-constructor completion barrier;
+6. require zero native-library attempts;
+7. require zero unplanned managed requests;
+8. require no other initializer-bearing assembly to enter the CLR;
+9. re-hash the prepared `0Harmony` bytes after initialization.
 
-### Gate C — PlannedDependencyResolution
+Gate C still does **not** call a Harmony patch API or any StS2 game member.
 
-Resolve all planned host bindings and load the maximal initializer-free private prepared closure. Planned private targets with module initializers are deliberately skipped and counted as deferred requirements. Any actual CLR resolver request for one of them is a hard failure.
+### Gate D — PostInitializationAudit
 
-Success requires:
+After controlled module initialization:
 
-- all planned host bindings resolve from `AssemblyLoadContext.Default`;
-- all initializer-free private targets resolve only from the exact receipt-hashed prepared set;
-- the private context equals the expected initializer-free prepared set;
-- every deferred initializer-bearing private assembly remains outside the CLR;
-- zero native-load attempts and zero unplanned managed requests.
+- re-hash the persisted runtime plan;
+- re-hash every prepared and live receipt-backed managed file;
+- re-prove OfflineReady;
+- require the private context to equal the Step 23 initializer-free closure plus exactly `0Harmony`;
+- require zero native-load attempts;
+- require zero rejected/unplanned managed requests;
+- require no trusted/prepared/live mutation;
+- record that explicit Harmony patching, game invocation, Godot startup, and native game loading remain **NO**.
 
-### Gate D — LoadIsolationAudit
-
-Rehash the plan, every prepared/live assembly, and re-prove OfflineReady. Require exactly one real `sts2` in the dedicated context, exact initializer-free context membership, zero native attempts, zero rejected/unplanned requests, and zero deferred-initializer assemblies loaded.
-
-A Step 23.4.x 4/4 pass therefore means: **the real `sts2.dll` plus the maximal automatically-inert managed closure can enter the iPhone CLR, while `0Harmony` remains explicitly outside the CLR for the next initialization boundary.**
-
-## Acceptance required for Step 23 closure
+## Acceptance required for Step 24 closure
 
 From a fresh process:
 
-1. confirm `STEP 23.4.3 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.72`;
-2. run Step 23 A–D and stop at the first failure;
-3. Gate A: primary module initializers = 0; deferred initializer-bearing dependencies may be nonzero and must be reported;
-4. Gate B: first real `sts2.dll` CLR load = PASS;
-5. Gate C: initializer-free managed closure = PASS, deferred dependencies not loaded, zero native attempts;
+1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.73`;
+2. run Step 24 A–D and stop at the first failing gate;
+3. Gate A: exact sole target = `0Harmony 2.4.2.0`, one module initializer, bounded automatic-initialization closure fully measured, hazards = 0;
+4. Gate B: accepted Step 23 initializer-free state reproduced, `0Harmony` absent;
+5. Gate C: `0Harmony` load + `RuntimeHelpers.RunModuleConstructor` completion barrier = PASS, zero native/unplanned requests;
 6. Gate D: PASS, summary 4/4;
 7. OfflineReady = PASS;
 8. Foundation 5/5 = PASS.
 
-After Gate B the real game assembly remains process-resident; force-quit before rerunning pre-load regressions.
+After Gate B, the real managed game context remains process-resident; force-quit before rerunning fresh-process Step 21/22/23 regressions.
 
-## Likely next step
+## Next frontier if Step 24 closes
 
-If Step 23 closes, Step 24 becomes the **audited automatic-initialization boundary**, starting with the exact `0Harmony <Module>..cctor` IL/call metadata exported by Gate A. Do not invoke Harmony or broaden native/game execution before that initializer is understood.
+Do **not** assume Harmony patching is viable merely because its module initializer completes. The next subsystem should use the actual Step 24 evidence to choose the smallest managed API/type initialization boundary. Explicit Harmony construction/patching, broad game reflection, Godot/game initialization, and native integration remain later boundaries until separately gated.

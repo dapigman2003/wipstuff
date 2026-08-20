@@ -54,7 +54,7 @@ Never fabricate an IPA or claim physical success from source inspection alone.
 
 ## Engineering cadence
 
-Use one tightly related subsystem per release with ordered gates. Stop at the first failing gate inside that subsystem. Preserve every physically proven fix unless evidence requires changing it.
+Use one tightly related subsystem per release with ordered gates. Closely related sequential questions may share one candidate/device run when each meaningful proof boundary has its own gate; this is how the project moves faster without sacrificing causal attribution or rigor. Stop at the first failing gate inside that subsystem. Preserve every physically proven fix unless evidence requires changing it.
 
 The normal loop is:
 
@@ -102,7 +102,8 @@ These are architecture, not temporary step hacks:
 - `MtouchInterpreter=-all`, with broad `UseInterpreter=true` and NativeAOT prohibited;
 - the measured 22 direct host framework roots established by Step 22;
 - iOS Files access enabled for shareable diagnostic reports;
-- no real StS2 assembly CLR load before the explicit first-load subsystem.
+- no real StS2 assembly CLR load before the explicit first-load subsystem;
+- no initializer-bearing prepared dependency is admitted automatically outside an explicit controlled-initialization subsystem with a measured target and fail-closed resolver/native policy.
 
 ## Data/workspace trust model
 
@@ -131,15 +132,15 @@ Authentication, ownership, depot discovery/download/resume, atomic install/updat
 
 ### Phase B — iOS execution/compatibility foundation
 
-Godot iOS host, Cecil runtime viability, real call-site analysis, controlled rewrite workspace, expression/no-dynamic-code behavior, post-publish managed IL execution, runtime/framework binding and host framework closure. This phase is physically proven through the current Step 22 boundary.
+Godot iOS host, Cecil runtime viability, real call-site analysis, controlled rewrite workspace, expression/no-dynamic-code behavior, post-publish managed IL execution, runtime/framework binding and host framework closure. This phase is physically proven through Step 22.
 
 ### Phase C — first real managed game load
 
-The next major boundary after foundation consolidation. Load the prepared real `sts2.dll` into the private execution context with dependency resolution active, verify identity and load-context behavior, and **do not intentionally invoke the game entry point or trigger broad initialization yet**. Any static-constructor/native-binding side effect encountered must be treated as evidence and gated carefully.
+Load the prepared real `sts2.dll` into the private execution context with exact dependency resolution active, verify identity and load-context behavior, and **do not intentionally invoke the game entry point or trigger broad initialization yet**. This phase is physically proven: Step 23 closed the first-real-load boundary while keeping initializer-bearing dependencies deferred.
 
 ### Phase D — controlled managed initialization
 
-Progress from assembly load to narrowly selected metadata/type/member access and then controlled initialization. Identify AOT/reflection/Harmony/runtime-service issues with one causal class per subsystem.
+This is the active major phase. Progress from the physically proven load-only state through explicitly measured automatic-initialization boundaries, beginning with known initializer-bearing prepared dependencies. Keep Harmony/game-member invocation, broad reflection, Godot/game startup, and native game loading as separately gated later boundaries. Identify AOT/reflection/Harmony/runtime-service issues with one causal class per subsystem.
 
 ### Phase E — Godot/game integration
 
@@ -164,6 +165,7 @@ Startup time, memory, prepared-payload caching, deterministic repair/update migr
 ## Gate design rules for future subsystems
 
 - A gate must test one named boundary and produce actionable diagnostics.
+- A candidate may include several adjacent sequential gates when that saves build/device cycles, provided each passed gate establishes a distinct claim and later gates cannot obscure the first failure.
 - Gate A should normally validate prerequisites/inputs, not perform the riskiest mutation/action immediately.
 - If Gate N fails, Gates N+1 onward are unproven.
 - A diagnostic-only failure that intentionally reports readiness `NO` can still close a subsystem if that was the defined purpose, but runtime actions must honor the readiness state.

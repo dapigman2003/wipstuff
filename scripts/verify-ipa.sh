@@ -39,10 +39,10 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 23 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 23 build version: $BUILD_VERSION" >&2; exit 4; }
-[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 23 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
-[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 23 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
+[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 24 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 24 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 24 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
+[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 24 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 
@@ -145,7 +145,7 @@ DEPENDENCIES="$TMP/otool-dependencies.txt"
 mkdir -p artifacts/logs
 otool -l "$EXECUTABLE" > "$LOAD_COMMANDS"
 otool -L "$EXECUTABLE" > "$DEPENDENCIES"
-cp "$DEPENDENCIES" artifacts/logs/step23-final-native-dependencies.log
+cp "$DEPENDENCIES" artifacts/logs/step24-final-native-dependencies.log
 
 if grep -Fq 'DiskArbitration' "$LOAD_COMMANDS" || grep -Fq 'DiskArbitration' "$DEPENDENCIES"; then
   echo "ERROR: proven DiskArbitration iOS linker filter regressed." >&2
@@ -202,7 +202,7 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
 }
 
 {
-  echo "Step 23 IPA verification passed."
+  echo "Step 24 IPA verification passed."
   echo "  Bundle ID: $BUNDLE_ID"
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
@@ -211,10 +211,10 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  Project-owned Step 16 regression fixture: bundled as inert raw assembly data"
   echo "  Step 20 external IL fixtures: exactly 3, SHA-256 manifest verified, post-publish data-only directory"
   echo "  Build-time launcher assemblies: remain AOT-targeted; MtouchInterpreter=-all retained from physically proven Step 20"
-  echo "  Real StS2/proprietary payload in IPA: none (Step 23 loads only the user-owned prepared copy from Documents at runtime)"
+  echo "  Real StS2/proprietary payload in IPA: none (Step 24 still loads only the user-owned prepared copy from Documents at runtime)"
   echo "  Dynamic dependency audit: system or bundled only"
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 23.4.3 — FIRST REAL STS2 CLR LOAD BOUNDARY"
-} | tee artifacts/logs/step23-ipa-verification-summary.log
+  echo "  Expected device UI: STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY"
+} | tee artifacts/logs/step24-ipa-verification-summary.log

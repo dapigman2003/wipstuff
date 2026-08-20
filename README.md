@@ -1,43 +1,34 @@
-# StS2 Launcher iOS — Step 23.4.3 First Real StS2 CLR Load Boundary
+# StS2 Launcher iOS — Step 24 Controlled 0Harmony Module Initialization Boundary
 
-This repository is the canonical launcher source after the Step 22.4.2 foundation closure.
+This repository is the canonical launcher source after the physical closure of Step 23.4.3.
 
-Step 23 crosses the first real managed-game boundary. The real receipt-backed `sts2.dll` may enter one dedicated private `AssemblyLoadContext`, but no game entry point, type/member reflection, game method, Godot startup, or unmanaged game library is invoked.
+Step 23 is now proven on a physical iPhone: all four first-real-load gates passed, OfflineReady passed afterward, and Foundation remained 5/5. The real receipt-backed `sts2.dll` plus the maximal initializer-free prepared managed closure can therefore enter the dedicated private CLR load context while initializer-bearing dependencies remain excluded.
 
-## Step 23.4 correction
+## Active Step 24 boundary
 
-Physical Step 23.3 Gate A found exactly one prepared dependency with a `<Module>..cctor`: `0Harmony, Version=2.4.2.0`. The primary `sts2.dll` itself was not identified as an initializer offender.
+Step 24 advances exactly to the sole deferred automatic-execution boundary observed in Step 23:
 
-Step 23.4 preserves the automatic-execution boundary instead of deleting the guard:
+`0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null`
 
-- Gate A still requires the primary `sts2.dll` to be module-initializer-free.
-- Initializer-bearing *dependencies* are statically audited and explicitly deferred.
-- Gate B loads only the real primary assembly.
-- Gate C loads the maximal initializer-free private closure and all planned host bindings, while refusing any resolver request that would load a deferred initializer-bearing dependency.
-- Gate D proves the deferred dependency never entered the CLR and that all prepared/live bytes remain unchanged.
-- Gate A writes a compact Cecil IL audit for every deferred `<Module>..cctor` into the normal Step 23 text report so Step 24 can target the real initialization behavior rather than guessing.
+The candidate remains intentionally narrower than “use Harmony”:
 
-The current known physical frontier is one deferred assembly: `0Harmony 2.4.2.0`.
+- Gate A replays the accepted Step 23 preflight and requires exactly one initializer-bearing dependency, exactly `0Harmony 2.4.2.0` with one `<Module>..cctor`.
+- A bounded Cecil same-assembly automatic-initialization audit runs before any Step 24 CLR load. It follows direct same-assembly calls plus implicitly triggerable same-assembly type constructors, and rejects P/Invoke, `calli`, function/delegate indirection, native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, and unexpected non-framework execution edges.
+- Gate B recreates the physically proven Step 23 initializer-free private context in the same Step 24 load context.
+- Gate C admits exactly `0Harmony`, loads the receipt-hashed prepared bytes, and calls `RuntimeHelpers.RunModuleConstructor` as the explicit completion barrier for the module constructor.
+- The strict private resolver still rejects all native-library resolution, unplanned managed loads, and any untargeted initializer-bearing dependency.
+- Gate D re-hashes the runtime plan and every prepared/live file, re-proves OfflineReady, and requires the private context to equal the Step 23 closure plus exactly `0Harmony`.
 
-
-## Step 23.4.3 synthetic fixture correction
-
-The Step 23.4.2 Codemagic run passed canonical static validation and Core compilation and reached **153/155 host tests**. Both failures were synthetic module-initializer fixtures that still persisted a legacy `mscorlib, Version=4.0.0.0` AssemblyRef.
-
-The prior fix attempted to clear that AssemblyRef after constructing the initializer. That was too late: Cecil had already embedded the legacy core-library scope in the initializer's `System.Void` TypeReference and recreated the reference during serialization.
-
-Step 23.4.3 fixes the fixture **by construction**. For initializer-bearing synthetic assemblies it adds the real host `System.Runtime` AssemblyRef before accessing Cecil `TypeSystem.Void`; Cecil therefore uses that recognized modern core-library contract for primitive void. After write/reopen the fixture requires an exact declared-vs-persisted AssemblyRef set, forbids `mscorlib`, and verifies the initializer return type is primitive `MetadataType.Void` scoped to `System.Runtime`.
-
-**Production Step 23 binding remains strict and unchanged. No legacy core-library alias is added.**
+Step 24 does **not** call Harmony patch APIs, inspect or invoke StS2 game types/members, invoke a game entry point, start Godot/game state, or permit native game-library loading.
 
 ## Codemagic
 
 Use workflow:
 
-`ios-step-23-4-3`
+`ios-step-24`
 
-Expected app version: `0.0.72 (72)`.
+Expected app version: `0.0.73 (73)`.
 
 ## Documentation
 
-Start with `docs/MASTER-PLAN.md` for the durable architecture/roadmap and `docs/CURRENT-STATUS.md` for the current physical boundary. Historical step records remain readable under `docs/history/steps/`. The optional `history.zip` is reference-only and is never a build dependency.
+Start with `docs/MASTER-PLAN.md` for durable architecture/roadmap rules and `docs/CURRENT-STATUS.md` for the active physical boundary. Historical evidence remains under `docs/history/steps/`; `history.zip` is reference-only and never a build dependency.
