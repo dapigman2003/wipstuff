@@ -12,9 +12,10 @@ namespace StS2Launcher.Core;
 /// Step 23 boundary. Performs the first real CLR load of the receipt-backed prepared StS2 managed
 /// payload after Step 22 has proven zero binding blockers. The boundary is intentionally load-only:
 /// no game entry point, game type/member reflection, method invocation, Godot initialization, or
-/// native game library resolution is permitted. Gate A rejects prepared assemblies with module
-/// initializers before crossing the CLR-load boundary because those initializers can execute as part
-/// of assembly loading.
+/// native game library resolution is permitted. Gate A requires the primary game assembly itself to
+/// be module-initializer-free. Initializer-bearing private dependencies are classified and deferred,
+/// because loading those dependencies would cross an automatic-execution boundary. Step 23 loads only
+/// the maximal initializer-free private closure; the deferred initializer boundary belongs to Step 24.
 /// </summary>
 public sealed class FirstRealGameAssemblyLoad : IDisposable
 {
@@ -194,6 +195,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
                     new AssemblyName(item.AssemblyFullName),
                     metadata.AssemblyReferences,
                     metadata.ModuleInitializerCount,
+                    metadata.ModuleInitializerAudits,
                     metadata.PInvokeMethodCount,
                     metadata.ModuleReferenceCount));
             }
@@ -219,16 +221,19 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
                 }
             }
 
-            if (moduleInitializerCount != 0)
+            var primary = prepared.Single(item => item.Plan.IsPrimary);
+            if (primary.ModuleInitializerCount != 0)
             {
-                var offenders = prepared
-                    .Where(item => item.ModuleInitializerCount > 0)
-                    .Select(item => $"{item.Plan.AssemblyFullName} ({item.ModuleInitializerCount})")
-                    .ToArray();
                 throw new InvalidDataException(
-                    "Step 23 refuses the first CLR load because one or more prepared private assemblies contain a <Module>..cctor module initializer. " +
-                    "A module initializer can execute during assembly loading, which is beyond this load-only boundary. Offenders: " + string.Join(" | ", offenders));
+                    "Step 23 refuses the first CLR load because the primary game assembly itself contains a <Module>..cctor module initializer. " +
+                    "Loading the primary would therefore cross an automatic-execution boundary before Step 24. Primary: " +
+                    $"{primary.Plan.AssemblyFullName} ({primary.ModuleInitializerCount})");
             }
+
+            var deferredInitializerAssemblies = prepared
+                .Where(item => !item.Plan.IsPrimary && item.ModuleInitializerCount > 0)
+                .OrderBy(item => item.Plan.AssemblyFullName, StringComparer.Ordinal)
+                .ToArray();
 
             var privateNames = prepared
                 .Select(item => item.AssemblyName.Name ?? string.Empty)
@@ -245,13 +250,13 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             if (OperatingSystem.IsIOS() && RuntimeFeature.IsDynamicCodeCompiled)
                 throw new InvalidDataException("Step 23 canonical iOS runtime unexpectedly reports RuntimeFeature.IsDynamicCodeCompiled=true; the proven AOT/interpreter contract has changed.");
 
-            var primary = prepared.Single(item => item.Plan.IsPrimary);
             _preflight = new PreflightSnapshot(
                 plan,
                 planSha256,
                 managedRoot,
                 prepared.ToArray(),
                 primary,
+                deferredInitializerAssemblies,
                 offline,
                 moduleInitializerCount,
                 pinvokeMethodCount,
@@ -264,7 +269,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
                 plan.PreparedAssemblies.Length,
                 plan.PreparedAssemblies.Length,
                 primary.Plan.RelativePath,
-                "Zero-blocker prepared runtime is receipt-identical, IL-only, module-initializer-free and ready for the first controlled CLR load."));
+                "Zero-blocker prepared runtime is receipt-identical and IL-only. The primary is initializer-free; initializer-bearing dependencies are deferred from Step 23."));
 
             return Pass(
                 FirstRealGameAssemblyLoadGate.PreparedLoadPreflight,
@@ -275,7 +280,13 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
                 $"Explicit binding blockers: {plan.Blockers.Length:N0}\n" +
                 $"Prepared private/game assemblies: {prepared.Count:N0}\n" +
                 $"Prepared primary: {primary.Plan.AssemblyFullName}\n" +
-                $"Module initializers found: {moduleInitializerCount:N0}\n" +
+                $"Module initializers found across prepared set: {moduleInitializerCount:N0}\n" +
+                $"Primary module initializers: {primary.ModuleInitializerCount:N0}\n" +
+                $"Deferred initializer-bearing private assemblies: {deferredInitializerAssemblies.Length:N0}\n" +
+                (deferredInitializerAssemblies.Length == 0
+                    ? "Deferred initializer audit: none\n"
+                    : "Deferred initializer audit:\n" + string.Join("\n", deferredInitializerAssemblies.Select(item =>
+                        $"  - {item.Plan.AssemblyFullName}: {string.Join(" || ", item.ModuleInitializerAudits)}")) + "\n") +
                 $"P/Invoke methods present (diagnostic only; not invoked): {pinvokeMethodCount:N0}\n" +
                 $"ModuleRef entries present (diagnostic only; not resolved): {moduleReferenceCount:N0}\n" +
                 $"RuntimeFeature.IsDynamicCodeSupported: {RuntimeFeature.IsDynamicCodeSupported}\n" +
@@ -283,6 +294,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
                 "Prepared/live bytes receipt-identical: YES\n" +
                 "Persisted plan exactly covers prepared AssemblyRef metadata: YES\n" +
                 "Prepared private/game assemblies already loaded before Gate B: 0\n" +
+                "Initializer-bearing private dependencies loaded by Gate A: 0\n" +
                 "Real StS2 CLR load performed by Gate A: NO\n" +
                 "Real managed install modified: NO");
         }
@@ -388,13 +400,25 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
 
             stage = "binding-plan requirement normalization";
             var requirements = BuildBindingRequirements(preflight.Plan);
+            var preparedByFullName = preflight.PreparedAssemblies
+                .ToDictionary(item => item.Plan.AssemblyFullName, StringComparer.Ordinal);
             var hostResolved = 0;
             var privateResolved = 0;
+            var deferredPrivateRequirements = 0;
 
             for (var index = 0; index < requirements.Length; index++)
             {
                 var requirement = requirements[index];
                 stage = $"runtime bind {index + 1}/{requirements.Length}: {requirement.RequestedFullName}";
+
+                if (requirement.Kind == PlannedBindingKind.PrivatePrepared &&
+                    preparedByFullName.TryGetValue(requirement.ExpectedTargetFullName, out var privateTarget) &&
+                    privateTarget.ModuleInitializerCount > 0)
+                {
+                    deferredPrivateRequirements++;
+                    continue;
+                }
+
                 var requested = new AssemblyName(requirement.RequestedFullName);
                 var assembly = context.LoadFromAssemblyName(requested);
                 var actualFullName = assembly.GetName().FullName ?? assembly.GetName().Name ?? string.Empty;
@@ -418,9 +442,10 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
                 }
             }
 
-            stage = "complete private prepared-set load audit";
-            var expectedPrivate = preflight.Plan.PreparedAssemblies
-                .Select(item => item.AssemblyFullName)
+            stage = "initializer-free private prepared-set load audit";
+            var expectedPrivate = preflight.PreparedAssemblies
+                .Where(item => item.ModuleInitializerCount == 0)
+                .Select(item => item.Plan.AssemblyFullName)
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray();
             var actualPrivate = context.Assemblies
@@ -430,9 +455,20 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             if (!expectedPrivate.SequenceEqual(actualPrivate, StringComparer.Ordinal))
             {
                 throw new InvalidDataException(
-                    "Step 23 runtime private assembly set differs from the audited prepared plan. " +
+                    "Step 23 runtime private assembly set differs from the maximal initializer-free prepared closure. " +
                     $"Expected [{string.Join(" | ", expectedPrivate)}], actual [{string.Join(" | ", actualPrivate)}].");
             }
+
+            var deferredLoaded = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly => assembly.GetName().FullName ?? assembly.GetName().Name ?? string.Empty)
+                .Where(fullName => preflight.DeferredInitializerAssemblies.Any(item => item.Plan.AssemblyFullName.Equals(fullName, StringComparison.Ordinal)))
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            if (deferredLoaded.Length != 0)
+                throw new InvalidDataException("Initializer-bearing private dependencies entered the CLR during Step 23: " + string.Join(" | ", deferredLoaded));
+
+            if (context.DeferredInitializerRequests.Count != 0)
+                throw new InvalidDataException("The CLR attempted to resolve an initializer-bearing private dependency during Step 23: " + string.Join(" | ", context.DeferredInitializerRequests));
 
             if (context.NativeLoadAttempts.Count != 0)
                 throw new InvalidDataException("A native library resolution attempt occurred during Step 23 load-only dependency binding: " + string.Join(" | ", context.NativeLoadAttempts));
@@ -443,6 +479,8 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
                 requirements.Length,
                 hostResolved,
                 privateResolved,
+                deferredPrivateRequirements,
+                preflight.DeferredInitializerAssemblies.Length,
                 actualPrivate.Length,
                 context.ManagedResolverRequests.ToArray(),
                 context.HostLoads.ToArray(),
@@ -450,13 +488,16 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
 
             return Pass(
                 FirstRealGameAssemblyLoadGate.PlannedDependencyResolution,
-                "Every unique managed dependency identity in the zero-blocker Step 21/22 plan resolved through the strict Step 23 runtime context without invoking game code.\n" +
+                "Every host binding and initializer-free private dependency in the zero-blocker Step 21/22 plan resolved through the strict Step 23 runtime context without invoking game code. Initializer-bearing private dependencies remain deliberately deferred to Step 24.\n" +
                 $"Unique planned binding requirements: {requirements.Length:N0}\n" +
                 $"Host framework requirements resolved from default context: {hostResolved:N0}\n" +
                 $"Private prepared requirements resolved from Step 23 context: {privateResolved:N0}\n" +
-                $"Private assemblies resident in Step 23 context (including primary): {actualPrivate.Length:N0}/{expectedPrivate.Length:N0}\n" +
+                $"Deferred initializer-bearing private requirements: {deferredPrivateRequirements:N0}\n" +
+                $"Deferred initializer-bearing private assemblies: {preflight.DeferredInitializerAssemblies.Length:N0}\n" +
+                $"Private assemblies resident in Step 23 context (primary + initializer-free closure): {actualPrivate.Length:N0}/{expectedPrivate.Length:N0}\n" +
                 $"Strict resolver rejected managed requests: {context.RejectedManagedRequests.Count:N0}\n" +
                 $"Native resolution attempts: {context.NativeLoadAttempts.Count:N0}\n" +
+                $"Initializer-bearing dependency resolver requests: {context.DeferredInitializerRequests.Count:N0}\n" +
                 "Unplanned non-framework fallback permitted: NO\n" +
                 "Downloaded desktop framework implementation fallback permitted: NO\n" +
                 "Game type/member reflection performed: NO\n" +
@@ -525,8 +566,9 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             if (loadedGame.Length != 1 || !ReferenceEquals(AssemblyLoadContext.GetLoadContext(loadedGame[0]), context))
                 throw new InvalidDataException("The real sts2 assembly escaped the dedicated Step 23 load context or was loaded more than once.");
 
-            var expectedPrivate = preflight.Plan.PreparedAssemblies
-                .Select(item => item.AssemblyFullName)
+            var expectedPrivate = preflight.PreparedAssemblies
+                .Where(item => item.ModuleInitializerCount == 0)
+                .Select(item => item.Plan.AssemblyFullName)
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray();
             var actualPrivate = context.Assemblies
@@ -536,10 +578,20 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             if (!expectedPrivate.SequenceEqual(actualPrivate, StringComparer.Ordinal))
                 throw new InvalidDataException("Step 23 private load-context assembly membership changed after Gate C.");
 
+            var deferredLoaded = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly => assembly.GetName().FullName ?? assembly.GetName().Name ?? string.Empty)
+                .Where(fullName => preflight.DeferredInitializerAssemblies.Any(item => item.Plan.AssemblyFullName.Equals(fullName, StringComparison.Ordinal)))
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            if (deferredLoaded.Length != 0)
+                throw new InvalidDataException("Initializer-bearing private dependencies entered the CLR before Step 24: " + string.Join(" | ", deferredLoaded));
+
             if (context.NativeLoadAttempts.Count != 0)
                 throw new InvalidDataException("Native library resolution occurred during Step 23 despite the load-only/native-refusal policy.");
             if (context.RejectedManagedRequests.Count != 0)
                 throw new InvalidDataException("Step 23 strict managed resolver recorded rejected requests during a supposedly closed plan.");
+            if (context.DeferredInitializerRequests.Count != 0)
+                throw new InvalidDataException("Step 23 resolver was asked to load an initializer-bearing private dependency before Step 24.");
 
             progress?.Report(new FirstRealGameAssemblyLoadProgress(
                 FirstRealGameAssemblyLoadGate.LoadIsolationAudit,
@@ -550,14 +602,17 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
 
             return Pass(
                 FirstRealGameAssemblyLoadGate.LoadIsolationAudit,
-                "Step 23 load-only isolation audit passed after the real sts2.dll and its complete planned managed closure entered the CLR.\n" +
+                "Step 23 load-only isolation audit passed after the real sts2.dll and the maximal initializer-free planned managed closure entered the CLR. Initializer-bearing private dependencies remain outside the CLR for Step 24.\n" +
                 $"Loaded primary identity: {primaryLoad.AssemblyFullName}\n" +
                 $"Prepared/live assemblies re-hashed after load: {verifiedPrepared:N0}/{preflight.PreparedAssemblies.Length:N0}\n" +
                 $"Runtime plan SHA-256 unchanged: {currentPlanSha256}\n" +
-                $"Planned binding requirements resolved: {dependencyResolution.TotalRequirements:N0}\n" +
-                $"Private assemblies in dedicated context: {actualPrivate.Length:N0}/{expectedPrivate.Length:N0}\n" +
+                $"Planned binding requirements considered: {dependencyResolution.TotalRequirements:N0}\n" +
+                $"Deferred initializer-bearing private requirements: {dependencyResolution.DeferredPrivateRequirements:N0}\n" +
+                $"Deferred initializer-bearing private assemblies: {dependencyResolution.DeferredInitializerAssemblies:N0}\n" +
+                $"Private assemblies in dedicated context (initializer-free closure): {actualPrivate.Length:N0}/{expectedPrivate.Length:N0}\n" +
                 $"Native load attempts: {context.NativeLoadAttempts.Count:N0}\n" +
                 $"Rejected/unplanned managed requests: {context.RejectedManagedRequests.Count:N0}\n" +
+                $"Initializer-bearing prepared dependencies loaded: 0/{preflight.DeferredInitializerAssemblies.Length:N0}\n" +
                 "Post-load OfflineReady exact-tree verification: YES\n" +
                 "Trusted Step 12 managed install unchanged: YES\n" +
                 "Prepared Step 21/22 bytes unchanged: YES\n" +
@@ -683,10 +738,15 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
         if (module.Assembly?.Name is null)
             throw new BadImageFormatException($"Managed assembly manifest missing: {path}");
 
-        var moduleInitializerCount = module.Types
+        var moduleInitializers = module.Types
             .Where(type => type.Name.Equals("<Module>", StringComparison.Ordinal))
             .SelectMany(type => type.Methods)
-            .Count(method => method.Name.Equals(".cctor", StringComparison.Ordinal) && method.IsStatic && method.HasBody);
+            .Where(method => method.Name.Equals(".cctor", StringComparison.Ordinal) && method.IsStatic && method.HasBody)
+            .ToArray();
+        var moduleInitializerAudits = moduleInitializers
+            .Select(FormatModuleInitializerAudit)
+            .ToArray();
+        var moduleInitializerCount = moduleInitializers.Length;
         var pinvokeCount = EnumerateTypes(module.Types)
             .SelectMany(type => type.Methods)
             .Count(method => method.IsPInvokeImpl || method.PInvokeInfo is not null);
@@ -700,9 +760,35 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
             (module.Attributes & ModuleAttributes.ILOnly) != 0,
             references,
             moduleInitializerCount,
+            moduleInitializerAudits,
             pinvokeCount,
             module.ModuleReferences.Count);
     }
+
+    private static string FormatModuleInitializerAudit(MethodDefinition method)
+    {
+        const int maxInstructions = 96;
+        var instructions = method.Body.Instructions;
+        var rendered = instructions
+            .Take(maxInstructions)
+            .Select(instruction => $"IL_{instruction.Offset:X4}: {instruction.OpCode.Code} {FormatInstructionOperand(instruction.Operand)}".TrimEnd())
+            .ToArray();
+        var suffix = instructions.Count > maxInstructions ? $" | ... {instructions.Count - maxInstructions} more instruction(s)" : string.Empty;
+        return $"token=0x{method.MetadataToken.ToInt32():X8}; instructions={instructions.Count}; handlers={method.Body.ExceptionHandlers.Count}; locals={method.Body.Variables.Count}; IL=[{string.Join(" | ", rendered)}]{suffix}";
+    }
+
+    private static string FormatInstructionOperand(object? operand)
+        => operand switch
+        {
+            null => string.Empty,
+            MethodReference method => method.FullName,
+            FieldReference field => field.FullName,
+            TypeReference type => type.FullName,
+            string value => $"\"{value.Replace("\r", "\\r", StringComparison.Ordinal).Replace("\n", "\\n", StringComparison.Ordinal)}\"",
+            Instruction target => $"IL_{target.Offset:X4}",
+            Instruction[] targets => string.Join(",", targets.Select(target => $"IL_{target.Offset:X4}")),
+            _ => operand.ToString() ?? string.Empty,
+        };
 
     private static IEnumerable<TypeDefinition> EnumerateTypes(IEnumerable<TypeDefinition> roots)
     {
@@ -870,6 +956,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
         bool IsIlOnly,
         IReadOnlyList<string> AssemblyReferences,
         int ModuleInitializerCount,
+        IReadOnlyList<string> ModuleInitializerAudits,
         int PInvokeMethodCount,
         int ModuleReferenceCount);
 
@@ -880,6 +967,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
         AssemblyName AssemblyName,
         IReadOnlyList<string> AssemblyReferences,
         int ModuleInitializerCount,
+        IReadOnlyList<string> ModuleInitializerAudits,
         int PInvokeMethodCount,
         int ModuleReferenceCount);
 
@@ -889,6 +977,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
         string ManagedRoot,
         PreparedAssemblySnapshot[] PreparedAssemblies,
         PreparedAssemblySnapshot Primary,
+        PreparedAssemblySnapshot[] DeferredInitializerAssemblies,
         SteamOfflineInstallResult Offline,
         int ModuleInitializerCount,
         int PInvokeMethodCount,
@@ -909,6 +998,8 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
         int TotalRequirements,
         int HostRequirements,
         int PrivateRequirements,
+        int DeferredPrivateRequirements,
+        int DeferredInitializerAssemblies,
         int LoadedPrivateAssemblies,
         IReadOnlyList<string> ManagedResolverRequests,
         IReadOnlyList<string> HostLoads,
@@ -941,6 +1032,7 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
         public List<string> PrivateLoads { get; } = [];
         public List<string> HostLoads { get; } = [];
         public List<string> RejectedManagedRequests { get; } = [];
+        public List<string> DeferredInitializerRequests { get; } = [];
         public List<string> NativeLoadAttempts { get; } = [];
 
         [UnconditionalSuppressMessage(
@@ -971,6 +1063,14 @@ public sealed class FirstRealGameAssemblyLoad : IDisposable
 
             if (_privateBySimpleName.TryGetValue(assemblyName.Name, out var privateAssembly))
             {
+                if (privateAssembly.ModuleInitializerCount > 0)
+                {
+                    var detail = $"{requestedFullName} => {privateAssembly.Plan.AssemblyFullName}";
+                    DeferredInitializerRequests.Add(detail);
+                    throw new FileLoadException(
+                        "Step 23 refuses to load an initializer-bearing private dependency before the Step 24 initialization boundary: " + detail);
+                }
+
                 if (!SameIdentityIgnoringVersion(assemblyName, privateAssembly.AssemblyName) ||
                     (privateAssembly.AssemblyName.Version ?? ZeroVersion).CompareTo(assemblyName.Version ?? ZeroVersion) < 0)
                 {
