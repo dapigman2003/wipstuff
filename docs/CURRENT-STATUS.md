@@ -31,7 +31,7 @@ Step 23 did not intentionally invoke a game entry point, inspect/invoke game typ
 
 ## Active candidate — Step 24
 
-- Version: **0.0.74 (74)**
+- Version: **0.0.75 (75)**
 - Codemagic workflow: **`ios-step-24`**
 - IPA: **`artifacts/StS2-Launcher-Step-24.ipa`**
 - Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
@@ -39,7 +39,11 @@ Step 23 did not intentionally invoke a game entry point, inspect/invoke game typ
 - Execution input: physically proven Step 21/22 zero-blocker prepared runtime and persisted binding plan
 - Closed prerequisite: physical Step 23.4.3 4/4 + OfflineReady + Foundation 5/5
 
-Step 24.0 / `0.0.73 (73)` did **not** reach host tests or iOS build. Codemagic static validation passed 281/281, then Core compilation failed because the new Step 24 subsystem called a nonexistent `SteamOfflineInstallInspection.InspectAsync` API at its pre/post OfflineReady checks. Step 24.0.1 / `0.0.74 (74)` is the minimal compile correction: it uses the established `RunAsync` result contract (`Success` + `ExactManagedTreeVerified`) without changing any Step 24 gate, resolver, initialization, or execution policy.
+Step 24.0 / `0.0.73 (73)` did **not** reach host tests or iOS build. Codemagic static validation passed 281/281, then Core compilation failed because the new Step 24 subsystem called a nonexistent `SteamOfflineInstallInspection.InspectAsync` API at its pre/post OfflineReady checks.
+
+Step 24.0.1 / `0.0.74 (74)` corrected that compile issue and reached the full host suite. Canonical static validation passed **287/287** and Core/test compilation succeeded, but host tests finished **160/162**. The two failures were both intentional Gate A safety assertions: `GateARejectsReachablePInvokeBeforeAnyStep24ClrLoad` and `GateARejectsImplicitTypeInitializerPInvokeBeforeAnyStep24ClrLoad`. The fixtures correctly encoded P/Invoke; the production audit resolved the same-assembly native stub but then skipped it because P/Invoke methods have no managed `MethodBody`. No IPA was produced and no physical Step 24 evidence exists for build 74.
+
+Step 24.0.2 / `0.0.75 (75)` is the minimal production audit correction. After resolving a same-assembly call, Gate A now checks P/Invoke metadata before applying the managed-body traversal filter. Reachable P/Invoke stubs fail closed immediately; any other reachable same-assembly method with no managed IL body also fails closed as an unmeasured execution edge. Gate ordering, target identity, resolver policy, module-constructor barrier, and the no-Harmony/game/native-execution boundary are unchanged.
 
 ### Gate A — InitializationPreflight
 
@@ -104,7 +108,7 @@ After controlled module initialization:
 
 From a fresh process:
 
-1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.74`;
+1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.75`;
 2. run Step 24 A–D and stop at the first failing gate;
 3. Gate A: exact sole target = `0Harmony 2.4.2.0`, one module initializer, bounded automatic-initialization closure fully measured, hazards = 0;
 4. Gate B: accepted Step 23 initializer-free state reproduced, `0Harmony` absent;

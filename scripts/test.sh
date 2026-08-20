@@ -41,9 +41,9 @@ dotnet test "$TEST_PROJECT" \
   -c Release \
   --nologo \
   --results-directory artifacts/test-results \
-  --logger "trx;LogFileName=step23.trx" \
+  --logger "trx;LogFileName=step24.trx" \
   --logger "console;verbosity=normal"
 
 echo "HOST UNIT TESTS: PASS"
-echo "TRX: artifacts/test-results/step23.trx"
+echo "TRX: artifacts/test-results/step24.trx"
 echo "Text report: $REPORT"

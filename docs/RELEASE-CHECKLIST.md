@@ -9,7 +9,8 @@
 - Step 22.4.2 protected behavior remains intact;
 - the physically closed Step 23.4.3 load-only implementation remains protected;
 - Step 24 is additive: controlled initialization subsystem, host tests, isolated UI/reporting, release wiring, and current documentation/tooling updates;
-- Step 24.0.1 corrects only the OfflineReady inspection API used by the Step 24 subsystem; no gate/resolver/initialization policy broadening is allowed.
+- Step 24.0.1 corrected only the OfflineReady inspection API used by the Step 24 subsystem.
+- Step 24.0.2 corrects the Gate A same-assembly P/Invoke audit blind spot exposed by the 0.0.74 host suite; no gate ordering, initializer target, resolver, module-constructor, Harmony/game invocation, or native-load policy broadening is allowed.
 
 ## Static/host build
 
@@ -18,7 +19,7 @@
 - Godot build/preflight passes on Codemagic/macOS;
 - iOS publish succeeds with `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is `0.0.74 (74)`;
+- expected version is `0.0.75 (75)`;
 - workflow is `ios-step-24`;
 - expected IPA is `artifacts/StS2-Launcher-Step-24.ipa`.
 

@@ -33,11 +33,12 @@ Re-hash the plan and every prepared/live file, re-prove OfflineReady, and requir
 ## Candidate lineage
 
 - Step 24.0 / `0.0.73 (73)`: Codemagic static validation passed 281/281, but Core compilation failed before host tests because `ControlledManagedInitialization` referenced nonexistent `SteamOfflineInstallInspection.InspectAsync` / `OfflineReady` members. No IPA or physical Step 24 evidence exists for build 73.
-- Step 24.0.1 / `0.0.74 (74)`: compile-only correction to the established OfflineReady `RunAsync` result contract; Step 24 execution policy is unchanged.
+- Step 24.0.1 / `0.0.74 (74)`: compile-only correction to the established OfflineReady `RunAsync` result contract. Codemagic then compiled successfully and ran 162 host tests; 160 passed and two Gate A safety tests failed because reachable P/Invoke stubs with no managed IL body were not inspected after same-assembly resolution. No IPA or physical Step 24 evidence exists for build 74.
+- Step 24.0.2 / `0.0.75 (75)`: production metadata-audit correction. Gate A inspects a resolved same-assembly target before the managed-body traversal filter, rejects reachable P/Invoke stubs explicitly, and fails closed on any other reachable same-assembly target without managed IL.
 
 ## Candidate identity
 
-- active corrected version: `0.0.74 (74)`
+- active corrected version: `0.0.75 (75)`
 - workflow: `ios-step-24`
 - IPA: `artifacts/StS2-Launcher-Step-24.ipa`
 - device report: `Documents/StS2Launcher/Reports/Step24-ControlledManagedInitialization.txt`

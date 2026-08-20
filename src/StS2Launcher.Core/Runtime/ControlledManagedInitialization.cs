@@ -655,8 +655,29 @@ public sealed class ControlledManagedInitialization : IDisposable
                     }
                 }
 
-                if (resolved is not null && methodsByToken.ContainsKey(resolved.MetadataToken.ToInt32()))
-                    queue.Enqueue(resolved);
+                if (resolved is not null)
+                {
+                    // P/Invoke/extern stubs intentionally have no managed MethodBody. They therefore
+                    // cannot be discovered by the body-bearing traversal set below. Inspect the
+                    // resolved same-assembly target before the HasBody filter so a direct call to a
+                    // native stub (including one reached through an implicit type initializer) is
+                    // rejected during metadata-only Gate A rather than being silently skipped.
+                    if (resolved.IsPInvokeImpl || resolved.PInvokeInfo is not null)
+                    {
+                        hazards.Add($"P/Invoke reachable: {resolved.FullName}");
+                    }
+                    else if (!resolved.HasBody)
+                    {
+                        // Step 24.0 does not guess what an extern/runtime/abstract same-assembly
+                        // execution edge would do. Any bodyless reachable target is outside the
+                        // bounded managed-IL closure and therefore fails closed.
+                        hazards.Add($"Same-assembly method without managed IL body reachable: {method.FullName} -> {resolved.FullName}");
+                    }
+                    else if (methodsByToken.ContainsKey(resolved.MetadataToken.ToInt32()))
+                    {
+                        queue.Enqueue(resolved);
+                    }
+                }
             }
         }
 

@@ -81,9 +81,9 @@ The pipeline runs static validation, host tests, iOS workload setup, Godot build
 
 ## Physical acceptance for Step 24
 
-Build `0.0.73 (73)` is not a physical-test candidate: Codemagic rejected it at Core compilation before host tests.
+Build `0.0.73 (73)` is not a physical-test candidate: Codemagic rejected it at Core compilation before host tests. Build `0.0.74 (74)` is also not a physical-test candidate: it compiled and reached the full host suite, but two Step 24 Gate A P/Invoke safety tests failed (160/162), so no IPA was produced.
 
-Install version `0.0.74 (74)` and start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
+Install version `0.0.75 (75)` only after Codemagic host tests and IPA verification are fully green, then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
 
 Run Step 24 A–D in order and require:
 
