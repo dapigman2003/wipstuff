@@ -1,4 +1,4 @@
-# Current Status — Step 23.2 First Real StS2 CLR Load Boundary
+# Current Status — Step 23.3 First Real StS2 CLR Load Boundary
 
 ## Physically closed boundary
 
@@ -18,12 +18,12 @@ The final Step 22.4.2 acceptance was completely green:
 
 This establishes version **0.0.64 (64)** as the protected pre-game-load foundation.
 
-## Active candidate — Step 23.2
+## Active candidate — Step 23.3
 
 Step 23 crosses exactly one new runtime boundary: the first real CLR load of the receipt-backed prepared `sts2.dll`.
 
-- Version: **0.0.67 (67)**
-- Codemagic workflow: **`ios-step-23-2`**
+- Version: **0.0.68 (68)**
+- Codemagic workflow: **`ios-step-23-3`**
 - Live iOS project: **`src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`**
 - Trusted game source: existing Step 12 receipt-backed managed install
 - Execution input: existing Step 21/22 zero-blocker prepared runtime + persisted binding plan
@@ -90,7 +90,7 @@ Codemagic must pass static validation, host unit tests, Godot/native build/prefl
 
 On device, from a fresh process:
 
-1. confirm `STEP 23.2 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.67`;
+1. confirm `STEP 23.3 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.68`;
 2. run Step 23 A–D and stop at the first failure;
 3. require Gate A module initializers = 0;
 4. require Gate B first real `sts2.dll` CLR load = PASS;
@@ -109,3 +109,9 @@ The first Step 23 Codemagic run reached the host test suite with 153/154 passing
 ### Step 23.2 deterministic host-test identity isolation
 
 Step 23.2 removes GC/unload timing from host-test correctness. Every synthetic Step 23 test now creates a unique primary assembly identity and uses an internal test-only identity policy. The public production constructor is unchanged and still recognizes only the real game identities `sts2` and `SlayTheSpire2` for its fresh-process guard. Synthetic contexts remain collectible as hygiene, but no test result depends on when the runtime actually collects them. This prevents Step 23 tests from contaminating each other or older Step 21 tests even if collectible ALC reclamation is delayed indefinitely.
+
+### Step 23.3 synthetic fixture binding-plan coverage correction
+
+The Step 23.2 Codemagic run proved the identity-isolation architecture worked: **153/154 host tests passed** and there was no cross-test contamination. The sole failure was the module-initializer negative fixture. Creating `<Module>..cctor` caused Cecil to add an implicit `mscorlib, Version=4.0.0.0` `AssemblyRef`; the synthetic plan still listed only `Game.Dependency` and `System.Linq`. Gate A correctly stopped at its earlier exact AssemblyRef-plan coverage invariant, so the test never reached the module-initializer refusal it was meant to prove.
+
+Step 23.3 fixes only the synthetic fixture planner. It now derives plan edges from the fixture assemblies' actual post-write Cecil `AssemblyReferences`, maps `Game.Dependency` to the private prepared dependency, maps `System.Linq` to the real host `System.Linq`, and maps Cecil's module-initializer-only `mscorlib` reference to the host core library. Unexpected synthetic references fail the fixture builder. **Production `FirstRealGameAssemblyLoad` remains unchanged; Gate A exact metadata coverage is not weakened.**
