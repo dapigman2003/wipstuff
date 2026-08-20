@@ -40,3 +40,5 @@ The current architecture and plan always live one level up in `docs/`.
 - [Step 23.4 — Deferred Dependency Module-Initializer Boundary](steps/STEP-23.4-DEFERRED-DEPENDENCY-MODULE-INITIALIZER-BOUNDARY.md)
 
 - `steps/STEP-23.4.1-CECIL-IL-AUDIT-COMPILE-FIX.md` — compile-only missing Cecil.Cil namespace correction.
+
+- `steps/STEP-23.4.2-SYNTHETIC-CORELIB-FIXTURE-NORMALIZATION.md` — host-test fixture correction removing artificial legacy mscorlib metadata.

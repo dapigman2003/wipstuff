@@ -350,14 +350,6 @@ public sealed class FirstRealGameAssemblyLoadTests
                 continue;
             }
 
-            if (reference.Name.Equals("mscorlib", StringComparison.OrdinalIgnoreCase))
-            {
-                var hostCoreLib = typeof(object).Assembly.GetName().FullName
-                    ?? throw new AssertFailedException("Host System.Private.CoreLib has no FullName.");
-                edges.Add(new RuntimeBindingEdge(sourceFullName, reference.FullName, "HostFramework", hostCoreLib));
-                continue;
-            }
-
             throw new AssertFailedException(
                 $"Synthetic Step 23 fixture emitted an unexpected AssemblyRef '{reference.FullName}'. " +
                 "Update the fixture binding-plan builder rather than weakening Gate A metadata coverage.");
@@ -389,15 +381,6 @@ public sealed class FirstRealGameAssemblyLoadTests
             new AssemblyNameDefinition(name, version),
             name,
             ModuleKind.Dll);
-        assembly.MainModule.AssemblyReferences.Clear();
-        foreach (var reference in references)
-        {
-            var item = new AssemblyNameReference(reference.Name, reference.Version);
-            if (!string.IsNullOrEmpty(reference.PublicKeyTokenHex))
-                item.PublicKeyToken = Convert.FromHexString(reference.PublicKeyTokenHex);
-            assembly.MainModule.AssemblyReferences.Add(item);
-        }
-
         if (includeModuleInitializer)
         {
             var moduleType = assembly.MainModule.Types.Single(type => type.Name == "<Module>");
@@ -409,7 +392,34 @@ public sealed class FirstRealGameAssemblyLoadTests
             moduleType.Methods.Add(initializer);
         }
 
+        // Cecil's TypeSystem.Void may temporarily materialize a legacy mscorlib AssemblyRef
+        // while constructing synthetic metadata. Normalize the fixture's AssemblyRef table only
+        // after the initializer exists so the written .NET 9 test assembly contains exactly the
+        // references this fixture intentionally declares. The production Step 23 resolver remains
+        // strict and never aliases mscorlib to System.Private.CoreLib.
+        assembly.MainModule.AssemblyReferences.Clear();
+        foreach (var reference in references)
+        {
+            var item = new AssemblyNameReference(reference.Name, reference.Version);
+            if (!string.IsNullOrEmpty(reference.PublicKeyTokenHex))
+                item.PublicKeyToken = Convert.FromHexString(reference.PublicKeyTokenHex);
+            assembly.MainModule.AssemblyReferences.Add(item);
+        }
+
         assembly.Write(path);
+
+        using var written = ModuleDefinition.ReadModule(path, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+        });
+        if (written.AssemblyReferences.Any(reference => reference.Name.Equals("mscorlib", StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new AssertFailedException(
+                "Synthetic Step 23 fixture unexpectedly retained a legacy mscorlib AssemblyRef. " +
+                "Fix the fixture generator rather than adding a production core-library alias.");
+        }
     }
 
     private sealed record AssemblyReferenceSpec(string Name, Version Version, string PublicKeyTokenHex);
