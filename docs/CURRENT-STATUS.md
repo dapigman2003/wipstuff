@@ -1,117 +1,82 @@
-# Current Status — Step 23.3 First Real StS2 CLR Load Boundary
+# Current Status — Step 23.4 First Real StS2 CLR Load Boundary
 
 ## Physically closed boundary
 
-**Steps 01–22 are closed on a physical iPhone, and Step 22.4.2 is the accepted canonical foundation baseline.**
+**Steps 01–22 are closed on a physical iPhone. Step 22.4.2 / 0.0.64 is the accepted canonical pre-game-load foundation.**
 
-The final Step 22.4.2 acceptance was completely green:
+The canonical foundation is fully green: Step 19 A–D, Step 22 A–D, zero runtime-binding blockers, runtime closure ready = YES, OfflineReady = PASS, Foundation 5/5 = PASS, and all other current regressions pass.
 
-- canonical Codemagic build/test/package path succeeded;
-- Step 19 A–D: PASS after the post-Step-20 regression-contract correction;
-- Step 22 A–D: PASS;
-- explicit runtime-binding blockers: 0;
-- runtime closure ready for first real CLR load: YES;
-- OfflineReady regression: PASS;
-- Foundation 5/5 regression: PASS;
-- all other current user-run tests passed;
-- current long diagnostics are available as Files-visible text reports.
+## Step 23 evidence so far
 
-This establishes version **0.0.64 (64)** as the protected pre-game-load foundation.
+Codemagic host-test iterations 23.0–23.3 isolated and corrected test-only issues without weakening production safeguards. Step 23.3 produced a physical iPhone report and reached the intended pre-load safety boundary.
 
-## Active candidate — Step 23.3
+Physical Step 23.3 / 0.0.68 result:
 
-Step 23 crosses exactly one new runtime boundary: the first real CLR load of the receipt-backed prepared `sts2.dll`.
+- Gate A: FAIL before any real CLR load;
+- stage: module-initializer safety after exact binding-plan metadata coverage;
+- offender: `0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null`;
+- `<Module>..cctor` count: 1;
+- no real `sts2.dll` CLR load occurred.
 
-- Version: **0.0.68 (68)**
-- Codemagic workflow: **`ios-step-23-3`**
-- Live iOS project: **`src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`**
-- Trusted game source: existing Step 12 receipt-backed managed install
-- Execution input: existing Step 21/22 zero-blocker prepared runtime + persisted binding plan
-- Game entry point/method invocation: **out of scope**
-- Godot/game initialization: **out of scope**
-- Native game-library resolution: **explicitly refused/out of scope**
+This proves the Step 23 load-only policy found an automatic-execution boundary in a dependency, not in the primary game assembly.
+
+## Active candidate — Step 23.4
+
+- Version: **0.0.69 (69)**
+- Codemagic workflow: **`ios-step-23-4`**
+- Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
+- Trusted source: Step 12 receipt-backed managed install
+- Execution input: Step 21/22 zero-blocker prepared runtime + persisted binding plan
+- Entry point, game type/member reflection, game method invocation, Godot startup, native game libraries: **still out of scope**
 
 ### Gate A — PreparedLoadPreflight
 
-Before any real game CLR load:
+Before any real game CLR load, re-prove OfflineReady, plan/manifest identity, zero blockers, exact prepared/live hashes, IL-only identities, and exact Cecil `AssemblyRef` plan coverage.
 
-1. re-prove exact OfflineReady;
-2. require the persisted Step 21/22 plan to match the current depot/manifest/branch;
-3. require `RuntimeClosureReady=true`, zero blockers, and no blocker edges;
-4. require exactly one primary `sts2` assembly;
-5. require the complete prepared file set to match the plan exactly;
-6. SHA-1/length reverify every prepared assembly and corresponding trusted live-install file;
-7. require every prepared private assembly to be IL-only and identity-identical to the plan;
-8. require the persisted plan edges to exactly cover every prepared assembly's Cecil `AssemblyRef` metadata;
-9. require no framework-shaped `System.*`/`netstandard` assembly in the private set;
-10. inspect module/PInvoke metadata with Cecil;
-11. **reject the load if any prepared private assembly has `<Module>..cctor`**, because the load-only step must not silently cross a module-initialization boundary;
-12. require no prepared private/game assembly already loaded in the process;
-13. preserve the canonical iOS `RuntimeFeature.IsDynamicCodeCompiled=false` contract.
+The module-initializer policy is now boundary-specific:
+
+- the **primary `sts2.dll` must have zero `<Module>..cctor` initializers**;
+- any initializer-bearing *dependency* is statically audited and added to a deferred set;
+- Gate A records compact Cecil IL for each deferred initializer in `Reports/Step23-FirstRealGameLoad.txt`;
+- no deferred assembly is loaded.
 
 ### Gate B — PrimaryAssemblyLoad
 
-- SHA-1 recheck the prepared primary immediately before load;
-- create one dedicated private `AssemblyLoadContext`;
-- call `LoadFromStream` on the real prepared `sts2.dll`;
-- require exact assembly identity;
-- require the assembly to belong to the dedicated Step 23 context;
-- do not inspect game types/members, entry point, custom attributes, or invoke any game method;
-- do not intentionally resolve native libraries.
+SHA-1 recheck the real prepared primary, create the dedicated private `AssemblyLoadContext`, and call `LoadFromStream` on `sts2.dll` only. Require exact identity/context ownership and exactly one real game assembly. If the CLR unexpectedly requests a deferred initializer-bearing dependency during primary load, the resolver refuses it and Gate B fails.
 
 ### Gate C — PlannedDependencyResolution
 
-For every unique dependency identity in the persisted zero-blocker plan:
+Resolve all planned host bindings and load the maximal initializer-free private prepared closure. Planned private targets with module initializers are deliberately skipped and counted as deferred requirements. Any actual CLR resolver request for one of them is a hard failure.
 
-- `HostFramework` must resolve from `AssemblyLoadContext.Default` to the exact planned actual host identity;
-- `WorkspaceExact` / `WorkspaceVersionUnified` must resolve from the exact receipt-hashed prepared set in the Step 23 private context;
-- unplanned non-framework fallback is rejected;
-- no downloaded desktop framework implementation fallback is permitted;
-- the final private context assembly set must equal the prepared plan exactly;
-- any unmanaged-library resolution attempt fails the gate.
+Success requires:
+
+- all planned host bindings resolve from `AssemblyLoadContext.Default`;
+- all initializer-free private targets resolve only from the exact receipt-hashed prepared set;
+- the private context equals the expected initializer-free prepared set;
+- every deferred initializer-bearing private assembly remains outside the CLR;
+- zero native-load attempts and zero unplanned managed requests.
 
 ### Gate D — LoadIsolationAudit
 
-After the real managed load:
+Rehash the plan, every prepared/live assembly, and re-prove OfflineReady. Require exactly one real `sts2` in the dedicated context, exact initializer-free context membership, zero native attempts, zero rejected/unplanned requests, and zero deferred-initializer assemblies loaded.
 
-- re-hash the persisted plan;
-- re-hash every prepared and live-install assembly;
-- re-prove OfflineReady;
-- require exactly one real `sts2` assembly and require it to remain in the dedicated context;
-- require exact private-context membership;
-- require zero native load attempts and zero rejected/unplanned managed requests;
-- record explicitly that no game entry point, game member reflection, method invocation, Godot initialization, or native game load was requested.
-
-The loaded Step 23 game context is intentionally process-resident in production. Force-quit before rerunning Step 21/22 gates that require no real game assembly in the CLR.
+A Step 23.4 4/4 pass therefore means: **the real `sts2.dll` plus the maximal automatically-inert managed closure can enter the iPhone CLR, while `0Harmony` remains explicitly outside the CLR for the next initialization boundary.**
 
 ## Acceptance required for Step 23 closure
 
-Codemagic must pass static validation, host unit tests, Godot/native build/preflight, iOS publish, and IPA verification.
+From a fresh process:
 
-On device, from a fresh process:
-
-1. confirm `STEP 23.3 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.68`;
+1. confirm `STEP 23.4 — FIRST REAL STS2 CLR LOAD BOUNDARY`, version `0.0.69`;
 2. run Step 23 A–D and stop at the first failure;
-3. require Gate A module initializers = 0;
-4. require Gate B first real `sts2.dll` CLR load = PASS;
-5. require Gate C complete planned managed closure resolution = PASS with zero native attempts;
-6. require Gate D = PASS and Step 23 summary 4/4;
-7. run OfflineReady and require PASS;
-8. run Foundation 5/5 and require PASS;
-9. share `Reports/Step23-FirstRealGameLoad.txt` on any failure or unexpected diagnostic.
+3. Gate A: primary module initializers = 0; deferred initializer-bearing dependencies may be nonzero and must be reported;
+4. Gate B: first real `sts2.dll` CLR load = PASS;
+5. Gate C: initializer-free managed closure = PASS, deferred dependencies not loaded, zero native attempts;
+6. Gate D: PASS, summary 4/4;
+7. OfflineReady = PASS;
+8. Foundation 5/5 = PASS.
 
-Only after this is green should controlled type/member access or broader managed initialization begin.
+After Gate B the real game assembly remains process-resident; force-quit before rerunning pre-load regressions.
 
-### Step 23.1 Codemagic host-test isolation result
+## Likely next step
 
-The first Step 23 Codemagic run reached the host test suite with 153/154 passing. Step 23.1 tried to make collectible synthetic `sts2` unloading deterministic by clearing strong references and forcing GC. The next Codemagic run proved that approach was still timing-dependent: 147/154 passed and seven tests failed because a collectible synthetic assembly named `sts2` remained visible in the shared test process. Three older Step 21 binding tests were also contaminated by that same synthetic identity. Production Step 23 was not implicated.
-
-### Step 23.2 deterministic host-test identity isolation
-
-Step 23.2 removes GC/unload timing from host-test correctness. Every synthetic Step 23 test now creates a unique primary assembly identity and uses an internal test-only identity policy. The public production constructor is unchanged and still recognizes only the real game identities `sts2` and `SlayTheSpire2` for its fresh-process guard. Synthetic contexts remain collectible as hygiene, but no test result depends on when the runtime actually collects them. This prevents Step 23 tests from contaminating each other or older Step 21 tests even if collectible ALC reclamation is delayed indefinitely.
-
-### Step 23.3 synthetic fixture binding-plan coverage correction
-
-The Step 23.2 Codemagic run proved the identity-isolation architecture worked: **153/154 host tests passed** and there was no cross-test contamination. The sole failure was the module-initializer negative fixture. Creating `<Module>..cctor` caused Cecil to add an implicit `mscorlib, Version=4.0.0.0` `AssemblyRef`; the synthetic plan still listed only `Game.Dependency` and `System.Linq`. Gate A correctly stopped at its earlier exact AssemblyRef-plan coverage invariant, so the test never reached the module-initializer refusal it was meant to prove.
-
-Step 23.3 fixes only the synthetic fixture planner. It now derives plan edges from the fixture assemblies' actual post-write Cecil `AssemblyReferences`, maps `Game.Dependency` to the private prepared dependency, maps `System.Linq` to the real host `System.Linq`, and maps Cecil's module-initializer-only `mscorlib` reference to the host core library. Unexpected synthetic references fail the fixture builder. **Production `FirstRealGameAssemblyLoad` remains unchanged; Gate A exact metadata coverage is not weakened.**
+If 23.4 passes, Step 24 becomes the **audited automatic-initialization boundary**, starting with the exact `0Harmony <Module>..cctor` IL/call metadata exported by Gate A. Do not invoke Harmony or broaden native/game execution before that initializer is understood.

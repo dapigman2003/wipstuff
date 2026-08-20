@@ -1,4 +1,4 @@
-# Release Checklist — Step 23.3
+# Release Checklist — Step 23.4
 
 ## Source/package
 
@@ -16,12 +16,12 @@
 - Godot build/preflight passes on Codemagic/macOS;
 - iOS publish succeeds with `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is 0.0.68 (68);
-- workflow is `ios-step-23-3`.
+- expected version is 0.0.69 (69);
+- workflow is `ios-step-23-4`.
 
 ## Device
 
-- header `STEP 23.3 — FIRST REAL STS2 CLR LOAD BOUNDARY`;
+- header `STEP 23.4 — FIRST REAL STS2 CLR LOAD BOUNDARY`;
 - start from a fresh process;
 - Step 23 Gate A requires zero module initializers and zero binding blockers;
 - Gate B first real `sts2.dll` CLR load passes;
