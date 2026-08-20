@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 23.4.2 First Real StS2 CLR Load Boundary
+# StS2 Launcher iOS — Step 23.4.3 First Real StS2 CLR Load Boundary
 
 This repository is the canonical launcher source after the Step 22.4.2 foundation closure.
 
@@ -20,19 +20,23 @@ Step 23.4 preserves the automatic-execution boundary instead of deleting the gua
 The current known physical frontier is one deferred assembly: `0Harmony 2.4.2.0`.
 
 
-## Step 23.4.2 synthetic fixture correction
+## Step 23.4.3 synthetic fixture correction
 
-The Step 23.4.1 Codemagic run passed canonical static validation and Core compilation and reached **154/155 host tests**. The only failure was the synthetic dependency-module-initializer test. Cecil's `TypeSystem.Void` temporarily materialized a legacy `mscorlib, Version=4.0.0.0` AssemblyRef in that fake test assembly. Gate C correctly refused to alias that .NET Framework identity to `System.Private.CoreLib` on .NET 9.
+The Step 23.4.2 Codemagic run passed canonical static validation and Core compilation and reached **153/155 host tests**. Both failures were synthetic module-initializer fixtures that still persisted a legacy `mscorlib, Version=4.0.0.0` AssemblyRef.
 
-Step 23.4.2 fixes only the synthetic fixture generator: it creates the initializer first, then normalizes the written fixture AssemblyRef table to exactly the references the test intentionally declared, and reopens the file to fail immediately if a legacy `mscorlib` reference reappears. **Production Step 23 binding remains strict and gains no core-library alias.**
+The prior fix attempted to clear that AssemblyRef after constructing the initializer. That was too late: Cecil had already embedded the legacy core-library scope in the initializer's `System.Void` TypeReference and recreated the reference during serialization.
+
+Step 23.4.3 fixes the fixture **by construction**. For initializer-bearing synthetic assemblies it adds the real host `System.Runtime` AssemblyRef before accessing Cecil `TypeSystem.Void`; Cecil therefore uses that recognized modern core-library contract for primitive void. After write/reopen the fixture requires an exact declared-vs-persisted AssemblyRef set, forbids `mscorlib`, and verifies the initializer return type is primitive `MetadataType.Void` scoped to `System.Runtime`.
+
+**Production Step 23 binding remains strict and unchanged. No legacy core-library alias is added.**
 
 ## Codemagic
 
 Use workflow:
 
-`ios-step-23-4-2`
+`ios-step-23-4-3`
 
-Expected app version: `0.0.71 (71)`.
+Expected app version: `0.0.72 (72)`.
 
 ## Documentation
 

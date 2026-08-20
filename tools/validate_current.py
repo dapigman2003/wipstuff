@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 23.4.2 synthetic core-library fixture normalization static validation")
+print("StS2 Launcher — Step 23.4.3 Cecil core-library scope construction static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>71</ApplicationVersion>" in project_text, "build version is 71")
-require("<ApplicationDisplayVersion>0.0.71</ApplicationDisplayVersion>" in project_text, "display version is 0.0.71")
-require(plist.get("CFBundleVersion") == "71", "Info.plist build version is 71")
-require(plist.get("CFBundleShortVersionString") == "0.0.71", "Info.plist display version is 0.0.71")
+require("<ApplicationVersion>72</ApplicationVersion>" in project_text, "build version is 72")
+require("<ApplicationDisplayVersion>0.0.72</ApplicationDisplayVersion>" in project_text, "display version is 0.0.72")
+require(plist.get("CFBundleVersion") == "72", "Info.plist build version is 72")
+require(plist.get("CFBundleShortVersionString") == "0.0.72", "Info.plist display version is 0.0.72")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -302,9 +302,9 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-23.4.2.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.71",
-    "STS2_BUILD_VERSION": "71",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-23.4.3.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.72",
+    "STS2_BUILD_VERSION": "72",
     "STS2_RUNTIME_POLICY_MARKER": "STEP23 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -456,7 +456,7 @@ require("SyntheticDependency." in step23_tests, "Step 23 host tests allocate uni
 require("expectedPrimarySimpleName: primarySimpleName" in step23_tests and "freshProcessAssemblyNames: [primarySimpleName]" in step23_tests, "Step 23 host tests scope freshness checks to their unique synthetic identity")
 require("ForceCollectibleContexts" not in step23_tests, "Step 23 host tests do not depend on collectible ALC GC timing")
 require("BuildSyntheticBindingPlan(" in step23_tests and "module.AssemblyReferences" in step23_tests, "Step 23 synthetic plans derive edges from post-write Cecil AssemblyRefs")
-require("Synthetic Step 23 fixture unexpectedly retained a legacy mscorlib AssemblyRef" in step23_tests and "Host System.Private.CoreLib has no FullName." not in step23_tests, "Step 23 module-initializer fixture removes Cecil implicit mscorlib AssemblyRef instead of aliasing it")
+require("Synthetic Step 23 fixture unexpectedly retained a legacy mscorlib AssemblyRef" in step23_tests and "Host System.Private.CoreLib has no FullName." not in step23_tests, "Step 23 module-initializer fixture prevents legacy mscorlib metadata instead of aliasing it")
 require("Update the fixture binding-plan builder rather than weakening Gate A metadata coverage" in step23_tests, "Step 23 fixture rejects unexpected synthetic AssemblyRefs instead of weakening production coverage")
 require("InternalsVisibleTo(\"StS2Launcher.Core.Tests\")" in read("src/StS2Launcher.Core/Properties/AssemblyInfo.cs"), "Step 23 test-only identity seam is limited to the host test assembly")
 require("[ExpectedPrimarySimpleName, \"SlayTheSpire2\"]" in step23_source, "Step 23 production constructor preserves the physical fresh-process game identity policy")
@@ -475,16 +475,24 @@ if candidate_manifest.is_file():
     require(not candidate_mismatches, "Step 23 candidate load-boundary implementation is hash-pinned", ", ".join(candidate_mismatches))
 
 
-# Step 23.4.2 host-fixture invariant: Cecil may internally materialize mscorlib while
-# TypeSystem.Void is accessed, but the final synthetic .NET 9 fixture must not retain it.
+# Step 23.4.3 host-fixture invariant: construct a modern core-library scope before
+# touching Cecil TypeSystem.Void. Do not try to erase mscorlib after it has already been
+# embedded in a TypeReference; Step 23.4.2 proved that approach is insufficient.
 step23_tests = read("tests/StS2Launcher.Core.Tests/Runtime/FirstRealGameAssemblyLoadTests.cs")
 require("Synthetic Step 23 fixture unexpectedly retained a legacy mscorlib AssemblyRef" in step23_tests, "Step 23 synthetic initializer fixture rejects legacy mscorlib metadata")
 require("Fix the fixture generator rather than adding a production core-library alias." in step23_tests, "Step 23 fixture documents no-production-alias policy")
-require("Host System.Private.CoreLib has no FullName." not in step23_tests, "Step 23 synthetic binding plan no longer aliases mscorlib to System.Private.CoreLib")
+require("Host System.Private.CoreLib has no FullName." not in step23_tests, "Step 23 synthetic binding plan has no mscorlib-to-System.Private.CoreLib alias")
+require('Assembly.Load(new AssemblyName("System.Runtime"))' in step23_tests, "Step 23 synthetic initializer fixture derives the real host System.Runtime identity")
+require('dependencyReferences.Add(systemRuntimeReference)' in step23_tests and 'primaryReferences.Add(systemRuntimeReference)' in step23_tests, "Step 23 initializer-bearing fixtures explicitly declare System.Runtime")
+require('reference.Name.Equals("System.Runtime"' in step23_tests and '"HostFramework", systemRuntimeFullName' in step23_tests, "Step 23 synthetic plan treats System.Runtime as an ordinary exact host binding")
 write_assembly_start = step23_tests.find("private static void WriteAssembly(")
-initializer_pos = step23_tests.find("if (includeModuleInitializer)", write_assembly_start)
-normalize_pos = step23_tests.find("assembly.MainModule.AssemblyReferences.Clear();", write_assembly_start)
-require(write_assembly_start >= 0 and initializer_pos >= 0 and normalize_pos > initializer_pos, "Step 23 fixture normalizes AssemblyRefs after module-initializer construction")
+add_ref_pos = step23_tests.find("assembly.MainModule.AssemblyReferences.Add(item);", write_assembly_start)
+type_void_pos = step23_tests.find("assembly.MainModule.TypeSystem.Void", write_assembly_start)
+require(write_assembly_start >= 0 and add_ref_pos >= 0 and type_void_pos > add_ref_pos, "Step 23 fixture adds modern AssemblyRefs before Cecil TypeSystem.Void is accessed")
+require("assembly.MainModule.AssemblyReferences.Clear();" not in step23_tests, "Step 23 fixture no longer relies on post-construction AssemblyRef clearing")
+require("Assert.AreSame(systemRuntimeReference, voidType.Scope)" in step23_tests, "Step 23 fixture verifies Cecil selected the declared System.Runtime core-library scope before write")
+require("ReadingMode = ReadingMode.Immediate" in step23_tests and "CollectionAssert.AreEqual(" in step23_tests, "Step 23 fixture immediately reopens and verifies the exact persisted AssemblyRef set")
+require("MetadataType.Void" in step23_tests and 'initializer.ReturnType.Scope?.Name' in step23_tests, "Step 23 fixture verifies primitive void metadata and System.Runtime scope after reopen")
 
 # ---------------------------------------------------------------------------
 # Documentation model
@@ -501,6 +509,7 @@ required_docs = [
     "docs/history/steps/STEP-23.4-DEFERRED-DEPENDENCY-MODULE-INITIALIZER-BOUNDARY.md",
     "docs/history/steps/STEP-23.4.1-CECIL-IL-AUDIT-COMPILE-FIX.md",
     "docs/history/steps/STEP-23.4.2-SYNTHETIC-CORELIB-FIXTURE-NORMALIZATION.md",
+    "docs/history/steps/STEP-23.4.3-CECIL-CORELIB-SCOPE-CONSTRUCTION-FIX.md",
 ]
 for doc in required_docs:
     require((ROOT / doc).is_file(), f"authoritative documentation exists: {doc}")
@@ -526,7 +535,7 @@ require(len(history_steps) >= 60, "historical documentation set is comprehensive
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-23-4-2:" in codemagic, "Codemagic exposes Step 23.4.2 workflow")
+require("ios-step-23-4-3:" in codemagic, "Codemagic exposes Step 23.4.3 workflow")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")

@@ -191,10 +191,11 @@ public sealed class FirstRealGameAssemblyLoadTests
 
         var systemLinq = typeof(Enumerable).Assembly.GetName();
         var systemLinqFullName = systemLinq.FullName ?? throw new AssertFailedException("System.Linq has no FullName.");
-        var systemLinqReference = new AssemblyReferenceSpec(
-            systemLinq.Name ?? "System.Linq",
-            systemLinq.Version ?? new Version(9, 0, 0, 0),
-            Convert.ToHexString(systemLinq.GetPublicKeyToken() ?? []).ToLowerInvariant());
+        var systemLinqReference = ToReferenceSpec(systemLinq, "System.Linq");
+
+        var systemRuntime = Assembly.Load(new AssemblyName("System.Runtime")).GetName();
+        var systemRuntimeFullName = systemRuntime.FullName ?? throw new AssertFailedException("System.Runtime has no FullName.");
+        var systemRuntimeReference = ToReferenceSpec(systemRuntime, "System.Runtime");
 
         var dependencySimpleName = "StS2Launcher.Step23.SyntheticDependency." + primarySimpleName.Split('.').Last();
         var dependencyRelative = $"{arm64RelativeRoot}/{dependencySimpleName}.dll";
@@ -202,17 +203,29 @@ public sealed class FirstRealGameAssemblyLoadTests
         var liveDependency = Path.Combine(managedRoot, dependencyRelative.Replace('/', Path.DirectorySeparatorChar));
         var livePrimary = Path.Combine(managedRoot, primaryRelative.Replace('/', Path.DirectorySeparatorChar));
 
+        var dependencyReferences = new List<AssemblyReferenceSpec> { systemLinqReference };
+        if (dependencyModuleInitializer)
+            dependencyReferences.Add(systemRuntimeReference);
+
+        var primaryReferences = new List<AssemblyReferenceSpec>
+        {
+            systemLinqReference,
+            new(dependencySimpleName, new Version(1, 0, 0, 0), string.Empty),
+        };
+        if (primaryModuleInitializer)
+            primaryReferences.Add(systemRuntimeReference);
+
         WriteAssembly(
             liveDependency,
             dependencySimpleName,
             new Version(1, 0, 0, 0),
-            [systemLinqReference],
+            dependencyReferences,
             includeModuleInitializer: dependencyModuleInitializer);
         WriteAssembly(
             livePrimary,
             primarySimpleName,
             new Version(0, 1, 0, 0),
-            [systemLinqReference, new AssemblyReferenceSpec(dependencySimpleName, new Version(1, 0, 0, 0), string.Empty)],
+            primaryReferences,
             primaryModuleInitializer);
 
         var receiptFiles = new List<SteamManagedInstallFile>();
@@ -261,7 +274,8 @@ public sealed class FirstRealGameAssemblyLoadTests
             preparedDependency,
             dependencyFullName,
             dependencySimpleName,
-            systemLinqFullName);
+            systemLinqFullName,
+            systemRuntimeFullName);
 
         var plan = new RuntimeFrameworkBindingPlanDocument(
             RuntimeFrameworkBindingPlanDocument.CurrentSchemaVersion,
@@ -297,11 +311,12 @@ public sealed class FirstRealGameAssemblyLoadTests
         string preparedDependency,
         string dependencyFullName,
         string dependencySimpleName,
-        string systemLinqFullName)
+        string systemLinqFullName,
+        string systemRuntimeFullName)
     {
         var edges = new List<RuntimeBindingEdge>();
-        AddSyntheticEdges(preparedPrimary, primaryFullName, dependencyFullName, dependencySimpleName, systemLinqFullName, edges);
-        AddSyntheticEdges(preparedDependency, dependencyFullName, dependencyFullName, dependencySimpleName, systemLinqFullName, edges);
+        AddSyntheticEdges(preparedPrimary, primaryFullName, dependencyFullName, dependencySimpleName, systemLinqFullName, systemRuntimeFullName, edges);
+        AddSyntheticEdges(preparedDependency, dependencyFullName, dependencyFullName, dependencySimpleName, systemLinqFullName, systemRuntimeFullName, edges);
 
         var hostBindings = edges
             .Where(edge => edge.BindingKind.Equals("HostFramework", StringComparison.Ordinal))
@@ -327,6 +342,7 @@ public sealed class FirstRealGameAssemblyLoadTests
         string dependencyFullName,
         string dependencySimpleName,
         string systemLinqFullName,
+        string systemRuntimeFullName,
         ICollection<RuntimeBindingEdge> edges)
     {
         using var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters
@@ -347,6 +363,12 @@ public sealed class FirstRealGameAssemblyLoadTests
             if (reference.Name.Equals("System.Linq", StringComparison.OrdinalIgnoreCase))
             {
                 edges.Add(new RuntimeBindingEdge(sourceFullName, reference.FullName, "HostFramework", systemLinqFullName));
+                continue;
+            }
+
+            if (reference.Name.Equals("System.Runtime", StringComparison.OrdinalIgnoreCase))
+            {
+                edges.Add(new RuntimeBindingEdge(sourceFullName, reference.FullName, "HostFramework", systemRuntimeFullName));
                 continue;
             }
 
@@ -381,29 +403,46 @@ public sealed class FirstRealGameAssemblyLoadTests
             new AssemblyNameDefinition(name, version),
             name,
             ModuleKind.Dll);
+
+        // Build the AssemblyRef table first. The module-initializer signature must use
+        // a modern .NET contract scope explicitly; MainModule.TypeSystem.Void on an
+        // otherwise synthetic Cecil module can embed a legacy mscorlib scope in the
+        // method signature, which later recreates an mscorlib AssemblyRef at write time.
+        var declaredReferences = new Dictionary<string, AssemblyNameReference>(StringComparer.OrdinalIgnoreCase);
+        foreach (var reference in references)
+        {
+            var item = CreateAssemblyNameReference(reference);
+            if (!declaredReferences.TryAdd(reference.Name, item))
+                throw new AssertFailedException($"Synthetic Step 23 fixture declared duplicate AssemblyRef '{reference.Name}'.");
+            assembly.MainModule.AssemblyReferences.Add(item);
+        }
+
         if (includeModuleInitializer)
         {
+            if (!declaredReferences.TryGetValue("System.Runtime", out var systemRuntimeReference))
+            {
+                throw new AssertFailedException(
+                    "Synthetic Step 23 module-initializer fixtures must explicitly declare System.Runtime " +
+                    "so System.Void never acquires a legacy mscorlib scope.");
+            }
+
+            // System.Runtime is already in AssemblyReferences, so Cecil's CommonTypeSystem
+            // recognizes it as the module's core-library contract. TypeSystem.Void therefore
+            // receives the correct primitive ELEMENT_TYPE_VOID metadata and System.Runtime
+            // scope instead of synthesizing legacy mscorlib for an otherwise-empty module.
+            var voidType = assembly.MainModule.TypeSystem.Void;
+            Assert.AreSame(systemRuntimeReference, voidType.Scope);
+
             var moduleType = assembly.MainModule.Types.Single(type => type.Name == "<Module>");
             var initializer = new MethodDefinition(
                 ".cctor",
-                Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName,
-                assembly.MainModule.TypeSystem.Void);
+                Mono.Cecil.MethodAttributes.Private |
+                Mono.Cecil.MethodAttributes.Static |
+                Mono.Cecil.MethodAttributes.SpecialName |
+                Mono.Cecil.MethodAttributes.RTSpecialName,
+                voidType);
             initializer.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             moduleType.Methods.Add(initializer);
-        }
-
-        // Cecil's TypeSystem.Void may temporarily materialize a legacy mscorlib AssemblyRef
-        // while constructing synthetic metadata. Normalize the fixture's AssemblyRef table only
-        // after the initializer exists so the written .NET 9 test assembly contains exactly the
-        // references this fixture intentionally declares. The production Step 23 resolver remains
-        // strict and never aliases mscorlib to System.Private.CoreLib.
-        assembly.MainModule.AssemblyReferences.Clear();
-        foreach (var reference in references)
-        {
-            var item = new AssemblyNameReference(reference.Name, reference.Version);
-            if (!string.IsNullOrEmpty(reference.PublicKeyTokenHex))
-                item.PublicKeyToken = Convert.FromHexString(reference.PublicKeyTokenHex);
-            assembly.MainModule.AssemblyReferences.Add(item);
         }
 
         assembly.Write(path);
@@ -412,15 +451,57 @@ public sealed class FirstRealGameAssemblyLoadTests
         {
             InMemory = true,
             ReadSymbols = false,
-            ReadingMode = ReadingMode.Deferred,
+            ReadingMode = ReadingMode.Immediate,
         });
-        if (written.AssemblyReferences.Any(reference => reference.Name.Equals("mscorlib", StringComparison.OrdinalIgnoreCase)))
+
+        var expectedReferences = references
+            .Select(ToExpectedAssemblyReferenceFullName)
+            .OrderBy(value => value, StringComparer.Ordinal)
+            .ToArray();
+        var actualReferences = written.AssemblyReferences
+            .Select(reference => reference.FullName)
+            .OrderBy(value => value, StringComparer.Ordinal)
+            .ToArray();
+
+        CollectionAssert.AreEqual(
+            expectedReferences,
+            actualReferences,
+            "Synthetic Step 23 fixture must persist exactly its declared AssemblyRefs.");
+
+        Assert.IsFalse(
+            written.AssemblyReferences.Any(reference => reference.Name.Equals("mscorlib", StringComparison.OrdinalIgnoreCase)),
+            "Synthetic Step 23 fixture unexpectedly retained a legacy mscorlib AssemblyRef. " +
+            "Fix the fixture generator rather than adding a production core-library alias.");
+
+        if (includeModuleInitializer)
         {
-            throw new AssertFailedException(
-                "Synthetic Step 23 fixture unexpectedly retained a legacy mscorlib AssemblyRef. " +
-                "Fix the fixture generator rather than adding a production core-library alias.");
+            var moduleType = written.Types.Single(type => type.Name == "<Module>");
+            var initializer = moduleType.Methods.Single(method => method.Name == ".cctor");
+            Assert.AreEqual("System.Void", initializer.ReturnType.FullName);
+            Assert.AreEqual(MetadataType.Void, initializer.ReturnType.MetadataType);
+            Assert.AreEqual(
+                "System.Runtime",
+                initializer.ReturnType.Scope?.Name,
+                "Synthetic module initializer System.Void must remain scoped to System.Runtime after Cecil write/reopen.");
         }
     }
+
+    private static AssemblyNameReference CreateAssemblyNameReference(AssemblyReferenceSpec reference)
+    {
+        var item = new AssemblyNameReference(reference.Name, reference.Version);
+        if (!string.IsNullOrEmpty(reference.PublicKeyTokenHex))
+            item.PublicKeyToken = Convert.FromHexString(reference.PublicKeyTokenHex);
+        return item;
+    }
+
+    private static AssemblyReferenceSpec ToReferenceSpec(AssemblyName name, string fallbackName)
+        => new(
+            name.Name ?? fallbackName,
+            name.Version ?? new Version(9, 0, 0, 0),
+            Convert.ToHexString(name.GetPublicKeyToken() ?? []).ToLowerInvariant());
+
+    private static string ToExpectedAssemblyReferenceFullName(AssemblyReferenceSpec reference)
+        => CreateAssemblyNameReference(reference).FullName;
 
     private sealed record AssemblyReferenceSpec(string Name, Version Version, string PublicKeyTokenHex);
     private sealed record SyntheticBindingPlan(RuntimeBindingHostFramework[] HostFrameworkBindings, RuntimeBindingEdge[] Edges);

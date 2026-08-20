@@ -2,11 +2,11 @@
 
 ## Build
 
-Codemagic workflow: `ios-step-23-4-2`
+Codemagic workflow: `ios-step-23-4-3`
 
-Expected app header: `STEP 23.4.2 — FIRST REAL STS2 CLR LOAD BOUNDARY`
+Expected app header: `STEP 23.4.3 — FIRST REAL STS2 CLR LOAD BOUNDARY`
 
-Expected version: `0.0.71`
+Expected version: `0.0.72`
 
 ## Device procedure
 

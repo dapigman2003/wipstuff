@@ -198,12 +198,12 @@ public sealed partial class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 23.4.2 — FIRST REAL STS2 CLR LOAD BOUNDARY",
+            "STEP 23.4.3 — FIRST REAL STS2 CLR LOAD BOUNDARY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.71",
+            "Version 0.0.72",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
@@ -735,7 +735,7 @@ public sealed partial class RootViewController : UIViewController
         content.AddArrangedSubview(_firstRealGameAssemblyLoadResultLabel);
 
         _firstRealGameAssemblyLoadDetailLabel = Label(
-            "Gate A re-proves OfflineReady, validates the persisted zero-blocker Step 21/22 plan and every prepared/live SHA-1, and uses Cecil to require IL-only private assemblies with zero <Module> module initializers before loading anything. Gate B performs the first real sts2.dll LoadFromStream into a dedicated private AssemblyLoadContext and stops after identity/context verification. Gate C asks that context to resolve every unique managed dependency identity in the audited plan: host frameworks must come from the default iOS/.NET context, private assemblies only from the exact prepared set, and unplanned fallback is refused. Gate D re-hashes plan/prepared/live state, re-proves OfflineReady, audits load-context ownership, and requires zero native resolution attempts. No game entry point, game type/member reflection, method invocation, Godot startup, or native game load is part of Step 23.",
+            "Gate A re-proves OfflineReady, validates the persisted zero-blocker Step 21/22 plan and every prepared/live SHA-1, and uses Cecil to require the primary sts2.dll to have zero <Module> module initializers; initializer-bearing private dependencies are metadata-audited and deferred without entering the CLR. Gate B performs the first real sts2.dll LoadFromStream into a dedicated private AssemblyLoadContext and stops after identity/context verification. Gate C resolves every planned host binding and loads only the initializer-free private closure from the exact prepared set; deferred initializer-bearing dependencies and all unplanned/native requests are refused. Gate D re-hashes plan/prepared/live state, re-proves OfflineReady, audits load-context ownership, and proves deferred dependencies remained unloaded. No game entry point, game type/member reflection, method invocation, Godot startup, or native game load is part of Step 23.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_firstRealGameAssemblyLoadDetailLabel);
