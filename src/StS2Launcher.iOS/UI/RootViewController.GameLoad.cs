@@ -27,7 +27,7 @@ public sealed partial class RootViewController
         _firstRealGameAssemblyLoad.Reset();
         _firstRealGameAssemblyLoadResultLabel.Text = "FIRST REAL STS2 CLR LOAD BOUNDARY: GATE A RUNNING…";
         _firstRealGameAssemblyLoadResultLabel.TextColor = UIColor.Label;
-        _firstRealGameAssemblyLoadDetailLabel.Text = "Gate A: validating the current zero-blocker Step 21/22 plan, receipt-identical prepared/live bytes and module-initializer-free load boundary before any real game CLR load.";
+        _firstRealGameAssemblyLoadDetailLabel.Text = "Gate A: validating the zero-blocker Step 21/22 plan, receipt-identical prepared/live bytes, an initializer-free primary, and any initializer-bearing dependencies that must be deferred before the first real game CLR load.";
         _statusLabel.Text = "STEP 23 GATE A — prepared-load preflight. No game assembly is loaded yet.";
         _statusLabel.TextColor = UIColor.Label;
 
@@ -51,7 +51,7 @@ public sealed partial class RootViewController
             if (!RecordFirstRealGameAssemblyLoadGate(gateB)) return;
 
             _firstRealGameAssemblyLoadResultLabel.Text = "FIRST REAL STS2 CLR LOAD BOUNDARY: GATE C RUNNING…";
-            _statusLabel.Text = "STEP 23 GATE C — strict runtime resolution of the complete audited managed dependency plan.";
+            _statusLabel.Text = "STEP 23 GATE C — strict runtime resolution of the host bindings + maximal initializer-free private closure; initializer-bearing dependencies remain deferred.";
             var gateC = await Task.Run(() => _firstRealGameAssemblyLoad.RunPlannedDependencyResolution(), token);
             if (!RecordFirstRealGameAssemblyLoadGate(gateC)) return;
 
@@ -64,8 +64,8 @@ public sealed partial class RootViewController
             _firstRealGameAssemblyLoadResultLabel.Text = snapshot.Summary;
             _firstRealGameAssemblyLoadResultLabel.TextColor = UIColor.Label;
             _firstRealGameAssemblyLoadDetailLabel.Text = FormatFirstRealGameAssemblyLoadDetail(
-                "All four Step 23 gates passed. The real receipt-backed sts2.dll and its complete planned managed closure are CLR-loadable in the private interpreter-backed context without entry-point/member invocation, native resolution, or live-install mutation. Run OfflineReady + Foundation 5/5 to close Step 23. Force-quit before rerunning any earlier pre-load regression that requires no real game assembly in the CLR.");
-            _statusLabel.Text = "PASS: STEP 23 FIRST REAL STS2 CLR LOAD BOUNDARY — 4/4. Real managed load + planned dependency binding are proven; game initialization/execution remains out of scope.";
+                "All four Step 23 gates passed. The real receipt-backed sts2.dll and the maximal initializer-free planned managed closure are CLR-loadable in the private interpreter-backed context. Initializer-bearing dependencies remain outside the CLR for Step 24. No entry-point/member invocation, native resolution, or live-install mutation occurred. Run OfflineReady + Foundation 5/5 to close Step 23. Force-quit before rerunning any earlier pre-load regression that requires no real game assembly in the CLR.");
+            _statusLabel.Text = "PASS: STEP 23 FIRST REAL STS2 CLR LOAD BOUNDARY — 4/4. Real primary load + initializer-free managed closure are proven; deferred automatic initialization remains Step 24.";
             _statusLabel.TextColor = UIColor.Label;
         }
         catch (OperationCanceledException)
@@ -128,9 +128,9 @@ public sealed partial class RootViewController
         }
 
         lines.Add("Step 23 read scope: the persisted Step21-PreparedRuntimeBinding prepared set + binding plan and the receipt-backed Step 12 managed install. Step 23 does not rewrite/copy game assemblies.");
-        lines.Add("CLR scope: real sts2.dll plus the exact zero-blocker managed closure from the Step 21/22 plan in one dedicated private AssemblyLoadContext; host frameworks remain in AssemblyLoadContext.Default.");
+        lines.Add("CLR scope: real sts2.dll plus the maximal initializer-free private closure from the zero-blocker Step 21/22 plan in one dedicated AssemblyLoadContext; host frameworks remain in AssemblyLoadContext.Default and initializer-bearing private dependencies remain outside the CLR.");
         lines.Add("Initialization boundary: no game entry point, no game type/member reflection, no game method/delegate invocation, no RuntimeHelpers.RunClassConstructor, no Activator/CreateInstance, and no Godot/game initialization are permitted in Step 23.");
-        lines.Add("Module-initializer policy: Gate A refuses to load if any prepared private assembly contains <Module>..cctor, because module initialization can run as part of assembly loading.");
+        lines.Add("Module-initializer policy: the primary sts2.dll must have no <Module>..cctor. Initializer-bearing private dependencies are Cecil-audited, resolver-blocked and deferred to Step 24 rather than loaded in Step 23.");
         lines.Add("Native boundary: the private load context refuses and audits unmanaged-library resolution. FMOD/Spine/Steamworks native integration and other native game dependencies remain later work.");
         lines.Add("Steps 01–22 and the Step 22.4.2 canonical foundation remain protected. Closure requires OfflineReady + Foundation 5/5 after a Step 23 4/4 pass.");
         lines.Add("After Gate B, the real game assembly remains process-resident until force-quit. Do not rerun Step 21/22 pre-load gates in the same process.");

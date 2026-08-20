@@ -198,12 +198,12 @@ public sealed partial class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 23.3 — FIRST REAL STS2 CLR LOAD BOUNDARY",
+            "STEP 23.4 — FIRST REAL STS2 CLR LOAD BOUNDARY",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.68",
+            "Version 0.0.69",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
