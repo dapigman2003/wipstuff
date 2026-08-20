@@ -5,6 +5,7 @@ using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace StS2Launcher.Core;
 
