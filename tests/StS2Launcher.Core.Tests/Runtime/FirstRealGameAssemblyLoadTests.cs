@@ -43,7 +43,7 @@ public sealed class FirstRealGameAssemblyLoadTests
     {
         var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
+        await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, primaryModuleInitializer: false, dependencyModuleInitializer: false, tamperPreparedAfterPlan: false);
 
         var results = await RunSyntheticLoadAndDisposeAsync(temp.Path, primarySimpleName);
 
@@ -51,7 +51,7 @@ public sealed class FirstRealGameAssemblyLoadTests
         Assert.IsTrue(results.GateB.Passed, results.GateB.Detail);
         Assert.IsTrue(results.GateC.Passed, results.GateC.Detail);
         Assert.IsTrue(results.GateD.Passed, results.GateD.Detail);
-        StringAssert.Contains(results.GateA.Detail, "Module initializers found: 0");
+        StringAssert.Contains(results.GateA.Detail, "Primary module initializers: 0");
         StringAssert.Contains(results.GateB.Detail, "FIRST REAL STS2 CLR LOAD SUCCEEDED");
         StringAssert.Contains(results.GateB.Detail, "Game entry point invoked: NO");
         StringAssert.Contains(results.GateC.Detail, "Host framework requirements resolved from default context: 1");
@@ -61,11 +61,11 @@ public sealed class FirstRealGameAssemblyLoadTests
     }
 
     [TestMethod]
-    public async Task GateARejectsModuleInitializerBeforeAnyRealClrLoad()
+    public async Task GateARejectsPrimaryModuleInitializerBeforeAnyRealClrLoad()
     {
         var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: true, tamperPreparedAfterPlan: false);
+        await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, primaryModuleInitializer: true, dependencyModuleInitializer: false, tamperPreparedAfterPlan: false);
 
         using var foundation = CreateSyntheticFoundation(temp.Path, primarySimpleName);
         var gateA = await foundation.RunPreparedLoadPreflightAsync();
@@ -76,11 +76,35 @@ public sealed class FirstRealGameAssemblyLoadTests
     }
 
     [TestMethod]
+    public async Task DependencyModuleInitializerIsDeferredWhilePrimaryAndSafeClosureLoad()
+    {
+        var primarySimpleName = CreateSyntheticPrimarySimpleName();
+        using var temp = new TempTestDirectory("sts2-step23-tests");
+        await CreateSyntheticPreparedRuntimeAsync(
+            temp.Path,
+            primarySimpleName,
+            primaryModuleInitializer: false,
+            dependencyModuleInitializer: true,
+            tamperPreparedAfterPlan: false);
+
+        var results = await RunSyntheticLoadAndDisposeAsync(temp.Path, primarySimpleName);
+
+        Assert.IsTrue(results.GateA.Passed, results.GateA.Detail);
+        Assert.IsTrue(results.GateB.Passed, results.GateB.Detail);
+        Assert.IsTrue(results.GateC.Passed, results.GateC.Detail);
+        Assert.IsTrue(results.GateD.Passed, results.GateD.Detail);
+        StringAssert.Contains(results.GateA.Detail, "Deferred initializer-bearing private assemblies: 1");
+        StringAssert.Contains(results.GateA.Detail, "IL_0000: Ret");
+        StringAssert.Contains(results.GateC.Detail, "Deferred initializer-bearing private requirements: 1");
+        StringAssert.Contains(results.GateD.Detail, "Initializer-bearing prepared dependencies loaded: 0/1");
+    }
+
+    [TestMethod]
     public async Task GateARejectsPersistedPlanThatDoesNotCoverPreparedAssemblyReferences()
     {
         var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
+        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, primaryModuleInitializer: false, dependencyModuleInitializer: false, tamperPreparedAfterPlan: false);
 
         RuntimeFrameworkBindingPlanDocument plan;
         await using (var input = File.OpenRead(synthetic.PlanPath))
@@ -92,7 +116,7 @@ public sealed class FirstRealGameAssemblyLoadTests
         }
         var reducedEdges = plan.Edges
             .Where(edge => !edge.SourceAssemblyFullName.Equals(plan.PrimaryAssemblyFullName, StringComparison.Ordinal) ||
-                           !new AssemblyName(edge.RequestedFullName).Name!.Equals("Game.Dependency", StringComparison.OrdinalIgnoreCase))
+                           !edge.BindingKind.Equals("WorkspaceExact", StringComparison.Ordinal))
             .ToArray();
         await using (var output = File.Create(synthetic.PlanPath))
         {
@@ -115,7 +139,7 @@ public sealed class FirstRealGameAssemblyLoadTests
     {
         var primarySimpleName = CreateSyntheticPrimarySimpleName();
         using var temp = new TempTestDirectory("sts2-step23-tests");
-        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, includeModuleInitializer: false, tamperPreparedAfterPlan: false);
+        var synthetic = await CreateSyntheticPreparedRuntimeAsync(temp.Path, primarySimpleName, primaryModuleInitializer: false, dependencyModuleInitializer: false, tamperPreparedAfterPlan: false);
         await File.AppendAllTextAsync(synthetic.PreparedPrimaryPath, "tamper");
 
         using var foundation = CreateSyntheticFoundation(temp.Path, primarySimpleName);
@@ -155,7 +179,8 @@ public sealed class FirstRealGameAssemblyLoadTests
     private static async Task<SyntheticPreparedRuntime> CreateSyntheticPreparedRuntimeAsync(
         string launcherRoot,
         string primarySimpleName,
-        bool includeModuleInitializer,
+        bool primaryModuleInitializer,
+        bool dependencyModuleInitializer,
         bool tamperPreparedAfterPlan)
     {
         var managedRelative = $"{SteamOfflineInstallInspection.ManagedRootRelativePath}/Depot-2868842";
@@ -171,23 +196,24 @@ public sealed class FirstRealGameAssemblyLoadTests
             systemLinq.Version ?? new Version(9, 0, 0, 0),
             Convert.ToHexString(systemLinq.GetPublicKeyToken() ?? []).ToLowerInvariant());
 
-        var dependencyRelative = $"{arm64RelativeRoot}/Game.Dependency.dll";
+        var dependencySimpleName = "StS2Launcher.Step23.SyntheticDependency." + primarySimpleName.Split('.').Last();
+        var dependencyRelative = $"{arm64RelativeRoot}/{dependencySimpleName}.dll";
         var primaryRelative = $"{arm64RelativeRoot}/sts2.dll";
         var liveDependency = Path.Combine(managedRoot, dependencyRelative.Replace('/', Path.DirectorySeparatorChar));
         var livePrimary = Path.Combine(managedRoot, primaryRelative.Replace('/', Path.DirectorySeparatorChar));
 
         WriteAssembly(
             liveDependency,
-            "Game.Dependency",
+            dependencySimpleName,
             new Version(1, 0, 0, 0),
             [systemLinqReference],
-            includeModuleInitializer: false);
+            includeModuleInitializer: dependencyModuleInitializer);
         WriteAssembly(
             livePrimary,
             primarySimpleName,
             new Version(0, 1, 0, 0),
-            [systemLinqReference, new AssemblyReferenceSpec("Game.Dependency", new Version(1, 0, 0, 0), string.Empty)],
-            includeModuleInitializer);
+            [systemLinqReference, new AssemblyReferenceSpec(dependencySimpleName, new Version(1, 0, 0, 0), string.Empty)],
+            primaryModuleInitializer);
 
         var receiptFiles = new List<SteamManagedInstallFile>();
         foreach (var path in Directory.EnumerateFiles(managedRoot, "*", SearchOption.AllDirectories).OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
@@ -234,6 +260,7 @@ public sealed class FirstRealGameAssemblyLoadTests
             primaryFullName,
             preparedDependency,
             dependencyFullName,
+            dependencySimpleName,
             systemLinqFullName);
 
         var plan = new RuntimeFrameworkBindingPlanDocument(
@@ -269,11 +296,12 @@ public sealed class FirstRealGameAssemblyLoadTests
         string primaryFullName,
         string preparedDependency,
         string dependencyFullName,
+        string dependencySimpleName,
         string systemLinqFullName)
     {
         var edges = new List<RuntimeBindingEdge>();
-        AddSyntheticEdges(preparedPrimary, primaryFullName, dependencyFullName, systemLinqFullName, edges);
-        AddSyntheticEdges(preparedDependency, dependencyFullName, dependencyFullName, systemLinqFullName, edges);
+        AddSyntheticEdges(preparedPrimary, primaryFullName, dependencyFullName, dependencySimpleName, systemLinqFullName, edges);
+        AddSyntheticEdges(preparedDependency, dependencyFullName, dependencyFullName, dependencySimpleName, systemLinqFullName, edges);
 
         var hostBindings = edges
             .Where(edge => edge.BindingKind.Equals("HostFramework", StringComparison.Ordinal))
@@ -297,6 +325,7 @@ public sealed class FirstRealGameAssemblyLoadTests
         string assemblyPath,
         string sourceFullName,
         string dependencyFullName,
+        string dependencySimpleName,
         string systemLinqFullName,
         ICollection<RuntimeBindingEdge> edges)
     {
@@ -309,7 +338,7 @@ public sealed class FirstRealGameAssemblyLoadTests
 
         foreach (var reference in module.AssemblyReferences)
         {
-            if (reference.Name.Equals("Game.Dependency", StringComparison.OrdinalIgnoreCase))
+            if (reference.Name.Equals(dependencySimpleName, StringComparison.OrdinalIgnoreCase))
             {
                 edges.Add(new RuntimeBindingEdge(sourceFullName, reference.FullName, "WorkspaceExact", dependencyFullName));
                 continue;

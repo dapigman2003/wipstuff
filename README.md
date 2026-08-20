@@ -1,37 +1,32 @@
-# StS2 Launcher iOS — Step 23.3 First Real StS2 CLR Load Boundary
+# StS2 Launcher iOS — Step 23.4 First Real StS2 CLR Load Boundary
 
-Experimental unofficial iOS launcher/compatibility host for **Slay the Spire 2** for legitimate owners. The repository does not include game payloads, Steam secrets, Apple signing secrets, or proprietary FMOD/Spine payloads.
+This repository is the canonical launcher source after the Step 22.4.2 foundation closure.
 
-## Current boundary
+Step 23 crosses the first real managed-game boundary. The real receipt-backed `sts2.dll` may enter one dedicated private `AssemblyLoadContext`, but no game entry point, type/member reflection, game method, Godot startup, or unmanaged game library is invoked.
 
-Steps 01–22 and the Step 22.4.2 canonical foundation are physically closed on iPhone. Step 23 crosses the first real managed-game boundary: load the receipt-verified prepared `sts2.dll` into a dedicated private `AssemblyLoadContext`, resolve the already-audited zero-blocker managed dependency plan, and stop before game entry-point/member invocation, Godot/game initialization, or native game-library resolution.
+## Step 23.4 correction
 
-Read **`docs/MASTER-PLAN.md` first** for architecture, roadmap, safety rules, and the resumption protocol. `docs/CURRENT-STATUS.md` contains the current physical/candidate state.
+Physical Step 23.3 Gate A found exactly one prepared dependency with a `<Module>..cctor`: `0Harmony, Version=2.4.2.0`. The primary `sts2.dll` itself was not identified as an initializer offender.
 
-Step 23.3 is a host-test fixture correction only: production first-load code is unchanged from Step 23.2; the synthetic binding plan now reflects its actual post-write Cecil AssemblyRefs so the module-initializer negative test reaches the intended Gate A stop.
+Step 23.4 preserves the automatic-execution boundary instead of deleting the guard:
 
-## Build
+- Gate A still requires the primary `sts2.dll` to be module-initializer-free.
+- Initializer-bearing *dependencies* are statically audited and explicitly deferred.
+- Gate B loads only the real primary assembly.
+- Gate C loads the maximal initializer-free private closure and all planned host bindings, while refusing any resolver request that would load a deferred initializer-bearing dependency.
+- Gate D proves the deferred dependency never entered the CLR and that all prepared/live bytes remain unchanged.
+- Gate A writes a compact Cecil IL audit for every deferred `<Module>..cctor` into the normal Step 23 text report so Step 24 can target the real initialization behavior rather than guessing.
 
-Codemagic workflow:
+The current known physical frontier is one deferred assembly: `0Harmony 2.4.2.0`.
 
-`ios-step-23-3`
+## Codemagic
 
-Authoritative pipeline entry point:
+Use workflow:
 
-```sh
-bash scripts/codemagic.sh
-```
+`ios-step-23-4`
 
-## Canonical source layout
+Expected app version: `0.0.69 (69)`.
 
-- `src/StS2Launcher.Core/` — shared launcher/Steam/compatibility/runtime logic
-- `src/StS2Launcher.iOS/` — the one live iOS application project
-- `tests/StS2Launcher.Core.Tests/` — host regression tests
-- `fixtures/` — project-owned regression fixtures
-- `native/` — project-owned Godot host/smoke source
-- `scripts/` — current build/test/validation entry points only
-- `tools/` — patcher and validation support
-- `docs/` — authoritative plan/current docs/history
-- `history.zip` — optional inert reference archive; never a build dependency
+## Documentation
 
-The old `StS2Launcher.Step05.iOS` project name is historical and no longer appears in live source/tooling.
+Start with `docs/MASTER-PLAN.md` for the durable architecture/roadmap and `docs/CURRENT-STATUS.md` for the current physical boundary. Historical step records remain readable under `docs/history/steps/`. The optional `history.zip` is reference-only and is never a build dependency.
