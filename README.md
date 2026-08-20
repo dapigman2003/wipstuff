@@ -1,4 +1,4 @@
-# StS2 Launcher iOS — Step 23.4 First Real StS2 CLR Load Boundary
+# StS2 Launcher iOS — Step 23.4.1 First Real StS2 CLR Load Boundary
 
 This repository is the canonical launcher source after the Step 22.4.2 foundation closure.
 
@@ -19,13 +19,18 @@ Step 23.4 preserves the automatic-execution boundary instead of deleting the gua
 
 The current known physical frontier is one deferred assembly: `0Harmony 2.4.2.0`.
 
+
+## Step 23.4.1 compile correction
+
+The Step 23.4 Codemagic run reached Core compilation and exposed one compile-only issue in the new Cecil metadata audit: `Instruction` lives in `Mono.Cecil.Cil`. Step 23.4.1 adds the missing namespace import. No Step 23.4 load/deferred-initializer behavior is changed.
+
 ## Codemagic
 
 Use workflow:
 
-`ios-step-23-4`
+`ios-step-23-4-1`
 
-Expected app version: `0.0.69 (69)`.
+Expected app version: `0.0.70 (69)`.
 
 ## Documentation
 

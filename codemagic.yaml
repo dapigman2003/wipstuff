@@ -1,6 +1,6 @@
 workflows:
-  ios-step-23-4:
-    name: Step 23.4 - First Real StS2 CLR Load Boundary Deferred Initializer Dependency
+  ios-step-23-4-1:
+    name: Step 23.4.1 - Cecil IL Audit Compile Fix
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -23,7 +23,7 @@ workflows:
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-23.4.ipa
+      - artifacts/StS2-Launcher-Step-23.4.1.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**

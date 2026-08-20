@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 23.4 First Real StS2 CLR Load Boundary deferred-initializer static validation")
+print("StS2 Launcher — Step 23.4.1 Cecil IL audit compile-fix static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>69</ApplicationVersion>" in project_text, "build version is 69")
-require("<ApplicationDisplayVersion>0.0.69</ApplicationDisplayVersion>" in project_text, "display version is 0.0.69")
-require(plist.get("CFBundleVersion") == "69", "Info.plist build version is 69")
-require(plist.get("CFBundleShortVersionString") == "0.0.69", "Info.plist display version is 0.0.69")
+require("<ApplicationVersion>70</ApplicationVersion>" in project_text, "build version is 70")
+require("<ApplicationDisplayVersion>0.0.70</ApplicationDisplayVersion>" in project_text, "display version is 0.0.70")
+require(plist.get("CFBundleVersion") == "70", "Info.plist build version is 70")
+require(plist.get("CFBundleShortVersionString") == "0.0.70", "Info.plist display version is 0.0.70")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -302,9 +302,9 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-23.4.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.69",
-    "STS2_BUILD_VERSION": "69",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-23.4.1.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.70",
+    "STS2_BUILD_VERSION": "70",
     "STS2_RUNTIME_POLICY_MARKER": "STEP23 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -446,6 +446,7 @@ require("DependencyModuleInitializerIsDeferredWhilePrimaryAndSafeClosureLoad" in
 require("DeferredInitializerRequests" in step23_source and "initializer-bearing private dependency" in step23_source, "Step 23 resolver explicitly refuses initializer-bearing dependency loads before Step 24")
 require("Primary module initializers" in step23_source and "Deferred initializer-bearing private assemblies" in step23_source, "Step 23 Gate A separates primary and dependency module-initializer policy")
 require("FormatModuleInitializerAudit" in step23_source and "IL_" in step23_source, "Step 23 exports a metadata-only Cecil IL audit for deferred module initializers")
+require("using Mono.Cecil.Cil;" in step23_source, "Step 23 deferred IL audit imports Mono.Cecil.Cil Instruction type")
 require("SyntheticZeroBlockerPreparedRuntimeLoadsAndResolvesWithoutInvokingGameCode" in step23_tests, "Step 23 host tests cover synthetic 4/4 load-only closure")
 require("GateARejectsPreparedByteDriftBeforeAnyRealClrLoad" in step23_tests, "Step 23 host tests prove prepared-byte drift stops before CLR load")
 require("GateARejectsPersistedPlanThatDoesNotCoverPreparedAssemblyReferences" in step23_tests, "Step 23 host tests prove stale/incomplete binding plans stop before CLR load")
@@ -486,6 +487,7 @@ required_docs = [
     "docs/history/steps/STEP-23.2-DETERMINISTIC-HOST-TEST-IDENTITY-ISOLATION.md",
     "docs/history/steps/STEP-23.3-SYNTHETIC-FIXTURE-PLAN-COVERAGE-FIX.md",
     "docs/history/steps/STEP-23.4-DEFERRED-DEPENDENCY-MODULE-INITIALIZER-BOUNDARY.md",
+    "docs/history/steps/STEP-23.4.1-CECIL-IL-AUDIT-COMPILE-FIX.md",
 ]
 for doc in required_docs:
     require((ROOT / doc).is_file(), f"authoritative documentation exists: {doc}")
@@ -511,7 +513,7 @@ require(len(history_steps) >= 60, "historical documentation set is comprehensive
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-23-4:" in codemagic, "Codemagic exposes Step 23.4 workflow")
+require("ios-step-23-4-1:" in codemagic, "Codemagic exposes Step 23.4.1 workflow")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
