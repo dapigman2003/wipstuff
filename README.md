@@ -28,7 +28,7 @@ Use workflow:
 
 `ios-step-25`
 
-Expected app version: `0.0.80 (80)`.
+Expected app version: `0.0.81 (81)`.
 
 Expected IPA: `artifacts/StS2-Launcher-Step-25.ipa`.
 

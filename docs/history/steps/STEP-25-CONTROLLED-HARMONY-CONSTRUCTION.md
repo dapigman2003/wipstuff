@@ -96,8 +96,10 @@ Re-hash the runtime plan and every prepared/live managed file, re-prove OfflineR
 
 ## Candidate identity
 
+Step 25.0 / `0.0.80 (80)` was a CI-only candidate: compilation succeeded and host tests reached 177/180; it was not physically tested. Step 25.0.1 / `0.0.81 (81)` corrects only the local-assembly classification used by synthetic fixtures plus one stale test label.
+
 - step: **25.0**
-- version: **0.0.80 (80)**
+- version: **0.0.81 (81)**
 - workflow: **`ios-step-25`**
 - IPA: **`artifacts/StS2-Launcher-Step-25.ipa`**
 - device report: `Documents/StS2Launcher/Reports/Step25-ControlledHarmonyConstruction.txt`

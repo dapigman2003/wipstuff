@@ -22,8 +22,10 @@ The Step 24 `System.Collections.Concurrent` preservation root is now **physicall
 
 ## Active candidate — Step 25
 
-- Step: **25.0**
-- Version: **0.0.80 (80)**
+Step 25.0 / `0.0.80 (80)` compiled successfully in Codemagic and executed all 180 host tests, with 177 PASS / 3 FAIL. No physical Step 25 run was performed. Two failures exposed a synthetic-fixture/local-assembly classification mismatch in the Harmony constructor metadata audit; the third was a stale test-only fingerprint label. Step 25.0.1 / `0.0.81 (81)` is the minimal correction and does not broaden the production execution boundary.
+
+- Step: **25.0.1**
+- Version: **0.0.81 (81)**
 - Codemagic workflow: **`ios-step-25`**
 - IPA: **`artifacts/StS2-Launcher-Step-25.ipa`**
 - Device report: `Documents/StS2Launcher/Reports/Step25-ControlledHarmonyConstruction.txt`
@@ -117,7 +119,7 @@ Re-hash the runtime plan and every prepared/live file, re-prove OfflineReady, re
 From a fresh process:
 
 1. Codemagic static validation + host tests + iOS publish + IPA verification = PASS;
-2. install `0.0.80 (80)`;
+2. install `0.0.81 (81)`;
 3. run Step 25 A–I and stop at the first failure;
 4. require summary **9/9 PASS**;
 5. run OfflineReady = **PASS**;

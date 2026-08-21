@@ -20,7 +20,7 @@
 - Godot build/preflight passes on Codemagic/macOS;
 - iOS publish succeeds with `TrimMode=full`, `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is `0.0.80 (80)`;
+- expected version is `0.0.81 (81)`;
 - workflow is `ios-step-25`;
 - expected IPA is `artifacts/StS2-Launcher-Step-25.ipa`;
 - host TRX is `artifacts/test-results/step25.trx`.

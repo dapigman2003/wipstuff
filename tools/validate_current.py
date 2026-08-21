@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>80</ApplicationVersion>" in project_text, "build version is 80")
-require("<ApplicationDisplayVersion>0.0.80</ApplicationDisplayVersion>" in project_text, "display version is 0.0.80")
-require(plist.get("CFBundleVersion") == "80", "Info.plist build version is 80")
-require(plist.get("CFBundleShortVersionString") == "0.0.80", "Info.plist display version is 0.0.80")
+require("<ApplicationVersion>81</ApplicationVersion>" in project_text, "build version is 81")
+require("<ApplicationDisplayVersion>0.0.81</ApplicationDisplayVersion>" in project_text, "display version is 0.0.81")
+require(plist.get("CFBundleVersion") == "81", "Info.plist build version is 81")
+require(plist.get("CFBundleShortVersionString") == "0.0.81", "Info.plist display version is 0.0.81")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -308,8 +308,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-25.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.80",
-    "STS2_BUILD_VERSION": "80",
+    "STS2_DISPLAY_VERSION": "0.0.81",
+    "STS2_BUILD_VERSION": "81",
     "STS2_RUNTIME_POLICY_MARKER": "STEP25 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -709,6 +709,8 @@ for safety_test in [
 ]:
     require(safety_test in step25_tests, f"Step 25 retains host safety regression: {safety_test}")
 require("AddSyntheticHarmonyType" in step25_tests and '"HARMONY_DEBUG"' in step25_tests and '"DEBUG"' in step25_tests and '"Id"' in step25_tests, "Step 25 synthetic target includes the exact Harmony API/constructor preflight surface")
+require("scopeName.Equals(module.Assembly.Name.Name, StringComparison.OrdinalIgnoreCase)" in step25_source, "Step 25 constructor audit classifies same-assembly calls from the audited module identity")
+require("Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH" in step25_tests and "Exact Step 25.0.4 MonoMod logger dispatch fingerprint: MATCH" not in step25_tests, "Step 25 logger regression names the physically measured Step 24.0.4 fingerprint")
 require("collectibleLoadContext: true" in step25_tests and "Guid.NewGuid()" in step25_tests, "Step 25 host tests isolate synthetic runtime identities in collectible contexts")
 
 step25_manifest = ROOT / "tools/validation/candidate-step25-harmony-construction-boundary.sha256"
@@ -746,6 +748,7 @@ required_docs = [
     "docs/history/steps/STEP-24.0.6-SYSTEM-COLLECTIONS-CONCURRENT-PRESERVATION.md",
     "docs/history/steps/STEP-24.0.6-PHYSICAL-CLOSURE.md",
     "docs/history/steps/STEP-25-CONTROLLED-HARMONY-CONSTRUCTION.md",
+    "docs/history/steps/STEP-25.0.1-HOST-LOCAL-ASSEMBLY-CLASSIFICATION-FIX.md",
     "docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt",
     "docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt",
     "docs/history/reports/STEP-24.0.3-PHYSICAL-GATE-A-REPORT.txt",
@@ -761,7 +764,7 @@ for doc in required_docs:
 step24_build78_report = read("docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt")
 require("CONTROLLED MANAGED INITIALIZATION BOUNDARY FAIL — 2/4" in step24_build78_report and "Gate A — InitializationPreflight: PASS" in step24_build78_report and "Gate B — ProvenLoadStateReplay: PASS" in step24_build78_report and "Gate C — DeferredModuleInitialization: FAIL" in step24_build78_report, "physical build 78 report preserves the exact 2/4 gate result")
 require("System.MissingMethodException: Method not found: void System.Collections.Concurrent.ConcurrentBag`1..ctor()" in step24_build78_report, "physical build 78 report preserves the ConcurrentBag constructor failure")
-require("0.0.80 (80)" in read("docs/CURRENT-STATUS.md") and "Step 24.0.6 / 0.0.79 (79)" in read("docs/CURRENT-STATUS.md") and "System.Collections.Concurrent" in read("docs/CURRENT-STATUS.md"), "current status records physical Step 24 closure and advances to Step 25 / 0.0.80")
+require("0.0.81 (81)" in read("docs/CURRENT-STATUS.md") and "Step 24.0.6 / 0.0.79 (79)" in read("docs/CURRENT-STATUS.md") and "System.Collections.Concurrent" in read("docs/CURRENT-STATUS.md"), "current status records physical Step 24 closure and advances to Step 25 / 0.0.81")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

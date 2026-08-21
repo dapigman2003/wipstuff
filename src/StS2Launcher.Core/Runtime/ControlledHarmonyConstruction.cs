@@ -1267,7 +1267,7 @@ public sealed class ControlledHarmonyConstruction : IDisposable
 
             var inDebugOnlyBlock = debugFieldLoadIndex >= 0 && i > debugFieldLoadIndex + 1 && i < debugBlockEndIndex;
             var scopeName = GetMethodScopeName(called);
-            var sameAssembly = scopeName.Equals(TargetSimpleName, StringComparison.OrdinalIgnoreCase);
+            var sameAssembly = scopeName.Equals(module.Assembly.Name.Name, StringComparison.OrdinalIgnoreCase);
             var allowedLocalSetter = sameAssembly &&
                 called.DeclaringType.FullName.Equals(HarmonyTypeFullName, StringComparison.Ordinal) &&
                 called.Name.Equals("set_Id", StringComparison.Ordinal);

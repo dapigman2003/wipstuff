@@ -14,7 +14,7 @@ Run:
 
 The validator must prove, among other current invariants:
 
-- canonical iOS project/version/release wiring is Step 25 / `0.0.80 (80)`;
+- canonical iOS project/version/release wiring is Step 25 / `0.0.81 (81)`;
 - full trimming and `MtouchInterpreter=-all` remain unchanged;
 - the exact Step-22 22-root set remains protected;
 - `System.Collections.Concurrent` remains exactly one separately classified, physically proven dynamic-IL preservation root;
@@ -59,7 +59,7 @@ The pipeline runs static validation, host tests, iOS workload setup, Godot build
 
 Expected release:
 
-- version: `0.0.80 (80)`;
+- version: `0.0.81 (81)`;
 - IPA: `artifacts/StS2-Launcher-Step-25.ipa`;
 - host TRX: `artifacts/test-results/step25.trx`.
 

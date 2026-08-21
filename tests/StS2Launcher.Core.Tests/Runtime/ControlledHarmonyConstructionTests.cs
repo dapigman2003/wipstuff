@@ -189,7 +189,7 @@ public sealed class ControlledHarmonyConstructionTests
         Assert.IsTrue(decision.Allowed, decision.Detail);
         Assert.AreEqual(0, decision.BlockingHazardCount);
         Assert.AreEqual(7, decision.ConditionalHazardCount);
-        StringAssert.Contains(decision.Detail, "Exact Step 25.0.4 MonoMod logger dispatch fingerprint: MATCH");
+        StringAssert.Contains(decision.Detail, "Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH");
     }
 
     [TestMethod]

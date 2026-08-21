@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-19T20:34:37Z
+UTC: 2026-08-21T16:18:35Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 23.2 First Real StS2 CLR Load Boundary deterministic host-test isolation static validation
-Root: /mnt/data/StS2Launcher-23.2
+StS2 Launcher — Step 25 controlled Harmony construction static validation
+Root: /mnt/data/step25work/StS2Launcher-Step25-0.0.80
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 156 C# files
+PASS: lexical delimiter scan passes for 172 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 67
-PASS: display version is 0.0.67
-PASS: Info.plist build version is 67
-PASS: Info.plist display version is 0.0.67
+PASS: build version is 81
+PASS: display version is 0.0.81
+PASS: Info.plist build version is 81
+PASS: Info.plist display version is 0.0.81
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -35,10 +35,14 @@ PASS: full trimming policy retained
 PASS: Step 20 interpreter policy retained
 PASS: build guard rejects broad UseInterpreter=true
 PASS: build guard rejects NativeAOT
-PASS: runtime policy emits Step 23 build telemetry
+PASS: runtime policy emits Step 25 build telemetry
 PASS: all 22 physically proven Step 22 direct host roots remain rooted
 PASS: Step 22 direct root set contains exactly 22 unique roots
 PASS: SteamKit/protobuf reflection roots remain protected
+PASS: physically proven Step 24.0.6 System.Collections.Concurrent preservation root remains exact
+PASS: Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root
+PASS: physically proven Step 24 preservation root is documented as protected platform policy
+PASS: Step 25 build telemetry identifies the physically proven framework preservation root
 PASS: DiskArbitration-only linker framework filter remains present
 PASS: all 97 physically proven Step 22.2 Core source files are retained
 PASS: 96 baseline Step 22.2 Core behavior files remain byte-for-byte unchanged and the one approved Step 19 regression delta is exact
@@ -64,7 +68,7 @@ PASS: release config pins STS2_BUILD_VERSION
 PASS: release config pins STS2_RUNTIME_POLICY_MARKER
 PASS: active source/tooling has no dependency on legacy paths or history archive
 PASS: no live history/ directory exists
-INFO: optional history.zip is absent; canonical validation is intentionally unaffected
+INFO: optional history.zip is present; it is intentionally not opened or required by validation
 PASS: device reports use atomic temporary-file replacement
 PASS: device report file names are constrained to local .txt files
 PASS: all current on-device verification/test paths have deterministic text-report outputs
@@ -132,18 +136,208 @@ PASS: Step 23 production boundary never mutates prepared/live install bytes: Dir
 PASS: Step 23 refuses all native library resolution
 PASS: Step 23 strict resolver audits and rejects unplanned managed bindings
 PASS: Step 23 on-device run emits a Files-visible text report
-PASS: Step 23 host tests prove module initializer preflight stop
+PASS: Step 23 host tests prove a primary module initializer still stops before CLR load
+PASS: Step 23 host tests prove dependency module initializers are deferred without weakening the primary-load boundary
+PASS: Step 23 resolver explicitly refuses initializer-bearing dependency loads before Step 24
+PASS: Step 23 Gate A separates primary and dependency module-initializer policy
+PASS: Step 23 exports a metadata-only Cecil IL audit for deferred module initializers
+PASS: Step 23 deferred IL audit imports Mono.Cecil.Cil Instruction type
 PASS: Step 23 host tests cover synthetic 4/4 load-only closure
 PASS: Step 23 host tests prove prepared-byte drift stops before CLR load
 PASS: Step 23 host tests prove stale/incomplete binding plans stop before CLR load
 PASS: Step 23 host tests use collectible contexts while production remains process-resident
 PASS: Step 23 host tests allocate unique synthetic primary identities
+PASS: Step 23 host tests allocate unique synthetic dependency identities to avoid collectible-ALC contamination
 PASS: Step 23 host tests scope freshness checks to their unique synthetic identity
 PASS: Step 23 host tests do not depend on collectible ALC GC timing
+PASS: Step 23 synthetic plans derive edges from post-write Cecil AssemblyRefs
+PASS: Step 23 module-initializer fixture prevents legacy mscorlib metadata instead of aliasing it
+PASS: Step 23 fixture rejects unexpected synthetic AssemblyRefs instead of weakening production coverage
 PASS: Step 23 test-only identity seam is limited to the host test assembly
 PASS: Step 23 production constructor preserves the physical fresh-process game identity policy
-PASS: Step 23 candidate boundary hash manifest exists
-PASS: Step 23 candidate load-boundary implementation is hash-pinned
+PASS: physically closed Step 23.4.3 boundary hash manifest exists
+PASS: physically closed Step 23.4.3 load-boundary implementation remains hash-pinned
+PASS: Step 23 synthetic initializer fixture rejects legacy mscorlib metadata
+PASS: Step 23 fixture documents no-production-alias policy
+PASS: Step 23 synthetic binding plan has no mscorlib-to-System.Private.CoreLib alias
+PASS: Step 23 synthetic initializer fixture derives the real host System.Runtime identity
+PASS: Step 23 initializer-bearing fixtures explicitly declare System.Runtime
+PASS: Step 23 synthetic plan treats System.Runtime as an ordinary exact host binding
+PASS: Step 23 fixture adds modern AssemblyRefs before Cecil TypeSystem.Void is accessed
+PASS: Step 23 fixture no longer relies on post-construction AssemblyRef clearing
+PASS: Step 23 fixture verifies Cecil selected the declared System.Runtime core-library scope before write
+PASS: Step 23 fixture immediately reopens and verifies the exact persisted AssemblyRef set
+PASS: Step 23 fixture verifies primitive void metadata and System.Runtime scope after reopen
+PASS: Step 24 controlled-initialization source exists: src/StS2Launcher.Core/Runtime/ControlledManagedInitialization.cs
+PASS: Step 24 controlled-initialization source exists: src/StS2Launcher.Core/Runtime/ControlledManagedInitializationGate.cs
+PASS: Step 24 controlled-initialization source exists: src/StS2Launcher.Core/Runtime/ControlledManagedInitializationGateResult.cs
+PASS: Step 24 controlled-initialization source exists: src/StS2Launcher.Core/Runtime/ControlledManagedInitializationProgress.cs
+PASS: Step 24 controlled-initialization source exists: src/StS2Launcher.Core/Runtime/ControlledManagedInitializationSummary.cs
+PASS: Step 24 controlled-initialization source exists: src/StS2Launcher.Core/Runtime/ControlledManagedInitializationGateSequence.cs
+PASS: Step 24 boundary has host unit tests
+PASS: Step 24 boundary has isolated iOS UI/report partial
+PASS: Step 24 production boundary contains required fail-closed invariant: TargetSimpleName = "0Harmony"
+PASS: Step 24 production boundary contains required fail-closed invariant: TargetVersion = new(2, 4, 2, 0)
+PASS: Step 24 production boundary contains required fail-closed invariant: RunPreparedLoadPreflightAsync
+PASS: Step 24 production boundary contains required fail-closed invariant: initializerBearing.Length != 1
+PASS: Step 24 production boundary contains required fail-closed invariant: target.ModuleInitializerCount != 1
+PASS: Step 24 production boundary contains required fail-closed invariant: Initializer call graph exceeded the Step 24.0 bound of 512
+PASS: Step 24 production boundary contains required fail-closed invariant: P/Invoke reachable
+PASS: Step 24 production boundary contains required fail-closed invariant: Code.Calli
+PASS: Step 24 production boundary contains required fail-closed invariant: Code.Ldftn
+PASS: Step 24 production boundary contains required fail-closed invariant: Code.Ldvirtftn
+PASS: Step 24 production boundary contains required fail-closed invariant: QueueAutomaticTypeInitializer
+PASS: Step 24 production boundary contains required fail-closed invariant: AutomaticInitializerCount
+PASS: Step 24 production boundary contains required fail-closed invariant: System.Runtime.InteropServices.NativeLibrary
+PASS: Step 24 production boundary contains required fail-closed invariant: System.Reflection.Emit.
+PASS: Step 24 production boundary contains required fail-closed invariant: RunClassConstructor
+PASS: Step 24 production boundary contains required fail-closed invariant: AllowedInitializerAssemblyFullName
+PASS: Step 24 production boundary contains required fail-closed invariant: RuntimeHelpers.RunModuleConstructor(targetAssembly.ManifestModule.ModuleHandle)
+PASS: Step 24 production boundary contains required fail-closed invariant: RejectedManagedRequests
+PASS: Step 24 production boundary contains required fail-closed invariant: throw new DllNotFoundException
+PASS: Step 24 production boundary contains required fail-closed invariant: ComputeSha1Hex(preflight.Target.PreparedPath)
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: HarmonyLib.Harmony
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: .Patch(
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: .PatchAll(
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: .Unpatch(
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: .EntryPoint
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: assembly.GetType(
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: .GetMethod(
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: .Invoke(
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: Activator.
+PASS: Step 24 production boundary does not intentionally advance to Harmony/game/native invocation: LoadUnmanagedDllFromPath
+PASS: Step 24 production boundary never mutates prepared/live install bytes: File.Copy(
+PASS: Step 24 production boundary never mutates prepared/live install bytes: File.Move(
+PASS: Step 24 production boundary never mutates prepared/live install bytes: File.Write
+PASS: Step 24 production boundary never mutates prepared/live install bytes: File.Create(
+PASS: Step 24 production boundary never mutates prepared/live install bytes: Directory.CreateDirectory(
+PASS: Step 24 on-device run emits a Files-visible text report
+PASS: Step 24 host tests enforce ordered fail-fast gates
+PASS: Step 24 host tests cover a successful inert module-initializer boundary
+PASS: Step 24 Gate A host test rejects reachable P/Invoke before Step 24 CLR load
+PASS: Step 24 Gate A host test rejects unbounded function-pointer/delegate indirection before CLR load
+PASS: Step 24 Gate A host test audits implicitly triggerable type constructors before CLR load
+PASS: Step 24 Gate A host test covers an unavailable external base without Cecil dependency resolution
+PASS: Step 24 Gate C host test records a throwing initializer and stops
+PASS: Step 24 host tests isolate synthetic runtime identities in collectible contexts
+PASS: Step 24 production constructor requires a fresh process for game + target identities
+PASS: Step 24 Gate A remains metadata-only for the new boundary
+PASS: Step 24 Gate A measures implicit type initialization and rejects indirect execution targets
+PASS: Step 24 Gate A inspects resolved bodyless P/Invoke stubs before managed-body traversal
+PASS: Step 24 Gate A fails closed on other reachable same-assembly bodyless execution edges
+PASS: Step 24 Gate A resolves same-assembly initializer calls only from current-module metadata
+PASS: Step 24 Gate A no longer routes method references through Cecil LookupToken
+PASS: Step 24 Gate A separates shallow whole-plan initializer classification from target-only closure traversal
+PASS: Step 24 Gate A uses deferred Cecil reading rather than eager whole-assembly method-body materialization
+PASS: Step 24 Gate A binds explicit rejecting Cecil assembly/metadata resolvers
+PASS: Step 24 physical failures retain exact prepared stage and full exception diagnostics
+PASS: Step 24 Gate A does not invoke Cecil external assembly resolution while traversing same-assembly calls
+PASS: Step 24 Gate A fails closed when local metadata cannot unambiguously resolve a same-assembly call
+PASS: Step 24 Gate A hazard failures preserve actionable initializer IL evidence
+PASS: Step 24 final audit explicitly preserves the no-Harmony-API boundary
+PASS: Step 24 uses the established OfflineReady RunAsync contract at both pre/post checks
+PASS: Step 24 contains no nonexistent OfflineReady inspection API references
+PASS: Step 24 fail-closes on the canonical OfflineReady result contract
+PASS: Step 24.0.5 pins the physically observed seven-finding MonoMod dispatch fingerprint in production metadata policy
+PASS: Step 24.0.5 conditional classification requires exact hazard fingerprint equality
+PASS: Step 24.0.5 conditional classification requires an inert debugger/environment state
+PASS: Step 24.0.5 watches MonoMod logging AppContext override: MonoMod.LogRecordHoles
+PASS: Step 24.0.5 watches MonoMod logging AppContext override: MonoMod.LogReplayQueueLength
+PASS: Step 24.0.5 watches MonoMod logging AppContext override: MonoMod.LogSpam
+PASS: Step 24.0.5 watches MonoMod logging AppContext override: MonoMod.LogToFile
+PASS: Step 24.0.5 watches MonoMod logging AppContext override: MonoMod.LogToFileFilter
+PASS: Step 24.0.5 watches MonoMod logging AppContext override: MonoMod.LogInMemory
+PASS: Step 24.0.5 pins the measured MonoMod.Switches initializer structure
+PASS: Step 24.0.5 pins the measured DebugLog initializer structure
+PASS: Step 24.0.5 pins the measured LevelSubscriptions initializer structure
+PASS: Step 24 Gate A reports raw, conditional, and blocking hazard counts separately
+PASS: Step 24.0.5 host test accepts only the exact inert physical logger fingerprint
+PASS: Step 24.0.5 host test rejects any physical hazard fingerprint drift
+PASS: Step 24.0.5 host test rejects debugger/environment/AppContext logger activation
+PASS: Step 24.0.5 host test requires the physically measured automatic-initializer shape
+PASS: Step 24.0.5 does not globally relax generic function/delegate indirection
+PASS: Step 24.0.5 retains the P/Invoke fail-closed regression
+PASS: physically closed Step 24.0.6 boundary hash manifest exists
+PASS: physically closed Step 24.0.6 controlled-initialization implementation remains hash-pinned
+PASS: Step 25 Harmony-construction source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyConstruction.cs
+PASS: Step 25 Harmony-construction source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGate.cs
+PASS: Step 25 Harmony-construction source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGateResult.cs
+PASS: Step 25 Harmony-construction source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionProgress.cs
+PASS: Step 25 Harmony-construction source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionSummary.cs
+PASS: Step 25 Harmony-construction source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGateSequence.cs
+PASS: Step 25 boundary has host unit tests
+PASS: Step 25 boundary has isolated iOS UI/report partial
+PASS: Step 25 production boundary contains required invariant: TargetSimpleName = "0Harmony"
+PASS: Step 25 production boundary contains required invariant: TargetVersion = new(2, 4, 2, 0)
+PASS: Step 25 production boundary contains required invariant: HarmonyTypeFullName = "HarmonyLib.Harmony"
+PASS: Step 25 production boundary contains required invariant: HarmonyId = "com.community.sts2launcher.step25.probe"
+PASS: Step 25 production boundary contains required invariant: ReadHarmonyConstructorMetadata
+PASS: Step 25 production boundary contains required invariant: GetEnvironmentVariable("HARMONY_DEBUG")
+PASS: Step 25 production boundary contains required invariant: value.Equals("HARMONY_DEBUG", StringComparison.Ordinal)
+PASS: Step 25 production boundary contains required invariant: field.Name.Equals("DEBUG", StringComparison.Ordinal)
+PASS: Step 25 production boundary contains required invariant: Code.Brfalse or Code.Brfalse_S
+PASS: Step 25 production boundary contains required invariant: RunProvenLoadStateReplay
+PASS: Step 25 production boundary contains required invariant: RunDeferredModuleInitialization
+PASS: Step 25 production boundary contains required invariant: RunProvenInitializationAuditAsync
+PASS: Step 25 production boundary contains required invariant: RunHarmonyApiResolution
+PASS: Step 25 production boundary contains required invariant: RunHarmonyTypeInitialization
+PASS: Step 25 production boundary contains required invariant: RunHarmonyTypeInitializationAudit
+PASS: Step 25 production boundary contains required invariant: RunHarmonyInstanceConstruction
+PASS: Step 25 production boundary contains required invariant: RunPostConstructionAuditAsync
+PASS: Step 25 production boundary contains required invariant: RuntimeHelpers.RunModuleConstructor(targetAssembly.ManifestModule.ModuleHandle)
+PASS: Step 25 production boundary contains required invariant: RuntimeHelpers.RunClassConstructor(api.HarmonyType.TypeHandle)
+PASS: Step 25 production boundary contains required invariant: api.Constructor.Invoke([HarmonyId])
+PASS: Step 25 production boundary contains required invariant: AssemblyLoadContext.GetLoadContext(instance.GetType().Assembly)
+PASS: Step 25 production boundary contains required invariant: Post-construction OfflineReady exact-tree verification: YES
+PASS: Step 25 gate enum includes InitializationPreflight
+PASS: Step 25 gate enum includes ProvenLoadStateReplay
+PASS: Step 25 gate enum includes DeferredModuleInitialization
+PASS: Step 25 gate enum includes ProvenInitializationAudit
+PASS: Step 25 gate enum includes HarmonyApiResolution
+PASS: Step 25 gate enum includes HarmonyTypeInitialization
+PASS: Step 25 gate enum includes HarmonyTypeInitializationAudit
+PASS: Step 25 gate enum includes HarmonyInstanceConstruction
+PASS: Step 25 gate enum includes PostConstructionAudit
+PASS: Step 25 gate sequence enforces strict ordering and reports exact pass count
+PASS: Step 25 summary requires nine passing gates
+PASS: Step 25 on-device run emits a Files-visible text report
+PASS: Step 25 UI exposes the ordered nine-gate run
+PASS: Step 25 Gate A remains metadata-only before the real-load replay
+PASS: Step 25 constructor/initializer preflight uses rejecting Cecil resolvers
+PASS: Step 25 runtime API gate requires the exact measured Harmony type initializer
+PASS: Step 25 runtime reflection requires exactly one public string constructor
+PASS: Step 25 runtime reflection is limited to exact observation members
+PASS: Step 25 Gate E proves targeted API resolution separately from type initialization and construction
+PASS: Step 25 has exactly one intentional reflection invocation site: exact Harmony(string) constructor
+PASS: Step 25 does not use broad Activator construction
+PASS: Step 25 does not perform broad method-name reflection
+PASS: Step 25 production code does not invoke Harmony patch/processor APIs
+PASS: Step 25 reports preservation of later game/Godot boundaries
+PASS: Step 25 strict private context still refuses native resolution
+PASS: Step 25 fails on unplanned managed resolution
+PASS: Step 25 re-proves OfflineReady at preflight, post-initialization, and post-construction boundaries
+PASS: Step 25 runtime boundary never mutates prepared/live bytes: File.Copy(
+PASS: Step 25 runtime boundary never mutates prepared/live bytes: File.Move(
+PASS: Step 25 runtime boundary never mutates prepared/live bytes: File.Write
+PASS: Step 25 runtime boundary never mutates prepared/live bytes: File.Create(
+PASS: Step 25 host tests enforce ordered fail-fast nine-gate behavior
+PASS: Step 25 host tests cover synthetic closed-Step24 replay plus exact inert Harmony construction
+PASS: Step 25 host tests separate API resolution, type initialization, and construction
+PASS: Step 25 retains host safety regression: GateARejectsReachablePInvokeBeforeAnyStep25ClrLoad
+PASS: Step 25 retains host safety regression: GateARejectsFunctionPointerIndirectionBeforeAnyStep25ClrLoad
+PASS: Step 25 retains host safety regression: GateARejectsImplicitTypeInitializerPInvokeBeforeAnyStep25ClrLoad
+PASS: Step 25 retains host safety regression: GateAMetadataAuditDoesNotResolveExternalBaseForNominallyLocalMemberRef
+PASS: Step 25 retains host safety regression: GateAConditionallyAcceptsExactPhysicalMonoModLoggerFingerprintOnlyWhenInert
+PASS: Step 25 retains host safety regression: GateAConditionalMonoModPolicyRejectsAnyFingerprintDrift
+PASS: Step 25 retains host safety regression: GateAConditionalMonoModPolicyRejectsNonInertLoggingState
+PASS: Step 25 retains host safety regression: GateAConditionalMonoModPolicyRequiresExactMeasuredAutomaticInitializerShape
+PASS: Step 25 retains host safety regression: GateCReportsThrowingModuleInitializerAndDoesNotAdvance
+PASS: Step 25 synthetic target includes the exact Harmony API/constructor preflight surface
+PASS: Step 25 constructor audit classifies same-assembly calls from the audited module identity
+PASS: Step 25 logger regression names the physically measured Step 24.0.4 fingerprint
+PASS: Step 25 host tests isolate synthetic runtime identities in collectible contexts
+PASS: Step 25 candidate boundary hash manifest exists
+PASS: Step 25 candidate Harmony-construction implementation is hash-pinned
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -159,6 +353,29 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-22.4.2-STEP19-
 PASS: authoritative documentation exists: docs/history/steps/STEP-23-FIRST-REAL-CLR-LOAD.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-23-TEST.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-23.2-DETERMINISTIC-HOST-TEST-IDENTITY-ISOLATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23.3-SYNTHETIC-FIXTURE-PLAN-COVERAGE-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23.4-DEFERRED-DEPENDENCY-MODULE-INITIALIZER-BOUNDARY.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23.4.1-CECIL-IL-AUDIT-COMPILE-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23.4.2-SYNTHETIC-CORELIB-FIXTURE-NORMALIZATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-23.4.3-CECIL-CORELIB-SCOPE-CONSTRUCTION-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.3-CECIL-LOCAL-METADATA-RESOLUTION-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.4-DEFERRED-TWO-PASS-METADATA-AUDIT-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.5-CONDITIONAL-MONOMOD-LOGGING-DISPATCH.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.6-SYSTEM-COLLECTIONS-CONCURRENT-PRESERVATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.6-PHYSICAL-CLOSURE.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-25-CONTROLLED-HARMONY-CONSTRUCTION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-25.0.1-HOST-LOCAL-ASSEMBLY-CLASSIFICATION-FIX.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt
+PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt
+PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.3-PHYSICAL-GATE-A-REPORT.txt
+PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.4-PHYSICAL-GATE-A-REPORT.txt
+PASS: authoritative documentation exists: docs/history/steps/STEP-23.4.3-PHYSICAL-CLOSURE.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.2-PINVOKE-AUDIT-FIX.md
+PASS: physical build 78 report preserves the exact 2/4 gate result
+PASS: physical build 78 report preserves the ConcurrentBag constructor failure
+PASS: current status records physical Step 24 closure and advances to Step 25 / 0.0.81
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -167,6 +384,8 @@ PASS: master plan contains durable section: Major roadmap
 PASS: master plan contains durable section: Definition of a closed step
 PASS: master plan contains durable section: Resumption rule
 PASS: master plan defines self-contained resumption path
+PASS: master plan advances durable roadmap through physically closed Step 24 into targeted Harmony runtime work
+PASS: master plan codifies gate batching for speed without losing discrete proof
 PASS: top-level docs are durable/current; step records live under docs/history/steps
 PASS: readable historical documentation retained for Step 01
 PASS: readable historical documentation retained for Step 02
@@ -191,10 +410,17 @@ PASS: readable historical documentation retained for Step 20
 PASS: readable historical documentation retained for Step 21
 PASS: readable historical documentation retained for Step 22
 PASS: readable historical documentation retained for Step 23
+PASS: readable historical documentation retained for Step 24
+PASS: readable historical documentation retained for Step 25
 PASS: Step 22.4 design/history record is present
-PASS: Step 23 design/test records are present
+PASS: Step 23 design/test/closure records are present
+PASS: Step 24 design/candidate/closure records are present
+PASS: Step 25 design/candidate record is present
 PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes Step 23.2 workflow
+PASS: Codemagic exposes the Step 25 workflow
+PASS: host-test report heading identifies Step 25
+PASS: host-test TRX artifact identifies Step 25
+PASS: Codemagic build-environment report heading identifies Step 25
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: Codemagic workflow has no history dependency
@@ -207,4 +433,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 193 checks
+VALIDATION PASS: 419 checks
