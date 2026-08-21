@@ -146,6 +146,112 @@ public sealed class ControlledManagedInitializationTests
     }
 
     [TestMethod]
+    public void GateAConditionallyAcceptsExactPhysicalMonoModLoggerFingerprintOnlyWhenInert()
+    {
+        var decision = ControlledManagedInitialization.EvaluateInitializerHazardPolicy(
+            ControlledManagedInitialization.TargetSimpleName,
+            ControlledManagedInitialization.TargetVersion,
+            ControlledManagedInitialization.ObservedMonoModLoggingDispatchHazards,
+            PhysicalMonoModAutomaticInitializerAuditShape(),
+            debuggerAttached: false,
+            monoModEnvironmentOverrideNames: [],
+            monoModAppContextOverrideNames: []);
+
+        Assert.IsTrue(decision.Allowed, decision.Detail);
+        Assert.AreEqual(0, decision.BlockingHazardCount);
+        Assert.AreEqual(7, decision.ConditionalHazardCount);
+        StringAssert.Contains(decision.Detail, "Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH");
+    }
+
+    [TestMethod]
+    public void GateAConditionalMonoModPolicyRejectsAnyFingerprintDrift()
+    {
+        var hazards = ControlledManagedInitialization.ObservedMonoModLoggingDispatchHazards
+            .Concat(["P/Invoke reachable: System.Void Unexpected::NativeProbe()"])
+            .ToArray();
+        var decision = ControlledManagedInitialization.EvaluateInitializerHazardPolicy(
+            ControlledManagedInitialization.TargetSimpleName,
+            ControlledManagedInitialization.TargetVersion,
+            hazards,
+            PhysicalMonoModAutomaticInitializerAuditShape(),
+            debuggerAttached: false,
+            monoModEnvironmentOverrideNames: [],
+            monoModAppContextOverrideNames: []);
+
+        Assert.IsFalse(decision.Allowed);
+        Assert.AreEqual(hazards.Length, decision.BlockingHazardCount);
+        StringAssert.Contains(decision.Detail, "fingerprint differs");
+        StringAssert.Contains(decision.Detail, "P/Invoke reachable");
+    }
+
+    [TestMethod]
+    public void GateAConditionalMonoModPolicyRejectsNonInertLoggingState()
+    {
+        var audits = PhysicalMonoModAutomaticInitializerAuditShape();
+
+        var debugger = ControlledManagedInitialization.EvaluateInitializerHazardPolicy(
+            ControlledManagedInitialization.TargetSimpleName,
+            ControlledManagedInitialization.TargetVersion,
+            ControlledManagedInitialization.ObservedMonoModLoggingDispatchHazards,
+            audits,
+            debuggerAttached: true,
+            monoModEnvironmentOverrideNames: [],
+            monoModAppContextOverrideNames: []);
+        Assert.IsFalse(debugger.Allowed);
+        StringAssert.Contains(debugger.Detail, "debugger is attached");
+
+        var environment = ControlledManagedInitialization.EvaluateInitializerHazardPolicy(
+            ControlledManagedInitialization.TargetSimpleName,
+            ControlledManagedInitialization.TargetVersion,
+            ControlledManagedInitialization.ObservedMonoModLoggingDispatchHazards,
+            audits,
+            debuggerAttached: false,
+            monoModEnvironmentOverrideNames: ["MONOMOD_LogToFile"],
+            monoModAppContextOverrideNames: []);
+        Assert.IsFalse(environment.Allowed);
+        StringAssert.Contains(environment.Detail, "MONOMOD_LogToFile");
+
+        var appContext = ControlledManagedInitialization.EvaluateInitializerHazardPolicy(
+            ControlledManagedInitialization.TargetSimpleName,
+            ControlledManagedInitialization.TargetVersion,
+            ControlledManagedInitialization.ObservedMonoModLoggingDispatchHazards,
+            audits,
+            debuggerAttached: false,
+            monoModEnvironmentOverrideNames: [],
+            monoModAppContextOverrideNames: ["MonoMod.LogInMemory"]);
+        Assert.IsFalse(appContext.Allowed);
+        StringAssert.Contains(appContext.Detail, "MonoMod.LogInMemory");
+    }
+
+    [TestMethod]
+    public void GateAConditionalMonoModPolicyRequiresExactMeasuredAutomaticInitializerShape()
+    {
+        var audits = PhysicalMonoModAutomaticInitializerAuditShape()
+            .Concat(["method=System.Void MonoMod.Unexpected::.cctor(); token=0x06000005; instructions=1; handlers=0; locals=0; IL=[IL_0000: Ret]"])
+            .ToArray();
+        var decision = ControlledManagedInitialization.EvaluateInitializerHazardPolicy(
+            ControlledManagedInitialization.TargetSimpleName,
+            ControlledManagedInitialization.TargetVersion,
+            ControlledManagedInitialization.ObservedMonoModLoggingDispatchHazards,
+            audits,
+            debuggerAttached: false,
+            monoModEnvironmentOverrideNames: [],
+            monoModAppContextOverrideNames: []);
+
+        Assert.IsFalse(decision.Allowed);
+        StringAssert.Contains(decision.Detail, "four-method MonoMod logging shape");
+    }
+
+    private static string[] PhysicalMonoModAutomaticInitializerAuditShape()
+        =>
+        [
+            "method=System.Void <Module>::.cctor(); token=0x06000001; instructions=2; handlers=0; locals=0; IL=[IL_0000: Call System.Void MonoMod.<fixture>MMDbgLog::LogVersion() | IL_0005: Ret]",
+            "method=System.Void MonoMod.Switches::.cctor(); token=0x06000002; instructions=48; handlers=1; locals=5; IL=[IL_0000: Call System.Collections.IDictionary System.Environment::GetEnvironmentVariables() | IL_0005: Call System.Object MonoMod.Switches::BestEffortParseEnvVar(System.String) | IL_000A: Ret]",
+            "method=System.Void MonoMod.Logs.DebugLog::.cctor(); token=0x06000003; instructions=15; handlers=0; locals=0; IL=[IL_0000: Newobj System.Void MonoMod.Logs.DebugLog::.ctor() | IL_0005: Stsfld MonoMod.Logs.DebugLog MonoMod.Logs.DebugLog::Instance | IL_000A: Stsfld System.Collections.Concurrent.ConcurrentDictionary`2<MonoMod.Logs.DebugLog/OnLogMessage,System.IDisposable> MonoMod.Logs.DebugLog::simpleRegDict | IL_000F: Ret]",
+            "method=System.Void MonoMod.Logs.DebugLog/LevelSubscriptions::.cctor(); token=0x06000004; instructions=3; handlers=0; locals=0; IL=[IL_0000: Newobj System.Void MonoMod.Logs.DebugLog/LevelSubscriptions::.ctor() | IL_0005: Stsfld MonoMod.Logs.DebugLog/LevelSubscriptions MonoMod.Logs.DebugLog/LevelSubscriptions::None | IL_000A: Ret]",
+        ];
+
+    [TestMethod]
     public async Task GateCReportsThrowingModuleInitializerAndDoesNotAdvance()
     {
         var names = CreateNames();

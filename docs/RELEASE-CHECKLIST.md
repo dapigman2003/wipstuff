@@ -12,7 +12,8 @@
 - Step 24.0.1 corrected only the OfflineReady inspection API used by the Step 24 subsystem.
 - Step 24.0.2 corrects the Gate A same-assembly P/Invoke audit blind spot exposed by the 0.0.74 host suite; no gate ordering, initializer target, resolver, module-constructor, Harmony/game invocation, or native-load policy broadening is allowed.
 - Step 24.0.3 corrects the physical 0.0.75 Gate A Cecil-resolution failure by forbidding external assembly resolution during same-assembly initializer traversal. Local calls are matched only against definitions already present in the audited module; unresolved local metadata and genuine non-framework edges still fail closed.
-- Step 24.0.4 responds to the repeated physical 0.0.76 resolver failure by separating shallow whole-plan initializer classification from target-only closure traversal, switching the Step 24 reader to deferred mode, binding explicit rejecting Cecil assembly/metadata resolvers, removing method-reference `LookupToken`, and preserving exact-stage/full-exception diagnostics. No runtime allowlist or execution boundary is broadened.
+- Step 24.0.4 responded to the repeated physical 0.0.76 resolver failure by separating shallow whole-plan initializer classification from target-only closure traversal, switching the Step 24 reader to deferred mode, binding explicit rejecting Cecil assembly/metadata resolvers, removing method-reference `LookupToken`, and preserving exact-stage/full-exception diagnostics. Physical build 77 eliminated the resolver failure and measured the real target closure as seven conservative MonoMod logging dispatch findings plus four automatic initializers; Gate B did not run.
+- Step 24.0.5 retains the conservative audit and adds only a conditional classification for that exact physical seven-finding fingerprint under the exact measured initializer shape and an inert MonoMod logging state (no debugger, no `MONOMOD_*` environment-variable name, no relevant logging AppContext override). Generic delegate/bodyless/PInvoke/native/reflection/dynamic/unresolved findings remain fail-closed.
 
 ## Static/host build
 
@@ -21,7 +22,7 @@
 - Godot build/preflight passes on Codemagic/macOS;
 - iOS publish succeeds with `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is `0.0.77 (77)`;
+- expected version is `0.0.78 (78)`;
 - workflow is `ios-step-24`;
 - expected IPA is `artifacts/StS2-Launcher-Step-24.ipa`.
 
@@ -29,7 +30,7 @@
 
 - header `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`;
 - start from a fresh process;
-- Gate A = exact sole initializer target `0Harmony 2.4.2.0`, one `<Module>..cctor`, bounded automatic-initialization closure (including implicit type constructors) fully measured, hazards 0;
+- Gate A = exact sole initializer target `0Harmony 2.4.2.0`, one `<Module>..cctor`, bounded automatic-initialization closure (including implicit type constructors) fully measured; current physical target must report raw findings 7, conditional findings 7, effective blocking hazards 0, and conditional policy PASS;
 - Gate B = exact accepted Step 23 initializer-free context replay, `0Harmony` still absent;
 - Gate C = exact target load plus `RuntimeHelpers.RunModuleConstructor` completion barrier, zero native/unplanned requests;
 - Gate D = exact post-initialization context/byte/OfflineReady audit;
@@ -40,7 +41,7 @@
 
 ## Stop conditions
 
-- If Gate A finds a second initializer-bearing dependency, identity/version drift, an unresolved same-assembly call, a reachable P/Invoke/`calli`/function-pointer or delegate indirection/native-loader/explicit runtime-constructor/reflection-dynamic/non-framework edge, an unmeasured implicit type initializer, any Cecil external assembly-resolution attempt, or any accepted Step 23 preflight regression, stop before Step 24 CLR loading and send the report.
+- If Gate A finds a second initializer-bearing dependency, identity/version drift, an unresolved same-assembly call, P/Invoke/`calli`/native-loader/explicit runtime-constructor/reflection-dynamic/non-framework execution, any function/delegate/bodyless dispatch outside the exact seven-finding physical MonoMod fingerprint, any fingerprint/initializer-shape drift, a debugger, any `MONOMOD_*` environment override name, any relevant MonoMod logging AppContext override, any Cecil external assembly-resolution attempt, or any accepted Step 23 preflight regression, stop before Step 24 CLR loading and send the report.
 - If Gate B fails to reproduce the exact Step 23 inert context, stop; do not admit `0Harmony`.
 - If Gate C throws, requests native code, makes an unplanned managed request, or admits another initializer-bearing assembly, stop; do not broaden resolver/native policy or call a Harmony API.
 - If Gate D detects byte/plan/OfflineReady/context drift, treat Step 24 as unclosed.

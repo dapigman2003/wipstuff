@@ -24,6 +24,7 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt` — physical build 75 stopped at Gate A before any Step 24 CLR load because Cecil attempted to resolve `GodotSharp`; this is the direct evidence for Step 24.0.3.
 - `reports/STEP-24.0.3-PHYSICAL-GATE-A-REPORT.txt` — physical build 76 repeated the build-75 Gate A `GodotSharp` resolver failure at 0/4, proving the explicit `MethodReference.Resolve()` removal did not eliminate every broad/eager Cecil metadata-resolution path.
+- `reports/STEP-24.0.4-PHYSICAL-GATE-A-REPORT.txt` — physical build 77 eliminated the resolver failure and exposed the actual target closure: exactly seven conservative MonoMod logging dispatch findings and four automatic initializers; Gate B never ran.
 
 ## Canonical-foundation build fixes
 
@@ -53,4 +54,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md` — build-73 compile-only correction to the established OfflineReady inspection API; build 74 subsequently reached host tests.
 - `steps/STEP-24.0.2-PINVOKE-AUDIT-FIX.md` — build-74 host tests exposed a same-assembly P/Invoke audit blind spot; build 75 corrected it and reached physical Gate A.
 - `steps/STEP-24.0.3-CECIL-LOCAL-METADATA-RESOLUTION-FIX.md` — build 75 motivated removal of explicit Cecil method resolution; physical build 76 later showed that correction was incomplete by repeating the same Gate A `GodotSharp` resolver failure.
-- `steps/STEP-24.0.4-DEFERRED-TWO-PASS-METADATA-AUDIT-FIX.md` — physical build 76 repeated the opaque `GodotSharp` resolver failure; active 0.0.77 narrows Gate A to deferred shallow whole-plan classification plus target-only closure audit with explicit rejecting Cecil resolvers and stronger diagnostics.
+- `steps/STEP-24.0.4-DEFERRED-TWO-PASS-METADATA-AUDIT-FIX.md` — physical build 76 repeated the opaque `GodotSharp` resolver failure; build 77 narrowed Gate A to deferred shallow whole-plan classification plus target-only closure audit with explicit rejecting Cecil resolvers and stronger diagnostics.
+- `steps/STEP-24.0.5-CONDITIONAL-MONOMOD-LOGGING-DISPATCH.md` — physical build 77 exposed seven exact MonoMod logger dispatch findings; active 0.0.78 preserves the raw audit and conditionally classifies only that exact fingerprint under the measured initializer shape and inert logger state.

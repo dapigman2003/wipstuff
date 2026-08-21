@@ -16,7 +16,7 @@ Cross the automatic module-initialization boundary without yet invoking Harmony 
 
 ### Gate A — InitializationPreflight
 
-Replay accepted Step 23 Gate A, require exactly the known `0Harmony 2.4.2.0` module-initializer target, and perform a bounded Cecil same-assembly automatic-initialization audit. Follow direct calls plus same-assembly type constructors that static calls/fields could implicitly trigger. Reject P/Invoke, `calli`, function/delegate indirection, native-loader APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, or unexpected non-framework execution edges before any Step 24 load.
+Replay accepted Step 23 Gate A, require exactly the known `0Harmony 2.4.2.0` module-initializer target, and perform a bounded Cecil same-assembly automatic-initialization audit. Follow direct calls plus same-assembly type constructors that static calls/fields could implicitly trigger. Preserve the raw conservative findings. P/Invoke, `calli`, native-loader APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, unresolved/non-framework execution edges, and generic function/delegate/bodyless dispatch remain blocking. Beginning with Step 24.0.5, only the exact seven physically measured MonoMod logging dispatch findings may be conditionally classified dormant under the exact measured initializer shape and inert logger state.
 
 ### Gate B — ProvenLoadStateReplay
 
@@ -36,11 +36,12 @@ Re-hash the plan and every prepared/live file, re-prove OfflineReady, and requir
 - Step 24.0.1 / `0.0.74 (74)`: compile-only correction to the established OfflineReady `RunAsync` result contract. Codemagic then compiled successfully and ran 162 host tests; 160 passed and two Gate A safety tests failed because reachable P/Invoke stubs with no managed IL body were not inspected after same-assembly resolution. No IPA or physical Step 24 evidence exists for build 74.
 - Step 24.0.2 / `0.0.75 (75)`: production metadata-audit correction. Gate A inspects a resolved same-assembly target before the managed-body traversal filter, rejects reachable P/Invoke stubs explicitly, and fails closed on any other reachable same-assembly target without managed IL.
 - Step 24.0.3 / `0.0.76 (76)`: removed the explicit `MethodReference.Resolve()` path, but physical testing repeated the same 0/4 Gate A `GodotSharp` `AssemblyResolutionException` at broad prepared-target classification. This proved the previous diagnosis was incomplete; no Step 24 CLR load occurred.
-- Step 24.0.4 / `0.0.77 (77)`: active metadata-containment correction. Whole-plan initializer classification is shallow + deferred; only the exact `0Harmony` target receives detailed call-closure traversal; Cecil assembly/metadata resolution is explicitly rejected; method-reference `LookupToken` is removed; and failures preserve exact file/stage plus full exception diagnostics.
+- Step 24.0.4 / `0.0.77 (77)`: physical Gate A evidence. The two-pass/deferred/rejecting-resolver design eliminated the prior `GodotSharp` resolution exception and reached the actual `0Harmony` closure. Gate A stopped 0/4 on exactly seven conservative MonoMod logging dispatch findings while measuring exactly four automatic initializers; Gate B never ran.
+- Step 24.0.5 / `0.0.78 (78)`: active conditional-classification candidate. Raw auditing remains unchanged; only the exact build-77 seven-finding MonoMod logging fingerprint may become conditionally dormant when the exact measured initializer shape and inert logger state are proven at Gate A.
 
 ## Candidate identity
 
-- active corrected version: `0.0.77 (77)`
+- active corrected version: `0.0.78 (78)`
 - workflow: `ios-step-24`
 - IPA: `artifacts/StS2-Launcher-Step-24.ipa`
 - device report: `Documents/StS2Launcher/Reports/Step24-ControlledManagedInitialization.txt`

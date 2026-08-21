@@ -31,7 +31,7 @@ Step 23 did not intentionally invoke a game entry point, inspect/invoke game typ
 
 ## Active candidate — Step 24
 
-- Version: **0.0.77 (77)**
+- Version: **0.0.78 (78)**
 - Codemagic workflow: **`ios-step-24`**
 - IPA: **`artifacts/StS2-Launcher-Step-24.ipa`**
 - Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
@@ -47,7 +47,9 @@ Step 24.0.2 / `0.0.75 (75)` corrected the P/Invoke audit and reached a physical 
 
 Step 24.0.3 / `0.0.76 (76)` reached a physical iPhone and again failed safely **0/4 at Gate A**, at the same broad `prepared target classification` stage with the same `AssemblyResolutionException` for `GodotSharp 4.5.1.0`. Because build 76 had already removed the explicit `MethodReference.Resolve()` call, this result proved the build-75 diagnosis was incomplete: some other eager/broad Cecil metadata path could still request external metadata before the target-specific audit. Gate B never ran and no Step 24 CLR state was created.
 
-Step 24.0.4 / `0.0.77 (77)` is the active correction. Gate A now performs **two passes**: a shallow `ReadingMode.Deferred` whole-plan scan that only counts module initializers, followed by a detailed automatic-initialization closure audit only for the exact selected `0Harmony 2.4.2.0` file. The reader is bound to an explicit rejecting `IAssemblyResolver`/`IMetadataResolver`, method-reference traversal no longer calls `ModuleDefinition.LookupToken`, and failure reports identify the exact prepared file/stage and preserve the full exception. This does not allow `GodotSharp`: a genuinely reachable non-framework call remains a prohibited edge. Gate ordering, target identity, runtime resolver policy, module-constructor barrier, and the no-Harmony/game/native-execution boundary are unchanged.
+Step 24.0.4 / `0.0.77 (77)` reached a physical iPhone and failed safely **0/4 at Gate A**, but it resolved the metadata ambiguity from builds 75–76. Gate A reached the exact `0Harmony.dll` target closure and reported seven conservative execution findings, all in merged MonoMod logging dispatch: one `IDebugFormattable` bodyless interface dispatch, two logging-delegate `Invoke` targets, two logging-delegate constructors, and two corresponding `ldftn`/delegate-indirection findings. The report also measured exactly four automatic initializers: `<Module>..cctor`, `MonoMod.Switches::.cctor`, `MonoMod.Logs.DebugLog::.cctor`, and `MonoMod.Logs.DebugLog/LevelSubscriptions::.cctor`; the module initializer itself is exactly two instructions, `MMDbgLog::LogVersion()` then `ret`. Gate B never ran, so no Step 24 CLR load occurred.
+
+Step 24.0.5 / `0.0.78 (78)` is the active candidate. The conservative metadata audit is unchanged and still records all raw findings. A separate fail-closed conditional policy may downgrade **only the exact seven physically measured logging findings** to dormant when the target remains exactly `0Harmony 2.4.2.0`, the exact four-method automatic-initializer set and measured structural markers are unchanged, no managed debugger is attached, no `MONOMOD_*` environment-variable name is present, and no relevant MonoMod logging AppContext key is overridden. Any missing/additional/changed finding, P/Invoke, `calli`, generic indirect target outside the measured set, native/reflection/dynamic/unresolved/non-framework edge, initializer-shape drift, or non-inert logger state remains blocking before Gate B. Gate ordering, runtime resolver policy, module-constructor barrier, and the no-Harmony/game/native-execution boundary are unchanged.
 
 ### Gate A — InitializationPreflight
 
@@ -61,7 +63,8 @@ Before any Step 24 game/Harmony CLR load:
 6. require exactly one initializer-bearing dependency;
 7. require it to be exactly `0Harmony 2.4.2.0` with exactly one `<Module>..cctor`;
 8. after selecting the sole exact target, audit only that file's module initializer plus bounded same-assembly automatic-initialization closure, including same-assembly type constructors that static calls/fields could implicitly trigger, resolving same-assembly calls only from definitions already present in the audited module;
-9. fail closed if a same-assembly call cannot be matched unambiguously from local metadata, or if the reachable closure contains P/Invoke, `calli`, function/delegate indirection, direct native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, or an unexpected non-framework execution edge.
+9. preserve the complete conservative hazard set; reject P/Invoke, `calli`, native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, unresolved local calls, unexpected non-framework execution edges, and generic function/delegate/bodyless dispatch; only the exact seven physically measured MonoMod logging dispatch findings may be conditionally downgraded when the exact measured initializer shape and inert-logging preconditions all match;
+10. report raw conservative findings separately from conditionally dormant findings and effective blocking hazards.
 
 Gate A is metadata-only. No Step 24 real game/Harmony assembly is loaded.
 
@@ -112,9 +115,9 @@ After controlled module initialization:
 
 From a fresh process:
 
-1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.77`;
+1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.78`;
 2. run Step 24 A–D and stop at the first failing gate;
-3. Gate A: exact sole target = `0Harmony 2.4.2.0`, one module initializer, bounded automatic-initialization closure fully measured, hazards = 0;
+3. Gate A: exact sole target = `0Harmony 2.4.2.0`, one module initializer, bounded automatic-initialization closure fully measured; for the current physical target expect raw conservative findings = 7, conditionally dormant findings = 7, effective `Initializer hazards` = 0, and conditional policy = PASS; any fingerprint/state drift must fail before Gate B;
 4. Gate B: accepted Step 23 initializer-free state reproduced, `0Harmony` absent;
 5. Gate C: `0Harmony` load + `RuntimeHelpers.RunModuleConstructor` completion barrier = PASS, zero native/unplanned requests;
 6. Gate D: PASS, summary 4/4;

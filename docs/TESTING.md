@@ -85,7 +85,9 @@ Build `0.0.73 (73)` is not a physical-test candidate: Codemagic rejected it at C
 
 Build `0.0.75 (75)` reached the physical iPhone but failed safely in Gate A during metadata classification because Cecil attempted to resolve `GodotSharp`; no Step 24 CLR load occurred.
 
-Install version `0.0.77 (77)` only after Codemagic host tests and IPA verification are fully green. Build 77 must retain Gate A's no-external-resolution rule while also proving the revised two-pass metadata behavior: shallow deferred whole-plan initializer classification first, then detailed closure traversal only for the exact `0Harmony` target. An actually reachable `GodotSharp` call must fail as an explicit prohibited edge with audited IL; any Cecil resolver attempt must fail with the exact prepared path/stage rather than widening the metadata environment. Then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
+Build `0.0.77 (77)` reached the physical iPhone and failed safely 0/4 at Gate A after successfully eliminating the prior Cecil resolver failure. It measured the exact target closure as seven conservative MonoMod logging dispatch findings plus four automatic initializers; Gate B never ran and no Step 24 CLR load occurred.
+
+Install version `0.0.78 (78)` only after Codemagic host tests and IPA verification are fully green. Build 78 must retain the conservative raw audit and the no-external-resolution rule. For the current receipt-backed `0Harmony 2.4.2.0`, the conditional policy may downgrade only the exact seven physically measured logging-dispatch findings, only when the exact four measured automatic initializers retain their structural markers and the process has no debugger, no `MONOMOD_*` environment-variable name, and no relevant MonoMod logging AppContext override. Then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
 
 Run Step 24 A–D in order and require:
 
@@ -96,7 +98,9 @@ Run Step 24 A–D in order and require:
    - exactly one initializer-bearing dependency exists;
    - exact target is `0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null`;
    - exactly one `<Module>..cctor`;
-   - bounded same-assembly automatic-initialization closure (including implicitly triggerable type constructors) is fully measured and hazards = 0;
+   - bounded same-assembly automatic-initialization closure (including implicitly triggerable type constructors) is fully measured;
+   - current physical target: raw conservative findings = 7; conditionally dormant MonoMod logging findings = 7; effective `Initializer hazards` = 0; conditional automatic-initialization policy = PASS;
+   - any changed/additional finding or non-inert logging state must fail before Gate B;
    - no Step 24 real game/Harmony CLR load yet.
 2. **Gate B — ProvenLoadStateReplay = PASS**
    - one dedicated Step 24 private context is created;

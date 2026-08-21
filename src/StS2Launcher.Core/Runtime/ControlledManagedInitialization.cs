@@ -21,6 +21,32 @@ public sealed class ControlledManagedInitialization : IDisposable
     public static readonly Version TargetVersion = new(2, 4, 2, 0);
     public const string LoadContextName = "StS2Launcher-Step24-Initialization";
 
+    // Physical Step 24.0.4 / 0.0.77 measured these seven conservative dispatch findings in the
+    // exact receipt-backed 0Harmony 2.4.2 automatic-initialization closure. They are not a general
+    // allowlist. Step 24.0.5 may conditionally classify exactly this fingerprint as dormant only
+    // when the process is in an explicitly inert MonoMod logging state. Any changed/additional
+    // finding remains fail-closed before Gate B.
+    internal static readonly string[] ObservedMonoModLoggingDispatchHazards =
+    [
+        "Same-assembly method without managed IL body reachable: System.Boolean MonoMod.Logs.DebugFormatter::TryFormatInto(T&,System.Object,System.Span`1<System.Char>,System.Int32&) -> System.Boolean MonoMod.Logs.IDebugFormattable::TryFormatInto(System.Span`1<System.Char>,System.Int32&)",
+        "Same-assembly method without managed IL body reachable: System.Void MonoMod.Logs.DebugLog/LogMessage::ReportTo(MonoMod.Logs.DebugLog/OnLogMessage) -> System.Void MonoMod.Logs.DebugLog/OnLogMessage::Invoke(System.String,System.DateTime,MonoMod.Logs.LogLevel,System.String)",
+        "Same-assembly method without managed IL body reachable: System.Void MonoMod.Logs.DebugLog/LogMessage::ReportTo(MonoMod.Logs.DebugLog/OnLogMessageDetailed) -> System.Void MonoMod.Logs.DebugLog/OnLogMessageDetailed::Invoke(System.String,System.DateTime,MonoMod.Logs.LogLevel,System.String,System.ReadOnlyMemory`1<MonoMod.Logs.MessageHole>)",
+        "Same-assembly method without managed IL body reachable: System.Void MonoMod.Logs.DebugLog::TryInitializeLogToFile(System.String,System.String[],MonoMod.Logs.LogLevelFilter) -> System.Void MonoMod.Logs.DebugLog/OnLogMessage::.ctor(System.Object,System.IntPtr)",
+        "Same-assembly method without managed IL body reachable: System.Void MonoMod.Logs.DebugLog::TryInitializeMemoryLog(MonoMod.Logs.LogLevelFilter) -> System.Void MonoMod.Logs.DebugLog/OnLogMessage::.ctor(System.Object,System.IntPtr)",
+        "indirect function/delegate target reachable: System.Void MonoMod.Logs.DebugLog::TryInitializeLogToFile(System.String,System.String[],MonoMod.Logs.LogLevelFilter) at IL_007C",
+        "indirect function/delegate target reachable: System.Void MonoMod.Logs.DebugLog::TryInitializeMemoryLog(MonoMod.Logs.LogLevelFilter) at IL_002F",
+    ];
+
+    private static readonly string[] MonoModLoggingAppContextKeys =
+    [
+        "MonoMod.LogRecordHoles",
+        "MonoMod.LogReplayQueueLength",
+        "MonoMod.LogSpam",
+        "MonoMod.LogToFile",
+        "MonoMod.LogToFileFilter",
+        "MonoMod.LogInMemory",
+    ];
+
     private readonly string _launcherDataRoot;
     private readonly string _step21WorkRoot;
     private readonly string _preparedRoot;
@@ -242,11 +268,31 @@ public sealed class ControlledManagedInitialization : IDisposable
                 throw new InvalidDataException("Step 24 could not relocate the selected initializer target in the prepared classification set.");
             prepared[targetIndex] = target;
 
-            if (target.InitializerHazards.Count != 0)
+            stage = "conditional automatic-initialization policy";
+            var monoModEnvironmentOverrides = Environment.GetEnvironmentVariables().Keys
+                .Cast<object>()
+                .Select(key => Convert.ToString(key, System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty)
+                .Where(key => key.StartsWith("MONOMOD_", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            var monoModAppContextOverrides = MonoModLoggingAppContextKeys
+                .Where(key => AppContext.GetData(key) is not null || AppContext.TryGetSwitch(key, out _))
+                .OrderBy(key => key, StringComparer.Ordinal)
+                .ToArray();
+            var hazardPolicy = EvaluateInitializerHazardPolicy(
+                target.AssemblyName.Name ?? string.Empty,
+                target.AssemblyName.Version ?? ZeroVersion,
+                target.InitializerHazards,
+                target.AutomaticInitializerAudits,
+                System.Diagnostics.Debugger.IsAttached,
+                monoModEnvironmentOverrides,
+                monoModAppContextOverrides);
+            if (!hazardPolicy.Allowed)
             {
                 throw new InvalidDataException(
-                    "Step 24 Gate A refuses automatic initialization because the bounded Cecil call-graph audit found a prohibited or unresolved execution edge:\n" +
+                    "Step 24 Gate A refuses automatic initialization because the bounded Cecil call-graph audit found a prohibited, unresolved, or non-dormant execution edge:\n" +
                     string.Join("\n", target.InitializerHazards) + "\n" +
+                    "Conditional policy:\n" + hazardPolicy.Detail + "\n" +
                     "Audited automatic-initialization IL:\n" + string.Join("\n", target.AutomaticInitializerAudits));
             }
 
@@ -266,7 +312,7 @@ public sealed class ControlledManagedInitialization : IDisposable
                 prepared.Count,
                 prepared.Count,
                 target.Plan.RelativePath,
-                "The accepted Step 23 preflight still passes and the sole deferred initializer is exactly 0Harmony 2.4.2.0 with no prohibited edge in the bounded automatic-initialization closure."));
+                "The accepted Step 23 preflight still passes and the sole deferred initializer is exactly 0Harmony 2.4.2.0 with zero effective blocking hazards under the measured conditional policy."));
 
             return Pass(
                 ControlledManagedInitializationGate.InitializationPreflight,
@@ -279,7 +325,13 @@ public sealed class ControlledManagedInitialization : IDisposable
                 $"Target module initializers: {target.ModuleInitializerCount:N0}\n" +
                 $"Automatic initializer methods in audited closure: {target.AutomaticInitializerCount:N0}\n" +
                 $"Initializer reachable same-assembly methods audited: {target.InitializerReachableMethods:N0}\n" +
-                $"Initializer hazards: {target.InitializerHazards.Count:N0}\n" +
+                $"Raw conservative audit findings: {target.InitializerHazards.Count:N0}\n" +
+                "Raw conservative audit detail:\n" + (target.InitializerHazards.Count == 0 ? "<none>" : string.Join("\n", target.InitializerHazards)) + "\n" +
+                $"Conditionally dormant MonoMod logging findings: {hazardPolicy.ConditionalHazardCount:N0}\n" +
+                $"Initializer hazards: {hazardPolicy.BlockingHazardCount:N0}\n" +
+                "Conditional automatic-initialization policy: PASS\n" +
+                hazardPolicy.Detail + "\n" +
+                $"Target prepared SHA-1: {target.Plan.Sha1Hex}\n" +
                 "Audited automatic-initialization IL:\n" + string.Join("\n", target.AutomaticInitializerAudits) + "\n" +
                 "No real game/Harmony assembly was loaded by Step 24 Gate A: YES");
         }
@@ -718,6 +770,137 @@ public sealed class ControlledManagedInitialization : IDisposable
     }
 
 
+    internal static InitializerHazardPolicyDecision EvaluateInitializerHazardPolicy(
+        string assemblySimpleName,
+        Version assemblyVersion,
+        IReadOnlyCollection<string> hazards,
+        IReadOnlyCollection<string> automaticInitializerAudits,
+        bool debuggerAttached,
+        IReadOnlyCollection<string> monoModEnvironmentOverrideNames,
+        IReadOnlyCollection<string> monoModAppContextOverrideNames)
+    {
+        var orderedHazards = hazards.OrderBy(value => value, StringComparer.Ordinal).ToArray();
+        if (orderedHazards.Length == 0)
+        {
+            return new InitializerHazardPolicyDecision(
+                true,
+                0,
+                0,
+                "No conservative initializer findings require conditional classification.");
+        }
+
+        // Synthetic targets and any future/deviating real target retain the original hard fail-closed
+        // behavior. The conditional path exists only for the physically measured merged 0Harmony
+        // 2.4.2 logger fingerprint from Step 24.0.4.
+        if (!assemblySimpleName.Equals(TargetSimpleName, StringComparison.OrdinalIgnoreCase) || assemblyVersion != TargetVersion)
+        {
+            return new InitializerHazardPolicyDecision(
+                false,
+                orderedHazards.Length,
+                0,
+                "Conditional dispatch classification is unavailable for any target other than exact 0Harmony 2.4.2.0.");
+        }
+
+        var expected = ObservedMonoModLoggingDispatchHazards.OrderBy(value => value, StringComparer.Ordinal).ToArray();
+        if (!orderedHazards.SequenceEqual(expected, StringComparer.Ordinal))
+        {
+            var missing = expected.Except(orderedHazards, StringComparer.Ordinal).ToArray();
+            var additional = orderedHazards.Except(expected, StringComparer.Ordinal).ToArray();
+            return new InitializerHazardPolicyDecision(
+                false,
+                orderedHazards.Length,
+                0,
+                "The conservative hazard fingerprint differs from the physically measured Step 24.0.4 set. " +
+                $"Missing={FormatNames(missing)}; additional={FormatNames(additional)}.");
+        }
+
+        var auditNames = automaticInitializerAudits.Select(GetAuditedMethodName).ToArray();
+        var requiredAuditNames = new[]
+        {
+            "System.Void <Module>::.cctor()",
+            "System.Void MonoMod.Switches::.cctor()",
+            "System.Void MonoMod.Logs.DebugLog::.cctor()",
+            "System.Void MonoMod.Logs.DebugLog/LevelSubscriptions::.cctor()",
+        };
+        if (auditNames.Length != requiredAuditNames.Length ||
+            !requiredAuditNames.All(required => auditNames.Contains(required, StringComparer.Ordinal)))
+        {
+            return new InitializerHazardPolicyDecision(
+                false,
+                orderedHazards.Length,
+                0,
+                "The automatic type-initializer set differs from the physically measured four-method MonoMod logging shape: " +
+                FormatNames(auditNames));
+        }
+
+        var moduleAudit = automaticInitializerAudits.Single(value => value.StartsWith("method=System.Void <Module>::.cctor();", StringComparison.Ordinal));
+        var switchesAudit = automaticInitializerAudits.Single(value => value.StartsWith("method=System.Void MonoMod.Switches::.cctor();", StringComparison.Ordinal));
+        var debugLogAudit = automaticInitializerAudits.Single(value => value.StartsWith("method=System.Void MonoMod.Logs.DebugLog::.cctor();", StringComparison.Ordinal));
+        var levelSubscriptionsAudit = automaticInitializerAudits.Single(value => value.StartsWith("method=System.Void MonoMod.Logs.DebugLog/LevelSubscriptions::.cctor();", StringComparison.Ordinal));
+        if (!moduleAudit.Contains("instructions=2", StringComparison.Ordinal) ||
+            !moduleAudit.Contains("MMDbgLog::LogVersion()", StringComparison.Ordinal) ||
+            !moduleAudit.Contains("IL_0005: Ret", StringComparison.Ordinal) ||
+            !switchesAudit.Contains("instructions=48", StringComparison.Ordinal) ||
+            !switchesAudit.Contains("System.Environment::GetEnvironmentVariables()", StringComparison.Ordinal) ||
+            !switchesAudit.Contains("MonoMod.Switches::BestEffortParseEnvVar", StringComparison.Ordinal) ||
+            !debugLogAudit.Contains("instructions=15", StringComparison.Ordinal) ||
+            !debugLogAudit.Contains("MonoMod.Logs.DebugLog::.ctor()", StringComparison.Ordinal) ||
+            !debugLogAudit.Contains("MonoMod.Logs.DebugLog::Instance", StringComparison.Ordinal) ||
+            !debugLogAudit.Contains("MonoMod.Logs.DebugLog::simpleRegDict", StringComparison.Ordinal) ||
+            !levelSubscriptionsAudit.Contains("instructions=3", StringComparison.Ordinal) ||
+            !levelSubscriptionsAudit.Contains("MonoMod.Logs.DebugLog/LevelSubscriptions::.ctor()", StringComparison.Ordinal) ||
+            !levelSubscriptionsAudit.Contains("MonoMod.Logs.DebugLog/LevelSubscriptions::None", StringComparison.Ordinal))
+        {
+            return new InitializerHazardPolicyDecision(
+                false,
+                orderedHazards.Length,
+                0,
+                "One or more automatic type initializers no longer match the physically measured Step 24.0.4 structural shape.");
+        }
+
+        var blockers = new List<string>();
+        if (debuggerAttached)
+            blockers.Add("managed debugger is attached");
+        if (monoModEnvironmentOverrideNames.Count != 0)
+            blockers.Add("MONOMOD_* environment override name(s): " + FormatNames(monoModEnvironmentOverrideNames));
+        if (monoModAppContextOverrideNames.Count != 0)
+            blockers.Add("MonoMod logging AppContext override name(s): " + FormatNames(monoModAppContextOverrideNames));
+        if (blockers.Count != 0)
+        {
+            return new InitializerHazardPolicyDecision(
+                false,
+                orderedHazards.Length,
+                0,
+                "The physically measured logger dispatches are only classified dormant in the default inert logger state. " +
+                string.Join("; ", blockers) + ". Values are intentionally not reported.");
+        }
+
+        return new InitializerHazardPolicyDecision(
+            true,
+            0,
+            orderedHazards.Length,
+            "Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH\n" +
+            "Debugger attached: NO\n" +
+            "MONOMOD_* environment override names present: NO\n" +
+            "MonoMod logging AppContext override names present: NO\n" +
+            "Policy note: these seven conservative dispatch findings are conditionally dormant for this exact measured initialization shape; P/Invoke/calli/native/reflection/dynamic/unresolved or any changed/additional edge remains blocking.");
+    }
+
+    private static string GetAuditedMethodName(string audit)
+    {
+        const string Prefix = "method=";
+        var start = audit.StartsWith(Prefix, StringComparison.Ordinal) ? Prefix.Length : 0;
+        var end = audit.IndexOf(';', start);
+        return end >= 0 ? audit[start..end] : audit[start..];
+    }
+
+    private static string FormatNames(IEnumerable<string> names)
+    {
+        var ordered = names.Where(value => !string.IsNullOrWhiteSpace(value)).OrderBy(value => value, StringComparer.Ordinal).ToArray();
+        return ordered.Length == 0 ? "<none>" : string.Join(" | ", ordered);
+    }
+
+
     private static MethodDefinition? ResolveSameAssemblyMethodFromLocalMetadata(
         ModuleDefinition module,
         MethodReference called,
@@ -1044,6 +1227,12 @@ public sealed class ControlledManagedInitialization : IDisposable
     }
 
     private sealed record PlannedBindingRequirement(string RequestedFullName, PlannedBindingKind Kind, string ExpectedTargetFullName);
+
+    internal sealed record InitializerHazardPolicyDecision(
+        bool Allowed,
+        int BlockingHazardCount,
+        int ConditionalHazardCount,
+        string Detail);
 
     private sealed record PreparedMetadataSnapshot(
         int ModuleInitializerCount,
