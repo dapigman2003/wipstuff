@@ -6,6 +6,8 @@ Step 24.0.6 / `0.0.79 (79)` is physically closed on an iPhone: Gates A–D passe
 
 ## Active Step 25 boundary
 
+Physical Step 25.0.1 / `0.0.81 (81)` advanced **7/9**: Gates A–G passed and Gate H failed only when the exact `Harmony(string)` constructor was invoked because trimmed framework member `System.Environment.Version` was unavailable. Step 25.0.2 / `0.0.82 (82)` keeps the A–I runtime boundary unchanged and adds only a bounded `DynamicDependency` preservation anchor for the measured constructor's framework surface.
+
 Step 25 remains inside controlled managed initialization. It advances only from the closed Step 24 state through **targeted Harmony API resolution, explicit initialization of the exact measured `HarmonyLib.Harmony` type initializer, and construction of one inert `HarmonyLib.Harmony` object**.
 
 The candidate is intentionally narrower than patching:
@@ -28,7 +30,7 @@ Use workflow:
 
 `ios-step-25`
 
-Expected app version: `0.0.81 (81)`.
+Expected app version: `0.0.82 (82)`.
 
 Expected IPA: `artifacts/StS2-Launcher-Step-25.ipa`.
 

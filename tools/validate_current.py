@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>81</ApplicationVersion>" in project_text, "build version is 81")
-require("<ApplicationDisplayVersion>0.0.81</ApplicationDisplayVersion>" in project_text, "display version is 0.0.81")
-require(plist.get("CFBundleVersion") == "81", "Info.plist build version is 81")
-require(plist.get("CFBundleShortVersionString") == "0.0.81", "Info.plist display version is 0.0.81")
+require("<ApplicationVersion>82</ApplicationVersion>" in project_text, "build version is 82")
+require("<ApplicationDisplayVersion>0.0.82</ApplicationDisplayVersion>" in project_text, "display version is 0.0.82")
+require(plist.get("CFBundleVersion") == "82", "Info.plist build version is 82")
+require(plist.get("CFBundleShortVersionString") == "0.0.82", "Info.plist display version is 0.0.82")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -222,6 +222,22 @@ expected_all_roots = set(step22_roots) | {"SteamKit2", "protobuf-net", "protobuf
 require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_all_roots), "Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root")
 require("Step 24 physically proved this additional post-publish dynamic-IL preservation root" in project_text, "physically proven Step 24 preservation root is documented as protected platform policy")
 require("STEP25 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 25 build telemetry identifies the physically proven framework preservation root")
+require("STEP25 CANDIDATE HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 25 build telemetry identifies the candidate Harmony-constructor framework preservation surface")
+require("System.Private.CoreLib" not in all_roots, "Step 25 does not broaden trimming by rooting System.Private.CoreLib")
+step25_preservation_path = ROOT / "src/StS2Launcher.iOS/Platform/Step25HarmonyConstructorFrameworkPreservation.cs"
+require(step25_preservation_path.is_file(), "Step 25 bounded Harmony-constructor framework preservation anchor exists")
+step25_preservation = step25_preservation_path.read_text() if step25_preservation_path.is_file() else ""
+for preserved_type in [
+    "typeof(Environment)", "typeof(OperatingSystem)", "typeof(Type)", "typeof(Assembly)",
+    "typeof(AssemblyName)", "typeof(MemberInfo)", "typeof(DateTime)", "typeof(Version)",
+    "typeof(DefaultInterpolatedStringHandler)",
+]:
+    require(preserved_type in step25_preservation, f"Step 25 candidate preservation includes measured constructor framework type: {preserved_type}")
+require(step25_preservation.count("[DynamicDependency(") == 9, "Step 25 candidate preservation is bounded to exactly nine measured framework type dependencies")
+require("internal static void Activate()" in step25_preservation and "Intentionally empty" in step25_preservation, "Step 25 preservation anchor is metadata-only and executes no probe")
+require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyConstruction.cs"), "Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files")
+build_ios = read("scripts/build-ios.sh")
+require("STEP25 CANDIDATE HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish requires Step 25 preservation telemetry")
 require("DiskArbitration" in project_text and '<_LinkerFrameworks Remove="DiskArbitration" />' in project_text, "DiskArbitration-only linker framework filter remains present")
 
 # ---------------------------------------------------------------------------
@@ -308,8 +324,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-25.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.81",
-    "STS2_BUILD_VERSION": "81",
+    "STS2_DISPLAY_VERSION": "0.0.82",
+    "STS2_BUILD_VERSION": "82",
     "STS2_RUNTIME_POLICY_MARKER": "STEP25 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -749,6 +765,8 @@ required_docs = [
     "docs/history/steps/STEP-24.0.6-PHYSICAL-CLOSURE.md",
     "docs/history/steps/STEP-25-CONTROLLED-HARMONY-CONSTRUCTION.md",
     "docs/history/steps/STEP-25.0.1-HOST-LOCAL-ASSEMBLY-CLASSIFICATION-FIX.md",
+    "docs/history/steps/STEP-25.0.2-HARMONY-CONSTRUCTOR-FRAMEWORK-PRESERVATION.md",
+    "docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt",
     "docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt",
     "docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt",
     "docs/history/reports/STEP-24.0.3-PHYSICAL-GATE-A-REPORT.txt",
@@ -764,7 +782,11 @@ for doc in required_docs:
 step24_build78_report = read("docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt")
 require("CONTROLLED MANAGED INITIALIZATION BOUNDARY FAIL — 2/4" in step24_build78_report and "Gate A — InitializationPreflight: PASS" in step24_build78_report and "Gate B — ProvenLoadStateReplay: PASS" in step24_build78_report and "Gate C — DeferredModuleInitialization: FAIL" in step24_build78_report, "physical build 78 report preserves the exact 2/4 gate result")
 require("System.MissingMethodException: Method not found: void System.Collections.Concurrent.ConcurrentBag`1..ctor()" in step24_build78_report, "physical build 78 report preserves the ConcurrentBag constructor failure")
-require("0.0.81 (81)" in read("docs/CURRENT-STATUS.md") and "Step 24.0.6 / 0.0.79 (79)" in read("docs/CURRENT-STATUS.md") and "System.Collections.Concurrent" in read("docs/CURRENT-STATUS.md"), "current status records physical Step 24 closure and advances to Step 25 / 0.0.81")
+step25_build81_report = read("docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt")
+require("CONTROLLED HARMONY CONSTRUCTION BOUNDARY FAIL — 7/9" in step25_build81_report and "Gate G — HarmonyTypeInitializationAudit: PASS" in step25_build81_report and "Gate H — HarmonyInstanceConstruction: FAIL" in step25_build81_report, "physical build 81 report preserves the exact 7/9 gate result")
+require("System.MissingMethodException: Method not found: System.Version System.Environment.get_Version()" in step25_build81_report, "physical build 81 report preserves the Environment.Version constructor failure")
+current_status = read("docs/CURRENT-STATUS.md")
+require("0.0.82 (82)" in current_status and "7/9" in current_status and "Gates A–G" in current_status and "System.Environment.get_Version()" in current_status and "System.Collections.Concurrent" in current_status, "current status preserves physical Step 25 7/9 evidence and advances to Step 25.0.2 / 0.0.82")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

@@ -14,10 +14,11 @@ Run:
 
 The validator must prove, among other current invariants:
 
-- canonical iOS project/version/release wiring is Step 25 / `0.0.81 (81)`;
+- canonical iOS project/version/release wiring is Step 25 / `0.0.82 (82)`;
 - full trimming and `MtouchInterpreter=-all` remain unchanged;
 - the exact Step-22 22-root set remains protected;
 - `System.Collections.Concurrent` remains exactly one separately classified, physically proven dynamic-IL preservation root;
+- Step 25.0.2 adds only a bounded candidate `DynamicDependency` preservation anchor for framework types referenced by the exact physically measured `Harmony(string)` IL; it does not root `System.Private.CoreLib` or change the interpreter policy;
 - Step 23.4.3 and Step 24.0.6 protected implementations remain hash-pinned;
 - the active Step 25 implementation is separately candidate-hash-pinned;
 - Step 25 has exactly nine ordered fail-fast gates;
@@ -59,7 +60,7 @@ The pipeline runs static validation, host tests, iOS workload setup, Godot build
 
 Expected release:
 
-- version: `0.0.81 (81)`;
+- version: `0.0.82 (82)`;
 - IPA: `artifacts/StS2-Launcher-Step-25.ipa`;
 - host TRX: `artifacts/test-results/step25.trx`.
 

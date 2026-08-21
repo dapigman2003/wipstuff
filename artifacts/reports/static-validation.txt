@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-21T16:18:35Z
+UTC: 2026-08-21T17:08:56Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,20 +11,20 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 25 controlled Harmony construction static validation
-Root: /mnt/data/step25work/StS2Launcher-Step25-0.0.80
+Root: /mnt/data/StS2Launcher-Step25-0.0.82
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 172 C# files
+PASS: lexical delimiter scan passes for 173 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 81
-PASS: display version is 0.0.81
-PASS: Info.plist build version is 81
-PASS: Info.plist display version is 0.0.81
+PASS: build version is 82
+PASS: display version is 0.0.82
+PASS: Info.plist build version is 82
+PASS: Info.plist display version is 0.0.82
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -43,6 +43,22 @@ PASS: physically proven Step 24.0.6 System.Collections.Concurrent preservation r
 PASS: Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root
 PASS: physically proven Step 24 preservation root is documented as protected platform policy
 PASS: Step 25 build telemetry identifies the physically proven framework preservation root
+PASS: Step 25 build telemetry identifies the candidate Harmony-constructor framework preservation surface
+PASS: Step 25 does not broaden trimming by rooting System.Private.CoreLib
+PASS: Step 25 bounded Harmony-constructor framework preservation anchor exists
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Environment)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(OperatingSystem)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Type)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Assembly)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(AssemblyName)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(MemberInfo)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(DateTime)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Version)
+PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(DefaultInterpolatedStringHandler)
+PASS: Step 25 candidate preservation is bounded to exactly nine measured framework type dependencies
+PASS: Step 25 preservation anchor is metadata-only and executes no probe
+PASS: Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files
+PASS: iOS publish requires Step 25 preservation telemetry
 PASS: DiskArbitration-only linker framework filter remains present
 PASS: all 97 physically proven Step 22.2 Core source files are retained
 PASS: 96 baseline Step 22.2 Core behavior files remain byte-for-byte unchanged and the one approved Step 19 regression delta is exact
@@ -365,6 +381,8 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.6-SYSTEM-
 PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.6-PHYSICAL-CLOSURE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-25-CONTROLLED-HARMONY-CONSTRUCTION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-25.0.1-HOST-LOCAL-ASSEMBLY-CLASSIFICATION-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-25.0.2-HARMONY-CONSTRUCTOR-FRAMEWORK-PRESERVATION.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.3-PHYSICAL-GATE-A-REPORT.txt
@@ -375,7 +393,9 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.1-OFFLINE
 PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.2-PINVOKE-AUDIT-FIX.md
 PASS: physical build 78 report preserves the exact 2/4 gate result
 PASS: physical build 78 report preserves the ConcurrentBag constructor failure
-PASS: current status records physical Step 24 closure and advances to Step 25 / 0.0.81
+PASS: physical build 81 report preserves the exact 7/9 gate result
+PASS: physical build 81 report preserves the Environment.Version constructor failure
+PASS: current status preserves physical Step 25 7/9 evidence and advances to Step 25.0.2 / 0.0.82
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -433,4 +453,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 419 checks
+VALIDATION PASS: 439 checks

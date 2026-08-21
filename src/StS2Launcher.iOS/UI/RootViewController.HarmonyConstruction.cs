@@ -1,4 +1,5 @@
 using StS2Launcher.Core;
+using StS2Launcher.iOS.Platform;
 using UIKit;
 
 namespace StS2Launcher.iOS;
@@ -7,6 +8,10 @@ public sealed partial class RootViewController
 {
     private void AddControlledHarmonyConstructionControls(UIStackView content)
     {
+        // Step 25.0.2: root only the metadata preservation anchor for the exact measured
+        // Harmony(string) framework surface. Activate() is intentionally empty.
+        Step25HarmonyConstructorFrameworkPreservation.Activate();
+
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(

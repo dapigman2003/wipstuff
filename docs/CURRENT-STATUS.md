@@ -22,18 +22,23 @@ The Step 24 `System.Collections.Concurrent` preservation root is now **physicall
 
 ## Active candidate — Step 25
 
-Step 25.0 / `0.0.80 (80)` compiled successfully in Codemagic and executed all 180 host tests, with 177 PASS / 3 FAIL. No physical Step 25 run was performed. Two failures exposed a synthetic-fixture/local-assembly classification mismatch in the Harmony constructor metadata audit; the third was a stale test-only fingerprint label. Step 25.0.1 / `0.0.81 (81)` is the minimal correction and does not broaden the production execution boundary.
+Step 25.0.1 / `0.0.81 (81)` passed Codemagic compilation/host testing and reached a physical iPhone. The physical run advanced **7/9**: Gates A–G passed, Gate H failed at the exact `HarmonyLib.Harmony::.ctor(System.String)` invocation with `MissingMethodException: System.Environment.get_Version()`, and Gate I did not run. This physically establishes targeted Harmony API resolution and the explicit `HarmonyLib.Harmony` type-initialization boundary under the current strict context. Step 25 itself remains open because instance construction did not complete.
 
-- Step: **25.0.1**
-- Version: **0.0.81 (81)**
+The measured constructor places `Environment.Version` inside the `Harmony.DEBUG` branch, while Gates F/G physically established `Harmony.DEBUG == false` and no `HARMONY_DEBUG` activation. The conservative diagnosis is therefore trim survival of framework tokens referenced by the exact post-publish constructor IL, not intentional execution of the debug branch. Step 25.0.2 / `0.0.82 (82)` adds a bounded candidate-only `DynamicDependency` preservation anchor for the exact framework types referenced by that measured constructor while leaving the A–I runtime code unchanged.
+
+- Step: **25.0.2**
+- Version: **0.0.82 (82)**
 - Codemagic workflow: **`ios-step-25`**
 - IPA: **`artifacts/StS2-Launcher-Step-25.ipa`**
 - Device report: `Documents/StS2Launcher/Reports/Step25-ControlledHarmonyConstruction.txt`
 - Trusted source: Step 12 receipt-backed managed install
 - Execution input: physically proven Step 21/22 prepared runtime + binding plan
 - Closed prerequisites: Step 23.4.3 + Step 24.0.6 + OfflineReady + Foundation 5/5
+- Physically established within Step 25: **Gates A–G on 0.0.81**
+- Open Step 25 frontier: **Gate H constructor completion → Gate I post-construction audit**
+- Candidate-only build change: bounded `DynamicDependency` preservation for the exact measured `Harmony(string)` framework surface
 
-Step 25 does not attempt patching. It advances only through exact Harmony API resolution, explicit execution of the exact measured `HarmonyLib.Harmony` type initializer, and construction of one inert `HarmonyLib.Harmony` object.
+Step 25 still does not attempt patching. It advances only through exact Harmony API resolution, explicit execution of the exact measured `HarmonyLib.Harmony` type initializer, and construction of one inert `HarmonyLib.Harmony` object.
 
 ### Gate A — InitializationPreflight
 
@@ -119,7 +124,7 @@ Re-hash the runtime plan and every prepared/live file, re-prove OfflineReady, re
 From a fresh process:
 
 1. Codemagic static validation + host tests + iOS publish + IPA verification = PASS;
-2. install `0.0.81 (81)`;
+2. install `0.0.82 (82)`;
 3. run Step 25 A–I and stop at the first failure;
 4. require summary **9/9 PASS**;
 5. run OfflineReady = **PASS**;

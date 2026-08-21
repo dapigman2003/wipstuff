@@ -10,7 +10,7 @@
 - physically closed Step 23.4.3 load-only implementation remains protected;
 - physically closed Step 24.0.6 controlled-initialization implementation remains protected;
 - `System.Collections.Concurrent` remains the one physically proven Step-24 dynamic-IL preservation root, separately classified from the exact Step-22 22-root set;
-- Step 25 adds only the targeted Harmony API/object-construction subsystem, host tests, isolated UI/reporting, release wiring, and current documentation/tooling updates;
+- Step 25 adds only the targeted Harmony API/type-initialization/object-construction subsystem, host tests, isolated UI/reporting, release wiring, and the candidate-only bounded `DynamicDependency` preservation anchor for the exact measured Harmony constructor framework surface;
 - no Harmony patch/processor API, StS2 member reflection/invocation, Godot/game startup, or native game load is introduced.
 
 ## Static/host build
@@ -20,14 +20,14 @@
 - Godot build/preflight passes on Codemagic/macOS;
 - iOS publish succeeds with `TrimMode=full`, `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is `0.0.81 (81)`;
+- expected version is `0.0.82 (82)`;
 - workflow is `ios-step-25`;
 - expected IPA is `artifacts/StS2-Launcher-Step-25.ipa`;
 - host TRX is `artifacts/test-results/step25.trx`.
 
 ## Device
 
-- header identifies `STEP 25 — CONTROLLED HARMONY API RESOLUTION + INSTANCE CONSTRUCTION`;
+- header identifies `STEP 25 — CONTROLLED HARMONY API RESOLUTION + TYPE INITIALIZATION + INSTANCE CONSTRUCTION`;
 - start from a fresh process;
 - Gate A = exact closed Step-24 preconditions plus exact metadata-only Harmony `.cctor`/constructor/API audit, `HARMONY_DEBUG` absent, measured `DEBUG=false` branch, no blocking execution edge;
 - Gate B = exact accepted Step-23 initializer-free context replay, `0Harmony` absent;
