@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>82</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.82</ApplicationDisplayVersion>
+    <ApplicationVersion>83</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.83</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -93,11 +93,11 @@
 
   <Target Name="ValidateRuntimeAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
-             Text="STEP25 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+             Text="STEP26 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Message Importance="High"
-             Text="STEP25 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
+             Text="STEP26 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
     <Message Importance="High"
-             Text="STEP25 CANDIDATE HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
+             Text="STEP26 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
     <Error Condition="'$(MtouchInterpreter)' != '-all'"
            Text="Canonical foundation preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
     <Error Condition="'$(UseInterpreter)' == 'true'"

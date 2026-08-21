@@ -1,39 +1,27 @@
-# StS2 Launcher iOS — Step 25 Controlled Harmony API Resolution + Type Initialization + Instance Construction
+# StS2 Launcher iOS — Step 26 Controlled Empty Harmony PatchProcessor Creation
 
-This repository is the canonical launcher source after the physical closure of **Steps 01–24**.
+Steps 01–25 are physically closed. Step 25.0.2 / `0.0.82 (82)` passed **9/9** on iPhone, followed by OfflineReady PASS and Foundation 5/5.
 
-Step 24.0.6 / `0.0.79 (79)` is physically closed on an iPhone: Gates A–D passed, OfflineReady passed afterward, and Foundation remained 5/5. Exact receipt-backed `0Harmony 2.4.2.0` can therefore enter the dedicated private CLR context and complete its module constructor under the strict managed-plan/native-refusal policy. The `System.Collections.Concurrent` preservation root that allowed the dynamically loaded MonoMod initialization path to reach the framework surface is now protected platform policy, separately classified from the exact 22 Step-22 direct framework roots.
+## Active Step 26 boundary
 
-## Active Step 25 boundary
+Step 26.0 / `0.0.83 (83)` tests the smallest Harmony patch-engine object boundary without patching anything.
 
-Physical Step 25.0.1 / `0.0.81 (81)` advanced **7/9**: Gates A–G passed and Gate H failed only when the exact `Harmony(string)` constructor was invoked because trimmed framework member `System.Environment.Version` was unavailable. Step 25.0.2 / `0.0.82 (82)` keeps the A–I runtime boundary unchanged and adds only a bounded `DynamicDependency` preservation anchor for the measured constructor's framework surface.
+The candidate replays the complete closed Step 25 chain, then:
 
-Step 25 remains inside controlled managed initialization. It advances only from the closed Step 24 state through **targeted Harmony API resolution, explicit initialization of the exact measured `HarmonyLib.Harmony` type initializer, and construction of one inert `HarmonyLib.Harmony` object**.
+- **Gate J:** metadata-audits and resolves exact `Harmony.CreateProcessor(MethodBase)` + `HarmonyLib.PatchProcessor` without type initialization or construction;
+- **Gate K:** explicitly completes only the measured `PatchProcessor` static `locker = new object()` initializer;
+- **Gate L:** resolves one launcher-owned inert host method, `HarmonyProcessorProbe.Target(int)`, without invoking it;
+- **Gate M:** calls only `Harmony.CreateProcessor(MethodBase)` and verifies the returned empty processor retains the exact Harmony object and launcher probe `MethodBase`;
+- **Gate N:** re-hashes/audits everything and re-proves OfflineReady.
 
-The candidate is intentionally narrower than patching:
+`PatchProcessor.Patch`, `Harmony.Patch/PatchAll`, `HarmonyMethod` creation, StS2 member reflection/invocation, Godot/game startup, and native game-library loading remain forbidden.
 
-- **Gate A — InitializationPreflight:** replay the closed Step 23/24 metadata and initializer conditions, then inspect exact `HarmonyLib.Harmony` metadata with Cecil before any Step 25 real game/Harmony CLR load. Require the exact measured three-instruction `HarmonyLib.Harmony::.cctor` static-cache shape, exactly one public `.ctor(System.String)`, public `Id` getter, public static bool `DEBUG`, the expected `HARMONY_DEBUG` environment probe, and a `DEBUG=false` branch that excludes debug-only constructor work.
-- **Gate B — ProvenLoadStateReplay:** recreate the physically proven Step 23 initializer-free private context; `0Harmony` remains absent.
-- **Gate C — DeferredModuleInitialization:** replay the physically proven Step 24 `0Harmony` module-initialization boundary with `RuntimeHelpers.RunModuleConstructor`.
-- **Gate D — ProvenInitializationAudit:** re-prove the complete closed Step 24 post-initialization state before any new Step 25 action.
-- **Gate E — HarmonyApiResolution:** resolve only exact `HarmonyLib.Harmony`, its exact measured type initializer, public `.ctor(string)`, `Id`, and `DEBUG` metadata. Do not read `DEBUG`, execute the type initializer, or construct an object.
-- **Gate F — HarmonyTypeInitialization:** explicitly execute only the exact Gate-A-measured `HarmonyLib.Harmony` type initializer with `RuntimeHelpers.RunClassConstructor`; require `HARMONY_DEBUG` absent, `Harmony.DEBUG == false`, unchanged bytes/context membership, and zero native/unplanned resolution.
-- **Gate G — HarmonyTypeInitializationAudit:** re-audit exact hash/context/resolver state after type initialization and require `Harmony.DEBUG == false` before construction.
-- **Gate H — HarmonyInstanceConstruction:** invoke only the exact public string constructor using fixed probe ID `com.community.sts2launcher.step25.probe`; verify object type/context/ID/DEBUG and require zero new native or unplanned managed resolution.
-- **Gate I — PostConstructionAudit:** re-hash the plan and prepared/live bytes, re-prove OfflineReady, require unchanged private-context membership, and re-verify the retained Harmony object.
+## Build
 
-Step 25 does **not** call `Patch`, `PatchAll`, `PatchCategory`, `PatchAllUncategorized`, `CreateProcessor`, or other patch/processor APIs. It does not discover patch classes, reflect over or invoke StS2 game members, invoke the game entry point, start Godot/game state, or permit native game-library loading.
+Codemagic workflow: `ios-step-26`
 
-## Codemagic
+Expected app version: `0.0.83 (83)`.
 
-Use workflow:
+Expected IPA: `artifacts/StS2-Launcher-Step-26.ipa`.
 
-`ios-step-25`
-
-Expected app version: `0.0.82 (82)`.
-
-Expected IPA: `artifacts/StS2-Launcher-Step-25.ipa`.
-
-## Documentation
-
-Start with `docs/MASTER-PLAN.md` for durable architecture/roadmap rules and `docs/CURRENT-STATUS.md` for the active physical boundary. Historical evidence remains under `docs/history/steps/`; `history.zip` is reference-only and never a build dependency.
+After a fully green Codemagic run, install fresh and run Step 26 A–N. Require **14/14**, then OfflineReady PASS and Foundation 5/5.

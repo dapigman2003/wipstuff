@@ -62,7 +62,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Step 25 Controlled Harmony API Resolution + Type Initialization + Instance Construction Boundary..."
+echo "Publishing Step 26 Controlled Empty Harmony PatchProcessor Creation Boundary..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \
@@ -72,8 +72,8 @@ set -e
 [[ "$status" == "0" ]] || exit "$status"
 
 grep -Fq "$STS2_RUNTIME_POLICY_MARKER MtouchInterpreter=-all" "$PUBLISH_LOG" || { echo "ERROR: runtime-policy telemetry missing." >&2; exit 15; }
-grep -Fq "STEP25 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" "$PUBLISH_LOG" || { echo "ERROR: proven System.Collections.Concurrent preservation telemetry missing." >&2; exit 15; }
-grep -Fq "STEP25 CANDIDATE HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" "$PUBLISH_LOG" || { echo "ERROR: Step 25 Harmony-constructor framework-preservation telemetry missing." >&2; exit 15; }
+grep -Fq "STEP26 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" "$PUBLISH_LOG" || { echo "ERROR: proven System.Collections.Concurrent preservation telemetry missing." >&2; exit 15; }
+grep -Fq "STEP26 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" "$PUBLISH_LOG" || { echo "ERROR: Step 26 Harmony-constructor framework-preservation telemetry missing." >&2; exit 15; }
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'UseInterpreter=true'; then echo "ERROR: broad UseInterpreter=true policy resolved." >&2; exit 15; fi
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'PublishAot=true'; then echo "ERROR: NativeAOT unexpectedly enabled." >&2; exit 15; fi
 BEFORE_LINE="$(grep 'STEP05.2 LINKER FRAMEWORKS BEFORE:' "$PUBLISH_LOG" | tail -1 || true)"

@@ -62,3 +62,6 @@ The current architecture and plan always live one level up in `docs/`.
 - [Step 25 — Controlled Harmony API Resolution + Type Initialization + Instance Construction](steps/STEP-25-CONTROLLED-HARMONY-CONSTRUCTION.md) — active nine-gate candidate that replays closed Step 24, resolves only the exact Harmony API/type-initializer surface, explicitly completes the measured Harmony type initializer, constructs one inert Harmony object, and still forbids patching/game/Godot/native progression.
 - `steps/STEP-25.0.1-HOST-LOCAL-ASSEMBLY-CLASSIFICATION-FIX.md` — Step 25.0 / 0.0.80 compiled and ran 180 host tests at 177/180; 0.0.81 minimally fixes synthetic local-assembly classification plus one stale test-only fingerprint label.
 - `steps/STEP-25.0.2-HARMONY-CONSTRUCTOR-FRAMEWORK-PRESERVATION.md` — physical 0.0.81 advanced 7/9 through Harmony type initialization; Gate H exposed trimmed `Environment.Version`, so 0.0.82 preserves the bounded framework type surface referenced by the exact measured constructor IL.
+
+- `steps/STEP-25.0.2-PHYSICAL-CLOSURE.md` — physical 9/9 Step 25 closure with OfflineReady + Foundation preserved.
+- `steps/STEP-26-CONTROLLED-HARMONY-PROCESSOR-CREATION.md` — active empty PatchProcessor creation design.

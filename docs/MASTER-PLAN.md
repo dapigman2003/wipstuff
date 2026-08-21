@@ -102,6 +102,7 @@ These are architecture, not temporary step hacks:
 - `MtouchInterpreter=-all`, with broad `UseInterpreter=true` and NativeAOT prohibited;
 - the measured 22 direct host framework roots established by Step 22;
 - the separately classified `System.Collections.Concurrent` preservation root physically proven by Step 24 for post-publish MonoMod/Harmony initialization while full trimming remains enabled;
+- the bounded Step-25 `DynamicDependency` preservation anchor for framework types referenced by the physically measured `Harmony(string)` constructor IL, while full trimming and `MtouchInterpreter=-all` remain enabled;
 - iOS Files access enabled for shareable diagnostic reports;
 - no real StS2 assembly CLR load before the explicit first-load subsystem;
 - no initializer-bearing prepared dependency is admitted automatically outside an explicit controlled-initialization subsystem with a measured target and fail-closed resolver/native policy.
@@ -141,7 +142,7 @@ Load the prepared real `sts2.dll` into the private execution context with exact 
 
 ### Phase D — controlled managed initialization
 
-This is the active major phase. Step 24 physically closed the first known automatic-initialization boundary: exact `0Harmony 2.4.2.0` can enter the dedicated private context and complete its module constructor under strict managed-plan resolution/native refusal, with the separately measured `System.Collections.Concurrent` preservation root. The active frontier advances from that closed state through narrowly measured Harmony runtime boundaries: first exact API/type resolution and one inert object construction, then patch-engine/processor and target-method interactions as separate later gates. Keep StS2 game-member invocation, broad game reflection, Godot/game startup, and native game loading separately gated. Identify AOT/reflection/Harmony/runtime-service issues with one causal class per subsystem.
+This is the active major phase. Step 24 physically closed the first known automatic-initialization boundary: exact `0Harmony 2.4.2.0` can enter the dedicated private context and complete its module constructor under strict managed-plan resolution/native refusal, with the separately measured `System.Collections.Concurrent` preservation root. Step 25 then physically closed exact `HarmonyLib.Harmony` API resolution, explicit Harmony type initialization, and one inert `Harmony(string)` object construction, including the bounded framework-surface preservation required by the post-publish constructor IL. The active frontier is now the patch engine itself: admit exact processor/patch-description objects and launcher-owned target metadata behind separate gates before any actual method replacement, then characterize replacement on launcher-owned probes before reflecting or patching StS2 members. Keep StS2 game-member invocation, broad game reflection, Godot/game startup, and native game loading separately gated. Identify AOT/reflection/Harmony/runtime-service issues with one causal class per subsystem.
 
 ### Phase E — Godot/game integration
 

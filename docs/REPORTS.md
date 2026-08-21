@@ -14,9 +14,9 @@ and are visible through:
 
 Specialized full diagnostics may use stable files directly under `Documents/StS2Launcher/`, for example the runtime-binding or framework-frontier reports.
 
-The active Step 25 report is:
+The active Step 26 report is:
 
-`Documents/StS2Launcher/Reports/Step25-ControlledHarmonyConstruction.txt`
+`Documents/StS2Launcher/Reports/Step26-ControlledHarmonyProcessorCreation.txt`
 
 It records the ordered A–I result; Step 23/24 metadata and runtime replay; exact Harmony type-initializer and constructor metadata preflight; exact targeted runtime type/type-initializer/constructor/member resolution; the explicit Harmony type-initialization barrier and its audit; the one controlled Harmony object construction; managed/native resolver observations; post-construction context membership; plan/file hashes; OfflineReady audit; and the explicit no-patching/no-game-reflection/no-Godot/no-native-game boundary.
 
