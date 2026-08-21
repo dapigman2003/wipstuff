@@ -35,11 +35,12 @@ Re-hash the plan and every prepared/live file, re-prove OfflineReady, and requir
 - Step 24.0 / `0.0.73 (73)`: Codemagic static validation passed 281/281, but Core compilation failed before host tests because `ControlledManagedInitialization` referenced nonexistent `SteamOfflineInstallInspection.InspectAsync` / `OfflineReady` members. No IPA or physical Step 24 evidence exists for build 73.
 - Step 24.0.1 / `0.0.74 (74)`: compile-only correction to the established OfflineReady `RunAsync` result contract. Codemagic then compiled successfully and ran 162 host tests; 160 passed and two Gate A safety tests failed because reachable P/Invoke stubs with no managed IL body were not inspected after same-assembly resolution. No IPA or physical Step 24 evidence exists for build 74.
 - Step 24.0.2 / `0.0.75 (75)`: production metadata-audit correction. Gate A inspects a resolved same-assembly target before the managed-body traversal filter, rejects reachable P/Invoke stubs explicitly, and fails closed on any other reachable same-assembly target without managed IL.
-- Step 24.0.3 / `0.0.76 (76)`: physical Gate A metadata-resolution correction. Build 75 stopped before any Step 24 CLR load because Cecil `MethodReference.Resolve()` attempted to resolve `GodotSharp` while walking a nominally same-assembly call. Gate A now resolves local calls strictly from definitions already present in the audited module; unresolved local metadata and genuine non-framework external edges remain fail-closed, and hazard failures include the audited initializer IL.
+- Step 24.0.3 / `0.0.76 (76)`: removed the explicit `MethodReference.Resolve()` path, but physical testing repeated the same 0/4 Gate A `GodotSharp` `AssemblyResolutionException` at broad prepared-target classification. This proved the previous diagnosis was incomplete; no Step 24 CLR load occurred.
+- Step 24.0.4 / `0.0.77 (77)`: active metadata-containment correction. Whole-plan initializer classification is shallow + deferred; only the exact `0Harmony` target receives detailed call-closure traversal; Cecil assembly/metadata resolution is explicitly rejected; method-reference `LookupToken` is removed; and failures preserve exact file/stage plus full exception diagnostics.
 
 ## Candidate identity
 
-- active corrected version: `0.0.76 (76)`
+- active corrected version: `0.0.77 (77)`
 - workflow: `ios-step-24`
 - IPA: `artifacts/StS2-Launcher-Step-24.ipa`
 - device report: `Documents/StS2Launcher/Reports/Step24-ControlledManagedInitialization.txt`

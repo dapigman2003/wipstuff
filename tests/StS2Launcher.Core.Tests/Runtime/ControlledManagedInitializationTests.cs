@@ -115,6 +115,37 @@ public sealed class ControlledManagedInitializationTests
     }
 
     [TestMethod]
+    public void GateAMetadataAuditDoesNotResolveExternalBaseForNominallyLocalMemberRef()
+    {
+        using var temp = new TempTestDirectory("sts2-step24-tests");
+        var path = Path.Combine(temp.Path, "resolver-free-memberref.dll");
+        WriteExternalBaseMemberRefFixture(path);
+
+        var reader = typeof(ControlledManagedInitialization).GetMethod(
+            "ReadPreparedMetadata",
+            BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new AssertFailedException("Step 24 metadata reader was not found.");
+
+        object? snapshot;
+        try
+        {
+            snapshot = reader.Invoke(null, [path, true, "SyntheticHarmony"]);
+        }
+        catch (TargetInvocationException ex)
+        {
+            Assert.Fail("Gate A metadata reader attempted external resolution instead of failing closed from local metadata: " + ex.InnerException);
+            return;
+        }
+
+        Assert.IsNotNull(snapshot);
+        var hazards = snapshot.GetType().GetProperty("InitializerHazards")?.GetValue(snapshot) as IReadOnlyList<string>;
+        Assert.IsNotNull(hazards);
+        Assert.IsTrue(
+            hazards.Any(value => value.Contains("Unresolved same-assembly call (local metadata only)", StringComparison.Ordinal)),
+            "The nominally local inherited MemberRef should become an unresolved-local hazard without consulting GodotSharp metadata.");
+    }
+
+    [TestMethod]
     public async Task GateCReportsThrowingModuleInitializerAndDoesNotAdvance()
     {
         var names = CreateNames();
@@ -446,6 +477,57 @@ public sealed class ControlledManagedInitializationTests
             Assert.AreEqual(MetadataType.Void, initializer.ReturnType.MetadataType);
             Assert.AreEqual("System.Runtime", initializer.ReturnType.Scope?.Name);
         }
+    }
+
+    private static void WriteExternalBaseMemberRefFixture(string path)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        using var assembly = AssemblyDefinition.CreateAssembly(
+            new AssemblyNameDefinition("SyntheticHarmony", ControlledManagedInitialization.TargetVersion),
+            "SyntheticHarmony",
+            ModuleKind.Dll);
+
+        var runtimeName = Assembly.Load(new AssemblyName("System.Runtime")).GetName();
+        var runtimeReference = CreateAssemblyNameReference(ToReferenceSpec(runtimeName, "System.Runtime"));
+        assembly.MainModule.AssemblyReferences.Add(runtimeReference);
+        var voidType = assembly.MainModule.TypeSystem.Void;
+        Assert.AreSame(runtimeReference, voidType.Scope);
+
+        var godotReference = new AssemblyNameReference("GodotSharp", new Version(4, 5, 1, 0));
+        assembly.MainModule.AssemblyReferences.Add(godotReference);
+        var unavailableBase = new TypeReference(
+            "Godot",
+            "GodotObject",
+            assembly.MainModule,
+            godotReference,
+            false);
+        var derived = new TypeDefinition(
+            "StS2Launcher.Step24.Tests",
+            "DerivedFromUnavailableGodot",
+            Mono.Cecil.TypeAttributes.NotPublic,
+            unavailableBase);
+        assembly.MainModule.Types.Add(derived);
+
+        var moduleType = assembly.MainModule.Types.Single(type => type.Name == "<Module>");
+        var initializer = new MethodDefinition(
+            ".cctor",
+            Mono.Cecil.MethodAttributes.Private |
+            Mono.Cecil.MethodAttributes.Static |
+            Mono.Cecil.MethodAttributes.SpecialName |
+            Mono.Cecil.MethodAttributes.RTSpecialName,
+            voidType);
+        moduleType.Methods.Add(initializer);
+
+        // Deliberately declare the MemberRef on the local derived type without defining the method
+        // there. A general Cecil Resolve() would be allowed to walk the unavailable Godot base type;
+        // Step 24 must instead stop from local metadata with an unresolved-local hazard.
+        var inheritedReference = new MethodReference("InheritedTouch", voidType, derived)
+        {
+            HasThis = false,
+        };
+        initializer.Body.Instructions.Add(Instruction.Create(OpCodes.Call, inheritedReference));
+        initializer.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+        assembly.Write(path);
     }
 
     private static MethodDefinition CreatePInvokeProbe(TypeReference voidType, ModuleReference nativeModule)

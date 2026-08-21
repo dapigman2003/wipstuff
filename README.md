@@ -21,7 +21,7 @@ The candidate remains intentionally narrower than “use Harmony”:
 
 Step 24 does **not** call Harmony patch APIs, inspect or invoke StS2 game types/members, invoke a game entry point, start Godot/game state, or permit native game-library loading.
 
-Step 24.0 / `0.0.73 (73)` was rejected by Codemagic at Core compilation before host tests because the new subsystem referenced the wrong OfflineReady inspection method. Step 24.0.1 / `0.0.74 (74)` compiled and ran the full host suite, where two Gate A safety tests exposed that reachable same-assembly P/Invoke stubs were skipped because they have no managed method body. Step 24.0.2 / `0.0.75 (75)` corrected that issue and reached a physical iPhone, where Gate A failed safely during prepared-target classification because Cecil attempted to resolve `GodotSharp` while traversing a nominally same-assembly method reference. No Step 24 CLR load occurred. The active Step 24.0.3 / `0.0.76 (76)` candidate removes external Cecil assembly resolution from the initializer audit: same-assembly traversal is resolved only from definitions already present in the target module, while genuine external `GodotSharp` or other non-framework execution edges remain prohibited and will be reported explicitly.
+Step 24.0 / `0.0.73 (73)` was rejected by Codemagic at Core compilation before host tests because the new subsystem referenced the wrong OfflineReady inspection method. Step 24.0.1 / `0.0.74 (74)` compiled and ran the full host suite, where two Gate A safety tests exposed that reachable same-assembly P/Invoke stubs were skipped because they have no managed method body. Step 24.0.2 / `0.0.75 (75)` corrected that issue and reached a physical iPhone, where Gate A failed safely during prepared-target classification because Cecil attempted to resolve `GodotSharp`. Step 24.0.3 / `0.0.76 (76)` removed the explicit `MethodReference.Resolve()` path but physically repeated the same Gate A `GodotSharp` resolver failure, proving the first diagnosis was incomplete. The active Step 24.0.4 / `0.0.77 (77)` candidate uses deferred two-pass metadata classification, audits the detailed automatic-initialization closure only for the exact `0Harmony` target, rejects all Cecil assembly/metadata resolution explicitly, and removes method-reference `LookupToken` use. Genuine external `GodotSharp` or other non-framework execution edges remain prohibited.
 
 ## Codemagic
 
@@ -29,7 +29,7 @@ Use workflow:
 
 `ios-step-24`
 
-Expected app version: `0.0.76 (76)`.
+Expected app version: `0.0.77 (77)`.
 
 ## Documentation
 

@@ -12,6 +12,7 @@
 - Step 24.0.1 corrected only the OfflineReady inspection API used by the Step 24 subsystem.
 - Step 24.0.2 corrects the Gate A same-assembly P/Invoke audit blind spot exposed by the 0.0.74 host suite; no gate ordering, initializer target, resolver, module-constructor, Harmony/game invocation, or native-load policy broadening is allowed.
 - Step 24.0.3 corrects the physical 0.0.75 Gate A Cecil-resolution failure by forbidding external assembly resolution during same-assembly initializer traversal. Local calls are matched only against definitions already present in the audited module; unresolved local metadata and genuine non-framework edges still fail closed.
+- Step 24.0.4 responds to the repeated physical 0.0.76 resolver failure by separating shallow whole-plan initializer classification from target-only closure traversal, switching the Step 24 reader to deferred mode, binding explicit rejecting Cecil assembly/metadata resolvers, removing method-reference `LookupToken`, and preserving exact-stage/full-exception diagnostics. No runtime allowlist or execution boundary is broadened.
 
 ## Static/host build
 
@@ -20,7 +21,7 @@
 - Godot build/preflight passes on Codemagic/macOS;
 - iOS publish succeeds with `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is `0.0.76 (76)`;
+- expected version is `0.0.77 (77)`;
 - workflow is `ios-step-24`;
 - expected IPA is `artifacts/StS2-Launcher-Step-24.ipa`.
 

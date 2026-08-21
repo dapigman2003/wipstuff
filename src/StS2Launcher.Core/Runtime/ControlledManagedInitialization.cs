@@ -172,14 +172,19 @@ public sealed class ControlledManagedInitialization : IDisposable
                 NormalizeRelative(offline.ManagedInstallRelativePath ?? plan.ManagedInstallRelativePath),
                 "managed install root");
 
-            stage = "prepared target classification";
+            // First classify only initializer presence across the exact prepared plan. Keep this pass
+            // deliberately shallow: no method-body traversal and no dependency metadata resolution.
+            // The detailed automatic-execution closure is audited only after the sole target identity
+            // has been established from the complete prepared set.
+            stage = "prepared initializer classification";
             var prepared = new List<PreparedAssemblySnapshot>(plan.PreparedAssemblies.Length);
             foreach (var item in plan.PreparedAssemblies)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                stage = $"prepared initializer classification: {item.RelativePath}";
                 var preparedPath = ResolveChildPath(_preparedRoot, item.RelativePath, "prepared assembly path");
                 var livePath = ResolveChildPath(managedRoot, item.RelativePath, "live assembly path");
-                var metadata = ReadPreparedMetadata(preparedPath, includeInitializerCallGraph: true, _targetSimpleName);
+                var metadata = ReadPreparedMetadata(preparedPath, includeInitializerCallGraph: false, _targetSimpleName);
                 prepared.Add(new PreparedAssemblySnapshot(
                     item,
                     preparedPath,
@@ -216,6 +221,27 @@ public sealed class ControlledManagedInitialization : IDisposable
             }
             if (target.ModuleInitializerCount != 1)
                 throw new InvalidDataException($"Step 24.0 expected exactly one {_targetSimpleName} <Module>..cctor, found {target.ModuleInitializerCount}.");
+
+            // Now audit only the exact deferred target. This prevents unrelated prepared assemblies
+            // from forcing method-body materialization merely to classify whether they own a module
+            // initializer, and gives any remaining metadata-only failure an exact target/stage.
+            stage = $"target automatic-initialization closure audit: {target.Plan.RelativePath}";
+            var targetMetadata = ReadPreparedMetadata(target.PreparedPath, includeInitializerCallGraph: true, _targetSimpleName);
+            if (targetMetadata.ModuleInitializerCount != target.ModuleInitializerCount)
+                throw new InvalidDataException("Step 24 target module-initializer count changed between shallow classification and detailed audit.");
+
+            target = target with
+            {
+                AutomaticInitializerCount = targetMetadata.AutomaticInitializerCount,
+                AutomaticInitializerAudits = targetMetadata.AutomaticInitializerAudits,
+                InitializerReachableMethods = targetMetadata.InitializerReachableMethods,
+                InitializerHazards = targetMetadata.InitializerHazards,
+            };
+            var targetIndex = prepared.FindIndex(item => item.Plan.RelativePath.Equals(target.Plan.RelativePath, StringComparison.Ordinal));
+            if (targetIndex < 0)
+                throw new InvalidDataException("Step 24 could not relocate the selected initializer target in the prepared classification set.");
+            prepared[targetIndex] = target;
+
             if (target.InitializerHazards.Count != 0)
             {
                 throw new InvalidDataException(
@@ -571,11 +597,14 @@ public sealed class ControlledManagedInitialization : IDisposable
 
     private static PreparedMetadataSnapshot ReadPreparedMetadata(string path, bool includeInitializerCallGraph, string targetSimpleName)
     {
+        using var resolver = new Step24MetadataOnlyResolver(path);
         using var module = ModuleDefinition.ReadModule(path, new ReaderParameters
         {
             InMemory = true,
             ReadSymbols = false,
-            ReadingMode = ReadingMode.Immediate,
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = resolver,
+            MetadataResolver = resolver,
         });
         if (module.Assembly?.Name is null)
             throw new BadImageFormatException("Managed assembly manifest missing: " + path);
@@ -702,19 +731,11 @@ public sealed class ControlledManagedInitialization : IDisposable
         if (elementMethod is MethodDefinition elementDefinition && ReferenceEquals(elementDefinition.Module, module))
             return elementDefinition;
 
-        // A MethodDef token can be recovered directly from the current module. MemberRef/MethodSpec
-        // tokens intentionally do not trigger Cecil assembly resolution here.
-        try
-        {
-            if (module.LookupToken(called.MetadataToken) is MethodDefinition tokenDefinition)
-                return tokenDefinition;
-        }
-        catch (ArgumentException)
-        {
-            // Invalid/non-local token for this module: continue to deterministic local matching.
-        }
-
-        var declaringTypeName = called.DeclaringType.GetElementType().FullName;
+        // Do not call ModuleDefinition.LookupToken for a MethodReference here. MethodDef operands
+        // were already handled above; MemberRef/MethodSpec operands are matched deterministically
+        // against definitions already materialized from this module. This keeps the audit independent
+        // from Cecil token-resolution machinery and therefore from external assembly metadata.
+        var declaringTypeName = GetElementTypeWithoutResolution(called.DeclaringType).FullName;
         if (!typesByFullName.TryGetValue(declaringTypeName, out var declaringType))
             return null;
 
@@ -737,6 +758,13 @@ public sealed class ControlledManagedInitialization : IDisposable
         return exact.Length == 1 ? exact[0] : null;
     }
 
+    private static TypeReference GetElementTypeWithoutResolution(TypeReference type)
+    {
+        while (type is TypeSpecification specification)
+            type = specification.ElementType;
+        return type;
+    }
+
     private static bool MetadataSignatureEquals(MethodReference definition, MethodReference reference)
     {
         if (!definition.ReturnType.FullName.Equals(reference.ReturnType.FullName, StringComparison.Ordinal))
@@ -756,7 +784,7 @@ public sealed class ControlledManagedInitialization : IDisposable
         ISet<int> visited,
         Queue<MethodDefinition> queue)
     {
-        var elementName = declaringType.GetElementType().FullName;
+        var elementName = GetElementTypeWithoutResolution(declaringType).FullName;
         if (!typesByFullName.TryGetValue(elementName, out var type))
             return;
 
@@ -976,7 +1004,31 @@ public sealed class ControlledManagedInitialization : IDisposable
         => new(gate, true, detail);
 
     private static ControlledManagedInitializationGateResult Fail(ControlledManagedInitializationGate gate, string stage, Exception ex)
-        => new(gate, false, $"Stage: {stage}\n{ex.GetType().Name}: {ex.Message}");
+        => new(gate, false, $"Stage: {stage}\n{ex}");
+
+    private sealed class Step24MetadataOnlyResolver(string auditedPath) : IAssemblyResolver, IMetadataResolver
+    {
+        public AssemblyDefinition Resolve(AssemblyNameReference name)
+            => throw new InvalidOperationException(
+                $"Step 24 Gate A metadata-only audit attempted forbidden external assembly resolution while reading '{auditedPath}': {name.FullName}");
+
+        public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
+            => Resolve(name);
+
+        TypeDefinition IMetadataResolver.Resolve(TypeReference type)
+            => throw new InvalidOperationException(
+                $"Step 24 Gate A metadata-only audit attempted forbidden type resolution while reading '{auditedPath}': {type.FullName}");
+
+        FieldDefinition IMetadataResolver.Resolve(FieldReference field)
+            => throw new InvalidOperationException(
+                $"Step 24 Gate A metadata-only audit attempted forbidden field resolution while reading '{auditedPath}': {field.FullName}");
+
+        MethodDefinition IMetadataResolver.Resolve(MethodReference method)
+            => throw new InvalidOperationException(
+                $"Step 24 Gate A metadata-only audit attempted forbidden method resolution while reading '{auditedPath}': {method.FullName}");
+
+        public void Dispose() { }
+    }
 
     private sealed class CallbackProgress<T> : IProgress<T>
     {

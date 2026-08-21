@@ -85,7 +85,7 @@ Build `0.0.73 (73)` is not a physical-test candidate: Codemagic rejected it at C
 
 Build `0.0.75 (75)` reached the physical iPhone but failed safely in Gate A during metadata classification because Cecil attempted to resolve `GodotSharp`; no Step 24 CLR load occurred.
 
-Install version `0.0.76 (76)` only after Codemagic host tests and IPA verification are fully green. Build 76 must retain Gate A's no-external-resolution rule: an actually reachable `GodotSharp` call is expected to fail as an explicit prohibited edge with audited IL, while Cecil must not abort merely because external assembly resolution is unavailable. Then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
+Install version `0.0.77 (77)` only after Codemagic host tests and IPA verification are fully green. Build 77 must retain Gate A's no-external-resolution rule while also proving the revised two-pass metadata behavior: shallow deferred whole-plan initializer classification first, then detailed closure traversal only for the exact `0Harmony` target. An actually reachable `GodotSharp` call must fail as an explicit prohibited edge with audited IL; any Cecil resolver attempt must fail with the exact prepared path/stage rather than widening the metadata environment. Then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
 
 Run Step 24 A–D in order and require:
 

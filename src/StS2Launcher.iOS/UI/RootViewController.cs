@@ -209,7 +209,7 @@ public sealed partial class RootViewController : UIViewController
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.76",
+            "Version 0.0.77",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
