@@ -11,7 +11,7 @@ export DOTNET_ROOT PATH="$DOTNET_ROOT:$PATH" DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNE
 [[ "$(uname -s)" == "Darwin" ]] || { echo "ERROR: Codemagic iOS build must run on macOS." >&2; exit 2; }
 
 {
-  echo "StS2 Launcher — Step 24 Controlled 0Harmony Module Initialization Boundary build environment"
+  echo "StS2 Launcher — Step 25 Controlled Harmony API Resolution + Type Initialization + Instance Construction Boundary build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -50,7 +50,7 @@ STS2_SKIP_STATIC_VALIDATION=1 bash scripts/build-ios.sh 2>&1 | tee artifacts/rep
 bash scripts/verify-ipa.sh "$STS2_IPA_REL"
 
 {
-  echo "StS2 Launcher iOS — Step 24 Controlled 0Harmony Module Initialization Boundary"
+  echo "StS2 Launcher iOS — Step 25 Controlled Harmony API Resolution + Type Initialization + Instance Construction Boundary"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"

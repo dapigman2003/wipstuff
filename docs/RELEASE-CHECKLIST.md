@@ -1,4 +1,4 @@
-# Release Checklist — Step 24
+# Release Checklist — Step 25
 
 ## Source/package
 
@@ -7,43 +7,51 @@
 - `history.zip` is optional/inert and not needed by validation or build;
 - no game payload, Steam reusable secrets, Apple signing secrets, or proprietary native game binaries in source/archive;
 - Step 22.4.2 protected behavior remains intact;
-- the physically closed Step 23.4.3 load-only implementation remains protected;
-- Step 24 is additive: controlled initialization subsystem, host tests, isolated UI/reporting, release wiring, and current documentation/tooling updates;
-- Step 24.0.1 corrected only the OfflineReady inspection API used by the Step 24 subsystem.
-- Step 24.0.2 corrects the Gate A same-assembly P/Invoke audit blind spot exposed by the 0.0.74 host suite; no gate ordering, initializer target, resolver, module-constructor, Harmony/game invocation, or native-load policy broadening is allowed.
-- Step 24.0.3 corrects the physical 0.0.75 Gate A Cecil-resolution failure by forbidding external assembly resolution during same-assembly initializer traversal. Local calls are matched only against definitions already present in the audited module; unresolved local metadata and genuine non-framework edges still fail closed.
-- Step 24.0.4 responded to the repeated physical 0.0.76 resolver failure by separating shallow whole-plan initializer classification from target-only closure traversal, switching the Step 24 reader to deferred mode, binding explicit rejecting Cecil assembly/metadata resolvers, removing method-reference `LookupToken`, and preserving exact-stage/full-exception diagnostics. Physical build 77 eliminated the resolver failure and measured the real target closure as seven conservative MonoMod logging dispatch findings plus four automatic initializers; Gate B did not run.
-- Step 24.0.5 retains the conservative audit and adds only a conditional classification for that exact physical seven-finding fingerprint under the exact measured initializer shape and an inert MonoMod logging state (no debugger, no `MONOMOD_*` environment-variable name, no relevant logging AppContext override). Generic delegate/bodyless/PInvoke/native/reflection/dynamic/unresolved findings remain fail-closed.
-- Step 24.0.6 responds to physical build 78 reaching Gate C and failing in `MonoMod.Logs.DebugLog::.cctor` with `MissingMethodException` for `System.Collections.Concurrent.ConcurrentBag<T>::.ctor()`. The only runtime-build change is one candidate-only `TrimmerRootAssembly` for `System.Collections.Concurrent`; full trimming, `MtouchInterpreter=-all`, the exact Step 22 22-root set, Gate A/B/C/D logic, resolver/native policy, and no-Harmony/game boundary remain unchanged.
+- physically closed Step 23.4.3 load-only implementation remains protected;
+- physically closed Step 24.0.6 controlled-initialization implementation remains protected;
+- `System.Collections.Concurrent` remains the one physically proven Step-24 dynamic-IL preservation root, separately classified from the exact Step-22 22-root set;
+- Step 25 adds only the targeted Harmony API/object-construction subsystem, host tests, isolated UI/reporting, release wiring, and current documentation/tooling updates;
+- no Harmony patch/processor API, StS2 member reflection/invocation, Godot/game startup, or native game load is introduced.
 
 ## Static/host build
 
 - `bash scripts/validate.sh` passes;
 - `bash scripts/test.sh` passes;
 - Godot build/preflight passes on Codemagic/macOS;
-- iOS publish succeeds with `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
+- iOS publish succeeds with `TrimMode=full`, `MtouchInterpreter=-all`, `UseInterpreter!=true`, `PublishAot!=true`;
 - IPA verification passes;
-- expected version is `0.0.79 (79)`;
-- workflow is `ios-step-24`;
-- expected IPA is `artifacts/StS2-Launcher-Step-24.ipa`.
+- expected version is `0.0.80 (80)`;
+- workflow is `ios-step-25`;
+- expected IPA is `artifacts/StS2-Launcher-Step-25.ipa`;
+- host TRX is `artifacts/test-results/step25.trx`.
 
 ## Device
 
-- header `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`;
+- header identifies `STEP 25 — CONTROLLED HARMONY API RESOLUTION + INSTANCE CONSTRUCTION`;
 - start from a fresh process;
-- Gate A = exact sole initializer target `0Harmony 2.4.2.0`, one `<Module>..cctor`, bounded automatic-initialization closure (including implicit type constructors) fully measured; current physical target must report raw findings 7, conditional findings 7, effective blocking hazards 0, and conditional policy PASS;
-- Gate B = exact accepted Step 23 initializer-free context replay, `0Harmony` still absent;
-- Gate C = exact target load plus `RuntimeHelpers.RunModuleConstructor` completion barrier under the single `System.Collections.Concurrent` preservation root, zero native/unplanned requests;
-- Gate D = exact post-initialization context/byte/OfflineReady audit;
-- Step 24 = 4/4;
-- `Reports/Step24-ControlledManagedInitialization.txt` exists;
+- Gate A = exact closed Step-24 preconditions plus exact metadata-only Harmony `.cctor`/constructor/API audit, `HARMONY_DEBUG` absent, measured `DEBUG=false` branch, no blocking execution edge;
+- Gate B = exact accepted Step-23 initializer-free context replay, `0Harmony` absent;
+- Gate C = exact closed Step-24 target load + `RuntimeHelpers.RunModuleConstructor`, zero native/unplanned requests;
+- Gate D = exact closed Step-24 post-initialization audit;
+- Gate E = exact runtime `HarmonyLib.Harmony` + measured `.cctor` + `.ctor(string)` + `Id` + `DEBUG` resolution only; no `DEBUG` read, no type initialization, no construction;
+- Gate F = exact measured Harmony type initializer completed with `RuntimeHelpers.RunClassConstructor`, `Harmony.DEBUG=false`, unchanged context/hash, zero native/unplanned requests;
+- Gate G = exact post-type-initialization hash/context/resolver/DEBUG audit;
+- Gate H = exact constructor invocation with fixed probe ID, exact object/type/context/ID/DEBUG verification, unchanged context membership/hash, zero native/unplanned requests;
+- Gate I = exact post-construction plan/file/OfflineReady/context/object audit;
+- Step 25 = **9/9**;
+- `Reports/Step25-ControlledHarmonyConstruction.txt` exists;
 - OfflineReady = PASS;
 - Foundation 5/5 = PASS.
 
 ## Stop conditions
 
-- If Gate A finds a second initializer-bearing dependency, identity/version drift, an unresolved same-assembly call, P/Invoke/`calli`/native-loader/explicit runtime-constructor/reflection-dynamic/non-framework execution, any function/delegate/bodyless dispatch outside the exact seven-finding physical MonoMod fingerprint, any fingerprint/initializer-shape drift, a debugger, any `MONOMOD_*` environment override name, any relevant MonoMod logging AppContext override, any Cecil external assembly-resolution attempt, or any accepted Step 23 preflight regression, stop before Step 24 CLR loading and send the report.
-- If Gate B fails to reproduce the exact Step 23 inert context, stop; do not admit `0Harmony`.
-- If Gate C throws, requests native code, makes an unplanned managed request, or admits another initializer-bearing assembly, stop. If the build-78 `ConcurrentBag<T>::.ctor()` failure persists, treat the one-root preservation hypothesis as disproven rather than broadening trimming/interpreter policy. Do not broaden resolver/native policy or call a Harmony API.
-- If Gate D detects byte/plan/OfflineReady/context drift, treat Step 24 as unclosed.
+- If Gate A finds any Step-23/24 regression, target/API identity drift, changed/missing Harmony type initializer, constructor-shape drift, non-empty `HARMONY_DEBUG`, missing DEBUG guard, or blocking constructor execution edge, stop before Step-25 CLR loading and send the report.
+- If Gate B fails to reproduce the exact Step-23 inert context, stop; do not admit `0Harmony`.
+- If Gate C fails to reproduce the physically closed Step-24 module-initialization state, stop; do not resolve Harmony.
+- If Gate D finds Step-24 byte/plan/OfflineReady/context drift, stop before targeted reflection.
+- If Gate E resolves anything other than the exact measured Harmony API/type-initializer surface, stop before Gate F. Gate E must not read `DEBUG`, run the type initializer, or construct an object.
+- If Gate F throws, produces `Harmony.DEBUG=true`, changes context membership/hash, causes native resolution, or makes an unplanned managed request, stop before construction.
+- If Gate G detects post-type-initialization hash/context/resolver/DEBUG drift, stop before construction.
+- If Gate H throws, changes context membership/hash, causes native resolution, or makes an unplanned managed request, stop; do not attempt patching or game reflection.
+- If Gate I detects byte/plan/OfflineReady/context/object drift, treat Step 25 as unclosed.
 - After Gate B, force-quit before rerunning any fresh-process runtime regression.

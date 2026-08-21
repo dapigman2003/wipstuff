@@ -12,7 +12,7 @@ Platform-neutral logic. Subsystems:
 - `Steam` — authentication, ownership, content, download, install/update/repair, offline state;
 - `Compatibility` — Cecil preparation/analysis/rewrite boundaries;
 - `Godot` — managed gate model for the source-built Godot host;
-- `Runtime` — dynamic managed execution, runtime binding/framework closure, the physically proven first real game assembly load boundary, and the explicit controlled managed-initialization boundary;
+- `Runtime` — dynamic managed execution, runtime binding/framework closure, the physically proven first real game assembly load boundary, the physically proven controlled dependency-initialization boundary, and the active targeted Harmony API/object-construction boundary;
 - `Diagnostics` — shareable report infrastructure.
 
 ### `src/StS2Launcher.iOS`
@@ -75,10 +75,10 @@ The canonicalization does not change:
 - Mono.Cecil 0.11.6 behavior;
 - `MtouchInterpreter=-all`;
 - the exact measured 22 Step 22 direct framework roots;
-- Step 24.0.6 currently adds one separately classified **candidate-only** preservation root, `System.Collections.Concurrent`, after physical build 78 reached dynamically loaded MonoMod code whose `ConcurrentBag<T>` constructor had been removed from the fully trimmed host. This does not redefine the Step 22 22-root set and is not yet a durable platform policy;
+- the separately classified `System.Collections.Concurrent` preservation root is physically proven by Step 24.0.6 for the post-publish MonoMod/Harmony initialization path. It remains distinct from the exact Step-22 22-root direct framework set;
 - Files-based diagnostic sharing;
 - the Step 23 rule that real StS2 CLR loading occurs only in the explicit dedicated private load subsystem;
-- initializer-bearing prepared dependencies remain excluded until an explicit controlled-initialization boundary admits a measured exact identity;
-- strict managed-plan resolution and native-load refusal remain in force while crossing controlled initialization; Harmony patch APIs, StS2 member invocation, Godot/game startup, and native game loading remain later boundaries.
+- initializer-bearing prepared dependencies remain excluded until an explicit controlled-initialization boundary admits a measured exact identity; Step 24 physically proved that exact admission and module-constructor completion for `0Harmony 2.4.2.0`;
+- strict managed-plan resolution and native-load refusal remain in force while crossing controlled initialization; Step 25 may resolve only the exact measured Harmony API/type-initializer surface, explicitly complete only the measured `HarmonyLib.Harmony` type initializer under its own gate, and construct one inert Harmony object; patch/processor APIs, StS2 member invocation, Godot/game startup, and native game loading remain later boundaries.
 
 See `MASTER-PLAN.md` for rationale and roadmap.

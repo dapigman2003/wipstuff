@@ -62,7 +62,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Step 24 Controlled 0Harmony Module Initialization Boundary..."
+echo "Publishing Step 25 Controlled Harmony API Resolution + Type Initialization + Instance Construction Boundary..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \

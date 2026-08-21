@@ -52,6 +52,22 @@ The current contract remains:
 
 The wider 44-name host probe is diagnostic; transitive-only desktop implementation names are not independent private-runtime requirements.
 
+## Step 24 — controlled `0Harmony` automatic initialization
+
+Step 24.0.6 is physically closed. Its current regression contract is capability-level rather than candidate-history-specific:
+
+- exact sole initializer-bearing prepared target remains `0Harmony 2.4.2.0`;
+- the exact physically measured automatic-initializer/conditional MonoMod logger policy remains fail-closed;
+- the dedicated private context may admit exact `0Harmony` only after the initializer-free Step-23 closure has been reproduced;
+- `RuntimeHelpers.RunModuleConstructor` completes;
+- the separately classified `System.Collections.Concurrent` preservation root remains present while `TrimMode=full` and `MtouchInterpreter=-all` remain unchanged;
+- native resolution and rejected/unplanned managed resolution remain zero;
+- final private-context membership equals the Step-23 initializer-free closure plus exactly `0Harmony`;
+- plan/prepared/live bytes and OfflineReady remain exact;
+- Harmony patch/processor APIs, StS2 game invocation/reflection, Godot/game startup, and native game loading are not part of the Step-24 regression.
+
+Later steps may use the loaded/initialized Harmony assembly, but they must replay or otherwise protect this capability before advancing a new boundary.
+
 ## Changing a contract later
 
 Before changing one of these contracts:

@@ -1,36 +1,36 @@
-# StS2 Launcher iOS — Step 24 Controlled 0Harmony Module Initialization Boundary
+# StS2 Launcher iOS — Step 25 Controlled Harmony API Resolution + Type Initialization + Instance Construction
 
-This repository is the canonical launcher source after the physical closure of Step 23.4.3.
+This repository is the canonical launcher source after the physical closure of **Steps 01–24**.
 
-Step 23 is now proven on a physical iPhone: all four first-real-load gates passed, OfflineReady passed afterward, and Foundation remained 5/5. The real receipt-backed `sts2.dll` plus the maximal initializer-free prepared managed closure can therefore enter the dedicated private CLR load context while initializer-bearing dependencies remain excluded.
+Step 24.0.6 / `0.0.79 (79)` is physically closed on an iPhone: Gates A–D passed, OfflineReady passed afterward, and Foundation remained 5/5. Exact receipt-backed `0Harmony 2.4.2.0` can therefore enter the dedicated private CLR context and complete its module constructor under the strict managed-plan/native-refusal policy. The `System.Collections.Concurrent` preservation root that allowed the dynamically loaded MonoMod initialization path to reach the framework surface is now protected platform policy, separately classified from the exact 22 Step-22 direct framework roots.
 
-## Active Step 24 boundary
+## Active Step 25 boundary
 
-Step 24 advances exactly to the sole deferred automatic-execution boundary observed in Step 23:
+Step 25 remains inside controlled managed initialization. It advances only from the closed Step 24 state through **targeted Harmony API resolution, explicit initialization of the exact measured `HarmonyLib.Harmony` type initializer, and construction of one inert `HarmonyLib.Harmony` object**.
 
-`0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null`
+The candidate is intentionally narrower than patching:
 
-The candidate remains intentionally narrower than “use Harmony”:
+- **Gate A — InitializationPreflight:** replay the closed Step 23/24 metadata and initializer conditions, then inspect exact `HarmonyLib.Harmony` metadata with Cecil before any Step 25 real game/Harmony CLR load. Require the exact measured three-instruction `HarmonyLib.Harmony::.cctor` static-cache shape, exactly one public `.ctor(System.String)`, public `Id` getter, public static bool `DEBUG`, the expected `HARMONY_DEBUG` environment probe, and a `DEBUG=false` branch that excludes debug-only constructor work.
+- **Gate B — ProvenLoadStateReplay:** recreate the physically proven Step 23 initializer-free private context; `0Harmony` remains absent.
+- **Gate C — DeferredModuleInitialization:** replay the physically proven Step 24 `0Harmony` module-initialization boundary with `RuntimeHelpers.RunModuleConstructor`.
+- **Gate D — ProvenInitializationAudit:** re-prove the complete closed Step 24 post-initialization state before any new Step 25 action.
+- **Gate E — HarmonyApiResolution:** resolve only exact `HarmonyLib.Harmony`, its exact measured type initializer, public `.ctor(string)`, `Id`, and `DEBUG` metadata. Do not read `DEBUG`, execute the type initializer, or construct an object.
+- **Gate F — HarmonyTypeInitialization:** explicitly execute only the exact Gate-A-measured `HarmonyLib.Harmony` type initializer with `RuntimeHelpers.RunClassConstructor`; require `HARMONY_DEBUG` absent, `Harmony.DEBUG == false`, unchanged bytes/context membership, and zero native/unplanned resolution.
+- **Gate G — HarmonyTypeInitializationAudit:** re-audit exact hash/context/resolver state after type initialization and require `Harmony.DEBUG == false` before construction.
+- **Gate H — HarmonyInstanceConstruction:** invoke only the exact public string constructor using fixed probe ID `com.community.sts2launcher.step25.probe`; verify object type/context/ID/DEBUG and require zero new native or unplanned managed resolution.
+- **Gate I — PostConstructionAudit:** re-hash the plan and prepared/live bytes, re-prove OfflineReady, require unchanged private-context membership, and re-verify the retained Harmony object.
 
-- Gate A replays the accepted Step 23 preflight and requires exactly one initializer-bearing dependency, exactly `0Harmony 2.4.2.0` with one `<Module>..cctor`.
-- A bounded Cecil same-assembly automatic-initialization audit runs before any Step 24 CLR load. It follows direct same-assembly calls plus implicitly triggerable same-assembly type constructors and resolves local calls only from metadata already present in the audited module. The raw audit remains conservative for P/Invoke, `calli`, function/delegate indirection, bodyless dispatch, native-library APIs, explicit runtime-constructor APIs, reflection/dynamic invocation, unresolved local calls, and unexpected non-framework execution edges. Step 24.0.5 may downgrade only the exact seven physically measured MonoMod logging dispatch findings to conditionally dormant when the exact measured initializer shape is unchanged and no debugger, `MONOMOD_*` environment override, or relevant MonoMod logging AppContext override is present; every other finding remains blocking.
-- Gate B recreates the physically proven Step 23 initializer-free private context in the same Step 24 load context.
-- Gate C admits exactly `0Harmony`, loads the receipt-hashed prepared bytes, and calls `RuntimeHelpers.RunModuleConstructor` as the explicit completion barrier for the module constructor.
-- Step 24.0.6 additionally roots only `System.Collections.Concurrent` in the iOS host because physical build 78 proved that the dynamically loaded MonoMod initializer reached a framework constructor removed from the fully trimmed host. The exact Step 22 22-root set remains intact; this is a separate unproven Step 24 preservation root.
-- The strict private resolver still rejects all native-library resolution, unplanned managed loads, and any untargeted initializer-bearing dependency.
-- Gate D re-hashes the runtime plan and every prepared/live file, re-proves OfflineReady, and requires the private context to equal the Step 23 closure plus exactly `0Harmony`.
-
-Step 24 does **not** call Harmony patch APIs, inspect or invoke StS2 game types/members, invoke a game entry point, start Godot/game state, or permit native game-library loading.
-
-Step 24.0 / `0.0.73 (73)` was rejected by Codemagic at Core compilation before host tests because the new subsystem referenced the wrong OfflineReady inspection method. Step 24.0.1 / `0.0.74 (74)` compiled and ran the full host suite, where two Gate A safety tests exposed that reachable same-assembly P/Invoke stubs were skipped because they have no managed method body. Step 24.0.2 / `0.0.75 (75)` corrected that issue and reached a physical iPhone, where Gate A failed safely during prepared-target classification because Cecil attempted to resolve `GodotSharp`. Step 24.0.3 / `0.0.76 (76)` removed the explicit `MethodReference.Resolve()` path but physically repeated the same Gate A `GodotSharp` resolver failure. Step 24.0.4 / `0.0.77 (77)` eliminated that resolver problem and physically exposed the real target closure: exactly seven conservative MonoMod logging dispatch findings and four automatic initializers; Gate A correctly stopped before Gate B. Step 24.0.5 / `0.0.78 (78)` then passed Gates A and B on-device and reached the real Gate C module-constructor boundary. `0Harmony` loaded and `<Module>..cctor` began, but `MonoMod.Logs.DebugLog::.cctor` failed with a missing `System.Collections.Concurrent.ConcurrentBag<T>` parameterless constructor in the fully trimmed iOS host. The active Step 24.0.6 / `0.0.79 (79)` retains the exact runtime gates and adds only one candidate-only build root, `System.Collections.Concurrent`, so the post-publish MonoMod IL can reach that framework surface without disabling full trimming or changing `MtouchInterpreter=-all`.
+Step 25 does **not** call `Patch`, `PatchAll`, `PatchCategory`, `PatchAllUncategorized`, `CreateProcessor`, or other patch/processor APIs. It does not discover patch classes, reflect over or invoke StS2 game members, invoke the game entry point, start Godot/game state, or permit native game-library loading.
 
 ## Codemagic
 
 Use workflow:
 
-`ios-step-24`
+`ios-step-25`
 
-Expected app version: `0.0.79 (79)`.
+Expected app version: `0.0.80 (80)`.
+
+Expected IPA: `artifacts/StS2-Launcher-Step-25.ipa`.
 
 ## Documentation
 

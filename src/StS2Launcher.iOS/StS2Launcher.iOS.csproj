@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>79</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.79</ApplicationDisplayVersion>
+    <ApplicationVersion>80</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.80</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -80,14 +80,12 @@
   </ItemGroup>
 
   <!--
-    Step 24.0.6 physical Gate C framework-surface preservation candidate. Build 78 proved that
-    receipt-backed 0Harmony 2.4.2.0 can enter the private context and begin its module
-    initializer, then failed in MonoMod.Logs.DebugLog::.cctor with MissingMethodException for
-    System.Collections.Concurrent.ConcurrentBag<T>::.ctor(). Because 0Harmony is post-publish
-    managed IL, the full trimmer cannot statically see this framework call surface. Preserve one
-    additional framework assembly, System.Collections.Concurrent, while retaining TrimMode=full
-    and the physically proven MtouchInterpreter=-all policy. This root is Step-24 candidate evidence
-    and is not part of the exact 22-root Step 22 foundation set.
+    Step 24 physically proved this additional post-publish dynamic-IL preservation root. Build 78
+    reached MonoMod.Logs.DebugLog::.cctor and exposed a trimmed ConcurrentBag<T> constructor;
+    Step 24.0.6 / 0.0.79 then passed all four physical gates plus OfflineReady and Foundation 5/5
+    with System.Collections.Concurrent rooted. Keep it as protected platform policy while retaining
+    TrimMode=full and MtouchInterpreter=-all. It remains separately classified from the exact
+    22-root Step 22 direct-host-framework closure.
   -->
   <ItemGroup>
     <TrimmerRootAssembly Include="System.Collections.Concurrent" />
@@ -95,9 +93,9 @@
 
   <Target Name="ValidateRuntimeAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
-             Text="STEP24 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+             Text="STEP25 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Message Importance="High"
-             Text="STEP24 DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
+             Text="STEP25 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
     <Error Condition="'$(MtouchInterpreter)' != '-all'"
            Text="Canonical foundation preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
     <Error Condition="'$(UseInterpreter)' == 'true'"

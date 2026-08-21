@@ -101,6 +101,7 @@ These are architecture, not temporary step hacks:
 - Mono.Cecil 0.11.6 for controlled metadata/IL work;
 - `MtouchInterpreter=-all`, with broad `UseInterpreter=true` and NativeAOT prohibited;
 - the measured 22 direct host framework roots established by Step 22;
+- the separately classified `System.Collections.Concurrent` preservation root physically proven by Step 24 for post-publish MonoMod/Harmony initialization while full trimming remains enabled;
 - iOS Files access enabled for shareable diagnostic reports;
 - no real StS2 assembly CLR load before the explicit first-load subsystem;
 - no initializer-bearing prepared dependency is admitted automatically outside an explicit controlled-initialization subsystem with a measured target and fail-closed resolver/native policy.
@@ -140,7 +141,7 @@ Load the prepared real `sts2.dll` into the private execution context with exact 
 
 ### Phase D — controlled managed initialization
 
-This is the active major phase. Progress from the physically proven load-only state through explicitly measured automatic-initialization boundaries, beginning with known initializer-bearing prepared dependencies. Keep Harmony/game-member invocation, broad reflection, Godot/game startup, and native game loading as separately gated later boundaries. Identify AOT/reflection/Harmony/runtime-service issues with one causal class per subsystem.
+This is the active major phase. Step 24 physically closed the first known automatic-initialization boundary: exact `0Harmony 2.4.2.0` can enter the dedicated private context and complete its module constructor under strict managed-plan resolution/native refusal, with the separately measured `System.Collections.Concurrent` preservation root. The active frontier advances from that closed state through narrowly measured Harmony runtime boundaries: first exact API/type resolution and one inert object construction, then patch-engine/processor and target-method interactions as separate later gates. Keep StS2 game-member invocation, broad game reflection, Godot/game startup, and native game loading separately gated. Identify AOT/reflection/Harmony/runtime-service issues with one causal class per subsystem.
 
 ### Phase E — Godot/game integration
 

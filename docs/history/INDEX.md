@@ -25,6 +25,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt` — physical build 75 stopped at Gate A before any Step 24 CLR load because Cecil attempted to resolve `GodotSharp`; this is the direct evidence for Step 24.0.3.
 - `reports/STEP-24.0.3-PHYSICAL-GATE-A-REPORT.txt` — physical build 76 repeated the build-75 Gate A `GodotSharp` resolver failure at 0/4, proving the explicit `MethodReference.Resolve()` removal did not eliminate every broad/eager Cecil metadata-resolution path.
 - `reports/STEP-24.0.4-PHYSICAL-GATE-A-REPORT.txt` — physical build 77 eliminated the resolver failure and exposed the actual target closure: exactly seven conservative MonoMod logging dispatch findings and four automatic initializers; Gate B never ran.
+- `reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt` — physical build 78 passed Gates A/B and reached the real module initializer; Gate C exposed the trimmed `ConcurrentBag<T>` constructor that motivated the final preservation root.
 
 ## Canonical-foundation build fixes
 
@@ -50,10 +51,12 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-23.4.3-CECIL-CORELIB-SCOPE-CONSTRUCTION-FIX.md` — constructs the synthetic module-initializer core-library scope correctly before Cecil creates primitive void metadata.
 
 - [Step 23.4.3 — Physical Closure](steps/STEP-23.4.3-PHYSICAL-CLOSURE.md) — all A–D gates, OfflineReady, and Foundation 5/5 passed on physical iPhone; Step 23 closed.
-- [Step 24 — Controlled 0Harmony Module Initialization Boundary](steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md) — active controlled automatic-initialization candidate after physical Step 23 closure.
+- [Step 24 — Controlled 0Harmony Module Initialization Boundary](steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md) — design lineage for the automatic-initialization boundary after physical Step 23 closure.
 - `steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md` — build-73 compile-only correction to the established OfflineReady inspection API; build 74 subsequently reached host tests.
 - `steps/STEP-24.0.2-PINVOKE-AUDIT-FIX.md` — build-74 host tests exposed a same-assembly P/Invoke audit blind spot; build 75 corrected it and reached physical Gate A.
 - `steps/STEP-24.0.3-CECIL-LOCAL-METADATA-RESOLUTION-FIX.md` — build 75 motivated removal of explicit Cecil method resolution; physical build 76 later showed that correction was incomplete by repeating the same Gate A `GodotSharp` resolver failure.
 - `steps/STEP-24.0.4-DEFERRED-TWO-PASS-METADATA-AUDIT-FIX.md` — physical build 76 repeated the opaque `GodotSharp` resolver failure; build 77 narrowed Gate A to deferred shallow whole-plan classification plus target-only closure audit with explicit rejecting Cecil resolvers and stronger diagnostics.
 - `steps/STEP-24.0.5-CONDITIONAL-MONOMOD-LOGGING-DISPATCH.md` — physical build 77 exposed seven exact MonoMod logger dispatch findings; build 78 preserved the raw audit, conditionally classified exactly that fingerprint, and physically passed Gates A/B before reaching Gate C.
-- `steps/STEP-24.0.6-SYSTEM-COLLECTIONS-CONCURRENT-PRESERVATION.md` — physical build 78 entered the real 0Harmony module initializer and failed on a trimmed `ConcurrentBag<T>` constructor; active 0.0.79 adds one candidate-only `System.Collections.Concurrent` trimmer root without changing the interpreter or execution boundary.
+- `steps/STEP-24.0.6-SYSTEM-COLLECTIONS-CONCURRENT-PRESERVATION.md` — physical build 78 entered the real 0Harmony module initializer and failed on a trimmed `ConcurrentBag<T>` constructor; 0.0.79 added one `System.Collections.Concurrent` trimmer root without changing the interpreter or execution boundary.
+- [Step 24.0.6 — Physical Closure](steps/STEP-24.0.6-PHYSICAL-CLOSURE.md) — user-confirmed physical 4/4 plus OfflineReady PASS and Foundation 5/5; Step 24 closed and the concurrent-collections preservation root became protected platform policy.
+- [Step 25 — Controlled Harmony API Resolution + Type Initialization + Instance Construction](steps/STEP-25-CONTROLLED-HARMONY-CONSTRUCTION.md) — active nine-gate candidate that replays closed Step 24, resolves only the exact Harmony API/type-initializer surface, explicitly completes the measured Harmony type initializer, constructs one inert Harmony object, and still forbids patching/game/Godot/native progression.
