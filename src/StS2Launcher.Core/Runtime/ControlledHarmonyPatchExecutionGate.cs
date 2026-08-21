@@ -1,0 +1,30 @@
+namespace StS2Launcher.Core;
+
+public enum ControlledHarmonyPatchExecutionGate
+{
+    InitializationPreflight = 1,
+    ProvenLoadStateReplay = 2,
+    DeferredModuleInitialization = 3,
+    ProvenInitializationAudit = 4,
+    HarmonyApiResolution = 5,
+    HarmonyTypeInitialization = 6,
+    HarmonyTypeInitializationAudit = 7,
+    HarmonyInstanceConstruction = 8,
+    PostConstructionAudit = 9,
+    HarmonyProcessorApiResolution = 10,
+    PatchProcessorTypeInitialization = 11,
+    LauncherProbeResolution = 12,
+    HarmonyProcessorCreation = 13,
+    PostProcessorAudit = 14,
+    HarmonyPatchApiResolution = 15,
+    LauncherPatchProbeResolution = 16,
+    BaselineProbeInvocation = 17,
+    PrefixRegistration = 18,
+    PatchEngineExecution = 19,
+    PostPatchAudit = 20,
+    PatchedProbeInvocation = 21,
+    ExactPrefixUnpatch = 22,
+    PostUnpatchAudit = 23,
+    RestoredProbeInvocation = 24,
+    FinalIsolationAudit = 25,
+}

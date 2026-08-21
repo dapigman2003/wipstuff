@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-21T17:54:14Z
+UTC: 2026-08-21T20:09:10Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 26 controlled empty Harmony PatchProcessor static validation
-Root: /mnt/data/StS2Launcher-Step26-0.0.83
+StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
+Root: /mnt/data/StS2Launcher-Step27-0.0.84
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 182 C# files
+PASS: lexical delimiter scan passes for 191 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 83
-PASS: display version is 0.0.83
-PASS: Info.plist build version is 83
-PASS: Info.plist display version is 0.0.83
+PASS: build version is 84
+PASS: display version is 0.0.84
+PASS: Info.plist build version is 84
+PASS: Info.plist display version is 0.0.84
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -35,15 +35,15 @@ PASS: full trimming policy retained
 PASS: Step 20 interpreter policy retained
 PASS: build guard rejects broad UseInterpreter=true
 PASS: build guard rejects NativeAOT
-PASS: runtime policy emits Step 26 build telemetry
+PASS: runtime policy emits Step 27 build telemetry
 PASS: all 22 physically proven Step 22 direct host roots remain rooted
 PASS: Step 22 direct root set contains exactly 22 unique roots
 PASS: SteamKit/protobuf reflection roots remain protected
 PASS: physically proven Step 24.0.6 System.Collections.Concurrent preservation root remains exact
 PASS: Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root
 PASS: physically proven Step 24 preservation root is documented as protected platform policy
-PASS: Step 26 build telemetry identifies the physically proven framework preservation root
-PASS: Step 26 build telemetry identifies the physically proven Harmony-constructor framework preservation surface
+PASS: Step 27 build telemetry identifies the physically proven framework preservation root
+PASS: Step 27 build telemetry identifies the physically proven Harmony-constructor framework preservation surface
 PASS: Step 25 does not broaden trimming by rooting System.Private.CoreLib
 PASS: Step 25 bounded Harmony-constructor framework preservation anchor exists
 PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Environment)
@@ -58,7 +58,7 @@ PASS: Step 25 candidate preservation includes measured constructor framework typ
 PASS: Step 25 candidate preservation is bounded to exactly nine measured framework type dependencies
 PASS: Step 25 preservation anchor is metadata-only and executes no probe
 PASS: Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files
-PASS: iOS publish requires Step 26 proven preservation telemetry
+PASS: iOS publish requires Step 27 proven preservation telemetry
 PASS: DiskArbitration-only linker framework filter remains present
 PASS: all 97 physically proven Step 22.2 Core source files are retained
 PASS: 96 baseline Step 22.2 Core behavior files remain byte-for-byte unchanged and the one approved Step 19 regression delta is exact
@@ -418,8 +418,94 @@ PASS: Step 26 host tests cover synthetic full A–N empty processor creation
 PASS: Step 26 synthetic target includes exact PatchProcessor/CreateProcessor metadata surface
 PASS: Step 26 host tests assert patch execution remains absent
 PASS: Step 26 host tests retain synthetic identity isolation
-PASS: Step 26 candidate boundary hash manifest exists
-PASS: Step 26 candidate processor-creation implementation is hash-pinned
+PASS: physically closed Step 26.0 protected boundary hash manifest exists
+PASS: physically closed Step 26.0 processor-creation behavior is byte-for-byte protected
+PASS: Step 27 patch-execution source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecution.cs
+PASS: Step 27 patch-execution source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGate.cs
+PASS: Step 27 patch-execution source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateResult.cs
+PASS: Step 27 patch-execution source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionProgress.cs
+PASS: Step 27 patch-execution source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionSummary.cs
+PASS: Step 27 patch-execution source exists: src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateSequence.cs
+PASS: Step 27 patch-execution source exists: src/StS2Launcher.Core/Runtime/HarmonyPatchProbe.cs
+PASS: Step 27 boundary has host unit tests
+PASS: Step 27 boundary has isolated iOS UI/report partial
+PASS: Step 27 gate enum includes InitializationPreflight
+PASS: Step 27 gate enum includes ProvenLoadStateReplay
+PASS: Step 27 gate enum includes DeferredModuleInitialization
+PASS: Step 27 gate enum includes ProvenInitializationAudit
+PASS: Step 27 gate enum includes HarmonyApiResolution
+PASS: Step 27 gate enum includes HarmonyTypeInitialization
+PASS: Step 27 gate enum includes HarmonyTypeInitializationAudit
+PASS: Step 27 gate enum includes HarmonyInstanceConstruction
+PASS: Step 27 gate enum includes PostConstructionAudit
+PASS: Step 27 gate enum includes HarmonyProcessorApiResolution
+PASS: Step 27 gate enum includes PatchProcessorTypeInitialization
+PASS: Step 27 gate enum includes LauncherProbeResolution
+PASS: Step 27 gate enum includes HarmonyProcessorCreation
+PASS: Step 27 gate enum includes PostProcessorAudit
+PASS: Step 27 gate enum includes HarmonyPatchApiResolution
+PASS: Step 27 gate enum includes LauncherPatchProbeResolution
+PASS: Step 27 gate enum includes BaselineProbeInvocation
+PASS: Step 27 gate enum includes PrefixRegistration
+PASS: Step 27 gate enum includes PatchEngineExecution
+PASS: Step 27 gate enum includes PostPatchAudit
+PASS: Step 27 gate enum includes PatchedProbeInvocation
+PASS: Step 27 gate enum includes ExactPrefixUnpatch
+PASS: Step 27 gate enum includes PostUnpatchAudit
+PASS: Step 27 gate enum includes RestoredProbeInvocation
+PASS: Step 27 gate enum includes FinalIsolationAudit
+PASS: Step 27 gate enum ends exactly at Gate Y / 25
+PASS: Step 27 gate sequence enforces strict ordered fail-fast execution
+PASS: Step 27 summary requires twenty-five passing gates
+PASS: Step 27 on-device run emits a Files-visible text report
+PASS: Step 27 UI exposes the ordered twenty-five-gate run
+PASS: Step 27 UI records the physically closed Step 26 prerequisite
+PASS: Step 27 retains the physically proven Step 25 constructor framework-preservation anchor
+PASS: Step 27 UI explicitly distinguishes the closed A-N replay from new patch gates
+PASS: Step 27 production boundary contains required invariant: ReadHarmonyPatchMetadata(preflight.Target.PreparedPath)
+PASS: Step 27 production boundary contains required invariant: Name.Equals("AddPrefix", StringComparison.Ordinal)
+PASS: Step 27 production boundary contains required invariant: Name.Equals("Patch", StringComparison.Ordinal)
+PASS: Step 27 production boundary contains required invariant: Name.Equals("Unpatch", StringComparison.Ordinal)
+PASS: Step 27 production boundary contains required invariant: GetType("HarmonyLib.HarmonyMethod", throwOnError: false, ignoreCase: false)
+PASS: Step 27 production boundary contains required invariant: GetField("prefix", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+PASS: Step 27 production boundary contains required invariant: GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+PASS: Step 27 production boundary contains required invariant: typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Target)
+PASS: Step 27 production boundary contains required invariant: typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Prefix)
+PASS: Step 27 production boundary contains required invariant: patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])
+PASS: Step 27 production boundary contains required invariant: patchApi.PatchMethod.Invoke(processor, null)
+PASS: Step 27 production boundary contains required invariant: patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])
+PASS: Step 27 production boundary contains required invariant: probe.Target.Invoke(null, [41])
+PASS: Step 27 production boundary contains required invariant: HarmonyPatchProbe.Target(41)
+PASS: Step 27 replays exactly one inert Harmony(string) constructor invocation
+PASS: Step 27 replays exactly one empty CreateProcessor(MethodBase) invocation
+PASS: Step 27 has exactly one intentional AddPrefix(MethodInfo) invocation
+PASS: Step 27 has exactly one intentional PatchProcessor.Patch() invocation
+PASS: Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation
+PASS: Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates
+PASS: Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates
+PASS: Step 27 replays exactly the proven Harmony and PatchProcessor class-constructor barriers
+PASS: Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries
+PASS: Step 27 has distinct post-patch and final OfflineReady proof stages
+PASS: Step 27 never invokes broad Harmony patch/discovery APIs
+PASS: Step 27 does not use broad Activator construction
+PASS: Step 27 strict private context still refuses native resolution
+PASS: Step 27 fails on unplanned managed resolution
+PASS: Step 27 introduces no named StS2 type reflection
+PASS: Step 27 runtime boundary never mutates prepared/live bytes: File.WriteAllBytes
+PASS: Step 27 runtime boundary never mutates prepared/live bytes: File.WriteAllText
+PASS: Step 27 runtime boundary never mutates prepared/live bytes: File.Move
+PASS: Step 27 runtime boundary never mutates prepared/live bytes: File.Delete
+PASS: Step 27 launcher target/prefix are protected from build-time inlining/optimization
+PASS: Step 27 launcher target has deterministic original value+1 behavior
+PASS: Step 27 launcher prefix deterministically replaces the result and skips the original body
+PASS: Step 27 launcher probe records target/prefix execution separately
+PASS: Step 27 host tests enforce ordered fail-fast twenty-five-gate behavior
+PASS: Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary
+PASS: Step 27 host tests cover exact launcher patch-probe behavior and signature metadata
+PASS: Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression
+PASS: Step 27 host tests retain synthetic runtime identity isolation
+PASS: Step 27 candidate boundary hash manifest exists
+PASS: Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -450,6 +536,8 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-25.0.1-HOST-LO
 PASS: authoritative documentation exists: docs/history/steps/STEP-25.0.2-HARMONY-CONSTRUCTOR-FRAMEWORK-PRESERVATION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-25.0.2-PHYSICAL-CLOSURE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-26-CONTROLLED-HARMONY-PROCESSOR-CREATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-26.0-PHYSICAL-CLOSURE.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27-CONTROLLED-LAUNCHER-HARMONY-PATCH.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt
@@ -463,7 +551,7 @@ PASS: physical build 78 report preserves the exact 2/4 gate result
 PASS: physical build 78 report preserves the ConcurrentBag constructor failure
 PASS: physical build 81 report preserves the exact 7/9 gate result
 PASS: physical build 81 report preserves the Environment.Version constructor failure
-PASS: current status records physical Step 25 closure and advances to Step 26 / 0.0.83
+PASS: current status records physical Step 26 closure and advances to Step 27 / 0.0.84 with Step 28 targeted-StS2-reflection frontier
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -472,7 +560,7 @@ PASS: master plan contains durable section: Major roadmap
 PASS: master plan contains durable section: Definition of a closed step
 PASS: master plan contains durable section: Resumption rule
 PASS: master plan defines self-contained resumption path
-PASS: master plan advances durable roadmap through physically closed Step 25 into the patch-engine frontier
+PASS: master plan advances durable roadmap through physically closed Step 26 into the launcher-owned replacement frontier
 PASS: master plan codifies gate batching for speed without losing discrete proof
 PASS: top-level docs are durable/current; step records live under docs/history/steps
 PASS: readable historical documentation retained for Step 01
@@ -501,16 +589,18 @@ PASS: readable historical documentation retained for Step 23
 PASS: readable historical documentation retained for Step 24
 PASS: readable historical documentation retained for Step 25
 PASS: readable historical documentation retained for Step 26
+PASS: readable historical documentation retained for Step 27
 PASS: Step 22.4 design/history record is present
 PASS: Step 23 design/test/closure records are present
 PASS: Step 24 design/candidate/closure records are present
 PASS: Step 25 design/candidate/closure records are present
-PASS: Step 26 design/candidate record is present
+PASS: Step 26 design/closure records are present
+PASS: Step 27 design/candidate record is present
 PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes the Step 26 workflow
-PASS: host-test report heading identifies Step 26
-PASS: host-test TRX artifact identifies Step 26
-PASS: Codemagic build-environment report heading identifies Step 26
+PASS: Codemagic exposes the Step 27 workflow
+PASS: host-test report heading identifies Step 27
+PASS: host-test TRX artifact identifies Step 27
+PASS: Codemagic build-environment report heading identifies Step 27
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: Codemagic workflow has no history dependency
@@ -523,4 +613,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 509 checks
+VALIDATION PASS: 599 checks

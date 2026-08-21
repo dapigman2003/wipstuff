@@ -1,10 +1,6 @@
-# Reports and Diagnostics
+# Diagnostic Reports
 
-Long diagnostic output should be written to files instead of forcing screenshots.
-
-## Device reports
-
-Current regression/test reports are written atomically under:
+Current on-device diagnostics write text reports beneath:
 
 `Documents/StS2Launcher/Reports/*.txt`
 
@@ -12,37 +8,28 @@ and are visible through:
 
 `Files → On My iPhone → StS2 Launcher → StS2Launcher → Reports`
 
-Specialized full diagnostics may use stable files directly under `Documents/StS2Launcher/`, for example the runtime-binding or framework-frontier reports.
+Specialized full diagnostics may use stable files directly under `Documents/StS2Launcher/`, for example runtime-binding or framework-frontier reports.
 
-The active Step 26 report is:
+The active Step 27 report is:
+
+`Documents/StS2Launcher/Reports/Step27-ControlledHarmonyPatchExecution.txt`
+
+It records the ordered A–Y result; exact replay of the closed Step-26 state; exact patch API metadata; launcher-owned target/prefix signatures and baseline counters; prefix registration; the first exact `PatchProcessor.Patch()` boundary; pre-invocation post-patch integrity; patched direct/reflection behavior; exact prefix unpatch; post-unpatch integrity; restored direct/reflection behavior; final plan/file hashes, OfflineReady, context membership, resolver/native observations; and the explicit no-StS2/no-Godot/no-native-game boundary.
+
+The physically closed Step 26 report remains:
 
 `Documents/StS2Launcher/Reports/Step26-ControlledHarmonyProcessorCreation.txt`
 
-It records the ordered A–I result; Step 23/24 metadata and runtime replay; exact Harmony type-initializer and constructor metadata preflight; exact targeted runtime type/type-initializer/constructor/member resolution; the explicit Harmony type-initialization barrier and its audit; the one controlled Harmony object construction; managed/native resolver observations; post-construction context membership; plan/file hashes; OfflineReady audit; and the explicit no-patching/no-game-reflection/no-Godot/no-native-game boundary.
+The physically closed Step 25 report remains:
 
-The physically closed Step 24 report remains available as:
+`Documents/StS2Launcher/Reports/Step25-ControlledHarmonyConstruction.txt`
+
+The physically closed Step 24 report remains:
 
 `Documents/StS2Launcher/Reports/Step24-ControlledManagedInitialization.txt`
 
-The physically closed Step 23 regression report remains available as:
+The physically closed Step 23 regression report remains:
 
 `Documents/StS2Launcher/Reports/Step23-FirstRealGameLoad.txt`
 
-A current verification overwrites its deterministic latest report. Reports are output-only and are never treated as trusted runtime input.
-
-## Build/host reports
-
-Shareable summaries:
-
-- `artifacts/reports/static-validation.txt`
-- `artifacts/reports/host-unit-tests.txt`
-- `artifacts/reports/godot-native-preflight.txt`
-- `artifacts/reports/ios-build.txt`
-- `artifacts/reports/ipa-verification.txt`
-- `artifacts/reports/build-summary.txt`
-
-Detailed material remains under `artifacts/logs/` and `artifacts/test-results/`.
-
-## Secret exclusions
-
-Reports must not contain Steam passwords, reusable refresh tokens, Steam Guard secrets/codes, Apple signing secrets/private keys, or other credential UI values. Absolute host paths should be omitted where they do not materially help diagnosis.
+A current verification overwrites its deterministic latest report. Reports are output-only and are never trusted runtime input.

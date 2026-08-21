@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 26 controlled empty Harmony PatchProcessor static validation")
+print("StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>83</ApplicationVersion>" in project_text, "build version is 83")
-require("<ApplicationDisplayVersion>0.0.83</ApplicationDisplayVersion>" in project_text, "display version is 0.0.83")
-require(plist.get("CFBundleVersion") == "83", "Info.plist build version is 83")
-require(plist.get("CFBundleShortVersionString") == "0.0.83", "Info.plist display version is 0.0.83")
+require("<ApplicationVersion>84</ApplicationVersion>" in project_text, "build version is 84")
+require("<ApplicationDisplayVersion>0.0.84</ApplicationDisplayVersion>" in project_text, "display version is 0.0.84")
+require(plist.get("CFBundleVersion") == "84", "Info.plist build version is 84")
+require(plist.get("CFBundleShortVersionString") == "0.0.84", "Info.plist display version is 0.0.84")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -202,7 +202,7 @@ require("<TrimMode>full</TrimMode>" in project_text, "full trimming policy retai
 require("<MtouchInterpreter>-all</MtouchInterpreter>" in project_text, "Step 20 interpreter policy retained")
 require("'$(UseInterpreter)' == 'true'" in project_text, "build guard rejects broad UseInterpreter=true")
 require("'$(PublishAot)' == 'true'" in project_text, "build guard rejects NativeAOT")
-require("STEP26 RUNTIME POLICY" in project_text, "runtime policy emits Step 26 build telemetry")
+require("STEP27 RUNTIME POLICY" in project_text, "runtime policy emits Step 27 build telemetry")
 
 all_roots = re.findall(r'<TrimmerRootAssembly Include="([^"]+)"\s*/>', project_text)
 step22_roots = [
@@ -221,8 +221,8 @@ require(all_roots.count("System.Collections.Concurrent") == 1, "physically prove
 expected_all_roots = set(step22_roots) | {"SteamKit2", "protobuf-net", "protobuf-net.Core", "System.Collections.Concurrent"}
 require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_all_roots), "Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root")
 require("Step 24 physically proved this additional post-publish dynamic-IL preservation root" in project_text, "physically proven Step 24 preservation root is documented as protected platform policy")
-require("STEP26 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 26 build telemetry identifies the physically proven framework preservation root")
-require("STEP26 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 26 build telemetry identifies the physically proven Harmony-constructor framework preservation surface")
+require("STEP27 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 27 build telemetry identifies the physically proven framework preservation root")
+require("STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 27 build telemetry identifies the physically proven Harmony-constructor framework preservation surface")
 require("System.Private.CoreLib" not in all_roots, "Step 25 does not broaden trimming by rooting System.Private.CoreLib")
 step25_preservation_path = ROOT / "src/StS2Launcher.iOS/Platform/Step25HarmonyConstructorFrameworkPreservation.cs"
 require(step25_preservation_path.is_file(), "Step 25 bounded Harmony-constructor framework preservation anchor exists")
@@ -237,7 +237,7 @@ require(step25_preservation.count("[DynamicDependency(") == 9, "Step 25 candidat
 require("internal static void Activate()" in step25_preservation and "Intentionally empty" in step25_preservation, "Step 25 preservation anchor is metadata-only and executes no probe")
 require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyConstruction.cs"), "Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files")
 build_ios = read("scripts/build-ios.sh")
-require("STEP26 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish requires Step 26 proven preservation telemetry")
+require("STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish requires Step 27 proven preservation telemetry")
 require("DiskArbitration" in project_text and '<_LinkerFrameworks Remove="DiskArbitration" />' in project_text, "DiskArbitration-only linker framework filter remains present")
 
 # ---------------------------------------------------------------------------
@@ -323,10 +323,10 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-26.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.83",
-    "STS2_BUILD_VERSION": "83",
-    "STS2_RUNTIME_POLICY_MARKER": "STEP26 RUNTIME POLICY:",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.84",
+    "STS2_BUILD_VERSION": "84",
+    "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
 
@@ -365,7 +365,7 @@ required_report_files = {
     "Step14-CompatibilityInventory.txt", "Step15-GodotFoundation.txt", "Step16-ManagedPreparation.txt",
     "Step17-CompatibilityCallSites.txt", "Step18-RealAssemblyRewrite.txt", "Step19-ExpressionInterpreter.txt",
     "Step20-DynamicManagedExecution.txt", "Step21-RuntimeFrameworkBinding.txt", "Step22-HostBindingFrontier.txt",
-    "Step23-FirstRealGameLoad.txt", "Step24-ControlledManagedInitialization.txt", "Step25-ControlledHarmonyConstruction.txt", "Step26-ControlledHarmonyProcessorCreation.txt",
+    "Step23-FirstRealGameLoad.txt", "Step24-ControlledManagedInitialization.txt", "Step25-ControlledHarmonyConstruction.txt", "Step26-ControlledHarmonyProcessorCreation.txt", "Step27-ControlledHarmonyPatchExecution.txt",
     "TestSetup-Repair.txt", "TestSetup-Update.txt", "TestSetup-DownloadCacheClear.txt", "TestSetup-FreshDownload.txt",
 }
 ui_text = "\n".join(p.read_text() for p in ui_files)
@@ -816,8 +816,8 @@ require("AddSyntheticHarmonyType" in step26_tests and '"PatchProcessor"' in step
 require("PatchProcessor.Patch invoked: NO" in step26_tests and "PatchProcessor.Patch/Harmony.Patch/PatchAll: NOT INVOKED" in step26_tests, "Step 26 host tests assert patch execution remains absent")
 require("collectibleLoadContext: true" in step26_tests and "Guid.NewGuid()" in step26_tests, "Step 26 host tests retain synthetic identity isolation")
 
-step26_manifest = ROOT / "tools/validation/candidate-step26-harmony-processor-boundary.sha256"
-require(step26_manifest.is_file(), "Step 26 candidate boundary hash manifest exists")
+step26_manifest = ROOT / "tools/validation/protected-step26.0-harmony-processor-boundary.sha256"
+require(step26_manifest.is_file(), "physically closed Step 26.0 protected boundary hash manifest exists")
 if step26_manifest.is_file():
     step26_mismatches: list[str] = []
     for line in step26_manifest.read_text().splitlines():
@@ -827,7 +827,105 @@ if step26_manifest.is_file():
         path = ROOT / relative
         if not path.is_file() or sha256(path) != digest:
             step26_mismatches.append(relative)
-    require(not step26_mismatches, "Step 26 candidate processor-creation implementation is hash-pinned", ", ".join(step26_mismatches))
+    require(not step26_mismatches, "physically closed Step 26.0 processor-creation behavior is byte-for-byte protected", ", ".join(step26_mismatches))
+
+# ---------------------------------------------------------------------------
+# Step 27 controlled launcher-owned Harmony patch/unpatch boundary
+# ---------------------------------------------------------------------------
+step27_core_files = [
+    "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecution.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGate.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateResult.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionProgress.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionSummary.cs",
+    "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateSequence.cs",
+    "src/StS2Launcher.Core/Runtime/HarmonyPatchProbe.cs",
+]
+for relative in step27_core_files:
+    require((ROOT / relative).is_file(), f"Step 27 patch-execution source exists: {relative}")
+step27_test_path = ROOT / "tests/StS2Launcher.Core.Tests/Runtime/ControlledHarmonyPatchExecutionTests.cs"
+step27_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs"
+require(step27_test_path.is_file(), "Step 27 boundary has host unit tests")
+require(step27_ui_path.is_file(), "Step 27 boundary has isolated iOS UI/report partial")
+step27_source = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecution.cs")
+step27_tests = step27_test_path.read_text() if step27_test_path.is_file() else ""
+step27_ui = step27_ui_path.read_text() if step27_ui_path.is_file() else ""
+step27_gate = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGate.cs")
+step27_sequence = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateSequence.cs")
+step27_probe = read("src/StS2Launcher.Core/Runtime/HarmonyPatchProbe.cs")
+for gate_name in [
+    "InitializationPreflight", "ProvenLoadStateReplay", "DeferredModuleInitialization", "ProvenInitializationAudit",
+    "HarmonyApiResolution", "HarmonyTypeInitialization", "HarmonyTypeInitializationAudit", "HarmonyInstanceConstruction",
+    "PostConstructionAudit", "HarmonyProcessorApiResolution", "PatchProcessorTypeInitialization", "LauncherProbeResolution",
+    "HarmonyProcessorCreation", "PostProcessorAudit", "HarmonyPatchApiResolution", "LauncherPatchProbeResolution",
+    "BaselineProbeInvocation", "PrefixRegistration", "PatchEngineExecution", "PostPatchAudit", "PatchedProbeInvocation",
+    "ExactPrefixUnpatch", "PostUnpatchAudit", "RestoredProbeInvocation", "FinalIsolationAudit",
+]:
+    require(gate_name in step27_gate, f"Step 27 gate enum includes {gate_name}")
+require("FinalIsolationAudit = 25" in step27_gate, "Step 27 gate enum ends exactly at Gate Y / 25")
+require("Expected Step 27 gate {expected}" in step27_sequence, "Step 27 gate sequence enforces strict ordered fail-fast execution")
+require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY PASS — 25/25" in read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionSummary.cs"), "Step 27 summary requires twenty-five passing gates")
+require("Step27-ControlledHarmonyPatchExecution.txt" in step27_ui, "Step 27 on-device run emits a Files-visible text report")
+require("Run Step 27 A–Y" in step27_ui and "GATE Y RUNNING" in step27_ui, "Step 27 UI exposes the ordered twenty-five-gate run")
+require("Step 27 prerequisite: physical Step 26.0 / 0.0.83 is closed" in step27_ui, "Step 27 UI records the physically closed Step 26 prerequisite")
+require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in step27_ui, "Step 27 retains the physically proven Step 25 constructor framework-preservation anchor")
+require("Gates A–N replay the physically closed Step 26 boundary" in step27_ui, "Step 27 UI explicitly distinguishes the closed A-N replay from new patch gates")
+for required in [
+    'ReadHarmonyPatchMetadata(preflight.Target.PreparedPath)',
+    'Name.Equals("AddPrefix", StringComparison.Ordinal)',
+    'Name.Equals("Patch", StringComparison.Ordinal)',
+    'Name.Equals("Unpatch", StringComparison.Ordinal)',
+    'GetType("HarmonyLib.HarmonyMethod", throwOnError: false, ignoreCase: false)',
+    'GetField("prefix", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)',
+    'GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)',
+    'typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Target)',
+    'typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Prefix)',
+    'patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])',
+    'patchApi.PatchMethod.Invoke(processor, null)',
+    'patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])',
+    'probe.Target.Invoke(null, [41])',
+    'HarmonyPatchProbe.Target(41)',
+]:
+    require(required in step27_source, f"Step 27 production boundary contains required invariant: {required}")
+require(step27_source.count("api.Constructor.Invoke([HarmonyId])") == 1, "Step 27 replays exactly one inert Harmony(string) constructor invocation")
+require(step27_source.count("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [probe.Method])") == 1, "Step 27 replays exactly one empty CreateProcessor(MethodBase) invocation")
+require(step27_source.count("patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])") == 1, "Step 27 has exactly one intentional AddPrefix(MethodInfo) invocation")
+require(step27_source.count("patchApi.PatchMethod.Invoke(processor, null)") == 1, "Step 27 has exactly one intentional PatchProcessor.Patch() invocation")
+require(step27_source.count("patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])") == 1, "Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation")
+require(step27_source.count("probe.Target.Invoke(null, [41])") == 3, "Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates")
+require(step27_source.count("HarmonyPatchProbe.Target(41)") == 3, "Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates")
+require(step27_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2, "Step 27 replays exactly the proven Harmony and PatchProcessor class-constructor barriers")
+require(step27_source.count("_offlineInspection.RunAsync(") == 6, "Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries")
+require('stage = "OfflineReady post-patch pre-invocation check"' in step27_source and 'stage = "OfflineReady final postcondition"' in step27_source and step27_source.count('\"OfflineReady exact-tree verification: YES\\n\" +') == 2, "Step 27 has distinct post-patch and final OfflineReady proof stages")
+require("Harmony.Patch(" not in step27_source and "PatchAll(" not in step27_source and "PatchCategory(" not in step27_source and "PatchClassProcessor" not in step27_source, "Step 27 never invokes broad Harmony patch/discovery APIs")
+require("Activator.CreateInstance" not in step27_source and "Activator." not in step27_source, "Step 27 does not use broad Activator construction")
+require("LoadUnmanagedDll(string unmanagedDllName)" in step27_source and "throw new DllNotFoundException" in step27_source, "Step 27 strict private context still refuses native resolution")
+require("context.RejectedManagedRequests.Count != 0" in step27_source, "Step 27 fails on unplanned managed resolution")
+require('GetType("StS' not in step27_source and 'GetType("STS' not in step27_source and 'GetType("MegaCrit' not in step27_source, "Step 27 introduces no named StS2 type reflection")
+for forbidden_write in ["File.WriteAllBytes", "File.WriteAllText", "File.Move", "File.Delete"]:
+    require(forbidden_write not in step27_source, f"Step 27 runtime boundary never mutates prepared/live bytes: {forbidden_write}")
+require("[MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]" in step27_probe, "Step 27 launcher target/prefix are protected from build-time inlining/optimization")
+require("public static int Target(int value)" in step27_probe and "return value + 1;" in step27_probe, "Step 27 launcher target has deterministic original value+1 behavior")
+require("public static bool Prefix(int value, ref int __result)" in step27_probe and "__result = value + 1000;" in step27_probe and "return false;" in step27_probe, "Step 27 launcher prefix deterministically replaces the result and skips the original body")
+require("Interlocked.Increment(ref _targetCalls)" in step27_probe and "Interlocked.Increment(ref _prefixCalls)" in step27_probe, "Step 27 launcher probe records target/prefix execution separately")
+require("OrderedHarmonyPatchExecutionGatesReachTwentyFiveOfTwentyFivePass" in step27_tests and "HarmonyPatchExecutionGatesStopAfterFirstFailure" in step27_tests, "Step 27 host tests enforce ordered fail-fast twenty-five-gate behavior")
+require("SyntheticStep26ReplayThroughEmptyProcessorStillPassesBeforePatchBoundary" in step27_tests and "RunPostProcessorAuditAsync" in step27_tests, "Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary")
+require("LauncherPatchProbeHasDeterministicOriginalAndPrefixBehavior" in step27_tests and "LauncherPatchProbeReflectionSurfaceIsExactAndLauncherOwned" in step27_tests, "Step 27 host tests cover exact launcher patch-probe behavior and signature metadata")
+require("Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH" in step27_tests, "Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression")
+require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
+
+step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
+require(step27_manifest.is_file(), "Step 27 candidate boundary hash manifest exists")
+if step27_manifest.is_file():
+    step27_mismatches: list[str] = []
+    for line in step27_manifest.read_text().splitlines():
+        if not line.strip():
+            continue
+        digest, relative = line.split("  ", 1)
+        path = ROOT / relative
+        if not path.is_file() or sha256(path) != digest:
+            step27_mismatches.append(relative)
+    require(not step27_mismatches, "Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned", ", ".join(step27_mismatches))
 
 # ---------------------------------------------------------------------------
 # Documentation model
@@ -855,6 +953,8 @@ required_docs = [
     "docs/history/steps/STEP-25.0.2-HARMONY-CONSTRUCTOR-FRAMEWORK-PRESERVATION.md",
     "docs/history/steps/STEP-25.0.2-PHYSICAL-CLOSURE.md",
     "docs/history/steps/STEP-26-CONTROLLED-HARMONY-PROCESSOR-CREATION.md",
+    "docs/history/steps/STEP-26.0-PHYSICAL-CLOSURE.md",
+    "docs/history/steps/STEP-27-CONTROLLED-LAUNCHER-HARMONY-PATCH.md",
     "docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt",
     "docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt",
     "docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt",
@@ -875,13 +975,13 @@ step25_build81_report = read("docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-R
 require("CONTROLLED HARMONY CONSTRUCTION BOUNDARY FAIL — 7/9" in step25_build81_report and "Gate G — HarmonyTypeInitializationAudit: PASS" in step25_build81_report and "Gate H — HarmonyInstanceConstruction: FAIL" in step25_build81_report, "physical build 81 report preserves the exact 7/9 gate result")
 require("System.MissingMethodException: Method not found: System.Version System.Environment.get_Version()" in step25_build81_report, "physical build 81 report preserves the Environment.Version constructor failure")
 current_status = read("docs/CURRENT-STATUS.md")
-require("0.0.82 (82)" in current_status and "9/9 PASS" in current_status and "Steps 01–25" in current_status and "0.0.83 (83)" in current_status and "14/14 PASS" in current_status and "System.Collections.Concurrent" in current_status, "current status records physical Step 25 closure and advances to Step 26 / 0.0.83")
+require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "14/14 PASS" in current_status and "0.0.84 (84)" in current_status and "25/25 PASS" in current_status and "Step 28" in current_status, "current status records physical Step 26 closure and advances to Step 27 / 0.0.84 with Step 28 targeted-StS2-reflection frontier")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
     require(heading in master, f"master plan contains durable section: {heading}")
 require("docs/CURRENT-STATUS.md" in master and "docs/REGRESSION-CONTRACTS.md" in master and "docs/history/INDEX.md" in master, "master plan defines self-contained resumption path")
-require("Step 23 closed the first-real-load boundary" in master and "Step 24 physically closed the first known automatic-initialization boundary" in master and "Step 25 then physically closed exact `HarmonyLib.Harmony` API resolution" in master and "The active frontier is now the patch engine itself" in master, "master plan advances durable roadmap through physically closed Step 25 into the patch-engine frontier")
+require("Step 23 closed the first-real-load boundary" in master and "Step 24 physically closed the first known automatic-initialization boundary" in master and "Step 25 then physically closed exact `HarmonyLib.Harmony` API resolution" in master and "Step 26 physically closed exact `Harmony.CreateProcessor(MethodBase)`" in master and "first real Harmony replacement on launcher-owned deterministic probes" in master, "master plan advances durable roadmap through physically closed Step 26 into the launcher-owned replacement frontier")
 require("several adjacent sequential gates" in master and "saves build/device cycles" in master, "master plan codifies gate batching for speed without losing discrete proof")
 
 top_level_step_docs = [p.name for p in (ROOT / "docs").glob("STEP-*.md")]
@@ -889,24 +989,25 @@ require(not top_level_step_docs, "top-level docs are durable/current; step recor
 
 history_steps = list((ROOT / "docs/history/steps").glob("*.md"))
 history_names = [p.name for p in history_steps]
-for major in range(1, 27):
+for major in range(1, 28):
     prefix = f"STEP-{major:02d}"
     require(any(name.startswith(prefix) for name in history_names), f"readable historical documentation retained for Step {major:02d}")
 require(any(name.startswith("STEP-22.4") for name in history_names), "Step 22.4 design/history record is present")
 require(any(name.startswith("STEP-23") for name in history_names), "Step 23 design/test/closure records are present")
 require(any(name.startswith("STEP-24") for name in history_names), "Step 24 design/candidate/closure records are present")
 require(any(name.startswith("STEP-25") for name in history_names), "Step 25 design/candidate/closure records are present")
-require(any(name.startswith("STEP-26") for name in history_names), "Step 26 design/candidate record is present")
+require(any(name.startswith("STEP-26") for name in history_names), "Step 26 design/closure records are present")
+require(any(name.startswith("STEP-27") for name in history_names), "Step 27 design/candidate record is present")
 require(len(history_steps) >= 60, "historical documentation set is comprehensive", f"count={len(history_steps)}")
 
 # ---------------------------------------------------------------------------
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-26:" in codemagic, "Codemagic exposes the Step 26 workflow")
-require("Step 26 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 26")
-require("LogFileName=step26.trx" in read("scripts/test.sh") and "artifacts/test-results/step26.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 26")
-require("Step 26 Controlled Empty Harmony PatchProcessor Creation Boundary build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 26")
+require("ios-step-27:" in codemagic, "Codemagic exposes the Step 27 workflow")
+require("Step 27 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 27")
+require("LogFileName=step27.trx" in read("scripts/test.sh") and "artifacts/test-results/step27.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 27")
+require("Step 27 Controlled Launcher-Owned Harmony Patch + Unpatch Boundary build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 27")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
