@@ -31,7 +31,7 @@ Step 23 did not intentionally invoke a game entry point, inspect/invoke game typ
 
 ## Active candidate — Step 24
 
-- Version: **0.0.78 (78)**
+- Version: **0.0.79 (79)**
 - Codemagic workflow: **`ios-step-24`**
 - IPA: **`artifacts/StS2-Launcher-Step-24.ipa`**
 - Live iOS project: `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`
@@ -49,7 +49,9 @@ Step 24.0.3 / `0.0.76 (76)` reached a physical iPhone and again failed safely **
 
 Step 24.0.4 / `0.0.77 (77)` reached a physical iPhone and failed safely **0/4 at Gate A**, but it resolved the metadata ambiguity from builds 75–76. Gate A reached the exact `0Harmony.dll` target closure and reported seven conservative execution findings, all in merged MonoMod logging dispatch: one `IDebugFormattable` bodyless interface dispatch, two logging-delegate `Invoke` targets, two logging-delegate constructors, and two corresponding `ldftn`/delegate-indirection findings. The report also measured exactly four automatic initializers: `<Module>..cctor`, `MonoMod.Switches::.cctor`, `MonoMod.Logs.DebugLog::.cctor`, and `MonoMod.Logs.DebugLog/LevelSubscriptions::.cctor`; the module initializer itself is exactly two instructions, `MMDbgLog::LogVersion()` then `ret`. Gate B never ran, so no Step 24 CLR load occurred.
 
-Step 24.0.5 / `0.0.78 (78)` is the active candidate. The conservative metadata audit is unchanged and still records all raw findings. A separate fail-closed conditional policy may downgrade **only the exact seven physically measured logging findings** to dormant when the target remains exactly `0Harmony 2.4.2.0`, the exact four-method automatic-initializer set and measured structural markers are unchanged, no managed debugger is attached, no `MONOMOD_*` environment-variable name is present, and no relevant MonoMod logging AppContext key is overridden. Any missing/additional/changed finding, P/Invoke, `calli`, generic indirect target outside the measured set, native/reflection/dynamic/unresolved/non-framework edge, initializer-shape drift, or non-inert logger state remains blocking before Gate B. Gate ordering, runtime resolver policy, module-constructor barrier, and the no-Harmony/game/native-execution boundary are unchanged.
+Step 24.0.5 / `0.0.78 (78)` reached a physical iPhone and advanced **2/4** before failing at Gate C. Gate A passed with the exact measured conditional policy: one initializer-bearing dependency, exact `0Harmony 2.4.2.0`, one `<Module>..cctor`, four automatic initializers, 111 same-assembly methods audited, seven raw conservative MonoMod logging findings, seven conditionally dormant findings, zero blocking hazards, and no debugger/environment/AppContext logger activation. Gate B then reproduced the accepted Step 23 state in the same private context: six initializer-free private assemblies, 73 managed resolver requests, 67 host loads, six private loads, zero native attempts, and `0Harmony` still absent. Gate C loaded the exact target and entered the explicit `RuntimeHelpers.RunModuleConstructor` completion barrier, where `<Module>..cctor -> MMDbgLog.LogVersion() -> MonoMod.Logs.DebugLog::.cctor` failed with ``MissingMethodException: Method not found: void System.Collections.Concurrent.ConcurrentBag`1..ctor()``. Gate D did not run. This is the first physical Step 24 evidence that the target can be admitted and automatic initialization can begin; Gate C itself remains open because the module constructor did not complete.
+
+Step 24.0.6 / `0.0.79 (79)` is the active candidate. It retains the exact Gate A conditional policy, Gate B replay, strict resolver/native refusal, and Gate C completion barrier. The only runtime-build policy change is one additional candidate-only trimmer root: `System.Collections.Concurrent`. Full `TrimMode=full` and the physically proven `MtouchInterpreter=-all` policy remain unchanged. The exact 22 Step 22 direct roots remain unchanged as a set; this is a separately documented Step 24 dynamic-IL preservation root motivated by the physical build-78 missing-method evidence. No downloaded/private framework implementation is introduced.
 
 ### Gate A — InitializationPreflight
 
@@ -84,7 +86,7 @@ Gate B crosses no new architectural frontier; it establishes the proven Step 23 
 
 ### Gate C — DeferredModuleInitialization
 
-This is the only new Step 24 execution boundary.
+This remains the only new Step 24 execution boundary. Build 79 additionally requires the iOS host to preserve `System.Collections.Concurrent` as a candidate-only framework root while keeping full trimming and `MtouchInterpreter=-all`.
 
 1. re-hash the exact prepared `0Harmony` target immediately before load;
 2. permit exactly that initializer-bearing identity in the Step 24 resolver;
@@ -115,11 +117,11 @@ After controlled module initialization:
 
 From a fresh process:
 
-1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.78`;
+1. confirm `STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY`, version `0.0.79`;
 2. run Step 24 A–D and stop at the first failing gate;
 3. Gate A: exact sole target = `0Harmony 2.4.2.0`, one module initializer, bounded automatic-initialization closure fully measured; for the current physical target expect raw conservative findings = 7, conditionally dormant findings = 7, effective `Initializer hazards` = 0, and conditional policy = PASS; any fingerprint/state drift must fail before Gate B;
 4. Gate B: accepted Step 23 initializer-free state reproduced, `0Harmony` absent;
-5. Gate C: `0Harmony` load + `RuntimeHelpers.RunModuleConstructor` completion barrier = PASS, zero native/unplanned requests;
+5. Gate C: `0Harmony` load + `RuntimeHelpers.RunModuleConstructor` completion barrier = PASS under the single `System.Collections.Concurrent` preservation-root candidate, zero native/unplanned requests;
 6. Gate D: PASS, summary 4/4;
 7. OfflineReady = PASS;
 8. Foundation 5/5 = PASS.

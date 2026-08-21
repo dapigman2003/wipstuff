@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>78</ApplicationVersion>" in project_text, "build version is 78")
-require("<ApplicationDisplayVersion>0.0.78</ApplicationDisplayVersion>" in project_text, "display version is 0.0.78")
-require(plist.get("CFBundleVersion") == "78", "Info.plist build version is 78")
-require(plist.get("CFBundleShortVersionString") == "0.0.78", "Info.plist display version is 0.0.78")
+require("<ApplicationVersion>79</ApplicationVersion>" in project_text, "build version is 79")
+require("<ApplicationDisplayVersion>0.0.79</ApplicationDisplayVersion>" in project_text, "display version is 0.0.79")
+require(plist.get("CFBundleVersion") == "79", "Info.plist build version is 79")
+require(plist.get("CFBundleShortVersionString") == "0.0.79", "Info.plist display version is 0.0.79")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -217,6 +217,11 @@ step22_roots = [
 require(set(step22_roots).issubset(set(all_roots)), "all 22 physically proven Step 22 direct host roots remain rooted")
 require(len([x for x in all_roots if x in step22_roots]) == 22, "Step 22 direct root set contains exactly 22 unique roots")
 require({"SteamKit2", "protobuf-net", "protobuf-net.Core"}.issubset(set(all_roots)), "SteamKit/protobuf reflection roots remain protected")
+require(all_roots.count("System.Collections.Concurrent") == 1, "Step 24.0.6 adds exactly one candidate-only System.Collections.Concurrent preservation root")
+expected_all_roots = set(step22_roots) | {"SteamKit2", "protobuf-net", "protobuf-net.Core", "System.Collections.Concurrent"}
+require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_all_roots), "Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root")
+require("Step 24.0.6 physical Gate C framework-surface preservation candidate" in project_text, "Step 24.0.6 root is documented in the live project as candidate evidence")
+require("STEP24 DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 24.0.6 build telemetry identifies the candidate framework preservation root")
 require("DiskArbitration" in project_text and '<_LinkerFrameworks Remove="DiskArbitration" />' in project_text, "DiskArbitration-only linker framework filter remains present")
 
 # ---------------------------------------------------------------------------
@@ -303,8 +308,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-24.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.78",
-    "STS2_BUILD_VERSION": "78",
+    "STS2_DISPLAY_VERSION": "0.0.79",
+    "STS2_BUILD_VERSION": "79",
     "STS2_RUNTIME_POLICY_MARKER": "STEP24 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -631,6 +636,8 @@ required_docs = [
     "docs/history/steps/STEP-24.0.3-CECIL-LOCAL-METADATA-RESOLUTION-FIX.md",
     "docs/history/steps/STEP-24.0.4-DEFERRED-TWO-PASS-METADATA-AUDIT-FIX.md",
     "docs/history/steps/STEP-24.0.5-CONDITIONAL-MONOMOD-LOGGING-DISPATCH.md",
+    "docs/history/steps/STEP-24.0.6-SYSTEM-COLLECTIONS-CONCURRENT-PRESERVATION.md",
+    "docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt",
     "docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt",
     "docs/history/reports/STEP-24.0.3-PHYSICAL-GATE-A-REPORT.txt",
     "docs/history/reports/STEP-24.0.4-PHYSICAL-GATE-A-REPORT.txt",
@@ -641,6 +648,11 @@ required_docs = [
 ]
 for doc in required_docs:
     require((ROOT / doc).is_file(), f"authoritative documentation exists: {doc}")
+
+step24_build78_report = read("docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt")
+require("CONTROLLED MANAGED INITIALIZATION BOUNDARY FAIL — 2/4" in step24_build78_report and "Gate A — InitializationPreflight: PASS" in step24_build78_report and "Gate B — ProvenLoadStateReplay: PASS" in step24_build78_report and "Gate C — DeferredModuleInitialization: FAIL" in step24_build78_report, "physical build 78 report preserves the exact 2/4 gate result")
+require("System.MissingMethodException: Method not found: void System.Collections.Concurrent.ConcurrentBag`1..ctor()" in step24_build78_report, "physical build 78 report preserves the ConcurrentBag constructor failure")
+require("0.0.79 (79)" in read("docs/CURRENT-STATUS.md") and "System.Collections.Concurrent" in read("docs/CURRENT-STATUS.md"), "current status advances to Step 24.0.6 and records the measured preservation root")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

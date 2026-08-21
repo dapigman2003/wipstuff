@@ -87,7 +87,9 @@ Build `0.0.75 (75)` reached the physical iPhone but failed safely in Gate A duri
 
 Build `0.0.77 (77)` reached the physical iPhone and failed safely 0/4 at Gate A after successfully eliminating the prior Cecil resolver failure. It measured the exact target closure as seven conservative MonoMod logging dispatch findings plus four automatic initializers; Gate B never ran and no Step 24 CLR load occurred.
 
-Install version `0.0.78 (78)` only after Codemagic host tests and IPA verification are fully green. Build 78 must retain the conservative raw audit and the no-external-resolution rule. For the current receipt-backed `0Harmony 2.4.2.0`, the conditional policy may downgrade only the exact seven physically measured logging-dispatch findings, only when the exact four measured automatic initializers retain their structural markers and the process has no debugger, no `MONOMOD_*` environment-variable name, and no relevant MonoMod logging AppContext override. Then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
+Build `0.0.78 (78)` reached the physical iPhone and advanced 2/4. Gate A passed the exact seven-finding conditional policy, and Gate B reproduced the accepted Step 23 initializer-free private context with zero native attempts and `0Harmony` still absent. Gate C loaded the exact `0Harmony` target and began its module initializer, but the explicit `RuntimeHelpers.RunModuleConstructor` barrier failed while initializing `MonoMod.Logs.DebugLog` with `MissingMethodException` for `System.Collections.Concurrent.ConcurrentBag<T>::.ctor()`. Gate D did not run.
+
+Install version `0.0.79 (79)` only after Codemagic host tests and IPA verification are fully green. Build 79 retains the exact build-78 Gate A/B/C logic and adds one bounded build-time preservation change: `System.Collections.Concurrent` is a candidate-only `TrimmerRootAssembly`. Full trimming, `MtouchInterpreter=-all`, the exact 22 Step 22 direct-root set, and all resolver/native/Harmony/game prohibitions remain unchanged. Then start from a fresh process. Do not run the Step 23 load regression or start the Step 15 Godot host first.
 
 Run Step 24 A–D in order and require:
 
@@ -109,6 +111,7 @@ Run Step 24 A–D in order and require:
    - `0Harmony` remains outside the CLR;
    - native attempts = 0 and rejected/unplanned managed requests = 0.
 3. **Gate C — DeferredModuleInitialization = PASS**
+   - iOS host was built with the single Step 24 candidate preservation root `System.Collections.Concurrent`, while `TrimMode=full` and `MtouchInterpreter=-all` remain unchanged;
    - exact prepared `0Harmony` hash matches immediately before load;
    - only that initializer-bearing identity is admitted;
    - exact target loads in the Step 24 context;

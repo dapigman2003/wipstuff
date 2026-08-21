@@ -75,6 +75,7 @@ The canonicalization does not change:
 - Mono.Cecil 0.11.6 behavior;
 - `MtouchInterpreter=-all`;
 - the exact measured 22 Step 22 direct framework roots;
+- Step 24.0.6 currently adds one separately classified **candidate-only** preservation root, `System.Collections.Concurrent`, after physical build 78 reached dynamically loaded MonoMod code whose `ConcurrentBag<T>` constructor had been removed from the fully trimmed host. This does not redefine the Step 22 22-root set and is not yet a durable platform policy;
 - Files-based diagnostic sharing;
 - the Step 23 rule that real StS2 CLR loading occurs only in the explicit dedicated private load subsystem;
 - initializer-bearing prepared dependencies remain excluded until an explicit controlled-initialization boundary admits a measured exact identity;

@@ -55,6 +55,14 @@ Unchanged from Step 24.0.4:
 
 No Harmony patch API, StS2 member/entry-point invocation, Godot/game startup, or native game-library loading is added.
 
+## Physical result
+
+Build `0.0.78 (78)` reached a physical iPhone and advanced **2/4**. Gate A passed the exact seven-finding conditional policy with zero effective hazards. Gate B reproduced the accepted Step 23 initializer-free private state with zero native attempts and `0Harmony` still absent. Gate C then loaded the exact target and entered the explicit module-constructor completion barrier. `<Module>..cctor -> MMDbgLog.LogVersion() -> MonoMod.Logs.DebugLog::.cctor` threw `MissingMethodException` because the fully trimmed iOS host did not retain `System.Collections.Concurrent.ConcurrentBag<T>::.ctor()`. Gate D did not run.
+
+The runtime evidence therefore supports the conditional logging classification, proves that the target can be admitted far enough for automatic initialization to begin, and identifies the next blocker as a host framework-member preservation issue rather than a Cecil/resolver or native-load problem. Gate C remains open because the module constructor did not complete.
+
+The raw physical report is preserved as `docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt`.
+
 ## Candidate identity
 
 - step: **24.0.5**
