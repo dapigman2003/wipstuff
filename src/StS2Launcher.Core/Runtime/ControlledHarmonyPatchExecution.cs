@@ -25,6 +25,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     public const string HarmonyTypeFullName = "HarmonyLib.Harmony";
     public const string HarmonyId = "com.community.sts2launcher.step25.probe";
     public const string PatchProcessorTypeFullName = "HarmonyLib.PatchProcessor";
+    public const string AccessToolsTypeFullName = "HarmonyLib.AccessTools";
 
     // Physical Step 24.0.4 / 0.0.77 measured these seven conservative dispatch findings in the
     // exact receipt-backed 0Harmony 2.4.2 automatic-initialization closure. They are not a general
@@ -77,6 +78,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     private HarmonyPatchApiSnapshot? _patchApi;
     private LauncherPatchProbeSnapshot? _patchProbe;
     private BaselineProbeInvocationSnapshot? _baselineProbeInvocation;
+    private AccessToolsTypeInitializationSnapshot? _accessToolsTypeInitialization;
     private PrefixRegistrationSnapshot? _prefixRegistration;
     private PatchExecutionSnapshot? _patchExecution;
     private ProbeInvocationSnapshot? _patchedProbeInvocation;
@@ -1560,6 +1562,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var metadata = ReadHarmonyPatchMetadata(preflight.Target.PreparedPath);
             if (!metadata.Allowed)
                 throw new InvalidDataException("Step 27 Gate O refuses patch admission because the exact patch metadata shape changed:\n" + metadata.Detail);
+            var accessToolsMetadata = ReadAccessToolsMetadata(preflight.Target.PreparedPath);
+            if (!accessToolsMetadata.Allowed)
+                throw new InvalidDataException("Step 27 Gate O refuses AccessTools admission because its type initializer is not the exact bounded BindingFlags-only shape:\n" + accessToolsMetadata.Detail);
 
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;
@@ -1609,6 +1614,20 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (harmonyMethodMethodField.FieldType != typeof(MethodInfo))
                 throw new InvalidDataException("HarmonyMethod.method runtime field type changed.");
 
+            var accessToolsType = initialization.TargetAssembly.GetType(AccessToolsTypeFullName, throwOnError: false, ignoreCase: false)
+                ?? throw new TypeLoadException("Exact HarmonyLib.AccessTools type is absent from loaded 0Harmony.");
+            if (!(accessToolsType.IsAbstract && accessToolsType.IsSealed))
+                throw new InvalidDataException("HarmonyLib.AccessTools is no longer an exact static type.");
+            var accessToolsTypeInitializer = accessToolsType.TypeInitializer
+                ?? throw new MissingMethodException(AccessToolsTypeFullName, ".cctor()");
+            var accessToolsAllField = accessToolsType.GetField("all", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "all");
+            var accessToolsAllDeclaredField = accessToolsType.GetField("allDeclared", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "allDeclared");
+            if (accessToolsAllField.FieldType != typeof(BindingFlags) || accessToolsAllDeclaredField.FieldType != typeof(BindingFlags))
+                throw new InvalidDataException("HarmonyLib.AccessTools BindingFlags field types changed.");
+            // Do not read either static field here: Gate R owns the AccessTools type-initialization boundary.
+
             if (context.ManagedResolverRequests.Count != managedBefore || context.PrivateLoads.Count != privateBefore || context.HostLoads.Count != hostBefore)
                 throw new InvalidDataException("Targeted patch API reflection unexpectedly changed resolver/load counters.");
             if (context.NativeLoadAttempts.Count != nativeBefore)
@@ -1627,6 +1646,11 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 harmonyMethodType,
                 harmonyMethodConstructor,
                 harmonyMethodMethodField,
+                accessToolsType,
+                accessToolsTypeInitializer,
+                accessToolsAllField,
+                accessToolsAllDeclaredField,
+                accessToolsMetadata.TypeInitializerAudit,
                 metadata.AddPrefixAudit,
                 metadata.PatchAudit,
                 metadata.UnpatchAudit,
@@ -1641,6 +1665,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "Patch descriptor type: HarmonyLib.HarmonyMethod — no type initializer\n" +
                 "Patch descriptor constructor: HarmonyMethod(System.Reflection.MethodInfo)\n" +
                 "Patch descriptor retained method field: method : System.Reflection.MethodInfo\n" +
+                "AccessTools type initializer: PRESENT — exact bounded BindingFlags-only static-field shape\n" +
+                "AccessTools.all/allDeclared values read: NO — Gate R owns the type-initialization boundary\n" +
                 "HarmonyMethod object constructed: NO\n" +
                 "PatchProcessor.Patch invoked: NO\n" +
                 "Launcher patch probe invoked: NO\n" +
@@ -1648,7 +1674,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "Audited AddPrefix(MethodInfo) IL:\n" + metadata.AddPrefixAudit + "\n" +
                 "Audited Patch() IL:\n" + metadata.PatchAudit + "\n" +
                 "Audited Unpatch(MethodInfo) IL:\n" + metadata.UnpatchAudit + "\n" +
-                "Audited HarmonyMethod(MethodInfo) IL:\n" + metadata.HarmonyMethodConstructorAudit);
+                "Audited HarmonyMethod(MethodInfo) IL:\n" + metadata.HarmonyMethodConstructorAudit + "\n" +
+                "Audited AccessTools::.cctor IL:\n" + accessToolsMetadata.TypeInitializerAudit);
         }
         catch (Exception ex)
         {
@@ -1770,6 +1797,88 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 explicitly initializes only exact metadata-verified HarmonyLib.AccessTools before HarmonyMethod construction.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "AccessTools is post-publish Harmony code unavailable to the build-time trimmer; Gate O bounds its exact type initializer before this explicit completion barrier.")]
+    public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization()
+    {
+        var stage = "explicit HarmonyLib.AccessTools type-initialization completion barrier";
+        try
+        {
+            ThrowIfDisposed();
+            var preflight = RequirePreflight();
+            var patchApi = RequirePatchApi();
+            _ = RequireBaselineProbeInvocation();
+            var context = RequireLoadContext();
+
+            VerifyFileLength(preflight.Target.PreparedPath, preflight.Target.Plan.Length, "prepared AccessTools initialization target");
+            var targetSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
+            if (!targetSha1.Equals(preflight.Target.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step 27 0Harmony SHA-1 changed immediately before AccessTools type initialization.");
+
+            var managedBefore = context.ManagedResolverRequests.Count;
+            var privateBefore = context.PrivateLoads.Count;
+            var hostBefore = context.HostLoads.Count;
+            var nativeBefore = context.NativeLoadAttempts.Count;
+            var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+
+            RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle);
+
+            stage = "AccessTools post-initialization BindingFlags verification";
+            var allRaw = patchApi.AccessToolsAllField.GetValue(null)
+                ?? throw new InvalidDataException("AccessTools.all remained null after explicit type initialization.");
+            var allDeclaredRaw = patchApi.AccessToolsAllDeclaredField.GetValue(null)
+                ?? throw new InvalidDataException("AccessTools.allDeclared remained null after explicit type initialization.");
+            if (allRaw is not BindingFlags all || allDeclaredRaw is not BindingFlags allDeclared)
+                throw new InvalidDataException("AccessTools BindingFlags fields returned unexpected runtime values/types.");
+            var expectedAll = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static |
+                BindingFlags.GetField | BindingFlags.SetField | BindingFlags.GetProperty | BindingFlags.SetProperty;
+            var expectedAllDeclared = expectedAll | BindingFlags.DeclaredOnly;
+            if (all != expectedAll || allDeclared != expectedAllDeclared)
+                throw new InvalidDataException($"AccessTools BindingFlags initialization changed: all={all} ({(int)all}), allDeclared={allDeclared} ({(int)allDeclared}), expected={expectedAll} ({(int)expectedAll}) / {expectedAllDeclared} ({(int)expectedAllDeclared}).");
+
+            if (context.NativeLoadAttempts.Count != nativeBefore)
+                throw new DllNotFoundException("AccessTools type initialization attempted native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
+            if (context.RejectedManagedRequests.Count != 0)
+                throw new FileLoadException("AccessTools type initialization triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests));
+            var membershipAfter = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
+                throw new InvalidDataException("AccessTools type initialization changed private-context membership.");
+            var postSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
+            if (!postSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("0Harmony prepared bytes changed across AccessTools type initialization.");
+            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
+                throw new InvalidDataException("AccessTools type initialization unexpectedly invoked the launcher target or prefix.");
+
+            _accessToolsTypeInitialization = new AccessToolsTypeInitializationSnapshot(
+                postSha1, all, allDeclared,
+                context.ManagedResolverRequests.Count - managedBefore,
+                context.PrivateLoads.Count - privateBefore,
+                context.HostLoads.Count - hostBefore,
+                context.NativeLoadAttempts.Count - nativeBefore);
+
+            return Pass(
+                ControlledHarmonyPatchExecutionGate.AccessToolsTypeInitialization,
+                "CONTROLLED HARMONY ACCESSTOOLS TYPE INITIALIZATION SUCCEEDED.\n" +
+                "Completion barrier: RuntimeHelpers.RunClassConstructor(HarmonyLib.AccessTools.TypeHandle) = PASS\n" +
+                "Measured initializer: BindingFlags-only static initialization of AccessTools.all + allDeclared\n" +
+                $"AccessTools.all: {all} ({(int)all})\n" +
+                $"AccessTools.allDeclared: {allDeclared} ({(int)allDeclared})\n" +
+                $"Managed resolver requests during type initialization: {_accessToolsTypeInitialization.ManagedResolverRequests:N0}\n" +
+                $"Private loads during type initialization: {_accessToolsTypeInitialization.PrivateLoads:N0}\n" +
+                $"Host loads during type initialization: {_accessToolsTypeInitialization.HostLoads:N0}\n" +
+                $"Native load attempts during type initialization: {_accessToolsTypeInitialization.NativeLoadAttempts:N0}\n" +
+                "Private-context membership changed: NO\n" +
+                "HarmonyMethod object constructed: NO\n" +
+                "PatchProcessor.Patch invoked: NO\n" +
+                "Launcher target/prefix invoked: NO\n" +
+                "StS2 type/member reflected or invoked: NO");
+        }
+        catch (Exception ex)
+        {
+            return Fail(ControlledHarmonyPatchExecutionGate.AccessToolsTypeInitialization, stage, ex);
+        }
+    }
+
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes exactly PatchProcessor.AddPrefix(MethodInfo) from the metadata-verified post-publish API surface.")]
     [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Step 27 inspects only exact post-publish HarmonyMethod fields/types resolved by Gate O.")]
     public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration()
@@ -1782,6 +1891,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var patchApi = RequirePatchApi();
             var probe = RequirePatchProbe();
             _ = RequireBaselineProbeInvocation();
+            _ = RequireAccessToolsTypeInitialization();
             var context = RequireLoadContext();
             var processor = _patchProcessorInstance ?? throw new InvalidOperationException("Step 27 retained PatchProcessor instance is missing.");
 
@@ -1844,6 +1954,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 $"Prefix: {probe.PrefixSignature}\n" +
                 "HarmonyMethod constructed: YES — by exact AddPrefix(MethodInfo) only\n" +
                 "HarmonyMethod.method retained exact prefix MethodInfo: YES\n" +
+                "HarmonyLib.AccessTools type initializer completed explicitly in prior Gate R: YES\n" +
                 $"Managed resolver requests during registration: {_prefixRegistration.ManagedResolverRequests:N0}\n" +
                 $"Private loads during registration: {_prefixRegistration.PrivateLoads:N0}\n" +
                 $"Host loads during registration: {_prefixRegistration.HostLoads:N0}\n" +
@@ -1935,7 +2046,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 $"Private loads during Patch(): {_patchExecution.PrivateLoads:N0}\n" +
                 $"Host loads during Patch(): {_patchExecution.HostLoads:N0}\n" +
                 $"Native load attempts during Patch(): {_patchExecution.NativeLoadAttempts:N0}\n" +
-                "Launcher target invoked after patch: NO — Gate U owns execution of patched behavior\n" +
+                "Launcher target invoked after patch: NO — Gate V owns execution of patched behavior\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
         }
         catch (Exception ex)
@@ -2046,7 +2157,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var probe = RequirePatchProbe();
             _ = RequirePatchExecution();
             if (!_postPatchAuditPassed)
-                throw new InvalidOperationException("Step 27 Gate T must pass before invoking patched launcher behavior.");
+                throw new InvalidOperationException("Step 27 Gate U must pass before invoking patched launcher behavior.");
             var context = RequireLoadContext();
             var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
             var nativeBefore = context.NativeLoadAttempts.Count;
@@ -2169,7 +2280,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 $"Host loads during unpatch: {_unpatch.HostLoads:N0}\n" +
                 $"Native load attempts during unpatch: {_unpatch.NativeLoadAttempts:N0}\n" +
                 "Launcher target/prefix invoked during unpatch: NO\n" +
-                "Restored behavior not yet invoked — Gate X owns that proof\n" +
+                "Restored behavior not yet invoked — Gate Y owns that proof\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
         }
         catch (Exception ex)
@@ -2233,7 +2344,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var probe = RequirePatchProbe();
             _ = RequireUnpatch();
             if (!_postUnpatchAuditPassed)
-                throw new InvalidOperationException("Step 27 Gate W must pass before verifying restored launcher behavior.");
+                throw new InvalidOperationException("Step 27 Gate X must pass before verifying restored launcher behavior.");
             var context = RequireLoadContext();
             var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
             var nativeBefore = context.NativeLoadAttempts.Count;
@@ -2449,6 +2560,135 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     }
 
 
+
+    private static AccessToolsMetadataSnapshot ReadAccessToolsMetadata(string path)
+    {
+        using var resolver = new Step27MetadataOnlyResolver(path);
+        using var module = ModuleDefinition.ReadModule(path, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = resolver,
+            MetadataResolver = resolver,
+        });
+        if (module.Assembly?.Name is null)
+            throw new BadImageFormatException("Managed assembly manifest missing while auditing Harmony AccessTools: " + path);
+
+        var accessTools = EnumerateTypes(module.Types).SingleOrDefault(type => type.FullName.Equals(AccessToolsTypeFullName, StringComparison.Ordinal));
+        if (accessTools is null)
+            return new AccessToolsMetadataSnapshot(false, "HarmonyLib.AccessTools is missing from exact 0Harmony.", "<missing>");
+        if (!accessTools.IsPublic || !accessTools.IsAbstract || !accessTools.IsSealed || accessTools.IsInterface)
+            return new AccessToolsMetadataSnapshot(false, "HarmonyLib.AccessTools is no longer the exact public static-class shape.", "<invalid type>");
+
+        var allField = accessTools.Fields.SingleOrDefault(field => field.IsPublic && field.IsStatic && field.IsInitOnly && field.Name.Equals("all", StringComparison.Ordinal));
+        var allDeclaredField = accessTools.Fields.SingleOrDefault(field => field.IsPublic && field.IsStatic && field.IsInitOnly && field.Name.Equals("allDeclared", StringComparison.Ordinal));
+        if (allField is null || allDeclaredField is null ||
+            !allField.FieldType.FullName.Equals("System.Reflection.BindingFlags", StringComparison.Ordinal) ||
+            !allDeclaredField.FieldType.FullName.Equals("System.Reflection.BindingFlags", StringComparison.Ordinal))
+            return new AccessToolsMetadataSnapshot(false, "AccessTools.all/allDeclared public static readonly BindingFlags fields changed.", "<blocked>");
+
+        var typeInitializers = accessTools.Methods.Where(method => method.IsConstructor && method.IsStatic).ToArray();
+        if (typeInitializers.Length != 1 || !typeInitializers[0].HasBody)
+            return new AccessToolsMetadataSnapshot(false, $"Expected exactly one managed AccessTools type initializer; observed {typeInitializers.Length}.", typeInitializers.Length == 0 ? "<missing>" : string.Join("\n", typeInitializers.Select(m => m.FullName)));
+        var cctor = typeInitializers[0];
+        if (cctor.IsPInvokeImpl || cctor.PInvokeInfo is not null || cctor.Body.ExceptionHandlers.Count != 0 || cctor.Body.Variables.Count != 0)
+            return new AccessToolsMetadataSnapshot(false, "AccessTools type initializer contains P/Invoke, handlers, or locals outside the bounded static BindingFlags initialization shape.", FormatMethodAudit(cctor));
+
+        var expectedAll = (int)(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static |
+            BindingFlags.GetField | BindingFlags.SetField | BindingFlags.GetProperty | BindingFlags.SetProperty);
+        var expectedAllDeclared = expectedAll | (int)BindingFlags.DeclaredOnly;
+        var stack = new Stack<int>();
+        int? measuredAll = null;
+        int? measuredAllDeclared = null;
+        var returned = false;
+        var hazards = new List<string>();
+
+        foreach (var instruction in cctor.Body.Instructions)
+        {
+            if (TryGetLdcI4Value(instruction, out var constant))
+            {
+                stack.Push(constant);
+                continue;
+            }
+
+            if (instruction.OpCode.Code == Code.Ldsfld && instruction.Operand is FieldReference loadField &&
+                loadField.DeclaringType.FullName.Equals(AccessToolsTypeFullName, StringComparison.Ordinal) &&
+                loadField.Name.Equals("all", StringComparison.Ordinal) && measuredAll.HasValue)
+            {
+                stack.Push(measuredAll.Value);
+                continue;
+            }
+
+            if (instruction.OpCode.Code == Code.Or && stack.Count >= 2)
+            {
+                var right = stack.Pop();
+                var left = stack.Pop();
+                stack.Push(left | right);
+                continue;
+            }
+
+            if (instruction.OpCode.Code == Code.Stsfld && instruction.Operand is FieldReference storeField &&
+                storeField.DeclaringType.FullName.Equals(AccessToolsTypeFullName, StringComparison.Ordinal) && stack.Count >= 1)
+            {
+                var value = stack.Pop();
+                if (storeField.Name.Equals("all", StringComparison.Ordinal) && !measuredAll.HasValue)
+                {
+                    measuredAll = value;
+                    continue;
+                }
+                if (storeField.Name.Equals("allDeclared", StringComparison.Ordinal) && !measuredAllDeclared.HasValue)
+                {
+                    measuredAllDeclared = value;
+                    continue;
+                }
+            }
+
+            if (instruction.OpCode.Code == Code.Ret && ReferenceEquals(instruction, cctor.Body.Instructions[^1]) && stack.Count == 0)
+            {
+                returned = true;
+                continue;
+            }
+
+            hazards.Add($"unexpected AccessTools::.cctor instruction IL_{instruction.Offset:X4}: {instruction.OpCode.Code} {FormatInstructionOperand(instruction.Operand)}".TrimEnd());
+        }
+
+        if (measuredAll != expectedAll)
+            hazards.Add($"AccessTools.all initializer value changed: observed {measuredAll?.ToString() ?? "<missing>"}, expected {expectedAll}.");
+        if (measuredAllDeclared != expectedAllDeclared)
+            hazards.Add($"AccessTools.allDeclared initializer value changed: observed {measuredAllDeclared?.ToString() ?? "<missing>"}, expected {expectedAllDeclared}.");
+        if (!returned)
+            hazards.Add("AccessTools type initializer did not end in the exact bounded empty-stack return.");
+
+        var detail =
+            "Type: HarmonyLib.AccessTools — exact public static class\n" +
+            $"Type initializer count: {typeInitializers.Length:N0}\n" +
+            $"AccessTools.all expected BindingFlags value: {expectedAll}\n" +
+            $"AccessTools.allDeclared expected BindingFlags value: {expectedAllDeclared}\n" +
+            $"Blocking AccessTools initializer hazards: {hazards.Count:N0}" +
+            (hazards.Count == 0 ? string.Empty : "\n" + string.Join("\n", hazards));
+        return new AccessToolsMetadataSnapshot(hazards.Count == 0, detail, FormatMethodAudit(cctor));
+    }
+
+    private static bool TryGetLdcI4Value(Instruction instruction, out int value)
+    {
+        switch (instruction.OpCode.Code)
+        {
+            case Code.Ldc_I4_M1: value = -1; return true;
+            case Code.Ldc_I4_0: value = 0; return true;
+            case Code.Ldc_I4_1: value = 1; return true;
+            case Code.Ldc_I4_2: value = 2; return true;
+            case Code.Ldc_I4_3: value = 3; return true;
+            case Code.Ldc_I4_4: value = 4; return true;
+            case Code.Ldc_I4_5: value = 5; return true;
+            case Code.Ldc_I4_6: value = 6; return true;
+            case Code.Ldc_I4_7: value = 7; return true;
+            case Code.Ldc_I4_8: value = 8; return true;
+            case Code.Ldc_I4_S: value = instruction.Operand is sbyte signed ? signed : Convert.ToInt32(instruction.Operand); return true;
+            case Code.Ldc_I4: value = Convert.ToInt32(instruction.Operand); return true;
+            default: value = 0; return false;
+        }
+    }
 
     private static HarmonyPatchMetadataSnapshot ReadHarmonyPatchMetadata(string path)
     {
@@ -3413,20 +3653,23 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     private BaselineProbeInvocationSnapshot RequireBaselineProbeInvocation()
         => _baselineProbeInvocation ?? throw new InvalidOperationException("Step 27 Gate Q must pass before prefix registration.");
 
+    private AccessToolsTypeInitializationSnapshot RequireAccessToolsTypeInitialization()
+        => _accessToolsTypeInitialization ?? throw new InvalidOperationException("Step 27 Gate R must pass before HarmonyMethod construction/prefix registration.");
+
     private PrefixRegistrationSnapshot RequirePrefixRegistration()
-        => _prefixRegistration ?? throw new InvalidOperationException("Step 27 Gate R must pass before PatchProcessor.Patch().");
+        => _prefixRegistration ?? throw new InvalidOperationException("Step 27 Gate S must pass before PatchProcessor.Patch().");
 
     private PatchExecutionSnapshot RequirePatchExecution()
-        => _patchExecution ?? throw new InvalidOperationException("Step 27 Gate S must pass before post-patch audit or patched invocation.");
+        => _patchExecution ?? throw new InvalidOperationException("Step 27 Gate T must pass before post-patch audit or patched invocation.");
 
     private ProbeInvocationSnapshot RequirePatchedProbeInvocation()
-        => _patchedProbeInvocation ?? throw new InvalidOperationException("Step 27 Gate U must pass before exact prefix unpatch.");
+        => _patchedProbeInvocation ?? throw new InvalidOperationException("Step 27 Gate V must pass before exact prefix unpatch.");
 
     private UnpatchSnapshot RequireUnpatch()
-        => _unpatch ?? throw new InvalidOperationException("Step 27 Gate V must pass before post-unpatch or restored-behavior gates.");
+        => _unpatch ?? throw new InvalidOperationException("Step 27 Gate W must pass before post-unpatch or restored-behavior gates.");
 
     private ProbeInvocationSnapshot RequireRestoredProbeInvocation()
-        => _restoredProbeInvocation ?? throw new InvalidOperationException("Step 27 Gate X must pass before the final isolation audit.");
+        => _restoredProbeInvocation ?? throw new InvalidOperationException("Step 27 Gate Y must pass before the final isolation audit.");
 
     private Step27LoadContext RequireLoadContext()
         => _loadContext ?? throw new InvalidOperationException("Step 27 dedicated load context is unavailable.");
@@ -3510,6 +3753,11 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         string PatchAudit,
         string UnpatchAudit,
         string HarmonyMethodConstructorAudit);
+
+    private sealed record AccessToolsMetadataSnapshot(
+        bool Allowed,
+        string Detail,
+        string TypeInitializerAudit);
 
     private sealed record PreparedMetadataSnapshot(
         int ModuleInitializerCount,
@@ -3615,6 +3863,11 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         Type HarmonyMethodType,
         ConstructorInfo HarmonyMethodConstructor,
         FieldInfo HarmonyMethodMethodField,
+        Type AccessToolsType,
+        ConstructorInfo AccessToolsTypeInitializer,
+        FieldInfo AccessToolsAllField,
+        FieldInfo AccessToolsAllDeclaredField,
+        string AccessToolsTypeInitializerAudit,
         string AddPrefixAudit,
         string PatchAudit,
         string UnpatchAudit,
@@ -3631,6 +3884,15 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         int ReflectionResult,
         int TargetCalls,
         int PrefixCalls);
+
+    private sealed record AccessToolsTypeInitializationSnapshot(
+        string PreparedSha1,
+        BindingFlags All,
+        BindingFlags AllDeclared,
+        int ManagedResolverRequests,
+        int PrivateLoads,
+        int HostLoads,
+        int NativeLoadAttempts);
 
     private sealed record PrefixRegistrationSnapshot(
         string PreparedSha1,

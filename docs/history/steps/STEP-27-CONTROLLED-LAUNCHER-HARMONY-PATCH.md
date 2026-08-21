@@ -115,3 +115,15 @@ Final plan/prepared/live rehash, OfflineReady exact-tree proof, exact context me
 - workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
 - device report: `Documents/StS2Launcher/Reports/Step27-ControlledHarmonyPatchExecution.txt`
+
+## Physical result — 0.0.84 (84)
+
+The first physical Step 27 run reached **17/25**. Gates A–Q passed. Gate R failed during exact `PatchProcessor.AddPrefix(MethodInfo)` before `Patch()` was called.
+
+The stack established a previously implicit execution boundary:
+
+`AddPrefix(MethodInfo)` → `HarmonyMethod(MethodInfo)` → `HarmonyMethod.ImportMethod` → `HarmonyMethodExtensions.CopyTo` → `HarmonyMethod.HarmonyFields()` → automatic `HarmonyLib.AccessTools::.cctor` → `NullReferenceException`.
+
+No launcher patch was installed and no StS2 member was reflected or invoked. The raw report is preserved at `docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt`.
+
+The next candidate does not weaken prefix or patch policy. It first metadata-audits the exact `AccessTools` static initializer and gives that automatic initialization its own explicit gate before retrying prefix registration.

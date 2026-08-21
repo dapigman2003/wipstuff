@@ -84,6 +84,15 @@ The live source is intentionally small and must not be constrained by historical
 
 The live iOS project is `src/StS2Launcher.iOS/StS2Launcher.iOS.csproj`. The old `StS2Launcher.Step05.iOS` name is historical only.
 
+## External StS2/mobile reference implementations
+
+The project may use external Android StS2 launcher/compatibility repositories as **advisory references only**:
+
+- `https://github.com/Ekyso/StS2-Launcher` — the earlier Android/mobile StS2 launcher reference used for architecture, compatibility ideas, and target discovery.
+- `https://github.com/SocialHummingbird/StS2-Launcher-Overhaul` — a later/evolved Android ARM64 implementation with broader real-StS2 Harmony patch coverage, current startup/main-menu evidence, mod/runtime compatibility work, and Godot/native mobile findings.
+
+These repositories are not authorities for this iOS runtime. Android/Mono/custom-Godot success never closes a .NET 9 iOS AOT, trimming, resolver, native-link, or physical-device boundary. Their most valuable uses are to suggest StS2 types/members worth measuring, known patch signatures, startup ordering, GodotSharp behavior, platform/native incompatibilities, and later mod-loader compatibility risks. Before this project reflects, patches, or invokes any suggested StS2 member, re-verify the exact type/member/signature and relevant IL against the receipt-backed macOS ARM64 payload used by this launcher, then prove the iOS boundary through this project’s own gated physical-device sequence. Never copy game payloads or treat an externally patched `sts2.dll` as trusted input.
+
 ## Physically proven platform policies that remain protected
 
 These are architecture, not temporary step hacks:

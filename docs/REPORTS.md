@@ -14,7 +14,7 @@ The active Step 27 report is:
 
 `Documents/StS2Launcher/Reports/Step27-ControlledHarmonyPatchExecution.txt`
 
-It records the ordered A–Y result; exact replay of the closed Step-26 state; exact patch API metadata; launcher-owned target/prefix signatures and baseline counters; prefix registration; the first exact `PatchProcessor.Patch()` boundary; pre-invocation post-patch integrity; patched direct/reflection behavior; exact prefix unpatch; post-unpatch integrity; restored direct/reflection behavior; final plan/file hashes, OfflineReady, context membership, resolver/native observations; and the explicit no-StS2/no-Godot/no-native-game boundary.
+It records the ordered A–Z result; exact replay of the closed Step-26 state; exact patch API plus bounded AccessTools initializer metadata; launcher-owned target/prefix signatures and baseline counters; explicit AccessTools type initialization; prefix registration; the first exact `PatchProcessor.Patch()` boundary; pre-invocation post-patch integrity; patched direct/reflection behavior; exact prefix unpatch; post-unpatch integrity; restored direct/reflection behavior; final plan/file hashes, OfflineReady, context membership, resolver/native observations; and the explicit no-StS2/no-Godot/no-native-game boundary.
 
 The physically closed Step 26 report remains:
 

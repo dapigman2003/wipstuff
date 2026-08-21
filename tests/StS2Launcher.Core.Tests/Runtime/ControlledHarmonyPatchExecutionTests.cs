@@ -13,7 +13,7 @@ namespace StS2Launcher.Core.Tests;
 public sealed class ControlledHarmonyPatchExecutionTests
 {
     [TestMethod]
-    public void OrderedHarmonyPatchExecutionGatesReachTwentyFiveOfTwentyFivePass()
+    public void OrderedHarmonyPatchExecutionGatesReachTwentySixOfTwentySixPass()
     {
         var gates = new ControlledHarmonyPatchExecutionGateSequence();
         gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.InitializationPreflight, true, "preflight"));
@@ -33,6 +33,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
         gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, true, "patch API"));
         gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.LauncherPatchProbeResolution, true, "patch probe"));
         gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.BaselineProbeInvocation, true, "baseline"));
+        gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.AccessToolsTypeInitialization, true, "AccessTools type init"));
         gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.PrefixRegistration, true, "prefix registration"));
         gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.PatchEngineExecution, true, "patch"));
         gates.Record(new ControlledHarmonyPatchExecutionGateResult(ControlledHarmonyPatchExecutionGate.PostPatchAudit, true, "post-patch audit"));
@@ -44,8 +45,28 @@ public sealed class ControlledHarmonyPatchExecutionTests
 
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
-        Assert.AreEqual(25, summary.PassedGates);
-        Assert.AreEqual("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY PASS — 25/25", summary.Summary);
+        Assert.AreEqual(26, summary.PassedGates);
+        Assert.AreEqual("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY PASS — 26/26", summary.Summary);
+    }
+
+    [TestMethod]
+    public void AccessToolsMetadataAuditAcceptsOnlyBoundedBindingFlagsInitializer()
+    {
+        using var temp = new TempTestDirectory("sts2-step27-accesstools-metadata");
+        var goodPath = Path.Combine(temp.Path, "AccessTools-good.dll");
+        var driftPath = Path.Combine(temp.Path, "AccessTools-drift.dll");
+        WriteAccessToolsFixture(goodPath, drift: false);
+        WriteAccessToolsFixture(driftPath, drift: true);
+
+        var audit = typeof(ControlledHarmonyPatchExecution).GetMethod("ReadAccessToolsMetadata", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new AssertFailedException("Step 27 AccessTools metadata audit helper is missing.");
+        var good = audit.Invoke(null, [goodPath]) ?? throw new AssertFailedException("Good AccessTools audit returned null.");
+        var drift = audit.Invoke(null, [driftPath]) ?? throw new AssertFailedException("Drift AccessTools audit returned null.");
+        var allowedProperty = good.GetType().GetProperty("Allowed") ?? throw new AssertFailedException("AccessTools audit result has no Allowed property.");
+        var detailProperty = good.GetType().GetProperty("Detail") ?? throw new AssertFailedException("AccessTools audit result has no Detail property.");
+        Assert.AreEqual(true, allowedProperty.GetValue(good));
+        Assert.AreEqual(false, allowedProperty.GetValue(drift));
+        StringAssert.Contains((string?)detailProperty.GetValue(drift) ?? string.Empty, "Blocking AccessTools initializer hazards: 1");
     }
 
     [TestMethod]
@@ -925,6 +946,43 @@ public sealed class ControlledHarmonyPatchExecutionTests
         createProcessor.Body.Instructions.Add(Instruction.Create(OpCodes.Newobj, processorCtor));
         createProcessor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         harmonyType.Methods.Add(createProcessor);
+    }
+
+    private static void WriteAccessToolsFixture(string path, bool drift)
+    {
+        using var module = ModuleDefinition.CreateModule(Path.GetFileName(path), ModuleKind.Dll);
+        var bindingFlagsType = new TypeReference("System.Reflection", "BindingFlags", module, module.TypeSystem.CoreLibrary, true);
+        var accessTools = new TypeDefinition(
+            "HarmonyLib",
+            "AccessTools",
+            Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Abstract | Mono.Cecil.TypeAttributes.Sealed,
+            module.TypeSystem.Object);
+        module.Types.Add(accessTools);
+        var all = new FieldDefinition(
+            "all",
+            Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static | Mono.Cecil.FieldAttributes.InitOnly,
+            bindingFlagsType);
+        var allDeclared = new FieldDefinition(
+            "allDeclared",
+            Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static | Mono.Cecil.FieldAttributes.InitOnly,
+            bindingFlagsType);
+        accessTools.Fields.Add(all);
+        accessTools.Fields.Add(allDeclared);
+        var cctor = new MethodDefinition(
+            ".cctor",
+            Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName,
+            module.TypeSystem.Void);
+        accessTools.Methods.Add(cctor);
+        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4, 15420));
+        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Stsfld, all));
+        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldsfld, all));
+        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4_2));
+        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Or));
+        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Stsfld, allDeclared));
+        if (drift)
+            cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Nop));
+        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+        module.Write(path);
     }
 
     private static void WriteExternalBaseMemberRefFixture(string path)

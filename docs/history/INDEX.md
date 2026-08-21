@@ -67,3 +67,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-26-CONTROLLED-HARMONY-PROCESSOR-CREATION.md` — active empty PatchProcessor creation design.
 - `steps/STEP-26.0-PHYSICAL-CLOSURE.md` — physical 14/14 Step 26 closure with OfflineReady PASS and Foundation 5/5; inert PatchProcessor creation became the accepted baseline.
 - `steps/STEP-27-CONTROLLED-LAUNCHER-HARMONY-PATCH.md` — active first real Harmony patch/unpatch design, restricted to a deterministic launcher-owned target/prefix pair; StS2 reflection remains deferred to Step 28.
+- `reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt` — physical 0.0.84 reached 17/25: A–Q PASS, Gate R failed before `Patch()` because `HarmonyMethod(MethodInfo)` implicitly triggered `HarmonyLib.AccessTools::.cctor`.
+- `steps/STEP-27.0.1-ACCESSTOOLS-TYPE-INITIALIZATION-BOUNDARY.md` — 0.0.85 makes the physically discovered AccessTools type initializer an explicit metadata-audited gate before prefix registration; first patch execution shifts to Gate T.

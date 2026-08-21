@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>84</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.84</ApplicationDisplayVersion>
+    <ApplicationVersion>85</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.85</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
