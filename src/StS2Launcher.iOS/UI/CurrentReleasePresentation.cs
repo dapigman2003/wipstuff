@@ -10,16 +10,16 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.4 — CONTROLLED LAUNCHER-OWNED HARMONY PATCH + UNPATCH";
+        "STEP 27.0.5 — CRASH-LOCALIZED LAUNCHER-OWNED HARMONY PATCH + UNPATCH";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • STEP 27 ACCESSTOOLS OPERAND ATTRIBUTION CORRECTION • STS2 REMAINS UNTOUCHED";
+        "STEPS 01–26 PHYSICALLY CLOSED • STEP 27 N–T CRASH LOCALIZATION + CLEANER GATE O • STS2 REMAINS UNTOUCHED";
 
     public const string Summary =
-        "Physical 0.0.87 stopped safely at Gate O before AccessTools initialization or patching. The 57-instruction fingerprint matched, but the phone disproved the prior attribution of the single ldc.i4.1: both RuntimeInformation Type.GetType(string, bool) probes use throwOnError=false, while ldc.i4.1 supplies LockRecursionPolicy.SupportsRecursion to ReaderWriterLockSlim. Step 27.0.4 pins those exact semantics, preserves the already-bounded reflected framework surface, then keeps Gate R as explicit AccessTools initialization, Gate S as prefix registration, and Gate T as the first PatchProcessor.Patch() boundary. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.88 produced unstable process termination around the N–Q region, plus one expected Gate-A fresh-process rejection when the prior Step-27 load context was still resident. Step 27.0.5 keeps the same 26-gate launcher-only patch objective but makes crash attribution durable: Step27-CrashCheckpoint.txt is synchronously flushed at every gate transition and sensitive O/R/S/T substage. Gate O now performs admission/resolution only and no longer invokes RuntimeInformation.FrameworkDescription through PropertyInfo.GetValue; Gate R owns that first reflected getter invocation immediately before the explicit AccessTools initializer. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Step 27.0 reached A–Q before implicit AccessTools initialization failed; Step 27.0.1–27.0.3 then stopped safely at Gate O while measuring and tightening that initializer. Step 27.0.4 is the active operand-attribution correction. Run Step 27 only in a fresh process. If Gate T or later runs, force-quit before retrying. Long reports are written to Files under Documents/StS2Launcher/Reports.";
+        "Status: Steps 01–26 are physically closed. Build 0.0.84 remains the furthest clean Step-27 execution evidence at A–Q; 0.0.85–0.0.87 refined the AccessTools metadata fingerprint. Physical 0.0.88 showed intermittent hard termination around N–Q, so 0.0.89 is the crash-localization candidate. Run Step 27 only after a force-quit/relaunch. Once Gate B starts, force-quit before every retry regardless of where the run stops. If the app terminates without a managed report, preserve Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt before another attempt.";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

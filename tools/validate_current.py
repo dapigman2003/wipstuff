@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>88</ApplicationVersion>" in project_text, "build version is 88")
-require("<ApplicationDisplayVersion>0.0.88</ApplicationDisplayVersion>" in project_text, "display version is 0.0.88")
-require(plist.get("CFBundleVersion") == "88", "Info.plist build version is 88")
-require(plist.get("CFBundleShortVersionString") == "0.0.88", "Info.plist display version is 0.0.88")
+require("<ApplicationVersion>89</ApplicationVersion>" in project_text, "build version is 89")
+require("<ApplicationDisplayVersion>0.0.89</ApplicationDisplayVersion>" in project_text, "display version is 0.0.89")
+require(plist.get("CFBundleVersion") == "89", "Info.plist build version is 89")
+require(plist.get("CFBundleShortVersionString") == "0.0.89", "Info.plist display version is 0.0.89")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,13 +198,13 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.4 — CONTROLLED LAUNCHER-OWNED HARMONY PATCH + UNPATCH" in release_presentation, "top launcher banner identifies active Step 27.0.4 candidate")
-require("Physical 0.0.87 stopped safely at Gate O" in release_presentation and "57-instruction fingerprint matched" in release_presentation and "throwOnError=false" in release_presentation and "SupportsRecursion" in release_presentation and "Gate T as the first PatchProcessor.Patch() boundary" in release_presentation, "top launcher banner short description matches current physical frontier")
+require("STEP 27.0.5 — CRASH-LOCALIZED LAUNCHER-OWNED HARMONY PATCH + UNPATCH" in release_presentation, "top launcher banner identifies active Step 27.0.5 candidate")
+require("Physical 0.0.88 produced unstable process termination around the N–Q region" in release_presentation and "Step27-CrashCheckpoint.txt" in release_presentation and "Gate O now performs admission/resolution only" in release_presentation and "Gate R owns that first reflected getter invocation" in release_presentation, "top launcher banner short description matches current physical frontier")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
 require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
-require("STEP 27.0.3 —" not in release_presentation and "Step 27.0.3 is the active" not in release_presentation, "stale prior Step-27 candidate banner identity is removed")
+require("STEP 27.0.4 —" not in release_presentation and "Step 27.0.4 is the active" not in release_presentation, "stale prior Step-27 candidate banner identity is removed")
 
 # ---------------------------------------------------------------------------
 # Physically proven runtime/build policy
@@ -335,8 +335,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.88",
-    "STS2_BUILD_VERSION": "88",
+    "STS2_DISPLAY_VERSION": "0.0.89",
+    "STS2_BUILD_VERSION": "89",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -881,6 +881,11 @@ require("Run Step 27 A–Z" in step27_ui and "GATE Z RUNNING" in step27_ui, "Ste
 require("Step 27 prerequisite: physical Step 26.0 / 0.0.83 is closed" in step27_ui, "Step 27 UI records the physically closed Step 26 prerequisite")
 require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in step27_ui, "Step 27 retains the physically proven Step 25 constructor framework-preservation anchor")
 require("Gates A–N replay the physically closed Step 26 boundary" in step27_ui, "Step 27 UI explicitly distinguishes the closed A-N replay from new patch gates")
+require('Step27-CrashCheckpoint.txt' in step27_ui and 'stream.Flush(flushToDisk: true)' in step27_ui, "Step 27 writes a synchronously flushed durable crash checkpoint")
+require(step27_ui.count('WriteStep27CrashCheckpoint("START"') == 26, "Step 27 crash checkpoint marks all twenty-six gate starts")
+require('WriteStep27CrashCheckpoint(result.Passed ? "PASS" : "FAIL"' in step27_ui and 'WriteStep27CrashCheckpoint("RUN_START"' in step27_ui and 'WriteStep27CrashCheckpoint("RUN_COMPLETE"' in step27_ui, "Step 27 crash checkpoint records run and gate outcomes")
+require('InlineProgress<ControlledHarmonyPatchExecutionProgress>' in step27_ui and 'WriteStep27CrashCheckpoint("PROGRESS"' in step27_ui, "Step 27 progress is synchronously checkpointed before UI marshaling")
+require('once Gate B has started' in step27_ui and 'force-quit before any retry' in step27_ui, "Step 27 UI states the correct fresh-process retry rule after Gate B")
 for required in [
     'ReadHarmonyPatchMetadata(preflight.Target.PreparedPath)',
     'ReadAccessToolsMetadata(preflight.Target.PreparedPath)',
@@ -935,6 +940,16 @@ require("typeof(RuntimeInformation)" in step27_preservation and "typeof(Property
 require("Step27AccessToolsFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs"), "Step 27 roots the AccessTools DynamicDependency preservation anchor from candidate-owned UI")
 require("cctor.Body.Instructions.Count != 57" in step27_source and "[Code.Ldc_I4_1] = 1" in step27_source and "Exact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight")
 require("expected false then false" in step27_source and "typedGetTypeCalls[0].Previous" in step27_source and "typedGetTypeCalls[1].Previous" in step27_source and "LockRecursionPolicy.SupportsRecursion" in step27_source and "ReaderWriterLockSlim recursion-policy operand changed" in step27_source, "Step 27 Gate O pins the physical RuntimeInformation Type.GetType operands and ReaderWriterLockSlim SupportsRecursion operand semantically")
+gate_o_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunHarmonyPatchApiResolution(")
+gate_o_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunLauncherPatchProbeResolution()", gate_o_start)
+gate_o_body = step27_source[gate_o_start:gate_o_end]
+require("frameworkDescriptionProperty.GetValue(null)" not in gate_o_body and "getter NOT INVOKED in Gate O" in gate_o_body, "Step 27 Gate O resolves FrameworkDescription metadata without invoking the reflected getter")
+require(all(marker in gate_o_body for marker in ["O1 —", "O2 —", "O3 —", "O4 —", "O5 —", "O6 —", "O7 —", "O8 —", "O9 —"]), "Step 27 Gate O exposes nine durable crash-localization substages")
+gate_r_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization(")
+gate_r_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(", gate_r_start)
+gate_r_body = step27_source[gate_r_start:gate_r_end]
+require("patchApi.RuntimeFrameworkDescriptionProperty.GetValue(null)" in gate_r_body and all(marker in gate_r_body for marker in ["R1 —", "R2 —", "R3 —"]), "Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages")
+require(all(marker in step27_source for marker in ["S1 —", "S2 —", "T1 —", "T2 —"]), "Step 27 prefix-registration and first-patch reflection calls have durable pre/post crash substages")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
 
 step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
@@ -982,6 +997,8 @@ required_docs = [
     "docs/history/steps/STEP-27.0.2-ACCESSTOOLS-MEASURED-INITIALIZER-PRESERVATION.md",
     "docs/history/steps/STEP-27.0.3-ACCESSTOOLS-PHYSICAL-FINGERPRINT-CORRECTION.md",
     "docs/history/steps/STEP-27.0.4-ACCESSTOOLS-OPERAND-ATTRIBUTION-CORRECTION.md",
+    "docs/history/steps/STEP-27.0.5-CRASH-LOCALIZATION-AND-GATE-O-PURITY.md",
+    "docs/history/reports/STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt",
     "docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt",
     "docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt",
     "docs/history/reports/STEP-27.0.2-PHYSICAL-GATE-O-REPORT.txt",
@@ -1017,8 +1034,10 @@ require("contains unexpected opcode Ldc_I4_1 (1 occurrence(s))" in step27_build8
 step27_build87_report = read("docs/history/reports/STEP-27.0.3-PHYSICAL-GATE-O-REPORT.txt")
 require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 14/26" in step27_build87_report and "Gate O — HarmonyPatchApiResolution: FAIL" in step27_build87_report and "Type initializer instructions: 57 (expected 57)" in step27_build87_report, "physical build 87 report preserves the exact Gate-O 14/26 stable instruction-count evidence")
 require("expected true then false" in step27_build87_report and "Blocking AccessTools initializer hazards: 1" in step27_build87_report, "physical build 87 report preserves the operand-attribution failure that motivated Step 27.0.4")
+step27_build88_guard_report = read("docs/history/reports/STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt")
+require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 0/26" in step27_build88_guard_report and "first failure: InitializationPreflight" in step27_build88_guard_report and "already loaded: sts2" in step27_build88_guard_report, "physical build 88 report preserves the expected stale-process Gate-A rejection")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.85 (85)" in current_status and "0.0.86 (86)" in current_status and "0.0.87 (87)" in current_status and "14/26" in current_status and "0.0.88 (88)" in current_status and "57 instructions" in current_status and "throwOnError=false" in current_status and "SupportsRecursion" in current_status and "AccessToolsTypeInitialization" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves all Step 27 physical evidence and advances to Step 27.0.4 / 0.0.88 with the corrected AccessTools operand attribution")
+require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.85 (85)" in current_status and "0.0.86 (86)" in current_status and "0.0.87 (87)" in current_status and "14/26" in current_status and "0.0.88 (88)" in current_status and "abrupt app termination" in current_status and "0.0.89 (89)" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.5 / 0.0.89 crash localization")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

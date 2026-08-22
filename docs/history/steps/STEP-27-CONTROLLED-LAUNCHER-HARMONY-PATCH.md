@@ -136,3 +136,7 @@ Step 27.0.1 failed at Gate O before AccessTools execution and exposed the real A
 ## Physical fingerprint refinement — 0.0.86 (86)
 
 Step 27.0.2 failed safely at Gate O before AccessTools execution or patching. Its stricter opcode audit corrected the prior 56-instruction interpretation: the receipt-backed initializer is 57 instructions and includes one required `ldc.i4.1`. Step 27.0.3 / 0.0.87 then confirmed the 57-instruction fingerprint but disproved the initial operand attribution: both `RuntimeInformation` `Type.GetType(string,bool)` calls use `false`, while the sole `ldc.i4.1` supplies `LockRecursionPolicy.SupportsRecursion` to `ReaderWriterLockSlim`. Step 27.0.4 / 0.0.88 pins those exact semantics. Gate R remains the explicit AccessTools initializer and Gate T remains the first patch call.
+
+## Step 27.0.5 crash-localization note
+
+Physical 0.0.88 produced intermittent abrupt termination around N–Q without a managed report, plus one expected Gate-A stale-process rejection after a prior Step-27 context had already been loaded. Step 27.0.5 / 0.0.89 keeps A–Z unchanged but adds a synchronously flushed crash checkpoint at every gate transition and sensitive O/R/S/T substages. Gate O no longer invokes the reflected `RuntimeInformation.FrameworkDescription` getter; Gate R owns that first reflected execution immediately before AccessTools type initialization. The first patch remains Gate T.

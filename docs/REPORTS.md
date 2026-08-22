@@ -33,3 +33,7 @@ The physically closed Step 23 regression report remains:
 `Documents/StS2Launcher/Reports/Step23-FirstRealGameLoad.txt`
 
 A current verification overwrites its deterministic latest report. Reports are output-only and are never trusted runtime input.
+
+## Step 27 crash checkpoint
+
+Step 27.0.5 adds `Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt`. Unlike the normal end-of-run report, this tiny output-only file is synchronously overwritten and flushed during the run so it can survive an abrupt process termination. Preserve it before the next Step-27 attempt if the app exits without a managed report. It is diagnostic only and is never consumed as trusted runtime input.

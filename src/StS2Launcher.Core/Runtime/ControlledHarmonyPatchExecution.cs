@@ -1549,7 +1549,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 resolves only exact receipt-verified post-publish Harmony patch APIs after Cecil metadata preflight.")]
     [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "The post-publish Harmony patch types are unavailable to the build-time trimmer; exact runtime reflection is bounded by metadata and identity checks.")]
-    public ControlledHarmonyPatchExecutionGateResult RunHarmonyPatchApiResolution()
+    public ControlledHarmonyPatchExecutionGateResult RunHarmonyPatchApiResolution(
+        IProgress<ControlledHarmonyPatchExecutionProgress>? progress = null)
     {
         var stage = "Harmony patch API resolution";
         try
@@ -1563,25 +1564,27 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidOperationException("Step 27 Gate N must pass before resolving any patch API surface.");
 
             stage = "patch Cecil metadata preflight";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O1 — reading exact PatchProcessor/HarmonyMethod Cecil metadata; no runtime member invocation.");
             var metadata = ReadHarmonyPatchMetadata(preflight.Target.PreparedPath);
             if (!metadata.Allowed)
                 throw new InvalidDataException("Step 27 Gate O refuses patch admission because the exact patch metadata shape changed:\n" + metadata.Detail);
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O2 — reading exact AccessTools::.cctor Cecil fingerprint; no AccessTools runtime reflection or initialization.");
             var accessToolsMetadata = ReadAccessToolsMetadata(preflight.Target.PreparedPath);
             if (!accessToolsMetadata.Allowed)
                 throw new InvalidDataException("Step 27 Gate O refuses AccessTools admission because its type initializer is not the exact physically measured runtime-detection/cache shape:\n" + accessToolsMetadata.Detail);
 
             stage = "AccessTools host-framework preservation preflight";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O3 — resolving RuntimeInformation by the exact string used by Harmony; metadata admission only.");
             var runtimeInformationType = Type.GetType("System.Runtime.InteropServices.RuntimeInformation", throwOnError: false, ignoreCase: false)
                 ?? throw new TypeLoadException("Step 27 AccessTools preservation preflight cannot resolve RuntimeInformation by the exact string used by Harmony.");
             if (runtimeInformationType != typeof(RuntimeInformation))
                 throw new InvalidDataException("String-resolved RuntimeInformation does not bind to the host RuntimeInformation type.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O4 — resolving FrameworkDescription PropertyInfo without invoking its getter.");
             var frameworkDescriptionProperty = runtimeInformationType.GetProperty("FrameworkDescription", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
                 ?? throw new MissingMemberException("RuntimeInformation.FrameworkDescription was trimmed; Step 27 cannot safely initialize AccessTools.");
             if (frameworkDescriptionProperty.PropertyType != typeof(string) || frameworkDescriptionProperty.GetMethod is null)
                 throw new InvalidDataException("RuntimeInformation.FrameworkDescription runtime shape changed.");
-            var frameworkDescription = frameworkDescriptionProperty.GetValue(null) as string;
-            if (string.IsNullOrWhiteSpace(frameworkDescription))
-                throw new InvalidDataException("RuntimeInformation.FrameworkDescription returned an empty value during AccessTools preservation preflight.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O5 — resolving the exact Dictionary<,>() and ReaderWriterLockSlim(LockRecursionPolicy) constructor metadata; constructors are not invoked.");
             _ = typeof(Dictionary<,>).GetConstructor(Type.EmptyTypes)
                 ?? throw new MissingMethodException("System.Collections.Generic.Dictionary<,>", ".ctor()");
             _ = typeof(ReaderWriterLockSlim).GetConstructor([typeof(LockRecursionPolicy)])
@@ -1594,6 +1597,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
 
             stage = "exact patch API reflection";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O6 — resolving exact PatchProcessor AddPrefix/Patch/Unpatch runtime MethodInfo objects.");
             var processorType = processorApi.PatchProcessorType;
             var addPrefixCandidates = processorType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .Where(method => method.Name.Equals("AddPrefix", StringComparison.Ordinal)).ToArray();
@@ -1618,6 +1622,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             var prefixField = processorType.GetField("prefix", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 ?? throw new MissingFieldException(PatchProcessorTypeFullName, "prefix");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O7 — resolving exact HarmonyMethod runtime type/constructor/field; no HarmonyMethod is constructed.");
             var harmonyMethodType = initialization.TargetAssembly.GetType("HarmonyLib.HarmonyMethod", throwOnError: false, ignoreCase: false)
                 ?? throw new TypeLoadException("Exact HarmonyLib.HarmonyMethod type is absent from loaded 0Harmony.");
             if (!ReferenceEquals(prefixField.FieldType, harmonyMethodType))
@@ -1635,6 +1640,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (harmonyMethodMethodField.FieldType != typeof(MethodInfo))
                 throw new InvalidDataException("HarmonyMethod.method runtime field type changed.");
 
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O8 — resolving exact AccessTools runtime Type/.cctor/fields without reading any static field.");
             var accessToolsType = initialization.TargetAssembly.GetType(AccessToolsTypeFullName, throwOnError: false, ignoreCase: false)
                 ?? throw new TypeLoadException("Exact HarmonyLib.AccessTools type is absent from loaded 0Harmony.");
             if (!(accessToolsType.IsAbstract && accessToolsType.IsSealed))
@@ -1682,6 +1688,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
                 throw new InvalidDataException("Targeted patch API reflection changed private-context membership.");
 
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O9 — runtime reflection/context checks passed; committing the bounded patch API snapshot.");
             _patchApi = new HarmonyPatchApiSnapshot(
                 addPrefix,
                 patch,
@@ -1700,7 +1707,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 accessToolsIsNetCoreRuntimeField,
                 accessToolsAddHandlerCacheField,
                 accessToolsAddHandlerCacheLockField,
-                frameworkDescription,
+                frameworkDescriptionProperty,
                 accessToolsMetadata.TypeInitializerAudit,
                 metadata.AddPrefixAudit,
                 metadata.PatchAudit,
@@ -1717,7 +1724,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "Patch descriptor constructor: HarmonyMethod(System.Reflection.MethodInfo)\n" +
                 "Patch descriptor retained method field: method : System.Reflection.MethodInfo\n" +
                 "AccessTools type initializer: PRESENT — exact Step 27.0.1 physical runtime-detection/cache fingerprint\n" +
-                $"Host RuntimeInformation.FrameworkDescription preservation preflight: {frameworkDescription}\n" +
+                "Host RuntimeInformation.FrameworkDescription metadata preservation preflight: PRESENT — getter NOT INVOKED in Gate O\n" +
                 "AccessTools static-field values read: NO — Gate R owns the type-initialization boundary\n" +
                 "HarmonyMethod object constructed: NO\n" +
                 "PatchProcessor.Patch invoked: NO\n" +
@@ -1851,7 +1858,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 explicitly initializes only the exact physically measured HarmonyLib.AccessTools runtime-detection/cache initializer before HarmonyMethod construction.")]
     [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "AccessTools is post-publish Harmony code unavailable to the build-time trimmer; Gate O bounds its exact physical runtime-detection/cache initializer and verifies the string-reflected framework surface before this explicit completion barrier.")]
-    public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization()
+    public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization(
+        IProgress<ControlledHarmonyPatchExecutionProgress>? progress = null)
     {
         var stage = "explicit HarmonyLib.AccessTools type-initialization completion barrier";
         try
@@ -1873,7 +1881,16 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var nativeBefore = context.NativeLoadAttempts.Count;
             var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
 
+            stage = "host reflective RuntimeInformation.FrameworkDescription invocation";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.AccessToolsTypeInitialization, "R1 — invoking the preserved RuntimeInformation.FrameworkDescription getter through PropertyInfo.GetValue before AccessTools::.cctor.");
+            var frameworkDescription = patchApi.RuntimeFrameworkDescriptionProperty.GetValue(null) as string;
+            if (string.IsNullOrWhiteSpace(frameworkDescription))
+                throw new InvalidDataException("RuntimeInformation.FrameworkDescription returned an empty value through the exact reflected getter path required by AccessTools.");
+
+            stage = "explicit HarmonyLib.AccessTools type-initialization completion barrier";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.AccessToolsTypeInitialization, "R2 — entering RuntimeHelpers.RunClassConstructor(HarmonyLib.AccessTools.TypeHandle).");
             RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle);
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.AccessToolsTypeInitialization, "R3 — AccessTools::.cctor returned; verifying exact static state.");
 
             stage = "AccessTools post-initialization BindingFlags verification";
             var allRaw = patchApi.AccessToolsAllField.GetValue(null)
@@ -1903,8 +1920,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 ?? throw new InvalidDataException("AccessTools.addHandlerCacheLock remained null or changed type after explicit type initialization.");
             if (addHandlerCacheLock.IsReadLockHeld || addHandlerCacheLock.IsUpgradeableReadLockHeld || addHandlerCacheLock.IsWriteLockHeld)
                 throw new InvalidDataException("AccessTools.addHandlerCacheLock unexpectedly holds a lock immediately after type initialization.");
-            var frameworkDescription = RuntimeInformation.FrameworkDescription;
-            if (string.IsNullOrWhiteSpace(frameworkDescription) || frameworkDescription.StartsWith(".NET Framework", StringComparison.Ordinal))
+            if (frameworkDescription.StartsWith(".NET Framework", StringComparison.Ordinal))
                 throw new InvalidDataException("AccessTools runtime environment is not the expected non-.NET-Framework host: " + frameworkDescription);
 
             if (context.NativeLoadAttempts.Count != nativeBefore)
@@ -1959,7 +1975,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes exactly PatchProcessor.AddPrefix(MethodInfo) from the metadata-verified post-publish API surface.")]
     [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Step 27 inspects only exact post-publish HarmonyMethod fields/types resolved by Gate O.")]
-    public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration()
+    public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(
+        IProgress<ControlledHarmonyPatchExecutionProgress>? progress = null)
     {
         var stage = "exact AddPrefix(MethodInfo) invocation";
         try
@@ -1987,7 +2004,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             object? returned;
             try
             {
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S1 — entering exact PatchProcessor.AddPrefix(MethodInfo) reflection invocation.");
                 returned = patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix]);
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S2 — AddPrefix(MethodInfo) returned; verifying the exact HarmonyMethod descriptor.");
             }
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
@@ -2049,7 +2068,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes exactly PatchProcessor.Patch() from the metadata-verified post-publish API surface against a launcher-owned probe.")]
     [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Step 27 retains only the exact replacement MethodInfo returned by the verified Patch() call.")]
-    public ControlledHarmonyPatchExecutionGateResult RunPatchEngineExecution()
+    public ControlledHarmonyPatchExecutionGateResult RunPatchEngineExecution(
+        IProgress<ControlledHarmonyPatchExecutionProgress>? progress = null)
     {
         var stage = "exact PatchProcessor.Patch() invocation";
         try
@@ -2076,7 +2096,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             object? rawReplacement;
             try
             {
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution, "T1 — entering the first exact PatchProcessor.Patch() reflection invocation; launcher target is still not invoked.");
                 rawReplacement = patchApi.PatchMethod.Invoke(processor, null);
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution, "T2 — PatchProcessor.Patch() returned; validating replacement MethodInfo and isolation state.");
             }
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
@@ -3860,6 +3882,12 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             throw new ObjectDisposedException(nameof(ControlledHarmonyPatchExecution));
     }
 
+    private static void ReportProgress(
+        IProgress<ControlledHarmonyPatchExecutionProgress>? progress,
+        ControlledHarmonyPatchExecutionGate gate,
+        string detail)
+        => progress?.Report(new ControlledHarmonyPatchExecutionProgress(gate, 0, 0, null, detail));
+
     private static ControlledHarmonyPatchExecutionGateResult Pass(ControlledHarmonyPatchExecutionGate gate, string detail)
         => new(gate, true, detail);
 
@@ -4053,7 +4081,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         FieldInfo AccessToolsIsNetCoreRuntimeField,
         FieldInfo AccessToolsAddHandlerCacheField,
         FieldInfo AccessToolsAddHandlerCacheLockField,
-        string RuntimeFrameworkDescription,
+        PropertyInfo RuntimeFrameworkDescriptionProperty,
         string AccessToolsTypeInitializerAudit,
         string AddPrefixAudit,
         string PatchAudit,

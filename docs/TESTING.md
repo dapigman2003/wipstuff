@@ -4,20 +4,22 @@
 
 Run `python3 tools/validate_current.py`.
 
-The validator protects the physically closed Step 23–26 boundaries, preserves the Step-27 physical 17/25 and successive 14/26 Gate-O evidence, and separately pins Step 27.0.4 / `0.0.88 (88)`. `TrimMode=full`, `MtouchInterpreter=-all`, Step-22 roots, proven `System.Collections.Concurrent`, and the proven Step-25 constructor preservation anchor remain mandatory.
+The validator protects the physically closed Step 23–26 boundaries, preserves Step-27 physical 17/25 and successive 14/26 evidence, records the 0.0.88 unstable N–Q observation/fresh-process rejection, and separately pins Step 27.0.5 / `0.0.89 (89)`. `TrimMode=full`, `MtouchInterpreter=-all`, Step-22 roots, proven `System.Collections.Concurrent`, and the proven Step-25 constructor preservation anchor remain mandatory.
 
-Step 27 has exactly **26 fail-fast gates A–Z**. Gate O admits only the exact measured 57-instruction AccessTools initializer plus the bounded host-framework preservation preflight. Its semantic fingerprint requires both `RuntimeInformation` `Type.GetType(string,bool)` calls to use `false` and the `ReaderWriterLockSlim` constructor to use `LockRecursionPolicy.SupportsRecursion (1)`. Gate R is the sole AccessTools execution barrier. Gate T remains the first intentional `PatchProcessor.Patch()` call. No StS2 member may be reflected, patched, or invoked.
+Step 27 still has exactly **26 fail-fast gates A–Z**. Gate O keeps the exact measured 57-instruction AccessTools initializer and bounded host-framework metadata preflight, but does **not** invoke `FrameworkDescription`. Gate R owns the reflected getter invocation plus explicit AccessTools initializer. Gate T remains the first intentional `PatchProcessor.Patch()` call. No StS2 member may be reflected, patched, or invoked.
+
+`Step27-CrashCheckpoint.txt` must be synchronously flushed at run start, each gate START/PASS/FAIL, normal progress, and sensitive O/R/S/T substages.
 
 ## Host tests
 
 Run `bash scripts/test.sh`.
 
-Host tests enforce A–Z ordering, the launcher probe, and a synthetic AccessTools fixture matching the physically measured runtime-detection/cache initializer; drift in either `Type.GetType` bool or the lock recursion policy must fail closed.
+Host tests enforce A–Z ordering, the launcher probe, and a synthetic AccessTools fixture matching the physically measured runtime-detection/cache initializer. Drift in either `Type.GetType` bool or the lock recursion policy must fail closed.
 
 Expected TRX: `artifacts/test-results/step27.trx`.
 
 ## Codemagic / physical acceptance
 
-Workflow: `ios-step-27`. Expected version: `0.0.88 (88)`. Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`.
+Workflow: `ios-step-27`. Expected version: `0.0.89 (89)`. Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`.
 
-From a fresh process require A–Z **26/26 PASS**, OfflineReady PASS, Foundation 5/5 PASS. Gate R must explicitly complete AccessTools with exact measured state; Gate T must be the first patch call; V must return 1041 through reflection/direct routes; W unpatches; Y restores 42; Z finishes cleanly. After Gate T or later, force-quit before retrying.
+Start from a force-quit/relaunch and require A–Z **26/26 PASS**, OfflineReady PASS, Foundation 5/5 PASS. Once Gate B starts, force-quit before any retry. If the process terminates without a managed report, preserve `Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt` before another run.

@@ -7,7 +7,7 @@ using System.Threading;
 namespace StS2Launcher.iOS.Platform;
 
 /// <summary>
-/// Step 27.0.4 candidate-only trimming preservation for the exact framework surface reached by
+/// Step 27.0.5 candidate-only trimming preservation for the exact framework surface reached by
 /// the physically measured HarmonyLib.AccessTools::.cctor. The real 0Harmony assembly is loaded
 /// only after publish, and AccessTools locates RuntimeInformation by string before reflecting its
 /// FrameworkDescription property, so the build-time trimmer cannot infer that dependency from the
