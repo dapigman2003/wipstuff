@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-22T02:54:08Z
+UTC: 2026-08-22T07:07:14Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,7 +11,7 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/work_step27_087/StS2Launcher-Step27-0.0.87
+Root: /mnt/data/StS2Launcher-Step27-0.0.88
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 193 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 87
-PASS: display version is 0.0.87
-PASS: Info.plist build version is 87
-PASS: Info.plist display version is 0.0.87
+PASS: build version is 88
+PASS: display version is 0.0.88
+PASS: Info.plist build version is 88
+PASS: Info.plist display version is 0.0.88
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,11 +32,12 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.3 candidate
+PASS: top launcher banner identifies active Step 27.0.4 candidate
 PASS: top launcher banner short description matches current physical frontier
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
+PASS: stale prior Step-27 candidate banner identity is removed
 PASS: full trimming policy retained
 PASS: Step 20 interpreter policy retained
 PASS: build guard rejects broad UseInterpreter=true
@@ -514,12 +515,13 @@ PASS: Step 27 host tests enforce ordered fail-fast twenty-six-gate behavior
 PASS: Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary
 PASS: Step 27 host tests cover exact launcher patch-probe behavior and signature metadata
 PASS: Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape
-PASS: Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType throwOnError operands
+PASS: Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands
+PASS: Step 27 host tests reject drift in the physical ReaderWriterLockSlim SupportsRecursion operand
 PASS: Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression
 PASS: Step 27 preserves only the bounded framework surface measured in AccessTools::.cctor
 PASS: Step 27 roots the AccessTools DynamicDependency preservation anchor from candidate-owned UI
 PASS: Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight
-PASS: Step 27 Gate O pins the physical RuntimeInformation Type.GetType throwOnError operands semantically
+PASS: Step 27 Gate O pins the physical RuntimeInformation Type.GetType operands and ReaderWriterLockSlim SupportsRecursion operand semantically
 PASS: Step 27 host tests retain synthetic runtime identity isolation
 PASS: Step 27 candidate boundary hash manifest exists
 PASS: Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned
@@ -558,9 +560,11 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-27-CONTROLLED-
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.1-ACCESSTOOLS-TYPE-INITIALIZATION-BOUNDARY.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.2-ACCESSTOOLS-MEASURED-INITIALIZER-PRESERVATION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.3-ACCESSTOOLS-PHYSICAL-FINGERPRINT-CORRECTION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.4-ACCESSTOOLS-OPERAND-ATTRIBUTION-CORRECTION.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.2-PHYSICAL-GATE-O-REPORT.txt
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.3-PHYSICAL-GATE-O-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt
@@ -580,7 +584,9 @@ PASS: physical build 85 report preserves the exact Gate-O 14/26 metadata result
 PASS: physical build 85 report preserves the measured AccessTools runtime-detection/cache surface
 PASS: physical build 86 report preserves the exact Gate-O 14/26 corrected instruction-count evidence
 PASS: physical build 86 report preserves the single newly exposed ldc.i4.1 and confirms no later gate ran
-PASS: current status preserves all Step 27 physical evidence and advances to Step 27.0.3 / 0.0.87 with the corrected AccessTools fingerprint
+PASS: physical build 87 report preserves the exact Gate-O 14/26 stable instruction-count evidence
+PASS: physical build 87 report preserves the operand-attribution failure that motivated Step 27.0.4
+PASS: current status preserves all Step 27 physical evidence and advances to Step 27.0.4 / 0.0.88 with the corrected AccessTools operand attribution
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -643,4 +649,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 629 checks
+VALIDATION PASS: 635 checks

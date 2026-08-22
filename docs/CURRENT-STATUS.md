@@ -12,15 +12,17 @@ Physical Step 27.0 reached **17/25**: Gates A–Q PASS, Gate R PrefixRegistratio
 
 ### 0.0.85 (85) — first AccessTools metadata correction
 
-Physical Step 27.0.1 reached **14/26** and failed safely at **Gate O — HarmonyPatchApiResolution** before AccessTools initialization. It disproved the original BindingFlags-only model and exposed the real runtime-detection/cache surface: `allTypesCached`, exact `all` / `allDeclared`, `Mono.Runtime`, string/reflection access to `RuntimeInformation.FrameworkDescription`, an add-handler dictionary, and `ReaderWriterLockSlim`.
+Physical Step 27.0.1 reached **14/26** and failed safely at Gate O before AccessTools initialization. It exposed the actual runtime-detection/cache initializer: exact BindingFlags state, `Mono.Runtime`, string/reflection access to `RuntimeInformation.FrameworkDescription`, an add-handler dictionary, and `ReaderWriterLockSlim`.
 
-### 0.0.86 (86) — exact physical fingerprint correction
+### 0.0.86 (86) — instruction-count correction
 
-Physical Step 27.0.2 again reached **14/26** and failed safely at **Gate O**, before AccessTools initialization or patching. The tightened audit showed that the previous candidate's 56-instruction interpretation was off by one instruction. The receipt-backed `AccessTools::.cctor` is **57 instructions**, with one required `ldc.i4.1` in addition to the already-measured surface. That constant supplies `throwOnError=true` to the first `Type.GetType("System.Runtime.InteropServices.RuntimeInformation", bool)` probe; the second corresponding probe uses `false`.
+Physical Step 27.0.2 again reached **14/26** at Gate O and established that the receipt-backed `AccessTools::.cctor` is **57 instructions**, not 56, with exactly one `ldc.i4.1`. No Gate R execution or patch occurred.
 
-No Gate R execution occurred in build 86 and no patch was installed.
+### 0.0.87 (87) — operand-attribution correction
 
-## Active candidate — Step 27.0.3 / 0.0.87 (87)
+Physical Step 27.0.3 again reached **14/26** at Gate O. The 57-instruction/opcode fingerprint matched, but the semantic operand check failed. The exact IL control flow shows both `Type.GetType("System.Runtime.InteropServices.RuntimeInformation", bool)` calls use `throwOnError=false`; each has an explicit null fallback. The single `ldc.i4.1` instead belongs to `ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion)`. Gate R still did not execute and no patch was installed.
+
+## Active candidate — Step 27.0.4 / 0.0.88 (88)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -34,7 +36,7 @@ Replay the physically closed Step 26 chain exactly.
 
 ### Gate O — HarmonyPatchApiResolution
 
-Metadata-audit exact patch APIs plus the exact physically measured AccessTools runtime-detection/cache initializer. Require the **57-instruction** fingerprint, exact fields/opcodes/strings/calls/stores, exact BindingFlags values, zero P/Invoke/handlers/locals, and exact `Type.GetType(string,bool)` control operands: first `true`, second `false`. Before AccessTools executes, prove `RuntimeInformation` resolves by Harmony's exact string and that `FrameworkDescription`, `Dictionary<,>()`, and `ReaderWriterLockSlim(LockRecursionPolicy)` survived trimming. Do not read AccessTools static state or construct a HarmonyMethod.
+Metadata-audit exact patch APIs plus the exact physically measured AccessTools runtime-detection/cache initializer. Require the **57-instruction** fingerprint, exact fields/opcodes/strings/calls/stores, exact BindingFlags values, zero P/Invoke/handlers/locals, both `RuntimeInformation` `Type.GetType(string,bool)` operands equal to `false`, and the `ReaderWriterLockSlim` constructor operand equal to `LockRecursionPolicy.SupportsRecursion (1)`. Before AccessTools executes, prove `RuntimeInformation` resolves by Harmony's exact string and that `FrameworkDescription`, `Dictionary<,>()`, and `ReaderWriterLockSlim(LockRecursionPolicy)` survived trimming. Do not read AccessTools static state or construct a HarmonyMethod.
 
 ### Gates P–Q
 
@@ -58,6 +60,6 @@ S registers the exact launcher prefix descriptor without patching. T is the firs
 
 ## Acceptance
 
-Fresh process: Codemagic + host tests + publish + IPA verification PASS; install `0.0.87 (87)`; run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS.
+Fresh process: Codemagic + host tests + publish + IPA verification PASS; install `0.0.88 (88)`; run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS.
 
 If Gate T or later runs, force-quit before retrying. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary; Android reference repositories remain advisory only and every target must be re-verified against the exact receipt-backed payload.

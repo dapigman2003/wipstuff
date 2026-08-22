@@ -56,23 +56,28 @@ public sealed class ControlledHarmonyPatchExecutionTests
         var goodPath = Path.Combine(temp.Path, "AccessTools-good.dll");
         var driftPath = Path.Combine(temp.Path, "AccessTools-drift.dll");
         var wrongThrowOnErrorPath = Path.Combine(temp.Path, "AccessTools-wrong-throw-on-error.dll");
+        var wrongLockRecursionPath = Path.Combine(temp.Path, "AccessTools-wrong-lock-recursion.dll");
         WriteAccessToolsFixture(goodPath, drift: false);
         WriteAccessToolsFixture(driftPath, drift: true);
         WriteAccessToolsFixture(wrongThrowOnErrorPath, drift: false, wrongThrowOnError: true);
+        WriteAccessToolsFixture(wrongLockRecursionPath, drift: false, wrongLockRecursion: true);
 
         var audit = typeof(ControlledHarmonyPatchExecution).GetMethod("ReadAccessToolsMetadata", BindingFlags.NonPublic | BindingFlags.Static)
             ?? throw new AssertFailedException("Step 27 AccessTools metadata audit helper is missing.");
         var good = audit.Invoke(null, [goodPath]) ?? throw new AssertFailedException("Good AccessTools audit returned null.");
         var drift = audit.Invoke(null, [driftPath]) ?? throw new AssertFailedException("Drift AccessTools audit returned null.");
         var wrongThrowOnError = audit.Invoke(null, [wrongThrowOnErrorPath]) ?? throw new AssertFailedException("Wrong-throwOnError AccessTools audit returned null.");
+        var wrongLockRecursion = audit.Invoke(null, [wrongLockRecursionPath]) ?? throw new AssertFailedException("Wrong-lock-recursion AccessTools audit returned null.");
         var allowedProperty = good.GetType().GetProperty("Allowed") ?? throw new AssertFailedException("AccessTools audit result has no Allowed property.");
         var detailProperty = good.GetType().GetProperty("Detail") ?? throw new AssertFailedException("AccessTools audit result has no Detail property.");
         Assert.AreEqual(true, allowedProperty.GetValue(good));
         Assert.AreEqual(false, allowedProperty.GetValue(drift));
         Assert.AreEqual(false, allowedProperty.GetValue(wrongThrowOnError));
+        Assert.AreEqual(false, allowedProperty.GetValue(wrongLockRecursion));
         StringAssert.Contains((string?)detailProperty.GetValue(good) ?? string.Empty, "Exact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH");
         StringAssert.Contains((string?)detailProperty.GetValue(drift) ?? string.Empty, "Blocking AccessTools initializer hazards:");
-        StringAssert.Contains((string?)detailProperty.GetValue(wrongThrowOnError) ?? string.Empty, "expected true then false");
+        StringAssert.Contains((string?)detailProperty.GetValue(wrongThrowOnError) ?? string.Empty, "expected false then false");
+        StringAssert.Contains((string?)detailProperty.GetValue(wrongLockRecursion) ?? string.Empty, "expected SupportsRecursion (1)");
     }
 
     [TestMethod]
@@ -954,7 +959,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
         harmonyType.Methods.Add(createProcessor);
     }
 
-    private static void WriteAccessToolsFixture(string path, bool drift, bool wrongThrowOnError = false)
+    private static void WriteAccessToolsFixture(string path, bool drift, bool wrongThrowOnError = false, bool wrongLockRecursion = false)
     {
         using var module = ModuleDefinition.CreateModule(Path.GetFileName(path), ModuleKind.Dll);
         var bindingFlagsType = module.ImportReference(typeof(BindingFlags));
@@ -1046,7 +1051,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
         il.Append(Instruction.Create(OpCodes.Stsfld, isMonoRuntime));
 
         il.Append(Instruction.Create(OpCodes.Ldstr, "System.Runtime.InteropServices.RuntimeInformation"));
-        il.Append(Instruction.Create(wrongThrowOnError ? OpCodes.Ldc_I4_0 : OpCodes.Ldc_I4_1));
+        il.Append(Instruction.Create(wrongThrowOnError ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0));
         il.Append(Instruction.Create(OpCodes.Call, typeGetType2));
         il.Append(Instruction.Create(OpCodes.Dup));
         il.Append(Instruction.Create(OpCodes.Brtrue_S, frameworkType1));
@@ -1085,7 +1090,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
 
         il.Append(Instruction.Create(OpCodes.Newobj, dictionaryCtor));
         il.Append(Instruction.Create(OpCodes.Stsfld, addHandlerCache));
-        il.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+        il.Append(Instruction.Create(wrongLockRecursion ? OpCodes.Ldc_I4_0 : OpCodes.Ldc_I4_1));
         il.Append(Instruction.Create(OpCodes.Newobj, lockCtor));
         il.Append(Instruction.Create(OpCodes.Stsfld, addHandlerCacheLock));
         if (drift)

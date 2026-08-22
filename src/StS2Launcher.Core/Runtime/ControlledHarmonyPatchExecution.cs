@@ -2774,10 +2774,23 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 method.FullName.Equals("System.Type System.Type::GetType(System.String,System.Boolean)", StringComparison.Ordinal))
             .ToArray();
         if (typedGetTypeCalls.Length != 2 ||
-            typedGetTypeCalls[0].Previous is null || !TryGetLdcI4Value(typedGetTypeCalls[0].Previous, out var firstThrowOnError) || firstThrowOnError != 1 ||
+            typedGetTypeCalls[0].Previous is null || !TryGetLdcI4Value(typedGetTypeCalls[0].Previous, out var firstThrowOnError) || firstThrowOnError != 0 ||
             typedGetTypeCalls[1].Previous is null || !TryGetLdcI4Value(typedGetTypeCalls[1].Previous, out var secondThrowOnError) || secondThrowOnError != 0)
         {
-            hazards.Add("AccessTools::.cctor RuntimeInformation Type.GetType throwOnError operands changed; expected true then false.");
+            hazards.Add("AccessTools::.cctor RuntimeInformation Type.GetType throwOnError operands changed; expected false then false.");
+        }
+
+        var readerWriterLockConstructors = cctor.Body.Instructions
+            .Where(instruction => instruction.OpCode.Code == Code.Newobj &&
+                instruction.Operand is MethodReference method &&
+                method.FullName.Equals("System.Void System.Threading.ReaderWriterLockSlim::.ctor(System.Threading.LockRecursionPolicy)", StringComparison.Ordinal))
+            .ToArray();
+        if (readerWriterLockConstructors.Length != 1 ||
+            readerWriterLockConstructors[0].Previous is null ||
+            !TryGetLdcI4Value(readerWriterLockConstructors[0].Previous, out var lockRecursionPolicy) ||
+            lockRecursionPolicy != (int)System.Threading.LockRecursionPolicy.SupportsRecursion)
+        {
+            hazards.Add("AccessTools::.cctor ReaderWriterLockSlim recursion-policy operand changed; expected SupportsRecursion (1).");
         }
 
         var expectedStores = new[]
@@ -2831,7 +2844,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             $"AccessTools.all expected BindingFlags value: {expectedAll}\n" +
             $"AccessTools.allDeclared expected BindingFlags value: {expectedAllDeclared}\n" +
             "Measured runtime probes: Mono.Runtime + RuntimeInformation.FrameworkDescription (.NET Framework / .NET Core legacy classification)\n" +
-            "Measured cache initialization: allTypesCached=null + Dictionary<Type,FastInvokeHandler> + ReaderWriterLockSlim\n" +
+            "Measured cache initialization: allTypesCached=null + Dictionary<Type,FastInvokeHandler> + ReaderWriterLockSlim(SupportsRecursion)\n" +
             $"Blocking AccessTools initializer hazards: {hazards.Count:N0}" +
             (hazards.Count == 0 ? "\nExact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" : "\n" + string.Join("\n", hazards));
         return new AccessToolsMetadataSnapshot(hazards.Count == 0, detail, FormatMethodAudit(cctor));

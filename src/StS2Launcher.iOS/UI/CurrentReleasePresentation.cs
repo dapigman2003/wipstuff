@@ -10,16 +10,16 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.3 — CONTROLLED LAUNCHER-OWNED HARMONY PATCH + UNPATCH";
+        "STEP 27.0.4 — CONTROLLED LAUNCHER-OWNED HARMONY PATCH + UNPATCH";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • STEP 27 ACCESSTOOLS PHYSICAL FINGERPRINT CORRECTION • STS2 REMAINS UNTOUCHED";
+        "STEPS 01–26 PHYSICALLY CLOSED • STEP 27 ACCESSTOOLS OPERAND ATTRIBUTION CORRECTION • STS2 REMAINS UNTOUCHED";
 
     public const string Summary =
-        "Physical 0.0.86 stopped safely at Gate O before AccessTools initialization or patching. The phone measured the exact AccessTools runtime-detection/cache initializer as 57 instructions, including one required ldc.i4.1 that supplies throwOnError=true to the first RuntimeInformation Type.GetType(string, bool) probe. Step 27.0.3 pins that corrected physical fingerprint, preserves the already-bounded reflected framework surface, then keeps Gate R as explicit AccessTools initialization, Gate S as prefix registration, and Gate T as the first PatchProcessor.Patch() boundary. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.87 stopped safely at Gate O before AccessTools initialization or patching. The 57-instruction fingerprint matched, but the phone disproved the prior attribution of the single ldc.i4.1: both RuntimeInformation Type.GetType(string, bool) probes use throwOnError=false, while ldc.i4.1 supplies LockRecursionPolicy.SupportsRecursion to ReaderWriterLockSlim. Step 27.0.4 pins those exact semantics, preserves the already-bounded reflected framework surface, then keeps Gate R as explicit AccessTools initialization, Gate S as prefix registration, and Gate T as the first PatchProcessor.Patch() boundary. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Step 27.0 reached A–Q before implicit AccessTools initialization failed; Step 27.0.1 and 27.0.2 then stopped safely at Gate O while measuring and tightening that initializer. Step 27.0.3 is the active corrected-fingerprint candidate. Run Step 27 only in a fresh process. If Gate T or later runs, force-quit before retrying. Long reports are written to Files under Documents/StS2Launcher/Reports.";
+        "Status: Steps 01–26 are physically closed. Step 27.0 reached A–Q before implicit AccessTools initialization failed; Step 27.0.1–27.0.3 then stopped safely at Gate O while measuring and tightening that initializer. Step 27.0.4 is the active operand-attribution correction. Run Step 27 only in a fresh process. If Gate T or later runs, force-quit before retrying. Long reports are written to Files under Documents/StS2Launcher/Reports.";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";
