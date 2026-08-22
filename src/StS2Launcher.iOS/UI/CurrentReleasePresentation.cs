@@ -10,21 +10,23 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.9 — CRASH-CHECKPOINT RELEASE PROVENANCE HARDENING";
+        "STEP 27.0.10 — HARMONYSHAREDSTATE CCTOR IN-FLIGHT OBSERVABILITY";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • SUPPLIED S1 TEXT MATCHES 0.0.89, NOT 0.0.92 • PATCH PATH UNCHANGED";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.93 CROSSED T1–T4 • HARD STOP IS INSIDE HARMONYSHAREDSTATE::.CCTOR";
 
     public const string Summary =
-        "The supplied 2026-08-22 Gate-S/S1 checkpoint says PatchProcessor.AddPrefix(MethodInfo) was entered. That exact executable S1 path was removed after physical 0.0.89 and does not exist in candidate 0.0.92, whose Gate S uses the bounded HarmonyMethod() descriptor path and never invokes AddPrefix(MethodInfo). Step 27.0.9 keeps the 0.0.92 Gate O/S/T runtime behavior unchanged and hardens crash-checkpoint provenance with installed bundle version/build, source candidate identity, and an explicit Gate-S implementation marker before continuing the same measured PatchProcessor.Patch() frontier. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.93 self-identified correctly and crossed Gate T1–T4, proving the bounded host preservation preflight and exact HarmonySharedState runtime reflection return on device. Its last durable checkpoint was T5 immediately before RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle), with PatchProcessor.Patch() and the launcher target still uninvoked. Step 27.0.10 keeps that exact cctor and patch path intact but arms bounded, output-only observers during the cctor for dedicated-ALC resolver activity and process assembly-load events, especially the generated HarmonySharedState and MonoMod.Utils.Cil.ILGeneratorProxy assemblies. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Physical 0.0.90 reached PatchProcessor.Patch() and hard-terminated there; physical 0.0.91 failed normally at Gate O before Gate T. The newly supplied checkpoint has a fresh timestamp but contains the archived 0.0.89 AddPrefix S1 text, so it cannot be attributed to executable 0.0.92 source. Build 0.0.93 does not change the patch algorithm: it adds fail-closed bundle/source identity checking and self-identifying crash telemetry, then retries the unchanged bounded Gate-S descriptor and decomposed Gate-T runtime boundary. Force-quit/relaunch before every Step-27 retry once Gate B has started.";
+        "Status: Steps 01–26 are physically closed. Physical 0.0.93 establishes the current Step-27 frontier inside HarmonyLib.HarmonySharedState::.cctor after T1–T4 returned. Build 0.0.94 does not pre-run or bypass any HarmonySharedState internal operation: it adds durable in-flight resolver/assembly-load breadcrumbs around the unchanged RunClassConstructor call so the next abrupt termination can be attributed before singleton load, between singleton load and ILGeneratorProxy generation, or after both. Force-quit/relaunch before every Step-27 retry once Gate B has started.";
 
-    public const string ExpectedDisplayVersion = "0.0.93";
-    public const string ExpectedBuildVersion = "93";
+    public const string ExpectedDisplayVersion = "0.0.94";
+    public const string ExpectedBuildVersion = "94";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
+    public const string GateTImplementationMarker =
+        "T1-T4 physically crossed; unchanged HarmonySharedState RunClassConstructor with bounded cctor resolver/AssemblyLoad observers; PatchProcessor.Patch() remains after T6";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

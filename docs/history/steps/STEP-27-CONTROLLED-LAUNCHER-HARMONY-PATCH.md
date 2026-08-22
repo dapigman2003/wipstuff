@@ -168,3 +168,9 @@ A newly supplied crash checkpoint has a fresh UTC timestamp but reports `S1 — 
 Step 27.0.9 / 0.0.93 therefore makes no patch-engine behavior change. It adds a fail-closed bundle/source release-identity check before any Step-27 gate and writes installed version/build, expected source version/build, active candidate identity, and the bounded Gate-S implementation marker into every synchronously flushed crash checkpoint. Gate O, the bounded Gate-S descriptor, and Gate T T1–T9 remain runtime-identical to 0.0.92.
 
 The detailed candidate record is `STEP-27.0.9-CRASH-CHECKPOINT-RELEASE-PROVENANCE-HARDENING.md`. The master document is intentionally unchanged.
+
+## Physical 0.0.93 T5 checkpoint + Step 27.0.10 / 0.0.94
+
+The self-identifying 0.0.93 checkpoint proves that T1–T4 returned and that the abrupt termination occurs after entry into `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)` but before T6. `PatchProcessor.Patch()` and the launcher target remained uninvoked.
+
+Step 27.0.10 / 0.0.94 leaves that cctor call and the later public Patch() path intact. T5a requires no pre-existing generated shared-state/proxy assembly and arms output-only observation of the dedicated Step-27 ALC plus relevant process `AssemblyLoad` events; T5b enters the unchanged cctor. The observer is removed before T6 validation if the cctor returns. This is crash localization, not a workaround or acceptance-path substitution.

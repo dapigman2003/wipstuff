@@ -1,17 +1,5 @@
-StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-22T19:57:16Z
-Checking active shell syntax...
-PASS: shell syntax — scripts/build-godot.sh
-PASS: shell syntax — scripts/build-ios.sh
-PASS: shell syntax — scripts/codemagic.sh
-PASS: shell syntax — scripts/lib/current-release.sh
-PASS: shell syntax — scripts/preflight-godot-link.sh
-PASS: shell syntax — scripts/test.sh
-PASS: shell syntax — scripts/validate.sh
-PASS: shell syntax — scripts/verify-ipa.sh
-PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/sts2_step27/StS2Launcher-Step27-0.0.93
+Root: /mnt/data/StS2Launcher-Step27-0.0.94
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 194 C# files
@@ -21,10 +9,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 93
-PASS: display version is 0.0.93
-PASS: Info.plist build version is 93
-PASS: Info.plist display version is 0.0.93
+PASS: build version is 94
+PASS: display version is 0.0.94
+PASS: Info.plist build version is 94
+PASS: Info.plist display version is 0.0.94
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,11 +20,12 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.9 candidate
-PASS: top launcher banner short description matches current provenance-hardening candidate
+PASS: top launcher banner identifies active Step 27.0.10 candidate
+PASS: top launcher banner short description matches current HarmonySharedState cctor-observability candidate
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 27.0.9 source pins expected bundle release identity
-PASS: Step 27.0.9 source pins the bounded Gate-S implementation marker
+PASS: Step 27.0.10 source pins expected bundle release identity
+PASS: Step 27.0.10 source pins the bounded Gate-S implementation marker
+PASS: Step 27.0.10 source pins the Gate-T cctor-observer implementation marker
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
 PASS: stale prior Step-27 candidate banner identity is removed
@@ -511,12 +500,17 @@ PASS: Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invoc
 PASS: Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates
 PASS: Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates
 PASS: Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier
+PASS: Step 27.0.10 brackets the unchanged HarmonySharedState cctor with durable T5a/T5b progress
+PASS: Step 27.0.10 process AssemblyLoad observer is bounded to the HarmonySharedState cctor interval
+PASS: Step 27.0.10 dedicated-ALC diagnostic observer is restored after the cctor interval
+PASS: Step 27.0.10 process assembly-load telemetry is restricted to dynamic or exact patch-engine generated assemblies
+PASS: Step 27.0.10 fails closed if generated HarmonySharedState/proxy state already exists before T5
 PASS: Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries
 PASS: Step 27 has distinct post-patch and final OfflineReady proof stages
 PASS: Step 27 never invokes broad Harmony patch/discovery APIs
 PASS: Step 27 does not use broad Activator construction
-PASS: Step 27.0.9 fails closed before Gate A on bundle/source identity mismatch
-PASS: Step 27.0.9 crash checkpoint self-identifies release/candidate/Gate-S provenance
+PASS: Step 27.0.10 fails closed before Gate A on bundle/source identity mismatch
+PASS: Step 27.0.10 crash checkpoint self-identifies release/candidate/Gate-S/Gate-T provenance
 PASS: Step 27 strict private context still refuses native resolution
 PASS: Step 27 fails on unplanned managed resolution
 PASS: Step 27 introduces no named StS2 type reflection
@@ -634,7 +628,9 @@ PASS: physical build 89 crash checkpoint localizes abrupt termination inside Add
 PASS: physical build 90 crash checkpoint localizes abrupt termination inside public Patch() before T2/target invocation
 PASS: physical build 91 report preserves the exact clean 14/26 Gate-O regression
 PASS: physical build 91 report preserves the resolver/load-counter failure before any Gate-T execution
-PASS: current status preserves Step 27 physical evidence and advances to Step 27.0.9 / 0.0.93 provenance-hardening candidate
+PASS: physical build 93 checkpoint preserves self-identifying release provenance and the Gate-T frontier
+PASS: physical build 93 checkpoint proves T1-T4 crossed and localizes abrupt termination inside HarmonySharedState cctor before Patch()/target invocation
+PASS: current status preserves Step 27 physical evidence and advances to Step 27.0.10 / 0.0.94 cctor-observability candidate
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -697,4 +693,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 683 checks
+VALIDATION PASS: 691 checks

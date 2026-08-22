@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>93</ApplicationVersion>" in project_text, "build version is 93")
-require("<ApplicationDisplayVersion>0.0.93</ApplicationDisplayVersion>" in project_text, "display version is 0.0.93")
-require(plist.get("CFBundleVersion") == "93", "Info.plist build version is 93")
-require(plist.get("CFBundleShortVersionString") == "0.0.93", "Info.plist display version is 0.0.93")
+require("<ApplicationVersion>94</ApplicationVersion>" in project_text, "build version is 94")
+require("<ApplicationDisplayVersion>0.0.94</ApplicationDisplayVersion>" in project_text, "display version is 0.0.94")
+require(plist.get("CFBundleVersion") == "94", "Info.plist build version is 94")
+require(plist.get("CFBundleShortVersionString") == "0.0.94", "Info.plist display version is 0.0.94")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,11 +198,12 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.9 — CRASH-CHECKPOINT RELEASE PROVENANCE HARDENING" in release_presentation, "top launcher banner identifies active Step 27.0.9 candidate")
-require("supplied 2026-08-22 Gate-S/S1 checkpoint" in release_presentation and "archived 0.0.89" in release_presentation and "runtime behavior unchanged" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner short description matches current provenance-hardening candidate")
+require("STEP 27.0.10 — HARMONYSHAREDSTATE CCTOR IN-FLIGHT OBSERVABILITY" in release_presentation, "top launcher banner identifies active Step 27.0.10 candidate")
+require("Physical 0.0.93" in release_presentation and "crossed Gate T1–T4" in release_presentation and "HarmonySharedState::.cctor" in release_presentation and "output-only observers" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner short description matches current HarmonySharedState cctor-observability candidate")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.93"' in release_presentation and 'ExpectedBuildVersion = "93"' in release_presentation, "Step 27.0.9 source pins expected bundle release identity")
-require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.9 source pins the bounded Gate-S implementation marker")
+require('ExpectedDisplayVersion = "0.0.94"' in release_presentation and 'ExpectedBuildVersion = "94"' in release_presentation, "Step 27.0.10 source pins expected bundle release identity")
+require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.10 source pins the bounded Gate-S implementation marker")
+require("GateTImplementationMarker" in release_presentation and "cctor resolver/AssemblyLoad observers" in release_presentation and "PatchProcessor.Patch() remains after T6" in release_presentation, "Step 27.0.10 source pins the Gate-T cctor-observer implementation marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
 require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
@@ -337,8 +338,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.93",
-    "STS2_BUILD_VERSION": "93",
+    "STS2_DISPLAY_VERSION": "0.0.94",
+    "STS2_BUILD_VERSION": "94",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -925,13 +926,18 @@ require(step27_source.count("patchApi.UnpatchMethod.Invoke(processor, [probe.Pre
 require(step27_source.count("probe.Target.Invoke(null, [41])") == 3, "Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates")
 require(step27_source.count("HarmonyPatchProbe.Target(41)") == 3, "Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates")
 require(step27_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2 and step27_source.count("RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)") == 1 and step27_source.count("RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)") == 1, "Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier")
+require('"T5a — HarmonySharedState cctor observers armed' in step27_source and '"T5b — entering explicit RuntimeHelpers.RunClassConstructor' in step27_source, "Step 27.0.10 brackets the unchanged HarmonySharedState cctor with durable T5a/T5b progress")
+require("AppDomain.CurrentDomain.AssemblyLoad += assemblyLoadObserver" in step27_source and "AppDomain.CurrentDomain.AssemblyLoad -= assemblyLoadObserver" in step27_source, "Step 27.0.10 process AssemblyLoad observer is bounded to the HarmonySharedState cctor interval")
+require("DiagnosticObserver = observation =>" in step27_source and "context.DiagnosticObserver = previousContextObserver" in step27_source, "Step 27.0.10 dedicated-ALC diagnostic observer is restored after the cctor interval")
+require('AllowedPatchEngineGeneratedAssemblySimpleNames.Contains(simpleName)' in step27_source and 'loaded.IsDynamic' in step27_source, "Step 27.0.10 process assembly-load telemetry is restricted to dynamic or exact patch-engine generated assemblies")
+require("generatedBeforeSharedInitialization.Length != 0" in step27_source and "unexpected pre-existing generated patch-engine assembly" in step27_source, "Step 27.0.10 fails closed if generated HarmonySharedState/proxy state already exists before T5")
 require(step27_source.count("_offlineInspection.RunAsync(") == 6, "Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries")
 require('stage = "OfflineReady post-patch pre-invocation check"' in step27_source and 'stage = "OfflineReady final postcondition"' in step27_source and step27_source.count('\"OfflineReady exact-tree verification: YES\\n\" +') == 2, "Step 27 has distinct post-patch and final OfflineReady proof stages")
 require("Harmony.Patch(" not in step27_source and "PatchAll(" not in step27_source and "PatchCategory(" not in step27_source and "PatchClassProcessor" not in step27_source, "Step 27 never invokes broad Harmony patch/discovery APIs")
 require("Activator.CreateInstance" not in step27_source and "Activator." not in step27_source, "Step 27 does not use broad Activator construction")
 step27_ui = read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs")
-require("BundleIdentityMatchesExpected" in step27_ui and "IDENTITY_FAIL" in step27_ui and "No Step-27 gate was run" in step27_ui, "Step 27.0.9 fails closed before Gate A on bundle/source identity mismatch")
-require("App version:" in step27_ui and "Expected source version:" in step27_ui and "Candidate:" in step27_ui and "Gate S implementation:" in step27_ui, "Step 27.0.9 crash checkpoint self-identifies release/candidate/Gate-S provenance")
+require("BundleIdentityMatchesExpected" in step27_ui and "IDENTITY_FAIL" in step27_ui and "No Step-27 gate was run" in step27_ui, "Step 27.0.10 fails closed before Gate A on bundle/source identity mismatch")
+require("App version:" in step27_ui and "Expected source version:" in step27_ui and "Candidate:" in step27_ui and "Gate S implementation:" in step27_ui and "Gate T implementation:" in step27_ui, "Step 27.0.10 crash checkpoint self-identifies release/candidate/Gate-S/Gate-T provenance")
 require("LoadUnmanagedDll(string unmanagedDllName)" in step27_source and "throw new DllNotFoundException" in step27_source, "Step 27 strict private context still refuses native resolution")
 require("context.RejectedManagedRequests.Count != 0" in step27_source, "Step 27 fails on unplanned managed resolution")
 require('GetType("StS' not in step27_source and 'GetType("STS' not in step27_source and 'GetType("MegaCrit' not in step27_source, "Step 27 introduces no named StS2 type reflection")
@@ -972,7 +978,7 @@ gate_r_start = step27_source.index("public ControlledHarmonyPatchExecutionGateRe
 gate_r_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(", gate_r_start)
 gate_r_body = step27_source[gate_r_start:gate_r_end]
 require("patchApi.RuntimeFrameworkDescriptionProperty.GetValue(null)" in gate_r_body and all(marker in gate_r_body for marker in ["R1 —", "R2 —", "R3 —"]), "Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages")
-require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —", "T3 —", "T4 —", "T5 —", "T6 —", "T7 —", "T8 —", "T9 —"]), "Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages")
+require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —", "T3 —", "T4 —", "T5a —", "T5b —", "T6 —", "T7 —", "T8 —", "T9 —"]), "Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages")
 gate_t_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPatchEngineExecution(")
 gate_t_end = step27_source.index("public async Task<ControlledHarmonyPatchExecutionGateResult> RunPostPatchAuditAsync(", gate_t_start)
 gate_t_body = step27_source[gate_t_start:gate_t_end]
@@ -1080,8 +1086,11 @@ require("Gate: T — PatchEngineExecution" in step27_build90_checkpoint and "T1 
 step27_build91_report = read("docs/history/reports/STEP-27.0.7-PHYSICAL-GATE-O-REPORT.txt")
 require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 14/26" in step27_build91_report and "App version: 0.0.91 (91)" in step27_build91_report and "Gate N — PostProcessorAudit: PASS" in step27_build91_report and "Gate O — HarmonyPatchApiResolution: FAIL" in step27_build91_report, "physical build 91 report preserves the exact clean 14/26 Gate-O regression")
 require("Targeted patch API reflection unexpectedly changed resolver/load counters" in step27_build91_report and "Gate T decomposes" in step27_build91_report, "physical build 91 report preserves the resolver/load-counter failure before any Gate-T execution")
+step27_build93_checkpoint = read("docs/history/reports/STEP-27.0.9-PHYSICAL-GATE-T5-CRASH-CHECKPOINT.txt")
+require("App version: 0.0.93 (93)" in step27_build93_checkpoint and "Expected source version: 0.0.93 (93)" in step27_build93_checkpoint and "Gate: T — PatchEngineExecution" in step27_build93_checkpoint, "physical build 93 checkpoint preserves self-identifying release provenance and the Gate-T frontier")
+require("T5 — entering explicit RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)" in step27_build93_checkpoint and "PatchProcessor.Patch() and launcher target remain uninvoked" in step27_build93_checkpoint, "physical build 93 checkpoint proves T1-T4 crossed and localizes abrupt termination inside HarmonySharedState cctor before Patch()/target invocation")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "Gate-T hard crash localized" in current_status and "0.0.91 (91)" in current_status and "clean Gate-O regression" in current_status and "0.0.93 (93)" in current_status and "provenance conflict" in current_status and "HarmonySharedState" in current_status and "T1" in current_status and "T9" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 physical evidence and advances to Step 27.0.9 / 0.0.93 provenance-hardening candidate")
+require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "Gate-T hard crash localized" in current_status and "0.0.91 (91)" in current_status and "clean Gate-O regression" in current_status and "0.0.93 (93)" in current_status and "provenance confirmed" in current_status and "0.0.94 (94)" in current_status and "T5a" in current_status and "T5b" in current_status and "HarmonySharedState" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 physical evidence and advances to Step 27.0.10 / 0.0.94 cctor-observability candidate")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

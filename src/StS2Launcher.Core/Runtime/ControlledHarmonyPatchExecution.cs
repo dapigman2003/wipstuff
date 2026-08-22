@@ -2245,12 +2245,50 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var sharedRejectedBefore = context.RejectedManagedRequests.Count;
             var sharedMembershipBefore = SnapshotPrivateContextMembership(context);
 
-            stage = "explicit HarmonySharedState type initialization";
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T5 — entering explicit RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle); PatchProcessor.Patch() and launcher target remain uninvoked.");
-            RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle);
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T6 — HarmonySharedState::.cctor returned; validating version, generated assemblies, hashes, probe counters, and native/rejected-request isolation before Patch().");
+            stage = "observed explicit HarmonySharedState type initialization";
+            var generatedBeforeSharedInitialization = DescribeKnownPatchEngineGeneratedAssemblies();
+            if (generatedBeforeSharedInitialization.Length != 0)
+                throw new InvalidDataException("HarmonySharedState initialization began with an unexpected pre-existing generated patch-engine assembly: " + FormatNames(generatedBeforeSharedInitialization));
+
+            var previousContextObserver = context.DiagnosticObserver;
+            AssemblyLoadEventHandler? assemblyLoadObserver = null;
+            try
+            {
+                void ReportSharedStateObservation(string observation)
+                    => ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                        "T5 observer — " + observation + " PatchProcessor.Patch() and launcher target remain uninvoked.");
+
+                context.DiagnosticObserver = observation =>
+                    ReportSharedStateObservation("dedicated ALC: " + observation);
+
+                assemblyLoadObserver = (_, args) =>
+                {
+                    var loaded = args.LoadedAssembly;
+                    var loadedName = loaded.GetName();
+                    var simpleName = loadedName.Name ?? "<unnamed>";
+                    if (!loaded.IsDynamic && !AllowedPatchEngineGeneratedAssemblySimpleNames.Contains(simpleName))
+                        return;
+
+                    var loadedContext = AssemblyLoadContext.GetLoadContext(loaded);
+                    ReportSharedStateObservation(
+                        $"process AssemblyLoad: {loadedName.FullName ?? simpleName}; dynamic={loaded.IsDynamic}; ALC={loadedContext?.Name ?? "<null/default>"}");
+                };
+                AppDomain.CurrentDomain.AssemblyLoad += assemblyLoadObserver;
+
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                    "T5a — HarmonySharedState cctor observers armed; no generated HarmonySharedState/ILGeneratorProxy assembly exists before initialization. The cctor and PatchProcessor.Patch() remain uninvoked.");
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                    "T5b — entering explicit RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) with bounded assembly-load/resolver observation active; PatchProcessor.Patch() and launcher target remain uninvoked.");
+                RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle);
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                    "T6 — HarmonySharedState::.cctor returned; observers will be removed before version/generated-assembly/hash/isolation validation and before Patch().");
+            }
+            finally
+            {
+                if (assemblyLoadObserver is not null)
+                    AppDomain.CurrentDomain.AssemblyLoad -= assemblyLoadObserver;
+                context.DiagnosticObserver = previousContextObserver;
+            }
 
             var actualVersionValue = harmonySharedStateActualVersionField.GetValue(null);
             if (actualVersionValue is not int actualVersion || actualVersion != 102)
@@ -4653,6 +4691,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
 
         public string? AllowedInitializerAssemblyFullName { get; set; }
+        public Action<string>? DiagnosticObserver { get; set; }
         public List<string> ManagedResolverRequests { get; } = [];
         public List<string> PrivateLoads { get; } = [];
         public List<string> HostLoads { get; } = [];
@@ -4673,7 +4712,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException("Step 24 prepared SHA-1 changed immediately before load: " + prepared.Plan.RelativePath);
             using var stream = new FileStream(prepared.PreparedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var loaded = LoadFromStream(stream);
-            PrivateLoads.Add($"{explicitReason}: {prepared.Plan.AssemblyFullName} => {loaded.GetName().FullName}");
+            var privateLoadDetail = $"{explicitReason}: {prepared.Plan.AssemblyFullName} => {loaded.GetName().FullName}";
+            PrivateLoads.Add(privateLoadDetail);
+            DiagnosticObserver?.Invoke("private load completed: " + privateLoadDetail);
             return loaded;
         }
 
@@ -4685,6 +4726,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         {
             var requestedFullName = assemblyName.FullName ?? assemblyName.Name ?? "<unknown>";
             ManagedResolverRequests.Add(requestedFullName);
+            DiagnosticObserver?.Invoke("managed resolver request: " + requestedFullName);
 
             if (assemblyName.Name is null)
                 return Reject(requestedFullName, "assembly request has no simple name");
@@ -4723,13 +4765,16 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (!allowedActual.Contains(actualFullName))
                 throw new FileLoadException($"Step 24 host binding drift for '{requestedFullName}'. Planned: {string.Join(" | ", allowedActual)}; actual: {actualFullName}.");
 
-            HostLoads.Add($"{requestedFullName} => {actualFullName}");
+            var hostLoadDetail = $"{requestedFullName} => {actualFullName}";
+            HostLoads.Add(hostLoadDetail);
+            DiagnosticObserver?.Invoke("host load completed: " + hostLoadDetail);
             return hostAssembly;
         }
 
         protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
         {
             NativeLoadAttempts.Add(unmanagedDllName);
+            DiagnosticObserver?.Invoke("native resolver request (will be rejected): " + unmanagedDllName);
             throw new DllNotFoundException($"Step 24 controlled-initialization boundary refuses native library resolution for '{unmanagedDllName}'.");
         }
 

@@ -1,1 +1,4 @@
-ERROR: dotnet is required to run host tests.
+StS2 Launcher — Step 27 canonical host regression tests
+Local package-assembly environment: NOT RUN
+Reason: `dotnet` is not installed in this container (`scripts/test.sh` exits 2 before executing tests).
+Authority before device installation: Codemagic must run `scripts/test.sh` and produce `artifacts/test-results/step27.trx` successfully.

@@ -48,11 +48,15 @@ The only newly added runtime-reflection block after Gate O's resolver/load snaps
 
 ### 2026-08-22 supplied Gate-S checkpoint — provenance conflict, not a new runtime frontier
 
-A newly supplied checkpoint has a fresh UTC timestamp and reports **Gate S / S1 — entering exact `PatchProcessor.AddPrefix(MethodInfo)` reflection invocation**. That text is byte-for-byte the archived 0.0.89 Gate-S/S1 implementation marker. It is not emitted by executable 0.0.92 source: 0.0.92 Gate S enters exact `HarmonyMethod()` construction and explicitly does **not** invoke `AddPrefix(MethodInfo)` or `ImportMethod`.
+A supplied checkpoint had a fresh UTC timestamp but reported **Gate S / S1 — entering exact `PatchProcessor.AddPrefix(MethodInfo)` reflection invocation**. That text is the archived 0.0.89 Gate-S/S1 path, not executable 0.0.92 source. Because that legacy schema lacked app/source identity, it was treated as a provenance mismatch rather than new runtime evidence. Step 27.0.9 / 0.0.93 added fail-closed release identity and self-identifying crash telemetry without changing the patch path.
 
-Because the legacy checkpoint schema did not include app version/build or candidate identity, the fresh timestamp alone cannot bind this observation to the uploaded 0.0.92 source. The observation is therefore treated as a **release-provenance mismatch** rather than evidence that the 0.0.92 Gate-S code regressed. No Step-27 physical frontier is advanced or revoked by this checkpoint.
+### 0.0.93 (93) — provenance confirmed; hard crash is inside HarmonySharedState::.cctor
 
-## Active candidate — Step 27.0.9 / 0.0.93 (93)
+The next physical checkpoint self-identifies **App version 0.0.93 (93)**, **Expected source version 0.0.93 (93)**, the Step 27.0.9 candidate, and the bounded Gate-S implementation marker. Its last durable record is **Gate T / PatchEngineExecution / T5 — entering `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)`**, with `PatchProcessor.Patch()` and the launcher target still uninvoked.
+
+That advances the physical frontier past T1–T4: the bounded host Reflection.Emit/RuntimeMethodHandle preservation preflight returned, and the exact HarmonySharedState runtime Type/.cctor/version-field reflection also returned. The abrupt termination is therefore inside `HarmonyLib.HarmonySharedState::.cctor` before T6. The raw breadcrumb is preserved at `docs/history/reports/STEP-27.0.9-PHYSICAL-GATE-T5-CRASH-CHECKPOINT.txt`.
+
+## Active candidate — Step 27.0.10 / 0.0.94 (94)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -61,61 +65,36 @@ Because the legacy checkpoint schema did not include app version/build or candid
 - Closed prerequisite: Step 26.0 + OfflineReady + Foundation 5/5
 - StS2 reflection/patching/invocation: **forbidden**
 
-### Gates A–N
+### Gates A–S
 
-Replay the physically closed Step 26 chain exactly. The crash checkpoint is flushed before and after each gate; asynchronous audit progress is also checkpointed.
+A–N replay the physically closed Step 26 chain. Gate O retains the physically passing 0.0.90 runtime-reflection surface plus the broader receipt-backed HarmonySharedState/replacement/detour Cecil audit. P–Q resolve and baseline only the launcher-owned probe. R explicitly initializes the measured AccessTools surface. S retains the bounded annotation-free `HarmonyMethod()` descriptor path and never invokes `AddPrefix(MethodInfo)`.
 
-### Gate O — HarmonyPatchApiResolution
+### Gate T — cctor in-flight observability without pre-execution
 
-Gate O is restored to the **physically passing 0.0.90 runtime-reflection boundary** while retaining the broader patch-engine work as receipt-backed Cecil metadata audit:
+T1–T4 are behavior-identical to 0.0.93 and are now physically crossed.
 
-- exact public `PatchProcessor.AddPrefix(MethodInfo)`, `Patch()`, and `Unpatch(MethodInfo)` plus bounded `HarmonyMethod` fields/constructors;
-- exact 57-instruction AccessTools initializer fingerprint and the physically proven RuntimeInformation/Dictionary/ReaderWriterLockSlim runtime metadata preflight;
-- exact internal `HarmonySharedState` / replacement-generation / detour / shared-state-update chain is still Cecil-audited from the receipt-backed 0Harmony image, including `internalVersion == 102`;
-- **no HarmonySharedState runtime Type/field reflection in Gate O**;
-- **no Reflection.Emit/RuntimeMethodHandle runtime preflight in Gate O**;
-- no HarmonySharedState initialization, dynamic replacement generation, detour installation, or launcher target invocation.
+- **T1/T2** — bounded Reflection.Emit/RuntimeMethodHandle host-preservation preflight and exact isolation accounting.
+- **T3/T4** — exact HarmonySharedState Type/.cctor/internalVersion/actualVersion reflection, with the initializer still unrun and exact loader deltas measured.
+- **T5a** — require no pre-existing process-visible generated `HarmonySharedState` or `MonoMod.Utils.Cil.ILGeneratorProxy` assembly, then arm bounded output-only observers.
+- While the cctor is active, the dedicated Step-27 `AssemblyLoadContext` reports managed resolver/private/host/native activity through the existing synchronous crash-checkpoint channel. A process `AssemblyLoad` observer reports only dynamic assemblies or the two exact generated names `HarmonySharedState` and `MonoMod.Utils.Cil.ILGeneratorProxy`.
+- **T5b** — enter the same exact `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)` call that hard-stopped 0.0.93. No HarmonySharedState internal operation is manually invoked or primed beforehand.
+- **T6** — emitted only if the cctor returns; observers are removed before the existing version/generated-assembly/hash/isolation checks.
+- **T7/T8/T9** — unchanged: exactly one public `PatchProcessor.Patch()` call, then replacement/isolation validation. The launcher target remains uninvoked until Gate V.
 
-Sensitive O1–O11 substages are synchronously checkpointed. The post-snapshot resolver/load purity assertion is again testing the same runtime-reflection surface that physically passed in 0.0.90.
+The next hard-stop checkpoint should therefore distinguish at least three useful milestones without altering the cctor's pre-state: no observed relevant load, generated `HarmonySharedState` loaded, or `MonoMod.Utils.Cil.ILGeneratorProxy` loaded. These are causal breadcrumbs, not source-line diagnoses.
 
-### Gates P–Q
-
-Resolve launcher-owned `HarmonyPatchProbe.Target(int)` + `Prefix(int, ref int __result)`, then establish the unpatched direct/reflection baseline of 42.
-
-### Gate R — AccessToolsTypeInitialization
-
-Gate R owns the first reflected execution of the preserved `RuntimeInformation.FrameworkDescription` getter, immediately followed by explicit `RuntimeHelpers.RunClassConstructor(HarmonyLib.AccessTools.TypeHandle)`. Physical 0.0.90 reached Gate T, so this AccessTools boundary was traversed by that device run.
-
-### Gate S — bounded prefix descriptor
-
-Gate S is runtime-identical to 0.0.92 and keeps the 0.0.90 path: exact `HarmonyMethod()` construction, require `priority=-1` and `method=null`, assign only the launcher Prefix `MethodInfo`, then assign only `PatchProcessor.prefix`. `AddPrefix(MethodInfo)`, `HarmonyMethod(MethodInfo)`, and `ImportMethod` remain reference-audited but uninvoked.
-
-### Gate T — measured patch-engine runtime resolution + shared-state initialization + public Patch()
-
-Gate T is runtime-identical to 0.0.92 and owns every runtime operation newly introduced by 0.0.91, with durable substages that preserve causal localization:
-
-- **T1** — enter the bounded Reflection.Emit/RuntimeMethodHandle host preservation preflight; HarmonySharedState runtime reflection, initialization, Patch(), and the launcher target remain uninvoked.
-- **T2** — require that preflight to return with private-context membership unchanged, no native/rejected request, unchanged prepared bytes/probe counters, and record exact managed/private/host load deltas.
-- **T3** — resolve the exact `HarmonyLib.HarmonySharedState` runtime Type, `.cctor`, `internalVersion`, and `actualVersion` fields. This is the runtime-reflection operation that 0.0.91 proved changes resolver/load counters. The initializer is still not run and `actualVersion` is not read.
-- **T4** — require exact static-type/field shape, `internalVersion == 102`, unchanged private-context membership, no native/rejected request, unchanged bytes/probe counters, and record the exact resolver/load deltas rather than requiring them to be zero.
-- **T5** — enter exactly one `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)`.
-- **T6** — require return, `actualVersion == 102`, unchanged bytes/probe counters and no private native/rejected request; admit only exact runtime-generated `HarmonySharedState` / `MonoMod.Utils.Cil.ILGeneratorProxy` names, reject removals/duplicates/any other addition, and snapshot resulting membership.
-- **T7** — enter the first exact public `PatchProcessor.Patch()` reflection invocation, exactly once.
-- **T8** — require return and begin exact replacement/isolation validation.
-- **T9** — replacement/isolation validation complete; launcher target remains uninvoked until Gate V.
-
-The bounded `DynamicDependency` preservation added in 0.0.91 remains because it is still justified by the audited Harmony/MonoMod path; only its runtime verification moved from Gate O to Gate T. Step 27.0.9 adds no new patch-engine preservation surface. `TrimMode=full`, `MtouchInterpreter=-all`, and the prohibition on broad `UseInterpreter=true` remain unchanged.
+`TrimMode=full`, `MtouchInterpreter=-all`, existing DynamicDependency preservation, trusted/prepared-byte immutability, and the broad `UseInterpreter=true`/NativeAOT prohibitions remain unchanged.
 
 ### Gates U–Z
 
-U audits before patched execution. V proves patched behavior. W removes exactly the prefix by `MethodInfo`. X audits. Y proves restored behavior. Z performs final hashes/OfflineReady/context/native isolation. No StS2 member is touched.
+U audits before patched execution. V proves patched launcher behavior. W removes exactly the prefix by `MethodInfo`. X audits. Y proves restored behavior. Z performs final hashes/OfflineReady/context/native isolation. No StS2 member is touched.
 
 ## Fresh-process rule
 
-**Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher patch state may remain process-resident.
+**Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another Step-27 run so the last durable stage is not overwritten. Candidate 0.0.93 checkpoints include installed app version/build, expected source version/build, active candidate identity, and the exact Gate-S implementation marker; a checkpoint without those provenance lines is not attributable to 0.0.93.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.94 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T cctor-observer implementation marker.
 
 ## Acceptance
 
-Codemagic + host tests + publish + IPA verification PASS; install `0.0.93 (93)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic + host tests + publish + IPA verification PASS; install `0.0.94 (94)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
