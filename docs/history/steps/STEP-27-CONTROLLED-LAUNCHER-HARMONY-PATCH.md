@@ -161,3 +161,10 @@ Step 27.0.8 / 0.0.92 corrects the regression without weakening Gate O. Gate O ke
 
 The detailed candidate record is `STEP-27.0.8-GATE-O-PURITY-RESTORATION-AND-T-RUNTIME-RESOLUTION.md`. The master document is intentionally unchanged.
 
+## Supplied 2026-08-22 legacy-S1 checkpoint + Step 27.0.9 / 0.0.93
+
+A newly supplied crash checkpoint has a fresh UTC timestamp but reports `S1 — entering exact PatchProcessor.AddPrefix(MethodInfo) reflection invocation.` That executable text belongs to physical 0.0.89 and is absent from candidate 0.0.92, whose Gate S enters the bounded parameterless `HarmonyMethod()` descriptor path and explicitly does not invoke AddPrefix or ImportMethod. Because the old checkpoint format did not carry bundle/candidate provenance, this observation cannot be attributed to the uploaded 0.0.92 source and does not change the physical runtime frontier.
+
+Step 27.0.9 / 0.0.93 therefore makes no patch-engine behavior change. It adds a fail-closed bundle/source release-identity check before any Step-27 gate and writes installed version/build, expected source version/build, active candidate identity, and the bounded Gate-S implementation marker into every synchronously flushed crash checkpoint. Gate O, the bounded Gate-S descriptor, and Gate T T1–T9 remain runtime-identical to 0.0.92.
+
+The detailed candidate record is `STEP-27.0.9-CRASH-CHECKPOINT-RELEASE-PROVENANCE-HARDENING.md`. The master document is intentionally unchanged.

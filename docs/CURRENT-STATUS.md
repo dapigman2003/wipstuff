@@ -46,7 +46,13 @@ Physical Step 27.0.7 replayed **Gates A–N PASS** and then failed normally at *
 
 The only newly added runtime-reflection block after Gate O's resolver/load snapshot was the HarmonySharedState Type/.cctor/version-field inspection. The candidate therefore proved that this newly introduced runtime reflection has an observable loader/resolver effect on the physical iOS runtime. It did **not** prove that HarmonySharedState initialization or PatchProcessor.Patch() was fixed. The full raw report is preserved at `docs/history/reports/STEP-27.0.7-PHYSICAL-GATE-O-REPORT.txt`.
 
-## Active candidate — Step 27.0.8 / 0.0.92 (92)
+### 2026-08-22 supplied Gate-S checkpoint — provenance conflict, not a new runtime frontier
+
+A newly supplied checkpoint has a fresh UTC timestamp and reports **Gate S / S1 — entering exact `PatchProcessor.AddPrefix(MethodInfo)` reflection invocation**. That text is byte-for-byte the archived 0.0.89 Gate-S/S1 implementation marker. It is not emitted by executable 0.0.92 source: 0.0.92 Gate S enters exact `HarmonyMethod()` construction and explicitly does **not** invoke `AddPrefix(MethodInfo)` or `ImportMethod`.
+
+Because the legacy checkpoint schema did not include app version/build or candidate identity, the fresh timestamp alone cannot bind this observation to the uploaded 0.0.92 source. The observation is therefore treated as a **release-provenance mismatch** rather than evidence that the 0.0.92 Gate-S code regressed. No Step-27 physical frontier is advanced or revoked by this checkpoint.
+
+## Active candidate — Step 27.0.9 / 0.0.93 (93)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -82,11 +88,11 @@ Gate R owns the first reflected execution of the preserved `RuntimeInformation.F
 
 ### Gate S — bounded prefix descriptor
 
-Gate S keeps the 0.0.90 path: exact `HarmonyMethod()` construction, require `priority=-1` and `method=null`, assign only the launcher Prefix `MethodInfo`, then assign only `PatchProcessor.prefix`. `AddPrefix(MethodInfo)`, `HarmonyMethod(MethodInfo)`, and `ImportMethod` remain reference-audited but uninvoked.
+Gate S is runtime-identical to 0.0.92 and keeps the 0.0.90 path: exact `HarmonyMethod()` construction, require `priority=-1` and `method=null`, assign only the launcher Prefix `MethodInfo`, then assign only `PatchProcessor.prefix`. `AddPrefix(MethodInfo)`, `HarmonyMethod(MethodInfo)`, and `ImportMethod` remain reference-audited but uninvoked.
 
 ### Gate T — measured patch-engine runtime resolution + shared-state initialization + public Patch()
 
-Gate T now owns every runtime operation newly introduced by 0.0.91, with durable substages that preserve causal localization:
+Gate T is runtime-identical to 0.0.92 and owns every runtime operation newly introduced by 0.0.91, with durable substages that preserve causal localization:
 
 - **T1** — enter the bounded Reflection.Emit/RuntimeMethodHandle host preservation preflight; HarmonySharedState runtime reflection, initialization, Patch(), and the launcher target remain uninvoked.
 - **T2** — require that preflight to return with private-context membership unchanged, no native/rejected request, unchanged prepared bytes/probe counters, and record exact managed/private/host load deltas.
@@ -98,7 +104,7 @@ Gate T now owns every runtime operation newly introduced by 0.0.91, with durable
 - **T8** — require return and begin exact replacement/isolation validation.
 - **T9** — replacement/isolation validation complete; launcher target remains uninvoked until Gate V.
 
-The bounded `DynamicDependency` preservation added in 0.0.91 remains because it is still justified by the audited Harmony/MonoMod path; only its runtime verification moved from Gate O to Gate T. `TrimMode=full`, `MtouchInterpreter=-all`, and the prohibition on broad `UseInterpreter=true` remain unchanged.
+The bounded `DynamicDependency` preservation added in 0.0.91 remains because it is still justified by the audited Harmony/MonoMod path; only its runtime verification moved from Gate O to Gate T. Step 27.0.9 adds no new patch-engine preservation surface. `TrimMode=full`, `MtouchInterpreter=-all`, and the prohibition on broad `UseInterpreter=true` remain unchanged.
 
 ### Gates U–Z
 
@@ -108,8 +114,8 @@ U audits before patched execution. V proves patched behavior. W removes exactly 
 
 **Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher patch state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another Step-27 run so the last durable stage is not overwritten.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another Step-27 run so the last durable stage is not overwritten. Candidate 0.0.93 checkpoints include installed app version/build, expected source version/build, active candidate identity, and the exact Gate-S implementation marker; a checkpoint without those provenance lines is not attributable to 0.0.93.
 
 ## Acceptance
 
-Codemagic + host tests + publish + IPA verification PASS; install `0.0.92 (92)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic + host tests + publish + IPA verification PASS; install `0.0.93 (93)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.

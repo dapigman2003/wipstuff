@@ -61,6 +61,20 @@ public sealed partial class RootViewController
             return;
         }
 
+        if (!CurrentReleasePresentation.BundleIdentityMatchesExpected)
+        {
+            var mismatch =
+                $"Step 27 release identity mismatch. Installed bundle is {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild}); " +
+                $"this source candidate requires {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion}). No Step-27 gate was run.";
+            WriteStep27CrashCheckpoint("IDENTITY_FAIL", null, mismatch);
+            _controlledHarmonyPatchExecutionResultLabel.Text = "CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY: RELEASE IDENTITY FAIL";
+            _controlledHarmonyPatchExecutionResultLabel.TextColor = UIColor.SystemRed;
+            _controlledHarmonyPatchExecutionDetailLabel.Text = mismatch;
+            _statusLabel.Text = mismatch;
+            _statusLabel.TextColor = UIColor.SystemRed;
+            return;
+        }
+
         BeginSteamOperation(allowCancel: true);
         _controlledHarmonyPatchExecutionGates.Reset();
         _controlledHarmonyPatchExecution.Reset();
@@ -349,6 +363,10 @@ public sealed partial class RootViewController
                 "Output-only diagnostic; never consumed as trusted runtime input.\n" +
                 $"Generated UTC: {DateTimeOffset.UtcNow:O}\n" +
                 $"Process ID: {Environment.ProcessId}\n" +
+                $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
+                $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
+                $"Candidate: {CurrentReleasePresentation.StepTitle}\n" +
+                $"Gate S implementation: {CurrentReleasePresentation.GateSImplementationMarker}\n" +
                 $"Phase: {phase}\n" +
                 $"Gate: {gateText}\n" +
                 "Detail:\n" + normalizedDetail + "\n";

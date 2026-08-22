@@ -4,8 +4,10 @@ Steps 01–26 are physically closed. Physical Step 27 builds progressively local
 
 ## Active candidate
 
-**Step 27.0.8 / `0.0.92 (92)`** keeps the same 26-gate launcher-only patch objective and corrects the 0.0.91 Gate-O regression without weakening its purity checks.
+**Step 27.0.9 / `0.0.93 (93)`** keeps the 0.0.92 26-gate launcher-only patch/runtime path unchanged and hardens release provenance after a newly supplied checkpoint reported the archived 0.0.89 Gate-S/AddPrefix S1 text.
 
+- Crash checkpoints now include installed app version/build, expected source version/build, active candidate identity, and an explicit Gate-S implementation marker; Step 27 refuses to start if the built bundle identity does not match the 0.0.93 source candidate.
+- Gate S remains the bounded `HarmonyMethod()` descriptor path and still never invokes `PatchProcessor.AddPrefix(MethodInfo)`.
 - Gate O retains the broader receipt-backed `HarmonySharedState -> MethodCreator -> MonoMod detour -> UpdatePatchInfo` **Cecil metadata audit**, but restores runtime reflection to the physically passing 0.0.90 PatchProcessor/HarmonyMethod/AccessTools surface.
 - Gate T1/T2 measures the bounded host `Reflection.Emit`/`RuntimeMethodHandle` preservation preflight while requiring unchanged private-context membership, bytes, probe counters, and native/rejected-request state.
 - Gate T3/T4 performs and measures the exact `HarmonySharedState` runtime Type/.cctor/version-field reflection that 0.0.91 proved has loader effects; those exact resolver/load deltas are recorded rather than globally ignored.
@@ -21,7 +23,7 @@ StS2 reflection/patching/invocation, broad Harmony discovery, Godot/game startup
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.92 (92)`
+Expected app version: `0.0.93 (93)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 
