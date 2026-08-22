@@ -152,3 +152,12 @@ Physical 0.0.90 advanced through the bounded Gate-S descriptor path and hard-ter
 The 0.0.91 candidate keeps public `PatchProcessor.Patch()` as the acceptance boundary. Gate O adds receipt-backed audits for the exact HarmonySharedState -> MethodCreator -> MonoMod detour -> UpdatePatchInfo chain and bounded host Reflection.Emit/MethodHandle preservation. Gate T first makes HarmonySharedState initialization explicit at T1/T2, then invokes public Patch exactly once at T3/T4 and validates the replacement at T5. A hard stop can therefore distinguish shared-state initialization from the remaining replacement/detour path while still grouping related consecutive boundaries in one device run.
 
 The detailed candidate record is `STEP-27.0.7-HARMONY-SHARED-STATE-INITIALIZATION-AND-PATCH-ENGINE-PRESERVATION.md`. The master document is intentionally unchanged.
+
+## Physical 0.0.91 result + Step 27.0.8 / 0.0.92
+
+Physical 0.0.91 did **not** reach Gate T. Gates A–N replayed successfully, then Gate O failed normally at 14/26 with `Targeted patch API reflection unexpectedly changed resolver/load counters.` No crash occurred and no later gate ran. The new Gate-O runtime work relative to the physically passing 0.0.90 surface was the HarmonySharedState Type/.cctor/version-field reflection, so the result proves that this reflection has an observable loader/resolver effect on the physical iOS runtime. It does not prove anything about HarmonySharedState initialization or PatchProcessor.Patch() beyond the earlier 0.0.90 evidence. The full report is preserved at `docs/history/reports/STEP-27.0.7-PHYSICAL-GATE-O-REPORT.txt`.
+
+Step 27.0.8 / 0.0.92 corrects the regression without weakening Gate O. Gate O keeps the new receipt-backed HarmonySharedState/replacement/detour **Cecil metadata audit** but restores runtime reflection to the 0.0.90 PatchProcessor/HarmonyMethod/AccessTools surface. Gate T now owns and measures the new runtime surfaces: T1/T2 bounded Reflection.Emit/RuntimeMethodHandle host preflight, T3/T4 exact HarmonySharedState runtime Type/.cctor/version reflection with exact resolver/load deltas, T5/T6 explicit shared-state initialization/version/generated-assembly validation, T7/T8 the single public PatchProcessor.Patch() call, and T9 replacement/isolation validation. The public patch call remains the acceptance boundary and the launcher target remains uninvoked until Gate V.
+
+The detailed candidate record is `STEP-27.0.8-GATE-O-PURITY-RESTORATION-AND-T-RUNTIME-RESOLUTION.md`. The master document is intentionally unchanged.
+

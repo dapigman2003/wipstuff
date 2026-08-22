@@ -10,16 +10,16 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.7 — HARMONY SHARED-STATE INITIALIZATION + PATCH-ENGINE PRESERVATION";
+        "STEP 27.0.8 — GATE-O PURITY RESTORATION + PATCH-ENGINE RUNTIME RESOLUTION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.90 REACHED PATCH() T1 • CRASH LOCALIZED INSIDE PATCH ENGINE";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.91 FAILED CLEANLY AT GATE O • NEW RUNTIME REFLECTION MOVED TO GATE T";
 
     public const string Summary =
-        "Physical 0.0.90 crash telemetry proves the bounded HarmonyMethod descriptor path reached Gate T and then hard-terminated after T1 while inside the first exact PatchProcessor.Patch() invocation, before the launcher target was invoked. Exact Harmony 2.4.2 source and Gate-O receipt-backed metadata show Patch() first enters HarmonySharedState.GetPatchInfo; HarmonySharedState::.cctor creates a dynamic singleton and on Mono can generate a FieldRef delegate before replacement generation and the MonoMod detour path. Step 27.0.7 keeps A–S and the public Patch() acceptance boundary intact, adds narrowly scoped framework preservation for the audited dynamic-code surface, and makes HarmonySharedState initialization an explicit T1/T2 boundary before the single Patch() call at T3/T4. T5 validates the returned replacement and isolation. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.91 replayed A–N but failed cleanly at Gate O because the newly added HarmonySharedState runtime reflection changed resolver/load counters. That means 0.0.91 never reached the former Gate-T crash boundary. Step 27.0.8 restores Gate O to the physically passing 0.0.90 runtime-reflection surface while retaining the broader HarmonySharedState -> MethodCreator -> MonoMod detour chain as Cecil metadata audit only. Gate T now measures the new host Reflection.Emit/MethodHandle preflight at T1/T2, the exact HarmonySharedState runtime Type/.cctor/version reflection at T3/T4, explicit HarmonySharedState initialization at T5/T6, and exactly one public PatchProcessor.Patch() at T7/T8 with T9 validation. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Build 0.0.89 localized the earlier hard crash to AddPrefix(MethodInfo). Build 0.0.90 bypassed only that annotation-import convenience path and physically advanced through Gate S into Gate T/T1, where the process hard-terminated inside PatchProcessor.Patch() before T2 and before any launcher target invocation. Build 0.0.91 is the bounded shared-state/patch-engine preservation candidate. Run Step 27 only after a force-quit/relaunch. Once Gate B starts, force-quit before every retry regardless of where the run stops. If the app terminates without a managed report, preserve Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt before another attempt.";
+        "Status: Steps 01–26 are physically closed. Build 0.0.90 reached Gate T and hard-terminated inside PatchProcessor.Patch(). Build 0.0.91 did not crash, but it failed normally at Gate O / 14 of 26 because the expanded HarmonySharedState runtime reflection changed resolver/load counters before Gate T. Build 0.0.92 restores Gate-O runtime purity and moves every newly introduced runtime-reflection/preflight operation into measured Gate-T substages before retrying the exact public Patch() boundary. Run Step 27 only after a force-quit/relaunch. Once Gate B starts, force-quit before every retry regardless of where the run stops. If the app terminates without a managed report, preserve Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt before another attempt.";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

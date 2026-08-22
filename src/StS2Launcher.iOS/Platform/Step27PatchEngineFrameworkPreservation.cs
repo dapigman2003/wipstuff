@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 namespace StS2Launcher.iOS.Platform;
 
 /// <summary>
-/// Step 27.0.7 candidate-only trimming preservation for the framework surface reached after the
+/// Step 27.0.8 candidate-retained trimming preservation for the framework surface reached after the
 /// physically proven Gate-T/T1 entry into HarmonyLib.PatchProcessor.Patch(). The receipt-backed
 /// 0Harmony assembly is loaded only after publish, so the build-time trimmer cannot see its calls
 /// into HarmonySharedState, MonoMod DynamicMethodDefinition, Reflection.Emit, or MethodHandle APIs.

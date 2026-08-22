@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>91</ApplicationVersion>" in project_text, "build version is 91")
-require("<ApplicationDisplayVersion>0.0.91</ApplicationDisplayVersion>" in project_text, "display version is 0.0.91")
-require(plist.get("CFBundleVersion") == "91", "Info.plist build version is 91")
-require(plist.get("CFBundleShortVersionString") == "0.0.91", "Info.plist display version is 0.0.91")
+require("<ApplicationVersion>92</ApplicationVersion>" in project_text, "build version is 92")
+require("<ApplicationDisplayVersion>0.0.92</ApplicationDisplayVersion>" in project_text, "display version is 0.0.92")
+require(plist.get("CFBundleVersion") == "92", "Info.plist build version is 92")
+require(plist.get("CFBundleShortVersionString") == "0.0.92", "Info.plist display version is 0.0.92")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,8 +198,8 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.7 — HARMONY SHARED-STATE INITIALIZATION + PATCH-ENGINE PRESERVATION" in release_presentation, "top launcher banner identifies active Step 27.0.7 candidate")
-require("Physical 0.0.90 crash telemetry proves" in release_presentation and "Gate T" in release_presentation and "HarmonySharedState" in release_presentation and "T3/T4" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner short description matches current physical frontier")
+require("STEP 27.0.8 — GATE-O PURITY RESTORATION + PATCH-ENGINE RUNTIME RESOLUTION" in release_presentation, "top launcher banner identifies active Step 27.0.8 candidate")
+require("Physical 0.0.91 replayed A–N" in release_presentation and "failed cleanly at Gate O" in release_presentation and "T3/T4" in release_presentation and "T7/T8" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner short description matches current physical frontier")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -335,8 +335,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.91",
-    "STS2_BUILD_VERSION": "91",
+    "STS2_DISPLAY_VERSION": "0.0.92",
+    "STS2_BUILD_VERSION": "92",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -891,7 +891,9 @@ for required in [
     'ReadAccessToolsMetadata(preflight.Target.PreparedPath)',
     'ReadHarmonyPatchEngineMetadata(preflight.Target.PreparedPath)',
     'RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)',
-    'RuntimeHelpers.RunClassConstructor(patchApi.HarmonySharedStateType.TypeHandle)',
+    'RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)',
+    'ValidatePatchEngineHostFrameworkPreservationSurface();',
+    'GetType(HarmonySharedStateTypeFullName, throwOnError: false, ignoreCase: false)',
     'GetField("all", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)',
     'GetField("allDeclared", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)',
     'Name.Equals("AddPrefix", StringComparison.Ordinal)',
@@ -920,7 +922,7 @@ require(step27_source.count("patchApi.PatchMethod.Invoke(processor, null)") == 1
 require(step27_source.count("patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])") == 1, "Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation")
 require(step27_source.count("probe.Target.Invoke(null, [41])") == 3, "Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates")
 require(step27_source.count("HarmonyPatchProbe.Target(41)") == 3, "Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates")
-require(step27_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2 and step27_source.count("RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)") == 1 and step27_source.count("RuntimeHelpers.RunClassConstructor(patchApi.HarmonySharedStateType.TypeHandle)") == 1, "Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier")
+require(step27_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2 and step27_source.count("RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)") == 1 and step27_source.count("RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)") == 1, "Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier")
 require(step27_source.count("_offlineInspection.RunAsync(") == 6, "Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries")
 require('stage = "OfflineReady post-patch pre-invocation check"' in step27_source and 'stage = "OfflineReady final postcondition"' in step27_source and step27_source.count('\"OfflineReady exact-tree verification: YES\\n\" +') == 2, "Step 27 has distinct post-patch and final OfflineReady proof stages")
 require("Harmony.Patch(" not in step27_source and "PatchAll(" not in step27_source and "PatchCategory(" not in step27_source and "PatchClassProcessor" not in step27_source, "Step 27 never invokes broad Harmony patch/discovery APIs")
@@ -947,8 +949,8 @@ step27_preservation = read("src/StS2Launcher.iOS/Platform/Step27AccessToolsFrame
 require("typeof(RuntimeInformation)" in step27_preservation and "typeof(PropertyInfo)" in step27_preservation and "typeof(Dictionary<,>)" in step27_preservation and "typeof(ReaderWriterLockSlim)" in step27_preservation, "Step 27 preserves only the bounded framework surface measured in AccessTools::.cctor")
 require("Step27AccessToolsFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs"), "Step 27 roots the AccessTools DynamicDependency preservation anchor from candidate-owned UI")
 step27_patch_engine_preservation = read("src/StS2Launcher.iOS/Platform/Step27PatchEngineFrameworkPreservation.cs")
-require(all(marker in step27_patch_engine_preservation for marker in ["typeof(DynamicMethod)", "typeof(ILGenerator)", "typeof(RuntimeMethodHandle)", "typeof(AssemblyBuilder)", "typeof(ModuleBuilder)", "typeof(TypeBuilder)", "typeof(MethodBuilder)"]), "Step 27.0.7 preserves only the bounded patch-engine Reflection.Emit/MethodHandle framework surface")
-require("TrimmerRootAssembly Include=\"System.Reflection.Emit" not in project_text, "Step 27.0.7 does not broaden preservation to a Reflection.Emit assembly root")
+require(all(marker in step27_patch_engine_preservation for marker in ["typeof(DynamicMethod)", "typeof(ILGenerator)", "typeof(RuntimeMethodHandle)", "typeof(AssemblyBuilder)", "typeof(ModuleBuilder)", "typeof(TypeBuilder)", "typeof(MethodBuilder)"]), "Step 27.0.8 retains only the bounded patch-engine Reflection.Emit/MethodHandle framework surface")
+require("TrimmerRootAssembly Include=\"System.Reflection.Emit" not in project_text, "Step 27.0.8 does not broaden preservation to a Reflection.Emit assembly root")
 require("Step27PatchEngineFrameworkPreservation.Activate();" in step27_ui, "Step 27 roots the bounded patch-engine DynamicDependency preservation anchor from candidate-owned UI")
 require("STEP27 CANDIDATE PATCH-ENGINE FRAMEWORK PRESERVATION" in project_text, "build telemetry declares the candidate patch-engine preservation anchor")
 require("cctor.Body.Instructions.Count != 57" in step27_source and "[Code.Ldc_I4_1] = 1" in step27_source and "Exact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight")
@@ -957,13 +959,20 @@ require("HarmonySharedState internalVersion: 102 — MATCH" in step27_source and
 gate_o_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunHarmonyPatchApiResolution(")
 gate_o_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunLauncherPatchProbeResolution()", gate_o_start)
 gate_o_body = step27_source[gate_o_start:gate_o_end]
-require("frameworkDescriptionProperty.GetValue(null)" not in gate_o_body and "FrameworkDescription" in gate_o_body and "no member invoked by this preflight" in gate_o_body, "Step 27 Gate O resolves FrameworkDescription metadata without invoking the reflected getter")
-require(all(marker in gate_o_body for marker in ["O1 —", "O2 —", "O3 —", "O4 —", "O5 —", "O6 —", "O7 —", "O8 —", "O9 —", "O10 —", "O11 —", "O12 —"]), "Step 27 Gate O exposes twelve durable crash-localization substages")
+require("frameworkDescriptionProperty.GetValue(null)" not in gate_o_body and "FrameworkDescription" in gate_o_body, "Step 27 Gate O resolves FrameworkDescription metadata without invoking the reflected getter")
+require("GetType(HarmonySharedStateTypeFullName" not in gate_o_body and "ValidatePatchEngineHostFrameworkPreservationSurface" not in gate_o_body, "Step 27.0.8 restores Gate-O runtime reflection to the physically passing 0.0.90 PatchProcessor/HarmonyMethod/AccessTools surface")
+require("ReadHarmonyPatchEngineMetadata(preflight.Target.PreparedPath)" in gate_o_body and "HarmonySharedState" in gate_o_body, "Step 27 Gate O retains HarmonySharedState/replacement/detour admission as metadata-only audit")
+require(all(marker in gate_o_body for marker in ["O1 —", "O2 —", "O3 —", "O4 —", "O5 —", "O6 —", "O7 —", "O8 —", "O9 —", "O10 —", "O11 —"]) and "O12 —" not in gate_o_body, "Step 27.0.8 Gate O exposes eleven durable crash-localization substages on the restored runtime surface")
 gate_r_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization(")
 gate_r_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(", gate_r_start)
 gate_r_body = step27_source[gate_r_start:gate_r_end]
 require("patchApi.RuntimeFrameworkDescriptionProperty.GetValue(null)" in gate_r_body and all(marker in gate_r_body for marker in ["R1 —", "R2 —", "R3 —"]), "Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages")
-require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —", "T3 —", "T4 —", "T5 —"]), "Step 27 bounded prefix registration and decomposed shared-state/first-patch boundary have durable crash substages")
+require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —", "T3 —", "T4 —", "T5 —", "T6 —", "T7 —", "T8 —", "T9 —"]), "Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages")
+gate_t_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPatchEngineExecution(")
+gate_t_end = step27_source.index("public async Task<ControlledHarmonyPatchExecutionGateResult> RunPostPatchAuditAsync(", gate_t_start)
+gate_t_body = step27_source[gate_t_start:gate_t_end]
+require("ValidatePatchEngineHostFrameworkPreservationSurface();" in gate_t_body and "GetType(HarmonySharedStateTypeFullName" in gate_t_body and "sharedResolutionManagedDelta" in gate_t_body and "sharedResolutionMembershipAfter.SequenceEqual" in gate_t_body, "Step 27.0.8 Gate T measures the new host/shared-state runtime reflection instead of weakening Gate-O purity")
+require("actualVersion was NOT read and the cctor was NOT run" in gate_t_body and "RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)" in gate_t_body and "patchApi.PatchMethod.Invoke(processor, null)" in gate_t_body, "Step 27.0.8 Gate T orders reflection -> shared-state initialization -> one public Patch() acceptance call")
 require("defaultCtorIl.Count == 6" in step27_source and "Code.Ldc_I4_M1" in step27_source and "HarmonyMethod() no longer matches exact priority=-1" in step27_source, "Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape")
 require("harmonyAnnotations.Length != 0" in step27_source and "HarmonyMethod(MethodInfo)/ImportMethod invoked: NO" in step27_source and "PatchProcessor.AddPrefix invoked: NO" in step27_source, "Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
@@ -1016,6 +1025,8 @@ required_docs = [
     "docs/history/steps/STEP-27.0.5-CRASH-LOCALIZATION-AND-GATE-O-PURITY.md",
     "docs/history/steps/STEP-27.0.6-BOUNDED-IOS-PREFIX-DESCRIPTOR-REGISTRATION.md",
     "docs/history/steps/STEP-27.0.7-HARMONY-SHARED-STATE-INITIALIZATION-AND-PATCH-ENGINE-PRESERVATION.md",
+    "docs/history/steps/STEP-27.0.8-GATE-O-PURITY-RESTORATION-AND-T-RUNTIME-RESOLUTION.md",
+    "docs/history/reports/STEP-27.0.7-PHYSICAL-GATE-O-REPORT.txt",
     "docs/history/reports/STEP-27.0.6-PHYSICAL-GATE-T-CRASH-CHECKPOINT.txt",
     "docs/history/reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt",
     "docs/history/reports/STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt",
@@ -1060,8 +1071,11 @@ step27_build89_checkpoint = read("docs/history/reports/STEP-27.0.5-PHYSICAL-GATE
 require("Gate: S — PrefixRegistration" in step27_build89_checkpoint and "S1 — entering exact PatchProcessor.AddPrefix(MethodInfo) reflection invocation" in step27_build89_checkpoint, "physical build 89 crash checkpoint localizes abrupt termination inside AddPrefix before S2/Patch()")
 step27_build90_checkpoint = read("docs/history/reports/STEP-27.0.6-PHYSICAL-GATE-T-CRASH-CHECKPOINT.txt")
 require("Gate: T — PatchEngineExecution" in step27_build90_checkpoint and "T1 — entering the first exact PatchProcessor.Patch() reflection invocation" in step27_build90_checkpoint and "launcher target is still not invoked" in step27_build90_checkpoint, "physical build 90 crash checkpoint localizes abrupt termination inside public Patch() before T2/target invocation")
+step27_build91_report = read("docs/history/reports/STEP-27.0.7-PHYSICAL-GATE-O-REPORT.txt")
+require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 14/26" in step27_build91_report and "App version: 0.0.91 (91)" in step27_build91_report and "Gate N — PostProcessorAudit: PASS" in step27_build91_report and "Gate O — HarmonyPatchApiResolution: FAIL" in step27_build91_report, "physical build 91 report preserves the exact clean 14/26 Gate-O regression")
+require("Targeted patch API reflection unexpectedly changed resolver/load counters" in step27_build91_report and "Gate T decomposes" in step27_build91_report, "physical build 91 report preserves the resolver/load-counter failure before any Gate-T execution")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "Gate-T hard crash localized" in current_status and "0.0.91 (91)" in current_status and "HarmonySharedState" in current_status and "T1" in current_status and "T5" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 physical evidence and advances to Step 27.0.7 / 0.0.91 shared-state patch-engine candidate")
+require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "Gate-T hard crash localized" in current_status and "0.0.91 (91)" in current_status and "clean Gate-O regression" in current_status and "0.0.92 (92)" in current_status and "HarmonySharedState" in current_status and "T1" in current_status and "T9" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 physical evidence and advances to Step 27.0.8 / 0.0.92 Gate-O-purity/runtime-resolution candidate")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
