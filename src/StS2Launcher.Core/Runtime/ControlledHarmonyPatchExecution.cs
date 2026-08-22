@@ -1630,6 +1630,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (harmonyMethodType.TypeInitializer is not null)
                 throw new InvalidDataException("Step 27 does not permit an implicit HarmonyMethod type initializer.");
             var harmonyMethodConstructors = harmonyMethodType.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            var harmonyMethodDefaultConstructor = harmonyMethodConstructors.SingleOrDefault(candidate => candidate.GetParameters().Length == 0)
+                ?? throw new MissingMethodException("HarmonyLib.HarmonyMethod", ".ctor()");
             var harmonyMethodConstructor = harmonyMethodConstructors.SingleOrDefault(candidate =>
             {
                 var parameters = candidate.GetParameters();
@@ -1637,8 +1639,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             }) ?? throw new MissingMethodException("HarmonyLib.HarmonyMethod", ".ctor(System.Reflection.MethodInfo)");
             var harmonyMethodMethodField = harmonyMethodType.GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 ?? throw new MissingFieldException("HarmonyLib.HarmonyMethod", "method");
-            if (harmonyMethodMethodField.FieldType != typeof(MethodInfo))
-                throw new InvalidDataException("HarmonyMethod.method runtime field type changed.");
+            var harmonyMethodPriorityField = harmonyMethodType.GetField("priority", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException("HarmonyLib.HarmonyMethod", "priority");
+            if (harmonyMethodMethodField.FieldType != typeof(MethodInfo) || harmonyMethodPriorityField.FieldType != typeof(int))
+                throw new InvalidDataException("HarmonyMethod method/priority runtime field shape changed.");
 
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O8 — resolving exact AccessTools runtime Type/.cctor/fields without reading any static field.");
             var accessToolsType = initialization.TargetAssembly.GetType(AccessToolsTypeFullName, throwOnError: false, ignoreCase: false)
@@ -1695,8 +1699,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 unpatch,
                 prefixField,
                 harmonyMethodType,
+                harmonyMethodDefaultConstructor,
                 harmonyMethodConstructor,
                 harmonyMethodMethodField,
+                harmonyMethodPriorityField,
                 accessToolsType,
                 accessToolsTypeInitializer,
                 accessToolsAllField,
@@ -1712,17 +1718,19 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 metadata.AddPrefixAudit,
                 metadata.PatchAudit,
                 metadata.UnpatchAudit,
+                metadata.HarmonyMethodDefaultConstructorAudit,
                 metadata.HarmonyMethodConstructorAudit);
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution,
                 "TARGETED HARMONY PATCH API RESOLUTION SUCCEEDED WITHOUT PATCH-DESCRIPTION CONSTRUCTION OR PATCHING.\n" +
-                "Patch description admission: PatchProcessor.AddPrefix(System.Reflection.MethodInfo)\n" +
+                "Reference prefix API: PatchProcessor.AddPrefix(System.Reflection.MethodInfo) — exact IL audited, NOT invoked by Step 27.0.6\n" +
                 "Patch execution method: PatchProcessor.Patch() -> System.Reflection.MethodInfo\n" +
                 "Exact removal method: PatchProcessor.Unpatch(System.Reflection.MethodInfo)\n" +
                 "Patch descriptor type: HarmonyLib.HarmonyMethod — no type initializer\n" +
-                "Patch descriptor constructor: HarmonyMethod(System.Reflection.MethodInfo)\n" +
-                "Patch descriptor retained method field: method : System.Reflection.MethodInfo\n" +
+                "Bounded iOS descriptor constructor: HarmonyMethod() — exact default priority=-1 shape\n" +
+                "Reference constructor: HarmonyMethod(System.Reflection.MethodInfo) — exact ImportMethod path audited, NOT invoked by Step 27.0.6\n" +
+                "Patch descriptor retained fields: method : System.Reflection.MethodInfo; priority : System.Int32\n" +
                 "AccessTools type initializer: PRESENT — exact Step 27.0.1 physical runtime-detection/cache fingerprint\n" +
                 "Host RuntimeInformation.FrameworkDescription metadata preservation preflight: PRESENT — getter NOT INVOKED in Gate O\n" +
                 "AccessTools static-field values read: NO — Gate R owns the type-initialization boundary\n" +
@@ -1733,7 +1741,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "Audited AddPrefix(MethodInfo) IL:\n" + metadata.AddPrefixAudit + "\n" +
                 "Audited Patch() IL:\n" + metadata.PatchAudit + "\n" +
                 "Audited Unpatch(MethodInfo) IL:\n" + metadata.UnpatchAudit + "\n" +
-                "Audited HarmonyMethod(MethodInfo) IL:\n" + metadata.HarmonyMethodConstructorAudit + "\n" +
+                "Audited HarmonyMethod() IL:\n" + metadata.HarmonyMethodDefaultConstructorAudit + "\n" +
+                "Audited HarmonyMethod(MethodInfo) IL (reference path only):\n" + metadata.HarmonyMethodConstructorAudit + "\n" +
                 "Audited AccessTools::.cctor IL:\n" + accessToolsMetadata.TypeInitializerAudit);
         }
         catch (Exception ex)
@@ -1973,12 +1982,12 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes exactly PatchProcessor.AddPrefix(MethodInfo) from the metadata-verified post-publish API surface.")]
-    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Step 27 inspects only exact post-publish HarmonyMethod fields/types resolved by Gate O.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 constructs only the exact metadata-verified parameterless HarmonyMethod descriptor and writes its exact public method field for a launcher prefix with no Harmony annotations.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Step 27 accesses only exact post-publish HarmonyMethod/PatchProcessor fields and constructors resolved by Gate O.")]
     public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(
         IProgress<ControlledHarmonyPatchExecutionProgress>? progress = null)
     {
-        var stage = "exact AddPrefix(MethodInfo) invocation";
+        var stage = "bounded iOS-safe prefix descriptor registration";
         try
         {
             ThrowIfDisposed();
@@ -1995,46 +2004,70 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (!targetSha1.Equals(preflight.Target.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step 27 0Harmony SHA-1 changed immediately before prefix registration.");
 
+            // HarmonyMethod(MethodInfo) imports Harmony annotations through AccessTools. The launcher probe intentionally
+            // carries no Harmony annotations, so the exact AddPrefix(MethodInfo) result is equivalent to a default
+            // HarmonyMethod descriptor whose method field is the exact prefix. This bounded path avoids the iOS hard
+            // crash physically localized inside AddPrefix's HarmonyMethod(MethodInfo) construction/import path.
+            var harmonyAnnotations = probe.Prefix.GetCustomAttributesData()
+                .Where(attribute =>
+                    string.Equals(attribute.AttributeType.Namespace, "HarmonyLib", StringComparison.Ordinal) ||
+                    string.Equals(attribute.AttributeType.Assembly.GetName().Name, TargetSimpleName, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            if (harmonyAnnotations.Length != 0)
+                throw new InvalidDataException("Step 27 bounded descriptor substitution requires the launcher prefix to carry zero Harmony annotations; observed: " + string.Join(", ", harmonyAnnotations.Select(attribute => attribute.AttributeType.FullName)));
+
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;
             var hostBefore = context.HostLoads.Count;
             var nativeBefore = context.NativeLoadAttempts.Count;
             var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
 
-            object? returned;
+            object descriptor;
             try
             {
-                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S1 — entering exact PatchProcessor.AddPrefix(MethodInfo) reflection invocation.");
-                returned = patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix]);
-                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S2 — AddPrefix(MethodInfo) returned; verifying the exact HarmonyMethod descriptor.");
+                stage = "exact parameterless HarmonyMethod construction";
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S1 — entering exact HarmonyMethod() reflection construction; AddPrefix(MethodInfo) and ImportMethod are NOT invoked.");
+                descriptor = patchApi.HarmonyMethodDefaultConstructor.Invoke([])
+                    ?? throw new InvalidDataException("Exact HarmonyMethod() constructor returned null.");
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S2 — HarmonyMethod() returned; verifying exact default descriptor state before any field assignment.");
             }
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
-                throw new InvalidOperationException("Exact PatchProcessor.AddPrefix(MethodInfo) threw.", ex.InnerException);
+                throw new InvalidOperationException("Exact HarmonyMethod() constructor threw.", ex.InnerException);
             }
-            if (!ReferenceEquals(returned, processor))
-                throw new InvalidDataException("PatchProcessor.AddPrefix(MethodInfo) did not return the same processor instance.");
 
-            stage = "registered prefix descriptor verification";
-            var descriptor = patchApi.PrefixField.GetValue(processor)
-                ?? throw new InvalidDataException("PatchProcessor.prefix remained null after exact AddPrefix(MethodInfo).");
             if (!ReferenceEquals(descriptor.GetType(), patchApi.HarmonyMethodType))
-                throw new InvalidDataException("PatchProcessor.prefix is not exact HarmonyLib.HarmonyMethod.");
+                throw new InvalidDataException("HarmonyMethod() returned an unexpected runtime type.");
+            if (patchApi.HarmonyMethodMethodField.GetValue(descriptor) is not null)
+                throw new InvalidDataException("HarmonyMethod() default descriptor unexpectedly has a non-null method field.");
+            if (patchApi.HarmonyMethodPriorityField.GetValue(descriptor) is not int priority || priority != -1)
+                throw new InvalidDataException($"HarmonyMethod() default priority changed; expected -1, observed {patchApi.HarmonyMethodPriorityField.GetValue(descriptor) ?? "<null>"}.");
+
+            stage = "exact HarmonyMethod.method assignment";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S3 — assigning only HarmonyMethod.method = exact launcher Prefix MethodInfo; no annotation import.");
+            patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix);
             if (!ReferenceEquals(patchApi.HarmonyMethodMethodField.GetValue(descriptor), probe.Prefix))
                 throw new InvalidDataException("HarmonyMethod.method did not retain the exact launcher-owned prefix MethodInfo.");
 
+            stage = "exact PatchProcessor.prefix assignment";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S4 — assigning only PatchProcessor.prefix = bounded HarmonyMethod descriptor; Patch() remains uninvoked.");
+            patchApi.PrefixField.SetValue(processor, descriptor);
+            if (!ReferenceEquals(patchApi.PrefixField.GetValue(processor), descriptor))
+                throw new InvalidDataException("PatchProcessor.prefix did not retain the bounded HarmonyMethod descriptor.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PrefixRegistration, "S5 — bounded descriptor registration complete; verifying isolation before first Patch() boundary.");
+
             if (context.NativeLoadAttempts.Count != nativeBefore)
-                throw new DllNotFoundException("Prefix registration attempted native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
+                throw new DllNotFoundException("Prefix descriptor registration attempted native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
             if (context.RejectedManagedRequests.Count != 0)
-                throw new FileLoadException("Prefix registration triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests));
+                throw new FileLoadException("Prefix descriptor registration triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests));
             var membershipAfter = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
             if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
-                throw new InvalidDataException("Prefix registration changed private-context membership.");
+                throw new InvalidDataException("Prefix descriptor registration changed private-context membership.");
             var postSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!postSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("0Harmony prepared bytes changed across prefix registration.");
+                throw new InvalidDataException("0Harmony prepared bytes changed across prefix descriptor registration.");
             if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("Prefix registration unexpectedly invoked the launcher probe or prefix.");
+                throw new InvalidDataException("Prefix descriptor registration unexpectedly invoked the launcher probe or prefix.");
 
             _prefixDescriptor = descriptor;
             _prefixRegistration = new PrefixRegistrationSnapshot(
@@ -2046,16 +2079,19 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.PrefixRegistration,
-                "CONTROLLED HARMONY PREFIX DESCRIPTION REGISTRATION SUCCEEDED WITHOUT PATCHING.\n" +
-                "API invoked: PatchProcessor.AddPrefix(System.Reflection.MethodInfo)\n" +
+                "CONTROLLED BOUNDED HARMONY PREFIX DESCRIPTOR REGISTRATION SUCCEEDED WITHOUT PATCHING.\n" +
+                "Reference API: PatchProcessor.AddPrefix(MethodInfo) — exact six-instruction IL remains metadata-audited but was NOT invoked because physical 0.0.89 localized a hard crash inside its HarmonyMethod(MethodInfo)/ImportMethod path.\n" +
+                "Compatibility path: exact HarmonyMethod() -> verify priority=-1/method=null -> method=launcher Prefix -> PatchProcessor.prefix=descriptor\n" +
+                "Launcher prefix Harmony annotations: 0 — required for equivalence\n" +
                 $"Prefix: {probe.PrefixSignature}\n" +
-                "HarmonyMethod constructed: YES — by exact AddPrefix(MethodInfo) only\n" +
                 "HarmonyMethod.method retained exact prefix MethodInfo: YES\n" +
                 "HarmonyLib.AccessTools type initializer completed explicitly in prior Gate R: YES\n" +
                 $"Managed resolver requests during registration: {_prefixRegistration.ManagedResolverRequests:N0}\n" +
                 $"Private loads during registration: {_prefixRegistration.PrivateLoads:N0}\n" +
                 $"Host loads during registration: {_prefixRegistration.HostLoads:N0}\n" +
                 $"Native load attempts during registration: {_prefixRegistration.NativeLoadAttempts:N0}\n" +
+                "PatchProcessor.AddPrefix invoked: NO\n" +
+                "HarmonyMethod(MethodInfo)/ImportMethod invoked: NO\n" +
                 "PatchProcessor.Patch invoked: NO\n" +
                 "Launcher target/prefix invoked: NO\n" +
                 "StS2 type/member reflected or invoked: NO");
@@ -2909,26 +2945,29 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         var processorType = EnumerateTypes(module.Types).SingleOrDefault(type => type.FullName.Equals(PatchProcessorTypeFullName, StringComparison.Ordinal));
         var harmonyMethodType = EnumerateTypes(module.Types).SingleOrDefault(type => type.FullName.Equals("HarmonyLib.HarmonyMethod", StringComparison.Ordinal));
         if (processorType is null || harmonyMethodType is null)
-            return new HarmonyPatchMetadataSnapshot(false, "PatchProcessor or HarmonyMethod type missing from exact 0Harmony.", "<missing>", "<missing>", "<missing>", "<missing>");
+            return new HarmonyPatchMetadataSnapshot(false, "PatchProcessor or HarmonyMethod type missing from exact 0Harmony.", "<missing>", "<missing>", "<missing>", "<missing>", "<missing>");
         if (!processorType.IsPublic || processorType.IsAbstract || processorType.IsInterface ||
             !harmonyMethodType.IsPublic || harmonyMethodType.IsAbstract || harmonyMethodType.IsInterface)
-            return new HarmonyPatchMetadataSnapshot(false, "PatchProcessor/HarmonyMethod runtime type shape changed.", "<invalid type>", "<invalid type>", "<invalid type>", "<invalid type>");
+            return new HarmonyPatchMetadataSnapshot(false, "PatchProcessor/HarmonyMethod runtime type shape changed.", "<invalid type>", "<invalid type>", "<invalid type>", "<invalid type>", "<invalid type>");
 
         var harmonyMethodTypeInitializers = harmonyMethodType.Methods.Where(method => method.IsConstructor && method.IsStatic).ToArray();
         if (harmonyMethodTypeInitializers.Length != 0)
-            return new HarmonyPatchMetadataSnapshot(false, $"Step 27 requires HarmonyMethod to have no type initializer; observed {harmonyMethodTypeInitializers.Length}.", "<blocked>", "<blocked>", "<blocked>", "<blocked>");
+            return new HarmonyPatchMetadataSnapshot(false, $"Step 27 requires HarmonyMethod to have no type initializer; observed {harmonyMethodTypeInitializers.Length}.", "<blocked>", "<blocked>", "<blocked>", "<blocked>", "<blocked>");
 
         var prefixField = processorType.Fields.SingleOrDefault(field => !field.IsStatic && field.Name.Equals("prefix", StringComparison.Ordinal));
         var harmonyMethodMethodField = harmonyMethodType.Fields.SingleOrDefault(field => !field.IsStatic && field.IsPublic && field.Name.Equals("method", StringComparison.Ordinal));
         if (prefixField is null || !prefixField.FieldType.FullName.Equals("HarmonyLib.HarmonyMethod", StringComparison.Ordinal) ||
             harmonyMethodMethodField is null || !harmonyMethodMethodField.FieldType.FullName.Equals("System.Reflection.MethodInfo", StringComparison.Ordinal))
-            return new HarmonyPatchMetadataSnapshot(false, "PatchProcessor.prefix or HarmonyMethod.method field shape changed.", "<blocked>", "<blocked>", "<blocked>", "<blocked>");
+            return new HarmonyPatchMetadataSnapshot(false, "PatchProcessor.prefix or HarmonyMethod.method field shape changed.", "<blocked>", "<blocked>", "<blocked>", "<blocked>", "<blocked>");
 
         var harmonyMethodConstructors = harmonyMethodType.Methods.Where(method => method.IsConstructor && !method.IsStatic && method.IsPublic).ToArray();
+        var harmonyMethodDefaultConstructor = harmonyMethodConstructors.SingleOrDefault(method => method.Parameters.Count == 0);
         var harmonyMethodConstructor = harmonyMethodConstructors.SingleOrDefault(method =>
             method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName.Equals("System.Reflection.MethodInfo", StringComparison.Ordinal));
+        if (harmonyMethodDefaultConstructor is null || !harmonyMethodDefaultConstructor.HasBody)
+            return new HarmonyPatchMetadataSnapshot(false, "Exact public HarmonyMethod() constructor is missing or bodyless.", "<blocked>", "<blocked>", "<blocked>", harmonyMethodDefaultConstructor?.FullName ?? "<missing>", harmonyMethodConstructor?.FullName ?? "<missing>");
         if (harmonyMethodConstructor is null || !harmonyMethodConstructor.HasBody)
-            return new HarmonyPatchMetadataSnapshot(false, "Exact public HarmonyMethod(MethodInfo) constructor is missing or bodyless.", "<blocked>", "<blocked>", "<blocked>", harmonyMethodConstructor?.FullName ?? "<missing>");
+            return new HarmonyPatchMetadataSnapshot(false, "Exact public HarmonyMethod(MethodInfo) constructor is missing or bodyless.", "<blocked>", "<blocked>", "<blocked>", FormatMethodAudit(harmonyMethodDefaultConstructor), harmonyMethodConstructor?.FullName ?? "<missing>");
 
         var addPrefixCandidates = processorType.Methods.Where(method => method.IsPublic && !method.IsStatic && method.Name.Equals("AddPrefix", StringComparison.Ordinal)).ToArray();
         var addPrefix = addPrefixCandidates.SingleOrDefault(method =>
@@ -2936,12 +2975,12 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             method.Parameters[0].ParameterType.FullName.Equals("System.Reflection.MethodInfo", StringComparison.Ordinal) &&
             method.ReturnType.FullName.Equals(PatchProcessorTypeFullName, StringComparison.Ordinal));
         if (addPrefix is null || !addPrefix.HasBody)
-            return new HarmonyPatchMetadataSnapshot(false, "Exact PatchProcessor.AddPrefix(MethodInfo) is missing or bodyless.", addPrefix?.FullName ?? "<missing>", "<blocked>", "<blocked>", FormatMethodAudit(harmonyMethodConstructor));
+            return new HarmonyPatchMetadataSnapshot(false, "Exact PatchProcessor.AddPrefix(MethodInfo) is missing or bodyless.", addPrefix?.FullName ?? "<missing>", "<blocked>", "<blocked>", FormatMethodAudit(harmonyMethodDefaultConstructor), FormatMethodAudit(harmonyMethodConstructor));
 
         var patchCandidates = processorType.Methods.Where(method => method.IsPublic && !method.IsStatic && method.Name.Equals("Patch", StringComparison.Ordinal)).ToArray();
         var patch = patchCandidates.SingleOrDefault(method => method.Parameters.Count == 0 && method.ReturnType.FullName.Equals("System.Reflection.MethodInfo", StringComparison.Ordinal));
         if (patch is null || !patch.HasBody)
-            return new HarmonyPatchMetadataSnapshot(false, "Exact parameterless PatchProcessor.Patch() -> MethodInfo is missing or bodyless.", FormatMethodAudit(addPrefix), patch?.FullName ?? "<missing>", "<blocked>", FormatMethodAudit(harmonyMethodConstructor));
+            return new HarmonyPatchMetadataSnapshot(false, "Exact parameterless PatchProcessor.Patch() -> MethodInfo is missing or bodyless.", FormatMethodAudit(addPrefix), patch?.FullName ?? "<missing>", "<blocked>", FormatMethodAudit(harmonyMethodDefaultConstructor), FormatMethodAudit(harmonyMethodConstructor));
 
         var unpatchCandidates = processorType.Methods.Where(method => method.IsPublic && !method.IsStatic && method.Name.Equals("Unpatch", StringComparison.Ordinal)).ToArray();
         var unpatch = unpatchCandidates.SingleOrDefault(method =>
@@ -2949,7 +2988,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             method.Parameters[0].ParameterType.FullName.Equals("System.Reflection.MethodInfo", StringComparison.Ordinal) &&
             method.ReturnType.FullName.Equals(PatchProcessorTypeFullName, StringComparison.Ordinal));
         if (unpatch is null || !unpatch.HasBody)
-            return new HarmonyPatchMetadataSnapshot(false, "Exact PatchProcessor.Unpatch(MethodInfo) is missing or bodyless.", FormatMethodAudit(addPrefix), FormatMethodAudit(patch), unpatch?.FullName ?? "<missing>", FormatMethodAudit(harmonyMethodConstructor));
+            return new HarmonyPatchMetadataSnapshot(false, "Exact PatchProcessor.Unpatch(MethodInfo) is missing or bodyless.", FormatMethodAudit(addPrefix), FormatMethodAudit(patch), unpatch?.FullName ?? "<missing>", FormatMethodAudit(harmonyMethodDefaultConstructor), FormatMethodAudit(harmonyMethodConstructor));
 
         var addPrefixIl = addPrefix.Body.Instructions;
         var addPrefixShape = addPrefixIl.Count == 6 &&
@@ -2962,6 +3001,15 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             addPrefixCtor.Parameters.Count == 1 && addPrefixCtor.Parameters[0].ParameterType.FullName.Equals("System.Reflection.MethodInfo", StringComparison.Ordinal) &&
             addPrefixIl[3].OpCode.Code == Code.Stfld && addPrefixIl[3].Operand is FieldReference prefixStore && prefixStore.Name.Equals("prefix", StringComparison.Ordinal) &&
             addPrefixIl[4].OpCode.Code == Code.Ldarg_0 && addPrefixIl[5].OpCode.Code == Code.Ret;
+
+        var defaultCtorIl = harmonyMethodDefaultConstructor.Body.Instructions;
+        var defaultCtorShape = defaultCtorIl.Count == 6 &&
+            defaultCtorIl[0].OpCode.Code == Code.Ldarg_0 &&
+            defaultCtorIl[1].OpCode.Code == Code.Ldc_I4_M1 &&
+            defaultCtorIl[2].OpCode.Code == Code.Stfld && defaultCtorIl[2].Operand is FieldReference priorityStore && priorityStore.Name.Equals("priority", StringComparison.Ordinal) && priorityStore.FieldType.FullName.Equals("System.Int32", StringComparison.Ordinal) &&
+            defaultCtorIl[3].OpCode.Code == Code.Ldarg_0 &&
+            defaultCtorIl[4].OpCode.Code == Code.Call && defaultCtorIl[4].Operand is MethodReference objectCtorCall && objectCtorCall.DeclaringType.FullName.Equals("System.Object", StringComparison.Ordinal) && objectCtorCall.Name.Equals(".ctor", StringComparison.Ordinal) &&
+            defaultCtorIl[5].OpCode.Code == Code.Ret;
 
         static string[] CalledMembers(MethodDefinition method) => method.Body.Instructions
             .Where(instruction => instruction.Operand is MethodReference)
@@ -2982,11 +3030,12 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         var harmonyMethodCtorShape = harmonyMethodCtorCalls.Any(value => value.Contains("HarmonyLib.HarmonyMethod::ImportMethod", StringComparison.Ordinal));
 
         var hazards = new List<string>();
+        if (!defaultCtorShape) hazards.Add("HarmonyMethod() no longer matches exact priority=-1 -> object::.ctor -> ret shape required by the bounded iOS descriptor path.");
         if (!addPrefixShape) hazards.Add("AddPrefix(MethodInfo) no longer matches new HarmonyMethod(fixMethod) -> prefix -> return this.");
         if (!patchShape) hazards.Add("Patch() no longer exposes the measured GetPatchInfo/AddPrefixes/UpdateWrapper/UpdatePatchInfo flow.");
         if (!unpatchShape) hazards.Add("Unpatch(MethodInfo) no longer exposes the measured GetPatchInfo/RemovePatch/UpdateWrapper/UpdatePatchInfo flow.");
         if (!harmonyMethodCtorShape) hazards.Add("HarmonyMethod(MethodInfo) no longer calls its measured ImportMethod path.");
-        foreach (var method in new[] { addPrefix, patch, unpatch, harmonyMethodConstructor })
+        foreach (var method in new[] { addPrefix, patch, unpatch, harmonyMethodDefaultConstructor, harmonyMethodConstructor })
         {
             if (method.IsPInvokeImpl || method.PInvokeInfo is not null)
                 hazards.Add("P/Invoke patch API body: " + method.FullName);
@@ -3000,6 +3049,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             $"Unpatch overloads: {unpatchCandidates.Length:N0}\n" +
             "Exact removal API: Unpatch(System.Reflection.MethodInfo) -> HarmonyLib.PatchProcessor\n" +
             "HarmonyMethod type initializer count: 0\n" +
+            "HarmonyMethod iOS-safe descriptor constructor: exact public .ctor() with priority=-1 only\n" +
+            "HarmonyMethod(MethodInfo) remains metadata-audited reference behavior and calls ImportMethod\n" +
             "HarmonyMethod retained field: method:System.Reflection.MethodInfo\n" +
             $"Blocking patch metadata hazards: {hazards.Count:N0}" +
             (hazards.Count == 0 ? string.Empty : "\n" + string.Join("\n", hazards));
@@ -3009,7 +3060,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             FormatMethodAudit(addPrefix),
             FormatMethodAudit(patch),
             FormatMethodAudit(unpatch),
-            FormatMethodAudit(harmonyMethodConstructor));
+            FormatMethodAudit(harmonyMethodDefaultConstructor), FormatMethodAudit(harmonyMethodConstructor));
     }
 
     private static HarmonyProcessorMetadataSnapshot ReadHarmonyProcessorMetadata(string path)
@@ -3960,6 +4011,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         string AddPrefixAudit,
         string PatchAudit,
         string UnpatchAudit,
+        string HarmonyMethodDefaultConstructorAudit,
         string HarmonyMethodConstructorAudit);
 
     private sealed record AccessToolsMetadataSnapshot(
@@ -4069,8 +4121,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         MethodInfo UnpatchMethod,
         FieldInfo PrefixField,
         Type HarmonyMethodType,
+        ConstructorInfo HarmonyMethodDefaultConstructor,
         ConstructorInfo HarmonyMethodConstructor,
         FieldInfo HarmonyMethodMethodField,
+        FieldInfo HarmonyMethodPriorityField,
         Type AccessToolsType,
         ConstructorInfo AccessToolsTypeInitializer,
         FieldInfo AccessToolsAllField,
@@ -4086,6 +4140,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         string AddPrefixAudit,
         string PatchAudit,
         string UnpatchAudit,
+        string HarmonyMethodDefaultConstructorAudit,
         string HarmonyMethodConstructorAudit);
 
     private sealed record LauncherPatchProbeSnapshot(

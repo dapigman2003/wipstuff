@@ -37,3 +37,5 @@ A current verification overwrites its deterministic latest report. Reports are o
 ## Step 27 crash checkpoint
 
 Step 27.0.5 adds `Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt`. Unlike the normal end-of-run report, this tiny output-only file is synchronously overwritten and flushed during the run so it can survive an abrupt process termination. Preserve it before the next Step-27 attempt if the app exits without a managed report. It is diagnostic only and is never consumed as trusted runtime input.
+
+- `docs/history/reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt` — physical 0.0.89 durable crash breadcrumb localizing abrupt termination to Gate S / S1 inside `PatchProcessor.AddPrefix(MethodInfo)` before the first `Patch()` call.

@@ -140,3 +140,7 @@ Step 27.0.2 failed safely at Gate O before AccessTools execution or patching. It
 ## Step 27.0.5 crash-localization note
 
 Physical 0.0.88 produced intermittent abrupt termination around N–Q without a managed report, plus one expected Gate-A stale-process rejection after a prior Step-27 context had already been loaded. Step 27.0.5 / 0.0.89 keeps A–Z unchanged but adds a synchronously flushed crash checkpoint at every gate transition and sensitive O/R/S/T substages. Gate O no longer invokes the reflected `RuntimeInformation.FrameworkDescription` getter; Gate R owns that first reflected execution immediately before AccessTools type initialization. The first patch remains Gate T.
+
+## Step 27.0.6 / 0.0.90
+
+Physical 0.0.89 crash checkpoint localized hard termination to Gate S/S1 inside `AddPrefix(MethodInfo)`. The next candidate keeps AddPrefix as exact Cecil-audited reference behavior but does not invoke it for the annotation-free launcher prefix. Gate S instead builds the equivalent descriptor via exact `HarmonyMethod()`, verifies default state, assigns only `method`, and assigns only `PatchProcessor.prefix`; Gate T remains the first actual patch call.

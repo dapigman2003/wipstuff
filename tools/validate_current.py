@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>89</ApplicationVersion>" in project_text, "build version is 89")
-require("<ApplicationDisplayVersion>0.0.89</ApplicationDisplayVersion>" in project_text, "display version is 0.0.89")
-require(plist.get("CFBundleVersion") == "89", "Info.plist build version is 89")
-require(plist.get("CFBundleShortVersionString") == "0.0.89", "Info.plist display version is 0.0.89")
+require("<ApplicationVersion>90</ApplicationVersion>" in project_text, "build version is 90")
+require("<ApplicationDisplayVersion>0.0.90</ApplicationDisplayVersion>" in project_text, "display version is 0.0.90")
+require(plist.get("CFBundleVersion") == "90", "Info.plist build version is 90")
+require(plist.get("CFBundleShortVersionString") == "0.0.90", "Info.plist display version is 0.0.90")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,13 +198,13 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.5 — CRASH-LOCALIZED LAUNCHER-OWNED HARMONY PATCH + UNPATCH" in release_presentation, "top launcher banner identifies active Step 27.0.5 candidate")
-require("Physical 0.0.88 produced unstable process termination around the N–Q region" in release_presentation and "Step27-CrashCheckpoint.txt" in release_presentation and "Gate O now performs admission/resolution only" in release_presentation and "Gate R owns that first reflected getter invocation" in release_presentation, "top launcher banner short description matches current physical frontier")
+require("STEP 27.0.6 — BOUNDED iOS HARMONY PREFIX-DESCRIPTOR REGISTRATION" in release_presentation, "top launcher banner identifies active Step 27.0.6 candidate")
+require("Physical 0.0.89 crash telemetry localized the abrupt iOS termination to Gate S" in release_presentation and "HarmonyMethod()" in release_presentation and "AddPrefix(MethodInfo)" in release_presentation and "PatchProcessor.Patch() remains Gate T" in release_presentation, "top launcher banner short description matches current physical frontier")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
 require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
-require("STEP 27.0.4 —" not in release_presentation and "Step 27.0.4 is the active" not in release_presentation, "stale prior Step-27 candidate banner identity is removed")
+require("STEP 27.0.5 —" not in release_presentation and "0.0.89 is the crash-localization candidate" not in release_presentation, "stale prior Step-27 candidate banner identity is removed")
 
 # ---------------------------------------------------------------------------
 # Physically proven runtime/build policy
@@ -335,8 +335,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.89",
-    "STS2_BUILD_VERSION": "89",
+    "STS2_DISPLAY_VERSION": "0.0.90",
+    "STS2_BUILD_VERSION": "90",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -900,7 +900,9 @@ for required in [
     'GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)',
     'typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Target)',
     'typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Prefix)',
-    'patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])',
+    'patchApi.HarmonyMethodDefaultConstructor.Invoke([])',
+    'patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)',
+    'patchApi.PrefixField.SetValue(processor, descriptor)',
     'patchApi.PatchMethod.Invoke(processor, null)',
     'patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])',
     'probe.Target.Invoke(null, [41])',
@@ -909,7 +911,9 @@ for required in [
     require(required in step27_source, f"Step 27 production boundary contains required invariant: {required}")
 require(step27_source.count("api.Constructor.Invoke([HarmonyId])") == 1, "Step 27 replays exactly one inert Harmony(string) constructor invocation")
 require(step27_source.count("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [probe.Method])") == 1, "Step 27 replays exactly one empty CreateProcessor(MethodBase) invocation")
-require(step27_source.count("patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])") == 1, "Step 27 has exactly one intentional AddPrefix(MethodInfo) invocation")
+require(step27_source.count("patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])") == 0, "Step 27 does not invoke the physically crashing AddPrefix(MethodInfo) wrapper")
+require(step27_source.count("patchApi.HarmonyMethodDefaultConstructor.Invoke([])") == 1, "Step 27 has exactly one bounded HarmonyMethod() descriptor construction")
+require(step27_source.count("patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)") == 1 and step27_source.count("patchApi.PrefixField.SetValue(processor, descriptor)") == 1, "Step 27 bounded descriptor path performs exactly one method assignment and one processor-prefix assignment")
 require(step27_source.count("patchApi.PatchMethod.Invoke(processor, null)") == 1, "Step 27 has exactly one intentional PatchProcessor.Patch() invocation")
 require(step27_source.count("patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])") == 1, "Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation")
 require(step27_source.count("probe.Target.Invoke(null, [41])") == 3, "Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates")
@@ -931,6 +935,7 @@ require("Interlocked.Increment(ref _targetCalls)" in step27_probe and "Interlock
 require("OrderedHarmonyPatchExecutionGatesReachTwentySixOfTwentySixPass" in step27_tests and "HarmonyPatchExecutionGatesStopAfterFirstFailure" in step27_tests, "Step 27 host tests enforce ordered fail-fast twenty-six-gate behavior")
 require("SyntheticStep26ReplayThroughEmptyProcessorStillPassesBeforePatchBoundary" in step27_tests and "RunPostProcessorAuditAsync" in step27_tests, "Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary")
 require("LauncherPatchProbeHasDeterministicOriginalAndPrefixBehavior" in step27_tests and "LauncherPatchProbeReflectionSurfaceIsExactAndLauncherOwned" in step27_tests, "Step 27 host tests cover exact launcher patch-probe behavior and signature metadata")
+require("LauncherPatchPrefixCarriesNoHarmonyAnnotationsSoBoundedDescriptorPathIsEquivalent" in step27_tests, "Step 27 host tests require zero Harmony annotations for the bounded descriptor substitution")
 require("AccessToolsMetadataAuditAcceptsOnlyExactMeasuredRuntimeDetectionCacheInitializer" in step27_tests and "WriteAccessToolsFixture" in step27_tests, "Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape")
 require("wrongThrowOnError" in step27_tests and "expected false then false" in step27_tests and "wrongThrowOnError ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0" in step27_tests, "Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands")
 require("wrongLockRecursion" in step27_tests and "expected SupportsRecursion (1)" in step27_tests and "wrongLockRecursion ? OpCodes.Ldc_I4_0 : OpCodes.Ldc_I4_1" in step27_tests, "Step 27 host tests reject drift in the physical ReaderWriterLockSlim SupportsRecursion operand")
@@ -949,7 +954,9 @@ gate_r_start = step27_source.index("public ControlledHarmonyPatchExecutionGateRe
 gate_r_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(", gate_r_start)
 gate_r_body = step27_source[gate_r_start:gate_r_end]
 require("patchApi.RuntimeFrameworkDescriptionProperty.GetValue(null)" in gate_r_body and all(marker in gate_r_body for marker in ["R1 —", "R2 —", "R3 —"]), "Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages")
-require(all(marker in step27_source for marker in ["S1 —", "S2 —", "T1 —", "T2 —"]), "Step 27 prefix-registration and first-patch reflection calls have durable pre/post crash substages")
+require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —"]), "Step 27 bounded prefix registration and first-patch calls have durable crash substages")
+require("defaultCtorIl.Count == 6" in step27_source and "Code.Ldc_I4_M1" in step27_source and "HarmonyMethod() no longer matches exact priority=-1" in step27_source, "Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape")
+require("harmonyAnnotations.Length != 0" in step27_source and "HarmonyMethod(MethodInfo)/ImportMethod invoked: NO" in step27_source and "PatchProcessor.AddPrefix invoked: NO" in step27_source, "Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
 
 step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
@@ -998,6 +1005,8 @@ required_docs = [
     "docs/history/steps/STEP-27.0.3-ACCESSTOOLS-PHYSICAL-FINGERPRINT-CORRECTION.md",
     "docs/history/steps/STEP-27.0.4-ACCESSTOOLS-OPERAND-ATTRIBUTION-CORRECTION.md",
     "docs/history/steps/STEP-27.0.5-CRASH-LOCALIZATION-AND-GATE-O-PURITY.md",
+    "docs/history/steps/STEP-27.0.6-BOUNDED-IOS-PREFIX-DESCRIPTOR-REGISTRATION.md",
+    "docs/history/reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt",
     "docs/history/reports/STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt",
     "docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt",
     "docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt",
@@ -1036,8 +1045,10 @@ require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 14/
 require("expected true then false" in step27_build87_report and "Blocking AccessTools initializer hazards: 1" in step27_build87_report, "physical build 87 report preserves the operand-attribution failure that motivated Step 27.0.4")
 step27_build88_guard_report = read("docs/history/reports/STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt")
 require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 0/26" in step27_build88_guard_report and "first failure: InitializationPreflight" in step27_build88_guard_report and "already loaded: sts2" in step27_build88_guard_report, "physical build 88 report preserves the expected stale-process Gate-A rejection")
+step27_build89_checkpoint = read("docs/history/reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt")
+require("Gate: S — PrefixRegistration" in step27_build89_checkpoint and "S1 — entering exact PatchProcessor.AddPrefix(MethodInfo) reflection invocation" in step27_build89_checkpoint, "physical build 89 crash checkpoint localizes abrupt termination inside AddPrefix before S2/Patch()")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.85 (85)" in current_status and "0.0.86 (86)" in current_status and "0.0.87 (87)" in current_status and "14/26" in current_status and "0.0.88 (88)" in current_status and "abrupt app termination" in current_status and "0.0.89 (89)" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.5 / 0.0.89 crash localization")
+require("Steps 01–26" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.89 (89)" in current_status and "Gate-S hard crash localized" in current_status and "0.0.90 (90)" in current_status and "HarmonyMethod()" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.6 / 0.0.90 bounded descriptor registration")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

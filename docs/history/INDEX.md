@@ -77,3 +77,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-27.0.4-ACCESSTOOLS-OPERAND-ATTRIBUTION-CORRECTION.md` — 0.0.88 pins false/false Type.GetType operands plus SupportsRecursion (1) for the lock constructor without moving the AccessTools or patch execution gates.
 - `reports/STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt` — physical 0.0.88 same-process retry was rejected safely at Gate A because the Step-27 `sts2`/Harmony context was already resident; user separately reported repeated abrupt termination around N–Q without a surviving managed report.
 - `steps/STEP-27.0.5-CRASH-LOCALIZATION-AND-GATE-O-PURITY.md` — 0.0.89 adds durable per-gate/substage crash checkpoints, corrects the force-quit rule to apply after Gate B starts, and moves reflected FrameworkDescription execution from Gate O into Gate R without changing the 26-gate patch objective.
+
+- `steps/STEP-27.0.6-BOUNDED-IOS-PREFIX-DESCRIPTOR-REGISTRATION.md` — 0.0.90 bounded descriptor path after physical 0.0.89 localized a hard crash inside AddPrefix.
+- `reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt` — raw durable 0.0.89 Gate-S/S1 crash checkpoint.

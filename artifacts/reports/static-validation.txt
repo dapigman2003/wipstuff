@@ -1,17 +1,5 @@
-StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-22T08:40:33Z
-Checking active shell syntax...
-PASS: shell syntax — scripts/build-godot.sh
-PASS: shell syntax — scripts/build-ios.sh
-PASS: shell syntax — scripts/codemagic.sh
-PASS: shell syntax — scripts/lib/current-release.sh
-PASS: shell syntax — scripts/preflight-godot-link.sh
-PASS: shell syntax — scripts/test.sh
-PASS: shell syntax — scripts/validate.sh
-PASS: shell syntax — scripts/verify-ipa.sh
-PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.89
+Root: /mnt/data/StS2Launcher-Step27-0.0.90
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 193 C# files
@@ -21,10 +9,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 89
-PASS: display version is 0.0.89
-PASS: Info.plist build version is 89
-PASS: Info.plist display version is 0.0.89
+PASS: build version is 90
+PASS: display version is 0.0.90
+PASS: Info.plist build version is 90
+PASS: Info.plist display version is 0.0.90
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,7 +20,7 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.5 candidate
+PASS: top launcher banner identifies active Step 27.0.6 candidate
 PASS: top launcher banner short description matches current physical frontier
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: RootViewController consumes the single current-release presentation source
@@ -488,14 +476,18 @@ PASS: Step 27 production boundary contains required invariant: GetField("prefix"
 PASS: Step 27 production boundary contains required invariant: GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
 PASS: Step 27 production boundary contains required invariant: typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Target)
 PASS: Step 27 production boundary contains required invariant: typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Prefix)
-PASS: Step 27 production boundary contains required invariant: patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])
+PASS: Step 27 production boundary contains required invariant: patchApi.HarmonyMethodDefaultConstructor.Invoke([])
+PASS: Step 27 production boundary contains required invariant: patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)
+PASS: Step 27 production boundary contains required invariant: patchApi.PrefixField.SetValue(processor, descriptor)
 PASS: Step 27 production boundary contains required invariant: patchApi.PatchMethod.Invoke(processor, null)
 PASS: Step 27 production boundary contains required invariant: patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])
 PASS: Step 27 production boundary contains required invariant: probe.Target.Invoke(null, [41])
 PASS: Step 27 production boundary contains required invariant: HarmonyPatchProbe.Target(41)
 PASS: Step 27 replays exactly one inert Harmony(string) constructor invocation
 PASS: Step 27 replays exactly one empty CreateProcessor(MethodBase) invocation
-PASS: Step 27 has exactly one intentional AddPrefix(MethodInfo) invocation
+PASS: Step 27 does not invoke the physically crashing AddPrefix(MethodInfo) wrapper
+PASS: Step 27 has exactly one bounded HarmonyMethod() descriptor construction
+PASS: Step 27 bounded descriptor path performs exactly one method assignment and one processor-prefix assignment
 PASS: Step 27 has exactly one intentional PatchProcessor.Patch() invocation
 PASS: Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation
 PASS: Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates
@@ -519,6 +511,7 @@ PASS: Step 27 launcher probe records target/prefix execution separately
 PASS: Step 27 host tests enforce ordered fail-fast twenty-six-gate behavior
 PASS: Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary
 PASS: Step 27 host tests cover exact launcher patch-probe behavior and signature metadata
+PASS: Step 27 host tests require zero Harmony annotations for the bounded descriptor substitution
 PASS: Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape
 PASS: Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands
 PASS: Step 27 host tests reject drift in the physical ReaderWriterLockSlim SupportsRecursion operand
@@ -530,7 +523,9 @@ PASS: Step 27 Gate O pins the physical RuntimeInformation Type.GetType operands 
 PASS: Step 27 Gate O resolves FrameworkDescription metadata without invoking the reflected getter
 PASS: Step 27 Gate O exposes nine durable crash-localization substages
 PASS: Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages
-PASS: Step 27 prefix-registration and first-patch reflection calls have durable pre/post crash substages
+PASS: Step 27 bounded prefix registration and first-patch calls have durable crash substages
+PASS: Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape
+PASS: Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path
 PASS: Step 27 host tests retain synthetic runtime identity isolation
 PASS: Step 27 candidate boundary hash manifest exists
 PASS: Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned
@@ -571,6 +566,8 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.2-ACCESST
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.3-ACCESSTOOLS-PHYSICAL-FINGERPRINT-CORRECTION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.4-ACCESSTOOLS-OPERAND-ATTRIBUTION-CORRECTION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.5-CRASH-LOCALIZATION-AND-GATE-O-PURITY.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.6-BOUNDED-IOS-PREFIX-DESCRIPTOR-REGISTRATION.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt
@@ -598,7 +595,8 @@ PASS: physical build 86 report preserves the single newly exposed ldc.i4.1 and c
 PASS: physical build 87 report preserves the exact Gate-O 14/26 stable instruction-count evidence
 PASS: physical build 87 report preserves the operand-attribution failure that motivated Step 27.0.4
 PASS: physical build 88 report preserves the expected stale-process Gate-A rejection
-PASS: current status preserves Step 27 evidence and advances to Step 27.0.5 / 0.0.89 crash localization
+PASS: physical build 89 crash checkpoint localizes abrupt termination inside AddPrefix before S2/Patch()
+PASS: current status preserves Step 27 evidence and advances to Step 27.0.6 / 0.0.90 bounded descriptor registration
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -661,4 +659,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 647 checks
+VALIDATION PASS: 657 checks

@@ -207,6 +207,24 @@ public sealed class ControlledHarmonyPatchExecutionTests
     }
 
     [TestMethod]
+    public void LauncherPatchPrefixCarriesNoHarmonyAnnotationsSoBoundedDescriptorPathIsEquivalent()
+    {
+        var prefix = typeof(HarmonyPatchProbe).GetMethod(
+            nameof(HarmonyPatchProbe.Prefix),
+            BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+            ?? throw new AssertFailedException("Launcher prefix MethodInfo is missing.");
+
+        var harmonyAnnotations = prefix.GetCustomAttributesData()
+            .Where(attribute =>
+                string.Equals(attribute.AttributeType.Namespace, "HarmonyLib", StringComparison.Ordinal) ||
+                string.Equals(attribute.AttributeType.Assembly.GetName().Name, "0Harmony", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
+        Assert.AreEqual(0, harmonyAnnotations.Length,
+            "The Step-27 bounded HarmonyMethod() descriptor path is admitted only while the launcher prefix has zero Harmony annotations.");
+    }
+
+    [TestMethod]
     public async Task GateARejectsReachablePInvokeBeforeAnyStep27ClrLoad()
     {
         var names = CreateNames();

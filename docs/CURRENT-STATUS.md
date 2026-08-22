@@ -28,7 +28,11 @@ The user observed repeated abrupt app termination around the **N–Q** region wi
 
 The 0.0.88 observation does **not** revoke the earlier 0.0.84 A–Q success; it shows that the current expanded Gate-O path needs better crash attribution before we infer a new runtime boundary.
 
-## Active candidate — Step 27.0.5 / 0.0.89 (89)
+### 0.0.89 (89) — Gate-S hard crash localized
+
+Physical Step 27.0.5 crash telemetry finally localized the abrupt termination. The last synchronously flushed checkpoint was **Gate S / PrefixRegistration / S1**, immediately after entering exact `PatchProcessor.AddPrefix(MethodInfo)` reflection invocation and before S2 could record a return. Therefore Gate R had completed far enough for Gate S to begin, and Gate T (`PatchProcessor.Patch()`) was still not reached. The crash is inside the AddPrefix convenience path, whose measured body constructs `HarmonyMethod(MethodInfo)` and stores it into `PatchProcessor.prefix`.
+
+## Active candidate — Step 27.0.6 / 0.0.90 (90)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -63,7 +67,7 @@ Gate R now owns the first **reflected execution** of the preserved `RuntimeInfor
 
 ### Gates S–Z
 
-S registers the exact launcher prefix descriptor without patching and has pre/post invocation breadcrumbs. T remains the first real `PatchProcessor.Patch()` call and has pre/post invocation breadcrumbs. U audits before patched execution. V proves patched behavior. W exactly unpatches. X audits. Y proves restored behavior. Z performs final hashes/OfflineReady/context/native isolation.
+S no longer invokes the physically crashing `AddPrefix(MethodInfo)` wrapper. Gate O still audits its exact six-instruction reference behavior. Because the launcher prefix is required to carry zero Harmony annotations, S uses the bounded equivalent descriptor path: exact `HarmonyMethod()` construction, require `priority=-1` and `method=null`, assign only `HarmonyMethod.method` to the exact launcher Prefix `MethodInfo`, then assign only `PatchProcessor.prefix`. S1–S5 checkpoint each operation. T remains the first real `PatchProcessor.Patch()` call and has pre/post invocation breadcrumbs. U audits before patched execution. V proves patched behavior. W exactly unpatches. X audits. Y proves restored behavior. Z performs final hashes/OfflineReady/context/native isolation.
 
 ## Fresh-process rule
 
@@ -73,4 +77,4 @@ If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting anoth
 
 ## Acceptance
 
-Codemagic + host tests + publish + IPA verification PASS; install `0.0.89 (89)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic + host tests + publish + IPA verification PASS; install `0.0.90 (90)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
