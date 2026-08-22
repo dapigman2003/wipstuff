@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>86</ApplicationVersion>" in project_text, "build version is 86")
-require("<ApplicationDisplayVersion>0.0.86</ApplicationDisplayVersion>" in project_text, "display version is 0.0.86")
-require(plist.get("CFBundleVersion") == "86", "Info.plist build version is 86")
-require(plist.get("CFBundleShortVersionString") == "0.0.86", "Info.plist display version is 0.0.86")
+require("<ApplicationVersion>87</ApplicationVersion>" in project_text, "build version is 87")
+require("<ApplicationDisplayVersion>0.0.87</ApplicationDisplayVersion>" in project_text, "display version is 0.0.87")
+require(plist.get("CFBundleVersion") == "87", "Info.plist build version is 87")
+require(plist.get("CFBundleShortVersionString") == "0.0.87", "Info.plist display version is 0.0.87")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -194,6 +194,16 @@ ios_cs = list((ROOT / "src/StS2Launcher.iOS").rglob("*.cs"))
 ios_text = "\n".join(p.read_text() for p in ios_cs)
 require("StS2Launcher.Step05.iOS" not in ios_text, "live iOS source contains no legacy Step05 namespace")
 require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonical namespace")
+
+release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
+require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
+release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
+require("STEP 27.0.3 — CONTROLLED LAUNCHER-OWNED HARMONY PATCH + UNPATCH" in release_presentation, "top launcher banner identifies active Step 27.0.3 candidate")
+require("Physical 0.0.86 stopped safely at Gate O" in release_presentation and "57 instructions" in release_presentation and "Gate T as the first PatchProcessor.Patch() boundary" in release_presentation, "top launcher banner short description matches current physical frontier")
+require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
+root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
+require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
+require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
 
 # ---------------------------------------------------------------------------
 # Physically proven runtime/build policy
@@ -324,8 +334,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.86",
-    "STS2_BUILD_VERSION": "86",
+    "STS2_DISPLAY_VERSION": "0.0.87",
+    "STS2_BUILD_VERSION": "87",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -916,11 +926,13 @@ require("OrderedHarmonyPatchExecutionGatesReachTwentySixOfTwentySixPass" in step
 require("SyntheticStep26ReplayThroughEmptyProcessorStillPassesBeforePatchBoundary" in step27_tests and "RunPostProcessorAuditAsync" in step27_tests, "Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary")
 require("LauncherPatchProbeHasDeterministicOriginalAndPrefixBehavior" in step27_tests and "LauncherPatchProbeReflectionSurfaceIsExactAndLauncherOwned" in step27_tests, "Step 27 host tests cover exact launcher patch-probe behavior and signature metadata")
 require("AccessToolsMetadataAuditAcceptsOnlyExactMeasuredRuntimeDetectionCacheInitializer" in step27_tests and "WriteAccessToolsFixture" in step27_tests, "Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape")
+require("wrongThrowOnError" in step27_tests and "expected true then false" in step27_tests and "OpCodes.Ldc_I4_1" in step27_tests, "Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType throwOnError operands")
 require("Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH" in step27_tests, "Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression")
 step27_preservation = read("src/StS2Launcher.iOS/Platform/Step27AccessToolsFrameworkPreservation.cs")
 require("typeof(RuntimeInformation)" in step27_preservation and "typeof(PropertyInfo)" in step27_preservation and "typeof(Dictionary<,>)" in step27_preservation and "typeof(ReaderWriterLockSlim)" in step27_preservation, "Step 27 preserves only the bounded framework surface measured in AccessTools::.cctor")
 require("Step27AccessToolsFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs"), "Step 27 roots the AccessTools DynamicDependency preservation anchor from candidate-owned UI")
-require("cctor.Body.Instructions.Count != 56" in step27_source and "Exact Step 27.0.1 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 56-instruction AccessTools fingerprint and framework preflight")
+require("cctor.Body.Instructions.Count != 57" in step27_source and "[Code.Ldc_I4_1] = 1" in step27_source and "Exact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight")
+require("expected true then false" in step27_source and "typedGetTypeCalls[0].Previous" in step27_source and "typedGetTypeCalls[1].Previous" in step27_source, "Step 27 Gate O pins the physical RuntimeInformation Type.GetType throwOnError operands semantically")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
 
 step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
@@ -966,8 +978,10 @@ required_docs = [
     "docs/history/steps/STEP-27-CONTROLLED-LAUNCHER-HARMONY-PATCH.md",
     "docs/history/steps/STEP-27.0.1-ACCESSTOOLS-TYPE-INITIALIZATION-BOUNDARY.md",
     "docs/history/steps/STEP-27.0.2-ACCESSTOOLS-MEASURED-INITIALIZER-PRESERVATION.md",
+    "docs/history/steps/STEP-27.0.3-ACCESSTOOLS-PHYSICAL-FINGERPRINT-CORRECTION.md",
     "docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt",
     "docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt",
+    "docs/history/reports/STEP-27.0.2-PHYSICAL-GATE-O-REPORT.txt",
     "docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt",
     "docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt",
     "docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt",
@@ -993,8 +1007,11 @@ require("TypeInitialization_Type, HarmonyLib.AccessTools" in step27_build84_repo
 step27_build85_report = read("docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt")
 require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 14/26" in step27_build85_report and "Gate O — HarmonyPatchApiResolution: FAIL" in step27_build85_report and "Blocking AccessTools initializer hazards: 46" in step27_build85_report, "physical build 85 report preserves the exact Gate-O 14/26 metadata result")
 require("System.Runtime.InteropServices.RuntimeInformation" in step27_build85_report and "ReaderWriterLockSlim" in step27_build85_report and "addHandlerCache" in step27_build85_report, "physical build 85 report preserves the measured AccessTools runtime-detection/cache surface")
+step27_build86_report = read("docs/history/reports/STEP-27.0.2-PHYSICAL-GATE-O-REPORT.txt")
+require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 14/26" in step27_build86_report and "Gate O — HarmonyPatchApiResolution: FAIL" in step27_build86_report and "Type initializer instructions: 57 (expected 56)" in step27_build86_report, "physical build 86 report preserves the exact Gate-O 14/26 corrected instruction-count evidence")
+require("contains unexpected opcode Ldc_I4_1 (1 occurrence(s))" in step27_build86_report and "Gate R explicitly" in step27_build86_report, "physical build 86 report preserves the single newly exposed ldc.i4.1 and confirms no later gate ran")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.85 (85)" in current_status and "14/26" in current_status and "0.0.86 (86)" in current_status and "26/26 PASS" in current_status and "56 instructions" in current_status and "AccessToolsTypeInitialization" in current_status and "Step 28" in current_status, "current status preserves both physical Step 27 results and advances to Step 27.0.2 / 0.0.86 with the measured AccessTools initializer")
+require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.85 (85)" in current_status and "0.0.86 (86)" in current_status and "14/26" in current_status and "0.0.87 (87)" in current_status and "57 instructions" in current_status and "throwOnError=true" in current_status and "AccessToolsTypeInitialization" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves all Step 27 physical evidence and advances to Step 27.0.3 / 0.0.87 with the corrected AccessTools fingerprint")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

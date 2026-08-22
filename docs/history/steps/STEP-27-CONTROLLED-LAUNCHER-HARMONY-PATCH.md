@@ -130,4 +130,9 @@ The next candidate does not weaken prefix or patch policy. It first metadata-aud
 
 ## Physical metadata refinement — 0.0.85 (85)
 
-Step 27.0.1 failed at Gate O before AccessTools execution, measuring the real 56-instruction AccessTools runtime-detection/cache initializer. This does not supersede build 84's A–Q execution evidence; it corrects the preflight model used before the explicit AccessTools gate. Step 27.0.2 / 0.0.86 pins the measured initializer and its bounded trimming-preservation needs before retrying Gate R.
+Step 27.0.1 failed at Gate O before AccessTools execution and exposed the real AccessTools runtime-detection/cache surface. The 0.0.86 candidate initially interpreted that evidence as a 56-instruction fingerprint; physical build 86 later corrected the count to 57. This does not supersede build 84's A–Q execution evidence; it records how the preflight model was refined before the explicit AccessTools gate.
+
+
+## Physical fingerprint refinement — 0.0.86 (86)
+
+Step 27.0.2 failed safely at Gate O before AccessTools execution or patching. Its stricter opcode audit corrected the prior 56-instruction interpretation: the receipt-backed initializer is 57 instructions and includes one required `ldc.i4.1`. Step 27.0.3 / 0.0.87 pins that constant semantically as `throwOnError=true` for the first `RuntimeInformation` `Type.GetType(string,bool)` call, while the second uses `false`. Gate R remains the explicit AccessTools initializer and Gate T remains the first patch call.

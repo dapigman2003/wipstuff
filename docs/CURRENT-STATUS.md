@@ -10,22 +10,17 @@
 
 Physical Step 27.0 reached **17/25**: Gates A–Q PASS, Gate R PrefixRegistration FAIL. `HarmonyMethod(MethodInfo)` implicitly triggered `HarmonyLib.AccessTools::.cctor`, which threw before any `PatchProcessor.Patch()` call. This remains the furthest Step-27 execution evidence.
 
-### 0.0.85 (85) — metadata correction evidence
+### 0.0.85 (85) — first AccessTools metadata correction
 
-Physical Step 27.0.1 reached **14/26** and failed safely at **Gate O — HarmonyPatchApiResolution** before AccessTools initialization. The new Cecil audit proved the earlier BindingFlags-only model was wrong and measured the real AccessTools initializer:
+Physical Step 27.0.1 reached **14/26** and failed safely at **Gate O — HarmonyPatchApiResolution** before AccessTools initialization. It disproved the original BindingFlags-only model and exposed the real runtime-detection/cache surface: `allTypesCached`, exact `all` / `allDeclared`, `Mono.Runtime`, string/reflection access to `RuntimeInformation.FrameworkDescription`, an add-handler dictionary, and `ReaderWriterLockSlim`.
 
-- 56 instructions, zero locals/handlers;
-- `allTypesCached = null`;
-- exact `all=15420` and `allDeclared=15422` BindingFlags initialization;
-- `Mono.Runtime` probe;
-- string lookup of `System.Runtime.InteropServices.RuntimeInformation`;
-- reflected `FrameworkDescription` checks for legacy `.NET Framework` / `.NET Core` classification;
-- `Dictionary<Type, HarmonyLib.FastInvokeHandler>` construction;
-- `ReaderWriterLockSlim(LockRecursionPolicy)` construction.
+### 0.0.86 (86) — exact physical fingerprint correction
 
-Gate R did not run in build 85 and no patch was installed.
+Physical Step 27.0.2 again reached **14/26** and failed safely at **Gate O**, before AccessTools initialization or patching. The tightened audit showed that the previous candidate's 56-instruction interpretation was off by one instruction. The receipt-backed `AccessTools::.cctor` is **57 instructions**, with one required `ldc.i4.1` in addition to the already-measured surface. That constant supplies `throwOnError=true` to the first `Type.GetType("System.Runtime.InteropServices.RuntimeInformation", bool)` probe; the second corresponding probe uses `false`.
 
-## Active candidate — Step 27.0.2 / 0.0.86 (86)
+No Gate R execution occurred in build 86 and no patch was installed.
+
+## Active candidate — Step 27.0.3 / 0.0.87 (87)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -39,7 +34,7 @@ Replay the physically closed Step 26 chain exactly.
 
 ### Gate O — HarmonyPatchApiResolution
 
-Metadata-audit exact patch APIs plus the exact physically measured AccessTools runtime-detection/cache initializer. Require the 56-instruction fingerprint, exact fields/opcodes/strings/calls/stores, exact BindingFlags values, and no P/Invoke/handlers/locals. Before AccessTools executes, prove `RuntimeInformation` resolves by Harmony's exact string and that `FrameworkDescription`, `Dictionary<,>()`, and `ReaderWriterLockSlim(LockRecursionPolicy)` survived trimming. Do not read AccessTools static state or construct a HarmonyMethod.
+Metadata-audit exact patch APIs plus the exact physically measured AccessTools runtime-detection/cache initializer. Require the **57-instruction** fingerprint, exact fields/opcodes/strings/calls/stores, exact BindingFlags values, zero P/Invoke/handlers/locals, and exact `Type.GetType(string,bool)` control operands: first `true`, second `false`. Before AccessTools executes, prove `RuntimeInformation` resolves by Harmony's exact string and that `FrameworkDescription`, `Dictionary<,>()`, and `ReaderWriterLockSlim(LockRecursionPolicy)` survived trimming. Do not read AccessTools static state or construct a HarmonyMethod.
 
 ### Gates P–Q
 
@@ -63,6 +58,6 @@ S registers the exact launcher prefix descriptor without patching. T is the firs
 
 ## Acceptance
 
-Fresh process: Codemagic + host tests + publish + IPA verification PASS; install `0.0.86 (86)`; run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS.
+Fresh process: Codemagic + host tests + publish + IPA verification PASS; install `0.0.87 (87)`; run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS.
 
 If Gate T or later runs, force-quit before retrying. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary; Android reference repositories remain advisory only and every target must be re-verified against the exact receipt-backed payload.

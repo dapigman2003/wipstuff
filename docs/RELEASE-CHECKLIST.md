@@ -1,21 +1,24 @@
-# Release Checklist — Step 27.0.2
+# Release Checklist — Step 27.0.3
 
 ## Source / policy
 
 - Steps 01–26 remain closed/protected.
 - Preserve physical Step 27.0 / 0.0.84 A–Q PASS / 17/25 evidence.
 - Preserve physical Step 27.0.1 / 0.0.85 Gate-O 14/26 metadata evidence.
-- Step 27.0.2 changes only the AccessTools measured metadata policy, bounded framework-preservation anchor, and associated diagnostics/tests; the launcher-only patch boundary is unchanged.
+- Preserve physical Step 27.0.2 / 0.0.86 Gate-O 14/26 corrected-fingerprint evidence.
+- Step 27.0.3 changes only the exact AccessTools physical fingerprint, associated diagnostics/tests, release identity, and the top-of-app current-candidate presentation; the launcher-only patch boundary is unchanged.
 - No protected Step 23/24/25/26 behavior file is edited.
 - `TrimMode=full`, `MtouchInterpreter=-all`, established roots/preservation policies remain active.
 - StS2 reflection/patching/invocation, broad Harmony discovery, Godot startup, native game libraries remain absent.
 
-## Build identity
+## Build identity / visible app identity
 
-- version: `0.0.86 (86)`
+- version: `0.0.87 (87)`
 - workflow: `ios-step-27`
 - IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 - TRX: `artifacts/test-results/step27.trx`
+- top launcher banner: **Step 27.0.3**, bundle-derived **Version 0.0.87**, current short description/status; no stale Step-26 banner text.
+- static validation must enforce the current top-banner step/summary and the bundle-derived version binding on every candidate.
 
 ## Authority
 

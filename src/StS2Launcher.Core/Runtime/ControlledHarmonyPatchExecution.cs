@@ -2693,8 +2693,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         var cctor = typeInitializers[0];
         if (cctor.IsPInvokeImpl || cctor.PInvokeInfo is not null || cctor.Body.ExceptionHandlers.Count != 0 || cctor.Body.Variables.Count != 0)
             hazards.Add("AccessTools type initializer contains P/Invoke, handlers, or locals outside the physically measured runtime-detection/cache shape.");
-        if (cctor.Body.Instructions.Count != 56)
-            hazards.Add($"AccessTools type initializer instruction count changed: observed {cctor.Body.Instructions.Count}, expected 56.");
+        if (cctor.Body.Instructions.Count != 57)
+            hazards.Add($"AccessTools type initializer instruction count changed: observed {cctor.Body.Instructions.Count}, expected 57.");
 
         var expectedOpcodeCounts = new Dictionary<Code, int>
         {
@@ -2705,6 +2705,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             [Code.Ldc_I4_2] = 1,
             [Code.Or] = 1,
             [Code.Ldc_I4_0] = 5,
+            [Code.Ldc_I4_1] = 1,
             [Code.Ldstr] = 7,
             [Code.Call] = 6,
             [Code.Callvirt] = 6,
@@ -2767,6 +2768,18 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         if (!observedMethodOperands.SequenceEqual(expectedMethodOperands, StringComparer.Ordinal))
             hazards.Add("AccessTools::.cctor call/newobj surface changed: " + FormatNames(observedMethodOperands));
 
+        var typedGetTypeCalls = cctor.Body.Instructions
+            .Where(instruction => instruction.OpCode.Code == Code.Call &&
+                instruction.Operand is MethodReference method &&
+                method.FullName.Equals("System.Type System.Type::GetType(System.String,System.Boolean)", StringComparison.Ordinal))
+            .ToArray();
+        if (typedGetTypeCalls.Length != 2 ||
+            typedGetTypeCalls[0].Previous is null || !TryGetLdcI4Value(typedGetTypeCalls[0].Previous, out var firstThrowOnError) || firstThrowOnError != 1 ||
+            typedGetTypeCalls[1].Previous is null || !TryGetLdcI4Value(typedGetTypeCalls[1].Previous, out var secondThrowOnError) || secondThrowOnError != 0)
+        {
+            hazards.Add("AccessTools::.cctor RuntimeInformation Type.GetType throwOnError operands changed; expected true then false.");
+        }
+
         var expectedStores = new[]
         {
             "System.Type[] HarmonyLib.AccessTools::allTypesCached",
@@ -2814,13 +2827,13 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         var detail =
             "Type: HarmonyLib.AccessTools — exact public static class\n" +
             $"Type initializer count: {typeInitializers.Length:N0}\n" +
-            $"Type initializer instructions: {cctor.Body.Instructions.Count:N0} (expected 56)\n" +
+            $"Type initializer instructions: {cctor.Body.Instructions.Count:N0} (expected 57)\n" +
             $"AccessTools.all expected BindingFlags value: {expectedAll}\n" +
             $"AccessTools.allDeclared expected BindingFlags value: {expectedAllDeclared}\n" +
             "Measured runtime probes: Mono.Runtime + RuntimeInformation.FrameworkDescription (.NET Framework / .NET Core legacy classification)\n" +
             "Measured cache initialization: allTypesCached=null + Dictionary<Type,FastInvokeHandler> + ReaderWriterLockSlim\n" +
             $"Blocking AccessTools initializer hazards: {hazards.Count:N0}" +
-            (hazards.Count == 0 ? "\nExact Step 27.0.1 physical AccessTools initializer fingerprint: MATCH" : "\n" + string.Join("\n", hazards));
+            (hazards.Count == 0 ? "\nExact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" : "\n" + string.Join("\n", hazards));
         return new AccessToolsMetadataSnapshot(hazards.Count == 0, detail, FormatMethodAudit(cctor));
     }
 

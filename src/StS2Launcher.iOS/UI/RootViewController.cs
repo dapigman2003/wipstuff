@@ -217,22 +217,22 @@ public sealed partial class RootViewController : UIViewController
             UIColor.Label));
 
         content.AddArrangedSubview(Label(
-            "STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION",
+            CurrentReleasePresentation.StepTitle,
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Version 0.0.83",
+            $"Version {CurrentReleasePresentation.DisplayVersion}",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "STEPS 01–25 PHYSICALLY CLOSED • EMPTY PATCHPROCESSOR CREATION IS THE ONLY NEW HARMONY EXECUTION BOUNDARY",
+            CurrentReleasePresentation.MilestoneLine,
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
 
         content.AddArrangedSubview(Label(
-            "Step 25.0.2 is physically closed: all nine controlled Harmony API/type-initialization/instance-construction gates passed on iPhone, followed by OfflineReady PASS and Foundation 5/5. The bounded Step-25 DynamicDependency preservation for the measured Harmony(string) framework surface is therefore protected platform policy. Step 26 replays that exact closed state, then advances through exact Harmony.CreateProcessor/PatchProcessor metadata, the measured PatchProcessor locker type initializer, one launcher-owned inert MethodInfo, and construction of one empty PatchProcessor. Patch(), Harmony.Patch/PatchAll, HarmonyMethod creation, StS2 member reflection/invocation, Godot startup, and native game libraries remain out of scope.",
+            CurrentReleasePresentation.Summary,
             UIFont.SystemFontOfSize(15),
             UIColor.Label));
 
@@ -776,7 +776,7 @@ public sealed partial class RootViewController : UIViewController
         content.AddArrangedSubview(Separator());
 
         _statusLabel = Label(
-            "Status: Steps 01–25 are physically closed. Step 25.0.2 proved exact Harmony API resolution, explicit Harmony type initialization, and inert Harmony(string) construction on iPhone with OfflineReady and Foundation preserved. Step 26 is the active controlled empty PatchProcessor-creation candidate. Run Step 26 only in a fresh process; after Gate B, the private game/Harmony context remains resident until force-quit. Long results are written to Files under Documents/StS2Launcher/Reports.",
+            CurrentReleasePresentation.InitialStatus,
             UIFont.SystemFontOfSize(14),
             UIColor.Label);
         content.AddArrangedSubview(_statusLabel);
@@ -795,7 +795,7 @@ public sealed partial class RootViewController : UIViewController
 
         _uiStartupPassed = true;
         RefreshSavedSessionStatus();
-        Console.WriteLine("Step 25 controlled Harmony construction boundary: RootViewController.ViewDidLoad complete");
+        Console.WriteLine($"{CurrentReleasePresentation.StepTitle} / {CurrentReleasePresentation.DisplayVersion}: RootViewController.ViewDidLoad complete");
     }
 
     public void SetLifecycleState(string state)
