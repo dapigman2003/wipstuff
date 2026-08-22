@@ -144,3 +144,11 @@ Physical 0.0.88 produced intermittent abrupt termination around N–Q without a 
 ## Step 27.0.6 / 0.0.90
 
 Physical 0.0.89 crash checkpoint localized hard termination to Gate S/S1 inside `AddPrefix(MethodInfo)`. The next candidate keeps AddPrefix as exact Cecil-audited reference behavior but does not invoke it for the annotation-free launcher prefix. Gate S instead builds the equivalent descriptor via exact `HarmonyMethod()`, verifies default state, assigns only `method`, and assigns only `PatchProcessor.prefix`; Gate T remains the first actual patch call.
+
+## Step 27.0.7 / 0.0.91
+
+Physical 0.0.90 advanced through the bounded Gate-S descriptor path and hard-terminated after the Gate-T/T1 crash checkpoint entered the first exact public `PatchProcessor.Patch()` invocation. No T2 checkpoint or launcher-target invocation survived. This physically moves the frontier inside the patch engine but does not identify the failing internal operation.
+
+The 0.0.91 candidate keeps public `PatchProcessor.Patch()` as the acceptance boundary. Gate O adds receipt-backed audits for the exact HarmonySharedState -> MethodCreator -> MonoMod detour -> UpdatePatchInfo chain and bounded host Reflection.Emit/MethodHandle preservation. Gate T first makes HarmonySharedState initialization explicit at T1/T2, then invokes public Patch exactly once at T3/T4 and validates the replacement at T5. A hard stop can therefore distinguish shared-state initialization from the remaining replacement/detour path while still grouping related consecutive boundaries in one device run.
+
+The detailed candidate record is `STEP-27.0.7-HARMONY-SHARED-STATE-INITIALIZATION-AND-PATCH-ENGINE-PRESERVATION.md`. The master document is intentionally unchanged.

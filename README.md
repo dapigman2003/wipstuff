@@ -1,28 +1,26 @@
 # StS2 Launcher iOS — Step 27 Controlled Launcher-Owned Harmony Patch + Unpatch
 
-Steps 01–26 are physically closed. Step 27.0 / `0.0.84 (84)` remains the furthest clean Step-27 execution result at **17/25 (A–Q PASS)** before implicit `HarmonyLib.AccessTools` initialization failed. Builds `0.0.85`–`0.0.87` then safely refined the exact AccessTools metadata fingerprint.
-
-Physical `0.0.88 (88)` exposed repeated abrupt termination around N–Q plus one expected stale-process Gate-A rejection. Step 27.0.5 / `0.0.89 (89)` then added durable crash telemetry and localized the hard termination precisely to **Gate S / S1**, inside the exact `PatchProcessor.AddPrefix(MethodInfo)` reflection invocation and before the first `Patch()` call.
+Steps 01–26 are physically closed. Physical Step 27 builds progressively localized the iOS/AOT compatibility frontier: `0.0.89 (89)` hard-terminated inside `PatchProcessor.AddPrefix(MethodInfo)`, and `0.0.90 (90)` successfully bypassed only that annotation-import convenience path, reached **Gate T / T1**, then hard-terminated inside the first exact public `PatchProcessor.Patch()` invocation before the launcher target was invoked.
 
 ## Active candidate
 
-**Step 27.0.6 / `0.0.90 (90)`** keeps the same 26-gate launcher-only patch objective but replaces the physically crashing `AddPrefix(MethodInfo)` convenience path with an exact bounded descriptor-registration equivalent for the deliberately Harmony-annotation-free launcher prefix.
+**Step 27.0.7 / `0.0.91 (91)`** keeps the same 26-gate launcher-only patch objective and preserves A–S from 0.0.90. It decomposes the newly measured patch-engine frontier instead of bypassing it.
 
-- `Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt` is synchronously flushed at run start, every gate START/PASS/FAIL, ordinary gate progress, and sensitive O/R/S/T substages.
-- Gate O retains the exact 57-instruction AccessTools metadata fingerprint and bounded runtime reflection, but it no longer invokes `RuntimeInformation.FrameworkDescription` through `PropertyInfo.GetValue`.
-- Gate R now owns that first reflected getter invocation immediately before the explicit `RuntimeHelpers.RunClassConstructor(HarmonyLib.AccessTools.TypeHandle)` barrier.
-- Gate S does **not** invoke `AddPrefix(MethodInfo)` or `HarmonyMethod(MethodInfo)`. It constructs exact `HarmonyMethod()`, verifies `priority=-1`/`method=null`, assigns only the exact launcher Prefix `MethodInfo`, then assigns only `PatchProcessor.prefix`; S1–S5 are crash-checkpointed.
-- Gate T remains the first actual `PatchProcessor.Patch()` call.
-- The fresh-process rule is explicit: once Gate B starts, force-quit before every Step-27 retry, even if the run stops before patching.
-- The top launcher banner remains release-synchronized through `CurrentReleasePresentation` plus bundle-derived version text.
+- Gate O now audits the exact receipt-backed `HarmonySharedState -> MethodCreator -> MonoMod detour -> UpdatePatchInfo` chain in addition to the public patch surface and physically traversed AccessTools initializer.
+- Gate O also preflights only the bounded host `Reflection.Emit`/`RuntimeMethodHandle` members used by that audited post-publish code.
+- Gate T1/T2 explicitly initializes and validates `HarmonySharedState` (`internalVersion/actualVersion == 102`) before public patching, admitting only the exact Harmony/MonoMod runtime-generated singleton/proxy assembly names and rejecting any other context mutation.
+- Gate T3/T4 still invokes **exactly one** public `PatchProcessor.Patch()`; T5 validates the replacement and snapshots the exact resulting context state for U–Z. The launcher target is not invoked until Gate V.
+- `TrimMode=full` and `MtouchInterpreter=-all` remain unchanged; broad `UseInterpreter=true` and NativeAOT remain prohibited.
+- Crash checkpoints continue at every gate plus sensitive O/R/S/T substages.
+- The fresh-process rule remains mandatory after any attempt reaches Gate B.
 
-StS2 reflection/patching/invocation, broad Harmony discovery, Godot/game startup, and native game-library loading remain forbidden.
+StS2 reflection/patching/invocation, broad Harmony discovery, Godot/game startup, and native game-library loading remain forbidden. The master document is unchanged; current/candidate evidence is recorded in Step-27 status/history documents.
 
 ## Build
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.90 (90)`
+Expected app version: `0.0.91 (91)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 

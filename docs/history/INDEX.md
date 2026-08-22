@@ -80,3 +80,5 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `steps/STEP-27.0.6-BOUNDED-IOS-PREFIX-DESCRIPTOR-REGISTRATION.md` — 0.0.90 bounded descriptor path after physical 0.0.89 localized a hard crash inside AddPrefix.
 - `reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt` — raw durable 0.0.89 Gate-S/S1 crash checkpoint.
+- `reports/STEP-27.0.6-PHYSICAL-GATE-T-CRASH-CHECKPOINT.txt` — raw durable 0.0.90 Gate-T/T1 checkpoint proving the bounded descriptor path reached the first exact public `PatchProcessor.Patch()` invocation before abrupt termination and before launcher-target invocation.
+- `steps/STEP-27.0.7-HARMONY-SHARED-STATE-INITIALIZATION-AND-PATCH-ENGINE-PRESERVATION.md` — 0.0.91 decomposes the newly measured patch-engine frontier with explicit HarmonySharedState T1/T2, bounded dynamic-code preservation, then the unchanged single public Patch() acceptance call at T3/T4 with T5 validation.

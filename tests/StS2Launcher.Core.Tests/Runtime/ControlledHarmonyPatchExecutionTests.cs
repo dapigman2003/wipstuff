@@ -81,6 +81,23 @@ public sealed class ControlledHarmonyPatchExecutionTests
     }
 
     [TestMethod]
+    public void HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing()
+    {
+        using var temp = new TempTestDirectory("sts2-step27-patch-engine-metadata");
+        var path = Path.Combine(temp.Path, "PatchEngine-incomplete.dll");
+        WriteAccessToolsFixture(path, drift: false);
+
+        var audit = typeof(ControlledHarmonyPatchExecution).GetMethod("ReadHarmonyPatchEngineMetadata", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new AssertFailedException("Step 27 patch-engine metadata audit helper is missing.");
+        var result = audit.Invoke(null, [path]) ?? throw new AssertFailedException("Patch-engine metadata audit returned null.");
+        var allowedProperty = result.GetType().GetProperty("Allowed") ?? throw new AssertFailedException("Patch-engine audit result has no Allowed property.");
+        var detailProperty = result.GetType().GetProperty("Detail") ?? throw new AssertFailedException("Patch-engine audit result has no Detail property.");
+
+        Assert.AreEqual(false, allowedProperty.GetValue(result));
+        StringAssert.Contains((string?)detailProperty.GetValue(result) ?? string.Empty, "patch-engine internal types are missing");
+    }
+
+    [TestMethod]
     public void HarmonyPatchExecutionGatesStopAfterFirstFailure()
     {
         var gates = new ControlledHarmonyPatchExecutionGateSequence();

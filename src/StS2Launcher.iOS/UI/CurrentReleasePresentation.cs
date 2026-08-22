@@ -10,16 +10,16 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.6 — BOUNDED iOS HARMONY PREFIX-DESCRIPTOR REGISTRATION";
+        "STEP 27.0.7 — HARMONY SHARED-STATE INITIALIZATION + PATCH-ENGINE PRESERVATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.89 HARD CRASH LOCALIZED INSIDE ADDPREFIX • PATCH() STILL NOT REACHED";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.90 REACHED PATCH() T1 • CRASH LOCALIZED INSIDE PATCH ENGINE";
 
     public const string Summary =
-        "Physical 0.0.89 crash telemetry localized the abrupt iOS termination to Gate S after S1: the process entered exact PatchProcessor.AddPrefix(MethodInfo) reflection invocation and disappeared before S2. Harmony's audited AddPrefix body is only new HarmonyMethod(fixMethod) -> PatchProcessor.prefix -> return this; HarmonyMethod(MethodInfo) then enters ImportMethod to inspect Harmony annotations. Step 27.0.6 keeps the same 26-gate launcher-only patch objective but avoids that crashing convenience wrapper for the deliberately annotation-free launcher prefix. Gate S instead constructs the exact metadata-verified HarmonyMethod() default descriptor, verifies priority=-1/method=null, assigns only the exact launcher Prefix MethodInfo, then assigns only PatchProcessor.prefix. PatchProcessor.Patch() remains Gate T and is unchanged. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.90 crash telemetry proves the bounded HarmonyMethod descriptor path reached Gate T and then hard-terminated after T1 while inside the first exact PatchProcessor.Patch() invocation, before the launcher target was invoked. Exact Harmony 2.4.2 source and Gate-O receipt-backed metadata show Patch() first enters HarmonySharedState.GetPatchInfo; HarmonySharedState::.cctor creates a dynamic singleton and on Mono can generate a FieldRef delegate before replacement generation and the MonoMod detour path. Step 27.0.7 keeps A–S and the public Patch() acceptance boundary intact, adds narrowly scoped framework preservation for the audited dynamic-code surface, and makes HarmonySharedState initialization an explicit T1/T2 boundary before the single Patch() call at T3/T4. T5 validates the returned replacement and isolation. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Build 0.0.84 remains the furthest clean Step-27 execution evidence at A–Q. Build 0.0.89 added durable crash telemetry and physically localized the hard crash to Gate S1 inside AddPrefix(MethodInfo), after the explicit AccessTools boundary. Build 0.0.90 is the bounded descriptor-registration candidate. Run Step 27 only after a force-quit/relaunch. Once Gate B starts, force-quit before every retry regardless of where the run stops. If the app terminates without a managed report, preserve Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt before another attempt.";
+        "Status: Steps 01–26 are physically closed. Build 0.0.89 localized the earlier hard crash to AddPrefix(MethodInfo). Build 0.0.90 bypassed only that annotation-import convenience path and physically advanced through Gate S into Gate T/T1, where the process hard-terminated inside PatchProcessor.Patch() before T2 and before any launcher target invocation. Build 0.0.91 is the bounded shared-state/patch-engine preservation candidate. Run Step 27 only after a force-quit/relaunch. Once Gate B starts, force-quit before every retry regardless of where the run stops. If the app terminates without a managed report, preserve Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt before another attempt.";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

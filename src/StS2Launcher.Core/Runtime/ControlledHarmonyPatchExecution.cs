@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
@@ -30,6 +31,16 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     public const string HarmonyId = "com.community.sts2launcher.step25.probe";
     public const string PatchProcessorTypeFullName = "HarmonyLib.PatchProcessor";
     public const string AccessToolsTypeFullName = "HarmonyLib.AccessTools";
+    public const string HarmonySharedStateTypeFullName = "HarmonyLib.HarmonySharedState";
+
+    // Exact runtime-generated assembly names reached by the tagged Harmony 2.4.2 shared-state /
+    // MonoMod ILGenerator path. These are not prepared dependencies and are admitted only after
+    // Gate T begins. Any other private-context addition remains fail-closed.
+    private static readonly HashSet<string> AllowedPatchEngineGeneratedAssemblySimpleNames = new(StringComparer.Ordinal)
+    {
+        "HarmonySharedState",
+        "MonoMod.Utils.Cil.ILGeneratorProxy",
+    };
 
     // Physical Step 24.0.4 / 0.0.77 measured these seven conservative dispatch findings in the
     // exact receipt-backed 0Harmony 2.4.2 automatic-initialization closure. They are not a general
@@ -84,6 +95,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     private BaselineProbeInvocationSnapshot? _baselineProbeInvocation;
     private AccessToolsTypeInitializationSnapshot? _accessToolsTypeInitialization;
     private PrefixRegistrationSnapshot? _prefixRegistration;
+    private HarmonySharedStateInitializationSnapshot? _harmonySharedStateInitialization;
     private PatchExecutionSnapshot? _patchExecution;
     private ProbeInvocationSnapshot? _patchedProbeInvocation;
     private UnpatchSnapshot? _unpatch;
@@ -108,7 +120,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName,
             TargetSimpleName,
             TargetVersion,
-            [FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, "SlayTheSpire2", TargetSimpleName])
+            [FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, "SlayTheSpire2", TargetSimpleName, "HarmonySharedState", "MonoMod.Utils.Cil.ILGeneratorProxy"])
     {
     }
 
@@ -1572,23 +1584,47 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var accessToolsMetadata = ReadAccessToolsMetadata(preflight.Target.PreparedPath);
             if (!accessToolsMetadata.Allowed)
                 throw new InvalidDataException("Step 27 Gate O refuses AccessTools admission because its type initializer is not the exact physically measured runtime-detection/cache shape:\n" + accessToolsMetadata.Detail);
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O3 — auditing HarmonySharedState, replacement creation, and detour internals from exact receipt-backed 0Harmony; metadata only.");
+            var patchEngineMetadata = ReadHarmonyPatchEngineMetadata(preflight.Target.PreparedPath);
+            if (!patchEngineMetadata.Allowed)
+                throw new InvalidDataException("Step 27 Gate O refuses patch-engine admission because the exact shared-state/replacement/detour metadata shape changed:\n" + patchEngineMetadata.Detail);
 
-            stage = "AccessTools host-framework preservation preflight";
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O3 — resolving RuntimeInformation by the exact string used by Harmony; metadata admission only.");
+            stage = "AccessTools and patch-engine host-framework preservation preflight";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O4 — resolving RuntimeInformation by the exact string used by Harmony; metadata admission only.");
             var runtimeInformationType = Type.GetType("System.Runtime.InteropServices.RuntimeInformation", throwOnError: false, ignoreCase: false)
                 ?? throw new TypeLoadException("Step 27 AccessTools preservation preflight cannot resolve RuntimeInformation by the exact string used by Harmony.");
             if (runtimeInformationType != typeof(RuntimeInformation))
                 throw new InvalidDataException("String-resolved RuntimeInformation does not bind to the host RuntimeInformation type.");
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O4 — resolving FrameworkDescription PropertyInfo without invoking its getter.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O5 — resolving FrameworkDescription PropertyInfo without invoking its getter.");
             var frameworkDescriptionProperty = runtimeInformationType.GetProperty("FrameworkDescription", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
                 ?? throw new MissingMemberException("RuntimeInformation.FrameworkDescription was trimmed; Step 27 cannot safely initialize AccessTools.");
             if (frameworkDescriptionProperty.PropertyType != typeof(string) || frameworkDescriptionProperty.GetMethod is null)
                 throw new InvalidDataException("RuntimeInformation.FrameworkDescription runtime shape changed.");
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O5 — resolving the exact Dictionary<,>() and ReaderWriterLockSlim(LockRecursionPolicy) constructor metadata; constructors are not invoked.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O6 — resolving exact AccessTools constructors plus the bounded Reflection.Emit/MethodHandle surface required by the audited patch engine; members are not invoked.");
             _ = typeof(Dictionary<,>).GetConstructor(Type.EmptyTypes)
                 ?? throw new MissingMethodException("System.Collections.Generic.Dictionary<,>", ".ctor()");
             _ = typeof(ReaderWriterLockSlim).GetConstructor([typeof(LockRecursionPolicy)])
                 ?? throw new MissingMethodException(typeof(ReaderWriterLockSlim).FullName, ".ctor(System.Threading.LockRecursionPolicy)");
+            if (typeof(DynamicMethod).GetConstructors(BindingFlags.Public | BindingFlags.Instance).Length == 0)
+                throw new MissingMethodException(typeof(DynamicMethod).FullName, ".ctor(...)");
+            if (!typeof(ILGenerator).GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name.Equals(nameof(ILGenerator.Emit), StringComparison.Ordinal)))
+                throw new MissingMethodException(typeof(ILGenerator).FullName, nameof(ILGenerator.Emit));
+            _ = typeof(AssemblyName).GetConstructor([typeof(string)])
+                ?? throw new MissingMethodException(typeof(AssemblyName).FullName, ".ctor(System.String)");
+            if (!typeof(AssemblyBuilder).GetMethods(BindingFlags.Public | BindingFlags.Static).Any(method => method.Name.Equals(nameof(AssemblyBuilder.DefineDynamicAssembly), StringComparison.Ordinal)))
+                throw new MissingMethodException(typeof(AssemblyBuilder).FullName, nameof(AssemblyBuilder.DefineDynamicAssembly));
+            if (!typeof(AssemblyBuilder).GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name.Equals(nameof(AssemblyBuilder.DefineDynamicModule), StringComparison.Ordinal)))
+                throw new MissingMethodException(typeof(AssemblyBuilder).FullName, nameof(AssemblyBuilder.DefineDynamicModule));
+            if (!typeof(ModuleBuilder).GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name.Equals(nameof(ModuleBuilder.DefineType), StringComparison.Ordinal)))
+                throw new MissingMethodException(typeof(ModuleBuilder).FullName, nameof(ModuleBuilder.DefineType));
+            if (!typeof(TypeBuilder).GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name.Equals(nameof(TypeBuilder.DefineMethod), StringComparison.Ordinal)))
+                throw new MissingMethodException(typeof(TypeBuilder).FullName, nameof(TypeBuilder.DefineMethod));
+            if (!typeof(MethodBuilder).GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name.Equals(nameof(MethodBuilder.GetILGenerator), StringComparison.Ordinal)))
+                throw new MissingMethodException(typeof(MethodBuilder).FullName, nameof(MethodBuilder.GetILGenerator));
+            _ = typeof(MethodBase).GetProperty(nameof(MethodBase.MethodHandle), BindingFlags.Public | BindingFlags.Instance)
+                ?? throw new MissingMemberException(typeof(MethodBase).FullName, nameof(MethodBase.MethodHandle));
+            if (!typeof(RuntimeMethodHandle).GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name.Equals(nameof(RuntimeMethodHandle.GetFunctionPointer), StringComparison.Ordinal)))
+                throw new MissingMethodException(typeof(RuntimeMethodHandle).FullName, nameof(RuntimeMethodHandle.GetFunctionPointer));
 
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;
@@ -1597,7 +1633,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
 
             stage = "exact patch API reflection";
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O6 — resolving exact PatchProcessor AddPrefix/Patch/Unpatch runtime MethodInfo objects.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O7 — resolving exact PatchProcessor AddPrefix/Patch/Unpatch runtime MethodInfo objects.");
             var processorType = processorApi.PatchProcessorType;
             var addPrefixCandidates = processorType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .Where(method => method.Name.Equals("AddPrefix", StringComparison.Ordinal)).ToArray();
@@ -1622,7 +1658,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             var prefixField = processorType.GetField("prefix", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 ?? throw new MissingFieldException(PatchProcessorTypeFullName, "prefix");
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O7 — resolving exact HarmonyMethod runtime type/constructor/field; no HarmonyMethod is constructed.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O8 — resolving exact HarmonyMethod runtime type/constructor/field; no HarmonyMethod is constructed.");
             var harmonyMethodType = initialization.TargetAssembly.GetType("HarmonyLib.HarmonyMethod", throwOnError: false, ignoreCase: false)
                 ?? throw new TypeLoadException("Exact HarmonyLib.HarmonyMethod type is absent from loaded 0Harmony.");
             if (!ReferenceEquals(prefixField.FieldType, harmonyMethodType))
@@ -1644,7 +1680,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (harmonyMethodMethodField.FieldType != typeof(MethodInfo) || harmonyMethodPriorityField.FieldType != typeof(int))
                 throw new InvalidDataException("HarmonyMethod method/priority runtime field shape changed.");
 
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O8 — resolving exact AccessTools runtime Type/.cctor/fields without reading any static field.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O9 — resolving exact AccessTools runtime Type/.cctor/fields without reading any static field.");
             var accessToolsType = initialization.TargetAssembly.GetType(AccessToolsTypeFullName, throwOnError: false, ignoreCase: false)
                 ?? throw new TypeLoadException("Exact HarmonyLib.AccessTools type is absent from loaded 0Harmony.");
             if (!(accessToolsType.IsAbstract && accessToolsType.IsSealed))
@@ -1682,6 +1718,25 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException("HarmonyLib.AccessTools addHandlerCache field type changed.");
             // Do not read any AccessTools static field here: Gate R owns the type-initialization boundary.
 
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O10 — resolving exact internal HarmonySharedState type/.cctor/version fields; no shared-state static field is read and the initializer is not executed.");
+            var harmonySharedStateType = initialization.TargetAssembly.GetType(HarmonySharedStateTypeFullName, throwOnError: false, ignoreCase: false)
+                ?? throw new TypeLoadException("Exact HarmonyLib.HarmonySharedState type is absent from loaded 0Harmony.");
+            if (harmonySharedStateType.IsPublic || !harmonySharedStateType.IsAbstract || !harmonySharedStateType.IsSealed)
+                throw new InvalidDataException("HarmonyLib.HarmonySharedState is no longer the expected internal static type.");
+            var harmonySharedStateTypeInitializer = harmonySharedStateType.TypeInitializer
+                ?? throw new MissingMethodException(HarmonySharedStateTypeFullName, ".cctor()");
+            var harmonySharedStateInternalVersionField = harmonySharedStateType.GetField("internalVersion", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "internalVersion");
+            var harmonySharedStateActualVersionField = harmonySharedStateType.GetField("actualVersion", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "actualVersion");
+            if (!harmonySharedStateInternalVersionField.IsLiteral || harmonySharedStateInternalVersionField.FieldType != typeof(int) ||
+                harmonySharedStateInternalVersionField.GetRawConstantValue() is not int internalVersion || internalVersion != 102)
+                throw new InvalidDataException("HarmonySharedState.internalVersion changed from the audited 2.4.2 value 102.");
+            if (harmonySharedStateActualVersionField.FieldType != typeof(int))
+                throw new InvalidDataException("HarmonySharedState.actualVersion runtime field type changed.");
+            // Do not read actualVersion here: Gate T owns HarmonySharedState type initialization.
+
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O11 — exact patch API/shared-state reflection complete; verifying no private-context/native side effects before snapshot commit.");
             if (context.ManagedResolverRequests.Count != managedBefore || context.PrivateLoads.Count != privateBefore || context.HostLoads.Count != hostBefore)
                 throw new InvalidDataException("Targeted patch API reflection unexpectedly changed resolver/load counters.");
             if (context.NativeLoadAttempts.Count != nativeBefore)
@@ -1692,7 +1747,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
                 throw new InvalidDataException("Targeted patch API reflection changed private-context membership.");
 
-            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O9 — runtime reflection/context checks passed; committing the bounded patch API snapshot.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution, "O12 — runtime reflection/context checks passed; committing the bounded patch API + patch-engine snapshot.");
             _patchApi = new HarmonyPatchApiSnapshot(
                 addPrefix,
                 patch,
@@ -1714,7 +1769,18 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 accessToolsAddHandlerCacheField,
                 accessToolsAddHandlerCacheLockField,
                 frameworkDescriptionProperty,
+                harmonySharedStateType,
+                harmonySharedStateTypeInitializer,
+                harmonySharedStateInternalVersionField,
+                harmonySharedStateActualVersionField,
                 accessToolsMetadata.TypeInitializerAudit,
+                patchEngineMetadata.Detail,
+                patchEngineMetadata.HarmonySharedStateTypeInitializerAudit,
+                patchEngineMetadata.GetOrCreateSharedStateTypeAudit,
+                patchEngineMetadata.MethodCreatorPrepareAudit,
+                patchEngineMetadata.UpdateWrapperAudit,
+                patchEngineMetadata.DetourMethodAudit,
+                patchEngineMetadata.UpdatePatchInfoAudit,
                 metadata.AddPrefixAudit,
                 metadata.PatchAudit,
                 metadata.UnpatchAudit,
@@ -1723,21 +1789,29 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.HarmonyPatchApiResolution,
-                "TARGETED HARMONY PATCH API RESOLUTION SUCCEEDED WITHOUT PATCH-DESCRIPTION CONSTRUCTION OR PATCHING.\n" +
-                "Reference prefix API: PatchProcessor.AddPrefix(System.Reflection.MethodInfo) — exact IL audited, NOT invoked by Step 27.0.6\n" +
-                "Patch execution method: PatchProcessor.Patch() -> System.Reflection.MethodInfo\n" +
+                "TARGETED HARMONY PATCH API + PATCH-ENGINE METADATA RESOLUTION SUCCEEDED WITHOUT PATCH-DESCRIPTION CONSTRUCTION OR PATCHING.\n" +
+                "Reference prefix API: PatchProcessor.AddPrefix(System.Reflection.MethodInfo) — exact IL audited, NOT invoked by Step 27.0.7\n" +
+                "Patch execution method: PatchProcessor.Patch() -> System.Reflection.MethodInfo — remains the exact public acceptance boundary\n" +
                 "Exact removal method: PatchProcessor.Unpatch(System.Reflection.MethodInfo)\n" +
                 "Patch descriptor type: HarmonyLib.HarmonyMethod — no type initializer\n" +
                 "Bounded iOS descriptor constructor: HarmonyMethod() — exact default priority=-1 shape\n" +
-                "Reference constructor: HarmonyMethod(System.Reflection.MethodInfo) — exact ImportMethod path audited, NOT invoked by Step 27.0.6\n" +
-                "Patch descriptor retained fields: method : System.Reflection.MethodInfo; priority : System.Int32\n" +
-                "AccessTools type initializer: PRESENT — exact Step 27.0.1 physical runtime-detection/cache fingerprint\n" +
-                "Host RuntimeInformation.FrameworkDescription metadata preservation preflight: PRESENT — getter NOT INVOKED in Gate O\n" +
-                "AccessTools static-field values read: NO — Gate R owns the type-initialization boundary\n" +
+                "Reference constructor: HarmonyMethod(System.Reflection.MethodInfo) — exact ImportMethod path audited, NOT invoked by Step 27.0.7\n" +
+                "HarmonySharedState: exact internal static type/cctor admitted; internalVersion constant == 102; actualVersion NOT READ in Gate O\n" +
+                "Patch-engine closure: shared-state singleton -> MethodCreator replacement generation -> MonoMod detour -> UpdatePatchInfo audited\n" +
+                "Host preservation preflight: RuntimeInformation + bounded Reflection.Emit/MethodHandle members PRESENT; no member invoked by this preflight\n" +
+                "AccessTools static-field values read: NO — Gate R owns AccessTools type initialization\n" +
+                "HarmonySharedState type initialized: NO — Gate T owns the new explicit shared-state boundary\n" +
                 "HarmonyMethod object constructed: NO\n" +
                 "PatchProcessor.Patch invoked: NO\n" +
                 "Launcher patch probe invoked: NO\n" +
                 "StS2 type/member reflected or invoked: NO\n" +
+                "Patch-engine metadata summary:\n" + patchEngineMetadata.Detail + "\n" +
+                "Audited HarmonySharedState::.cctor IL:\n" + patchEngineMetadata.HarmonySharedStateTypeInitializerAudit + "\n" +
+                "Audited HarmonySharedState::GetOrCreateSharedStateType IL:\n" + patchEngineMetadata.GetOrCreateSharedStateTypeAudit + "\n" +
+                "Audited MethodCreatorConfig::Prepare IL:\n" + patchEngineMetadata.MethodCreatorPrepareAudit + "\n" +
+                "Audited PatchFunctions::UpdateWrapper IL:\n" + patchEngineMetadata.UpdateWrapperAudit + "\n" +
+                "Audited PatchTools::DetourMethod IL:\n" + patchEngineMetadata.DetourMethodAudit + "\n" +
+                "Audited HarmonySharedState::UpdatePatchInfo IL:\n" + patchEngineMetadata.UpdatePatchInfoAudit + "\n" +
                 "Audited AddPrefix(MethodInfo) IL:\n" + metadata.AddPrefixAudit + "\n" +
                 "Audited Patch() IL:\n" + metadata.PatchAudit + "\n" +
                 "Audited Unpatch(MethodInfo) IL:\n" + metadata.UnpatchAudit + "\n" +
@@ -2102,12 +2176,12 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes exactly PatchProcessor.Patch() from the metadata-verified post-publish API surface against a launcher-owned probe.")]
-    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Step 27 retains only the exact replacement MethodInfo returned by the verified Patch() call.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 explicitly initializes only the metadata-audited HarmonySharedState type, then invokes exactly PatchProcessor.Patch() from the verified post-publish API surface against a launcher-owned probe.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Step 27 reads only the exact HarmonySharedState version field and replacement MethodInfo admitted by Gate O.")]
     public ControlledHarmonyPatchExecutionGateResult RunPatchEngineExecution(
         IProgress<ControlledHarmonyPatchExecutionProgress>? progress = null)
     {
-        var stage = "exact PatchProcessor.Patch() invocation";
+        var stage = "explicit HarmonySharedState initialization before exact PatchProcessor.Patch() invocation";
         try
         {
             ThrowIfDisposed();
@@ -2121,24 +2195,78 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             VerifyFileLength(preflight.Target.PreparedPath, preflight.Target.Plan.Length, "prepared patch-execution target");
             var targetSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!targetSha1.Equals(preflight.Target.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step 27 0Harmony SHA-1 changed immediately before Patch().");
+                throw new InvalidDataException("Step 27 0Harmony SHA-1 changed immediately before HarmonySharedState initialization/Patch().");
+            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
+                throw new InvalidDataException("Launcher patch probe counters changed before the explicit HarmonySharedState boundary.");
+
+            var sharedManagedBefore = context.ManagedResolverRequests.Count;
+            var sharedPrivateBefore = context.PrivateLoads.Count;
+            var sharedHostBefore = context.HostLoads.Count;
+            var sharedNativeBefore = context.NativeLoadAttempts.Count;
+            var sharedMembershipBefore = context.Assemblies
+                .Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty)
+                .OrderBy(v => v, StringComparer.Ordinal)
+                .ToArray();
+
+            stage = "explicit HarmonySharedState type initialization";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T1 — entering explicit RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle); PatchProcessor.Patch() and launcher target remain uninvoked.");
+            RuntimeHelpers.RunClassConstructor(patchApi.HarmonySharedStateType.TypeHandle);
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T2 — HarmonySharedState::.cctor returned; validating version, hashes, probe counters, and private-context/native isolation before Patch().");
+
+            var actualVersionValue = patchApi.HarmonySharedStateActualVersionField.GetValue(null);
+            if (actualVersionValue is not int actualVersion || actualVersion != 102)
+                throw new InvalidDataException($"HarmonySharedState.actualVersion changed from the audited value 102 after explicit initialization; observed {actualVersionValue ?? "<null>"}.");
+            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
+                throw new InvalidDataException("HarmonySharedState initialization unexpectedly invoked the launcher target or prefix.");
+            if (context.NativeLoadAttempts.Count != sharedNativeBefore)
+                throw new DllNotFoundException("HarmonySharedState initialization attempted private-context native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(sharedNativeBefore)));
+            if (context.RejectedManagedRequests.Count != 0)
+                throw new FileLoadException("HarmonySharedState initialization triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests));
+            var sharedMembershipAfter = ValidateBoundedPatchEngineContextTransition(
+                context,
+                sharedMembershipBefore,
+                "HarmonySharedState initialization");
+            var sharedGeneratedAssemblies = DescribeKnownPatchEngineGeneratedAssemblies();
+            if (sharedGeneratedAssemblies.Count(entry => entry.StartsWith("HarmonySharedState,", StringComparison.Ordinal) || entry.StartsWith("HarmonySharedState @", StringComparison.Ordinal)) != 1)
+                throw new InvalidDataException("HarmonySharedState initialization did not leave exactly one process-visible HarmonySharedState singleton assembly.");
+            var sharedPostSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
+            if (!sharedPostSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("0Harmony prepared bytes changed across explicit HarmonySharedState initialization.");
+
+            _harmonySharedStateInitialization = new HarmonySharedStateInitializationSnapshot(
+                sharedPostSha1,
+                actualVersion,
+                context.ManagedResolverRequests.Count - sharedManagedBefore,
+                context.PrivateLoads.Count - sharedPrivateBefore,
+                context.HostLoads.Count - sharedHostBefore,
+                context.NativeLoadAttempts.Count - sharedNativeBefore,
+                sharedMembershipAfter,
+                sharedGeneratedAssemblies);
 
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;
             var hostBefore = context.HostLoads.Count;
             var nativeBefore = context.NativeLoadAttempts.Count;
-            var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            var membershipBefore = context.Assemblies
+                .Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty)
+                .OrderBy(v => v, StringComparer.Ordinal)
+                .ToArray();
 
+            stage = "exact PatchProcessor.Patch() invocation after explicit shared-state initialization";
             object? rawReplacement;
             try
             {
-                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution, "T1 — entering the first exact PatchProcessor.Patch() reflection invocation; launcher target is still not invoked.");
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                    "T3 — entering the first exact PatchProcessor.Patch() reflection invocation after explicit HarmonySharedState initialization; launcher target is still not invoked.");
                 rawReplacement = patchApi.PatchMethod.Invoke(processor, null);
-                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution, "T2 — PatchProcessor.Patch() returned; validating replacement MethodInfo and isolation state.");
+                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                    "T4 — PatchProcessor.Patch() returned; validating replacement MethodInfo and isolation state.");
             }
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
-                throw new InvalidOperationException("Exact PatchProcessor.Patch() threw.", ex.InnerException);
+                throw new InvalidOperationException("Exact PatchProcessor.Patch() threw after explicit HarmonySharedState initialization.", ex.InnerException);
             }
             if (rawReplacement is not MethodInfo replacement)
                 throw new InvalidDataException("PatchProcessor.Patch() did not return a System.Reflection.MethodInfo replacement.");
@@ -2149,12 +2277,14 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException("Harmony replacement parameter surface does not match the launcher-owned Int32 target.");
 
             if (context.NativeLoadAttempts.Count != nativeBefore)
-                throw new DllNotFoundException("PatchProcessor.Patch attempted native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
+                throw new DllNotFoundException("PatchProcessor.Patch attempted private-context native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
             if (context.RejectedManagedRequests.Count != 0)
                 throw new FileLoadException("PatchProcessor.Patch triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests));
-            var membershipAfter = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
-            if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
-                throw new InvalidDataException("PatchProcessor.Patch changed private-context membership.");
+            var membershipAfter = ValidateBoundedPatchEngineContextTransition(
+                context,
+                membershipBefore,
+                "PatchProcessor.Patch");
+            var generatedAssembliesAfterPatch = DescribeKnownPatchEngineGeneratedAssemblies();
             var postSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!postSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("0Harmony prepared bytes changed across Patch().");
@@ -2169,11 +2299,23 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 context.ManagedResolverRequests.Count - managedBefore,
                 context.PrivateLoads.Count - privateBefore,
                 context.HostLoads.Count - hostBefore,
-                context.NativeLoadAttempts.Count - nativeBefore);
+                context.NativeLoadAttempts.Count - nativeBefore,
+                membershipAfter,
+                generatedAssembliesAfterPatch);
+
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T5 — explicit HarmonySharedState initialization and exact PatchProcessor.Patch() completed with replacement/isolation validation; launcher target remains uninvoked until Gate V.");
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "FIRST REAL HARMONY PATCH ENGINE EXECUTION COMPLETED AGAINST LAUNCHER-OWNED TARGET.\n" +
+                "EXPLICIT HARMONY SHARED-STATE INITIALIZATION + FIRST REAL HARMONY PATCH ENGINE EXECUTION COMPLETED AGAINST LAUNCHER-OWNED TARGET.\n" +
+                "New candidate boundary: RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) — EXACTLY ONCE, before public Patch()\n" +
+                $"HarmonySharedState.actualVersion: {_harmonySharedStateInitialization.ActualVersion:N0} (expected 102)\n" +
+                $"Managed resolver requests during shared-state initialization: {_harmonySharedStateInitialization.ManagedResolverRequests:N0}\n" +
+                $"Private loads during shared-state initialization: {_harmonySharedStateInitialization.PrivateLoads:N0}\n" +
+                $"Host loads during shared-state initialization: {_harmonySharedStateInitialization.HostLoads:N0}\n" +
+                $"Native load attempts during shared-state initialization: {_harmonySharedStateInitialization.NativeLoadAttempts:N0}\n" +
+                $"Known generated assemblies after shared-state initialization: {FormatNames(_harmonySharedStateInitialization.KnownGeneratedAssemblies)}\n" +
                 "API invoked: HarmonyLib.PatchProcessor::Patch() — EXACTLY ONCE\n" +
                 $"Original target: {probe.TargetSignature}\n" +
                 $"Registered prefix: {probe.PrefixSignature}\n" +
@@ -2182,6 +2324,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 $"Private loads during Patch(): {_patchExecution.PrivateLoads:N0}\n" +
                 $"Host loads during Patch(): {_patchExecution.HostLoads:N0}\n" +
                 $"Native load attempts during Patch(): {_patchExecution.NativeLoadAttempts:N0}\n" +
+                $"Known generated assemblies after Patch(): {FormatNames(_patchExecution.KnownGeneratedAssemblies)}\n" +
                 "Launcher target invoked after patch: NO — Gate V owns execution of patched behavior\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
         }
@@ -2241,12 +2384,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException(offline.Error ?? "OfflineReady exact-tree verification failed after Patch().");
 
             stage = "post-patch state audit";
-            var expected = preflight.PreparedAssemblies
-                .Where(item => item.ModuleInitializerCount == 0 || item.Plan.AssemblyFullName.Equals(preflight.Target.Plan.AssemblyFullName, StringComparison.Ordinal))
-                .Select(item => item.Plan.AssemblyFullName).OrderBy(value => value, StringComparer.Ordinal).ToArray();
-            var actual = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            var expected = patchExecution.PrivateContextMembership;
+            var actual = SnapshotPrivateContextMembership(context);
             if (!actual.SequenceEqual(expected, StringComparer.Ordinal))
-                throw new InvalidDataException("Step 27 post-patch private context differs from the physically proven Step 26 context membership.");
+                throw new InvalidDataException("Step 27 post-patch private context changed after the exact Gate-T patch-engine snapshot.");
             if (context.NativeLoadAttempts.Count != 0)
                 throw new DllNotFoundException("Step 27 observed native-library resolution during patch installation: " + string.Join(" | ", context.NativeLoadAttempts));
             if (context.RejectedManagedRequests.Count != 0)
@@ -2432,18 +2573,17 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         {
             ThrowIfDisposed();
             var preflight = RequirePreflight();
+            var patchExecution = RequirePatchExecution();
             var unpatch = RequireUnpatch();
             var context = RequireLoadContext();
 
             var targetSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!targetSha1.Equals(unpatch.PreparedSha1, StringComparison.OrdinalIgnoreCase) || !targetSha1.Equals(preflight.Target.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step 27 0Harmony prepared bytes changed after exact prefix unpatch.");
-            var expected = preflight.PreparedAssemblies
-                .Where(item => item.ModuleInitializerCount == 0 || item.Plan.AssemblyFullName.Equals(preflight.Target.Plan.AssemblyFullName, StringComparison.Ordinal))
-                .Select(item => item.Plan.AssemblyFullName).OrderBy(value => value, StringComparer.Ordinal).ToArray();
-            var actual = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            var expected = patchExecution.PrivateContextMembership;
+            var actual = SnapshotPrivateContextMembership(context);
             if (!actual.SequenceEqual(expected, StringComparer.Ordinal))
-                throw new InvalidDataException("Step 27 post-unpatch private context differs from the physically proven Step 26 context membership.");
+                throw new InvalidDataException("Step 27 post-unpatch private context changed from the exact Gate-T patch-engine snapshot.");
             if (context.NativeLoadAttempts.Count != 0)
                 throw new DllNotFoundException("Step 27 observed native-library resolution during patch/unpatch: " + string.Join(" | ", context.NativeLoadAttempts));
             if (context.RejectedManagedRequests.Count != 0)
@@ -2583,12 +2723,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException(offline.Error ?? "OfflineReady exact-tree verification failed after Step 27 patch/unpatch cycle.");
 
             stage = "final runtime state audit";
-            var expected = preflight.PreparedAssemblies
-                .Where(item => item.ModuleInitializerCount == 0 || item.Plan.AssemblyFullName.Equals(preflight.Target.Plan.AssemblyFullName, StringComparison.Ordinal))
-                .Select(item => item.Plan.AssemblyFullName).OrderBy(value => value, StringComparer.Ordinal).ToArray();
-            var actual = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            var expected = patchExecution.PrivateContextMembership;
+            var actual = SnapshotPrivateContextMembership(context);
             if (!actual.SequenceEqual(expected, StringComparer.Ordinal))
-                throw new InvalidDataException("Step 27 final private context differs from the physically proven Step 26 context membership.");
+                throw new InvalidDataException("Step 27 final private context changed from the exact Gate-T patch-engine snapshot.");
             if (context.NativeLoadAttempts.Count != 0)
                 throw new DllNotFoundException("Step 27 observed native-library resolution: " + string.Join(" | ", context.NativeLoadAttempts));
             if (context.RejectedManagedRequests.Count != 0)
@@ -2615,7 +2753,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 $"Private context: {actual.Length:N0}/{expected.Length:N0} expected assemblies\n" +
                 "OfflineReady exact-tree verification: YES\n" +
                 "Harmony.DEBUG: false\n" +
-                "Patch lifecycle: AddPrefix(MethodInfo) → Patch() → patched reflection/direct invocation → Unpatch(MethodInfo) → restored reflection/direct invocation\n" +
+                "Patch lifecycle: bounded HarmonyMethod descriptor registration → Patch() → patched reflection/direct invocation → Unpatch(MethodInfo) → restored reflection/direct invocation\n" +
                 "Patched result: 1041 on both routes\n" +
                 "Restored result: 42 on both routes\n" +
                 $"Final launcher target calls: {restored.TargetCalls}\n" +
@@ -2658,6 +2796,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         _unpatch = null;
         _patchedProbeInvocation = null;
         _patchExecution = null;
+        _harmonySharedStateInitialization = null;
         _prefixRegistration = null;
         _baselineProbeInvocation = null;
         _patchProbe = null;
@@ -2692,7 +2831,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             .OrderBy(value => value, StringComparer.Ordinal)
             .ToArray();
         if (matches.Length != 0)
-            throw new InvalidDataException("Step 27 requires a fresh process; a game/Harmony assembly is already loaded: " + string.Join(" | ", matches));
+            throw new InvalidDataException("Step 27 requires a fresh process; a game/Harmony/shared-state assembly is already loaded: " + string.Join(" | ", matches));
     }
 
 
@@ -2908,6 +3047,61 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         return new AccessToolsMetadataSnapshot(hazards.Count == 0, detail, FormatMethodAudit(cctor));
     }
 
+    private static string[] SnapshotPrivateContextMembership(Step27LoadContext context)
+        => context.Assemblies
+            .Select(assembly => assembly.GetName().FullName ?? assembly.GetName().Name ?? string.Empty)
+            .OrderBy(value => value, StringComparer.Ordinal)
+            .ToArray();
+
+    private static string[] ValidateBoundedPatchEngineContextTransition(
+        Step27LoadContext context,
+        string[] membershipBefore,
+        string operation)
+    {
+        var membershipAfter = SnapshotPrivateContextMembership(context);
+        var removed = membershipBefore.Except(membershipAfter, StringComparer.Ordinal).ToArray();
+        if (removed.Length != 0)
+            throw new InvalidDataException($"{operation} removed private-context assemblies unexpectedly: {FormatNames(removed)}");
+
+        var added = membershipAfter.Except(membershipBefore, StringComparer.Ordinal).ToArray();
+        foreach (var identity in added)
+        {
+            string? simpleName;
+            try
+            {
+                simpleName = new AssemblyName(identity).Name;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidDataException($"{operation} added an assembly with an unreadable identity: {identity}", ex);
+            }
+
+            if (simpleName is null || !AllowedPatchEngineGeneratedAssemblySimpleNames.Contains(simpleName))
+                throw new InvalidDataException($"{operation} added an unplanned private-context assembly: {identity}");
+        }
+
+        foreach (var allowedName in AllowedPatchEngineGeneratedAssemblySimpleNames)
+        {
+            var count = context.Assemblies.Count(assembly => string.Equals(assembly.GetName().Name, allowedName, StringComparison.Ordinal));
+            if (count > 1)
+                throw new InvalidDataException($"{operation} produced duplicate '{allowedName}' assemblies in the private context: {count}.");
+        }
+
+        return membershipAfter;
+    }
+
+    private static string[] DescribeKnownPatchEngineGeneratedAssemblies()
+        => AppDomain.CurrentDomain.GetAssemblies()
+            .Where(assembly => AllowedPatchEngineGeneratedAssemblySimpleNames.Contains(assembly.GetName().Name ?? string.Empty))
+            .Select(assembly =>
+            {
+                var identity = assembly.GetName().FullName ?? assembly.GetName().Name ?? string.Empty;
+                var loadContext = AssemblyLoadContext.GetLoadContext(assembly);
+                return $"{identity} @ {loadContext?.Name ?? "<unknown-context>"}";
+            })
+            .OrderBy(value => value, StringComparer.Ordinal)
+            .ToArray();
+
     private static bool TryGetLdcI4Value(Instruction instruction, out int value)
     {
         switch (instruction.OpCode.Code)
@@ -2926,6 +3120,151 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             case Code.Ldc_I4: value = Convert.ToInt32(instruction.Operand); return true;
             default: value = 0; return false;
         }
+    }
+
+    private static HarmonyPatchEngineMetadataSnapshot ReadHarmonyPatchEngineMetadata(string path)
+    {
+        using var resolver = new Step27MetadataOnlyResolver(path);
+        using var module = ModuleDefinition.ReadModule(path, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = resolver,
+            MetadataResolver = resolver,
+        });
+        if (module.Assembly?.Name is null)
+            throw new BadImageFormatException("Managed assembly manifest missing while auditing the Harmony patch engine: " + path);
+
+        var allTypes = EnumerateTypes(module.Types).ToArray();
+        var sharedStateType = allTypes.SingleOrDefault(type => type.FullName.Equals(HarmonySharedStateTypeFullName, StringComparison.Ordinal));
+        var patchFunctionsType = allTypes.SingleOrDefault(type => type.FullName.Equals("HarmonyLib.PatchFunctions", StringComparison.Ordinal));
+        var methodCreatorConfigType = allTypes.SingleOrDefault(type => type.FullName.Equals("HarmonyLib.MethodCreatorConfig", StringComparison.Ordinal));
+        var methodPatcherToolsType = allTypes.SingleOrDefault(type => type.FullName.Equals("HarmonyLib.MethodPatcherTools", StringComparison.Ordinal));
+        var patchToolsType = allTypes.SingleOrDefault(type => type.FullName.Equals("HarmonyLib.PatchTools", StringComparison.Ordinal));
+        if (sharedStateType is null || patchFunctionsType is null || methodCreatorConfigType is null || methodPatcherToolsType is null || patchToolsType is null)
+        {
+            return new HarmonyPatchEngineMetadataSnapshot(
+                false,
+                "One or more exact Harmony patch-engine internal types are missing.",
+                "<shared-state missing>", "<get-or-create missing>", "<prepare missing>", "<update-wrapper missing>", "<detour missing>", "<update-patch-info missing>");
+        }
+        if (sharedStateType.IsPublic || !sharedStateType.IsAbstract || !sharedStateType.IsSealed)
+        {
+            return new HarmonyPatchEngineMetadataSnapshot(
+                false,
+                "HarmonySharedState is no longer the expected internal static type.",
+                "<invalid shared-state type>", "<blocked>", "<blocked>", "<blocked>", "<blocked>", "<blocked>");
+        }
+
+        var sharedStateCctors = sharedStateType.Methods.Where(method => method.IsConstructor && method.IsStatic).ToArray();
+        var sharedStateCctor = sharedStateCctors.SingleOrDefault();
+        var getOrCreateSharedStateType = sharedStateType.Methods.SingleOrDefault(method =>
+            method.IsStatic && method.Name.Equals("GetOrCreateSharedStateType", StringComparison.Ordinal) && method.Parameters.Count == 0);
+        var getPatchInfo = sharedStateType.Methods.SingleOrDefault(method =>
+            method.IsStatic && method.Name.Equals("GetPatchInfo", StringComparison.Ordinal) && method.Parameters.Count == 1 &&
+            method.Parameters[0].ParameterType.FullName.Equals("System.Reflection.MethodBase", StringComparison.Ordinal));
+        var updatePatchInfo = sharedStateType.Methods.SingleOrDefault(method =>
+            method.IsStatic && method.Name.Equals("UpdatePatchInfo", StringComparison.Ordinal) && method.Parameters.Count == 3);
+        var internalVersionField = sharedStateType.Fields.SingleOrDefault(field => field.Name.Equals("internalVersion", StringComparison.Ordinal));
+        var actualVersionField = sharedStateType.Fields.SingleOrDefault(field => field.Name.Equals("actualVersion", StringComparison.Ordinal));
+
+        var updateWrapper = patchFunctionsType.Methods.SingleOrDefault(method =>
+            method.IsStatic && method.Name.Equals("UpdateWrapper", StringComparison.Ordinal) && method.Parameters.Count == 2);
+        var prepare = methodCreatorConfigType.Methods.SingleOrDefault(method =>
+            !method.IsStatic && method.Name.Equals("Prepare", StringComparison.Ordinal) && method.Parameters.Count == 0);
+        var createDynamicMethod = methodPatcherToolsType.Methods.SingleOrDefault(method =>
+            method.IsStatic && method.Name.Equals("CreateDynamicMethod", StringComparison.Ordinal) && method.Parameters.Count == 3);
+        var detourMethod = patchToolsType.Methods.SingleOrDefault(method =>
+            method.IsStatic && method.Name.Equals("DetourMethod", StringComparison.Ordinal) && method.Parameters.Count == 2);
+
+        var missing = new List<string>();
+        if (sharedStateCctor is null || !sharedStateCctor.HasBody) missing.Add("HarmonySharedState::.cctor");
+        if (getOrCreateSharedStateType is null || !getOrCreateSharedStateType.HasBody) missing.Add("HarmonySharedState::GetOrCreateSharedStateType");
+        if (getPatchInfo is null || !getPatchInfo.HasBody) missing.Add("HarmonySharedState::GetPatchInfo");
+        if (updatePatchInfo is null || !updatePatchInfo.HasBody) missing.Add("HarmonySharedState::UpdatePatchInfo");
+        if (updateWrapper is null || !updateWrapper.HasBody) missing.Add("PatchFunctions::UpdateWrapper");
+        if (prepare is null || !prepare.HasBody) missing.Add("MethodCreatorConfig::Prepare");
+        if (createDynamicMethod is null || !createDynamicMethod.HasBody) missing.Add("MethodPatcherTools::CreateDynamicMethod");
+        if (detourMethod is null || !detourMethod.HasBody) missing.Add("PatchTools::DetourMethod");
+        if (internalVersionField is null || !internalVersionField.HasConstant || Convert.ToInt32(internalVersionField.Constant) != 102) missing.Add("HarmonySharedState::internalVersion == 102");
+        if (actualVersionField is null || !actualVersionField.IsStatic || !actualVersionField.FieldType.FullName.Equals("System.Int32", StringComparison.Ordinal)) missing.Add("HarmonySharedState::actualVersion static Int32");
+        if (missing.Count != 0)
+        {
+            return new HarmonyPatchEngineMetadataSnapshot(
+                false,
+                "Required exact Harmony patch-engine members are missing or changed: " + string.Join(" | ", missing),
+                sharedStateCctor?.HasBody == true ? FormatMethodAudit(sharedStateCctor) : "<missing>",
+                getOrCreateSharedStateType?.HasBody == true ? FormatMethodAudit(getOrCreateSharedStateType) : "<missing>",
+                prepare?.HasBody == true ? FormatMethodAudit(prepare) : "<missing>",
+                updateWrapper?.HasBody == true ? FormatMethodAudit(updateWrapper) : "<missing>",
+                detourMethod?.HasBody == true ? FormatMethodAudit(detourMethod) : "<missing>",
+                updatePatchInfo?.HasBody == true ? FormatMethodAudit(updatePatchInfo) : "<missing>");
+        }
+
+        static string[] CalledMembers(MethodDefinition method) => method.Body.Instructions
+            .Where(instruction => instruction.Operand is MethodReference)
+            .Select(instruction => ((MethodReference)instruction.Operand).FullName)
+            .ToArray();
+        static bool Calls(string[] calls, string fragment) => calls.Any(value => value.Contains(fragment, StringComparison.Ordinal));
+
+        var cctorCalls = CalledMembers(sharedStateCctor!);
+        var getOrCreateCalls = CalledMembers(getOrCreateSharedStateType!);
+        var prepareCalls = CalledMembers(prepare!);
+        var updateWrapperCalls = CalledMembers(updateWrapper!);
+        var detourCalls = CalledMembers(detourMethod!);
+        var updatePatchInfoCalls = CalledMembers(updatePatchInfo!);
+
+        var hazards = new List<string>();
+        if (!Calls(cctorCalls, "HarmonyLib.HarmonySharedState::GetOrCreateSharedStateType"))
+            hazards.Add("HarmonySharedState::.cctor no longer enters GetOrCreateSharedStateType.");
+        if (!Calls(cctorCalls, "HarmonyLib.AccessTools::get_IsMonoRuntime") ||
+            !Calls(cctorCalls, "HarmonyLib.AccessTools::Field") ||
+            !Calls(cctorCalls, "HarmonyLib.AccessTools::FieldRefAccess"))
+            hazards.Add("HarmonySharedState::.cctor no longer exposes the measured Mono StackFrame/FieldRefAccess branch.");
+        if (!Calls(getOrCreateCalls, "System.Type::GetType") ||
+            !Calls(getOrCreateCalls, "Mono.Cecil.ModuleDefinition::CreateModule") ||
+            !Calls(getOrCreateCalls, "MonoMod.Utils.ReflectionHelper::Load"))
+            hazards.Add("GetOrCreateSharedStateType no longer exposes Type.GetType -> Cecil CreateModule -> ReflectionHelper.Load dynamic-singleton flow.");
+        if (!Calls(prepareCalls, "HarmonyLib.HarmonySharedState::GetPatchInfo") ||
+            !Calls(prepareCalls, "HarmonyLib.MethodPatcherTools::CreateDynamicMethod") ||
+            !Calls(prepareCalls, "MonoMod.Utils.DynamicMethodDefinition::GetILGenerator"))
+            hazards.Add("MethodCreatorConfig.Prepare no longer exposes shared-state lookup -> DynamicMethodDefinition creation -> ILGenerator flow.");
+        if (!Calls(updateWrapperCalls, "HarmonyLib.MethodCreator::CreateReplacement") ||
+            !Calls(updateWrapperCalls, "HarmonyLib.PatchTools::DetourMethod"))
+            hazards.Add("PatchFunctions.UpdateWrapper no longer exposes CreateReplacement -> DetourMethod flow.");
+        if (!Calls(detourCalls, "MonoMod.Core.DetourFactory::get_Current") || !Calls(detourCalls, "CreateDetour"))
+            hazards.Add("PatchTools.DetourMethod no longer exposes DetourFactory.Current.CreateDetour.");
+        if (!Calls(updatePatchInfoCalls, "System.RuntimeMethodHandle::GetFunctionPointer"))
+            hazards.Add("HarmonySharedState.UpdatePatchInfo no longer exposes the Mono replacement MethodHandle.GetFunctionPointer path.");
+
+        foreach (var method in new[] { sharedStateCctor!, getOrCreateSharedStateType!, getPatchInfo!, updatePatchInfo!, updateWrapper!, prepare!, createDynamicMethod!, detourMethod! })
+        {
+            if (method.IsPInvokeImpl || method.PInvokeInfo is not null)
+                hazards.Add("P/Invoke in exact patch-engine audit member: " + method.FullName);
+        }
+
+        var detail =
+            "HarmonySharedState internalVersion: 102 — MATCH\n" +
+            "HarmonySharedState explicit type-initialization boundary: PRESENT\n" +
+            "Shared-state singleton path: Type.GetType -> Cecil ModuleDefinition.CreateModule -> ReflectionHelper.Load — PRESENT\n" +
+            "Mono StackFrame methodAddress FieldRefAccess dynamic-code branch: PRESENT\n" +
+            "MethodCreatorConfig.Prepare: GetPatchInfo -> CreateDynamicMethod -> GetILGenerator — PRESENT\n" +
+            "PatchFunctions.UpdateWrapper: CreateReplacement -> PatchTools.DetourMethod — PRESENT\n" +
+            "PatchTools.DetourMethod: DetourFactory.Current.CreateDetour — PRESENT\n" +
+            "HarmonySharedState.UpdatePatchInfo: MethodHandle.GetFunctionPointer Mono path — PRESENT\n" +
+            $"Blocking patch-engine metadata hazards: {hazards.Count:N0}" +
+            (hazards.Count == 0 ? string.Empty : "\n" + string.Join("\n", hazards));
+
+        return new HarmonyPatchEngineMetadataSnapshot(
+            hazards.Count == 0,
+            detail,
+            FormatMethodAudit(sharedStateCctor!),
+            FormatMethodAudit(getOrCreateSharedStateType!),
+            FormatMethodAudit(prepare!),
+            FormatMethodAudit(updateWrapper!),
+            FormatMethodAudit(detourMethod!),
+            FormatMethodAudit(updatePatchInfo!));
     }
 
     private static HarmonyPatchMetadataSnapshot ReadHarmonyPatchMetadata(string path)
@@ -4005,6 +4344,16 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         string PatchProcessorConstructorAudit,
         string PatchProcessorTypeInitializerAudit);
 
+    private sealed record HarmonyPatchEngineMetadataSnapshot(
+        bool Allowed,
+        string Detail,
+        string HarmonySharedStateTypeInitializerAudit,
+        string GetOrCreateSharedStateTypeAudit,
+        string MethodCreatorPrepareAudit,
+        string UpdateWrapperAudit,
+        string DetourMethodAudit,
+        string UpdatePatchInfoAudit);
+
     private sealed record HarmonyPatchMetadataSnapshot(
         bool Allowed,
         string Detail,
@@ -4136,7 +4485,18 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         FieldInfo AccessToolsAddHandlerCacheField,
         FieldInfo AccessToolsAddHandlerCacheLockField,
         PropertyInfo RuntimeFrameworkDescriptionProperty,
+        Type HarmonySharedStateType,
+        ConstructorInfo HarmonySharedStateTypeInitializer,
+        FieldInfo HarmonySharedStateInternalVersionField,
+        FieldInfo HarmonySharedStateActualVersionField,
         string AccessToolsTypeInitializerAudit,
+        string PatchEngineMetadataDetail,
+        string HarmonySharedStateTypeInitializerAudit,
+        string HarmonySharedStateGetOrCreateAudit,
+        string MethodCreatorPrepareAudit,
+        string UpdateWrapperAudit,
+        string DetourMethodAudit,
+        string UpdatePatchInfoAudit,
         string AddPrefixAudit,
         string PatchAudit,
         string UnpatchAudit,
@@ -4175,6 +4535,16 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         int HostLoads,
         int NativeLoadAttempts);
 
+    private sealed record HarmonySharedStateInitializationSnapshot(
+        string PreparedSha1,
+        int ActualVersion,
+        int ManagedResolverRequests,
+        int PrivateLoads,
+        int HostLoads,
+        int NativeLoadAttempts,
+        string[] PrivateContextMembership,
+        string[] KnownGeneratedAssemblies);
+
     private sealed record PatchExecutionSnapshot(
         string PreparedSha1,
         string ReplacementName,
@@ -4182,7 +4552,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         int ManagedResolverRequests,
         int PrivateLoads,
         int HostLoads,
-        int NativeLoadAttempts);
+        int NativeLoadAttempts,
+        string[] PrivateContextMembership,
+        string[] KnownGeneratedAssemblies);
 
     private sealed record ProbeInvocationSnapshot(
         int ReflectionResult,
