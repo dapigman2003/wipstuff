@@ -1,9 +1,13 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -1564,7 +1568,24 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException("Step 27 Gate O refuses patch admission because the exact patch metadata shape changed:\n" + metadata.Detail);
             var accessToolsMetadata = ReadAccessToolsMetadata(preflight.Target.PreparedPath);
             if (!accessToolsMetadata.Allowed)
-                throw new InvalidDataException("Step 27 Gate O refuses AccessTools admission because its type initializer is not the exact bounded BindingFlags-only shape:\n" + accessToolsMetadata.Detail);
+                throw new InvalidDataException("Step 27 Gate O refuses AccessTools admission because its type initializer is not the exact physically measured runtime-detection/cache shape:\n" + accessToolsMetadata.Detail);
+
+            stage = "AccessTools host-framework preservation preflight";
+            var runtimeInformationType = Type.GetType("System.Runtime.InteropServices.RuntimeInformation", throwOnError: false, ignoreCase: false)
+                ?? throw new TypeLoadException("Step 27 AccessTools preservation preflight cannot resolve RuntimeInformation by the exact string used by Harmony.");
+            if (runtimeInformationType != typeof(RuntimeInformation))
+                throw new InvalidDataException("String-resolved RuntimeInformation does not bind to the host RuntimeInformation type.");
+            var frameworkDescriptionProperty = runtimeInformationType.GetProperty("FrameworkDescription", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingMemberException("RuntimeInformation.FrameworkDescription was trimmed; Step 27 cannot safely initialize AccessTools.");
+            if (frameworkDescriptionProperty.PropertyType != typeof(string) || frameworkDescriptionProperty.GetMethod is null)
+                throw new InvalidDataException("RuntimeInformation.FrameworkDescription runtime shape changed.");
+            var frameworkDescription = frameworkDescriptionProperty.GetValue(null) as string;
+            if (string.IsNullOrWhiteSpace(frameworkDescription))
+                throw new InvalidDataException("RuntimeInformation.FrameworkDescription returned an empty value during AccessTools preservation preflight.");
+            _ = typeof(Dictionary<,>).GetConstructor(Type.EmptyTypes)
+                ?? throw new MissingMethodException("System.Collections.Generic.Dictionary<,>", ".ctor()");
+            _ = typeof(ReaderWriterLockSlim).GetConstructor([typeof(LockRecursionPolicy)])
+                ?? throw new MissingMethodException(typeof(ReaderWriterLockSlim).FullName, ".ctor(System.Threading.LockRecursionPolicy)");
 
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;
@@ -1626,7 +1647,30 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 ?? throw new MissingFieldException(AccessToolsTypeFullName, "allDeclared");
             if (accessToolsAllField.FieldType != typeof(BindingFlags) || accessToolsAllDeclaredField.FieldType != typeof(BindingFlags))
                 throw new InvalidDataException("HarmonyLib.AccessTools BindingFlags field types changed.");
-            // Do not read either static field here: Gate R owns the AccessTools type-initialization boundary.
+            var accessToolsAllTypesCachedField = accessToolsType.GetField("allTypesCached", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "allTypesCached");
+            var accessToolsIsMonoRuntimeField = accessToolsType.GetField("<IsMonoRuntime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "<IsMonoRuntime>k__BackingField");
+            var accessToolsIsNetFrameworkRuntimeField = accessToolsType.GetField("<IsNetFrameworkRuntime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "<IsNetFrameworkRuntime>k__BackingField");
+            var accessToolsIsNetCoreRuntimeField = accessToolsType.GetField("<IsNetCoreRuntime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "<IsNetCoreRuntime>k__BackingField");
+            var accessToolsAddHandlerCacheField = accessToolsType.GetField("addHandlerCache", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "addHandlerCache");
+            var accessToolsAddHandlerCacheLockField = accessToolsType.GetField("addHandlerCacheLock", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(AccessToolsTypeFullName, "addHandlerCacheLock");
+            if (accessToolsAllTypesCachedField.FieldType != typeof(Type[]) ||
+                accessToolsIsMonoRuntimeField.FieldType != typeof(bool) ||
+                accessToolsIsNetFrameworkRuntimeField.FieldType != typeof(bool) ||
+                accessToolsIsNetCoreRuntimeField.FieldType != typeof(bool) ||
+                accessToolsAddHandlerCacheLockField.FieldType != typeof(ReaderWriterLockSlim))
+                throw new InvalidDataException("HarmonyLib.AccessTools measured runtime-detection/cache field types changed.");
+            var cacheType = accessToolsAddHandlerCacheField.FieldType;
+            if (!cacheType.IsGenericType || cacheType.GetGenericTypeDefinition() != typeof(Dictionary<,>) ||
+                cacheType.GetGenericArguments()[0] != typeof(Type) ||
+                !cacheType.GetGenericArguments()[1].FullName!.Equals("HarmonyLib.FastInvokeHandler", StringComparison.Ordinal))
+                throw new InvalidDataException("HarmonyLib.AccessTools addHandlerCache field type changed.");
+            // Do not read any AccessTools static field here: Gate R owns the type-initialization boundary.
 
             if (context.ManagedResolverRequests.Count != managedBefore || context.PrivateLoads.Count != privateBefore || context.HostLoads.Count != hostBefore)
                 throw new InvalidDataException("Targeted patch API reflection unexpectedly changed resolver/load counters.");
@@ -1650,6 +1694,13 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 accessToolsTypeInitializer,
                 accessToolsAllField,
                 accessToolsAllDeclaredField,
+                accessToolsAllTypesCachedField,
+                accessToolsIsMonoRuntimeField,
+                accessToolsIsNetFrameworkRuntimeField,
+                accessToolsIsNetCoreRuntimeField,
+                accessToolsAddHandlerCacheField,
+                accessToolsAddHandlerCacheLockField,
+                frameworkDescription,
                 accessToolsMetadata.TypeInitializerAudit,
                 metadata.AddPrefixAudit,
                 metadata.PatchAudit,
@@ -1665,8 +1716,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "Patch descriptor type: HarmonyLib.HarmonyMethod — no type initializer\n" +
                 "Patch descriptor constructor: HarmonyMethod(System.Reflection.MethodInfo)\n" +
                 "Patch descriptor retained method field: method : System.Reflection.MethodInfo\n" +
-                "AccessTools type initializer: PRESENT — exact bounded BindingFlags-only static-field shape\n" +
-                "AccessTools.all/allDeclared values read: NO — Gate R owns the type-initialization boundary\n" +
+                "AccessTools type initializer: PRESENT — exact Step 27.0.1 physical runtime-detection/cache fingerprint\n" +
+                $"Host RuntimeInformation.FrameworkDescription preservation preflight: {frameworkDescription}\n" +
+                "AccessTools static-field values read: NO — Gate R owns the type-initialization boundary\n" +
                 "HarmonyMethod object constructed: NO\n" +
                 "PatchProcessor.Patch invoked: NO\n" +
                 "Launcher patch probe invoked: NO\n" +
@@ -1797,8 +1849,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 explicitly initializes only exact metadata-verified HarmonyLib.AccessTools before HarmonyMethod construction.")]
-    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "AccessTools is post-publish Harmony code unavailable to the build-time trimmer; Gate O bounds its exact type initializer before this explicit completion barrier.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 explicitly initializes only the exact physically measured HarmonyLib.AccessTools runtime-detection/cache initializer before HarmonyMethod construction.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "AccessTools is post-publish Harmony code unavailable to the build-time trimmer; Gate O bounds its exact physical runtime-detection/cache initializer and verifies the string-reflected framework surface before this explicit completion barrier.")]
     public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization()
     {
         var stage = "explicit HarmonyLib.AccessTools type-initialization completion barrier";
@@ -1836,6 +1888,25 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (all != expectedAll || allDeclared != expectedAllDeclared)
                 throw new InvalidDataException($"AccessTools BindingFlags initialization changed: all={all} ({(int)all}), allDeclared={allDeclared} ({(int)allDeclared}), expected={expectedAll} ({(int)expectedAll}) / {expectedAllDeclared} ({(int)expectedAllDeclared}).");
 
+            stage = "AccessTools post-initialization runtime-detection/cache verification";
+            if (patchApi.AccessToolsAllTypesCachedField.GetValue(null) is not null)
+                throw new InvalidDataException("AccessTools.allTypesCached no longer matches the measured null post-initialization state.");
+            if (patchApi.AccessToolsIsMonoRuntimeField.GetValue(null) is not bool isMonoRuntime ||
+                patchApi.AccessToolsIsNetFrameworkRuntimeField.GetValue(null) is not bool isNetFrameworkRuntime ||
+                patchApi.AccessToolsIsNetCoreRuntimeField.GetValue(null) is not bool isNetCoreRuntime)
+                throw new InvalidDataException("AccessTools runtime-detection backing fields returned unexpected runtime values/types.");
+            var addHandlerCache = patchApi.AccessToolsAddHandlerCacheField.GetValue(null)
+                ?? throw new InvalidDataException("AccessTools.addHandlerCache remained null after explicit type initialization.");
+            if (addHandlerCache is not ICollection cacheCollection || cacheCollection.Count != 0)
+                throw new InvalidDataException("AccessTools.addHandlerCache is not the expected empty ICollection immediately after type initialization.");
+            var addHandlerCacheLock = patchApi.AccessToolsAddHandlerCacheLockField.GetValue(null) as ReaderWriterLockSlim
+                ?? throw new InvalidDataException("AccessTools.addHandlerCacheLock remained null or changed type after explicit type initialization.");
+            if (addHandlerCacheLock.IsReadLockHeld || addHandlerCacheLock.IsUpgradeableReadLockHeld || addHandlerCacheLock.IsWriteLockHeld)
+                throw new InvalidDataException("AccessTools.addHandlerCacheLock unexpectedly holds a lock immediately after type initialization.");
+            var frameworkDescription = RuntimeInformation.FrameworkDescription;
+            if (string.IsNullOrWhiteSpace(frameworkDescription) || frameworkDescription.StartsWith(".NET Framework", StringComparison.Ordinal))
+                throw new InvalidDataException("AccessTools runtime environment is not the expected non-.NET-Framework host: " + frameworkDescription);
+
             if (context.NativeLoadAttempts.Count != nativeBefore)
                 throw new DllNotFoundException("AccessTools type initialization attempted native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
             if (context.RejectedManagedRequests.Count != 0)
@@ -1850,7 +1921,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException("AccessTools type initialization unexpectedly invoked the launcher target or prefix.");
 
             _accessToolsTypeInitialization = new AccessToolsTypeInitializationSnapshot(
-                postSha1, all, allDeclared,
+                postSha1, all, allDeclared, isMonoRuntime, isNetFrameworkRuntime, isNetCoreRuntime, frameworkDescription,
                 context.ManagedResolverRequests.Count - managedBefore,
                 context.PrivateLoads.Count - privateBefore,
                 context.HostLoads.Count - hostBefore,
@@ -1860,9 +1931,16 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 ControlledHarmonyPatchExecutionGate.AccessToolsTypeInitialization,
                 "CONTROLLED HARMONY ACCESSTOOLS TYPE INITIALIZATION SUCCEEDED.\n" +
                 "Completion barrier: RuntimeHelpers.RunClassConstructor(HarmonyLib.AccessTools.TypeHandle) = PASS\n" +
-                "Measured initializer: BindingFlags-only static initialization of AccessTools.all + allDeclared\n" +
+                "Measured initializer: exact Step 27.0.1 physical runtime-detection/cache shape\n" +
                 $"AccessTools.all: {all} ({(int)all})\n" +
                 $"AccessTools.allDeclared: {allDeclared} ({(int)allDeclared})\n" +
+                $"AccessTools.IsMonoRuntime: {isMonoRuntime}\n" +
+                $"AccessTools.IsNetFrameworkRuntime: {isNetFrameworkRuntime}\n" +
+                $"AccessTools.IsNetCoreRuntime: {isNetCoreRuntime}\n" +
+                $"RuntimeInformation.FrameworkDescription: {frameworkDescription}\n" +
+                "AccessTools.allTypesCached: null — MATCH\n" +
+                "AccessTools.addHandlerCache: empty — MATCH\n" +
+                "AccessTools.addHandlerCacheLock: initialized/unheld — MATCH\n" +
                 $"Managed resolver requests during type initialization: {_accessToolsTypeInitialization.ManagedResolverRequests:N0}\n" +
                 $"Private loads during type initialization: {_accessToolsTypeInitialization.PrivateLoads:N0}\n" +
                 $"Host loads during type initialization: {_accessToolsTypeInitialization.HostLoads:N0}\n" +
@@ -2581,92 +2659,168 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         if (!accessTools.IsPublic || !accessTools.IsAbstract || !accessTools.IsSealed || accessTools.IsInterface)
             return new AccessToolsMetadataSnapshot(false, "HarmonyLib.AccessTools is no longer the exact public static-class shape.", "<invalid type>");
 
-        var allField = accessTools.Fields.SingleOrDefault(field => field.IsPublic && field.IsStatic && field.IsInitOnly && field.Name.Equals("all", StringComparison.Ordinal));
-        var allDeclaredField = accessTools.Fields.SingleOrDefault(field => field.IsPublic && field.IsStatic && field.IsInitOnly && field.Name.Equals("allDeclared", StringComparison.Ordinal));
-        if (allField is null || allDeclaredField is null ||
-            !allField.FieldType.FullName.Equals("System.Reflection.BindingFlags", StringComparison.Ordinal) ||
-            !allDeclaredField.FieldType.FullName.Equals("System.Reflection.BindingFlags", StringComparison.Ordinal))
-            return new AccessToolsMetadataSnapshot(false, "AccessTools.all/allDeclared public static readonly BindingFlags fields changed.", "<blocked>");
+        var hazards = new List<string>();
+        FieldDefinition? ExactField(string name, string typeName, bool requirePublic = false, bool requireInitOnly = false)
+        {
+            var matches = accessTools.Fields.Where(field => field.Name.Equals(name, StringComparison.Ordinal)).ToArray();
+            if (matches.Length != 1)
+            {
+                hazards.Add($"AccessTools field {name} count changed: {matches.Length}.");
+                return null;
+            }
+            var field = matches[0];
+            if (!field.IsStatic || !field.FieldType.FullName.Equals(typeName, StringComparison.Ordinal) ||
+                (requirePublic && !field.IsPublic) || (requireInitOnly && !field.IsInitOnly))
+            {
+                hazards.Add($"AccessTools field {name} shape changed: {field.FullName}.");
+                return null;
+            }
+            return field;
+        }
+
+        var allTypesCached = ExactField("allTypesCached", "System.Type[]");
+        var allField = ExactField("all", "System.Reflection.BindingFlags", requirePublic: true, requireInitOnly: true);
+        var allDeclaredField = ExactField("allDeclared", "System.Reflection.BindingFlags", requirePublic: true, requireInitOnly: true);
+        var isMonoRuntime = ExactField("<IsMonoRuntime>k__BackingField", "System.Boolean");
+        var isNetFrameworkRuntime = ExactField("<IsNetFrameworkRuntime>k__BackingField", "System.Boolean");
+        var isNetCoreRuntime = ExactField("<IsNetCoreRuntime>k__BackingField", "System.Boolean");
+        var addHandlerCache = ExactField("addHandlerCache", "System.Collections.Generic.Dictionary`2<System.Type,HarmonyLib.FastInvokeHandler>");
+        var addHandlerCacheLock = ExactField("addHandlerCacheLock", "System.Threading.ReaderWriterLockSlim");
 
         var typeInitializers = accessTools.Methods.Where(method => method.IsConstructor && method.IsStatic).ToArray();
         if (typeInitializers.Length != 1 || !typeInitializers[0].HasBody)
             return new AccessToolsMetadataSnapshot(false, $"Expected exactly one managed AccessTools type initializer; observed {typeInitializers.Length}.", typeInitializers.Length == 0 ? "<missing>" : string.Join("\n", typeInitializers.Select(m => m.FullName)));
         var cctor = typeInitializers[0];
         if (cctor.IsPInvokeImpl || cctor.PInvokeInfo is not null || cctor.Body.ExceptionHandlers.Count != 0 || cctor.Body.Variables.Count != 0)
-            return new AccessToolsMetadataSnapshot(false, "AccessTools type initializer contains P/Invoke, handlers, or locals outside the bounded static BindingFlags initialization shape.", FormatMethodAudit(cctor));
+            hazards.Add("AccessTools type initializer contains P/Invoke, handlers, or locals outside the physically measured runtime-detection/cache shape.");
+        if (cctor.Body.Instructions.Count != 56)
+            hazards.Add($"AccessTools type initializer instruction count changed: observed {cctor.Body.Instructions.Count}, expected 56.");
+
+        var expectedOpcodeCounts = new Dictionary<Code, int>
+        {
+            [Code.Ldnull] = 6,
+            [Code.Stsfld] = 8,
+            [Code.Ldc_I4] = 1,
+            [Code.Ldsfld] = 1,
+            [Code.Ldc_I4_2] = 1,
+            [Code.Or] = 1,
+            [Code.Ldc_I4_0] = 5,
+            [Code.Ldstr] = 7,
+            [Code.Call] = 6,
+            [Code.Callvirt] = 6,
+            [Code.Ceq] = 3,
+            [Code.Dup] = 2,
+            [Code.Brtrue_S] = 2,
+            [Code.Pop] = 2,
+            [Code.Br_S] = 2,
+            [Code.Newobj] = 2,
+            [Code.Ret] = 1,
+        };
+        var observedOpcodeCounts = cctor.Body.Instructions
+            .GroupBy(instruction => instruction.OpCode.Code)
+            .ToDictionary(group => group.Key, group => group.Count());
+        foreach (var expected in expectedOpcodeCounts)
+        {
+            observedOpcodeCounts.TryGetValue(expected.Key, out var observed);
+            if (observed != expected.Value)
+                hazards.Add($"AccessTools::.cctor opcode count changed for {expected.Key}: observed {observed}, expected {expected.Value}.");
+        }
+        foreach (var unexpected in observedOpcodeCounts.Keys.Except(expectedOpcodeCounts.Keys).OrderBy(code => code.ToString(), StringComparer.Ordinal))
+            hazards.Add($"AccessTools::.cctor contains unexpected opcode {unexpected} ({observedOpcodeCounts[unexpected]} occurrence(s)).");
+
+        var expectedStrings = new[]
+        {
+            "Mono.Runtime",
+            "System.Runtime.InteropServices.RuntimeInformation",
+            "FrameworkDescription",
+            ".NET Framework",
+            "System.Runtime.InteropServices.RuntimeInformation",
+            "FrameworkDescription",
+            ".NET Core",
+        };
+        var observedStrings = cctor.Body.Instructions.Where(instruction => instruction.OpCode.Code == Code.Ldstr).Select(instruction => instruction.Operand as string ?? string.Empty).ToArray();
+        if (!observedStrings.SequenceEqual(expectedStrings, StringComparer.Ordinal))
+            hazards.Add("AccessTools::.cctor string-literal sequence changed: " + FormatNames(observedStrings));
+
+        var expectedMethodOperands = new[]
+        {
+            "System.Type System.Type::GetType(System.String)",
+            "System.Type System.Type::GetType(System.String,System.Boolean)",
+            "System.Type System.Type::GetType(System.String,System.Boolean)",
+            "System.Boolean HarmonyLib.AccessTools::get_IsMonoRuntime()",
+            "System.Reflection.PropertyInfo System.Type::GetProperty(System.String)",
+            "System.Reflection.PropertyInfo System.Type::GetProperty(System.String)",
+            "System.Object System.Reflection.PropertyInfo::GetValue(System.Object,System.Object[])",
+            "System.Object System.Reflection.PropertyInfo::GetValue(System.Object,System.Object[])",
+            "System.String System.Object::ToString()",
+            "System.String System.Object::ToString()",
+            "System.Boolean System.String::StartsWith(System.String)",
+            "System.Boolean System.String::StartsWith(System.String)",
+            "System.Void System.Collections.Generic.Dictionary`2<System.Type,HarmonyLib.FastInvokeHandler>::.ctor()",
+            "System.Void System.Threading.ReaderWriterLockSlim::.ctor(System.Threading.LockRecursionPolicy)",
+        }.OrderBy(value => value, StringComparer.Ordinal).ToArray();
+        var observedMethodOperands = cctor.Body.Instructions
+            .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt or Code.Newobj)
+            .Select(instruction => instruction.Operand is MethodReference method ? method.FullName : "<non-method>")
+            .OrderBy(value => value, StringComparer.Ordinal)
+            .ToArray();
+        if (!observedMethodOperands.SequenceEqual(expectedMethodOperands, StringComparer.Ordinal))
+            hazards.Add("AccessTools::.cctor call/newobj surface changed: " + FormatNames(observedMethodOperands));
+
+        var expectedStores = new[]
+        {
+            "System.Type[] HarmonyLib.AccessTools::allTypesCached",
+            "System.Reflection.BindingFlags HarmonyLib.AccessTools::all",
+            "System.Reflection.BindingFlags HarmonyLib.AccessTools::allDeclared",
+            "System.Boolean HarmonyLib.AccessTools::<IsMonoRuntime>k__BackingField",
+            "System.Boolean HarmonyLib.AccessTools::<IsNetFrameworkRuntime>k__BackingField",
+            "System.Boolean HarmonyLib.AccessTools::<IsNetCoreRuntime>k__BackingField",
+            "System.Collections.Generic.Dictionary`2<System.Type,HarmonyLib.FastInvokeHandler> HarmonyLib.AccessTools::addHandlerCache",
+            "System.Threading.ReaderWriterLockSlim HarmonyLib.AccessTools::addHandlerCacheLock",
+        }.OrderBy(value => value, StringComparer.Ordinal).ToArray();
+        var observedStores = cctor.Body.Instructions
+            .Where(instruction => instruction.OpCode.Code == Code.Stsfld)
+            .Select(instruction => instruction.Operand is FieldReference field ? field.FullName : "<non-field>")
+            .OrderBy(value => value, StringComparer.Ordinal)
+            .ToArray();
+        if (!observedStores.SequenceEqual(expectedStores, StringComparer.Ordinal))
+            hazards.Add("AccessTools::.cctor static-field store surface changed: " + FormatNames(observedStores));
 
         var expectedAll = (int)(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static |
             BindingFlags.GetField | BindingFlags.SetField | BindingFlags.GetProperty | BindingFlags.SetProperty);
         var expectedAllDeclared = expectedAll | (int)BindingFlags.DeclaredOnly;
-        var stack = new Stack<int>();
-        int? measuredAll = null;
-        int? measuredAllDeclared = null;
-        var returned = false;
-        var hazards = new List<string>();
-
-        foreach (var instruction in cctor.Body.Instructions)
+        if (allField is not null)
         {
-            if (TryGetLdcI4Value(instruction, out var constant))
-            {
-                stack.Push(constant);
-                continue;
-            }
-
-            if (instruction.OpCode.Code == Code.Ldsfld && instruction.Operand is FieldReference loadField &&
-                loadField.DeclaringType.FullName.Equals(AccessToolsTypeFullName, StringComparison.Ordinal) &&
-                loadField.Name.Equals("all", StringComparison.Ordinal) && measuredAll.HasValue)
-            {
-                stack.Push(measuredAll.Value);
-                continue;
-            }
-
-            if (instruction.OpCode.Code == Code.Or && stack.Count >= 2)
-            {
-                var right = stack.Pop();
-                var left = stack.Pop();
-                stack.Push(left | right);
-                continue;
-            }
-
-            if (instruction.OpCode.Code == Code.Stsfld && instruction.Operand is FieldReference storeField &&
-                storeField.DeclaringType.FullName.Equals(AccessToolsTypeFullName, StringComparison.Ordinal) && stack.Count >= 1)
-            {
-                var value = stack.Pop();
-                if (storeField.Name.Equals("all", StringComparison.Ordinal) && !measuredAll.HasValue)
-                {
-                    measuredAll = value;
-                    continue;
-                }
-                if (storeField.Name.Equals("allDeclared", StringComparison.Ordinal) && !measuredAllDeclared.HasValue)
-                {
-                    measuredAllDeclared = value;
-                    continue;
-                }
-            }
-
-            if (instruction.OpCode.Code == Code.Ret && ReferenceEquals(instruction, cctor.Body.Instructions[^1]) && stack.Count == 0)
-            {
-                returned = true;
-                continue;
-            }
-
-            hazards.Add($"unexpected AccessTools::.cctor instruction IL_{instruction.Offset:X4}: {instruction.OpCode.Code} {FormatInstructionOperand(instruction.Operand)}".TrimEnd());
+            var store = cctor.Body.Instructions.SingleOrDefault(instruction => instruction.OpCode.Code == Code.Stsfld && ReferenceEquals(instruction.Operand, allField));
+            if (store is null || store.Previous is null || !TryGetLdcI4Value(store.Previous, out var value) || value != expectedAll)
+                hazards.Add($"AccessTools.all initializer value/shape changed; expected direct constant {expectedAll}.");
         }
-
-        if (measuredAll != expectedAll)
-            hazards.Add($"AccessTools.all initializer value changed: observed {measuredAll?.ToString() ?? "<missing>"}, expected {expectedAll}.");
-        if (measuredAllDeclared != expectedAllDeclared)
-            hazards.Add($"AccessTools.allDeclared initializer value changed: observed {measuredAllDeclared?.ToString() ?? "<missing>"}, expected {expectedAllDeclared}.");
-        if (!returned)
-            hazards.Add("AccessTools type initializer did not end in the exact bounded empty-stack return.");
+        if (allDeclaredField is not null)
+        {
+            var store = cctor.Body.Instructions.SingleOrDefault(instruction => instruction.OpCode.Code == Code.Stsfld && ReferenceEquals(instruction.Operand, allDeclaredField));
+            if (store is null || store.Previous?.OpCode.Code != Code.Or || store.Previous.Previous is null || !TryGetLdcI4Value(store.Previous.Previous, out var declaredOnly) || declaredOnly != (int)BindingFlags.DeclaredOnly ||
+                store.Previous.Previous.Previous?.OpCode.Code != Code.Ldsfld || store.Previous.Previous.Previous.Operand is not FieldReference source || !source.Name.Equals("all", StringComparison.Ordinal))
+                hazards.Add($"AccessTools.allDeclared initializer shape changed; expected all | DeclaredOnly ({expectedAllDeclared}).");
+        }
+        if (allTypesCached is not null)
+        {
+            var first = cctor.Body.Instructions.FirstOrDefault();
+            if (first?.OpCode.Code != Code.Ldnull || first.Next?.OpCode.Code != Code.Stsfld || first.Next.Operand is not FieldReference field || !field.Name.Equals(allTypesCached.Name, StringComparison.Ordinal))
+                hazards.Add("AccessTools.allTypesCached is no longer initialized to null at the beginning of the type initializer.");
+        }
+        if (cctor.Body.Instructions.LastOrDefault()?.OpCode.Code != Code.Ret)
+            hazards.Add("AccessTools type initializer no longer ends in ret.");
 
         var detail =
             "Type: HarmonyLib.AccessTools — exact public static class\n" +
             $"Type initializer count: {typeInitializers.Length:N0}\n" +
+            $"Type initializer instructions: {cctor.Body.Instructions.Count:N0} (expected 56)\n" +
             $"AccessTools.all expected BindingFlags value: {expectedAll}\n" +
             $"AccessTools.allDeclared expected BindingFlags value: {expectedAllDeclared}\n" +
+            "Measured runtime probes: Mono.Runtime + RuntimeInformation.FrameworkDescription (.NET Framework / .NET Core legacy classification)\n" +
+            "Measured cache initialization: allTypesCached=null + Dictionary<Type,FastInvokeHandler> + ReaderWriterLockSlim\n" +
             $"Blocking AccessTools initializer hazards: {hazards.Count:N0}" +
-            (hazards.Count == 0 ? string.Empty : "\n" + string.Join("\n", hazards));
+            (hazards.Count == 0 ? "\nExact Step 27.0.1 physical AccessTools initializer fingerprint: MATCH" : "\n" + string.Join("\n", hazards));
         return new AccessToolsMetadataSnapshot(hazards.Count == 0, detail, FormatMethodAudit(cctor));
     }
 
@@ -3867,6 +4021,13 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         ConstructorInfo AccessToolsTypeInitializer,
         FieldInfo AccessToolsAllField,
         FieldInfo AccessToolsAllDeclaredField,
+        FieldInfo AccessToolsAllTypesCachedField,
+        FieldInfo AccessToolsIsMonoRuntimeField,
+        FieldInfo AccessToolsIsNetFrameworkRuntimeField,
+        FieldInfo AccessToolsIsNetCoreRuntimeField,
+        FieldInfo AccessToolsAddHandlerCacheField,
+        FieldInfo AccessToolsAddHandlerCacheLockField,
+        string RuntimeFrameworkDescription,
         string AccessToolsTypeInitializerAudit,
         string AddPrefixAudit,
         string PatchAudit,
@@ -3889,6 +4050,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         string PreparedSha1,
         BindingFlags All,
         BindingFlags AllDeclared,
+        bool IsMonoRuntime,
+        bool IsNetFrameworkRuntime,
+        bool IsNetCoreRuntime,
+        string RuntimeFrameworkDescription,
         int ManagedResolverRequests,
         int PrivateLoads,
         int HostLoads,

@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>85</ApplicationVersion>" in project_text, "build version is 85")
-require("<ApplicationDisplayVersion>0.0.85</ApplicationDisplayVersion>" in project_text, "display version is 0.0.85")
-require(plist.get("CFBundleVersion") == "85", "Info.plist build version is 85")
-require(plist.get("CFBundleShortVersionString") == "0.0.85", "Info.plist display version is 0.0.85")
+require("<ApplicationVersion>86</ApplicationVersion>" in project_text, "build version is 86")
+require("<ApplicationDisplayVersion>0.0.86</ApplicationDisplayVersion>" in project_text, "display version is 0.0.86")
+require(plist.get("CFBundleVersion") == "86", "Info.plist build version is 86")
+require(plist.get("CFBundleShortVersionString") == "0.0.86", "Info.plist display version is 0.0.86")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -324,8 +324,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.85",
-    "STS2_BUILD_VERSION": "85",
+    "STS2_DISPLAY_VERSION": "0.0.86",
+    "STS2_BUILD_VERSION": "86",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -915,8 +915,12 @@ require("Interlocked.Increment(ref _targetCalls)" in step27_probe and "Interlock
 require("OrderedHarmonyPatchExecutionGatesReachTwentySixOfTwentySixPass" in step27_tests and "HarmonyPatchExecutionGatesStopAfterFirstFailure" in step27_tests, "Step 27 host tests enforce ordered fail-fast twenty-six-gate behavior")
 require("SyntheticStep26ReplayThroughEmptyProcessorStillPassesBeforePatchBoundary" in step27_tests and "RunPostProcessorAuditAsync" in step27_tests, "Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary")
 require("LauncherPatchProbeHasDeterministicOriginalAndPrefixBehavior" in step27_tests and "LauncherPatchProbeReflectionSurfaceIsExactAndLauncherOwned" in step27_tests, "Step 27 host tests cover exact launcher patch-probe behavior and signature metadata")
-require("AccessToolsMetadataAuditAcceptsOnlyBoundedBindingFlagsInitializer" in step27_tests and "WriteAccessToolsFixture" in step27_tests, "Step 27 host tests pin the bounded AccessTools BindingFlags-only initializer metadata shape")
+require("AccessToolsMetadataAuditAcceptsOnlyExactMeasuredRuntimeDetectionCacheInitializer" in step27_tests and "WriteAccessToolsFixture" in step27_tests, "Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape")
 require("Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH" in step27_tests, "Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression")
+step27_preservation = read("src/StS2Launcher.iOS/Platform/Step27AccessToolsFrameworkPreservation.cs")
+require("typeof(RuntimeInformation)" in step27_preservation and "typeof(PropertyInfo)" in step27_preservation and "typeof(Dictionary<,>)" in step27_preservation and "typeof(ReaderWriterLockSlim)" in step27_preservation, "Step 27 preserves only the bounded framework surface measured in AccessTools::.cctor")
+require("Step27AccessToolsFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs"), "Step 27 roots the AccessTools DynamicDependency preservation anchor from candidate-owned UI")
+require("cctor.Body.Instructions.Count != 56" in step27_source and "Exact Step 27.0.1 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 56-instruction AccessTools fingerprint and framework preflight")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
 
 step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
@@ -961,7 +965,9 @@ required_docs = [
     "docs/history/steps/STEP-26.0-PHYSICAL-CLOSURE.md",
     "docs/history/steps/STEP-27-CONTROLLED-LAUNCHER-HARMONY-PATCH.md",
     "docs/history/steps/STEP-27.0.1-ACCESSTOOLS-TYPE-INITIALIZATION-BOUNDARY.md",
+    "docs/history/steps/STEP-27.0.2-ACCESSTOOLS-MEASURED-INITIALIZER-PRESERVATION.md",
     "docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt",
+    "docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt",
     "docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt",
     "docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt",
     "docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt",
@@ -984,8 +990,11 @@ require("System.MissingMethodException: Method not found: System.Version System.
 step27_build84_report = read("docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt")
 require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 17/25" in step27_build84_report and "Gate Q — BaselineProbeInvocation: PASS" in step27_build84_report and "Gate R — PrefixRegistration: FAIL" in step27_build84_report, "physical build 84 report preserves the exact Step 27 17/25 gate result")
 require("TypeInitialization_Type, HarmonyLib.AccessTools" in step27_build84_report and "PatchProcessor.AddPrefix" in step27_build84_report, "physical build 84 report preserves the implicit AccessTools initialization failure before Patch()")
+step27_build85_report = read("docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt")
+require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 14/26" in step27_build85_report and "Gate O — HarmonyPatchApiResolution: FAIL" in step27_build85_report and "Blocking AccessTools initializer hazards: 46" in step27_build85_report, "physical build 85 report preserves the exact Gate-O 14/26 metadata result")
+require("System.Runtime.InteropServices.RuntimeInformation" in step27_build85_report and "ReaderWriterLockSlim" in step27_build85_report and "addHandlerCache" in step27_build85_report, "physical build 85 report preserves the measured AccessTools runtime-detection/cache surface")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "14/14 PASS" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.85 (85)" in current_status and "26/26 PASS" in current_status and "AccessToolsTypeInitialization" in current_status and "Step 28" in current_status, "current status preserves physical Step 27.0 17/25 evidence and advances to Step 27.0.1 / 0.0.85 with an explicit AccessTools gate before the Step 28 frontier")
+require("Steps 01–26" in current_status and "0.0.83 (83)" in current_status and "0.0.84 (84)" in current_status and "17/25" in current_status and "0.0.85 (85)" in current_status and "14/26" in current_status and "0.0.86 (86)" in current_status and "26/26 PASS" in current_status and "56 instructions" in current_status and "AccessToolsTypeInitialization" in current_status and "Step 28" in current_status, "current status preserves both physical Step 27 results and advances to Step 27.0.2 / 0.0.86 with the measured AccessTools initializer")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

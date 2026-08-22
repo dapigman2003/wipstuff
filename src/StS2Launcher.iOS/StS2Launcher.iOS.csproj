@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>85</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.85</ApplicationDisplayVersion>
+    <ApplicationVersion>86</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.86</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -98,6 +98,8 @@
              Text="STEP27 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
     <Message Importance="High"
              Text="STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
+    <Message Importance="High"
+             Text="STEP27 CANDIDATE ACCESSTOOLS FRAMEWORK PRESERVATION: DynamicDependency RuntimeInformation/PropertyInfo/Dictionary/ReaderWriterLockSlim measured initializer surface" />
     <Error Condition="'$(MtouchInterpreter)' != '-all'"
            Text="Canonical foundation preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
     <Error Condition="'$(UseInterpreter)' == 'true'"

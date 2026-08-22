@@ -29,3 +29,7 @@ Upstream Harmony 2.4.2 source defines `AccessTools.all` as the combined public/n
 - version: **0.0.85 (85)**
 - workflow: **`ios-step-27`**
 - expected summary: **26/26 PASS**
+
+## Physical result — 0.0.85 (85)
+
+Physical build 85 failed safely at Gate O, 14/26, before `RunClassConstructor` or any patching. The receipt-backed AccessTools initializer disproved this candidate's BindingFlags-only assumption: it is a 56-instruction runtime-detection/cache initializer that also string-resolves `RuntimeInformation`, reflects `FrameworkDescription`, and constructs a handler dictionary and `ReaderWriterLockSlim`. The raw report is preserved at `docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt`. Step 27.0.2 replaces the incorrect metadata model; no Step-27 execution fact from build 84 is revoked.

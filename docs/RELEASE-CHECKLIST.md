@@ -1,41 +1,24 @@
-# Release Checklist — Step 27.0.1
+# Release Checklist — Step 27.0.2
 
 ## Source / policy
 
 - Steps 01–26 remain closed/protected.
-- Physical Step 27.0 / 0.0.84 17/25 evidence is preserved.
-- Step 27.0.1 adds only the explicit measured `HarmonyLib.AccessTools` type-initialization gate plus shifted later gate labels; the intended launcher-only patch boundary is unchanged.
+- Preserve physical Step 27.0 / 0.0.84 A–Q PASS / 17/25 evidence.
+- Preserve physical Step 27.0.1 / 0.0.85 Gate-O 14/26 metadata evidence.
+- Step 27.0.2 changes only the AccessTools measured metadata policy, bounded framework-preservation anchor, and associated diagnostics/tests; the launcher-only patch boundary is unchanged.
 - No protected Step 23/24/25/26 behavior file is edited.
-- `TrimMode=full`, `MtouchInterpreter=-all`, Step-22 roots, `System.Collections.Concurrent`, and the proven Step-25 constructor framework-preservation anchor remain active.
-- StS2 member reflection/patching/invocation, broad Harmony discovery, Godot/game startup, and native game-library loading remain absent.
+- `TrimMode=full`, `MtouchInterpreter=-all`, established roots/preservation policies remain active.
+- StS2 reflection/patching/invocation, broad Harmony discovery, Godot startup, native game libraries remain absent.
 
 ## Build identity
 
-- expected version: `0.0.85 (85)`;
-- workflow: `ios-step-27`;
-- expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`;
-- host TRX: `artifacts/test-results/step27.trx`.
+- version: `0.0.86 (86)`
+- workflow: `ios-step-27`
+- IPA: `artifacts/StS2-Launcher-Step-27.ipa`
+- TRX: `artifacts/test-results/step27.trx`
 
-## Pre-device authority
+## Authority
 
-Require static validation, host tests, iOS publish, and IPA verification all PASS. Do not install a candidate with any CI failure.
+Require static validation, host tests, iOS publish, and IPA verification PASS before installation. Fresh physical run A–Z, expected **26/26**, then OfflineReady PASS and Foundation 5/5.
 
-## Physical run
-
-Fresh process only. Run Step 27 A–Z in order and stop on first failure. Expected final summary: **26/26 PASS**. Then require OfflineReady PASS and Foundation 5/5.
-
-## Failure interpretation
-
-- A–N: regression in a closed prerequisite.
-- O: patch/AccessTools metadata drift; no new type initialization or patching occurred.
-- P/Q: launcher probe metadata/baseline problem.
-- R: explicit AccessTools initialization boundary remains open; no HarmonyMethod or patch should exist.
-- S: prefix-description construction remains open; `Patch()` was not attempted.
-- T: first real patch-engine boundary remains open.
-- U: a patch may exist, but patched execution is intentionally withheld because integrity was not proven.
-- V: patch installation completed but patched behavior is not proven.
-- W/X: exact removal or post-removal integrity remains open.
-- Y: removal completed but restored behavior is not proven.
-- Z: behavior may be demonstrated, but Step 27 is not closed until final integrity/isolation passes.
-
-After Gate T or later, force-quit before any retry or earlier fresh-process runtime regression.
+Failure meaning: O = metadata/preservation preflight only; R = explicit AccessTools initialization remains open; S = descriptor construction; T = first patch engine; U–Z = post-patch behavior/removal/integrity. Force-quit after any Gate-T-or-later failure.

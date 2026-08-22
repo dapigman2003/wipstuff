@@ -50,7 +50,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
     }
 
     [TestMethod]
-    public void AccessToolsMetadataAuditAcceptsOnlyBoundedBindingFlagsInitializer()
+    public void AccessToolsMetadataAuditAcceptsOnlyExactMeasuredRuntimeDetectionCacheInitializer()
     {
         using var temp = new TempTestDirectory("sts2-step27-accesstools-metadata");
         var goodPath = Path.Combine(temp.Path, "AccessTools-good.dll");
@@ -66,7 +66,8 @@ public sealed class ControlledHarmonyPatchExecutionTests
         var detailProperty = good.GetType().GetProperty("Detail") ?? throw new AssertFailedException("AccessTools audit result has no Detail property.");
         Assert.AreEqual(true, allowedProperty.GetValue(good));
         Assert.AreEqual(false, allowedProperty.GetValue(drift));
-        StringAssert.Contains((string?)detailProperty.GetValue(drift) ?? string.Empty, "Blocking AccessTools initializer hazards: 1");
+        StringAssert.Contains((string?)detailProperty.GetValue(good) ?? string.Empty, "Exact Step 27.0.1 physical AccessTools initializer fingerprint: MATCH");
+        StringAssert.Contains((string?)detailProperty.GetValue(drift) ?? string.Empty, "Blocking AccessTools initializer hazards:");
     }
 
     [TestMethod]
@@ -951,37 +952,139 @@ public sealed class ControlledHarmonyPatchExecutionTests
     private static void WriteAccessToolsFixture(string path, bool drift)
     {
         using var module = ModuleDefinition.CreateModule(Path.GetFileName(path), ModuleKind.Dll);
-        var bindingFlagsType = new TypeReference("System.Reflection", "BindingFlags", module, module.TypeSystem.CoreLibrary, true);
+        var bindingFlagsType = module.ImportReference(typeof(BindingFlags));
+        var systemType = module.ImportReference(typeof(Type));
+        var propertyInfoType = module.ImportReference(typeof(PropertyInfo));
+        var readerWriterLockType = module.ImportReference(typeof(System.Threading.ReaderWriterLockSlim));
+        var lockRecursionPolicyType = module.ImportReference(typeof(System.Threading.LockRecursionPolicy));
+
+        var fastInvokeHandler = new TypeDefinition(
+            "HarmonyLib",
+            "FastInvokeHandler",
+            Mono.Cecil.TypeAttributes.NotPublic | Mono.Cecil.TypeAttributes.Sealed,
+            module.TypeSystem.Object);
+        module.Types.Add(fastInvokeHandler);
+
+        var dictionaryOpen = module.ImportReference(typeof(Dictionary<,>));
+        var dictionaryType = new GenericInstanceType(dictionaryOpen);
+        dictionaryType.GenericArguments.Add(systemType);
+        dictionaryType.GenericArguments.Add(fastInvokeHandler);
+
         var accessTools = new TypeDefinition(
             "HarmonyLib",
             "AccessTools",
             Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Abstract | Mono.Cecil.TypeAttributes.Sealed,
             module.TypeSystem.Object);
         module.Types.Add(accessTools);
-        var all = new FieldDefinition(
-            "all",
-            Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static | Mono.Cecil.FieldAttributes.InitOnly,
-            bindingFlagsType);
-        var allDeclared = new FieldDefinition(
-            "allDeclared",
-            Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static | Mono.Cecil.FieldAttributes.InitOnly,
-            bindingFlagsType);
+
+        var allTypesCached = new FieldDefinition("allTypesCached", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, new ArrayType(systemType));
+        var all = new FieldDefinition("all", Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static | Mono.Cecil.FieldAttributes.InitOnly, bindingFlagsType);
+        var allDeclared = new FieldDefinition("allDeclared", Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static | Mono.Cecil.FieldAttributes.InitOnly, bindingFlagsType);
+        var isMonoRuntime = new FieldDefinition("<IsMonoRuntime>k__BackingField", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, module.TypeSystem.Boolean);
+        var isNetFrameworkRuntime = new FieldDefinition("<IsNetFrameworkRuntime>k__BackingField", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, module.TypeSystem.Boolean);
+        var isNetCoreRuntime = new FieldDefinition("<IsNetCoreRuntime>k__BackingField", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, module.TypeSystem.Boolean);
+        var addHandlerCache = new FieldDefinition("addHandlerCache", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, dictionaryType);
+        var addHandlerCacheLock = new FieldDefinition("addHandlerCacheLock", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, readerWriterLockType);
+        accessTools.Fields.Add(allTypesCached);
         accessTools.Fields.Add(all);
         accessTools.Fields.Add(allDeclared);
+        accessTools.Fields.Add(isMonoRuntime);
+        accessTools.Fields.Add(isNetFrameworkRuntime);
+        accessTools.Fields.Add(isNetCoreRuntime);
+        accessTools.Fields.Add(addHandlerCache);
+        accessTools.Fields.Add(addHandlerCacheLock);
+
+        var getIsMonoRuntime = new MethodDefinition(
+            "get_IsMonoRuntime",
+            Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig | Mono.Cecil.MethodAttributes.SpecialName,
+            module.TypeSystem.Boolean);
+        getIsMonoRuntime.Body.Instructions.Add(Instruction.Create(OpCodes.Ldsfld, isMonoRuntime));
+        getIsMonoRuntime.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+        accessTools.Methods.Add(getIsMonoRuntime);
+
+        var typeGetType1 = module.ImportReference(typeof(Type).GetMethod(nameof(Type.GetType), [typeof(string)])!);
+        var typeGetType2 = module.ImportReference(typeof(Type).GetMethod(nameof(Type.GetType), [typeof(string), typeof(bool)])!);
+        var typeGetProperty = module.ImportReference(typeof(Type).GetMethod(nameof(Type.GetProperty), [typeof(string)])!);
+        var propertyGetValue = module.ImportReference(typeof(PropertyInfo).GetMethod(nameof(PropertyInfo.GetValue), [typeof(object), typeof(object[])])!);
+        var objectToString = module.ImportReference(typeof(object).GetMethod(nameof(ToString), Type.EmptyTypes)!);
+        var stringStartsWith = module.ImportReference(typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!);
+        var dictionaryCtor = new MethodReference(".ctor", module.TypeSystem.Void, dictionaryType) { HasThis = true };
+        var lockCtor = module.ImportReference(typeof(System.Threading.ReaderWriterLockSlim).GetConstructor([typeof(System.Threading.LockRecursionPolicy)])!);
+
         var cctor = new MethodDefinition(
             ".cctor",
             Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName,
             module.TypeSystem.Void);
         accessTools.Methods.Add(cctor);
-        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4, 15420));
-        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Stsfld, all));
-        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldsfld, all));
-        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4_2));
-        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Or));
-        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Stsfld, allDeclared));
+        var il = cctor.Body.GetILProcessor();
+
+        var frameworkType1 = Instruction.Create(OpCodes.Ldstr, "FrameworkDescription");
+        var storeFramework = Instruction.Create(OpCodes.Stsfld, isNetFrameworkRuntime);
+        var frameworkType2 = Instruction.Create(OpCodes.Ldstr, "FrameworkDescription");
+        var storeNetCore = Instruction.Create(OpCodes.Stsfld, isNetCoreRuntime);
+
+        il.Append(Instruction.Create(OpCodes.Ldnull));
+        il.Append(Instruction.Create(OpCodes.Stsfld, allTypesCached));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4, 15420));
+        il.Append(Instruction.Create(OpCodes.Stsfld, all));
+        il.Append(Instruction.Create(OpCodes.Ldsfld, all));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4_2));
+        il.Append(Instruction.Create(OpCodes.Or));
+        il.Append(Instruction.Create(OpCodes.Stsfld, allDeclared));
+
+        il.Append(Instruction.Create(OpCodes.Ldstr, "Mono.Runtime"));
+        il.Append(Instruction.Create(OpCodes.Call, typeGetType1));
+        il.Append(Instruction.Create(OpCodes.Ldnull));
+        il.Append(Instruction.Create(OpCodes.Ceq));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+        il.Append(Instruction.Create(OpCodes.Ceq));
+        il.Append(Instruction.Create(OpCodes.Stsfld, isMonoRuntime));
+
+        il.Append(Instruction.Create(OpCodes.Ldstr, "System.Runtime.InteropServices.RuntimeInformation"));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+        il.Append(Instruction.Create(OpCodes.Call, typeGetType2));
+        il.Append(Instruction.Create(OpCodes.Dup));
+        il.Append(Instruction.Create(OpCodes.Brtrue_S, frameworkType1));
+        il.Append(Instruction.Create(OpCodes.Pop));
+        il.Append(Instruction.Create(OpCodes.Call, getIsMonoRuntime));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+        il.Append(Instruction.Create(OpCodes.Ceq));
+        il.Append(Instruction.Create(OpCodes.Br_S, storeFramework));
+        il.Append(frameworkType1);
+        il.Append(Instruction.Create(OpCodes.Call, typeGetProperty));
+        il.Append(Instruction.Create(OpCodes.Ldnull));
+        il.Append(Instruction.Create(OpCodes.Ldnull));
+        il.Append(Instruction.Create(OpCodes.Callvirt, propertyGetValue));
+        il.Append(Instruction.Create(OpCodes.Callvirt, objectToString));
+        il.Append(Instruction.Create(OpCodes.Ldstr, ".NET Framework"));
+        il.Append(Instruction.Create(OpCodes.Callvirt, stringStartsWith));
+        il.Append(storeFramework);
+
+        il.Append(Instruction.Create(OpCodes.Ldstr, "System.Runtime.InteropServices.RuntimeInformation"));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+        il.Append(Instruction.Create(OpCodes.Call, typeGetType2));
+        il.Append(Instruction.Create(OpCodes.Dup));
+        il.Append(Instruction.Create(OpCodes.Brtrue_S, frameworkType2));
+        il.Append(Instruction.Create(OpCodes.Pop));
+        il.Append(Instruction.Create(OpCodes.Br_S, storeNetCore));
+        il.Append(frameworkType2);
+        il.Append(Instruction.Create(OpCodes.Call, typeGetProperty));
+        il.Append(Instruction.Create(OpCodes.Ldnull));
+        il.Append(Instruction.Create(OpCodes.Ldnull));
+        il.Append(Instruction.Create(OpCodes.Callvirt, propertyGetValue));
+        il.Append(Instruction.Create(OpCodes.Callvirt, objectToString));
+        il.Append(Instruction.Create(OpCodes.Ldstr, ".NET Core"));
+        il.Append(Instruction.Create(OpCodes.Callvirt, stringStartsWith));
+        il.Append(storeNetCore);
+
+        il.Append(Instruction.Create(OpCodes.Newobj, dictionaryCtor));
+        il.Append(Instruction.Create(OpCodes.Stsfld, addHandlerCache));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+        il.Append(Instruction.Create(OpCodes.Newobj, lockCtor));
+        il.Append(Instruction.Create(OpCodes.Stsfld, addHandlerCacheLock));
         if (drift)
-            cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Nop));
-        cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+            il.Append(Instruction.Create(OpCodes.Nop));
+        il.Append(Instruction.Create(OpCodes.Ret));
         module.Write(path);
     }
 

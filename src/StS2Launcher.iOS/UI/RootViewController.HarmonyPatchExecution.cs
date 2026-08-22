@@ -17,6 +17,7 @@ public sealed partial class RootViewController
         // Step 26.0 / 0.0.83 is physically closed. Keep the physically proven Step-25
         // constructor-preservation anchor rooted while Step 27 advances beyond inert PatchProcessor creation.
         Step25HarmonyConstructorFrameworkPreservation.Activate();
+        Step27AccessToolsFrameworkPreservation.Activate();
 
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
@@ -37,7 +38,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_controlledHarmonyPatchExecutionResultLabel);
 
         _controlledHarmonyPatchExecutionDetailLabel = Label(
-            "Gates A–N replay the physically closed Step 26 boundary in one fresh dedicated context through one empty PatchProcessor targeting the Step-26 launcher probe. Gate O metadata-audits and resolves only exact AddPrefix(MethodInfo), Patch(), Unpatch(MethodInfo), HarmonyMethod(MethodInfo), and the exact bounded HarmonyLib.AccessTools type initializer without executing it. Gate P resolves a separate launcher-owned Step-27 Target(int) + Prefix(int, ref __result) pair and never reflects StS2. Gate Q proves original target behavior before patching. Gate R explicitly completes only the measured AccessTools BindingFlags type initializer and verifies all/allDeclared. Gate S registers only the launcher prefix descriptor without replacement. Gate T is the first real Harmony patch-engine boundary: exactly one PatchProcessor.Patch() call against the launcher target, with no target invocation yet. Gate U audits bytes/OfflineReady/context before patched execution. Gate V requires both reflection and direct calls to return the prefix-controlled result while the original body is skipped. Gate W removes exactly that prefix by MethodInfo; Gate X audits before restored invocation; Gate Y requires original behavior on both routes; Gate Z performs the final full hash/OfflineReady/context audit. StS2 reflection/patching/invocation, Harmony.Patch/PatchAll, patch classes/categories, transpilers/finalizers, Godot startup, and native game loading remain forbidden.",
+            "Gates A–N replay the physically closed Step 26 boundary in one fresh dedicated context through one empty PatchProcessor targeting the Step-26 launcher probe. Gate O metadata-audits and resolves only exact AddPrefix(MethodInfo), Patch(), Unpatch(MethodInfo), HarmonyMethod(MethodInfo), and the exact physically measured HarmonyLib.AccessTools runtime-detection/cache initializer without executing it; it also proves the string-reflected RuntimeInformation.FrameworkDescription surface survived trimming. Gate P resolves a separate launcher-owned Step-27 Target(int) + Prefix(int, ref __result) pair and never reflects StS2. Gate Q proves original target behavior before patching. Gate R explicitly completes only the measured AccessTools runtime-detection/cache type initializer and verifies all/allDeclared plus the measured cache/runtime-detection state. Gate S registers only the launcher prefix descriptor without replacement. Gate T is the first real Harmony patch-engine boundary: exactly one PatchProcessor.Patch() call against the launcher target, with no target invocation yet. Gate U audits bytes/OfflineReady/context before patched execution. Gate V requires both reflection and direct calls to return the prefix-controlled result while the original body is skipped. Gate W removes exactly that prefix by MethodInfo; Gate X audits before restored invocation; Gate Y requires original behavior on both routes; Gate Z performs the final full hash/OfflineReady/context audit. StS2 reflection/patching/invocation, Harmony.Patch/PatchAll, patch classes/categories, transpilers/finalizers, Godot startup, and native game loading remain forbidden.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_controlledHarmonyPatchExecutionDetailLabel);
@@ -162,7 +163,7 @@ public sealed partial class RootViewController
             if (!RecordControlledHarmonyPatchExecutionGate(gateQ)) return;
 
             _controlledHarmonyPatchExecutionResultLabel.Text = "CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY: GATE R RUNNING…";
-            _statusLabel.Text = "STEP 27 GATE R — explicitly completing only the Gate-O-measured HarmonyLib.AccessTools BindingFlags type initializer. No HarmonyMethod construction or patching.";
+            _statusLabel.Text = "STEP 27 GATE R — explicitly completing only the Gate-O-measured HarmonyLib.AccessTools runtime-detection/cache type initializer. No HarmonyMethod construction or patching.";
             var gateR = await Task.Run(() => _controlledHarmonyPatchExecution.RunAccessToolsTypeInitialization(), token);
             if (!RecordControlledHarmonyPatchExecutionGate(gateR)) return;
 
@@ -278,7 +279,7 @@ public sealed partial class RootViewController
         lines.Add("Gate O metadata-audits and resolves only exact PatchProcessor.AddPrefix(MethodInfo), Patch(), Unpatch(MethodInfo), HarmonyMethod(MethodInfo), PatchProcessor.prefix, HarmonyMethod.method, and the exact bounded HarmonyLib.AccessTools type initializer. It does not initialize AccessTools, construct a patch descriptor, or patch anything.");
         lines.Add("Gate P resolves only launcher-owned HarmonyPatchProbe.Target(int) + Prefix(int, ref int __result), including exact parameter names required by Harmony. No StS2 member is reflected.");
         lines.Add("Gate Q invokes the launcher target through direct + reflection routes before patching and requires original value+1 behavior with prefix count zero.");
-        lines.Add("Gate R explicitly completes only the Gate-O-measured HarmonyLib.AccessTools BindingFlags type initializer with RunClassConstructor and verifies exact all/allDeclared values. It still constructs no HarmonyMethod and applies no patch.");
+        lines.Add("Gate R explicitly completes only the Gate-O-measured HarmonyLib.AccessTools runtime-detection/cache type initializer with RunClassConstructor and verifies the exact measured runtime-detection/cache state. It still constructs no HarmonyMethod and applies no patch.");
         lines.Add("Gate S invokes only AddPrefix(MethodInfo), verifies the constructed HarmonyMethod retains the exact launcher prefix, and still forbids Patch().");
         lines.Add("Gate T is the first real patch-engine boundary: exactly one PatchProcessor.Patch() against the launcher target. The patched target is not invoked until Gate V.");
         lines.Add("Gate U re-hashes plan/prepared/live bytes, re-proves OfflineReady, and audits context/native/resolver state before patched execution.");

@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-21T20:09:10Z
+UTC: 2026-08-21T21:58:00Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,20 +11,20 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.84
+Root: /mnt/data/StS2Launcher-Step27-0.0.86
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 191 C# files
+PASS: lexical delimiter scan passes for 192 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 84
-PASS: display version is 0.0.84
-PASS: Info.plist build version is 84
-PASS: Info.plist display version is 0.0.84
+PASS: build version is 86
+PASS: display version is 0.0.86
+PASS: Info.plist build version is 86
+PASS: Info.plist display version is 0.0.86
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -446,6 +446,7 @@ PASS: Step 27 gate enum includes PostProcessorAudit
 PASS: Step 27 gate enum includes HarmonyPatchApiResolution
 PASS: Step 27 gate enum includes LauncherPatchProbeResolution
 PASS: Step 27 gate enum includes BaselineProbeInvocation
+PASS: Step 27 gate enum includes AccessToolsTypeInitialization
 PASS: Step 27 gate enum includes PrefixRegistration
 PASS: Step 27 gate enum includes PatchEngineExecution
 PASS: Step 27 gate enum includes PostPatchAudit
@@ -454,15 +455,19 @@ PASS: Step 27 gate enum includes ExactPrefixUnpatch
 PASS: Step 27 gate enum includes PostUnpatchAudit
 PASS: Step 27 gate enum includes RestoredProbeInvocation
 PASS: Step 27 gate enum includes FinalIsolationAudit
-PASS: Step 27 gate enum ends exactly at Gate Y / 25
+PASS: Step 27 gate enum ends exactly at Gate Z / 26
 PASS: Step 27 gate sequence enforces strict ordered fail-fast execution
-PASS: Step 27 summary requires twenty-five passing gates
+PASS: Step 27 summary requires twenty-six passing gates
 PASS: Step 27 on-device run emits a Files-visible text report
-PASS: Step 27 UI exposes the ordered twenty-five-gate run
+PASS: Step 27 UI exposes the ordered twenty-six-gate run
 PASS: Step 27 UI records the physically closed Step 26 prerequisite
 PASS: Step 27 retains the physically proven Step 25 constructor framework-preservation anchor
 PASS: Step 27 UI explicitly distinguishes the closed A-N replay from new patch gates
 PASS: Step 27 production boundary contains required invariant: ReadHarmonyPatchMetadata(preflight.Target.PreparedPath)
+PASS: Step 27 production boundary contains required invariant: ReadAccessToolsMetadata(preflight.Target.PreparedPath)
+PASS: Step 27 production boundary contains required invariant: RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)
+PASS: Step 27 production boundary contains required invariant: GetField("all", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+PASS: Step 27 production boundary contains required invariant: GetField("allDeclared", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
 PASS: Step 27 production boundary contains required invariant: Name.Equals("AddPrefix", StringComparison.Ordinal)
 PASS: Step 27 production boundary contains required invariant: Name.Equals("Patch", StringComparison.Ordinal)
 PASS: Step 27 production boundary contains required invariant: Name.Equals("Unpatch", StringComparison.Ordinal)
@@ -483,7 +488,7 @@ PASS: Step 27 has exactly one intentional PatchProcessor.Patch() invocation
 PASS: Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation
 PASS: Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates
 PASS: Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates
-PASS: Step 27 replays exactly the proven Harmony and PatchProcessor class-constructor barriers
+PASS: Step 27 replays the proven Harmony/PatchProcessor class-constructor barriers and adds exactly one explicit AccessTools barrier
 PASS: Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries
 PASS: Step 27 has distinct post-patch and final OfflineReady proof stages
 PASS: Step 27 never invokes broad Harmony patch/discovery APIs
@@ -499,10 +504,14 @@ PASS: Step 27 launcher target/prefix are protected from build-time inlining/opti
 PASS: Step 27 launcher target has deterministic original value+1 behavior
 PASS: Step 27 launcher prefix deterministically replaces the result and skips the original body
 PASS: Step 27 launcher probe records target/prefix execution separately
-PASS: Step 27 host tests enforce ordered fail-fast twenty-five-gate behavior
+PASS: Step 27 host tests enforce ordered fail-fast twenty-six-gate behavior
 PASS: Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary
 PASS: Step 27 host tests cover exact launcher patch-probe behavior and signature metadata
+PASS: Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape
 PASS: Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression
+PASS: Step 27 preserves only the bounded framework surface measured in AccessTools::.cctor
+PASS: Step 27 roots the AccessTools DynamicDependency preservation anchor from candidate-owned UI
+PASS: Step 27 Gate O pins the exact physical 56-instruction AccessTools fingerprint and framework preflight
 PASS: Step 27 host tests retain synthetic runtime identity isolation
 PASS: Step 27 candidate boundary hash manifest exists
 PASS: Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned
@@ -538,6 +547,10 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-25.0.2-PHYSICA
 PASS: authoritative documentation exists: docs/history/steps/STEP-26-CONTROLLED-HARMONY-PROCESSOR-CREATION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-26.0-PHYSICAL-CLOSURE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27-CONTROLLED-LAUNCHER-HARMONY-PATCH.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.1-ACCESSTOOLS-TYPE-INITIALIZATION-BOUNDARY.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.2-ACCESSTOOLS-MEASURED-INITIALIZER-PRESERVATION.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.1-PHYSICAL-GATE-O-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-25.0.1-PHYSICAL-GATE-H-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.5-PHYSICAL-GATE-C-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-24.0.2-PHYSICAL-GATE-A-REPORT.txt
@@ -551,7 +564,11 @@ PASS: physical build 78 report preserves the exact 2/4 gate result
 PASS: physical build 78 report preserves the ConcurrentBag constructor failure
 PASS: physical build 81 report preserves the exact 7/9 gate result
 PASS: physical build 81 report preserves the Environment.Version constructor failure
-PASS: current status records physical Step 26 closure and advances to Step 27 / 0.0.84 with Step 28 targeted-StS2-reflection frontier
+PASS: physical build 84 report preserves the exact Step 27 17/25 gate result
+PASS: physical build 84 report preserves the implicit AccessTools initialization failure before Patch()
+PASS: physical build 85 report preserves the exact Gate-O 14/26 metadata result
+PASS: physical build 85 report preserves the measured AccessTools runtime-detection/cache surface
+PASS: current status preserves both physical Step 27 results and advances to Step 27.0.2 / 0.0.86 with the measured AccessTools initializer
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -562,6 +579,7 @@ PASS: master plan contains durable section: Resumption rule
 PASS: master plan defines self-contained resumption path
 PASS: master plan advances durable roadmap through physically closed Step 26 into the launcher-owned replacement frontier
 PASS: master plan codifies gate batching for speed without losing discrete proof
+PASS: master plan records both Android StS2 reference implementations as advisory/non-authoritative inputs
 PASS: top-level docs are durable/current; step records live under docs/history/steps
 PASS: readable historical documentation retained for Step 01
 PASS: readable historical documentation retained for Step 02
@@ -613,4 +631,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 599 checks
+VALIDATION PASS: 617 checks

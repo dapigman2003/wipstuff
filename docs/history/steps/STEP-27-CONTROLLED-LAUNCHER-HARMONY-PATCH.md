@@ -127,3 +127,7 @@ The stack established a previously implicit execution boundary:
 No launcher patch was installed and no StS2 member was reflected or invoked. The raw report is preserved at `docs/history/reports/STEP-27.0-PHYSICAL-GATE-R-REPORT.txt`.
 
 The next candidate does not weaken prefix or patch policy. It first metadata-audits the exact `AccessTools` static initializer and gives that automatic initialization its own explicit gate before retrying prefix registration.
+
+## Physical metadata refinement — 0.0.85 (85)
+
+Step 27.0.1 failed at Gate O before AccessTools execution, measuring the real 56-instruction AccessTools runtime-detection/cache initializer. This does not supersede build 84's A–Q execution evidence; it corrects the preflight model used before the explicit AccessTools gate. Step 27.0.2 / 0.0.86 pins the measured initializer and its bounded trimming-preservation needs before retrying Gate R.
