@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.11 — IOS HARMONYSHAREDSTATE AOT NORMALIZATION";
+        "STEP 27.0.12 — CECIL OPCODES COMPILE HARDENING";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.94 CONFIRMED T5 CCTOR FAILURE • IOS-SAFE HARMONYSHAREDSTATE NORMALIZATION ACTIVE";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.95 STOPPED AT HOST COMPILATION • IOS-SAFE HARMONYSHAREDSTATE NORMALIZATION RETAINED";
 
     public const string Summary =
-        "Physical 0.0.94 self-identified correctly and again terminated inside HarmonySharedState::.cctor after the dedicated Step-27 load context successfully resolved netstandard. Step 27.0.11 converts that diagnosis into a bounded compatibility fix: Gate A deterministically rewrites only HarmonySharedState::.cctor in an in-memory runtime image of the verified prepared 0Harmony 2.4.2 assembly, replacing dynamic shared-state assembly creation and Mono StackFrame FieldRefAccess initialization with direct launcher-private dictionaries, actualVersion=102, and a null methodAddressRef. The prepared/source/live files remain untouched, and PatchProcessor.Patch() is still forbidden until the normalized initializer returns and T6 validates. No StS2 member is reflected, patched, or invoked.";
+        "Codemagic proved 0.0.95 never reached runtime: host compilation stopped with CS0104 because the new Cecil cctor normalizer used bare OpCodes while both System.Reflection.Emit and Mono.Cecil.Cil were imported. Step 27.0.12 is a compile-only hardening of the same bounded compatibility fix: the eleven generated initializer instructions now use the explicit CecilOpCodes alias. Gate A still rewrites only HarmonySharedState::.cctor in an in-memory runtime image of the verified prepared 0Harmony 2.4.2 assembly; prepared/source/live files remain untouched; and PatchProcessor.Patch() remains forbidden until the normalized initializer returns and T6 validates. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Physical 0.0.94 confirms the current hard stop remains inside HarmonyLib.HarmonySharedState::.cctor after host netstandard resolution succeeds. Build 0.0.95 removes the two runtime-only operations that are not needed in this single-version private Harmony context: dynamic HarmonySharedState singleton generation/loading and StackFrame FieldRefAccess construction. Gate A audits and reopens an exact 11-instruction normalized cctor, Gate B loads that byte-distinct image from memory while re-verifying the untouched prepared SHA, and Gate T runs/validates it before any PatchProcessor.Patch(). Force-quit/relaunch before every Step-27 retry once Gate B has started.";
+        "Status: Steps 01–26 are physically closed. Physical 0.0.94 remains the latest device evidence: the original HarmonySharedState cctor still stops before T6 after netstandard resolution succeeds. Build 0.0.95 did not run on-device because host compilation failed on an ambiguous OpCodes symbol in the new normalizer. Build 0.0.96 retains the exact 11-instruction AOT-normalized cctor behavior and explicitly binds those generated instructions to Mono.Cecil.Cil.OpCodes via CecilOpCodes. Gate B still loads only the byte-distinct normalized image after re-verifying the untouched prepared SHA, and Gate T runs/validates it before any PatchProcessor.Patch(). Force-quit/relaunch before every Step-27 retry once Gate B has started.";
 
-    public const string ExpectedDisplayVersion = "0.0.95";
-    public const string ExpectedBuildVersion = "95";
+    public const string ExpectedDisplayVersion = "0.0.96";
+    public const string ExpectedBuildVersion = "96";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
     public const string GateTImplementationMarker =

@@ -62,7 +62,11 @@ Physical Step 27.0.10 self-identified **App version 0.0.94 (94)** and **Expected
 
 This proves the observed netstandard request itself was satisfied and moves the actionable problem back inside the remaining original cctor work. The raw checkpoint is preserved at `docs/history/reports/STEP-27.0.10-PHYSICAL-GATE-T5-OBSERVER-CRASH-CHECKPOINT.txt`.
 
-## Active candidate — Step 27.0.11 / 0.0.95 (95)
+### 0.0.95 (95) — Codemagic compile stop; runtime fix not exercised
+
+Codemagic never reached iOS publish or device packaging for Step 27.0.11. The host-test compilation failed with eleven `CS0104` errors in `ControlledHarmonyPatchExecution.cs`: bare `OpCodes` in the new Cecil initializer rewrite was ambiguous between `System.Reflection.Emit.OpCodes` and `Mono.Cecil.Cil.OpCodes`. This is a compile-only defect introduced by the normalizer source; it provides no negative runtime evidence about the HarmonySharedState AOT-normalization design. The exact compiler output is preserved at `docs/history/reports/STEP-27.0.11-CODEMAGIC-CS0104-HOST-COMPILE-FAILURE.txt`.
+
+## Active candidate — Step 27.0.12 / 0.0.96 (96)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -73,7 +77,7 @@ This proves the observed netstandard request itself was satisfied and moves the 
 
 ### Gates A–S
 
-A–N replay the physically closed Step-26 chain. Gate A additionally performs a fail-closed compatibility normalization only after the exact original Harmony 2.4.2 patch-engine metadata fingerprint passes: it rewrites `HarmonySharedState::.cctor` into a deterministic **in-memory runtime image**, reopens it, and requires the exact 11-instruction direct-state fingerprint. The receipt-backed source/live/prepared files are never mutated and their normal SHA/length checks remain authoritative.
+A–N replay the physically closed Step-26 chain. Gate A additionally performs a fail-closed compatibility normalization only after the exact original Harmony 2.4.2 patch-engine metadata fingerprint passes: it rewrites `HarmonySharedState::.cctor` into a deterministic **in-memory runtime image**, reopens it, and requires the exact 11-instruction direct-state fingerprint. Step 27.0.12 changes only source-level opcode qualification: all eleven emitted instructions are bound through `CecilOpCodes = Mono.Cecil.Cil.OpCodes`, eliminating the 0.0.95 compiler ambiguity without changing emitted IL intent. The receipt-backed source/live/prepared files are never mutated and their normal SHA/length checks remain authoritative.
 
 Gate B's dedicated private load context re-verifies the on-disk prepared Harmony SHA and, for exactly the admitted `0Harmony, Version=2.4.2.0` identity, loads the retained normalized bytes from a read-only memory stream. Every other prepared assembly continues to load from disk. Gate O remains on the physically passing runtime-reflection surface plus metadata-only audit of the original HarmonySharedState/replacement/detour chain. R initializes the measured AccessTools surface. S retains the bounded annotation-free `HarmonyMethod()` descriptor path and never invokes `AddPrefix(MethodInfo)`.
 
@@ -100,8 +104,8 @@ U audits before patched execution. V proves patched launcher behavior. W removes
 
 **Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.95 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T normalized-cctor implementation marker.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.96 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T normalized-cctor implementation marker.
 
 ## Acceptance
 
-Codemagic + host tests + publish + IPA verification PASS; install `0.0.95 (95)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic + host tests + publish + IPA verification PASS; install `0.0.96 (96)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.

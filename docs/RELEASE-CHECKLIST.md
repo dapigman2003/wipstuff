@@ -1,10 +1,12 @@
-# Release Checklist — Step 27.0.11
+# Release Checklist — Step 27.0.12
 
 ## Source / policy
 
 - Steps 01–26 remain closed/protected.
 - Preserve physical 0.0.89 AddPrefix, 0.0.90 Patch(), 0.0.91 Gate-O, 0.0.93 original-cctor entry, and 0.0.94 successful netstandard-binding-before-crash evidence.
 - Physical 0.0.94 still terminated before T6; `PatchProcessor.Patch()` and the launcher target were uninvoked.
+- Codemagic 0.0.95 stopped in host compilation with eleven CS0104 `OpCodes` ambiguities; no 0.0.95 runtime evidence exists.
+- The cctor normalizer must import `CecilOpCodes = Mono.Cecil.Cil.OpCodes`, use that alias for all eleven generated instructions, and contain no bare `Instruction.Create(OpCodes.` calls.
 - Gate O and Gate S behavior remain unchanged.
 - Gate A may normalize only after the exact original Harmony 2.4.2 patch-engine metadata fingerprint passes.
 - The source/live/prepared 0Harmony files must never be rewritten; normal prepared SHA/length verification remains authoritative.
@@ -23,11 +25,11 @@
 
 ## Build identity / visible app identity
 
-- version: `0.0.95 (95)`
+- version: `0.0.96 (96)`
 - workflow: `ios-step-27`
 - IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 - TRX: `artifacts/test-results/step27.trx`
-- top launcher banner: **Step 27.0.11**, bundle-derived **Version 0.0.95**, current iOS HarmonySharedState AOT-normalization status.
+- top launcher banner: **Step 27.0.12**, bundle-derived **Version 0.0.96**, current iOS HarmonySharedState AOT-normalization status.
 
 ## Device-run discipline
 

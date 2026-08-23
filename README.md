@@ -4,9 +4,9 @@ Steps 01–26 are physically closed. Step 27 has localized the current iOS/AOT c
 
 ## Active candidate
 
-**Step 27.0.11 / `0.0.95 (95)`** converts the physical `0.0.94 (94)` diagnosis into a bounded compatibility fix. The 0.0.94 checkpoint proved that the dedicated Step-27 load context successfully resolved requested `netstandard, Version=2.0.0.0` to host `netstandard, Version=2.1.0.0` while the original HarmonySharedState initializer was running, but the process still terminated before T6.
+**Step 27.0.12 / `0.0.96 (96)`** is the compile-hardened form of the 0.0.95 HarmonySharedState compatibility candidate. Codemagic proved 0.0.95 never reached runtime: host compilation stopped with CS0104 because `OpCodes` was ambiguous between `System.Reflection.Emit.OpCodes` and `Mono.Cecil.Cil.OpCodes`. Build 0.0.96 keeps the runtime design unchanged and binds the eleven generated cctor instructions explicitly to Cecil via `CecilOpCodes`.
 
-- Gate A first requires the exact receipt-backed Harmony 2.4.2 patch-engine metadata fingerprint, then creates a **byte-distinct in-memory runtime image** in which only `HarmonySharedState::.cctor` is normalized.
+- Gate A first requires the exact receipt-backed Harmony 2.4.2 patch-engine metadata fingerprint, then creates a **byte-distinct in-memory runtime image** in which only `HarmonySharedState::.cctor` is normalized. The emitted instructions use the explicit `CecilOpCodes` alias so the normalizer compiles alongside the existing `System.Reflection.Emit` import.
 - The normalized initializer is audited as exactly 11 IL instructions: initialize the three Harmony state dictionaries, set `methodAddressRef = null`, set `actualVersion = 102`, and return.
 - The source/live/prepared Harmony files are never rewritten. Their persisted length/SHA checks remain authoritative.
 - Gate B loads the normalized bytes only for the exact verified `0Harmony, Version=2.4.2.0` private identity; all other assemblies continue to load from their verified prepared files.
@@ -23,7 +23,7 @@ The master document is unchanged; this is a bounded Step-27 runtime-compatibilit
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.95 (95)`
+Expected app version: `0.0.96 (96)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 

@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Threading;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using CecilOpCodes = Mono.Cecil.Cil.OpCodes;
 
 namespace StS2Launcher.Core;
 
@@ -3305,17 +3306,17 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             MaxStackSize = 1,
         };
         var il = cctor.Body.GetILProcessor();
-        il.Append(Instruction.Create(OpCodes.Newobj, ParameterlessConstructor(module, stateField.FieldType)));
-        il.Append(Instruction.Create(OpCodes.Stsfld, stateField));
-        il.Append(Instruction.Create(OpCodes.Newobj, ParameterlessConstructor(module, originalsField.FieldType)));
-        il.Append(Instruction.Create(OpCodes.Stsfld, originalsField));
-        il.Append(Instruction.Create(OpCodes.Newobj, ParameterlessConstructor(module, originalsMonoField.FieldType)));
-        il.Append(Instruction.Create(OpCodes.Stsfld, originalsMonoField));
-        il.Append(Instruction.Create(OpCodes.Ldnull));
-        il.Append(Instruction.Create(OpCodes.Stsfld, methodAddressRefField));
-        il.Append(Instruction.Create(OpCodes.Ldc_I4, HarmonySharedStateInternalVersion));
-        il.Append(Instruction.Create(OpCodes.Stsfld, actualVersionField));
-        il.Append(Instruction.Create(OpCodes.Ret));
+        il.Append(Instruction.Create(CecilOpCodes.Newobj, ParameterlessConstructor(module, stateField.FieldType)));
+        il.Append(Instruction.Create(CecilOpCodes.Stsfld, stateField));
+        il.Append(Instruction.Create(CecilOpCodes.Newobj, ParameterlessConstructor(module, originalsField.FieldType)));
+        il.Append(Instruction.Create(CecilOpCodes.Stsfld, originalsField));
+        il.Append(Instruction.Create(CecilOpCodes.Newobj, ParameterlessConstructor(module, originalsMonoField.FieldType)));
+        il.Append(Instruction.Create(CecilOpCodes.Stsfld, originalsMonoField));
+        il.Append(Instruction.Create(CecilOpCodes.Ldnull));
+        il.Append(Instruction.Create(CecilOpCodes.Stsfld, methodAddressRefField));
+        il.Append(Instruction.Create(CecilOpCodes.Ldc_I4, HarmonySharedStateInternalVersion));
+        il.Append(Instruction.Create(CecilOpCodes.Stsfld, actualVersionField));
+        il.Append(Instruction.Create(CecilOpCodes.Ret));
 
         byte[] runtimeBytes;
         using (var output = new MemoryStream())
