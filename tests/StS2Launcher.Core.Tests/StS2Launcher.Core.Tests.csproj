@@ -13,7 +13,7 @@
     <PackageReference Include="MSTest.TestFramework" Version="4.3.2" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
     <!--
-      Step 27.0.16 real-Harmony fixture acquisition is intentionally outside MSBuild.
+      Step 27.0.17 real-Harmony fixture acquisition is intentionally outside MSBuild.
       scripts/test.sh downloads the exact tagged Harmony-Fat 2.4.2 release archive into
       artifacts/host-step27-fixtures and passes only its netstandard2.0/0Harmony.dll path
       through STS2_STEP27_REAL_HARMONY_FIXTURE. No Harmony package assets enter this graph.

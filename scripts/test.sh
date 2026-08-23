@@ -15,7 +15,9 @@ FIXTURE_DIR="artifacts/host-step20-fixtures"
 STEP27_FIXTURE_DIR="artifacts/host-step27-fixtures"
 STEP27_HARMONY_RELEASE_URL="https://github.com/pardeike/Harmony/releases/download/v2.4.2.0/Harmony-Fat.2.4.2.0.zip"
 STEP27_HARMONY_ARCHIVE="$STEP27_FIXTURE_DIR/Harmony-Fat.2.4.2.0.zip"
-STEP27_HARMONY_ARCHIVE_MEMBER="netstandard2.0/0Harmony.dll"
+STEP27_HARMONY_ARCHIVE_SUFFIX="/netstandard2.0/0Harmony.dll"
+STEP27_HARMONY_MEMBER_LIST="$STEP27_FIXTURE_DIR/archive-members.txt"
+STEP27_HARMONY_MATCH_LIST="$STEP27_FIXTURE_DIR/netstandard2.0-0Harmony-members.txt"
 STEP27_HARMONY_FIXTURE="$STEP27_FIXTURE_DIR/0Harmony.dll"
 
 command -v dotnet >/dev/null 2>&1 || { echo "ERROR: dotnet is required to run host tests."; exit 2; }
@@ -34,11 +36,23 @@ curl --fail --location --silent --show-error \
   --proto '=https' --tlsv1.2 \
   "$STEP27_HARMONY_RELEASE_URL" \
   --output "$STEP27_HARMONY_ARCHIVE"
-STEP27_HARMONY_MEMBER_COUNT="$(unzip -Z1 "$STEP27_HARMONY_ARCHIVE" | grep -Fxc "$STEP27_HARMONY_ARCHIVE_MEMBER" || true)"
+unzip -Z1 "$STEP27_HARMONY_ARCHIVE" > "$STEP27_HARMONY_MEMBER_LIST"
+# Official Harmony-Fat ZIPs wrap framework directories under a release root such as
+# Harmony-Fat.2.4.2.0/. Match the exact framework/DLL suffix while retaining the
+# archive's original member name for extraction. Backslashes are normalized only
+# for comparison so this remains deterministic if a ZIP producer changes separators.
+awk -v suffix="$STEP27_HARMONY_ARCHIVE_SUFFIX" '
+  { original=$0; normalized=$0; gsub(/\\/, "/", normalized); if (length(normalized) >= length(suffix) && substr(normalized, length(normalized)-length(suffix)+1) == suffix) print original }
+' "$STEP27_HARMONY_MEMBER_LIST" > "$STEP27_HARMONY_MATCH_LIST"
+STEP27_HARMONY_MEMBER_COUNT="$(awk 'END { print NR + 0 }' "$STEP27_HARMONY_MATCH_LIST")"
 if [[ "$STEP27_HARMONY_MEMBER_COUNT" != "1" ]]; then
-  echo "ERROR: official Harmony-Fat 2.4.2 archive must contain exactly one $STEP27_HARMONY_ARCHIVE_MEMBER; found $STEP27_HARMONY_MEMBER_COUNT."
+  echo "ERROR: official Harmony-Fat 2.4.2 archive must contain exactly one member ending in $STEP27_HARMONY_ARCHIVE_SUFFIX; found $STEP27_HARMONY_MEMBER_COUNT."
+  echo "Discovered 0Harmony.dll archive members:"
+  awk '{ normalized=$0; gsub(/\\/, "/", normalized); if (normalized ~ /(^|\/)0Harmony\.dll$/) print "  " $0 }' "$STEP27_HARMONY_MEMBER_LIST" || true
   exit 3
 fi
+STEP27_HARMONY_ARCHIVE_MEMBER="$(cat "$STEP27_HARMONY_MATCH_LIST")"
+echo "Harmony archive member: $STEP27_HARMONY_ARCHIVE_MEMBER"
 unzip -p "$STEP27_HARMONY_ARCHIVE" "$STEP27_HARMONY_ARCHIVE_MEMBER" > "$STEP27_HARMONY_FIXTURE"
 [[ -s "$STEP27_HARMONY_FIXTURE" ]] || { echo "ERROR: extracted Step-27 Harmony fixture is empty."; exit 3; }
 echo "Harmony release URL: $STEP27_HARMONY_RELEASE_URL"

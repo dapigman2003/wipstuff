@@ -4,21 +4,21 @@ Steps 01–26 are physically closed. Step 27 remains focused on proving one laun
 
 ## Active candidate
 
-**Step 27.0.16 / `0.0.100 (100)` — real-Harmony fat release fixture hardening**
+**Step 27.0.17 / `0.0.101 (101)` — Harmony-Fat archive member discovery hardening**
 
-Codemagic 0.0.99 advanced beyond the prior namespace error: `StS2Launcher.Core` and `StS2Launcher.Core.Tests` both compiled. It then failed before test execution in the test-project MSBuild fixture-copy target because the downloaded `Lib.Harmony 2.4.2` NuGet package did not contain the implementation DLL at the assumed `lib/netstandard2.0/0Harmony.dll` path. No host tests, IPA publish, or device runtime occurred.
+Codemagic 0.0.100 successfully downloaded the exact official `Harmony-Fat.2.4.2.0.zip`, but the host script stopped before any build or MSTest execution because it required the archive member to equal `netstandard2.0/0Harmony.dll`. Official fat distributions wrap framework folders under a release root (for example `Harmony-Fat.2.4.2.0/net48/0Harmony.dll`), so the root-exact check found zero netstandard candidates. No production code was compiled or executed in that run, no IPA was published, and there is no new device evidence.
 
-0.0.100 fixes the acquisition boundary without changing production runtime code:
+0.0.101 fixes only that CI fixture selector:
 
-- removes `PackageDownload` and the brittle `$(NuGetPackageRoot)` MSBuild copy target;
-- pins the official tagged `Harmony-Fat.2.4.2.0.zip` release URL in `scripts/test.sh`;
-- requires exactly one `netstandard2.0/0Harmony.dll` member and extracts only that file into `artifacts/host-step27-fixtures`;
-- passes the absolute fixture path through `STS2_STEP27_REAL_HARMONY_FIXTURE`;
-- records archive and extracted-DLL SHA-256 values in the host-test report;
-- retains the real-binary assertions for `0Harmony` 2.4.2.0 identity, netstandard 2.0 reference profile, `EditorBrowsableAttribute` surface, Deferred-Cecil normalization, source-byte immutability, and the exact byte-distinct 11-instruction runtime cctor;
-- leaves `ControlledHarmonyPatchExecution.cs` byte-for-byte unchanged from 0.0.99.
+- downloads the same exact tagged official `Harmony-Fat.2.4.2.0.zip`;
+- lists the archive once and requires exactly one member whose normalized path ends in `/netstandard2.0/0Harmony.dll`;
+- retains the archive's original member name for extraction rather than inventing a path;
+- prints all discovered `0Harmony.dll` members if the strict selector ever finds zero or multiple candidates;
+- extracts only the unique netstandard2.0 DLL into `artifacts/host-step27-fixtures`;
+- preserves the SHA-256 and `STS2_STEP27_REAL_HARMONY_FIXTURE` handoff;
+- leaves `ControlledHarmonyPatchExecution.cs` byte-for-byte unchanged from 0.0.100 and retains the real-binary identity/metadata/normalizer assertions.
 
-The 0.0.99 Codemagic report is preserved in `docs/history/reports/STEP-27.0.15-CODEMAGIC-REAL-HARMONY-FIXTURE-ACQUISITION-FAILURE.txt`.
+The 0.0.100 Codemagic host report is preserved in `docs/history/reports/STEP-27.0.16-CODEMAGIC-HARMONY-FAT-ARCHIVE-MEMBER-FAILURE.txt`.
 
 ## iOS detour decision rule
 
@@ -29,13 +29,13 @@ The stop rule from 0.0.98 remains unchanged:
 3. If T6 passes but T7/T8 fails, perform one representative patch/unpatch on a launcher-owned post-publish interpreted fixture.
 4. If that interpreted target also cannot be patched, stop iterating Harmony internals and propose deterministic ahead-of-load Cecil transforms on derived runtime copies. That would be a master-plan-level architecture change.
 
-The master plan remains unchanged because 0.0.100 is still inside the existing launcher-owned Harmony characterization boundary.
+The master plan remains unchanged because 0.0.101 is still inside the existing launcher-owned Harmony characterization boundary.
 
 ## Build
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.100 (100)`
+Expected app version: `0.0.101 (101)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 
