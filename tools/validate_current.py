@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>99</ApplicationVersion>" in project_text, "build version is 99")
-require("<ApplicationDisplayVersion>0.0.99</ApplicationDisplayVersion>" in project_text, "display version is 0.0.99")
-require(plist.get("CFBundleVersion") == "99", "Info.plist build version is 99")
-require(plist.get("CFBundleShortVersionString") == "0.0.99", "Info.plist display version is 0.0.99")
+require("<ApplicationVersion>100</ApplicationVersion>" in project_text, "build version is 100")
+require("<ApplicationDisplayVersion>0.0.100</ApplicationDisplayVersion>" in project_text, "display version is 0.0.100")
+require(plist.get("CFBundleVersion") == "100", "Info.plist build version is 100")
+require(plist.get("CFBundleShortVersionString") == "0.0.100", "Info.plist display version is 0.0.100")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.15 — REAL HARMONY TEST COMPILE HARDENING" in release_presentation, "top launcher banner identifies active Step 27.0.15 candidate")
-require("Physical 0.0.97" in release_presentation and "ReadingMode.Immediate" in release_presentation and "Deferred" in release_presentation and "IcustomAttributeProvider".lower() in release_presentation.lower() and "CecilCustomAttributeProvider" in release_presentation and "Lib.Harmony 2.4.2" in release_presentation and "quarantined" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner describes the Deferred correction and 0.0.98 real-Harmony test compile hardening")
+require("STEP 27.0.16 — REAL HARMONY FAT RELEASE FIXTURE HARDENING" in release_presentation, "top launcher banner identifies active Step 27.0.16 candidate")
+require("Physical 0.0.97" in release_presentation and "ReadingMode.Immediate" in release_presentation and "Deferred" in release_presentation and "0.0.99" in release_presentation and "NuGet" in release_presentation and "Harmony-Fat.2.4.2.0" in release_presentation and "STS2_STEP27_REAL_HARMONY_FIXTURE" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner preserves Deferred-Cecil evidence and describes official Harmony-Fat fixture acquisition")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.99"' in release_presentation and 'ExpectedBuildVersion = "99"' in release_presentation, "Step 27.0.15 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.100"' in release_presentation and 'ExpectedBuildVersion = "100"' in release_presentation, "Step 27.0.16 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
 require("GateTImplementationMarker" in release_presentation and "11-instruction iOS-normalized HarmonySharedState cctor loaded from memory" in release_presentation and "deferred Cecil source/audit" in release_presentation and "direct state only" in release_presentation and "PatchProcessor.Patch() remains after T6" in release_presentation, "Step 27.0.14 source pins the Gate-T deferred normalized-cctor implementation marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
@@ -338,8 +338,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.99",
-    "STS2_BUILD_VERSION": "99",
+    "STS2_DISPLAY_VERSION": "0.0.100",
+    "STS2_BUILD_VERSION": "100",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -969,11 +969,15 @@ require("LauncherPatchPrefixCarriesNoHarmonyAnnotationsSoBoundedDescriptorPathIs
 require("AccessToolsMetadataAuditAcceptsOnlyExactMeasuredRuntimeDetectionCacheInitializer" in step27_tests and "WriteAccessToolsFixture" in step27_tests, "Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape")
 require("HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing" in step27_tests and "ReadHarmonyPatchEngineMetadata" in step27_tests, "Step 27 host tests exercise fail-closed patch-engine metadata admission")
 step27_test_project = read("tests/StS2Launcher.Core.Tests/StS2Launcher.Core.Tests.csproj")
-require('<PackageDownload Include="Lib.Harmony" Version="[2.4.2]" />' in step27_test_project and 'PackageReference Include="Lib.Harmony"' not in step27_test_project, "Step 27.0.14 downloads exact Harmony 2.4.2 only as a quarantined host-test fixture with no package assets/dependencies")
-require("CopyStep27RealHarmonyNormalizerFixture" in step27_test_project and "$(NuGetPackageRoot)lib.harmony/2.4.2/lib/netstandard2.0/0Harmony.dll" in step27_test_project and "Step27RealHarmonyFixture" in step27_test_project, "Step 27.0.14 copies only the exact merged netstandard2.0 Harmony fixture into a dedicated host-test folder")
-require("RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes" in step27_tests and "HasEditorBrowsableAttributeSurface" in step27_tests and "CreateIosNormalizedHarmonyRuntimeImage" in step27_tests and "SourcePreparedSha1" in step27_tests and "RuntimeImageSha1" in step27_tests and "instructions=11" in step27_tests, "Step 27.0.14 host tests exercise the real Harmony 2.4.2 normalizer and preserve source bytes")
-require("ConstructorArguments" not in step27_tests[step27_tests.index("RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes"):step27_tests.index("HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing")], "Step 27.0.14 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values")
-require('reference.Name == "netstandard"' in step27_tests and 'new Version(2, 0, 0, 0)' in step27_tests, "Step 27.0.14 real-Harmony fixture pins the netstandard 2.0 assembly-reference profile observed on-device")
+step27_test_script = read("scripts/test.sh")
+require('PackageDownload Include="Lib.Harmony"' not in step27_test_project and 'PackageReference Include="Lib.Harmony"' not in step27_test_project and "CopyStep27RealHarmonyNormalizerFixture" not in step27_test_project and "NuGetPackageRoot" not in step27_test_project, "Step 27.0.16 removes Harmony package assets and brittle NuGet/MSBuild fixture-path assumptions from the test project")
+require('STEP27_HARMONY_RELEASE_URL="https://github.com/pardeike/Harmony/releases/download/v2.4.2.0/Harmony-Fat.2.4.2.0.zip"' in step27_test_script and 'STEP27_HARMONY_ARCHIVE_MEMBER="netstandard2.0/0Harmony.dll"' in step27_test_script, "Step 27.0.16 pins the exact official Harmony-Fat 2.4.2 release URL and exact netstandard2.0 archive member")
+require("curl --fail --location --silent --show-error" in step27_test_script and "--retry 3" in step27_test_script and "--proto '=https' --tlsv1.2" in step27_test_script and 'unzip -Z1 "$STEP27_HARMONY_ARCHIVE"' in step27_test_script and 'grep -Fxc "$STEP27_HARMONY_ARCHIVE_MEMBER"' in step27_test_script, "Step 27.0.16 fixture acquisition is HTTPS-only, retried, and requires exactly one expected archive member")
+require('artifacts/host-step27-fixtures' in step27_test_script and 'export STS2_STEP27_REAL_HARMONY_FIXTURE="$ROOT/$STEP27_HARMONY_FIXTURE"' in step27_test_script and "Harmony archive SHA-256:" in step27_test_script and "Harmony fixture SHA-256:" in step27_test_script, "Step 27.0.16 quarantines the official Harmony fixture, exports its absolute path, and records content hashes")
+require('Environment.GetEnvironmentVariable("STS2_STEP27_REAL_HARMONY_FIXTURE")' in step27_tests and "Path.GetFullPath(fixturePath!)" in step27_tests, "Step 27.0.16 real-Harmony regression consumes only the canonical host-script fixture path")
+require("RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes" in step27_tests and "HasEditorBrowsableAttributeSurface" in step27_tests and "CreateIosNormalizedHarmonyRuntimeImage" in step27_tests and "SourcePreparedSha1" in step27_tests and "RuntimeImageSha1" in step27_tests and "instructions=11" in step27_tests, "Step 27.0.16 host tests exercise the official real Harmony 2.4.2 normalizer and preserve source bytes")
+require("ConstructorArguments" not in step27_tests[step27_tests.index("RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes"):step27_tests.index("HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing")], "Step 27.0.16 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values")
+require('reference.Name == "netstandard"' in step27_tests and 'new Version(2, 0, 0, 0)' in step27_tests, "Step 27.0.16 real-Harmony fixture pins the netstandard 2.0 assembly-reference profile observed on-device")
 require("using CecilCustomAttributeProvider = Mono.Cecil.ICustomAttributeProvider;" in step27_tests and "HasAttribute(CecilCustomAttributeProvider provider, string fullName)" in step27_tests, "Step 27.0.15 real-Harmony test explicitly aliases the Cecil custom-attribute provider")
 require("HasAttribute(ICustomAttributeProvider provider, string fullName)" not in step27_tests, "Step 27.0.15 forbids the ambiguous bare ICustomAttributeProvider helper declaration")
 require("wrongThrowOnError" in step27_tests and "expected false then false" in step27_tests and "wrongThrowOnError ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0" in step27_tests, "Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands")
@@ -1066,7 +1070,9 @@ required_docs = [
     "docs/history/steps/STEP-27.0.13-SYNTHETIC-PREFLIGHT-SCOPE-HARDENING.md",
     "docs/history/steps/STEP-27.0.14-DEFERRED-CECIL-NORMALIZATION-AND-REAL-HARMONY-CI-GATE.md",
     "docs/history/steps/STEP-27.0.15-REAL-HARMONY-TEST-NAMESPACE-COMPILE-HARDENING.md",
+    "docs/history/steps/STEP-27.0.16-REAL-HARMONY-FAT-RELEASE-FIXTURE-HARDENING.md",
     "docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt",
+    "docs/history/reports/STEP-27.0.15-CODEMAGIC-REAL-HARMONY-FIXTURE-ACQUISITION-FAILURE.txt",
     "docs/history/reports/STEP-27.0.13-PHYSICAL-GATE-A-REPORT.txt",
     "docs/history/reports/STEP-27.0.12-CODEMAGIC-HOST-TEST-FAILURE.txt",
     "docs/history/reports/STEP-27.0.11-CODEMAGIC-CS0104-HOST-COMPILE-FAILURE.txt",
@@ -1134,8 +1140,11 @@ require("HarmonySharedState iOS runtime-image normalization" in step27_build97_r
 step27_build98_host = read("docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt")
 require("StS2Launcher.Core ->" in step27_build98_host and "error CS0104" in step27_build98_host and "ICustomAttributeProvider" in step27_build98_host and "Mono.Cecil.ICustomAttributeProvider" in step27_build98_host and "System.Reflection.ICustomAttributeProvider" in step27_build98_host, "Codemagic build 98 evidence proves production core compiled and localizes the test compile stop to ambiguous ICustomAttributeProvider")
 require("ControlledHarmonyPatchExecutionTests.cs(141,34)" in step27_build98_host and "error CS1503" in step27_build98_host, "Codemagic build 98 preserves the exact primary and follow-on real-Harmony test compiler diagnostics")
+step27_build99_host = read("docs/history/reports/STEP-27.0.15-CODEMAGIC-REAL-HARMONY-FIXTURE-ACQUISITION-FAILURE.txt")
+require("StS2Launcher.Core ->" in step27_build99_host and "StS2Launcher.Core.Tests ->" in step27_build99_host and "CopyStep27RealHarmonyNormalizerFixture" not in step27_build99_host, "Codemagic build 99 evidence proves both production and test assemblies compiled before fixture acquisition stopped the run")
+require("StS2Launcher.Core.Tests.csproj(34,5): error" in step27_build99_host and "requires exact merged Lib.Harmony 2.4.2 netstandard2.0/0Harmony.dll as a quarantined host-test fixture" in step27_build99_host, "Codemagic build 99 evidence localizes the stop to the brittle real-Harmony fixture-path contract before MSTest execution")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "0.0.93 (93)" in current_status and "0.0.94 (94)" in current_status and "0.0.95 (95)" in current_status and "0.0.96 (96)" in current_status and "209 passed" in current_status and "0.0.97 (97)" in current_status and "EditorBrowsableState" in current_status and "ReadingMode.Immediate" in current_status and "ReadingMode.Deferred" in current_status and "0.0.98 (98)" in current_status and "ICustomAttributeProvider" in current_status and "CS0104" in current_status and "Step 27.0.15 / 0.0.99 (99)" in current_status and "CecilCustomAttributeProvider" in current_status and "Lib.Harmony 2.4.2" in current_status and "post-publish interpreted fixture" in current_status and "ahead-of-load Cecil" in current_status and "T6" in current_status and "T7/T8" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.15 / 0.0.99 real-Harmony test compile hardening")
+require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "0.0.93 (93)" in current_status and "0.0.94 (94)" in current_status and "0.0.95 (95)" in current_status and "0.0.96 (96)" in current_status and "209 passed" in current_status and "0.0.97 (97)" in current_status and "EditorBrowsableState" in current_status and "ReadingMode.Immediate" in current_status and "ReadingMode.Deferred" in current_status and "0.0.98 (98)" in current_status and "ICustomAttributeProvider" in current_status and "CS0104" in current_status and "0.0.99 (99)" in current_status and "StS2Launcher.Core.Tests" in current_status and "NuGetPackageRoot" in current_status and "Step 27.0.16 / 0.0.100 (100)" in current_status and "Harmony-Fat.2.4.2.0" in current_status and "STS2_STEP27_REAL_HARMONY_FIXTURE" in current_status and "post-publish interpreted fixture" in current_status and "ahead-of-load Cecil" in current_status and "T6" in current_status and "T7/T8" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.16 / 0.0.100 official Harmony-Fat fixture hardening")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

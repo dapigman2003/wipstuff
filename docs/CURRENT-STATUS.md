@@ -83,7 +83,11 @@ The failure is not evidence against the 11-instruction normalized cctor. It is a
 
 Codemagic 0.0.98 compiled `StS2Launcher.Core` successfully, including the Deferred-Cecil production normalizer, but stopped while compiling `StS2Launcher.Core.Tests`. The newly added real-Harmony regression imported both `System.Reflection` and `Mono.Cecil` and used the bare interface name `ICustomAttributeProvider`, which is defined by both namespaces. Roslyn reported CS0104 at the helper declaration and follow-on CS1503 errors at its call sites. The real Harmony 2.4.2 normalizer regression never executed, no IPA was published, and this provides no new physical runtime evidence. The raw Codemagic report is preserved at `docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt`.
 
-## Active candidate — Step 27.0.15 / 0.0.99 (99)
+### 0.0.99 (99) — production and test source compile; real-Harmony fixture acquisition fails before test execution
+
+Codemagic 0.0.99 advanced past the 0.0.98 `ICustomAttributeProvider` namespace collision. `StS2Launcher.Core` compiled, `StS2Launcher.Core.Tests` compiled, and the test assembly was emitted. The build then stopped in the test project's `CopyStep27RealHarmonyNormalizerFixture` MSBuild target with: `Step 27.0.14 requires exact merged Lib.Harmony 2.4.2 netstandard2.0/0Harmony.dll as a quarantined host-test fixture.` The target had hard-coded `$(NuGetPackageRoot)lib.harmony/2.4.2/lib/netstandard2.0/0Harmony.dll`; that path assumption does not hold for the restored package. No MSTest case executed, no IPA was published, and there is still no new physical runtime evidence. The raw report is preserved at `docs/history/reports/STEP-27.0.15-CODEMAGIC-REAL-HARMONY-FIXTURE-ACQUISITION-FAILURE.txt`.
+
+## Active candidate — Step 27.0.16 / 0.0.100 (100)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -92,13 +96,13 @@ Codemagic 0.0.98 compiled `StS2Launcher.Core` successfully, including the Deferr
 - Closed prerequisite: Step 26.0 + OfflineReady + Foundation 5/5
 - StS2 reflection/patching/invocation: **forbidden**
 
-### Gate A — normalization correction + real-input CI gate
+### Gate A — normalized runtime image + official real-input CI gate
 
-Step 27.0.15 keeps the 0.0.98 production normalizer unchanged and fixes only the real-Harmony host regression compilation by aliasing `Mono.Cecil.ICustomAttributeProvider` as `CecilCustomAttributeProvider`. The static validator requires that alias and forbids the ambiguous bare helper declaration.
+Step 27.0.16 keeps the 0.0.99 production code unchanged and repairs only real-Harmony fixture acquisition. The test project no longer downloads or locates Harmony through MSBuild/NuGet package layout. The canonical `scripts/test.sh` instead downloads the exact tagged official `Harmony-Fat.2.4.2.0.zip` release asset, requires exactly one `netstandard2.0/0Harmony.dll` member, extracts only that DLL to `artifacts/host-step27-fixtures`, records archive/DLL SHA-256 values, and exposes its absolute path through `STS2_STEP27_REAL_HARMONY_FIXTURE`. The test project itself retains no Harmony package dependency or asset.
 
-The production normalizer remains restricted to exact `0Harmony, Version=2.4.2.0`, and the original patch-engine fingerprint must still pass before any rewrite. The retained 0.0.98 correction changes both normalizer reads from `ReadingMode.Immediate` to `ReadingMode.Deferred`: the source module stays lazy while the exact local `HarmonySharedState` field/cctor definitions are rewritten, and the post-write audit materializes only the exact normalized cctor body. The fail-closed metadata resolver is **not** relaxed.
+The production normalizer remains restricted to exact `0Harmony, Version=2.4.2.0`, and the original patch-engine fingerprint must still pass before any rewrite. The retained 0.0.98 correction keeps both normalizer reads on `ReadingMode.Deferred`: the source module stays lazy while the exact local `HarmonySharedState` field/cctor definitions are rewritten, and the post-write audit materializes only the exact normalized cctor body. The fail-closed metadata resolver is **not** relaxed.
 
-Codemagic now restores exact upstream `Lib.Harmony 2.4.2` as a quarantined host-test fixture without adding it as a normal compile/runtime dependency. The host suite runs the real production normalizer against that DLL and requires exact identity, the `EditorBrowsableAttribute` metadata surface, byte-immutable source bytes, a byte-distinct runtime image, and the exact 11-instruction normalized cctor audit. This is intended to catch real-Harmony metadata regressions before IPA publication instead of first on-device.
+The host suite runs the real production normalizer against the extracted official fat-release DLL and requires exact identity, the netstandard 2.0 assembly-reference profile observed on-device, the `EditorBrowsableAttribute` metadata surface, byte-immutable source bytes, a byte-distinct runtime image, and the exact 11-instruction normalized cctor audit. This makes the CI pre-device proof independent of NuGet package internal layout.
 
 Internal randomized synthetic A–N fixtures retain the 0.0.97 byte-identical passthrough rule. The public constructor still cannot use that path.
 
@@ -121,7 +125,7 @@ T1–T4 retain the physically crossed preservation/runtime-reflection sequence.
 
 `MtouchInterpreter=-all` keeps build-time launcher assemblies AOT-compiled while retaining the Mono interpreter for dynamically loaded/runtime-generated managed code. That is enough to justify the current normalized-cctor experiment, but it is **not** proof that MonoMod's native runtime detour backend can rewrite iOS executable code.
 
-If 0.0.99 reaches T6 but fails at T7/T8, the next candidate will perform one launcher-owned patch/unpatch experiment on a **post-publish interpreted fixture**, not another build-time AOT method. This stays inside the master plan's launcher-owned deterministic-probe boundary and better represents eventual dynamically loaded `sts2.dll`. If that representative interpreted target also cannot be patched/unpatched, the project will stop iterating Harmony internals and propose an ahead-of-load Cecil transformation architecture; that would be a large enough change to update the master plan.
+If 0.0.100 reaches T6 but fails at T7/T8, the next candidate will perform one launcher-owned patch/unpatch experiment on a **post-publish interpreted fixture**, not another build-time AOT method. This stays inside the master plan's launcher-owned deterministic-probe boundary and better represents eventual dynamically loaded `sts2.dll`. If that representative interpreted target also cannot be patched/unpatched, the project will stop iterating Harmony internals and propose an ahead-of-load Cecil transformation architecture; that would be a large enough change to update the master plan.
 
 `TrimMode=full`, `MtouchInterpreter=-all`, existing DynamicDependency preservation, trusted/prepared-byte immutability, and the broad `UseInterpreter=true`/NativeAOT prohibitions remain unchanged.
 
@@ -133,9 +137,9 @@ U audits before patched execution. V proves patched launcher behavior. W removes
 
 **Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.99 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T deferred-normalized-cctor implementation marker.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.100 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T deferred-normalized-cctor implementation marker.
 
 ## Acceptance
 
-Codemagic must compile and run the full host suite, including the now-compilable real-Harmony-2.4.2 normalizer regression, before iOS publish/IPA verification. Then install `0.0.99 (99)` and from a fresh process run A–Z to **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. T6 is the first proof that the normalized cctor fix actually ran on-device; T7/T8 is the first proof point for the public runtime detour boundary. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic must compile and run the full host suite, including the official-fat-release real-Harmony-2.4.2 normalizer regression, before iOS publish/IPA verification. Then install `0.0.100 (100)` and from a fresh process run A–Z to **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. T6 is the first proof that the normalized cctor fix actually ran on-device; T7/T8 is the first proof point for the public runtime detour boundary. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
 

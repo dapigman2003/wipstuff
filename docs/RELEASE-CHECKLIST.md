@@ -1,4 +1,4 @@
-# Release Checklist — Step 27.0.15
+# Release Checklist — Step 27.0.16
 
 ## Source / policy
 
@@ -18,7 +18,7 @@
 - T5b contains the single `RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)` call.
 - T6 proves the three dictionaries non-null, `methodAddressRef` null, `actualVersion == 102`, generated shared-state/proxy assemblies absent, prepared bytes unchanged, and isolation/probe counters valid.
 - T7/T8/T9 retain exactly one public `PatchProcessor.Patch()` path; no internal patch method substitutes for acceptance.
-- Exact upstream `Lib.Harmony 2.4.2` is permitted only as a quarantined host-test fixture. It must be excluded from normal compile/runtime assets and copied only into `Step27RealHarmonyFixture` for tests.
+- The real-Harmony regression fixture must come from the exact tagged official `Harmony-Fat.2.4.2.0.zip` URL in `scripts/test.sh`; MSBuild/NuGet package layout must not be used. The archive must contain exactly one `netstandard2.0/0Harmony.dll`, extracted only to `artifacts/host-step27-fixtures`, with its absolute path passed through `STS2_STEP27_REAL_HARMONY_FIXTURE`.
 - The real-Harmony host regression must invoke `CreateIosNormalizedHarmonyRuntimeImage`, require exact 2.4.2 identity, detect the `EditorBrowsableAttribute` metadata surface without resolving its argument values, preserve source bytes, and produce an 11-instruction byte-distinct runtime image.
 - Crash checkpoints self-identify installed/source version, candidate, Gate-S implementation, and Gate-T implementation.
 - `TrimMode=full`, `MtouchInterpreter=-all`, established roots/preservation policies remain active; `UseInterpreter=true` and NativeAOT remain prohibited.
@@ -27,11 +27,11 @@
 
 ## Build identity / visible app identity
 
-- version: `0.0.99 (99)`
+- version: `0.0.100 (100)`
 - workflow: `ios-step-27`
 - IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 - TRX: `artifacts/test-results/step27.trx`
-- top launcher banner: **Step 27.0.15**, bundle-derived **Version 0.0.99**, real-Harmony-test-compile-hardening status.
+- top launcher banner: **Step 27.0.16**, bundle-derived **Version 0.0.100**, official-Harmony-fat-fixture-hardening status.
 
 ## Device-run discipline
 

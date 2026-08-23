@@ -4,7 +4,7 @@
 
 Run `bash scripts/validate.sh`.
 
-The validator protects Steps 23–26 and all Step-27 evidence through physical 0.0.97. For Step 27.0.15 / `0.0.99 (99)`, it must prove that the production normalizer uses `ReadingMode.Deferred` for source and post-write audit, contains no `ReadingMode.Immediate`, retains the fail-closed metadata resolver, preserves the exact eleven Cecil-opcode rewrite, keeps canonical-vs-synthetic scope separation, requires the explicit Cecil custom-attribute-provider alias in the real-Harmony regression, and preserves the later single public `PatchProcessor.Patch()` boundary.
+The validator protects Steps 23–26 and all Step-27 evidence through physical 0.0.97. For Step 27.0.16 / `0.0.100 (100)`, it must prove that the production normalizer uses `ReadingMode.Deferred` for source and post-write audit, contains no `ReadingMode.Immediate`, retains the fail-closed metadata resolver, preserves the exact eleven Cecil-opcode rewrite, keeps canonical-vs-synthetic scope separation, requires the explicit Cecil custom-attribute-provider alias in the real-Harmony regression, requires official fat-release fixture acquisition outside MSBuild, and preserves the later single public `PatchProcessor.Patch()` boundary.
 
 The physical 0.0.97 report must remain archived and fingerprinted as the evidence for the `System.ComponentModel.EditorBrowsableState` eager-resolution failure.
 
@@ -12,7 +12,7 @@ The physical 0.0.97 report must remain archived and fingerprinted as the evidenc
 
 Run `bash scripts/test.sh`.
 
-In addition to the synthetic gate tests, Codemagic now restores exact `Lib.Harmony 2.4.2` only as a quarantined test fixture. The test project copies its `netstandard2.0/0Harmony.dll` to `Step27RealHarmonyFixture` and calls the private production `CreateIosNormalizedHarmonyRuntimeImage` helper against that real binary.
+In addition to the synthetic gate tests, the canonical host-test script downloads the exact tagged official `Harmony-Fat.2.4.2.0.zip` release asset to `artifacts/host-step27-fixtures`. It requires exactly one `netstandard2.0/0Harmony.dll`, extracts only that member, records archive/DLL SHA-256 values, exports its absolute path as `STS2_STEP27_REAL_HARMONY_FIXTURE`, and then calls the private production `CreateIosNormalizedHarmonyRuntimeImage` helper against that real binary. The test project contains no Harmony PackageReference/PackageDownload and therefore cannot depend on a NuGet package's internal file layout.
 
 That regression requires:
 
@@ -29,7 +29,7 @@ Expected TRX: `artifacts/test-results/step27.trx`.
 
 ## Codemagic / physical acceptance
 
-Workflow: `ios-step-27`. Expected version: `0.0.99 (99)`. Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`.
+Workflow: `ios-step-27`. Expected version: `0.0.100 (100)`. Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`.
 
 Codemagic must pass compilation and the complete host suite before publish. Start the physical run from a force-quit/relaunch and require A–Z **26/26 PASS**, OfflineReady PASS, Foundation 5/5 PASS. Once Gate B starts, force-quit before any retry. If the process terminates without a managed report, preserve `Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt` before another run.
 

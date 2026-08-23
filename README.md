@@ -4,19 +4,21 @@ Steps 01–26 are physically closed. Step 27 remains focused on proving one laun
 
 ## Active candidate
 
-**Step 27.0.15 / `0.0.99 (99)` — real-Harmony test compile hardening**
+**Step 27.0.16 / `0.0.100 (100)` — real-Harmony fat release fixture hardening**
 
-Codemagic 0.0.98 proved the production core still compiles after the Deferred-Cecil normalizer correction, but the newly added real-Harmony host regression itself failed to compile. Its helper used bare `ICustomAttributeProvider` while importing both `System.Reflection` and `Mono.Cecil`, producing CS0104 plus follow-on CS1503 diagnostics. The real Harmony 2.4.2 normalizer regression therefore never executed and no IPA/device evidence was produced.
+Codemagic 0.0.99 advanced beyond the prior namespace error: `StS2Launcher.Core` and `StS2Launcher.Core.Tests` both compiled. It then failed before test execution in the test-project MSBuild fixture-copy target because the downloaded `Lib.Harmony 2.4.2` NuGet package did not contain the implementation DLL at the assumed `lib/netstandard2.0/0Harmony.dll` path. No host tests, IPA publish, or device runtime occurred.
 
-0.0.99 changes only that test boundary:
+0.0.100 fixes the acquisition boundary without changing production runtime code:
 
-- aliases `Mono.Cecil.ICustomAttributeProvider` as `CecilCustomAttributeProvider`;
-- uses the alias in the `EditorBrowsableAttribute` surface scan;
-- adds static protection forbidding the ambiguous bare helper declaration;
-- retains the exact merged `Lib.Harmony 2.4.2` `netstandard2.0` quarantined CI fixture;
-- keeps production `ReadingMode.Deferred`, the fail-closed resolver, the exact eleven-instruction `HarmonySharedState::.cctor` rewrite, prepared/source immutability, and Gates S/T unchanged.
+- removes `PackageDownload` and the brittle `$(NuGetPackageRoot)` MSBuild copy target;
+- pins the official tagged `Harmony-Fat.2.4.2.0.zip` release URL in `scripts/test.sh`;
+- requires exactly one `netstandard2.0/0Harmony.dll` member and extracts only that file into `artifacts/host-step27-fixtures`;
+- passes the absolute fixture path through `STS2_STEP27_REAL_HARMONY_FIXTURE`;
+- records archive and extracted-DLL SHA-256 values in the host-test report;
+- retains the real-binary assertions for `0Harmony` 2.4.2.0 identity, netstandard 2.0 reference profile, `EditorBrowsableAttribute` surface, Deferred-Cecil normalization, source-byte immutability, and the exact byte-distinct 11-instruction runtime cctor;
+- leaves `ControlledHarmonyPatchExecution.cs` byte-for-byte unchanged from 0.0.99.
 
-The 0.0.98 Codemagic compiler report is preserved in `docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt`.
+The 0.0.99 Codemagic report is preserved in `docs/history/reports/STEP-27.0.15-CODEMAGIC-REAL-HARMONY-FIXTURE-ACQUISITION-FAILURE.txt`.
 
 ## iOS detour decision rule
 
@@ -27,14 +29,14 @@ The stop rule from 0.0.98 remains unchanged:
 3. If T6 passes but T7/T8 fails, perform one representative patch/unpatch on a launcher-owned post-publish interpreted fixture.
 4. If that interpreted target also cannot be patched, stop iterating Harmony internals and propose deterministic ahead-of-load Cecil transforms on derived runtime copies. That would be a master-plan-level architecture change.
 
-The master plan remains unchanged because 0.0.99 is still inside the existing launcher-owned Harmony characterization boundary.
+The master plan remains unchanged because 0.0.100 is still inside the existing launcher-owned Harmony characterization boundary.
 
 ## Build
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.99 (99)`
+Expected app version: `0.0.100 (100)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 
-Codemagic must compile and execute the full host suite, including the real Harmony 2.4.2 normalizer regression, before publish. Physical acceptance remains A–Z **26/26**, then OfflineReady PASS and Foundation 5/5.
+Codemagic must acquire and execute the real Harmony 2.4.2 normalizer regression and then pass the complete host suite before publish. Physical acceptance remains A–Z **26/26**, then OfflineReady PASS and Foundation 5/5.

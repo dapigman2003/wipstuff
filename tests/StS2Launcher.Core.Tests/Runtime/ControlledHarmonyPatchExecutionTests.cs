@@ -84,8 +84,12 @@ public sealed class ControlledHarmonyPatchExecutionTests
     [TestMethod]
     public void RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes()
     {
-        var fixturePath = Path.Combine(AppContext.BaseDirectory, "Step27RealHarmonyFixture", "0Harmony.dll");
-        Assert.IsTrue(File.Exists(fixturePath), "Exact merged Lib.Harmony 2.4.2 netstandard2.0 fixture was not copied to the quarantined test folder.");
+        var fixturePath = Environment.GetEnvironmentVariable("STS2_STEP27_REAL_HARMONY_FIXTURE");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(fixturePath),
+            "STS2_STEP27_REAL_HARMONY_FIXTURE must point to the quarantined official Harmony-Fat 2.4.2 netstandard2.0/0Harmony.dll fixture.");
+        fixturePath = Path.GetFullPath(fixturePath!);
+        Assert.IsTrue(File.Exists(fixturePath),
+            $"Exact official Harmony-Fat 2.4.2 netstandard2.0 fixture is missing: {fixturePath}");
 
         var sourceBytesBefore = File.ReadAllBytes(fixturePath);
         var sourceSha1Before = Convert.ToHexString(SHA1.HashData(sourceBytesBefore)).ToLowerInvariant();

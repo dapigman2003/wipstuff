@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-23T17:43:31Z
+UTC: 2026-08-23T19:52:00Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,7 +11,7 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.99.work/StS2Launcher-Step27-0.0.99
+Root: /mnt/data/StS2Launcher-Step27-0.0.100
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 194 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 99
-PASS: display version is 0.0.99
-PASS: Info.plist build version is 99
-PASS: Info.plist display version is 0.0.99
+PASS: build version is 100
+PASS: display version is 0.0.100
+PASS: Info.plist build version is 100
+PASS: Info.plist display version is 0.0.100
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.15 candidate
-PASS: top launcher banner describes the Deferred correction and 0.0.98 real-Harmony test compile hardening
+PASS: top launcher banner identifies active Step 27.0.16 candidate
+PASS: top launcher banner preserves Deferred-Cecil evidence and describes official Harmony-Fat fixture acquisition
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 27.0.15 source pins expected bundle release identity
+PASS: Step 27.0.16 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.14 source pins the Gate-T deferred normalized-cctor implementation marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -555,11 +555,14 @@ PASS: Step 27 host tests cover exact launcher patch-probe behavior and signature
 PASS: Step 27 host tests require zero Harmony annotations for the bounded descriptor substitution
 PASS: Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape
 PASS: Step 27 host tests exercise fail-closed patch-engine metadata admission
-PASS: Step 27.0.14 downloads exact Harmony 2.4.2 only as a quarantined host-test fixture with no package assets/dependencies
-PASS: Step 27.0.14 copies only the exact merged netstandard2.0 Harmony fixture into a dedicated host-test folder
-PASS: Step 27.0.14 host tests exercise the real Harmony 2.4.2 normalizer and preserve source bytes
-PASS: Step 27.0.14 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values
-PASS: Step 27.0.14 real-Harmony fixture pins the netstandard 2.0 assembly-reference profile observed on-device
+PASS: Step 27.0.16 removes Harmony package assets and brittle NuGet/MSBuild fixture-path assumptions from the test project
+PASS: Step 27.0.16 pins the exact official Harmony-Fat 2.4.2 release URL and exact netstandard2.0 archive member
+PASS: Step 27.0.16 fixture acquisition is HTTPS-only, retried, and requires exactly one expected archive member
+PASS: Step 27.0.16 quarantines the official Harmony fixture, exports its absolute path, and records content hashes
+PASS: Step 27.0.16 real-Harmony regression consumes only the canonical host-script fixture path
+PASS: Step 27.0.16 host tests exercise the official real Harmony 2.4.2 normalizer and preserve source bytes
+PASS: Step 27.0.16 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values
+PASS: Step 27.0.16 real-Harmony fixture pins the netstandard 2.0 assembly-reference profile observed on-device
 PASS: Step 27.0.15 real-Harmony test explicitly aliases the Cecil custom-attribute provider
 PASS: Step 27.0.15 forbids the ambiguous bare ICustomAttributeProvider helper declaration
 PASS: Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands
@@ -633,7 +636,9 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.12-CECIL-
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.13-SYNTHETIC-PREFLIGHT-SCOPE-HARDENING.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.14-DEFERRED-CECIL-NORMALIZATION-AND-REAL-HARMONY-CI-GATE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.15-REAL-HARMONY-TEST-NAMESPACE-COMPILE-HARDENING.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.16-REAL-HARMONY-FAT-RELEASE-FIXTURE-HARDENING.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.15-CODEMAGIC-REAL-HARMONY-FIXTURE-ACQUISITION-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.13-PHYSICAL-GATE-A-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.12-CODEMAGIC-HOST-TEST-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.11-CODEMAGIC-CS0104-HOST-COMPILE-FAILURE.txt
@@ -682,7 +687,9 @@ PASS: physical build 97 evidence preserves the exact 0/26 Gate-A failure
 PASS: physical build 97 evidence localizes the regression to eager Cecil custom-attribute decoding inside the normalizer
 PASS: Codemagic build 98 evidence proves production core compiled and localizes the test compile stop to ambiguous ICustomAttributeProvider
 PASS: Codemagic build 98 preserves the exact primary and follow-on real-Harmony test compiler diagnostics
-PASS: current status preserves Step 27 evidence and advances to Step 27.0.15 / 0.0.99 real-Harmony test compile hardening
+PASS: Codemagic build 99 evidence proves both production and test assemblies compiled before fixture acquisition stopped the run
+PASS: Codemagic build 99 evidence localizes the stop to the brittle real-Harmony fixture-path contract before MSTest execution
+PASS: current status preserves Step 27 evidence and advances to Step 27.0.16 / 0.0.100 official Harmony-Fat fixture hardening
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -745,4 +752,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 731 checks
+VALIDATION PASS: 738 checks
