@@ -32,6 +32,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     public const string PatchProcessorTypeFullName = "HarmonyLib.PatchProcessor";
     public const string AccessToolsTypeFullName = "HarmonyLib.AccessTools";
     public const string HarmonySharedStateTypeFullName = "HarmonyLib.HarmonySharedState";
+    public const int HarmonySharedStateInternalVersion = 102;
 
     // Exact runtime-generated assembly names reached by the tagged Harmony 2.4.2 shared-state /
     // MonoMod ILGenerator path. These are not prepared dependencies and are admitted only after
@@ -366,6 +367,13 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                     "Audited Harmony constructor IL:\n" + harmonyConstructorMetadata.ConstructorAudit);
             }
 
+            stage = "HarmonySharedState iOS runtime-image normalization";
+            var harmonyRuntimeImage = CreateIosNormalizedHarmonyRuntimeImage(target.PreparedPath);
+            if (!harmonyRuntimeImage.SourcePreparedSha1.Equals(target.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step 27 Gate A refuses the Harmony runtime-image normalization because the source prepared SHA-1 no longer matches the persisted plan.");
+            if (harmonyRuntimeImage.RuntimeImageSha1.Equals(harmonyRuntimeImage.SourcePreparedSha1, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step 27 Gate A expected the bounded HarmonySharedState normalization to produce a byte-distinct runtime image.");
+
             stage = "plan digest";
             var planSha256 = await ComputeSha256HexAsync(_planPath, cancellationToken).ConfigureAwait(false);
             _preflight = new InitializationPreflightSnapshot(
@@ -376,6 +384,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 primary,
                 target,
                 harmonyConstructorMetadata,
+                harmonyRuntimeImage,
                 offline);
 
             progress?.Report(new ControlledHarmonyPatchExecutionProgress(
@@ -406,6 +415,13 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "Audited automatic-initialization IL:\n" + string.Join("\n", target.AutomaticInitializerAudits) + "\n" +
                 "Harmony constructor metadata policy: PASS\n" +
                 harmonyConstructorMetadata.Detail + "\n" +
+                "HarmonySharedState iOS runtime-image normalization: PASS\n" +
+                $"Source prepared SHA-1 preserved: {harmonyRuntimeImage.SourcePreparedSha1}\n" +
+                $"Normalized runtime-image SHA-1: {harmonyRuntimeImage.RuntimeImageSha1}\n" +
+                $"Normalized runtime-image bytes: {harmonyRuntimeImage.RuntimeImageBytes.LongLength:N0}\n" +
+                "Normalized HarmonySharedState::.cctor: direct launcher-private state/originals/originalsMono dictionaries + actualVersion=102 + null methodAddressRef\n" +
+                "Runtime dynamic HarmonySharedState singleton creation/ReflectionHelper.Load/StackFrame FieldRefAccess initialization: REMOVED FROM NORMALIZED CCTOR\n" +
+                "Prepared/source/live file mutation: NO\n" +
                 "HARMONY_DEBUG environment activation: ABSENT\n" +
                 "Audited Harmony constructor IL:\n" + harmonyConstructorMetadata.ConstructorAudit + "\n" +
                 "No real game/Harmony assembly was loaded by Step 27 Gate A: YES");
@@ -434,6 +450,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 LoadContextName,
                 preflight.Plan,
                 preflight.PreparedAssemblies,
+                preflight.Target.Plan.AssemblyFullName,
+                preflight.HarmonyRuntimeImage,
                 _collectibleLoadContext);
             _loadContext = context;
 
@@ -2201,7 +2219,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             stage = "exact HarmonySharedState runtime reflection resolution";
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T3 — entering exact HarmonySharedState runtime Type/.cctor/internalVersion/actualVersion reflection; this is the runtime-reflection operation that 0.0.91 proved changes resolver/load counters. The initializer and Patch() remain uninvoked.");
+                "T3 — entering exact HarmonySharedState runtime Type/.cctor/internalVersion/actualVersion/state reflection from the already-loaded bounded iOS-normalized 0Harmony image. The initializer and Patch() remain uninvoked.");
             var harmonySharedStateType = initialization.TargetAssembly.GetType(HarmonySharedStateTypeFullName, throwOnError: false, ignoreCase: false)
                 ?? throw new TypeLoadException("Exact HarmonyLib.HarmonySharedState type is absent from loaded 0Harmony.");
             if (!ReferenceEquals(harmonySharedStateType.Assembly, initialization.TargetAssembly))
@@ -2214,6 +2232,14 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "internalVersion");
             var harmonySharedStateActualVersionField = harmonySharedStateType.GetField("actualVersion", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
                 ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "actualVersion");
+            var harmonySharedStateStateField = harmonySharedStateType.GetField("state", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "state");
+            var harmonySharedStateOriginalsField = harmonySharedStateType.GetField("originals", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "originals");
+            var harmonySharedStateOriginalsMonoField = harmonySharedStateType.GetField("originalsMono", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "originalsMono");
+            var harmonySharedStateMethodAddressRefField = harmonySharedStateType.GetField("methodAddressRef", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "methodAddressRef");
             if (!harmonySharedStateInternalVersionField.IsLiteral || harmonySharedStateInternalVersionField.FieldType != typeof(int) ||
                 harmonySharedStateInternalVersionField.GetRawConstantValue() is not int internalVersion || internalVersion != 102)
                 throw new InvalidDataException("HarmonySharedState.internalVersion changed from the Gate-O-audited 2.4.2 value 102.");
@@ -2236,7 +2262,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var sharedResolutionPrivateDelta = context.PrivateLoads.Count - sharedResolutionPrivateBefore;
             var sharedResolutionHostDelta = context.HostLoads.Count - sharedResolutionHostBefore;
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                $"T4 — exact HarmonySharedState runtime reflection returned; internalVersion=102 and private membership unchanged. Measured deltas: managed={sharedResolutionManagedDelta}, private={sharedResolutionPrivateDelta}, host={sharedResolutionHostDelta}, native=0. actualVersion was NOT read and the cctor was NOT run.");
+                $"T4 — normalized HarmonySharedState runtime reflection returned; internalVersion=102 and private membership unchanged. Measured deltas: managed={sharedResolutionManagedDelta}, private={sharedResolutionPrivateDelta}, host={sharedResolutionHostDelta}, native=0. Static field values were NOT read and the cctor was NOT run.");
 
             var sharedManagedBefore = context.ManagedResolverRequests.Count;
             var sharedPrivateBefore = context.PrivateLoads.Count;
@@ -2245,54 +2271,31 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var sharedRejectedBefore = context.RejectedManagedRequests.Count;
             var sharedMembershipBefore = SnapshotPrivateContextMembership(context);
 
-            stage = "observed explicit HarmonySharedState type initialization";
+            stage = "bounded iOS-normalized HarmonySharedState type initialization";
             var generatedBeforeSharedInitialization = DescribeKnownPatchEngineGeneratedAssemblies();
             if (generatedBeforeSharedInitialization.Length != 0)
                 throw new InvalidDataException("HarmonySharedState initialization began with an unexpected pre-existing generated patch-engine assembly: " + FormatNames(generatedBeforeSharedInitialization));
 
-            var previousContextObserver = context.DiagnosticObserver;
-            AssemblyLoadEventHandler? assemblyLoadObserver = null;
-            try
-            {
-                void ReportSharedStateObservation(string observation)
-                    => ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                        "T5 observer — " + observation + " PatchProcessor.Patch() and launcher target remain uninvoked.");
-
-                context.DiagnosticObserver = observation =>
-                    ReportSharedStateObservation("dedicated ALC: " + observation);
-
-                assemblyLoadObserver = (_, args) =>
-                {
-                    var loaded = args.LoadedAssembly;
-                    var loadedName = loaded.GetName();
-                    var simpleName = loadedName.Name ?? "<unnamed>";
-                    if (!loaded.IsDynamic && !AllowedPatchEngineGeneratedAssemblySimpleNames.Contains(simpleName))
-                        return;
-
-                    var loadedContext = AssemblyLoadContext.GetLoadContext(loaded);
-                    ReportSharedStateObservation(
-                        $"process AssemblyLoad: {loadedName.FullName ?? simpleName}; dynamic={loaded.IsDynamic}; ALC={loadedContext?.Name ?? "<null/default>"}");
-                };
-                AppDomain.CurrentDomain.AssemblyLoad += assemblyLoadObserver;
-
-                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                    "T5a — HarmonySharedState cctor observers armed; no generated HarmonySharedState/ILGeneratorProxy assembly exists before initialization. The cctor and PatchProcessor.Patch() remain uninvoked.");
-                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                    "T5b — entering explicit RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) with bounded assembly-load/resolver observation active; PatchProcessor.Patch() and launcher target remain uninvoked.");
-                RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle);
-                ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                    "T6 — HarmonySharedState::.cctor returned; observers will be removed before version/generated-assembly/hash/isolation validation and before Patch().");
-            }
-            finally
-            {
-                if (assemblyLoadObserver is not null)
-                    AppDomain.CurrentDomain.AssemblyLoad -= assemblyLoadObserver;
-                context.DiagnosticObserver = previousContextObserver;
-            }
+            var runtimeImageHash = Convert.ToHexString(SHA1.HashData(preflight.HarmonyRuntimeImage.RuntimeImageBytes)).ToLowerInvariant();
+            if (!runtimeImageHash.Equals(preflight.HarmonyRuntimeImage.RuntimeImageSha1, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("The bounded iOS-normalized Harmony runtime image changed after Gate A.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T5a — bounded iOS-normalized HarmonySharedState cctor image reverified in memory; no generated HarmonySharedState/ILGeneratorProxy assembly exists before initialization. PatchProcessor.Patch() and launcher target remain uninvoked.");
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T5b — entering RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) against the normalized direct-state initializer; dynamic shared-state assembly creation and StackFrame FieldRefAccess initialization are absent from this runtime cctor. PatchProcessor.Patch() and launcher target remain uninvoked.");
+            RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle);
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T6 — normalized HarmonySharedState::.cctor returned; validating direct state dictionaries, null methodAddressRef, actualVersion=102, zero generated shared-state assemblies, hashes, and isolation before Patch().");
 
             var actualVersionValue = harmonySharedStateActualVersionField.GetValue(null);
-            if (actualVersionValue is not int actualVersion || actualVersion != 102)
-                throw new InvalidDataException($"HarmonySharedState.actualVersion changed from the audited value 102 after explicit initialization; observed {actualVersionValue ?? "<null>"}.");
+            if (actualVersionValue is not int actualVersion || actualVersion != HarmonySharedStateInternalVersion)
+                throw new InvalidDataException($"HarmonySharedState.actualVersion changed from the normalized value {HarmonySharedStateInternalVersion} after explicit initialization; observed {actualVersionValue ?? "<null>"}.");
+            if (harmonySharedStateStateField.GetValue(null) is null ||
+                harmonySharedStateOriginalsField.GetValue(null) is null ||
+                harmonySharedStateOriginalsMonoField.GetValue(null) is null)
+                throw new InvalidDataException("Normalized HarmonySharedState initialization did not initialize all three direct state dictionaries.");
+            if (harmonySharedStateMethodAddressRefField.GetValue(null) is not null)
+                throw new InvalidDataException("Normalized HarmonySharedState.methodAddressRef must remain null on the bounded iOS runtime path.");
             if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
                 throw new InvalidDataException("HarmonySharedState initialization unexpectedly invoked the launcher target or prefix.");
             if (context.NativeLoadAttempts.Count != sharedNativeBefore)
@@ -2304,8 +2307,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 sharedMembershipBefore,
                 "HarmonySharedState initialization");
             var sharedGeneratedAssemblies = DescribeKnownPatchEngineGeneratedAssemblies();
-            if (sharedGeneratedAssemblies.Count(entry => entry.StartsWith("HarmonySharedState,", StringComparison.Ordinal) || entry.StartsWith("HarmonySharedState @", StringComparison.Ordinal)) != 1)
-                throw new InvalidDataException("HarmonySharedState initialization did not leave exactly one process-visible HarmonySharedState singleton assembly.");
+            if (sharedGeneratedAssemblies.Length != 0)
+                throw new InvalidDataException("Normalized HarmonySharedState initialization unexpectedly generated a patch-engine assembly: " + FormatNames(sharedGeneratedAssemblies));
             var sharedPostSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!sharedPostSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("0Harmony prepared bytes changed across explicit HarmonySharedState initialization.");
@@ -2381,17 +2384,17 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "MEASURED PATCH-ENGINE RUNTIME RESOLUTION + EXPLICIT HARMONY SHARED-STATE INITIALIZATION + FIRST REAL HARMONY PATCH ENGINE EXECUTION COMPLETED AGAINST LAUNCHER-OWNED TARGET.\n" +
+                "MEASURED PATCH-ENGINE RUNTIME RESOLUTION + IOS-NORMALIZED HARMONY SHARED-STATE INITIALIZATION + FIRST REAL HARMONY PATCH ENGINE EXECUTION COMPLETED AGAINST LAUNCHER-OWNED TARGET.\n" +
                 $"Bounded host-framework preflight deltas: managed={frameworkManagedDelta:N0}; private={frameworkPrivateDelta:N0}; host={frameworkHostDelta:N0}; native=0\n" +
                 $"HarmonySharedState runtime-reflection deltas: managed={sharedResolutionManagedDelta:N0}; private={sharedResolutionPrivateDelta:N0}; host={sharedResolutionHostDelta:N0}; native=0\n" +
-                "HarmonySharedState runtime Type/.cctor/version fields: EXACT Gate-O-audited 2.4.2 shape\n" +
-                "RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle): EXACTLY ONCE, before public Patch()\n" +
+                "HarmonySharedState source metadata: exact Gate-O-audited 2.4.2 shape; runtime cctor: Gate-A-audited 11-instruction iOS-normalized direct-state shape\n" +
+                "RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle): EXACTLY ONCE against normalized runtime image, before public Patch()\n" +
                 $"HarmonySharedState.actualVersion: {_harmonySharedStateInitialization.ActualVersion:N0} (expected 102)\n" +
                 $"Managed resolver requests during shared-state initialization: {_harmonySharedStateInitialization.ManagedResolverRequests:N0}\n" +
                 $"Private loads during shared-state initialization: {_harmonySharedStateInitialization.PrivateLoads:N0}\n" +
                 $"Host loads during shared-state initialization: {_harmonySharedStateInitialization.HostLoads:N0}\n" +
                 $"Native load attempts during shared-state initialization: {_harmonySharedStateInitialization.NativeLoadAttempts:N0}\n" +
-                $"Known generated assemblies after shared-state initialization: {FormatNames(_harmonySharedStateInitialization.KnownGeneratedAssemblies)}\n" +
+                $"Known generated assemblies after normalized shared-state initialization: {FormatNames(_harmonySharedStateInitialization.KnownGeneratedAssemblies)} (required: none)\n" +
                 "API invoked: HarmonyLib.PatchProcessor::Patch() — EXACTLY ONCE\n" +
                 $"Original target: {probe.TargetSignature}\n" +
                 $"Registered prefix: {probe.PrefixSignature}\n" +
@@ -3220,6 +3223,149 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             case Code.Ldc_I4: value = Convert.ToInt32(instruction.Operand); return true;
             default: value = 0; return false;
         }
+    }
+
+    private static HarmonyRuntimeImageNormalizationSnapshot CreateIosNormalizedHarmonyRuntimeImage(string path)
+    {
+        var sourceAudit = ReadHarmonyPatchEngineMetadata(path);
+        if (!sourceAudit.Allowed)
+        {
+            throw new InvalidDataException(
+                "Step 27 refuses to normalize HarmonySharedState because the source 0Harmony patch-engine fingerprint is no longer the exact audited 2.4.2 shape:\n" +
+                sourceAudit.Detail);
+        }
+
+        var sourceSha1 = ComputeSha1Hex(path);
+        using var resolver = new Step27MetadataOnlyResolver(path);
+        using var module = ModuleDefinition.ReadModule(path, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Immediate,
+            AssemblyResolver = resolver,
+            MetadataResolver = resolver,
+        });
+        if (module.Assembly?.Name is null)
+            throw new BadImageFormatException("Managed assembly manifest missing while normalizing HarmonySharedState: " + path);
+        if (!string.Equals(module.Assembly.Name.Name, TargetSimpleName, StringComparison.OrdinalIgnoreCase) ||
+            (module.Assembly.Name.Version ?? ZeroVersion) != TargetVersion)
+        {
+            throw new InvalidDataException(
+                $"HarmonySharedState normalization is pinned to {TargetSimpleName}, Version={TargetVersion}; observed {module.Assembly.Name.FullName}.");
+        }
+
+        var sharedStateType = EnumerateTypes(module.Types).SingleOrDefault(type => type.FullName.Equals(HarmonySharedStateTypeFullName, StringComparison.Ordinal))
+            ?? throw new TypeLoadException("Exact HarmonyLib.HarmonySharedState type is missing from the normalization source image.");
+        var cctor = sharedStateType.Methods.SingleOrDefault(method => method.IsConstructor && method.IsStatic && method.HasBody)
+            ?? throw new MissingMethodException(HarmonySharedStateTypeFullName, ".cctor()");
+
+        FieldDefinition RequireField(string name, string fieldTypeFullName, bool requireInitOnly)
+        {
+            var matches = sharedStateType.Fields.Where(field => field.Name.Equals(name, StringComparison.Ordinal)).ToArray();
+            if (matches.Length != 1)
+                throw new MissingFieldException(HarmonySharedStateTypeFullName, name);
+            var field = matches[0];
+            if (!field.IsStatic || !field.FieldType.FullName.Equals(fieldTypeFullName, StringComparison.Ordinal) ||
+                (requireInitOnly && !field.IsInitOnly))
+            {
+                throw new InvalidDataException($"HarmonySharedState normalization field shape changed for {name}: {field.FullName}.");
+            }
+            return field;
+        }
+
+        var stateField = RequireField("state", "System.Collections.Generic.Dictionary`2<System.Reflection.MethodBase,System.Byte[]>", requireInitOnly: true);
+        var originalsField = RequireField("originals", "System.Collections.Generic.Dictionary`2<System.Reflection.MethodInfo,System.Reflection.MethodBase>", requireInitOnly: true);
+        var originalsMonoField = RequireField("originalsMono", "System.Collections.Generic.Dictionary`2<System.Int64,System.Reflection.MethodBase[]>", requireInitOnly: true);
+        var methodAddressRefField = sharedStateType.Fields.SingleOrDefault(field => field.Name.Equals("methodAddressRef", StringComparison.Ordinal))
+            ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "methodAddressRef");
+        if (!methodAddressRefField.IsStatic || !methodAddressRefField.IsInitOnly ||
+            !methodAddressRefField.FieldType.FullName.Contains("HarmonyLib.AccessTools/FieldRef", StringComparison.Ordinal))
+        {
+            throw new InvalidDataException("HarmonySharedState.methodAddressRef no longer has the exact static readonly AccessTools.FieldRef shape required by the bounded iOS normalization.");
+        }
+        var actualVersionField = RequireField("actualVersion", "System.Int32", requireInitOnly: true);
+        var internalVersionField = sharedStateType.Fields.SingleOrDefault(field => field.Name.Equals("internalVersion", StringComparison.Ordinal))
+            ?? throw new MissingFieldException(HarmonySharedStateTypeFullName, "internalVersion");
+        if (!internalVersionField.IsLiteral || !internalVersionField.HasConstant || Convert.ToInt32(internalVersionField.Constant) != HarmonySharedStateInternalVersion)
+            throw new InvalidDataException($"HarmonySharedState.internalVersion changed from {HarmonySharedStateInternalVersion}.");
+
+        if (cctor.IsPInvokeImpl || cctor.PInvokeInfo is not null)
+            throw new InvalidDataException("HarmonySharedState::.cctor unexpectedly became a P/Invoke boundary; refusing normalization.");
+
+        static MethodReference ParameterlessConstructor(ModuleDefinition module, TypeReference declaringType)
+            => new(".ctor", module.TypeSystem.Void, declaringType)
+            {
+                HasThis = true,
+                ExplicitThis = false,
+            };
+
+        cctor.Body = new Mono.Cecil.Cil.MethodBody(cctor)
+        {
+            InitLocals = false,
+            MaxStackSize = 1,
+        };
+        var il = cctor.Body.GetILProcessor();
+        il.Append(Instruction.Create(OpCodes.Newobj, ParameterlessConstructor(module, stateField.FieldType)));
+        il.Append(Instruction.Create(OpCodes.Stsfld, stateField));
+        il.Append(Instruction.Create(OpCodes.Newobj, ParameterlessConstructor(module, originalsField.FieldType)));
+        il.Append(Instruction.Create(OpCodes.Stsfld, originalsField));
+        il.Append(Instruction.Create(OpCodes.Newobj, ParameterlessConstructor(module, originalsMonoField.FieldType)));
+        il.Append(Instruction.Create(OpCodes.Stsfld, originalsMonoField));
+        il.Append(Instruction.Create(OpCodes.Ldnull));
+        il.Append(Instruction.Create(OpCodes.Stsfld, methodAddressRefField));
+        il.Append(Instruction.Create(OpCodes.Ldc_I4, HarmonySharedStateInternalVersion));
+        il.Append(Instruction.Create(OpCodes.Stsfld, actualVersionField));
+        il.Append(Instruction.Create(OpCodes.Ret));
+
+        byte[] runtimeBytes;
+        using (var output = new MemoryStream())
+        {
+            module.Write(output);
+            runtimeBytes = output.ToArray();
+        }
+        if (runtimeBytes.Length == 0)
+            throw new InvalidDataException("HarmonySharedState normalization produced an empty runtime image.");
+
+        string normalizedAudit;
+        using (var normalizedStream = new MemoryStream(runtimeBytes, writable: false))
+        using (var normalizedResolver = new Step27MetadataOnlyResolver(path + "::<normalized-runtime-image>"))
+        using (var normalizedModule = ModuleDefinition.ReadModule(normalizedStream, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Immediate,
+            AssemblyResolver = normalizedResolver,
+            MetadataResolver = normalizedResolver,
+        }))
+        {
+            if (normalizedModule.Assembly?.Name.FullName != module.Assembly.Name.FullName)
+                throw new InvalidDataException("HarmonySharedState normalization changed the 0Harmony managed assembly identity.");
+            var normalizedType = EnumerateTypes(normalizedModule.Types).Single(type => type.FullName.Equals(HarmonySharedStateTypeFullName, StringComparison.Ordinal));
+            var normalizedCctor = normalizedType.Methods.Single(method => method.IsConstructor && method.IsStatic && method.HasBody);
+            var instructions = normalizedCctor.Body.Instructions;
+            if (instructions.Count != 11 ||
+                instructions.Count(instruction => instruction.OpCode.Code == Code.Newobj) != 3 ||
+                instructions.Count(instruction => instruction.OpCode.Code == Code.Stsfld) != 5 ||
+                instructions.Count(instruction => instruction.OpCode.Code == Code.Ldnull) != 1 ||
+                instructions.Count(instruction => instruction.OpCode.Code == Code.Ldc_I4) != 1 ||
+                instructions.Count(instruction => instruction.OpCode.Code == Code.Ret) != 1 ||
+                instructions.Any(instruction => instruction.Operand is MethodReference called &&
+                    (called.FullName.Contains("GetOrCreateSharedStateType", StringComparison.Ordinal) ||
+                     called.FullName.Contains("FieldRefAccess", StringComparison.Ordinal) ||
+                     called.FullName.Contains("ReflectionHelper::Load", StringComparison.Ordinal))))
+            {
+                throw new InvalidDataException("Normalized HarmonySharedState::.cctor failed its exact 11-instruction iOS-safe fingerprint audit.");
+            }
+            normalizedAudit = FormatMethodAudit(normalizedCctor);
+        }
+
+        var runtimeSha1 = Convert.ToHexString(SHA1.HashData(runtimeBytes)).ToLowerInvariant();
+        return new HarmonyRuntimeImageNormalizationSnapshot(
+            sourceSha1,
+            runtimeSha1,
+            runtimeBytes,
+            sourceAudit.HarmonySharedStateTypeInitializerAudit,
+            normalizedAudit);
     }
 
     private static HarmonyPatchEngineMetadataSnapshot ReadHarmonyPatchEngineMetadata(string path)
@@ -4494,7 +4640,15 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         PreparedAssemblySnapshot Primary,
         PreparedAssemblySnapshot Target,
         HarmonyConstructorMetadataSnapshot HarmonyConstructorMetadata,
+        HarmonyRuntimeImageNormalizationSnapshot HarmonyRuntimeImage,
         SteamOfflineInstallResult Offline);
+
+    private sealed record HarmonyRuntimeImageNormalizationSnapshot(
+        string SourcePreparedSha1,
+        string RuntimeImageSha1,
+        byte[] RuntimeImageBytes,
+        string OriginalTypeInitializerAudit,
+        string NormalizedTypeInitializerAudit);
 
     private sealed record ProvenLoadReplaySnapshot(
         string PrimaryAssemblyFullName,
@@ -4671,11 +4825,15 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     {
         private readonly IReadOnlyDictionary<string, PreparedAssemblySnapshot> _privateBySimpleName;
         private readonly RuntimeBindingHostFramework[] _hostBindings;
+        private readonly string _normalizedHarmonyAssemblyFullName;
+        private readonly HarmonyRuntimeImageNormalizationSnapshot _harmonyRuntimeImage;
 
         public Step27LoadContext(
             string name,
             RuntimeFrameworkBindingPlanDocument plan,
             IReadOnlyList<PreparedAssemblySnapshot> preparedAssemblies,
+            string normalizedHarmonyAssemblyFullName,
+            HarmonyRuntimeImageNormalizationSnapshot harmonyRuntimeImage,
             bool isCollectible)
             : base(name, isCollectible)
         {
@@ -4688,6 +4846,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             }
             _privateBySimpleName = privateBySimpleName;
             _hostBindings = plan.HostFrameworkBindings;
+            _normalizedHarmonyAssemblyFullName = normalizedHarmonyAssemblyFullName;
+            _harmonyRuntimeImage = harmonyRuntimeImage;
         }
 
         public string? AllowedInitializerAssemblyFullName { get; set; }
@@ -4710,12 +4870,29 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var hash = ComputeSha1Hex(prepared.PreparedPath);
             if (!hash.Equals(prepared.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step 24 prepared SHA-1 changed immediately before load: " + prepared.Plan.RelativePath);
-            using var stream = new FileStream(prepared.PreparedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var loaded = LoadFromStream(stream);
-            var privateLoadDetail = $"{explicitReason}: {prepared.Plan.AssemblyFullName} => {loaded.GetName().FullName}";
-            PrivateLoads.Add(privateLoadDetail);
-            DiagnosticObserver?.Invoke("private load completed: " + privateLoadDetail);
-            return loaded;
+            Stream stream;
+            if (prepared.Plan.AssemblyFullName.Equals(_normalizedHarmonyAssemblyFullName, StringComparison.Ordinal))
+            {
+                if (!_harmonyRuntimeImage.SourcePreparedSha1.Equals(hash, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("Step 27 normalized Harmony runtime image source SHA-1 drifted immediately before load.");
+                var runtimeHash = Convert.ToHexString(SHA1.HashData(_harmonyRuntimeImage.RuntimeImageBytes)).ToLowerInvariant();
+                if (!runtimeHash.Equals(_harmonyRuntimeImage.RuntimeImageSha1, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("Step 27 normalized Harmony runtime image bytes changed after Gate A.");
+                stream = new MemoryStream(_harmonyRuntimeImage.RuntimeImageBytes, writable: false);
+                DiagnosticObserver?.Invoke("loading bounded iOS-normalized Harmony runtime image: source=" + hash + "; runtime=" + runtimeHash);
+            }
+            else
+            {
+                stream = new FileStream(prepared.PreparedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            }
+            using (stream)
+            {
+                var loaded = LoadFromStream(stream);
+                var privateLoadDetail = $"{explicitReason}: {prepared.Plan.AssemblyFullName} => {loaded.GetName().FullName}";
+                PrivateLoads.Add(privateLoadDetail);
+                DiagnosticObserver?.Invoke("private load completed: " + privateLoadDetail);
+                return loaded;
+            }
         }
 
         public Assembly ResolvePlanned(AssemblyName assemblyName)

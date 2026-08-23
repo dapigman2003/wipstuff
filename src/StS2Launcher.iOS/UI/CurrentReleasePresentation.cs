@@ -10,23 +10,23 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.10 — HARMONYSHAREDSTATE CCTOR IN-FLIGHT OBSERVABILITY";
+        "STEP 27.0.11 — IOS HARMONYSHAREDSTATE AOT NORMALIZATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.93 CROSSED T1–T4 • HARD STOP IS INSIDE HARMONYSHAREDSTATE::.CCTOR";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.94 CONFIRMED T5 CCTOR FAILURE • IOS-SAFE HARMONYSHAREDSTATE NORMALIZATION ACTIVE";
 
     public const string Summary =
-        "Physical 0.0.93 self-identified correctly and crossed Gate T1–T4, proving the bounded host preservation preflight and exact HarmonySharedState runtime reflection return on device. Its last durable checkpoint was T5 immediately before RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle), with PatchProcessor.Patch() and the launcher target still uninvoked. Step 27.0.10 keeps that exact cctor and patch path intact but arms bounded, output-only observers during the cctor for dedicated-ALC resolver activity and process assembly-load events, especially the generated HarmonySharedState and MonoMod.Utils.Cil.ILGeneratorProxy assemblies. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.94 self-identified correctly and again terminated inside HarmonySharedState::.cctor after the dedicated Step-27 load context successfully resolved netstandard. Step 27.0.11 converts that diagnosis into a bounded compatibility fix: Gate A deterministically rewrites only HarmonySharedState::.cctor in an in-memory runtime image of the verified prepared 0Harmony 2.4.2 assembly, replacing dynamic shared-state assembly creation and Mono StackFrame FieldRefAccess initialization with direct launcher-private dictionaries, actualVersion=102, and a null methodAddressRef. The prepared/source/live files remain untouched, and PatchProcessor.Patch() is still forbidden until the normalized initializer returns and T6 validates. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Physical 0.0.93 establishes the current Step-27 frontier inside HarmonyLib.HarmonySharedState::.cctor after T1–T4 returned. Build 0.0.94 does not pre-run or bypass any HarmonySharedState internal operation: it adds durable in-flight resolver/assembly-load breadcrumbs around the unchanged RunClassConstructor call so the next abrupt termination can be attributed before singleton load, between singleton load and ILGeneratorProxy generation, or after both. Force-quit/relaunch before every Step-27 retry once Gate B has started.";
+        "Status: Steps 01–26 are physically closed. Physical 0.0.94 confirms the current hard stop remains inside HarmonyLib.HarmonySharedState::.cctor after host netstandard resolution succeeds. Build 0.0.95 removes the two runtime-only operations that are not needed in this single-version private Harmony context: dynamic HarmonySharedState singleton generation/loading and StackFrame FieldRefAccess construction. Gate A audits and reopens an exact 11-instruction normalized cctor, Gate B loads that byte-distinct image from memory while re-verifying the untouched prepared SHA, and Gate T runs/validates it before any PatchProcessor.Patch(). Force-quit/relaunch before every Step-27 retry once Gate B has started.";
 
-    public const string ExpectedDisplayVersion = "0.0.94";
-    public const string ExpectedBuildVersion = "94";
+    public const string ExpectedDisplayVersion = "0.0.95";
+    public const string ExpectedBuildVersion = "95";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
     public const string GateTImplementationMarker =
-        "T1-T4 physically crossed; unchanged HarmonySharedState RunClassConstructor with bounded cctor resolver/AssemblyLoad observers; PatchProcessor.Patch() remains after T6";
+        "Gate-A 11-instruction iOS-normalized HarmonySharedState cctor loaded from memory; T5b RunClassConstructor uses direct state only; PatchProcessor.Patch() remains after T6";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

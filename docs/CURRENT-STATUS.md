@@ -56,7 +56,13 @@ The next physical checkpoint self-identifies **App version 0.0.93 (93)**, **Expe
 
 That advances the physical frontier past T1–T4: the bounded host Reflection.Emit/RuntimeMethodHandle preservation preflight returned, and the exact HarmonySharedState runtime Type/.cctor/version-field reflection also returned. The abrupt termination is therefore inside `HarmonyLib.HarmonySharedState::.cctor` before T6. The raw breadcrumb is preserved at `docs/history/reports/STEP-27.0.9-PHYSICAL-GATE-T5-CRASH-CHECKPOINT.txt`.
 
-## Active candidate — Step 27.0.10 / 0.0.94 (94)
+### 0.0.94 (94) — original cctor survives host netstandard binding, still terminates before T6
+
+Physical Step 27.0.10 self-identified **App version 0.0.94 (94)** and **Expected source version 0.0.94 (94)**. Its last durable T5 observer record shows the dedicated Step-27 load context completed the host binding `netstandard, Version=2.0.0.0` => `netstandard, Version=2.1.0.0` while the original `HarmonyLib.HarmonySharedState::.cctor` was running. The process then still terminated before T6; `PatchProcessor.Patch()` and the launcher target remained uninvoked.
+
+This proves the observed netstandard request itself was satisfied and moves the actionable problem back inside the remaining original cctor work. The raw checkpoint is preserved at `docs/history/reports/STEP-27.0.10-PHYSICAL-GATE-T5-OBSERVER-CRASH-CHECKPOINT.txt`.
+
+## Active candidate — Step 27.0.11 / 0.0.95 (95)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -67,21 +73,22 @@ That advances the physical frontier past T1–T4: the bounded host Reflection.Em
 
 ### Gates A–S
 
-A–N replay the physically closed Step 26 chain. Gate O retains the physically passing 0.0.90 runtime-reflection surface plus the broader receipt-backed HarmonySharedState/replacement/detour Cecil audit. P–Q resolve and baseline only the launcher-owned probe. R explicitly initializes the measured AccessTools surface. S retains the bounded annotation-free `HarmonyMethod()` descriptor path and never invokes `AddPrefix(MethodInfo)`.
+A–N replay the physically closed Step-26 chain. Gate A additionally performs a fail-closed compatibility normalization only after the exact original Harmony 2.4.2 patch-engine metadata fingerprint passes: it rewrites `HarmonySharedState::.cctor` into a deterministic **in-memory runtime image**, reopens it, and requires the exact 11-instruction direct-state fingerprint. The receipt-backed source/live/prepared files are never mutated and their normal SHA/length checks remain authoritative.
 
-### Gate T — cctor in-flight observability without pre-execution
+Gate B's dedicated private load context re-verifies the on-disk prepared Harmony SHA and, for exactly the admitted `0Harmony, Version=2.4.2.0` identity, loads the retained normalized bytes from a read-only memory stream. Every other prepared assembly continues to load from disk. Gate O remains on the physically passing runtime-reflection surface plus metadata-only audit of the original HarmonySharedState/replacement/detour chain. R initializes the measured AccessTools surface. S retains the bounded annotation-free `HarmonyMethod()` descriptor path and never invokes `AddPrefix(MethodInfo)`.
 
-T1–T4 are behavior-identical to 0.0.93 and are now physically crossed.
+### Gate T — normalized HarmonySharedState compatibility boundary
+
+T1–T4 retain the physically crossed preservation/runtime-reflection sequence.
 
 - **T1/T2** — bounded Reflection.Emit/RuntimeMethodHandle host-preservation preflight and exact isolation accounting.
-- **T3/T4** — exact HarmonySharedState Type/.cctor/internalVersion/actualVersion reflection, with the initializer still unrun and exact loader deltas measured.
-- **T5a** — require no pre-existing process-visible generated `HarmonySharedState` or `MonoMod.Utils.Cil.ILGeneratorProxy` assembly, then arm bounded output-only observers.
-- While the cctor is active, the dedicated Step-27 `AssemblyLoadContext` reports managed resolver/private/host/native activity through the existing synchronous crash-checkpoint channel. A process `AssemblyLoad` observer reports only dynamic assemblies or the two exact generated names `HarmonySharedState` and `MonoMod.Utils.Cil.ILGeneratorProxy`.
-- **T5b** — enter the same exact `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)` call that hard-stopped 0.0.93. No HarmonySharedState internal operation is manually invoked or primed beforehand.
-- **T6** — emitted only if the cctor returns; observers are removed before the existing version/generated-assembly/hash/isolation checks.
-- **T7/T8/T9** — unchanged: exactly one public `PatchProcessor.Patch()` call, then replacement/isolation validation. The launcher target remains uninvoked until Gate V.
+- **T3/T4** — exact runtime reflection of the already-loaded normalized `HarmonySharedState` Type/.cctor/version/state fields without reading static values or running the cctor.
+- **T5a** — re-hash the retained normalized runtime image and require zero pre-existing known generated `HarmonySharedState`/`MonoMod.Utils.Cil.ILGeneratorProxy` assemblies.
+- **T5b** — execute exactly one `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)` against the Gate-A-audited direct-state initializer. The normalized cctor contains no `GetOrCreateSharedStateType`, `ReflectionHelper.Load`, or `FieldRefAccess` call.
+- **T6** — require `state`, `originals`, and `originalsMono` non-null; `methodAddressRef == null`; `actualVersion == 102`; zero generated shared-state/proxy assemblies; unchanged prepared bytes; unchanged launcher-probe counters; and bounded private-context isolation.
+- **T7/T8/T9** — only after T6, retain exactly one public `PatchProcessor.Patch()` call and replacement/isolation validation. The launcher target remains uninvoked until Gate V.
 
-The next hard-stop checkpoint should therefore distinguish at least three useful milestones without altering the cctor's pre-state: no observed relevant load, generated `HarmonySharedState` loaded, or `MonoMod.Utils.Cil.ILGeneratorProxy` loaded. These are causal breadcrumbs, not source-line diagnoses.
+This deliberately removes Harmony's dynamic cross-context shared-state singleton machinery only from the fresh-process, exact-version private Step-27 runtime image. It does not weaken admission of the original source image and does not rewrite trusted/prepared files.
 
 `TrimMode=full`, `MtouchInterpreter=-all`, existing DynamicDependency preservation, trusted/prepared-byte immutability, and the broad `UseInterpreter=true`/NativeAOT prohibitions remain unchanged.
 
@@ -93,8 +100,8 @@ U audits before patched execution. V proves patched launcher behavior. W removes
 
 **Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.94 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T cctor-observer implementation marker.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.95 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T normalized-cctor implementation marker.
 
 ## Acceptance
 
-Codemagic + host tests + publish + IPA verification PASS; install `0.0.94 (94)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic + host tests + publish + IPA verification PASS; install `0.0.95 (95)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.

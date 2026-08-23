@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>94</ApplicationVersion>" in project_text, "build version is 94")
-require("<ApplicationDisplayVersion>0.0.94</ApplicationDisplayVersion>" in project_text, "display version is 0.0.94")
-require(plist.get("CFBundleVersion") == "94", "Info.plist build version is 94")
-require(plist.get("CFBundleShortVersionString") == "0.0.94", "Info.plist display version is 0.0.94")
+require("<ApplicationVersion>95</ApplicationVersion>" in project_text, "build version is 95")
+require("<ApplicationDisplayVersion>0.0.95</ApplicationDisplayVersion>" in project_text, "display version is 0.0.95")
+require(plist.get("CFBundleVersion") == "95", "Info.plist build version is 95")
+require(plist.get("CFBundleShortVersionString") == "0.0.95", "Info.plist display version is 0.0.95")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,12 +198,12 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.10 — HARMONYSHAREDSTATE CCTOR IN-FLIGHT OBSERVABILITY" in release_presentation, "top launcher banner identifies active Step 27.0.10 candidate")
-require("Physical 0.0.93" in release_presentation and "crossed Gate T1–T4" in release_presentation and "HarmonySharedState::.cctor" in release_presentation and "output-only observers" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner short description matches current HarmonySharedState cctor-observability candidate")
+require("STEP 27.0.11 — IOS HARMONYSHAREDSTATE AOT NORMALIZATION" in release_presentation, "top launcher banner identifies active Step 27.0.11 candidate")
+require("Physical 0.0.94" in release_presentation and "HarmonySharedState::.cctor" in release_presentation and "netstandard" in release_presentation and "11-instruction" in release_presentation and "prepared/source/live files remain untouched" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner short description matches current HarmonySharedState AOT-normalization candidate")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.94"' in release_presentation and 'ExpectedBuildVersion = "94"' in release_presentation, "Step 27.0.10 source pins expected bundle release identity")
-require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.10 source pins the bounded Gate-S implementation marker")
-require("GateTImplementationMarker" in release_presentation and "cctor resolver/AssemblyLoad observers" in release_presentation and "PatchProcessor.Patch() remains after T6" in release_presentation, "Step 27.0.10 source pins the Gate-T cctor-observer implementation marker")
+require('ExpectedDisplayVersion = "0.0.95"' in release_presentation and 'ExpectedBuildVersion = "95"' in release_presentation, "Step 27.0.11 source pins expected bundle release identity")
+require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.11 source pins the bounded Gate-S implementation marker")
+require("GateTImplementationMarker" in release_presentation and "11-instruction iOS-normalized HarmonySharedState cctor loaded from memory" in release_presentation and "direct state only" in release_presentation and "PatchProcessor.Patch() remains after T6" in release_presentation, "Step 27.0.11 source pins the Gate-T normalized-cctor implementation marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
 require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
@@ -338,8 +338,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.94",
-    "STS2_BUILD_VERSION": "94",
+    "STS2_DISPLAY_VERSION": "0.0.95",
+    "STS2_BUILD_VERSION": "95",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -926,18 +926,23 @@ require(step27_source.count("patchApi.UnpatchMethod.Invoke(processor, [probe.Pre
 require(step27_source.count("probe.Target.Invoke(null, [41])") == 3, "Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates")
 require(step27_source.count("HarmonyPatchProbe.Target(41)") == 3, "Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates")
 require(step27_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2 and step27_source.count("RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)") == 1 and step27_source.count("RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)") == 1, "Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier")
-require('"T5a — HarmonySharedState cctor observers armed' in step27_source and '"T5b — entering explicit RuntimeHelpers.RunClassConstructor' in step27_source, "Step 27.0.10 brackets the unchanged HarmonySharedState cctor with durable T5a/T5b progress")
-require("AppDomain.CurrentDomain.AssemblyLoad += assemblyLoadObserver" in step27_source and "AppDomain.CurrentDomain.AssemblyLoad -= assemblyLoadObserver" in step27_source, "Step 27.0.10 process AssemblyLoad observer is bounded to the HarmonySharedState cctor interval")
-require("DiagnosticObserver = observation =>" in step27_source and "context.DiagnosticObserver = previousContextObserver" in step27_source, "Step 27.0.10 dedicated-ALC diagnostic observer is restored after the cctor interval")
-require('AllowedPatchEngineGeneratedAssemblySimpleNames.Contains(simpleName)' in step27_source and 'loaded.IsDynamic' in step27_source, "Step 27.0.10 process assembly-load telemetry is restricted to dynamic or exact patch-engine generated assemblies")
-require("generatedBeforeSharedInitialization.Length != 0" in step27_source and "unexpected pre-existing generated patch-engine assembly" in step27_source, "Step 27.0.10 fails closed if generated HarmonySharedState/proxy state already exists before T5")
+require(step27_source.count("CreateIosNormalizedHarmonyRuntimeImage(target.PreparedPath)") == 1, "Step 27.0.11 creates exactly one bounded normalized Harmony runtime image during Gate A")
+require("ReadHarmonyPatchEngineMetadata(path)" in step27_source and "refuses to normalize HarmonySharedState because the source 0Harmony patch-engine fingerprint" in step27_source, "Step 27.0.11 admits normalization only after the exact original patch-engine fingerprint passes")
+require("module.Write(output)" in step27_source and "new MemoryStream(runtimeBytes, writable: false)" in step27_source and "instructions.Count != 11" in step27_source, "Step 27.0.11 writes/reopens the compatibility image in memory and pins the exact 11-instruction cctor")
+require("GetOrCreateSharedStateType" in step27_source and "FieldRefAccess" in step27_source and "ReflectionHelper::Load" in step27_source and "Normalized HarmonySharedState::.cctor failed its exact 11-instruction iOS-safe fingerprint audit." in step27_source, "Step 27.0.11 normalized cctor audit forbids the original dynamic-singleton/FieldRefAccess load calls")
+require("HarmonySharedStateInternalVersion = 102" in step27_source and 'RequireField("state"' in step27_source and 'RequireField("originals"' in step27_source and 'RequireField("originalsMono"' in step27_source and 'GetField("methodAddressRef"' in step27_source, "Step 27.0.11 normalization is pinned to the exact HarmonySharedState direct-state field surface")
+require("SourcePreparedSha1" in step27_source and "RuntimeImageSha1" in step27_source and "RuntimeImageBytes" in step27_source and "produce a byte-distinct runtime image" in step27_source, "Step 27.0.11 records source/runtime hashes and requires a byte-distinct compatibility image")
+require("new MemoryStream(_harmonyRuntimeImage.RuntimeImageBytes, writable: false)" in step27_source and "prepared.Plan.AssemblyFullName.Equals(_normalizedHarmonyAssemblyFullName" in step27_source, "Step 27.0.11 private load context uses memory bytes only for the exact admitted 0Harmony identity")
+require('"T5a — bounded iOS-normalized HarmonySharedState cctor image reverified in memory' in step27_source and '"T5b — entering RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) against the normalized direct-state initializer' in step27_source, "Step 27.0.11 brackets the normalized HarmonySharedState cctor with durable T5a/T5b progress")
+require("generatedBeforeSharedInitialization.Length != 0" in step27_source and "unexpected pre-existing generated patch-engine assembly" in step27_source and "sharedGeneratedAssemblies.Length != 0" in step27_source, "Step 27.0.11 rejects generated HarmonySharedState/proxy state before and after normalized T5/T6")
+require("harmonySharedStateStateField.GetValue(null) is null" in step27_source and "harmonySharedStateOriginalsField.GetValue(null) is null" in step27_source and "harmonySharedStateOriginalsMonoField.GetValue(null) is null" in step27_source and "harmonySharedStateMethodAddressRefField.GetValue(null) is not null" in step27_source, "Step 27.0.11 T6 validates three initialized dictionaries and null methodAddressRef")
 require(step27_source.count("_offlineInspection.RunAsync(") == 6, "Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries")
 require('stage = "OfflineReady post-patch pre-invocation check"' in step27_source and 'stage = "OfflineReady final postcondition"' in step27_source and step27_source.count('\"OfflineReady exact-tree verification: YES\\n\" +') == 2, "Step 27 has distinct post-patch and final OfflineReady proof stages")
 require("Harmony.Patch(" not in step27_source and "PatchAll(" not in step27_source and "PatchCategory(" not in step27_source and "PatchClassProcessor" not in step27_source, "Step 27 never invokes broad Harmony patch/discovery APIs")
 require("Activator.CreateInstance" not in step27_source and "Activator." not in step27_source, "Step 27 does not use broad Activator construction")
 step27_ui = read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs")
-require("BundleIdentityMatchesExpected" in step27_ui and "IDENTITY_FAIL" in step27_ui and "No Step-27 gate was run" in step27_ui, "Step 27.0.10 fails closed before Gate A on bundle/source identity mismatch")
-require("App version:" in step27_ui and "Expected source version:" in step27_ui and "Candidate:" in step27_ui and "Gate S implementation:" in step27_ui and "Gate T implementation:" in step27_ui, "Step 27.0.10 crash checkpoint self-identifies release/candidate/Gate-S/Gate-T provenance")
+require("BundleIdentityMatchesExpected" in step27_ui and "IDENTITY_FAIL" in step27_ui and "No Step-27 gate was run" in step27_ui, "Step 27.0.11 fails closed before Gate A on bundle/source identity mismatch")
+require("App version:" in step27_ui and "Expected source version:" in step27_ui and "Candidate:" in step27_ui and "Gate S implementation:" in step27_ui and "Gate T implementation:" in step27_ui, "Step 27.0.11 crash checkpoint self-identifies release/candidate/Gate-S/Gate-T provenance")
 require("LoadUnmanagedDll(string unmanagedDllName)" in step27_source and "throw new DllNotFoundException" in step27_source, "Step 27 strict private context still refuses native resolution")
 require("context.RejectedManagedRequests.Count != 0" in step27_source, "Step 27 fails on unplanned managed resolution")
 require('GetType("StS' not in step27_source and 'GetType("STS' not in step27_source and 'GetType("MegaCrit' not in step27_source, "Step 27 introduces no named StS2 type reflection")
@@ -983,7 +988,7 @@ gate_t_start = step27_source.index("public ControlledHarmonyPatchExecutionGateRe
 gate_t_end = step27_source.index("public async Task<ControlledHarmonyPatchExecutionGateResult> RunPostPatchAuditAsync(", gate_t_start)
 gate_t_body = step27_source[gate_t_start:gate_t_end]
 require("ValidatePatchEngineHostFrameworkPreservationSurface();" in gate_t_body and "GetType(HarmonySharedStateTypeFullName" in gate_t_body and "sharedResolutionManagedDelta" in gate_t_body and "sharedResolutionMembershipAfter.SequenceEqual" in gate_t_body, "Step 27.0.8 Gate T measures the new host/shared-state runtime reflection instead of weakening Gate-O purity")
-require("actualVersion was NOT read and the cctor was NOT run" in gate_t_body and "RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)" in gate_t_body and "patchApi.PatchMethod.Invoke(processor, null)" in gate_t_body, "Step 27.0.8 Gate T orders reflection -> shared-state initialization -> one public Patch() acceptance call")
+require("Static field values were NOT read and the cctor was NOT run" in gate_t_body and "RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)" in gate_t_body and "patchApi.PatchMethod.Invoke(processor, null)" in gate_t_body, "Step 27 Gate T orders reflection -> normalized shared-state initialization -> one public Patch() acceptance call")
 require("defaultCtorIl.Count == 6" in step27_source and "Code.Ldc_I4_M1" in step27_source and "HarmonyMethod() no longer matches exact priority=-1" in step27_source, "Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape")
 require("harmonyAnnotations.Length != 0" in step27_source and "HarmonyMethod(MethodInfo)/ImportMethod invoked: NO" in step27_source and "PatchProcessor.AddPrefix invoked: NO" in step27_source, "Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
@@ -1038,6 +1043,8 @@ required_docs = [
     "docs/history/steps/STEP-27.0.7-HARMONY-SHARED-STATE-INITIALIZATION-AND-PATCH-ENGINE-PRESERVATION.md",
     "docs/history/steps/STEP-27.0.8-GATE-O-PURITY-RESTORATION-AND-T-RUNTIME-RESOLUTION.md",
     "docs/history/steps/STEP-27.0.9-CRASH-CHECKPOINT-RELEASE-PROVENANCE-HARDENING.md",
+    "docs/history/steps/STEP-27.0.11-IOS-HARMONYSHAREDSTATE-AOT-NORMALIZATION.md",
+    "docs/history/reports/STEP-27.0.10-PHYSICAL-GATE-T5-OBSERVER-CRASH-CHECKPOINT.txt",
     "docs/history/reports/STEP-27.0.7-PHYSICAL-GATE-O-REPORT.txt",
     "docs/history/reports/STEP-27.0.6-PHYSICAL-GATE-T-CRASH-CHECKPOINT.txt",
     "docs/history/reports/STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt",
@@ -1089,8 +1096,11 @@ require("Targeted patch API reflection unexpectedly changed resolver/load counte
 step27_build93_checkpoint = read("docs/history/reports/STEP-27.0.9-PHYSICAL-GATE-T5-CRASH-CHECKPOINT.txt")
 require("App version: 0.0.93 (93)" in step27_build93_checkpoint and "Expected source version: 0.0.93 (93)" in step27_build93_checkpoint and "Gate: T — PatchEngineExecution" in step27_build93_checkpoint, "physical build 93 checkpoint preserves self-identifying release provenance and the Gate-T frontier")
 require("T5 — entering explicit RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)" in step27_build93_checkpoint and "PatchProcessor.Patch() and launcher target remain uninvoked" in step27_build93_checkpoint, "physical build 93 checkpoint proves T1-T4 crossed and localizes abrupt termination inside HarmonySharedState cctor before Patch()/target invocation")
+step27_build94_checkpoint = read("docs/history/reports/STEP-27.0.10-PHYSICAL-GATE-T5-OBSERVER-CRASH-CHECKPOINT.txt")
+require("App version: 0.0.94 (94)" in step27_build94_checkpoint and "Expected source version: 0.0.94 (94)" in step27_build94_checkpoint and "Gate: T — PatchEngineExecution" in step27_build94_checkpoint, "physical build 94 checkpoint preserves self-identifying release provenance and the original-cctor Gate-T frontier")
+require("T5 observer — dedicated ALC: host load completed: netstandard, Version=2.0.0.0" in step27_build94_checkpoint and "=> netstandard, Version=2.1.0.0" in step27_build94_checkpoint and "PatchProcessor.Patch() and launcher target remain uninvoked" in step27_build94_checkpoint, "physical build 94 checkpoint proves host netstandard binding completed inside the original cctor before the hard stop")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "Gate-T hard crash localized" in current_status and "0.0.91 (91)" in current_status and "clean Gate-O regression" in current_status and "0.0.93 (93)" in current_status and "provenance confirmed" in current_status and "0.0.94 (94)" in current_status and "T5a" in current_status and "T5b" in current_status and "HarmonySharedState" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 physical evidence and advances to Step 27.0.10 / 0.0.94 cctor-observability candidate")
+require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "Gate-T hard crash localized" in current_status and "0.0.91 (91)" in current_status and "clean Gate-O regression" in current_status and "0.0.93 (93)" in current_status and "provenance confirmed" in current_status and "0.0.94 (94)" in current_status and "netstandard" in current_status and "0.0.95 (95)" in current_status and "11-instruction" in current_status and "T5a" in current_status and "T5b" in current_status and "HarmonySharedState" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 physical evidence and advances to Step 27.0.11 / 0.0.95 AOT-normalization candidate")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
