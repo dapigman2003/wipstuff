@@ -101,7 +101,13 @@ Codemagic 0.0.102 finally acquired the exact official `Harmony-Fat.2.4.2.0.zip`,
 
 The failure occurred before the production normalizer invocation. The test incorrectly asserted that a net9 implementation must not contain any `netstandard` AssemblyRef. The official net9 Harmony implementation legitimately retains a netstandard compatibility reference, so that negative reference-graph assertion is not a valid target-framework proof. This is test-harness evidence only; it is not negative evidence about Deferred Cecil normalization, the 11-instruction cctor image, iOS T5/T6, or `PatchProcessor.Patch()`. The raw host report is preserved at `docs/history/reports/STEP-27.0.18-CODEMAGIC-NET9-SURROGATE-REFERENCE-ASSERTION-FAILURE.txt`.
 
-## Active candidate — Step 27.0.19 / 0.0.103 (103)
+### 0.0.103 (103) — 211/212 again; merged AssemblyRef uniqueness assumption fails before normalizer
+
+Codemagic 0.0.103 compiled production and tests and again executed all **212** host tests. **211 passed / 1 failed**. The same real-Harmony regression now failed at its positive `System.Runtime` check with `System.InvalidOperationException: Sequence contains more than one matching element`. The official dependency-merged Harmony-Fat net9 binary contains multiple `System.Runtime` AssemblyRef rows, so `SingleOrDefault` is not a valid provenance or target-framework check.
+
+This failure also occurred before `CreateIosNormalizedHarmonyRuntimeImage` was invoked. Codemagic recorded stable content identities for the exact official inputs: archive SHA-256 `a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774`, selected member `net9.0/0Harmony.dll`, and extracted DLL SHA-256 `a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab`. Those hashes are stronger and more relevant provenance evidence than merged AssemblyRef topology. The raw report is preserved at `docs/history/reports/STEP-27.0.19-CODEMAGIC-DUPLICATE-SYSTEM-RUNTIME-ASSEMBLYREF-FAILURE.txt`.
+
+## Active candidate — Step 27.0.20 / 0.0.104 (104)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -110,50 +116,47 @@ The failure occurred before the production normalizer invocation. The test incor
 - Closed prerequisite: Step 26.0 + OfflineReady + Foundation 5/5
 - StS2 reflection/patching/invocation: **forbidden**
 
-### Gate A — normalized runtime image + official real-input CI gate
+### Gate A — unchanged production normalizer; hash-pinned official host input
 
-Step 27.0.19 keeps production `ControlledHarmonyPatchExecution.cs` unchanged and corrects only the host surrogate regression contract exposed by Codemagic 0.0.102. The canonical `scripts/test.sh` still downloads the exact tagged release and requires exactly one `net9.0/0Harmony.dll` member at archive root or under a release wrapper. It now exports that exact selected archive member to the test so framework selection is proven from the release artifact itself. The DLL remains a **host-only structural surrogate**: it is not claimed to be byte-identical to StS2's on-device Harmony image.
+Step 27.0.20 keeps production `ControlledHarmonyPatchExecution.cs` byte-for-byte unchanged. The production normalizer is still restricted to exact `0Harmony, Version=2.4.2.0`, the exact prepared StS2 patch-engine metadata fingerprint, Deferred Cecil reads, the rejecting metadata resolver, and the exact 11-instruction direct-state `HarmonySharedState::.cctor` rewrite. Internal randomized synthetic fixtures retain byte-identical passthrough.
 
-The production normalizer remains restricted to exact `0Harmony, Version=2.4.2.0`, and the original on-device patch-engine fingerprint must still pass before any rewrite. Both normalizer reads remain `ReadingMode.Deferred`; the fail-closed metadata resolver is **not** relaxed.
+The host regression no longer infers target framework or provenance from merged AssemblyRef rows. The canonical host script downloads the exact tagged Harmony-Fat 2.4.2 release, requires exactly one root-or-wrapped `net9.0/0Harmony.dll`, and now fail-closes on exact content hashes observed by Codemagic 0.0.103:
 
-The host suite requires the selected archive member to be exactly `net9.0/0Harmony.dll` or a wrapped path ending in `/net9.0/0Harmony.dll`, then invokes the actual private production normalizer against that surrogate. It positively requires exact `0Harmony, Version=2.4.2.0`, `System.Runtime, Version=9.0.0.0`, the `EditorBrowsableAttribute` metadata surface without reading constructor arguments, byte-immutable source bytes, a byte-distinct runtime image, and the exact 11-instruction normalized cctor audit. It deliberately makes **no assertion that `netstandard` must be absent** from the reference graph. `STS2_STEP27_REAL_HARMONY_FIXTURE` and `STS2_STEP27_REAL_HARMONY_ARCHIVE_MEMBER` are the two canonical fixture handoffs. Physical StS2 metadata remains the production authority.
+- archive SHA-256: `a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774`
+- selected DLL SHA-256: `a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab`
 
-Internal randomized synthetic A–N fixtures retain the 0.0.97 byte-identical passthrough rule. The public constructor still cannot use that path.
+The C# test independently re-hashes the selected DLL, verifies exact 0Harmony 2.4.2 identity and the `EditorBrowsableAttribute` surface without reading attribute arguments, and then immediately invokes `CreateIosNormalizedHarmonyRuntimeImage`. It deliberately makes no uniqueness/version/absence assertion about `System.Runtime` or `netstandard` AssemblyRef rows. Physical StS2 metadata remains the production authority.
 
 ### Gates B–S
 
-Gate B's dedicated private load context re-verifies the on-disk prepared SHA immediately before load. Exact production Harmony uses the retained normalized bytes; internal synthetic replay uses exact fixture bytes. Gate O remains on the physically passing runtime-reflection surface plus metadata-only audit of the original HarmonySharedState/replacement/detour chain. R initializes the measured AccessTools surface. S retains the bounded annotation-free `HarmonyMethod()` descriptor path and never invokes `AddPrefix(MethodInfo)`.
+Unchanged from 0.0.103. Gate B loads the retained normalized bytes only for the exact admitted production identity. Gate O remains the physically passing runtime-reflection surface plus metadata-only patch-engine audit. Gate R initializes the measured AccessTools surface. Gate S uses the bounded annotation-free `HarmonyMethod()` descriptor and never invokes `AddPrefix(MethodInfo)`.
 
 ### Gate T — normalized HarmonySharedState compatibility boundary
 
-T1–T4 retain the physically crossed preservation/runtime-reflection sequence.
+Unchanged from 0.0.103:
 
-- **T1/T2** — bounded Reflection.Emit/RuntimeMethodHandle host-preservation preflight and exact isolation accounting.
-- **T3/T4** — exact runtime reflection of the already-loaded normalized `HarmonySharedState` Type/.cctor/version/state fields without reading static values or running the cctor.
-- **T5a** — re-hash the retained normalized runtime image and require zero pre-existing known generated `HarmonySharedState`/`MonoMod.Utils.Cil.ILGeneratorProxy` assemblies.
-- **T5b** — execute exactly one `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)` against the Gate-A-audited direct-state initializer. The normalized cctor contains no `GetOrCreateSharedStateType`, `ReflectionHelper.Load`, or `FieldRefAccess` call.
-- **T6** — require `state`, `originals`, and `originalsMono` non-null; `methodAddressRef == null`; `actualVersion == 102`; zero generated shared-state/proxy assemblies; unchanged prepared bytes; unchanged launcher-probe counters; and bounded private-context isolation.
-- **T7/T8/T9** — only after T6, retain exactly one public `PatchProcessor.Patch()` call and replacement/isolation validation. The launcher target remains uninvoked until Gate V.
+- **T1/T2** — bounded Reflection.Emit/RuntimeMethodHandle host-preservation preflight.
+- **T3/T4** — exact runtime reflection of the normalized `HarmonySharedState` type/cctor/state fields without initialization.
+- **T5a** — re-hash the retained normalized runtime image and require zero pre-existing generated patch-engine assemblies.
+- **T5b** — execute exactly one `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)` against the direct-state cctor.
+- **T6** — require the three dictionaries non-null, `methodAddressRef == null`, `actualVersion == 102`, no generated shared-state/proxy assemblies, unchanged prepared bytes, and bounded isolation.
+- **T7/T8/T9** — only after T6, invoke exactly one public `PatchProcessor.Patch()` and validate replacement/isolation. The launcher target remains uninvoked until Gate V.
 
 ### Detour stop rule
 
-`MtouchInterpreter=-all` keeps build-time launcher assemblies AOT-compiled while retaining the Mono interpreter for dynamically loaded/runtime-generated managed code. That is enough to justify the current normalized-cctor experiment, but it is **not** proof that MonoMod's native runtime detour backend can rewrite iOS executable code.
-
-If 0.0.103 reaches T6 but fails at T7/T8, the next candidate will perform one launcher-owned patch/unpatch experiment on a **post-publish interpreted fixture**, not another build-time AOT method. This stays inside the master plan's launcher-owned deterministic-probe boundary and better represents eventual dynamically loaded `sts2.dll`. If that representative interpreted target also cannot be patched/unpatched, the project will stop iterating Harmony internals and propose an ahead-of-load Cecil transformation architecture; that would be a large enough change to update the master plan.
-
-`TrimMode=full`, `MtouchInterpreter=-all`, existing DynamicDependency preservation, trusted/prepared-byte immutability, and the broad `UseInterpreter=true`/NativeAOT prohibitions remain unchanged.
+`MtouchInterpreter=-all` is still sufficient to justify the normalized managed-code experiment but is not proof that MonoMod's native detour backend can modify iOS executable code. If 0.0.104 reaches T6 but fails at T7/T8, the next candidate performs one post-publish interpreted fixture patch/unpatch experiment on a launcher-owned target. If that representative interpreted target also cannot be patched, stop iterating Harmony internals and propose ahead-of-load Cecil transformation; that would require a master-plan update.
 
 ### Gates U–Z
 
-U audits before patched execution. V proves patched launcher behavior. W removes exactly the prefix by `MethodInfo`. X audits. Y proves restored behavior. Z performs final hashes/OfflineReady/context/native isolation. No StS2 member is touched.
+Unchanged. U audits before patched execution; V proves patched launcher behavior; W removes exactly the prefix; X audits; Y proves restoration; Z performs final byte/OfflineReady/context/native isolation. No StS2 member is touched.
 
 ## Fresh-process rule
 
 **Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.103 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T deferred-normalized-cctor implementation marker.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.104 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T deferred-normalized-cctor implementation marker.
 
 ## Acceptance
 
-Codemagic must compile and run the full host suite, including the official-fat-release real-Harmony-2.4.2 normalizer regression, before iOS publish/IPA verification. Then install `0.0.103 (103)` and from a fresh process run A–Z to **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. T6 is the first proof that the normalized cctor fix actually ran on-device; T7/T8 is the first proof point for the public runtime detour boundary. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic must compile and run the full host suite, including the official-fat-release real-Harmony-2.4.2 normalizer regression, before iOS publish/IPA verification. Then install `0.0.104 (104)` and from a fresh process run A–Z to **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. T6 is the first proof that the normalized cctor fix actually ran on-device; T7/T8 is the first proof point for the public runtime detour boundary. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
 

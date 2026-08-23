@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.19 — NET9 SURROGATE REFERENCE-GRAPH ASSERTION FIX";
+        "STEP 27.0.20 — HASH-PINNED REAL-HARMONY NORMALIZER EXECUTION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.102 RAN 212 HOST TESTS • 211 PASS / 1 TEST-ASSUMPTION FAIL • PRODUCTION NORMALIZER UNCHANGED";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.103 RAN 212 HOST TESTS • 211 PASS / 1 MERGED-METADATA ASSUMPTION FAIL • PRODUCTION NORMALIZER UNCHANGED";
 
     public const string Summary =
-        "Codemagic 0.0.102 finally acquired the official Harmony-Fat 2.4.2 net9.0 structural surrogate, compiled production and tests, and executed all 212 host tests. 211 passed. The sole failure was a test-only assumption that a net9 implementation must have no netstandard AssemblyRef; the official net9 binary legitimately retains that compatibility reference. Step 27.0.19 removes that negative inference, positively proves net9 selection from the exact release archive member plus System.Runtime 9.0 metadata, and leaves the production Deferred-Cecil normalizer and 11-instruction HarmonySharedState cctor rewrite byte-for-byte unchanged. No StS2 member is reflected, patched, or invoked.";
+        "Codemagic 0.0.103 compiled production and tests and executed all 212 host tests. The sole failure occurred before normalization because the merged official Harmony-Fat net9.0 binary contains multiple System.Runtime AssemblyRef rows, making SingleOrDefault an invalid provenance check. Step 27.0.20 removes all target-framework inference from merged AssemblyRef topology, pins the exact official Harmony-Fat 2.4.2 release archive and selected net9.0 DLL by SHA-256, and then executes the production Deferred-Cecil normalizer directly. ControlledHarmonyPatchExecution.cs and the 11-instruction HarmonySharedState cctor rewrite remain byte-for-byte unchanged. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Codemagic 0.0.102 reached the real Harmony regression and ran 212 host tests at 211/212; only the surrogate test's false no-netstandard-reference assertion failed before normalization was invoked. Build 0.0.103 corrects that host assertion without changing production runtime code. If CI passes, the next meaningful evidence is on-device T6, then the single public PatchProcessor.Patch() boundary at T7/T8.";
+        "Status: Steps 01–26 are physically closed. Codemagic 0.0.103 ran 212 tests at 211/212; the only failure was a duplicate System.Runtime AssemblyRef assumption before the real normalizer call. Build 0.0.104 replaces merged-reference inference with exact release/DLL SHA-256 provenance and proceeds directly to the normalizer. If CI passes, the next meaningful evidence is on-device T6, then the single public PatchProcessor.Patch() boundary at T7/T8.";
 
-    public const string ExpectedDisplayVersion = "0.0.103";
-    public const string ExpectedBuildVersion = "103";
+    public const string ExpectedDisplayVersion = "0.0.104";
+    public const string ExpectedBuildVersion = "104";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
     public const string GateTImplementationMarker =

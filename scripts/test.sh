@@ -16,6 +16,8 @@ STEP27_FIXTURE_DIR="artifacts/host-step27-fixtures"
 STEP27_HARMONY_RELEASE_URL="https://github.com/pardeike/Harmony/releases/download/v2.4.2.0/Harmony-Fat.2.4.2.0.zip"
 STEP27_HARMONY_ARCHIVE="$STEP27_FIXTURE_DIR/Harmony-Fat.2.4.2.0.zip"
 STEP27_HARMONY_ARCHIVE_RELATIVE="net9.0/0Harmony.dll"
+STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED="a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774"
+STEP27_HARMONY_FIXTURE_SHA256_EXPECTED="a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab"
 STEP27_HARMONY_MEMBER_LIST="$STEP27_FIXTURE_DIR/archive-members.txt"
 STEP27_HARMONY_MATCH_LIST="$STEP27_FIXTURE_DIR/net9.0-0Harmony-members.txt"
 STEP27_HARMONY_FIXTURE="$STEP27_FIXTURE_DIR/0Harmony.dll"
@@ -36,6 +38,11 @@ curl --fail --location --silent --show-error \
   --proto '=https' --tlsv1.2 \
   "$STEP27_HARMONY_RELEASE_URL" \
   --output "$STEP27_HARMONY_ARCHIVE"
+STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL="$(shasum -a 256 "$STEP27_HARMONY_ARCHIVE" | awk '{print $1}')"
+if [[ "$STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL" != "$STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED" ]]; then
+  echo "ERROR: official Harmony-Fat 2.4.2 archive hash drift: expected $STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED, observed $STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL."
+  exit 3
+fi
 unzip -Z1 "$STEP27_HARMONY_ARCHIVE" > "$STEP27_HARMONY_MEMBER_LIST"
 # Harmony-Fat 2.4.2 does not publish a netstandard2.0 implementation in the release ZIP.
 # Use its official merged net9.0 implementation as the host-only structural surrogate:
@@ -57,9 +64,14 @@ STEP27_HARMONY_ARCHIVE_MEMBER="$(cat "$STEP27_HARMONY_MATCH_LIST")"
 echo "Harmony archive member: $STEP27_HARMONY_ARCHIVE_MEMBER"
 unzip -p "$STEP27_HARMONY_ARCHIVE" "$STEP27_HARMONY_ARCHIVE_MEMBER" > "$STEP27_HARMONY_FIXTURE"
 [[ -s "$STEP27_HARMONY_FIXTURE" ]] || { echo "ERROR: extracted Step-27 Harmony fixture is empty."; exit 3; }
+STEP27_HARMONY_FIXTURE_SHA256_ACTUAL="$(shasum -a 256 "$STEP27_HARMONY_FIXTURE" | awk '{print $1}')"
+if [[ "$STEP27_HARMONY_FIXTURE_SHA256_ACTUAL" != "$STEP27_HARMONY_FIXTURE_SHA256_EXPECTED" ]]; then
+  echo "ERROR: official Harmony-Fat 2.4.2 net9.0 fixture hash drift: expected $STEP27_HARMONY_FIXTURE_SHA256_EXPECTED, observed $STEP27_HARMONY_FIXTURE_SHA256_ACTUAL."
+  exit 3
+fi
 echo "Harmony release URL: $STEP27_HARMONY_RELEASE_URL"
-echo "Harmony archive SHA-256: $(shasum -a 256 "$STEP27_HARMONY_ARCHIVE" | awk '{print $1}')"
-echo "Harmony fixture SHA-256: $(shasum -a 256 "$STEP27_HARMONY_FIXTURE" | awk '{print $1}')"
+echo "Harmony archive SHA-256: $STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL (PIN MATCH)"
+echo "Harmony fixture SHA-256: $STEP27_HARMONY_FIXTURE_SHA256_ACTUAL (PIN MATCH)"
 export STS2_STEP27_REAL_HARMONY_FIXTURE="$ROOT/$STEP27_HARMONY_FIXTURE"
 export STS2_STEP27_REAL_HARMONY_ARCHIVE_MEMBER="$STEP27_HARMONY_ARCHIVE_MEMBER"
 

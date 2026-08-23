@@ -101,6 +101,10 @@ public sealed class ControlledHarmonyPatchExecutionTests
             $"Official Harmony-Fat structural-surrogate member is not the selected net9.0 implementation: {archiveMember}");
 
         var sourceBytesBefore = File.ReadAllBytes(fixturePath);
+        const string expectedFixtureSha256 = "a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab";
+        var sourceSha256Before = Convert.ToHexString(SHA256.HashData(sourceBytesBefore)).ToLowerInvariant();
+        Assert.AreEqual(expectedFixtureSha256, sourceSha256Before,
+            "The real-Harmony regression must execute only against the exact official Harmony-Fat 2.4.2 net9.0 bytes observed and pinned by Codemagic.");
         var sourceSha1Before = Convert.ToHexString(SHA1.HashData(sourceBytesBefore)).ToLowerInvariant();
 
         using (var module = ModuleDefinition.ReadModule(fixturePath, new ReaderParameters
@@ -112,13 +116,11 @@ public sealed class ControlledHarmonyPatchExecutionTests
         {
             Assert.AreEqual("0Harmony", module.Assembly.Name.Name);
             Assert.AreEqual(new Version(2, 4, 2, 0), module.Assembly.Name.Version);
-            // Do not infer target-framework identity from the absence of a netstandard AssemblyRef.
-            // The official net9.0 implementation legitimately retains a netstandard compatibility reference.
-            // scripts/test.sh proves framework selection from the signed release archive member; here we
-            // positively verify the net9 System.Runtime profile and then exercise the production normalizer.
-            var systemRuntimeReference = module.AssemblyReferences.SingleOrDefault(reference => reference.Name == "System.Runtime");
-            Assert.IsNotNull(systemRuntimeReference, "The official net9.0 Harmony-Fat structural surrogate must reference System.Runtime.");
-            Assert.AreEqual(new Version(9, 0, 0, 0), systemRuntimeReference.Version);
+            // Do not infer target-framework identity from merged AssemblyRef rows. The official fat
+            // binary is provenance-pinned by release URL, exact archive member, archive SHA-256, and
+            // extracted DLL SHA-256 in scripts/test.sh. Merged Harmony legitimately contains duplicate
+            // framework references, so the C# regression intentionally makes no uniqueness/version claim
+            // about System.Runtime/netstandard and proceeds directly to the production normalizer.
             Assert.IsTrue(HasEditorBrowsableAttributeSurface(module),
                 "The real-Harmony regression fixture must retain the EditorBrowsable custom-attribute surface that exposed the 0.0.97 Immediate-reader bug.");
         }

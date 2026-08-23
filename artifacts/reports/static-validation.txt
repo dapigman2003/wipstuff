@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-23T20:36:55Z
+UTC: 2026-08-23T20:52:57Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,7 +11,7 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.103.work/StS2Launcher-Step27-0.0.103
+Root: /mnt/data/StS2Launcher-Step27-0.0.104
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 194 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 103
-PASS: display version is 0.0.103
-PASS: Info.plist build version is 103
-PASS: Info.plist display version is 0.0.103
+PASS: build version is 104
+PASS: display version is 0.0.104
+PASS: Info.plist build version is 104
+PASS: Info.plist display version is 0.0.104
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.19 candidate
-PASS: top launcher banner records the 0.0.102 real-surrogate test result and scopes the 0.0.103 assertion-only correction
+PASS: top launcher banner identifies active Step 27.0.20 candidate
+PASS: top launcher banner records the 0.0.103 duplicate-AssemblyRef failure and scopes the 0.0.104 content-addressed correction
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 27.0.19 source pins expected bundle release identity
+PASS: Step 27.0.20 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.14 source pins the Gate-T deferred normalized-cctor implementation marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -555,17 +555,19 @@ PASS: Step 27 host tests cover exact launcher patch-probe behavior and signature
 PASS: Step 27 host tests require zero Harmony annotations for the bounded descriptor substitution
 PASS: Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape
 PASS: Step 27 host tests exercise fail-closed patch-engine metadata admission
-PASS: Step 27.0.19 keeps Harmony package assets and brittle NuGet/MSBuild fixture-path assumptions out of the test project
-PASS: Step 27.0.19 pins the exact official Harmony-Fat 2.4.2 release URL and strict net9.0 implementation relative path
-PASS: Step 27.0.19 explicitly scopes the official net9.0 binary to CI structural regression only
-PASS: Step 27.0.19 fixture acquisition is HTTPS-only, retried, lists the archive once, and requires exactly one root-or-wrapped relative-path match
-PASS: Step 27.0.19 accepts the exact root member or one wrapped relative path, normalizes separators only for matching, retains the original archive member, and emits drift diagnostics
-PASS: Step 27.0.19 quarantines the official Harmony fixture, exports its absolute path plus exact selected archive member, and records content hashes
-PASS: Step 27.0.19 real-Harmony regression consumes only the canonical host-script fixture path and selected archive-member evidence
-PASS: Step 27.0.19 host tests exercise the official merged Harmony 2.4.2 net9 structural surrogate through the production normalizer and preserve source bytes
-PASS: Step 27.0.19 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values
-PASS: Step 27.0.19 positively pins net9 from the selected release member and System.Runtime 9.0 without the invalid no-netstandard-reference inference
-PASS: Step 27.0.19 forbids the false assumption that a net9 implementation cannot retain a netstandard AssemblyRef
+PASS: Step 27.0.20 keeps Harmony package assets and brittle NuGet/MSBuild fixture-path assumptions out of the test project
+PASS: Step 27.0.20 pins the exact official Harmony-Fat 2.4.2 release URL and strict net9.0 implementation member
+PASS: Step 27.0.20 content-addresses the exact official archive and selected net9 DLL observed by Codemagic 0.0.103
+PASS: Step 27.0.20 explicitly scopes the official net9.0 binary to CI structural regression only
+PASS: Step 27.0.20 verifies exact archive/DLL hashes before the real-Harmony regression
+PASS: Step 27.0.20 retains exact root-or-wrapped member selection and drift diagnostics
+PASS: Step 27.0.20 quarantines the official Harmony fixture and exports only its path/member evidence
+PASS: Step 27.0.20 real-Harmony regression consumes only the canonical host-script fixture path and selected archive-member evidence
+PASS: Step 27.0.20 host test executes the official merged Harmony 2.4.2 net9 surrogate through the production normalizer and preserves source bytes
+PASS: Step 27.0.20 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values
+PASS: Step 27.0.20 C# regression independently pins and re-hashes the exact official net9 DLL
+PASS: Step 27.0.20 keeps exact selected-member proof without AssemblyRef inference
+PASS: Step 27.0.20 forbids target-framework/provenance inference from merged System.Runtime/netstandard AssemblyRef topology
 PASS: Step 27.0.15 real-Harmony test explicitly aliases the Cecil custom-attribute provider
 PASS: Step 27.0.15 forbids the ambiguous bare ICustomAttributeProvider helper declaration
 PASS: Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands
@@ -640,6 +642,8 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.13-SYNTHE
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.14-DEFERRED-CECIL-NORMALIZATION-AND-REAL-HARMONY-CI-GATE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.15-REAL-HARMONY-TEST-NAMESPACE-COMPILE-HARDENING.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.16-REAL-HARMONY-FAT-RELEASE-FIXTURE-HARDENING.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.20-HASH-PINNED-REAL-HARMONY-NORMALIZER-EXECUTION.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.19-CODEMAGIC-DUPLICATE-SYSTEM-RUNTIME-ASSEMBLYREF-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.15-CODEMAGIC-REAL-HARMONY-FIXTURE-ACQUISITION-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.13-PHYSICAL-GATE-A-REPORT.txt
@@ -699,7 +703,9 @@ PASS: Codemagic build 101 evidence proves the stop occurred before build/MSTest 
 PASS: Codemagic build 102 evidence proves the official net9 surrogate reached the compiled 212-test host suite at 211/212
 PASS: Codemagic build 102 evidence localizes the only failure to the invalid no-netstandard-reference test assertion
 PASS: Codemagic build 102 did not report a production-normalizer exception before the test-only assertion stopped the regression
-PASS: current status preserves Step 27 evidence and advances to Step 27.0.19 / 0.0.103 net9 surrogate reference-graph assertion fix
+PASS: Codemagic build 103 evidence pins the exact official fixture bytes and proves the compiled 212-test suite reached 211/212
+PASS: Codemagic build 103 localizes the sole failure to duplicate System.Runtime AssemblyRef handling before the production normalizer call
+PASS: current status preserves Step 27 evidence and advances to Step 27.0.20 / 0.0.104 hash-pinned real-Harmony normalizer execution
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -762,108 +768,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 748 checks
--CLOSURE.md
-PASS: authoritative documentation exists: docs/history/steps/STEP-24-CONTROLLED-MANAGED-INITIALIZATION.md
-PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.1-OFFLINEREADY-API-COMPILE-FIX.md
-PASS: authoritative documentation exists: docs/history/steps/STEP-24.0.2-PINVOKE-AUDIT-FIX.md
-PASS: physical build 78 report preserves the exact 2/4 gate result
-PASS: physical build 78 report preserves the ConcurrentBag constructor failure
-PASS: physical build 81 report preserves the exact 7/9 gate result
-PASS: physical build 81 report preserves the Environment.Version constructor failure
-PASS: physical build 84 report preserves the exact Step 27 17/25 gate result
-PASS: physical build 84 report preserves the implicit AccessTools initialization failure before Patch()
-PASS: physical build 85 report preserves the exact Gate-O 14/26 metadata result
-PASS: physical build 85 report preserves the measured AccessTools runtime-detection/cache surface
-PASS: physical build 86 report preserves the exact Gate-O 14/26 corrected instruction-count evidence
-PASS: physical build 86 report preserves the single newly exposed ldc.i4.1 and confirms no later gate ran
-PASS: physical build 87 report preserves the exact Gate-O 14/26 stable instruction-count evidence
-PASS: physical build 87 report preserves the operand-attribution failure that motivated Step 27.0.4
-PASS: physical build 88 report preserves the expected stale-process Gate-A rejection
-PASS: physical build 89 crash checkpoint localizes abrupt termination inside AddPrefix before S2/Patch()
-PASS: physical build 90 crash checkpoint localizes abrupt termination inside public Patch() before T2/target invocation
-PASS: physical build 91 report preserves the exact clean 14/26 Gate-O regression
-PASS: physical build 91 report preserves the resolver/load-counter failure before any Gate-T execution
-PASS: physical build 93 checkpoint preserves self-identifying release provenance and the Gate-T frontier
-PASS: physical build 93 checkpoint proves T1-T4 crossed and localizes abrupt termination inside HarmonySharedState cctor before Patch()/target invocation
-PASS: physical build 94 checkpoint preserves self-identifying release provenance and the original-cctor Gate-T frontier
-PASS: physical build 94 checkpoint proves host netstandard binding completed inside the original cctor before the hard stop
-PASS: Codemagic build 96 evidence proves compilation succeeded and exactly 2/211 host tests failed
-PASS: Codemagic build 96 evidence localizes both failures to production normalizer overreach into minimal synthetic fixtures
-PASS: physical build 97 evidence preserves the exact 0/26 Gate-A failure
-PASS: physical build 97 evidence localizes the regression to eager Cecil custom-attribute decoding inside the normalizer
-PASS: Codemagic build 98 evidence proves production core compiled and localizes the test compile stop to ambiguous ICustomAttributeProvider
-PASS: Codemagic build 98 preserves the exact primary and follow-on real-Harmony test compiler diagnostics
-PASS: Codemagic build 99 evidence proves both production and test assemblies compiled before fixture acquisition stopped the run
-PASS: Codemagic build 99 evidence localizes the stop to the brittle real-Harmony fixture-path contract before MSTest execution
-PASS: Codemagic build 100 evidence proves the official archive download reached member inspection and the root-exact selector found zero candidates
-PASS: Codemagic build 100 evidence proves the stop occurred before build/MSTest rather than in production normalization
-PASS: Codemagic build 101 evidence proves the official fat archive has no netstandard implementation and does contain concrete net9/net10 merged implementations
-PASS: Codemagic build 101 evidence proves the stop occurred before build/MSTest and not inside production normalization
-PASS: Codemagic build 102 evidence proves the official net9 surrogate reached the compiled 212-test host suite at 211/212
-PASS: Codemagic build 102 evidence localizes the only failure to the invalid no-netstandard-reference test assertion
-PASS: Codemagic build 102 did not report a production-normalizer exception before the test-only assertion stopped the regression
-PASS: current status preserves Step 27 evidence and advances to Step 27.0.19 / 0.0.103 net9 surrogate reference-graph assertion fix
-PASS: master plan contains durable section: Product objective
-PASS: master plan contains durable section: Non-negotiable security and content boundaries
-PASS: master plan contains durable section: Authority model
-PASS: master plan contains durable section: Canonical source architecture
-PASS: master plan contains durable section: Major roadmap
-PASS: master plan contains durable section: Definition of a closed step
-PASS: master plan contains durable section: Resumption rule
-PASS: master plan defines self-contained resumption path
-PASS: master plan advances durable roadmap through physically closed Step 26 into the launcher-owned replacement frontier
-PASS: master plan codifies gate batching for speed without losing discrete proof
-PASS: master plan records both Android StS2 reference implementations as advisory/non-authoritative inputs
-PASS: top-level docs are durable/current; step records live under docs/history/steps
-PASS: readable historical documentation retained for Step 01
-PASS: readable historical documentation retained for Step 02
-PASS: readable historical documentation retained for Step 03
-PASS: readable historical documentation retained for Step 04
-PASS: readable historical documentation retained for Step 05
-PASS: readable historical documentation retained for Step 06
-PASS: readable historical documentation retained for Step 07
-PASS: readable historical documentation retained for Step 08
-PASS: readable historical documentation retained for Step 09
-PASS: readable historical documentation retained for Step 10
-PASS: readable historical documentation retained for Step 11
-PASS: readable historical documentation retained for Step 12
-PASS: readable historical documentation retained for Step 13
-PASS: readable historical documentation retained for Step 14
-PASS: readable historical documentation retained for Step 15
-PASS: readable historical documentation retained for Step 16
-PASS: readable historical documentation retained for Step 17
-PASS: readable historical documentation retained for Step 18
-PASS: readable historical documentation retained for Step 19
-PASS: readable historical documentation retained for Step 20
-PASS: readable historical documentation retained for Step 21
-PASS: readable historical documentation retained for Step 22
-PASS: readable historical documentation retained for Step 23
-PASS: readable historical documentation retained for Step 24
-PASS: readable historical documentation retained for Step 25
-PASS: readable historical documentation retained for Step 26
-PASS: readable historical documentation retained for Step 27
-PASS: Step 22.4 design/history record is present
-PASS: Step 23 design/test/closure records are present
-PASS: Step 24 design/candidate/closure records are present
-PASS: Step 25 design/candidate/closure records are present
-PASS: Step 26 design/closure records are present
-PASS: Step 27 design/candidate record is present
-PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes the Step 27 workflow
-PASS: host-test report heading identifies Step 27
-PASS: host-test TRX artifact identifies Step 27
-PASS: Codemagic build-environment report heading identifies Step 27
-PASS: Codemagic contains one active launcher workflow
-PASS: Codemagic calls the consolidated build entry point
-PASS: Codemagic workflow has no history dependency
-PASS: iOS build sources canonical release configuration
-PASS: iOS build uses canonical project variable
-PASS: iOS build uses canonical Godot wrapper
-PASS: IPA verifier enforces release-config version
-PASS: IPA verifier reads native bridge from canonical project path
-PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
-PASS: authoritative source tree contains no StS2/proprietary runtime payload
-PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
-
-VALIDATION PASS: 748 checks
+VALIDATION PASS: 754 checks

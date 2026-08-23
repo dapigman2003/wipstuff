@@ -105,3 +105,6 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-27.0.18-CODEMAGIC-NET9-SURROGATE-REFERENCE-ASSERTION-FAILURE.txt` — 0.0.102 Codemagic acquired the official net9 surrogate and ran 212 tests at 211/212; the only failure was the invalid assumption that a net9 implementation cannot reference netstandard.
 - `steps/STEP-27.0.19-NET9-SURROGATE-REFERENCE-GRAPH-ASSERTION-FIX.md` — 0.0.103 removes that negative inference, positively pins the selected net9 archive member and System.Runtime 9.0 profile, and leaves production normalization unchanged.
+
+- `reports/STEP-27.0.19-CODEMAGIC-DUPLICATE-SYSTEM-RUNTIME-ASSEMBLYREF-FAILURE.txt` — 0.0.103 Codemagic compiled production/tests and ran 212 tests at 211/212; the only failure was test-only `SingleOrDefault` over duplicate `System.Runtime` AssemblyRef rows before the normalizer call.
+- `steps/STEP-27.0.20-HASH-PINNED-REAL-HARMONY-NORMALIZER-EXECUTION.md` — 0.0.104 removes AssemblyRef-based surrogate inference, pins the exact official release archive/DLL hashes observed by Codemagic, and proceeds directly to the unchanged production normalizer.
