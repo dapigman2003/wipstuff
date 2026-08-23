@@ -66,7 +66,13 @@ This proves the observed netstandard request itself was satisfied and moves the 
 
 Codemagic never reached iOS publish or device packaging for Step 27.0.11. The host-test compilation failed with eleven `CS0104` errors in `ControlledHarmonyPatchExecution.cs`: bare `OpCodes` in the new Cecil initializer rewrite was ambiguous between `System.Reflection.Emit.OpCodes` and `Mono.Cecil.Cil.OpCodes`. This is a compile-only defect introduced by the normalizer source; it provides no negative runtime evidence about the HarmonySharedState AOT-normalization design. The exact compiler output is preserved at `docs/history/reports/STEP-27.0.11-CODEMAGIC-CS0104-HOST-COMPILE-FAILURE.txt`.
 
-## Active candidate — Step 27.0.12 / 0.0.96 (96)
+### 0.0.96 (96) — compile fixed; 209/211 host tests pass; synthetic preflight scope regression
+
+Codemagic proved the Cecil `OpCodes` compile correction works: the project compiled, the host test runner executed all **211** tests, and **209 passed**. The two failures were `SyntheticStep26ReplayThroughEmptyProcessorStillPassesBeforePatchBoundary` and `GateCReportsThrowingModuleInitializerAndDoesNotAdvance`. Both failed at Gate A with the same message: the new HarmonySharedState normalization attempted the full exact 0Harmony 2.4.2 patch-engine audit against a randomized minimal synthetic Harmony-like fixture, where the internal patch-engine types intentionally do not exist.
+
+This is a host-test scope defect, not physical runtime evidence and not a failure of the normalized production cctor. The public production constructor is already pinned to exact `0Harmony` 2.4.2; Step 27.0.13 therefore restores the synthetic A–N replay by applying the production normalizer only to that canonical target, while internal non-canonical test targets retain their exact original bytes. The full 0.0.96 host report is preserved at `docs/history/reports/STEP-27.0.12-CODEMAGIC-HOST-TEST-FAILURE.txt`.
+
+## Active candidate — Step 27.0.13 / 0.0.97 (97)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -77,9 +83,11 @@ Codemagic never reached iOS publish or device packaging for Step 27.0.11. The ho
 
 ### Gates A–S
 
-A–N replay the physically closed Step-26 chain. Gate A additionally performs a fail-closed compatibility normalization only after the exact original Harmony 2.4.2 patch-engine metadata fingerprint passes: it rewrites `HarmonySharedState::.cctor` into a deterministic **in-memory runtime image**, reopens it, and requires the exact 11-instruction direct-state fingerprint. Step 27.0.12 changes only source-level opcode qualification: all eleven emitted instructions are bound through `CecilOpCodes = Mono.Cecil.Cil.OpCodes`, eliminating the 0.0.95 compiler ambiguity without changing emitted IL intent. The receipt-backed source/live/prepared files are never mutated and their normal SHA/length checks remain authoritative.
+A–N replay the physically closed Step-26 chain. For the public production boundary, Gate A still performs the fail-closed compatibility normalization only for exact `0Harmony, Version=2.4.2.0`: the original patch-engine metadata fingerprint must pass first, `HarmonySharedState::.cctor` is rewritten only in a deterministic in-memory runtime image, the image is reopened and audited as an exact **11-instruction** initializer, and the runtime SHA must be byte-distinct from the untouched prepared SHA. `CecilOpCodes = Mono.Cecil.Cil.OpCodes` remains mandatory for all eleven emitted instructions.
 
-Gate B's dedicated private load context re-verifies the on-disk prepared Harmony SHA and, for exactly the admitted `0Harmony, Version=2.4.2.0` identity, loads the retained normalized bytes from a read-only memory stream. Every other prepared assembly continues to load from disk. Gate O remains on the physically passing runtime-reflection surface plus metadata-only audit of the original HarmonySharedState/replacement/detour chain. R initializes the measured AccessTools surface. S retains the bounded annotation-free `HarmonyMethod()` descriptor path and never invokes `AddPrefix(MethodInfo)`.
+Step 27.0.13 changes only the internal host-test replay scope. The randomized minimal synthetic Harmony-like targets used to prove Gates A–N are non-canonical by design and do not contain Harmony's full patch-engine internals. They now retain a byte-identical in-memory image and are explicitly barred from pretending to be normalized. This does **not** create a public bypass: the public constructor remains pinned to `TargetSimpleName = "0Harmony"` and `TargetVersion = 2.4.2.0`, and that canonical path still requires the exact patch-engine audit plus byte-distinct normalization.
+
+Gate B's dedicated private load context re-verifies the on-disk prepared SHA immediately before load. Exact production Harmony uses the retained normalized bytes; internal synthetic replay uses the exact original fixture bytes. Gate O remains on the physically passing runtime-reflection surface plus metadata-only audit of the original HarmonySharedState/replacement/detour chain. R initializes the measured AccessTools surface. S retains the bounded annotation-free `HarmonyMethod()` descriptor path and never invokes `AddPrefix(MethodInfo)`.
 
 ### Gate T — normalized HarmonySharedState compatibility boundary
 
@@ -92,7 +100,7 @@ T1–T4 retain the physically crossed preservation/runtime-reflection sequence.
 - **T6** — require `state`, `originals`, and `originalsMono` non-null; `methodAddressRef == null`; `actualVersion == 102`; zero generated shared-state/proxy assemblies; unchanged prepared bytes; unchanged launcher-probe counters; and bounded private-context isolation.
 - **T7/T8/T9** — only after T6, retain exactly one public `PatchProcessor.Patch()` call and replacement/isolation validation. The launcher target remains uninvoked until Gate V.
 
-This deliberately removes Harmony's dynamic cross-context shared-state singleton machinery only from the fresh-process, exact-version private Step-27 runtime image. It does not weaken admission of the original source image and does not rewrite trusted/prepared files.
+The runtime compatibility design is therefore unchanged from 0.0.96 for the real app. This release only repairs the test harness so Codemagic can actually certify that design before device installation.
 
 `TrimMode=full`, `MtouchInterpreter=-all`, existing DynamicDependency preservation, trusted/prepared-byte immutability, and the broad `UseInterpreter=true`/NativeAOT prohibitions remain unchanged.
 
@@ -104,8 +112,8 @@ U audits before patched execution. V proves patched launcher behavior. W removes
 
 **Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.96 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T normalized-cctor implementation marker.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.97 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T normalized-cctor implementation marker.
 
 ## Acceptance
 
-Codemagic + host tests + publish + IPA verification PASS; install `0.0.96 (96)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic + host tests + publish + IPA verification PASS; install `0.0.97 (97)`; from a fresh process run A–Z to **26/26 PASS**; then OfflineReady PASS and Foundation 5/5 PASS. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.

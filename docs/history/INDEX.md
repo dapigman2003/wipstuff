@@ -89,4 +89,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-27.0.11-IOS-HARMONYSHAREDSTATE-AOT-NORMALIZATION.md` — 0.0.95 replaces only the failing HarmonySharedState runtime cctor in a verified in-memory 0Harmony image with direct local state initialization, preserving the trusted prepared file and keeping Patch() behind T6.
 - `reports/STEP-27.0.11-CODEMAGIC-CS0104-HOST-COMPILE-FAILURE.txt` — Codemagic host compilation for 0.0.95 stopped on eleven ambiguous bare `OpCodes` references before iOS publish/runtime.
 - `steps/STEP-27.0.12-CECIL-OPCODES-COMPILE-HARDENING.md` — 0.0.96 keeps the 0.0.95 runtime design unchanged and explicitly aliases Cecil opcodes for the eleven normalized cctor instructions.
+- `steps/STEP-27.0.13-SYNTHETIC-PREFLIGHT-SCOPE-HARDENING.md` — 0.0.97 keeps the production normalization unchanged while restoring byte-identical randomized synthetic A–N replay after the 0.0.96 209/211 host-test result.
+- `reports/STEP-27.0.12-CODEMAGIC-HOST-TEST-FAILURE.txt` — full 0.0.96 Codemagic host report proving compilation succeeded and exactly two synthetic Gate-A tests failed before publish.
 - `reports/STEP-27.0.10-PHYSICAL-GATE-T5-OBSERVER-CRASH-CHECKPOINT.txt` — physical 0.0.94 confirms the cctor survives netstandard host binding but still terminates before T6/Patch().

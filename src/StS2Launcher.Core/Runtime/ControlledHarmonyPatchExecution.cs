@@ -369,11 +369,24 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             }
 
             stage = "HarmonySharedState iOS runtime-image normalization";
-            var harmonyRuntimeImage = CreateIosNormalizedHarmonyRuntimeImage(target.PreparedPath);
+            var requiresIosHarmonyNormalization =
+                _targetSimpleName.Equals(TargetSimpleName, StringComparison.OrdinalIgnoreCase) &&
+                _targetVersion == TargetVersion;
+            var harmonyRuntimeImage = requiresIosHarmonyNormalization
+                ? CreateIosNormalizedHarmonyRuntimeImage(target.PreparedPath)
+                : CreateSyntheticPassthroughRuntimeImage(target.PreparedPath);
             if (!harmonyRuntimeImage.SourcePreparedSha1.Equals(target.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step 27 Gate A refuses the Harmony runtime-image normalization because the source prepared SHA-1 no longer matches the persisted plan.");
-            if (harmonyRuntimeImage.RuntimeImageSha1.Equals(harmonyRuntimeImage.SourcePreparedSha1, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step 27 Gate A refuses the Harmony runtime-image selection because the source prepared SHA-1 no longer matches the persisted plan.");
+            if (requiresIosHarmonyNormalization &&
+                harmonyRuntimeImage.RuntimeImageSha1.Equals(harmonyRuntimeImage.SourcePreparedSha1, StringComparison.OrdinalIgnoreCase))
+            {
                 throw new InvalidDataException("Step 27 Gate A expected the bounded HarmonySharedState normalization to produce a byte-distinct runtime image.");
+            }
+            if (!requiresIosHarmonyNormalization &&
+                !harmonyRuntimeImage.RuntimeImageSha1.Equals(harmonyRuntimeImage.SourcePreparedSha1, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException("Step 27 internal synthetic-target replay must remain byte-identical when iOS HarmonySharedState normalization is not applicable.");
+            }
 
             stage = "plan digest";
             var planSha256 = await ComputeSha256HexAsync(_planPath, cancellationToken).ConfigureAwait(false);
@@ -416,12 +429,14 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "Audited automatic-initialization IL:\n" + string.Join("\n", target.AutomaticInitializerAudits) + "\n" +
                 "Harmony constructor metadata policy: PASS\n" +
                 harmonyConstructorMetadata.Detail + "\n" +
-                "HarmonySharedState iOS runtime-image normalization: PASS\n" +
+                $"HarmonySharedState iOS runtime-image normalization: {(requiresIosHarmonyNormalization ? "PASS — canonical 0Harmony 2.4.2 target" : "NOT APPLICABLE — internal synthetic target replay")}\n" +
                 $"Source prepared SHA-1 preserved: {harmonyRuntimeImage.SourcePreparedSha1}\n" +
-                $"Normalized runtime-image SHA-1: {harmonyRuntimeImage.RuntimeImageSha1}\n" +
-                $"Normalized runtime-image bytes: {harmonyRuntimeImage.RuntimeImageBytes.LongLength:N0}\n" +
-                "Normalized HarmonySharedState::.cctor: direct launcher-private state/originals/originalsMono dictionaries + actualVersion=102 + null methodAddressRef\n" +
-                "Runtime dynamic HarmonySharedState singleton creation/ReflectionHelper.Load/StackFrame FieldRefAccess initialization: REMOVED FROM NORMALIZED CCTOR\n" +
+                $"Runtime-image SHA-1: {harmonyRuntimeImage.RuntimeImageSha1}\n" +
+                $"Runtime-image bytes: {harmonyRuntimeImage.RuntimeImageBytes.LongLength:N0}\n" +
+                (requiresIosHarmonyNormalization
+                    ? "Normalized HarmonySharedState::.cctor: direct launcher-private state/originals/originalsMono dictionaries + actualVersion=102 + null methodAddressRef\n" +
+                      "Runtime dynamic HarmonySharedState singleton creation/ReflectionHelper.Load/StackFrame FieldRefAccess initialization: REMOVED FROM NORMALIZED CCTOR\n"
+                    : "Internal synthetic target replay: original fixture bytes retained exactly; production normalization policy not bypassed.\n") +
                 "Prepared/source/live file mutation: NO\n" +
                 "HARMONY_DEBUG environment activation: ABSENT\n" +
                 "Audited Harmony constructor IL:\n" + harmonyConstructorMetadata.ConstructorAudit + "\n" +
@@ -3224,6 +3239,21 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             case Code.Ldc_I4: value = Convert.ToInt32(instruction.Operand); return true;
             default: value = 0; return false;
         }
+    }
+
+    private static HarmonyRuntimeImageNormalizationSnapshot CreateSyntheticPassthroughRuntimeImage(string path)
+    {
+        var bytes = File.ReadAllBytes(path);
+        if (bytes.Length == 0)
+            throw new InvalidDataException("Step 27 internal synthetic-target replay received an empty prepared runtime image.");
+
+        var sha1 = Convert.ToHexString(SHA1.HashData(bytes)).ToLowerInvariant();
+        return new HarmonyRuntimeImageNormalizationSnapshot(
+            sha1,
+            sha1,
+            bytes,
+            "<internal synthetic target: production HarmonySharedState normalization not applicable>",
+            "<byte-identical synthetic passthrough>");
     }
 
     private static HarmonyRuntimeImageNormalizationSnapshot CreateIosNormalizedHarmonyRuntimeImage(string path)

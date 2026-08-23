@@ -120,6 +120,8 @@ public sealed class ControlledHarmonyPatchExecutionTests
         Assert.IsTrue(gateA.Passed, gateA.Detail);
         StringAssert.Contains(gateA.Detail, "Initializer hazards: 0");
         StringAssert.Contains(gateA.Detail, "IL_0000: Ret");
+        StringAssert.Contains(gateA.Detail, "HarmonySharedState iOS runtime-image normalization: NOT APPLICABLE — internal synthetic target replay");
+        StringAssert.Contains(gateA.Detail, "original fixture bytes retained exactly; production normalization policy not bypassed");
 
         var gateB = boundary.RunProvenLoadStateReplay();
         Assert.IsTrue(gateB.Passed, gateB.Detail);
