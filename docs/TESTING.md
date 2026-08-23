@@ -2,26 +2,37 @@
 
 ## Static validation
 
-Run `python3 tools/validate_current.py`.
+Run `bash scripts/validate.sh`.
 
-The validator protects the physically closed Step 23–26 boundaries and Step-27 refinement evidence through the physical `0.0.94` T5 observer checkpoint. Step 27.0.11 / `0.0.95 (95)` retains all 26 A–Z gates while introducing one bounded runtime-image compatibility substitution for the exact admitted Harmony 2.4.2 `HarmonySharedState::.cctor`. `TrimMode=full`, `MtouchInterpreter=-all`, Step-22 roots, proven `System.Collections.Concurrent`, and existing Step-25/27 preservation anchors remain mandatory.
+The validator protects Steps 23–26 and all Step-27 evidence through physical 0.0.97. For Step 27.0.14 / `0.0.98 (98)`, it must prove that the production normalizer uses `ReadingMode.Deferred` for source and post-write audit, contains no `ReadingMode.Immediate`, retains the fail-closed metadata resolver, preserves the exact eleven Cecil-opcode rewrite, keeps canonical-vs-synthetic scope separation, and preserves the later single public `PatchProcessor.Patch()` boundary.
 
-Static validation pins all of the following: exact source patch-engine metadata admission before normalization; one in-memory Cecil rewrite; unchanged managed assembly identity; exact 11-instruction normalized cctor; distinct source/runtime SHA-1; no write to receipt-backed source/live/prepared files; exact private-memory load only for admitted 0Harmony; T5a runtime-image rehash; one T5b `RunClassConstructor`; T6 direct-state/null-methodAddress/version/generated-assembly validation; and exactly one later public `PatchProcessor.Patch()` call. No StS2 member may be reflected, patched, or invoked.
-
-`Step27-CrashCheckpoint.txt` must be synchronously flushed at run start, each gate START/PASS/FAIL, normal progress, and sensitive O/R/S/T substages.
+The physical 0.0.97 report must remain archived and fingerprinted as the evidence for the `System.ComponentModel.EditorBrowsableState` eager-resolution failure.
 
 ## Host tests
 
 Run `bash scripts/test.sh`.
 
-Host tests enforce A–Z ordering, launcher-probe invariants, AccessTools metadata, and fail-closed patch-engine metadata admission. The current local execution environment may not contain the .NET SDK; absence of `dotnet` is not recorded as a PASS and Codemagic must execute the suite before installation.
+In addition to the synthetic gate tests, Codemagic now restores exact `Lib.Harmony 2.4.2` only as a quarantined test fixture. The test project copies its `netstandard2.0/0Harmony.dll` to `Step27RealHarmonyFixture` and calls the private production `CreateIosNormalizedHarmonyRuntimeImage` helper against that real binary.
+
+That regression requires:
+
+- exact `0Harmony` / `2.4.2.0` identity;
+- an `EditorBrowsableAttribute` somewhere on the real metadata surface, detected without reading constructor arguments;
+- successful normalization under the rejecting metadata resolver;
+- original fixture bytes unchanged;
+- source SHA and runtime-image SHA different;
+- normalized cctor audit contains `instructions=11`.
+
+This test is specifically intended to catch the class of failure that 0.0.95–0.0.97 allowed to reach Codemagic/device because synthetic fixtures did not reproduce the real Harmony metadata shape.
 
 Expected TRX: `artifacts/test-results/step27.trx`.
 
 ## Codemagic / physical acceptance
 
-Workflow: `ios-step-27`. Expected version: `0.0.95 (95)`. Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`.
+Workflow: `ios-step-27`. Expected version: `0.0.98 (98)`. Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`.
 
-Start from a force-quit/relaunch and require A–Z **26/26 PASS**, OfflineReady PASS, Foundation 5/5 PASS. Once Gate B starts, force-quit before any retry. If the process terminates without a managed report, preserve `Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt` before another run.
+Codemagic must pass compilation and the complete host suite before publish. Start the physical run from a force-quit/relaunch and require A–Z **26/26 PASS**, OfflineReady PASS, Foundation 5/5 PASS. Once Gate B starts, force-quit before any retry. If the process terminates without a managed report, preserve `Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt` before another run.
 
-For 0.0.95, require the checkpoint to identify `App version: 0.0.95 (95)`, the Step 27.0.11 candidate, the bounded Gate-S implementation, and the Gate-T 11-instruction normalized-cctor implementation. The key next substages are T5a (runtime image reverified), T5b (normalized cctor entered), T6 (normalized cctor returned and state validation started), and then T7/T8/T9 for the public Patch() boundary.
+The key physical substages are T5a (runtime image reverified), T5b (normalized cctor entered), T6 (normalized cctor returned and state validation started), then T7/T8/T9 for the public Patch boundary.
+
+If T6 passes but T7/T8 fails, the next test target is a project-owned post-publish interpreted assembly so runtime patching is evaluated against the same managed execution class as eventual dynamically loaded game IL. If that representative target also fails, Harmony runtime detouring is no longer the default direction; propose ahead-of-load Cecil transformation and update the master plan before implementation.

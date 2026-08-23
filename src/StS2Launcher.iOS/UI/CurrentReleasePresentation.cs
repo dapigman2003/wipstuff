@@ -10,23 +10,23 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.13 — SYNTHETIC PREFLIGHT SCOPE HARDENING";
+        "STEP 27.0.14 — DEFERRED CECIL NORMALIZATION + REAL HARMONY CI GATE";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.96 COMPILED • 209/211 HOST TESTS PASS • PRODUCTION NORMALIZATION RETAINED";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.97 GATE A ROOT-CAUSED • DEFERRED CECIL WRITE • REAL HARMONY 2.4.2 CI FIXTURE";
 
     public const string Summary =
-        "Codemagic proved 0.0.96 compiles and executes the host suite: 209/211 tests passed. The two failures were synthetic-boundary regressions because Gate A unconditionally applied the new exact real-0Harmony patch-engine normalization audit to randomized minimal Harmony-like fixtures that are intentionally only valid through Gates A–N. Step 27.0.13 scopes the compatibility rewrite to the canonical production target identity only: exact 0Harmony 2.4.2 still requires the full audited fingerprint and a byte-distinct normalized runtime image, while internal synthetic replay retains its original fixture bytes exactly. The public production constructor, normalized cctor, Gate T ordering, and PatchProcessor.Patch() boundary are unchanged. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.97 failed before Gate B because the new HarmonySharedState runtime-image normalizer reopened exact 0Harmony with Mono.Cecil ReadingMode.Immediate. Immediate mode eagerly decodes custom-attribute constructor arguments and forced the deliberately rejecting metadata resolver to resolve System.ComponentModel.EditorBrowsableState. Step 27.0.14 uses ReadingMode.Deferred for both the source rewrite and normalized-image audit; Cecil's writer completes a deferred module with custom-attribute resolution disabled. Codemagic now also restores exact merged Lib.Harmony 2.4.2 netstandard2.0 as a quarantined test fixture and runs the real production normalizer against it, requiring byte-immutable source plus the exact byte-distinct 11-instruction runtime image. Gate S/T patch behavior is otherwise unchanged. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Physical 0.0.94 remains the latest device evidence: the original HarmonySharedState cctor still stops before T6 after netstandard resolution succeeds. Build 0.0.95 did not compile. Build 0.0.96 fixed that compile defect and Codemagic ran 211 host tests, with 209 passing and two synthetic A–N replay tests failing because the canonical HarmonySharedState normalizer was applied outside its intended exact-production target. Build 0.0.97 keeps the same 11-instruction AOT-normalized production cctor and CecilOpCodes binding, while restoring byte-identical synthetic replay for internal randomized fixtures. Gate B still loads the byte-distinct normalized image for exact production 0Harmony 2.4.2, and Gate T runs/validates it before any PatchProcessor.Patch(). Force-quit/relaunch before every Step-27 retry once Gate B has started.";
+        "Status: Steps 01–26 are physically closed. Physical 0.0.94 localized the original HarmonySharedState cctor crash before T6. Builds 0.0.95 and 0.0.96 exposed compile/test-harness regressions before device execution. Physical 0.0.97 then exposed a deterministic Gate-A Cecil regression: the normalizer alone used ReadingMode.Immediate and eagerly resolved an unrelated EditorBrowsableState custom-attribute argument. Build 0.0.98 restores the project's established metadata-only Deferred-read discipline end-to-end and adds a Codemagic regression test against the real upstream Harmony 2.4.2 binary so this class of failure must be caught before IPA publication. If the normalized run reaches T6, the next evidence boundary is the single public PatchProcessor.Patch() call at T7; if that runtime-detour boundary fails, the documented next experiment is an interpreted post-publish launcher-owned probe before any architecture pivot.";
 
-    public const string ExpectedDisplayVersion = "0.0.97";
-    public const string ExpectedBuildVersion = "97";
+    public const string ExpectedDisplayVersion = "0.0.98";
+    public const string ExpectedBuildVersion = "98";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
     public const string GateTImplementationMarker =
-        "Gate-A 11-instruction iOS-normalized HarmonySharedState cctor loaded from memory; T5b RunClassConstructor uses direct state only; PatchProcessor.Patch() remains after T6";
+        "Gate-A 11-instruction iOS-normalized HarmonySharedState cctor loaded from memory; deferred Cecil source/audit; T5b RunClassConstructor uses direct state only; PatchProcessor.Patch() remains after T6";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

@@ -12,10 +12,30 @@
     <PackageReference Include="MSTest.TestAdapter" Version="4.3.2" PrivateAssets="all" />
     <PackageReference Include="MSTest.TestFramework" Version="4.3.2" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+    <!--
+      Step 27.0.14 regression fixture only: download the exact upstream Harmony 2.4.2 package
+      without adding any of its assets or dependencies to the host-test graph. The build copies
+      only its merged netstandard2.0 0Harmony.dll into a quarantined fixture folder so the normalizer is
+      exercised against real Harmony metadata (including enum-valued custom attributes).
+    -->
+    <PackageDownload Include="Lib.Harmony" Version="[2.4.2]" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../../src/StS2Launcher.Core/StS2Launcher.Core.csproj" />
     <ProjectReference Include="../../fixtures/StS2Launcher.Step16.Fixture/StS2Launcher.Step16.Fixture.csproj" />
   </ItemGroup>
+
+  <Target Name="CopyStep27RealHarmonyNormalizerFixture" AfterTargets="Build">
+    <PropertyGroup>
+      <_Step27HarmonyFixtureSource>$(NuGetPackageRoot)lib.harmony/2.4.2/lib/netstandard2.0/0Harmony.dll</_Step27HarmonyFixtureSource>
+      <_Step27HarmonyFixtureDir>$(OutDir)Step27RealHarmonyFixture</_Step27HarmonyFixtureDir>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_Step27HarmonyFixtureSource)')"
+           Text="Step 27.0.14 requires exact merged Lib.Harmony 2.4.2 netstandard2.0/0Harmony.dll as a quarantined host-test fixture." />
+    <MakeDir Directories="$(_Step27HarmonyFixtureDir)" />
+    <Copy SourceFiles="$(_Step27HarmonyFixtureSource)"
+          DestinationFiles="$(_Step27HarmonyFixtureDir)/0Harmony.dll" />
+  </Target>
+
 </Project>

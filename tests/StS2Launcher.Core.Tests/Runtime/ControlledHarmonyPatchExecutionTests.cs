@@ -81,6 +81,99 @@ public sealed class ControlledHarmonyPatchExecutionTests
     }
 
     [TestMethod]
+    public void RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes()
+    {
+        var fixturePath = Path.Combine(AppContext.BaseDirectory, "Step27RealHarmonyFixture", "0Harmony.dll");
+        Assert.IsTrue(File.Exists(fixturePath), "Exact merged Lib.Harmony 2.4.2 netstandard2.0 fixture was not copied to the quarantined test folder.");
+
+        var sourceBytesBefore = File.ReadAllBytes(fixturePath);
+        var sourceSha1Before = Convert.ToHexString(SHA1.HashData(sourceBytesBefore)).ToLowerInvariant();
+
+        using (var module = ModuleDefinition.ReadModule(fixturePath, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+        }))
+        {
+            Assert.AreEqual("0Harmony", module.Assembly.Name.Name);
+            Assert.AreEqual(new Version(2, 4, 2, 0), module.Assembly.Name.Version);
+            var netstandardReference = module.AssemblyReferences.SingleOrDefault(reference => reference.Name == "netstandard");
+            Assert.IsNotNull(netstandardReference, "The real-Harmony fixture must use the netstandard profile observed on-device.");
+            Assert.AreEqual(new Version(2, 0, 0, 0), netstandardReference.Version);
+            Assert.IsTrue(HasEditorBrowsableAttributeSurface(module),
+                "The real-Harmony regression fixture must retain the EditorBrowsable custom-attribute surface that exposed the 0.0.97 Immediate-reader bug.");
+        }
+
+        var normalize = typeof(ControlledHarmonyPatchExecution).GetMethod(
+            "CreateIosNormalizedHarmonyRuntimeImage",
+            BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new AssertFailedException("Step 27 real-Harmony normalizer helper is missing.");
+
+        object snapshot;
+        try
+        {
+            snapshot = normalize.Invoke(null, [fixturePath])
+                ?? throw new AssertFailedException("Real-Harmony normalizer returned null.");
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw new AssertFailedException("Real Harmony 2.4.2 normalization failed: " + ex.InnerException, ex.InnerException);
+        }
+
+        var snapshotType = snapshot.GetType();
+        string ReadString(string name) => (string?)(snapshotType.GetProperty(name)?.GetValue(snapshot))
+            ?? throw new AssertFailedException($"Normalizer snapshot is missing string property {name}.");
+        var runtimeBytes = (byte[]?)(snapshotType.GetProperty("RuntimeImageBytes")?.GetValue(snapshot))
+            ?? throw new AssertFailedException("Normalizer snapshot is missing RuntimeImageBytes.");
+
+        Assert.AreEqual(sourceSha1Before, ReadString("SourcePreparedSha1"));
+        Assert.AreNotEqual(sourceSha1Before, ReadString("RuntimeImageSha1"));
+        Assert.IsTrue(runtimeBytes.Length > 0);
+        StringAssert.Contains(ReadString("NormalizedTypeInitializerAudit"), "instructions=11");
+        CollectionAssert.AreEqual(sourceBytesBefore, File.ReadAllBytes(fixturePath),
+            "The real Harmony fixture must remain byte-for-byte immutable after in-memory normalization.");
+    }
+
+    private static bool HasEditorBrowsableAttributeSurface(ModuleDefinition module)
+    {
+        const string attributeName = "System.ComponentModel.EditorBrowsableAttribute";
+        static bool HasAttribute(ICustomAttributeProvider provider, string fullName)
+            => provider.HasCustomAttributes && provider.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == fullName);
+
+        if (HasAttribute(module, attributeName) || (module.Assembly is not null && HasAttribute(module.Assembly, attributeName)))
+            return true;
+
+        foreach (var type in EnumerateFixtureTypes(module.Types))
+        {
+            if (HasAttribute(type, attributeName) ||
+                type.Fields.Any(field => HasAttribute(field, attributeName)) ||
+                type.Properties.Any(property => HasAttribute(property, attributeName)) ||
+                type.Events.Any(@event => HasAttribute(@event, attributeName)))
+                return true;
+
+            foreach (var method in type.Methods)
+            {
+                if (HasAttribute(method, attributeName) || HasAttribute(method.MethodReturnType, attributeName) ||
+                    method.Parameters.Any(parameter => HasAttribute(parameter, attributeName)))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static IEnumerable<TypeDefinition> EnumerateFixtureTypes(IEnumerable<TypeDefinition> roots)
+    {
+        foreach (var root in roots)
+        {
+            yield return root;
+            foreach (var nested in EnumerateFixtureTypes(root.NestedTypes))
+                yield return nested;
+        }
+    }
+
+    [TestMethod]
     public void HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing()
     {
         using var temp = new TempTestDirectory("sts2-step27-patch-engine-metadata");

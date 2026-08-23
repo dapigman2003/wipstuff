@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-23T04:37:10Z
+UTC: 2026-08-23T06:25:35Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,7 +11,7 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.97
+Root: /mnt/data/StS2Launcher-Step27-0.0.98.work
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 194 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 97
-PASS: display version is 0.0.97
-PASS: Info.plist build version is 97
-PASS: Info.plist display version is 0.0.97
+PASS: build version is 98
+PASS: display version is 0.0.98
+PASS: Info.plist build version is 98
+PASS: Info.plist display version is 0.0.98
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,12 +32,12 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.13 candidate
-PASS: top launcher banner short description matches current synthetic-preflight scope hardening candidate
+PASS: top launcher banner identifies active Step 27.0.14 candidate
+PASS: top launcher banner describes the physical Cecil failure, Deferred correction, and real-Harmony CI gate
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 27.0.13 source pins expected bundle release identity
-PASS: Step 27.0.13 source pins the bounded Gate-S implementation marker
-PASS: Step 27.0.13 source pins the Gate-T normalized-cctor implementation marker
+PASS: Step 27.0.14 source pins expected bundle release identity
+PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
+PASS: Step 27.0.14 source pins the Gate-T deferred normalized-cctor implementation marker
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
 PASS: stale prior Step-27 candidate banner identity is removed
@@ -512,30 +512,32 @@ PASS: Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invoc
 PASS: Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates
 PASS: Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates
 PASS: Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier
-PASS: Step 27.0.13 creates exactly one bounded normalized Harmony runtime image during Gate A
-PASS: Step 27.0.13 has exactly one internal synthetic passthrough path alongside canonical normalization
-PASS: Step 27.0.13 scopes production normalization to exact canonical target identity/version
-PASS: Step 27.0.13 requires canonical normalization to be byte-distinct and synthetic replay to be byte-identical
+PASS: Step 27.0.14 creates exactly one bounded normalized Harmony runtime image during Gate A
+PASS: Step 27.0.14 retains exactly one internal synthetic passthrough path alongside canonical normalization
+PASS: Step 27.0.14 scopes production normalization to exact canonical target identity/version
+PASS: Step 27.0.14 requires canonical normalization to be byte-distinct and synthetic replay to be byte-identical
 PASS: Step 27.0.13 synthetic passthrough hashes exactly the unchanged prepared bytes
 PASS: Step 27 public constructor remains pinned to canonical 0Harmony 2.4.2 target
 PASS: Step 27 host tests explicitly prove synthetic replay bypass is test-scoped and byte-preserving
-PASS: Step 27.0.13 admits normalization only after the exact original patch-engine fingerprint passes
-PASS: Step 27.0.13 writes/reopens the compatibility image in memory and pins the exact 11-instruction cctor
-PASS: Step 27.0.13 explicitly aliases Cecil OpCodes alongside System.Reflection.Emit
-PASS: Step 27.0.13 uses CecilOpCodes for all eleven generated cctor instructions and forbids bare ambiguous OpCodes
-PASS: Step 27.0.13 normalized cctor audit forbids the original dynamic-singleton/FieldRefAccess load calls
-PASS: Step 27.0.13 normalization is pinned to the exact HarmonySharedState direct-state field surface
-PASS: Step 27.0.13 records source/runtime hashes and requires a byte-distinct compatibility image
-PASS: Step 27.0.13 private load context uses retained memory bytes only for the exact admitted target identity
-PASS: Step 27.0.13 brackets the normalized HarmonySharedState cctor with durable T5a/T5b progress
-PASS: Step 27.0.13 rejects generated HarmonySharedState/proxy state before and after normalized T5/T6
-PASS: Step 27.0.13 T6 validates three initialized dictionaries and null methodAddressRef
+PASS: Step 27.0.14 admits normalization only after the exact original patch-engine fingerprint passes
+PASS: Step 27.0.14 writes/reopens the compatibility image in memory and pins the exact 11-instruction cctor
+PASS: Step 27.0.14 explicitly aliases Cecil OpCodes alongside System.Reflection.Emit
+PASS: Step 27.0.14 uses CecilOpCodes for all eleven generated cctor instructions and forbids bare ambiguous OpCodes
+PASS: Step 27.0.14 keeps all Step-27 Cecil reads deferred and forbids the physical 0.0.97 Immediate-reader regression
+PASS: Step 27.0.14 documents why Deferred mode preserves unrelated custom-attribute blobs during normalization
+PASS: Step 27.0.14 normalized cctor audit forbids the original dynamic-singleton/FieldRefAccess load calls
+PASS: Step 27.0.14 normalization is pinned to the exact HarmonySharedState direct-state field surface
+PASS: Step 27.0.14 records source/runtime hashes and requires a byte-distinct compatibility image
+PASS: Step 27.0.14 private load context uses retained memory bytes only for the exact admitted target identity
+PASS: Step 27.0.14 brackets the normalized HarmonySharedState cctor with durable T5a/T5b progress
+PASS: Step 27.0.14 rejects generated HarmonySharedState/proxy state before and after normalized T5/T6
+PASS: Step 27.0.14 T6 validates three initialized dictionaries and null methodAddressRef
 PASS: Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries
 PASS: Step 27 has distinct post-patch and final OfflineReady proof stages
 PASS: Step 27 never invokes broad Harmony patch/discovery APIs
 PASS: Step 27 does not use broad Activator construction
-PASS: Step 27.0.13 fails closed before Gate A on bundle/source identity mismatch
-PASS: Step 27.0.13 crash checkpoint self-identifies release/candidate/Gate-S/Gate-T provenance
+PASS: Step 27.0.14 fails closed before Gate A on bundle/source identity mismatch
+PASS: Step 27.0.14 crash checkpoint self-identifies release/candidate/Gate-S/Gate-T provenance
 PASS: Step 27 strict private context still refuses native resolution
 PASS: Step 27 fails on unplanned managed resolution
 PASS: Step 27 introduces no named StS2 type reflection
@@ -553,6 +555,11 @@ PASS: Step 27 host tests cover exact launcher patch-probe behavior and signature
 PASS: Step 27 host tests require zero Harmony annotations for the bounded descriptor substitution
 PASS: Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape
 PASS: Step 27 host tests exercise fail-closed patch-engine metadata admission
+PASS: Step 27.0.14 downloads exact Harmony 2.4.2 only as a quarantined host-test fixture with no package assets/dependencies
+PASS: Step 27.0.14 copies only the exact merged netstandard2.0 Harmony fixture into a dedicated host-test folder
+PASS: Step 27.0.14 host tests exercise the real Harmony 2.4.2 normalizer and preserve source bytes
+PASS: Step 27.0.14 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values
+PASS: Step 27.0.14 real-Harmony fixture pins the netstandard 2.0 assembly-reference profile observed on-device
 PASS: Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands
 PASS: Step 27 host tests reject drift in the physical ReaderWriterLockSlim SupportsRecursion operand
 PASS: Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression
@@ -622,6 +629,8 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.9-CRASH-C
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.11-IOS-HARMONYSHAREDSTATE-AOT-NORMALIZATION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.12-CECIL-OPCODES-COMPILE-HARDENING.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.13-SYNTHETIC-PREFLIGHT-SCOPE-HARDENING.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.14-DEFERRED-CECIL-NORMALIZATION-AND-REAL-HARMONY-CI-GATE.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.13-PHYSICAL-GATE-A-REPORT.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.12-CODEMAGIC-HOST-TEST-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.11-CODEMAGIC-CS0104-HOST-COMPILE-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.10-PHYSICAL-GATE-T5-OBSERVER-CRASH-CHECKPOINT.txt
@@ -665,7 +674,9 @@ PASS: physical build 94 checkpoint preserves self-identifying release provenance
 PASS: physical build 94 checkpoint proves host netstandard binding completed inside the original cctor before the hard stop
 PASS: Codemagic build 96 evidence proves compilation succeeded and exactly 2/211 host tests failed
 PASS: Codemagic build 96 evidence localizes both failures to production normalizer overreach into minimal synthetic fixtures
-PASS: current status preserves Step 27 physical/build evidence and advances to Step 27.0.13 / 0.0.97 synthetic-preflight scope hardening candidate
+PASS: physical build 97 evidence preserves the exact 0/26 Gate-A failure
+PASS: physical build 97 evidence localizes the regression to eager Cecil custom-attribute decoding inside the normalizer
+PASS: current status preserves Step 27 evidence and advances to Step 27.0.14 / 0.0.98 Deferred-Cecil real-Harmony CI candidate
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -728,4 +739,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 714 checks
+VALIDATION PASS: 725 checks

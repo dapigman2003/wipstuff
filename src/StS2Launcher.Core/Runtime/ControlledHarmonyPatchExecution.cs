@@ -3272,7 +3272,12 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         {
             InMemory = true,
             ReadSymbols = false,
-            ReadingMode = ReadingMode.Immediate,
+            // Deferred mode is intentional. Immediate mode eagerly decodes unrelated custom-attribute
+            // constructor arguments and therefore asks the fail-closed metadata resolver to resolve
+            // framework enum types (for example EditorBrowsableState). We only need the exact
+            // HarmonySharedState type/field/method bodies; Cecil's writer completes a deferred read
+            // with custom-attribute resolution disabled before serializing the rewritten image.
+            ReadingMode = ReadingMode.Deferred,
             AssemblyResolver = resolver,
             MetadataResolver = resolver,
         });
@@ -3364,7 +3369,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         {
             InMemory = true,
             ReadSymbols = false,
-            ReadingMode = ReadingMode.Immediate,
+            // Keep the post-write audit metadata-only as well. The exact cctor body is materialized
+            // lazily below; unrelated attribute blobs must remain opaque.
+            ReadingMode = ReadingMode.Deferred,
             AssemblyResolver = normalizedResolver,
             MetadataResolver = normalizedResolver,
         }))
@@ -4565,22 +4572,22 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     {
         public AssemblyDefinition Resolve(AssemblyNameReference name)
             => throw new InvalidOperationException(
-                $"Step 24 Gate A metadata-only audit attempted forbidden external assembly resolution while reading '{auditedPath}': {name.FullName}");
+                $"Step 27 Gate A metadata-only audit attempted forbidden external assembly resolution while reading '{auditedPath}': {name.FullName}");
 
         public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
             => Resolve(name);
 
         TypeDefinition IMetadataResolver.Resolve(TypeReference type)
             => throw new InvalidOperationException(
-                $"Step 24 Gate A metadata-only audit attempted forbidden type resolution while reading '{auditedPath}': {type.FullName}");
+                $"Step 27 Gate A metadata-only audit attempted forbidden type resolution while reading '{auditedPath}': {type.FullName}");
 
         FieldDefinition IMetadataResolver.Resolve(FieldReference field)
             => throw new InvalidOperationException(
-                $"Step 24 Gate A metadata-only audit attempted forbidden field resolution while reading '{auditedPath}': {field.FullName}");
+                $"Step 27 Gate A metadata-only audit attempted forbidden field resolution while reading '{auditedPath}': {field.FullName}");
 
         MethodDefinition IMetadataResolver.Resolve(MethodReference method)
             => throw new InvalidOperationException(
-                $"Step 24 Gate A metadata-only audit attempted forbidden method resolution while reading '{auditedPath}': {method.FullName}");
+                $"Step 27 Gate A metadata-only audit attempted forbidden method resolution while reading '{auditedPath}': {method.FullName}");
 
         public void Dispose() { }
     }
