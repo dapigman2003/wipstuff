@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>98</ApplicationVersion>" in project_text, "build version is 98")
-require("<ApplicationDisplayVersion>0.0.98</ApplicationDisplayVersion>" in project_text, "display version is 0.0.98")
-require(plist.get("CFBundleVersion") == "98", "Info.plist build version is 98")
-require(plist.get("CFBundleShortVersionString") == "0.0.98", "Info.plist display version is 0.0.98")
+require("<ApplicationVersion>99</ApplicationVersion>" in project_text, "build version is 99")
+require("<ApplicationDisplayVersion>0.0.99</ApplicationDisplayVersion>" in project_text, "display version is 0.0.99")
+require(plist.get("CFBundleVersion") == "99", "Info.plist build version is 99")
+require(plist.get("CFBundleShortVersionString") == "0.0.99", "Info.plist display version is 0.0.99")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.14 — DEFERRED CECIL NORMALIZATION + REAL HARMONY CI GATE" in release_presentation, "top launcher banner identifies active Step 27.0.14 candidate")
-require("Physical 0.0.97" in release_presentation and "ReadingMode.Immediate" in release_presentation and "ReadingMode.Deferred" in release_presentation and "EditorBrowsableState" in release_presentation and "Lib.Harmony 2.4.2" in release_presentation and "quarantined test fixture" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner describes the physical Cecil failure, Deferred correction, and real-Harmony CI gate")
+require("STEP 27.0.15 — REAL HARMONY TEST COMPILE HARDENING" in release_presentation, "top launcher banner identifies active Step 27.0.15 candidate")
+require("Physical 0.0.97" in release_presentation and "ReadingMode.Immediate" in release_presentation and "Deferred" in release_presentation and "IcustomAttributeProvider".lower() in release_presentation.lower() and "CecilCustomAttributeProvider" in release_presentation and "Lib.Harmony 2.4.2" in release_presentation and "quarantined" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner describes the Deferred correction and 0.0.98 real-Harmony test compile hardening")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.98"' in release_presentation and 'ExpectedBuildVersion = "98"' in release_presentation, "Step 27.0.14 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.99"' in release_presentation and 'ExpectedBuildVersion = "99"' in release_presentation, "Step 27.0.15 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
 require("GateTImplementationMarker" in release_presentation and "11-instruction iOS-normalized HarmonySharedState cctor loaded from memory" in release_presentation and "deferred Cecil source/audit" in release_presentation and "direct state only" in release_presentation and "PatchProcessor.Patch() remains after T6" in release_presentation, "Step 27.0.14 source pins the Gate-T deferred normalized-cctor implementation marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
@@ -338,8 +338,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.98",
-    "STS2_BUILD_VERSION": "98",
+    "STS2_DISPLAY_VERSION": "0.0.99",
+    "STS2_BUILD_VERSION": "99",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -974,6 +974,8 @@ require("CopyStep27RealHarmonyNormalizerFixture" in step27_test_project and "$(N
 require("RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes" in step27_tests and "HasEditorBrowsableAttributeSurface" in step27_tests and "CreateIosNormalizedHarmonyRuntimeImage" in step27_tests and "SourcePreparedSha1" in step27_tests and "RuntimeImageSha1" in step27_tests and "instructions=11" in step27_tests, "Step 27.0.14 host tests exercise the real Harmony 2.4.2 normalizer and preserve source bytes")
 require("ConstructorArguments" not in step27_tests[step27_tests.index("RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes"):step27_tests.index("HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing")], "Step 27.0.14 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values")
 require('reference.Name == "netstandard"' in step27_tests and 'new Version(2, 0, 0, 0)' in step27_tests, "Step 27.0.14 real-Harmony fixture pins the netstandard 2.0 assembly-reference profile observed on-device")
+require("using CecilCustomAttributeProvider = Mono.Cecil.ICustomAttributeProvider;" in step27_tests and "HasAttribute(CecilCustomAttributeProvider provider, string fullName)" in step27_tests, "Step 27.0.15 real-Harmony test explicitly aliases the Cecil custom-attribute provider")
+require("HasAttribute(ICustomAttributeProvider provider, string fullName)" not in step27_tests, "Step 27.0.15 forbids the ambiguous bare ICustomAttributeProvider helper declaration")
 require("wrongThrowOnError" in step27_tests and "expected false then false" in step27_tests and "wrongThrowOnError ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0" in step27_tests, "Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands")
 require("wrongLockRecursion" in step27_tests and "expected SupportsRecursion (1)" in step27_tests and "wrongLockRecursion ? OpCodes.Ldc_I4_0 : OpCodes.Ldc_I4_1" in step27_tests, "Step 27 host tests reject drift in the physical ReaderWriterLockSlim SupportsRecursion operand")
 require("Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH" in step27_tests, "Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression")
@@ -1063,6 +1065,8 @@ required_docs = [
     "docs/history/steps/STEP-27.0.12-CECIL-OPCODES-COMPILE-HARDENING.md",
     "docs/history/steps/STEP-27.0.13-SYNTHETIC-PREFLIGHT-SCOPE-HARDENING.md",
     "docs/history/steps/STEP-27.0.14-DEFERRED-CECIL-NORMALIZATION-AND-REAL-HARMONY-CI-GATE.md",
+    "docs/history/steps/STEP-27.0.15-REAL-HARMONY-TEST-NAMESPACE-COMPILE-HARDENING.md",
+    "docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt",
     "docs/history/reports/STEP-27.0.13-PHYSICAL-GATE-A-REPORT.txt",
     "docs/history/reports/STEP-27.0.12-CODEMAGIC-HOST-TEST-FAILURE.txt",
     "docs/history/reports/STEP-27.0.11-CODEMAGIC-CS0104-HOST-COMPILE-FAILURE.txt",
@@ -1127,8 +1131,11 @@ require("SyntheticStep26ReplayThroughEmptyProcessorStillPassesBeforePatchBoundar
 step27_build97_report = read("docs/history/reports/STEP-27.0.13-PHYSICAL-GATE-A-REPORT.txt")
 require("App version: 0.0.97 (97)" in step27_build97_report and "CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 0/26" in step27_build97_report and "first failure: InitializationPreflight" in step27_build97_report, "physical build 97 evidence preserves the exact 0/26 Gate-A failure")
 require("HarmonySharedState iOS runtime-image normalization" in step27_build97_report and "System.ComponentModel.EditorBrowsableState" in step27_build97_report and "ImmediateModuleReader" in step27_build97_report and "CreateIosNormalizedHarmonyRuntimeImage" in step27_build97_report, "physical build 97 evidence localizes the regression to eager Cecil custom-attribute decoding inside the normalizer")
+step27_build98_host = read("docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt")
+require("StS2Launcher.Core ->" in step27_build98_host and "error CS0104" in step27_build98_host and "ICustomAttributeProvider" in step27_build98_host and "Mono.Cecil.ICustomAttributeProvider" in step27_build98_host and "System.Reflection.ICustomAttributeProvider" in step27_build98_host, "Codemagic build 98 evidence proves production core compiled and localizes the test compile stop to ambiguous ICustomAttributeProvider")
+require("ControlledHarmonyPatchExecutionTests.cs(141,34)" in step27_build98_host and "error CS1503" in step27_build98_host, "Codemagic build 98 preserves the exact primary and follow-on real-Harmony test compiler diagnostics")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "Gate-T hard crash localized" in current_status and "0.0.91 (91)" in current_status and "clean Gate-O regression" in current_status and "0.0.93 (93)" in current_status and "provenance confirmed" in current_status and "0.0.94 (94)" in current_status and "netstandard" in current_status and "0.0.95 (95)" in current_status and "CS0104" in current_status and "0.0.96 (96)" in current_status and "209 passed" in current_status and "0.0.97 (97)" in current_status and "EditorBrowsableState" in current_status and "ReadingMode.Immediate" in current_status and "ReadingMode.Deferred" in current_status and "Lib.Harmony 2.4.2" in current_status and "post-publish interpreted fixture" in current_status and "ahead-of-load Cecil" in current_status and "11-instruction" in current_status and "T5a" in current_status and "T5b" in current_status and "T6" in current_status and "T7/T8" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.14 / 0.0.98 Deferred-Cecil real-Harmony CI candidate")
+require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "0.0.93 (93)" in current_status and "0.0.94 (94)" in current_status and "0.0.95 (95)" in current_status and "0.0.96 (96)" in current_status and "209 passed" in current_status and "0.0.97 (97)" in current_status and "EditorBrowsableState" in current_status and "ReadingMode.Immediate" in current_status and "ReadingMode.Deferred" in current_status and "0.0.98 (98)" in current_status and "ICustomAttributeProvider" in current_status and "CS0104" in current_status and "Step 27.0.15 / 0.0.99 (99)" in current_status and "CecilCustomAttributeProvider" in current_status and "Lib.Harmony 2.4.2" in current_status and "post-publish interpreted fixture" in current_status and "ahead-of-load Cecil" in current_status and "T6" in current_status and "T7/T8" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.15 / 0.0.99 real-Harmony test compile hardening")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

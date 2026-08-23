@@ -1,4 +1,4 @@
-# Release Checklist — Step 27.0.14
+# Release Checklist — Step 27.0.15
 
 ## Source / policy
 
@@ -27,11 +27,11 @@
 
 ## Build identity / visible app identity
 
-- version: `0.0.98 (98)`
+- version: `0.0.99 (99)`
 - workflow: `ios-step-27`
 - IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 - TRX: `artifacts/test-results/step27.trx`
-- top launcher banner: **Step 27.0.14**, bundle-derived **Version 0.0.98**, deferred-Cecil/real-Harmony-CI status.
+- top launcher banner: **Step 27.0.15**, bundle-derived **Version 0.0.99**, real-Harmony-test-compile-hardening status.
 
 ## Device-run discipline
 

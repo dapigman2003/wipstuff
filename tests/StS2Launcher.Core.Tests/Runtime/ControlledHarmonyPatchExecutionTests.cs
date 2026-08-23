@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using CecilCustomAttributeProvider = Mono.Cecil.ICustomAttributeProvider;
 using StS2Launcher.Core;
 
 namespace StS2Launcher.Core.Tests;
@@ -138,7 +139,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
     private static bool HasEditorBrowsableAttributeSurface(ModuleDefinition module)
     {
         const string attributeName = "System.ComponentModel.EditorBrowsableAttribute";
-        static bool HasAttribute(ICustomAttributeProvider provider, string fullName)
+        static bool HasAttribute(CecilCustomAttributeProvider provider, string fullName)
             => provider.HasCustomAttributes && provider.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == fullName);
 
         if (HasAttribute(module, attributeName) || (module.Assembly is not null && HasAttribute(module.Assembly, attributeName)))
