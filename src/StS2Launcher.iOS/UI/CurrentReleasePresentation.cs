@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.17 — HARMONY FAT ARCHIVE MEMBER DISCOVERY HARDENING";
+        "STEP 27.0.18 — OFFICIAL NET9 HARMONY-FAT NORMALIZER SURROGATE";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.100 ARCHIVE-LAYOUT STOP • PRODUCTION NORMALIZER UNCHANGED • STRICT HARMONY-FAT NETSTANDARD2.0 MEMBER DISCOVERY";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.101 PROVED NO NETSTANDARD FAT BINARY • PRODUCTION NORMALIZER UNCHANGED • OFFICIAL NET9 STRUCTURAL CI SURROGATE";
 
     public const string Summary =
-        "Physical 0.0.97 exposed the Mono.Cecil ReadingMode.Immediate regression and 0.0.98 corrected production normalization to Deferred reads. Builds 0.0.98–0.0.100 then hardened the real-Harmony CI gate. Codemagic 0.0.100 successfully downloaded the official Harmony-Fat.2.4.2.0 archive but stopped before build/test because the script incorrectly required netstandard2.0/0Harmony.dll at archive root. Step 27.0.17 keeps production runtime code unchanged and discovers exactly one archive member ending in /netstandard2.0/0Harmony.dll, preserving the archive's original wrapped member name for extraction and printing all 0Harmony.dll members on mismatch. Production Deferred-Cecil normalization, the exact 11-instruction HarmonySharedState cctor image, and Gates S/T are unchanged. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.97 exposed the Mono.Cecil ReadingMode.Immediate regression and 0.0.98 corrected production normalization to Deferred reads. Builds 0.0.98–0.0.101 hardened the real-Harmony CI gate. Codemagic 0.0.101 downloaded the official Harmony-Fat.2.4.2.0 archive and printed every implementation member, proving that this release contains netcoreapp3.x, net5.0–net10.0, and .NET Framework binaries but no netstandard2.0 implementation. Step 27.0.18 therefore uses the official merged net9.0/0Harmony.dll only as a host structural surrogate for the unchanged production normalizer; on-device exact 0Harmony 2.4.2 metadata remains the production authority. Production Deferred-Cecil normalization, the exact 11-instruction HarmonySharedState cctor image, and Gates S/T are unchanged. No StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Physical 0.0.94 localized the original HarmonySharedState cctor crash before T6; physical 0.0.97 exposed eager Cecil metadata reading before the normalized image could be tested. Builds 0.0.98–0.0.100 hardened the real-Harmony CI regression. Codemagic 0.0.100 downloaded the official fat archive but proved its contents are wrapped under a release-root directory, so the exact-root member check found zero candidates before MSTest. Build 0.0.101 fixes only that archive-member discovery while leaving production runtime code unchanged. If normalization reaches T6 on-device, the next evidence boundary is the single public PatchProcessor.Patch() call at T7; if that runtime-detour boundary fails, the documented next experiment is one interpreted post-publish launcher-owned probe before any architecture pivot.";
+        "Status: Steps 01–26 are physically closed. Physical 0.0.94 localized the original HarmonySharedState cctor crash before T6; physical 0.0.97 exposed eager Cecil metadata reading before the normalized image could be tested. Codemagic 0.0.101 proved the official Harmony-Fat 2.4.2 release has no netstandard2.0 implementation, so build 0.0.102 uses its exact merged net9.0 implementation as a clearly labeled host-only structural surrogate while leaving production runtime code unchanged. If normalization reaches T6 on-device, the next evidence boundary is the single public PatchProcessor.Patch() call at T7; if that runtime-detour boundary fails, the documented next experiment is one interpreted post-publish launcher-owned probe before any architecture pivot.";
 
-    public const string ExpectedDisplayVersion = "0.0.101";
-    public const string ExpectedBuildVersion = "101";
+    public const string ExpectedDisplayVersion = "0.0.102";
+    public const string ExpectedBuildVersion = "102";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
     public const string GateTImplementationMarker =

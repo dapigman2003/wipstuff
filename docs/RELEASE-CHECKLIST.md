@@ -1,4 +1,4 @@
-# Release Checklist — Step 27.0.17
+# Release Checklist — Step 27.0.18
 
 ## Source / policy
 
@@ -18,8 +18,8 @@
 - T5b contains the single `RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)` call.
 - T6 proves the three dictionaries non-null, `methodAddressRef` null, `actualVersion == 102`, generated shared-state/proxy assemblies absent, prepared bytes unchanged, and isolation/probe counters valid.
 - T7/T8/T9 retain exactly one public `PatchProcessor.Patch()` path; no internal patch method substitutes for acceptance.
-- The real-Harmony regression fixture must come from the exact tagged official `Harmony-Fat.2.4.2.0.zip` URL in `scripts/test.sh`; MSBuild/NuGet package layout must not be used. The archive must contain exactly one member whose normalized path ends in `/netstandard2.0/0Harmony.dll`; the script must retain the original archive member name, print all `0Harmony.dll` members on selector mismatch, extract only the unique match to `artifacts/host-step27-fixtures`, and pass its absolute path through `STS2_STEP27_REAL_HARMONY_FIXTURE`.
-- The real-Harmony host regression must invoke `CreateIosNormalizedHarmonyRuntimeImage`, require exact 2.4.2 identity, detect the `EditorBrowsableAttribute` metadata surface without resolving its argument values, preserve source bytes, and produce an 11-instruction byte-distinct runtime image.
+- The real-Harmony regression fixture must come from the exact tagged official `Harmony-Fat.2.4.2.0.zip` URL in `scripts/test.sh`; MSBuild/NuGet package layout must not be used. Because physical Codemagic 0.0.101 proved the release has no netstandard2.0 implementation, the script must select exactly one `net9.0/0Harmony.dll` member at archive root or under a release wrapper as a **host-only structural surrogate**, retain the original archive member name, print all `0Harmony.dll` members on mismatch, extract only the unique match to `artifacts/host-step27-fixtures`, and pass its absolute path through `STS2_STEP27_REAL_HARMONY_FIXTURE`. Production admission remains governed only by the exact prepared StS2 0Harmony fingerprint.
+- The real-Harmony host regression must invoke `CreateIosNormalizedHarmonyRuntimeImage`, require exact 2.4.2 identity, require the net9 `System.Runtime` profile and no `netstandard` reference, detect the `EditorBrowsableAttribute` metadata surface without resolving its argument values, preserve source bytes, and produce an 11-instruction byte-distinct runtime image.
 - Crash checkpoints self-identify installed/source version, candidate, Gate-S implementation, and Gate-T implementation.
 - `TrimMode=full`, `MtouchInterpreter=-all`, established roots/preservation policies remain active; `UseInterpreter=true` and NativeAOT remain prohibited.
 - StS2 reflection/patching/invocation, broad Harmony discovery, Godot startup, and native game libraries remain absent.
@@ -27,11 +27,11 @@
 
 ## Build identity / visible app identity
 
-- version: `0.0.101 (101)`
+- version: `0.0.102 (102)`
 - workflow: `ios-step-27`
 - IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 - TRX: `artifacts/test-results/step27.trx`
-- top launcher banner: **Step 27.0.17**, bundle-derived **Version 0.0.101**, Harmony-Fat archive-member-discovery-hardening status.
+- top launcher banner: **Step 27.0.18**, bundle-derived **Version 0.0.102**, official net9 Harmony-Fat structural-surrogate status.
 
 ## Device-run discipline
 

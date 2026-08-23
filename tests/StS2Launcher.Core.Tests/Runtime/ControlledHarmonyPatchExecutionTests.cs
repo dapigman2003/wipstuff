@@ -82,14 +82,14 @@ public sealed class ControlledHarmonyPatchExecutionTests
     }
 
     [TestMethod]
-    public void RealHarmony242NormalizerUsesDeferredMetadataAndPreservesSourceBytes()
+    public void OfficialHarmony242Net9FatNormalizerUsesDeferredMetadataAndPreservesSourceBytes()
     {
         var fixturePath = Environment.GetEnvironmentVariable("STS2_STEP27_REAL_HARMONY_FIXTURE");
         Assert.IsFalse(string.IsNullOrWhiteSpace(fixturePath),
-            "STS2_STEP27_REAL_HARMONY_FIXTURE must point to the quarantined official Harmony-Fat 2.4.2 netstandard2.0/0Harmony.dll fixture.");
+            "STS2_STEP27_REAL_HARMONY_FIXTURE must point to the quarantined official Harmony-Fat 2.4.2 net9.0/0Harmony.dll structural-surrogate fixture.");
         fixturePath = Path.GetFullPath(fixturePath!);
         Assert.IsTrue(File.Exists(fixturePath),
-            $"Exact official Harmony-Fat 2.4.2 netstandard2.0 fixture is missing: {fixturePath}");
+            $"Exact official Harmony-Fat 2.4.2 net9.0 structural-surrogate fixture is missing: {fixturePath}");
 
         var sourceBytesBefore = File.ReadAllBytes(fixturePath);
         var sourceSha1Before = Convert.ToHexString(SHA1.HashData(sourceBytesBefore)).ToLowerInvariant();
@@ -103,9 +103,11 @@ public sealed class ControlledHarmonyPatchExecutionTests
         {
             Assert.AreEqual("0Harmony", module.Assembly.Name.Name);
             Assert.AreEqual(new Version(2, 4, 2, 0), module.Assembly.Name.Version);
-            var netstandardReference = module.AssemblyReferences.SingleOrDefault(reference => reference.Name == "netstandard");
-            Assert.IsNotNull(netstandardReference, "The real-Harmony fixture must use the netstandard profile observed on-device.");
-            Assert.AreEqual(new Version(2, 0, 0, 0), netstandardReference.Version);
+            Assert.IsFalse(module.AssemblyReferences.Any(reference => reference.Name == "netstandard"),
+                "The official Harmony-Fat 2.4.2 host structural surrogate must be the net9.0 implementation, not a netstandard reference surface.");
+            var systemRuntimeReference = module.AssemblyReferences.SingleOrDefault(reference => reference.Name == "System.Runtime");
+            Assert.IsNotNull(systemRuntimeReference, "The official net9.0 Harmony-Fat structural surrogate must reference System.Runtime.");
+            Assert.AreEqual(new Version(9, 0, 0, 0), systemRuntimeReference.Version);
             Assert.IsTrue(HasEditorBrowsableAttributeSurface(module),
                 "The real-Harmony regression fixture must retain the EditorBrowsable custom-attribute surface that exposed the 0.0.97 Immediate-reader bug.");
         }

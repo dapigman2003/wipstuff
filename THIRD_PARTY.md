@@ -24,6 +24,11 @@ Steps 16–17 intentionally use Mono.Cecil at runtime for managed metadata/IL **
 
 The build-only patcher operates on an isolated local NuGet copy of SteamKit2. It verifies SteamKit2 3.4.0 and replaces at most one unsupported `Process.StartTime` call with `DateTime.UtcNow` if that call is still present. It refuses ambiguous matches and the patcher itself is not packaged into the IPA.
 
+
+### Harmony 2.4.2 official fat release fixture
+
+Step 27 host regression tests download the exact tagged upstream `Harmony-Fat.2.4.2.0.zip` release during CI and extract only its merged `net9.0/0Harmony.dll` as a quarantined structural-surrogate fixture. It is used only to exercise the project's Deferred Mono.Cecil normalizer against real upstream Harmony/MonoMod metadata; it is not linked into the launcher, bundled in the IPA, or treated as authority for the receipt-backed StS2 `0Harmony.dll`. Harmony is MIT-licensed.
+
 ### Microsoft.NET.Test.Sdk / MSTest
 
 Used only by `tests/StS2Launcher.Core.Tests` for host unit tests. Test framework/adapter assemblies are build-time dependencies and are excluded from the IPA.
