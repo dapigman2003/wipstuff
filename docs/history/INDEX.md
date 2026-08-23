@@ -102,3 +102,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-27.0.17-HARMONY-FAT-ARCHIVE-MEMBER-DISCOVERY-HARDENING.md` — 0.0.101 keeps production runtime code unchanged and selects exactly one wrapped `/netstandard2.0/0Harmony.dll` archive member by strict suffix, with diagnostic member listing on drift.
 - `reports/STEP-27.0.17-CODEMAGIC-HARMONY-FAT-NETSTANDARD-ABSENCE.txt` — 0.0.101 Codemagic proves the official fat release contains no netstandard2.0 implementation and stops before build/test after printing the complete 0Harmony framework set.
 - `steps/STEP-27.0.18-OFFICIAL-NET9-FAT-NORMALIZER-SURROGATE.md` — 0.0.102 keeps production runtime code unchanged and uses the official merged net9.0 Harmony 2.4.2 implementation as a clearly labeled host-only structural surrogate for the Deferred-Cecil normalizer regression.
+
+- `reports/STEP-27.0.18-CODEMAGIC-NET9-SURROGATE-REFERENCE-ASSERTION-FAILURE.txt` — 0.0.102 Codemagic acquired the official net9 surrogate and ran 212 tests at 211/212; the only failure was the invalid assumption that a net9 implementation cannot reference netstandard.
+- `steps/STEP-27.0.19-NET9-SURROGATE-REFERENCE-GRAPH-ASSERTION-FIX.md` — 0.0.103 removes that negative inference, positively pins the selected net9 archive member and System.Runtime 9.0 profile, and leaves production normalization unchanged.

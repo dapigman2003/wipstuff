@@ -27,7 +27,7 @@ The build-only patcher operates on an isolated local NuGet copy of SteamKit2. It
 
 ### Harmony 2.4.2 official fat release fixture
 
-Step 27 host regression tests download the exact tagged upstream `Harmony-Fat.2.4.2.0.zip` release during CI and extract only its merged `net9.0/0Harmony.dll` as a quarantined structural-surrogate fixture. It is used only to exercise the project's Deferred Mono.Cecil normalizer against real upstream Harmony/MonoMod metadata; it is not linked into the launcher, bundled in the IPA, or treated as authority for the receipt-backed StS2 `0Harmony.dll`. Harmony is MIT-licensed.
+Step 27 host regression tests download the exact tagged upstream `Harmony-Fat.2.4.2.0.zip` release during CI and extract only its merged `net9.0/0Harmony.dll` as a quarantined structural-surrogate fixture; the selected archive member itself is retained as CI evidence of the target framework. It is used only to exercise the project's Deferred Mono.Cecil normalizer against real upstream Harmony/MonoMod metadata; it is not linked into the launcher, bundled in the IPA, or treated as authority for the receipt-backed StS2 `0Harmony.dll`. Harmony is MIT-licensed.
 
 ### Microsoft.NET.Test.Sdk / MSTest
 

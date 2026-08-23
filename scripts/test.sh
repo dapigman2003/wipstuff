@@ -61,6 +61,7 @@ echo "Harmony release URL: $STEP27_HARMONY_RELEASE_URL"
 echo "Harmony archive SHA-256: $(shasum -a 256 "$STEP27_HARMONY_ARCHIVE" | awk '{print $1}')"
 echo "Harmony fixture SHA-256: $(shasum -a 256 "$STEP27_HARMONY_FIXTURE" | awk '{print $1}')"
 export STS2_STEP27_REAL_HARMONY_FIXTURE="$ROOT/$STEP27_HARMONY_FIXTURE"
+export STS2_STEP27_REAL_HARMONY_ARCHIVE_MEMBER="$STEP27_HARMONY_ARCHIVE_MEMBER"
 
 echo "Building external managed fixtures once for host tests and later IPA packaging..."
 dotnet build "$DYNAMIC_PROJECT" -c Release --nologo

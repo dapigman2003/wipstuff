@@ -1,4 +1,4 @@
-# Release Checklist — Step 27.0.18
+# Release Checklist — Step 27.0.19
 
 ## Source / policy
 
@@ -27,11 +27,11 @@
 
 ## Build identity / visible app identity
 
-- version: `0.0.102 (102)`
+- version: `0.0.103 (103)`
 - workflow: `ios-step-27`
 - IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 - TRX: `artifacts/test-results/step27.trx`
-- top launcher banner: **Step 27.0.18**, bundle-derived **Version 0.0.102**, official net9 Harmony-Fat structural-surrogate status.
+- top launcher banner: **Step 27.0.19**, bundle-derived **Version 0.0.103**, net9 structural-surrogate reference-graph assertion-fix status.
 
 ## Device-run discipline
 

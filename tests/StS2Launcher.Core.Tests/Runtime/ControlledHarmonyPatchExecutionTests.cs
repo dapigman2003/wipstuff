@@ -91,6 +91,15 @@ public sealed class ControlledHarmonyPatchExecutionTests
         Assert.IsTrue(File.Exists(fixturePath),
             $"Exact official Harmony-Fat 2.4.2 net9.0 structural-surrogate fixture is missing: {fixturePath}");
 
+        var archiveMember = Environment.GetEnvironmentVariable("STS2_STEP27_REAL_HARMONY_ARCHIVE_MEMBER");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(archiveMember),
+            "STS2_STEP27_REAL_HARMONY_ARCHIVE_MEMBER must identify the exact official net9.0 archive member selected by scripts/test.sh.");
+        var normalizedArchiveMember = archiveMember!.Replace('\\', '/');
+        Assert.IsTrue(
+            normalizedArchiveMember.Equals("net9.0/0Harmony.dll", StringComparison.Ordinal) ||
+            normalizedArchiveMember.EndsWith("/net9.0/0Harmony.dll", StringComparison.Ordinal),
+            $"Official Harmony-Fat structural-surrogate member is not the selected net9.0 implementation: {archiveMember}");
+
         var sourceBytesBefore = File.ReadAllBytes(fixturePath);
         var sourceSha1Before = Convert.ToHexString(SHA1.HashData(sourceBytesBefore)).ToLowerInvariant();
 
@@ -103,8 +112,10 @@ public sealed class ControlledHarmonyPatchExecutionTests
         {
             Assert.AreEqual("0Harmony", module.Assembly.Name.Name);
             Assert.AreEqual(new Version(2, 4, 2, 0), module.Assembly.Name.Version);
-            Assert.IsFalse(module.AssemblyReferences.Any(reference => reference.Name == "netstandard"),
-                "The official Harmony-Fat 2.4.2 host structural surrogate must be the net9.0 implementation, not a netstandard reference surface.");
+            // Do not infer target-framework identity from the absence of a netstandard AssemblyRef.
+            // The official net9.0 implementation legitimately retains a netstandard compatibility reference.
+            // scripts/test.sh proves framework selection from the signed release archive member; here we
+            // positively verify the net9 System.Runtime profile and then exercise the production normalizer.
             var systemRuntimeReference = module.AssemblyReferences.SingleOrDefault(reference => reference.Name == "System.Runtime");
             Assert.IsNotNull(systemRuntimeReference, "The official net9.0 Harmony-Fat structural surrogate must reference System.Runtime.");
             Assert.AreEqual(new Version(9, 0, 0, 0), systemRuntimeReference.Version);
