@@ -4,32 +4,38 @@ Steps 01–26 are physically closed. Step 27 remains focused on proving one laun
 
 ## Active candidate
 
-**Step 27.0.20 / `0.0.104 (104)` — hash-pinned real-Harmony normalizer execution**
+**Step 27.0.21 / `0.0.105 (105)` — raw HarmonySharedState method-body normalization**
 
-Codemagic 0.0.103 compiled production and tests and executed all **212** host tests. **211 passed / 1 failed**. The sole failure was test-only and occurred before `CreateIosNormalizedHarmonyRuntimeImage`: the merged official Harmony-Fat net9.0 binary contains more than one `System.Runtime` AssemblyRef, so `SingleOrDefault` was an invalid metadata assumption.
+Codemagic 0.0.104 compiled production and tests and executed all **212** host tests. **211 passed / 1 failed**. This time the failure was inside the real production normalizer: the exact hash-pinned official Harmony-Fat 2.4.2 net9.0 surrogate entered `CreateIosNormalizedHarmonyRuntimeImage`, the Deferred Cecil read succeeded, and `Mono.Cecil.ModuleDefinition.Write` failed while rebuilding unrelated enum-typed Constant metadata because the fail-closed resolver correctly refused `System.Reflection.BindingFlags`.
 
-0.0.104 removes that entire class of surrogate inference instead of replacing it with another AssemblyRef guess:
+That exposed the remaining design flaw: even Deferred Cecil cannot round-trip the full assembly without resolving enum definitions during metadata serialization. 0.0.105 removes that dependency rather than adding a framework-enum whitelist.
 
-- `scripts/test.sh` downloads the exact tagged `Harmony-Fat.2.4.2.0.zip`;
-- it requires the exact selected `net9.0/0Harmony.dll` archive member;
-- it now pins the Codemagic-observed release archive SHA-256 `a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774`;
-- it pins the extracted official net9.0 DLL SHA-256 `a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab`;
-- the C# regression independently re-hashes the DLL, verifies exact `0Harmony, Version=2.4.2.0` identity and the `EditorBrowsableAttribute` surface, and then immediately invokes the actual production Deferred-Cecil normalizer;
-- it deliberately makes no uniqueness/version assertions about `System.Runtime` or `netstandard` AssemblyRef rows in the merged binary.
+Gate A now:
 
-`ControlledHarmonyPatchExecution.cs` is unchanged from 0.0.103. The production on-device admission still uses the exact prepared StS2 Harmony 2.4.2 patch-engine fingerprint; the upstream net9 binary remains a host-only structural surrogate.
+- keeps the exact original 0Harmony 2.4.2 patch-engine fingerprint and rejecting metadata resolver;
+- uses Deferred Cecil **read-only** for identity, field/cctor shape, and existing metadata-token discovery;
+- reuses the original cctor's already-existing parameterless `Dictionary<...>` constructor MemberRef tokens and exact HarmonySharedState FieldDef tokens;
+- maps the existing cctor RVA to its PE file offset with `PEReader.PEHeaders`;
+- requires a fat ECMA-335 header, no exception/extra sections, and sufficient existing body capacity;
+- clones the prepared bytes and replaces **only that existing method-body slot** with a 12-byte fat header plus the exact 47-byte / 11-instruction direct-state IL;
+- verifies no byte outside the original cctor slot changed;
+- reopens the in-memory result with Deferred Cecil and requires the exact 11-instruction fingerprint.
 
-The full 0.0.103 Codemagic 211/212 report is preserved in project history.
+No metadata table, heap/blob, AssemblyRef, MemberRef, TypeSpec, Constant, CustomAttribute, resource, signature, or unrelated method is rebuilt or moved. The source/live/prepared Harmony files remain immutable.
+
+The official Harmony-Fat host regression remains content-addressed by the already-observed release archive and selected net9.0 DLL SHA-256 values. It now serves its intended purpose: exercising the production normalizer against a real merged Harmony 2.4.2 image before IPA publication.
+
+The full 0.0.104 Codemagic 211/212 report and Cecil-writer stack are preserved in project history.
 
 ## iOS detour decision rule
 
-The stop rule remains unchanged: reach T6 with the normalized cctor; if public `PatchProcessor.Patch()` works, continue Harmony. If T6 passes but T7/T8 fails, perform one representative patch/unpatch on a launcher-owned post-publish interpreted fixture. If that also fails, stop iterating Harmony internals and propose deterministic ahead-of-load Cecil transforms on derived runtime copies; that would be a master-plan-level architecture change.
+The stop rule remains unchanged: reach T6 with the normalized cctor; if public `PatchProcessor.Patch()` works, continue Harmony. If T6 passes but T7/T8 fails, perform one representative patch/unpatch on a launcher-owned post-publish interpreted fixture. If that also fails, stop iterating Harmony internals and propose deterministic ahead-of-load transforms on derived runtime copies; that would be a master-plan-level architecture change.
 
 ## Build
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.104 (104)`
+Expected app version: `0.0.105 (105)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 

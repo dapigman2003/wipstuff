@@ -11,7 +11,8 @@ using System.Text.Json;
 using System.Threading;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CecilOpCodes = Mono.Cecil.Cil.OpCodes;
+using BinaryPrimitives = System.Buffers.Binary.BinaryPrimitives;
+using PEReader = System.Reflection.PortableExecutable.PEReader;
 
 namespace StS2Launcher.Core;
 
@@ -3266,17 +3267,20 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 sourceAudit.Detail);
         }
 
-        var sourceSha1 = ComputeSha1Hex(path);
+        var sourceBytes = File.ReadAllBytes(path);
+        if (sourceBytes.Length == 0)
+            throw new InvalidDataException("HarmonySharedState normalization source image is empty.");
+        var sourceSha1 = Convert.ToHexString(SHA1.HashData(sourceBytes)).ToLowerInvariant();
+
         using var resolver = new Step27MetadataOnlyResolver(path);
-        using var module = ModuleDefinition.ReadModule(path, new ReaderParameters
+        using var module = ModuleDefinition.ReadModule(new MemoryStream(sourceBytes, writable: false), new ReaderParameters
         {
             InMemory = true,
             ReadSymbols = false,
-            // Deferred mode is intentional. Immediate mode eagerly decodes unrelated custom-attribute
-            // constructor arguments and therefore asks the fail-closed metadata resolver to resolve
-            // framework enum types (for example EditorBrowsableState). We only need the exact
-            // HarmonySharedState type/field/method bodies; Cecil's writer completes a deferred read
-            // with custom-attribute resolution disabled before serializing the rewritten image.
+            // Keep the admission/token-discovery read deferred and resolution-free. The normalizer
+            // no longer asks Cecil to write the assembly: Cecil 0.11.6 must resolve enum-typed
+            // constants while rebuilding metadata (MetadataBuilder.GetConstantType), which makes a
+            // whole-module round-trip incompatible with this fail-closed metadata-only boundary.
             ReadingMode = ReadingMode.Deferred,
             AssemblyResolver = resolver,
             MetadataResolver = resolver,
@@ -3289,6 +3293,13 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             throw new InvalidDataException(
                 $"HarmonySharedState normalization is pinned to {TargetSimpleName}, Version={TargetVersion}; observed {module.Assembly.Name.FullName}.");
         }
+        if ((module.Attributes & ModuleAttributes.StrongNameSigned) != 0)
+        {
+            throw new InvalidDataException(
+                "HarmonySharedState raw-body normalization refuses a StrongNameSigned source image because in-place IL substitution would invalidate its strong-name signature.");
+        }
+        if ((module.Attributes & ModuleAttributes.ILOnly) == 0)
+            throw new InvalidDataException("HarmonySharedState raw-body normalization requires an IL-only source module.");
 
         var sharedStateType = EnumerateTypes(module.Types).SingleOrDefault(type => type.FullName.Equals(HarmonySharedStateTypeFullName, StringComparison.Ordinal))
             ?? throw new TypeLoadException("Exact HarmonyLib.HarmonySharedState type is missing from the normalization source image.");
@@ -3327,40 +3338,161 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
         if (cctor.IsPInvokeImpl || cctor.PInvokeInfo is not null)
             throw new InvalidDataException("HarmonySharedState::.cctor unexpectedly became a P/Invoke boundary; refusing normalization.");
+        if (cctor.RVA <= 0)
+            throw new InvalidDataException("HarmonySharedState::.cctor has no physical method-body RVA; refusing raw-body normalization.");
+        if (cctor.Body.ExceptionHandlers.Count != 0)
+            throw new InvalidDataException("HarmonySharedState::.cctor unexpectedly contains exception handlers; refusing bounded raw-body normalization.");
 
-        static MethodReference ParameterlessConstructor(ModuleDefinition module, TypeReference declaringType)
-            => new(".ctor", module.TypeSystem.Void, declaringType)
-            {
-                HasThis = true,
-                ExplicitThis = false,
-            };
-
-        cctor.Body = new Mono.Cecil.Cil.MethodBody(cctor)
+        static int RequireFieldToken(FieldDefinition field)
         {
-            InitLocals = false,
-            MaxStackSize = 1,
-        };
-        var il = cctor.Body.GetILProcessor();
-        il.Append(Instruction.Create(CecilOpCodes.Newobj, ParameterlessConstructor(module, stateField.FieldType)));
-        il.Append(Instruction.Create(CecilOpCodes.Stsfld, stateField));
-        il.Append(Instruction.Create(CecilOpCodes.Newobj, ParameterlessConstructor(module, originalsField.FieldType)));
-        il.Append(Instruction.Create(CecilOpCodes.Stsfld, originalsField));
-        il.Append(Instruction.Create(CecilOpCodes.Newobj, ParameterlessConstructor(module, originalsMonoField.FieldType)));
-        il.Append(Instruction.Create(CecilOpCodes.Stsfld, originalsMonoField));
-        il.Append(Instruction.Create(CecilOpCodes.Ldnull));
-        il.Append(Instruction.Create(CecilOpCodes.Stsfld, methodAddressRefField));
-        il.Append(Instruction.Create(CecilOpCodes.Ldc_I4, HarmonySharedStateInternalVersion));
-        il.Append(Instruction.Create(CecilOpCodes.Stsfld, actualVersionField));
-        il.Append(Instruction.Create(CecilOpCodes.Ret));
-
-        byte[] runtimeBytes;
-        using (var output = new MemoryStream())
-        {
-            module.Write(output);
-            runtimeBytes = output.ToArray();
+            var token = field.MetadataToken.ToInt32();
+            if ((token & unchecked((int)0xFF000000)) != 0x04000000)
+                throw new InvalidDataException($"Expected a FieldDef token for {field.FullName}; observed 0x{token:X8}.");
+            return token;
         }
-        if (runtimeBytes.Length == 0)
-            throw new InvalidDataException("HarmonySharedState normalization produced an empty runtime image.");
+
+        static int RequireExistingParameterlessConstructorToken(MethodDefinition initializer, TypeReference declaringType)
+        {
+            var matches = initializer.Body.Instructions
+                .Where(instruction =>
+                    instruction.OpCode.Code == Code.Newobj &&
+                    instruction.Operand is MethodReference called &&
+                    called.Name.Equals(".ctor", StringComparison.Ordinal) &&
+                    called.Parameters.Count == 0 &&
+                    called.DeclaringType.FullName.Equals(declaringType.FullName, StringComparison.Ordinal))
+                .Select(instruction => ((MethodReference)instruction.Operand).MetadataToken.ToInt32())
+                .Distinct()
+                .ToArray();
+            if (matches.Length != 1)
+            {
+                throw new InvalidDataException(
+                    $"HarmonySharedState::.cctor must contain exactly one existing parameterless constructor token for {declaringType.FullName}; observed {matches.Length}.");
+            }
+
+            var token = matches[0];
+            if ((token & unchecked((int)0xFF000000)) != 0x0A000000)
+                throw new InvalidDataException($"Expected an existing MemberRef constructor token for {declaringType.FullName}; observed 0x{token:X8}.");
+            return token;
+        }
+
+        var stateCtorToken = RequireExistingParameterlessConstructorToken(cctor, stateField.FieldType);
+        var originalsCtorToken = RequireExistingParameterlessConstructorToken(cctor, originalsField.FieldType);
+        var originalsMonoCtorToken = RequireExistingParameterlessConstructorToken(cctor, originalsMonoField.FieldType);
+        var stateFieldToken = RequireFieldToken(stateField);
+        var originalsFieldToken = RequireFieldToken(originalsField);
+        var originalsMonoFieldToken = RequireFieldToken(originalsMonoField);
+        var methodAddressRefFieldToken = RequireFieldToken(methodAddressRefField);
+        var actualVersionFieldToken = RequireFieldToken(actualVersionField);
+
+        var replacementIl = new byte[47];
+        var ilOffset = 0;
+
+        void EmitTokenInstruction(byte opcode, int token)
+        {
+            replacementIl[ilOffset++] = opcode;
+            BinaryPrimitives.WriteInt32LittleEndian(replacementIl.AsSpan(ilOffset, 4), token);
+            ilOffset += 4;
+        }
+
+        EmitTokenInstruction(0x73, stateCtorToken);
+        EmitTokenInstruction(0x80, stateFieldToken);
+        EmitTokenInstruction(0x73, originalsCtorToken);
+        EmitTokenInstruction(0x80, originalsFieldToken);
+        EmitTokenInstruction(0x73, originalsMonoCtorToken);
+        EmitTokenInstruction(0x80, originalsMonoFieldToken);
+        replacementIl[ilOffset++] = 0x14;
+        EmitTokenInstruction(0x80, methodAddressRefFieldToken);
+        replacementIl[ilOffset++] = 0x20;
+        BinaryPrimitives.WriteInt32LittleEndian(replacementIl.AsSpan(ilOffset, 4), HarmonySharedStateInternalVersion);
+        ilOffset += 4;
+        EmitTokenInstruction(0x80, actualVersionFieldToken);
+        replacementIl[ilOffset++] = 0x2A;
+        if (ilOffset != replacementIl.Length)
+            throw new InvalidOperationException($"Internal Step 27 replacement IL length drift: expected {replacementIl.Length}, wrote {ilOffset}.");
+
+        var runtimeBytes = (byte[])sourceBytes.Clone();
+        int methodFileOffset;
+        int originalBodyStorageLength;
+        using (var peStream = new MemoryStream(sourceBytes, writable: false))
+        using (var peReader = new PEReader(peStream))
+        {
+            if (!peReader.HasMetadata)
+                throw new BadImageFormatException("HarmonySharedState normalization source is not a managed PE image.");
+
+            var sectionIndex = peReader.PEHeaders.GetContainingSectionIndex(cctor.RVA);
+            if (sectionIndex < 0)
+                throw new BadImageFormatException($"HarmonySharedState::.cctor RVA 0x{cctor.RVA:X8} is not contained by any PE section.");
+            var section = peReader.PEHeaders.SectionHeaders[sectionIndex];
+            methodFileOffset = checked(section.PointerToRawData + (cctor.RVA - section.VirtualAddress));
+            if (methodFileOffset < 0 || methodFileOffset > sourceBytes.Length - 12)
+                throw new BadImageFormatException($"HarmonySharedState::.cctor file offset 0x{methodFileOffset:X8} is outside the source image.");
+
+            var firstHeaderByte = sourceBytes[methodFileOffset];
+            if ((firstHeaderByte & 0x03) != 0x03)
+                throw new InvalidDataException($"HarmonySharedState::.cctor must use a fat ECMA-335 method header for bounded in-place normalization; observed format 0x{(firstHeaderByte & 0x03):X2}.");
+
+            var flagsAndSize = BinaryPrimitives.ReadUInt16LittleEndian(sourceBytes.AsSpan(methodFileOffset, 2));
+            var headerDwords = (flagsAndSize >> 12) & 0x0F;
+            var headerSize = checked(headerDwords * 4);
+            if (headerDwords < 3 || headerSize > 60)
+                throw new BadImageFormatException($"HarmonySharedState::.cctor fat-header size is invalid: {headerSize} bytes.");
+            if (methodFileOffset > sourceBytes.Length - headerSize)
+                throw new BadImageFormatException("HarmonySharedState::.cctor fat header extends beyond the source image.");
+
+            var originalCodeSize = BinaryPrimitives.ReadInt32LittleEndian(sourceBytes.AsSpan(methodFileOffset + 4, 4));
+            if (originalCodeSize <= 0)
+                throw new InvalidDataException($"HarmonySharedState::.cctor original CodeSize is invalid: {originalCodeSize}.");
+            originalBodyStorageLength = checked(headerSize + originalCodeSize);
+            if (methodFileOffset > sourceBytes.Length - originalBodyStorageLength)
+                throw new BadImageFormatException("HarmonySharedState::.cctor declared body extends beyond the source image.");
+
+            var cctorEndRva = checked(cctor.RVA + originalBodyStorageLength);
+            var overlappingMethod = EnumerateTypes(module.Types)
+                .SelectMany(type => type.Methods)
+                .FirstOrDefault(method =>
+                    !ReferenceEquals(method, cctor) &&
+                    method.RVA > 0 &&
+                    method.RVA >= cctor.RVA &&
+                    method.RVA < cctorEndRva);
+            if (overlappingMethod is not null)
+            {
+                throw new InvalidDataException(
+                    $"HarmonySharedState::.cctor method-body slot overlaps another managed method RVA ({overlappingMethod.FullName} at 0x{overlappingMethod.RVA:X8}); refusing in-place normalization.");
+            }
+
+            const ushort CorIlMethodMoreSects = 0x0008;
+            if ((flagsAndSize & CorIlMethodMoreSects) != 0)
+                throw new InvalidDataException("HarmonySharedState::.cctor unexpectedly carries extra method sections; refusing bounded raw-body normalization.");
+
+            const int replacementHeaderSize = 12;
+            if (replacementHeaderSize + replacementIl.Length > originalBodyStorageLength)
+            {
+                throw new InvalidDataException(
+                    $"HarmonySharedState::.cctor original method-body slot is too small for the bounded replacement: available={originalBodyStorageLength}, required={replacementHeaderSize + replacementIl.Length}.");
+            }
+
+            Array.Clear(runtimeBytes, methodFileOffset, originalBodyStorageLength);
+            const ushort replacementFatFlagsAndSize = 0x3003;
+            BinaryPrimitives.WriteUInt16LittleEndian(runtimeBytes.AsSpan(methodFileOffset, 2), replacementFatFlagsAndSize);
+            BinaryPrimitives.WriteUInt16LittleEndian(runtimeBytes.AsSpan(methodFileOffset + 2, 2), 1);
+            BinaryPrimitives.WriteInt32LittleEndian(runtimeBytes.AsSpan(methodFileOffset + 4, 4), replacementIl.Length);
+            BinaryPrimitives.WriteInt32LittleEndian(runtimeBytes.AsSpan(methodFileOffset + 8, 4), 0);
+            replacementIl.AsSpan().CopyTo(runtimeBytes.AsSpan(methodFileOffset + replacementHeaderSize, replacementIl.Length));
+        }
+
+        if (sourceBytes.AsSpan().SequenceEqual(runtimeBytes))
+            throw new InvalidDataException("HarmonySharedState raw-body normalization produced a byte-identical runtime image.");
+
+        for (var index = 0; index < sourceBytes.Length; index++)
+        {
+            if (index >= methodFileOffset && index < methodFileOffset + originalBodyStorageLength)
+                continue;
+            if (sourceBytes[index] != runtimeBytes[index])
+            {
+                throw new InvalidDataException(
+                    $"HarmonySharedState raw-body normalization changed bytes outside the admitted .cctor method-body slot at file offset 0x{index:X8}.");
+            }
+        }
 
         string normalizedAudit;
         using (var normalizedStream = new MemoryStream(runtimeBytes, writable: false))
@@ -3369,8 +3501,6 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         {
             InMemory = true,
             ReadSymbols = false,
-            // Keep the post-write audit metadata-only as well. The exact cctor body is materialized
-            // lazily below; unrelated attribute blobs must remain opaque.
             ReadingMode = ReadingMode.Deferred,
             AssemblyResolver = normalizedResolver,
             MetadataResolver = normalizedResolver,

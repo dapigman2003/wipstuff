@@ -82,7 +82,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
     }
 
     [TestMethod]
-    public void OfficialHarmony242Net9FatNormalizerUsesDeferredMetadataAndPreservesSourceBytes()
+    public void OfficialHarmony242Net9FatNormalizerPatchesOnlySharedStateMethodBodyAndPreservesSourceBytes()
     {
         var fixturePath = Environment.GetEnvironmentVariable("STS2_STEP27_REAL_HARMONY_FIXTURE");
         Assert.IsFalse(string.IsNullOrWhiteSpace(fixturePath),
@@ -149,7 +149,10 @@ public sealed class ControlledHarmonyPatchExecutionTests
 
         Assert.AreEqual(sourceSha1Before, ReadString("SourcePreparedSha1"));
         Assert.AreNotEqual(sourceSha1Before, ReadString("RuntimeImageSha1"));
-        Assert.IsTrue(runtimeBytes.Length > 0);
+        Assert.AreEqual(sourceBytesBefore.Length, runtimeBytes.Length,
+            "Raw-body normalization must preserve the exact PE image length; no metadata/section rebuild is admitted.");
+        Assert.IsFalse(sourceBytesBefore.AsSpan().SequenceEqual(runtimeBytes),
+            "Raw-body normalization must change the admitted HarmonySharedState::.cctor slot.");
         StringAssert.Contains(ReadString("NormalizedTypeInitializerAudit"), "instructions=11");
         CollectionAssert.AreEqual(sourceBytesBefore, File.ReadAllBytes(fixturePath),
             "The real Harmony fixture must remain byte-for-byte immutable after in-memory normalization.");
