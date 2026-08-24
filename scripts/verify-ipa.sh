@@ -39,10 +39,10 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 27 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 27 build version: $BUILD_VERSION" >&2; exit 4; }
-[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 27 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
-[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 27 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
+[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 28 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 28 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 28 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
+[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 28 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 
@@ -139,6 +139,35 @@ STEP27_BUNDLED_COUNT="$(wc -l < "$STEP27_BUNDLED_LIST" | tr -d '[:space:]')"
   exit 5
 }
 
+# Step 28.0 ahead-of-load fixture is the active architecture-pivot payload. It is built outside
+# the iOS project graph and copied only after publish. The IPA must contain exactly one byte-identical
+# source fixture; the transformed copy is created later on-device in launcher-private Documents storage.
+STEP28_FIXTURE_DIR="$APP/Step28AheadOfLoadFixture"
+STEP28_FIXTURE="$STEP28_FIXTURE_DIR/StS2Launcher.Step28.AheadOfLoadFixture.dll"
+STEP28_FIXTURE_SOURCE="$ROOT/fixtures/StS2Launcher.Step28.AheadOfLoadFixture/bin/Release/net9.0/StS2Launcher.Step28.AheadOfLoadFixture.dll"
+STEP28_FIXTURE_MANIFEST="$STEP28_FIXTURE_DIR/step28-ahead-of-load-fixture.sha256"
+[[ -d "$STEP28_FIXTURE_DIR" ]] || { echo "ERROR: Step 28 ahead-of-load fixture directory missing from IPA." >&2; exit 5; }
+[[ -f "$STEP28_FIXTURE_SOURCE" ]] || { echo "ERROR: just-built Step 28 ahead-of-load fixture source missing." >&2; exit 5; }
+[[ -s "$STEP28_FIXTURE" ]] || { echo "ERROR: bundled Step 28 ahead-of-load fixture missing/empty." >&2; exit 5; }
+[[ -f "$STEP28_FIXTURE_MANIFEST" ]] || { echo "ERROR: Step 28 ahead-of-load fixture SHA-256 manifest missing." >&2; exit 5; }
+cmp -s "$STEP28_FIXTURE_SOURCE" "$STEP28_FIXTURE" || { echo "ERROR: bundled Step 28 fixture differs from exact just-built source." >&2; exit 5; }
+(
+  cd "$STEP28_FIXTURE_DIR"
+  shasum -a 256 -c step28-ahead-of-load-fixture.sha256 >/dev/null
+) || { echo "ERROR: bundled Step 28 fixture manifest verification failed." >&2; exit 5; }
+STEP28_BUNDLED_LIST="$TMP/step28-ahead-of-load-fixture-dlls.txt"
+find "$APP" -type f -name 'StS2Launcher.Step28.AheadOfLoadFixture.dll' -print | sort > "$STEP28_BUNDLED_LIST"
+STEP28_BUNDLED_COUNT="$(wc -l < "$STEP28_BUNDLED_LIST" | tr -d '[:space:]')"
+[[ "$STEP28_BUNDLED_COUNT" == "1" ]] || {
+  echo "ERROR: expected exactly one Step 28 ahead-of-load fixture DLL in final .app, found $STEP28_BUNDLED_COUNT." >&2
+  sed 's/^/  /' "$STEP28_BUNDLED_LIST" >&2
+  exit 5
+}
+[[ "$(cat "$STEP28_BUNDLED_LIST")" == "$STEP28_FIXTURE" ]] || {
+  echo "ERROR: Step 28 ahead-of-load fixture escaped its exact data-only directory." >&2
+  exit 5
+}
+
 # Every Step 15 native bridge symbol must still survive final linking.
 NATIVE_SYMBOLS_FILE="$TMP/native-symbols.txt"
 nm -gU "$EXECUTABLE" > "$NATIVE_SYMBOLS_FILE" 2>/dev/null || { echo "ERROR: nm could not inspect final executable." >&2; exit 6; }
@@ -174,7 +203,7 @@ DEPENDENCIES="$TMP/otool-dependencies.txt"
 mkdir -p artifacts/logs
 otool -l "$EXECUTABLE" > "$LOAD_COMMANDS"
 otool -L "$EXECUTABLE" > "$DEPENDENCIES"
-cp "$DEPENDENCIES" artifacts/logs/step27-final-native-dependencies.log
+cp "$DEPENDENCIES" artifacts/logs/step28-final-native-dependencies.log
 
 if grep -Fq 'DiskArbitration' "$LOAD_COMMANDS" || grep -Fq 'DiskArbitration' "$DEPENDENCIES"; then
   echo "ERROR: proven DiskArbitration iOS linker filter regressed." >&2

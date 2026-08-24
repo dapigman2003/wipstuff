@@ -118,3 +118,6 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-27.0.23-PHYSICAL-NOTIMPLEMENTED-PATCHENGINE.txt` — physical 0.0.107 removed the known trimming ambiguity and reached the first real PatchProcessor.Patch(), which threw NotImplementedException from PatchFunctions.UpdateWrapper.
 - `steps/STEP-27.0.24-POST-PUBLISH-INTERPRETED-PATCH-EXPERIMENT.md` — the single stop-rule trial against a launcher-owned target/prefix DLL copied only after iOS publish; failure to patch ends Harmony-internal iteration and triggers the Step-28 ahead-of-load pivot.
+- `reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt` — physical 0.0.108 final Step-27 discriminator: 19/26, Gate T PatchEngineExecution fails with `NotImplementedException` from `PatchFunctions.UpdateWrapper` against a genuine post-publish interpreted target.
+- `steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md` — closes Step 27 negatively and records the architecture decision to retire runtime Harmony/MonoMod replacement.
+- `steps/STEP-28-AHEAD-OF-LOAD-MANAGED-TRANSFORMATION.md` — Step 28.0 / 0.0.109 design: deterministic Cecil transformation before CLR admission, transformed-only private-context execution, no real StS2 behavior yet.

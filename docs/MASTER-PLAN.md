@@ -115,6 +115,8 @@ These are architecture, not temporary step hacks:
 - iOS Files access enabled for shareable diagnostic reports;
 - no real StS2 assembly CLR load before the explicit first-load subsystem;
 - no initializer-bearing prepared dependency is admitted automatically outside an explicit controlled-initialization subsystem with a measured target and fail-closed resolver/native policy.
+- runtime Harmony/MonoMod method replacement is **not** an active iOS compatibility mechanism: physical Step 27.0.24 / 0.0.108 failed the exact public `PatchProcessor.Patch()` boundary on a genuine post-publish interpreted target after trimming ambiguity was removed; no further Harmony-internal workaround iteration is planned.
+- compatibility behavior changes are now applied deterministically **ahead of CLR load** to verified launcher-private copies with Mono.Cecil, then the transformed image is reopened/verified and only that image may enter the private runtime context. The receipt-backed Step 12 source remains immutable.
 
 ## Data/workspace trust model
 
@@ -124,7 +126,8 @@ The Step 12 managed install and receipt are the trusted local game copy. Later c
 2. clone/copy into a launcher-private workspace or prepared runtime set;
 3. never resolve Cecil/runtime dependencies from arbitrary system paths, network locations, or the mutable live install unless a subsystem explicitly defines and verifies that source;
 4. keep preparation deterministic and auditable;
-5. preserve source/live-install bytes unless the install subsystem itself is doing an authenticated update/repair.
+5. preserve source/live-install bytes unless the install subsystem itself is doing an authenticated update/repair;
+6. for behavior-changing compatibility work, verify the transformed output before load and do not CLR-load the immutable source copy in the same execution path merely to compare behavior.
 
 ## Diagnostic policy
 
@@ -149,9 +152,11 @@ Godot iOS host, Cecil runtime viability, real call-site analysis, controlled rew
 
 Load the prepared real `sts2.dll` into the private execution context with exact dependency resolution active, verify identity and load-context behavior, and **do not intentionally invoke the game entry point or trigger broad initialization yet**. This phase is physically proven: Step 23 closed the first-real-load boundary while keeping initializer-bearing dependencies deferred.
 
-### Phase D — controlled managed initialization
+### Phase D — ahead-of-load managed compatibility + controlled initialization
 
-This is the active major phase. Step 24 physically closed the first known automatic-initialization boundary: exact `0Harmony 2.4.2.0` can enter the dedicated private context and complete its module constructor under strict managed-plan resolution/native refusal. Step 25 physically closed exact `HarmonyLib.Harmony` API resolution, explicit Harmony type initialization, and one inert `Harmony(string)` object construction. Step 26 physically closed exact `Harmony.CreateProcessor(MethodBase)` / `HarmonyLib.PatchProcessor` admission, explicit PatchProcessor type initialization, launcher-owned inert target metadata resolution, and empty processor construction without method replacement. Step 27 then proved the iOS-specific `HarmonySharedState` normalization but exposed two successive publish-time trimming failures inside the first real `PatchProcessor.Patch()` path (`Enumerable.Union<T>` followed by `DebuggableAttribute`) before MonoMod detouring. Because receipt-backed StS2/Harmony/mod assemblies arrive after publish and are invisible to ILLink, the host now uses `MtouchLink=None` + `TrimMode=copy` as an architectural dynamic-payload compatibility policy rather than expanding one framework root at a time. Harmony remains on trial: the active frontier is still first real Harmony replacement on launcher-owned deterministic probes, followed by exact unpatch/restoration, before any StS2 member is reflected or patched. A pivot to ahead-of-load patching is justified only by representative replacement/detour evidence after trimming ambiguity is removed. Keep StS2 game-member invocation, broad game reflection, Godot/game startup, and native game loading separately gated.
+This is the active major phase. Steps 24–26 physically proved that the real `0Harmony 2.4.2.0` assembly can be admitted and initialized in the private iOS managed context and that inert `Harmony` / `PatchProcessor` objects can be constructed safely. Step 27 then isolated the first real replacement boundary. Physical 0.0.105 and 0.0.106 exposed two independent publish-time trimming failures (`Enumerable.Union<T>` and `DebuggableAttribute`), which established the architectural need for `MtouchLink=None` + `TrimMode=copy` because receipt-backed StS2/Harmony/mod assemblies arrive after publish and are invisible to ILLink. Physical 0.0.107 removed those trimming failures and reached `PatchProcessor.Patch()`, which threw `NotImplementedException` from `PatchFunctions.UpdateWrapper`. The final Step-27 stop-rule candidate, physical 0.0.108, repeated that failure against a genuine post-publish interpreted target whose direct in-fixture IL execution was proven immediately beforehand. That removed the AOT-target ambiguity and **closed runtime Harmony/MonoMod replacement as a negative architecture result**.
+
+The active frontier is now deterministic ahead-of-load managed transformation. Step 28 first combines the already-proven Step-18 Cecil write/reopen capability with Step-20 post-publish interpreted execution: verify immutable source bytes, clone to launcher-private storage, apply one exact Cecil semantic transformation before CLR admission, reopen/hash-verify the transformed image, then load and execute only transformed bytes in the private context. After that combined mechanism is physically closed, later Step-28 candidates may select narrowly audited real StS2 compatibility transformations based on receipt-backed ARM64 IL evidence. Runtime Harmony detours are not to be revived merely to improve mod compatibility; Workshop/Harmony-mod compatibility is a later separate design problem and must not block getting the base game running. Keep real StS2 member invocation, Godot/game startup, native game loading, and broad mod compatibility separately gated.
 
 ### Phase E — Godot/game integration
 

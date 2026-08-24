@@ -1,37 +1,37 @@
-# StS2 Launcher iOS — Step 27 Controlled Launcher-Owned Harmony Patch + Unpatch
+# StS2 Launcher iOS — Step 28 Ahead-of-Load Managed Transformation
 
-Steps 01–26 are physically closed. Step 27 remains focused on proving one launcher-owned Harmony patch/unpatch boundary on iOS before any StS2 member is reflected or modified.
+Steps 01–26 are physically closed. Step 27 is now a **closed negative architecture result**: physical `0.0.108 (108)` proved that the exact public `HarmonyLib.PatchProcessor.Patch()` boundary still throws `System.NotImplementedException` from `PatchFunctions.UpdateWrapper` even when the target is a genuine post-publish interpreted method whose direct in-fixture IL execution was proven immediately beforehand.
+
+Per the pre-declared stop rule, the project is no longer iterating Harmony/MonoMod runtime detours.
 
 ## Active candidate
 
-**Step 27.0.24 / `0.0.108 (108)` — single post-publish interpreted Harmony decision experiment**
+**Step 28.0 / `0.0.109 (109)` — deterministic ahead-of-load semantic transformation + transformed-only execution**
 
-Physical 0.0.107 proved the copy/no-link host policy removed the prior `Enumerable.Union<T>` and `DebuggableAttribute` trimming blockers. The normalized `HarmonySharedState` boundary remained viable and the first exact public `PatchProcessor.Patch()` call then failed with `System.NotImplementedException` surfaced from `HarmonyLib.PatchFunctions.UpdateWrapper`.
+The new active compatibility pipeline is:
 
-That is now a real patch-engine execution failure rather than another trimmed-framework-member failure, but the stack does not distinguish replacement generation from the later MonoMod detour installation. Step 27's predefined stop rule therefore allows exactly one representative experiment against managed code that is not part of the launcher's build-time iOS AOT graph.
+`verified source -> launcher-private clone -> Cecil transform before CLR load -> reopen/hash verify -> load only transformed image -> execute through Mono interpreter`
 
-0.0.108 performs that experiment:
+0.0.109 deliberately proves that pipeline on a project-owned post-publish fixture before touching real StS2 behavior:
 
-- a new launcher-owned `StS2Launcher.Step27.InterpretedPatchFixture.dll` is built separately and copied into the `.app` only **after** `dotnet publish`;
-- the iOS project and host-test project do not reference that fixture;
-- the fixture contains the exact `Target`, in-fixture `InvokeTarget`, and Harmony `Prefix` methods plus deterministic counters;
-- Gate P loads the exact fixture bytes into the Step-27 private context and creates a **fresh** processor for the interpreted Target through public `Harmony.CreateProcessor(MethodBase)`;
-- Gate Q proves baseline behavior through Target reflection plus an in-fixture direct IL call to Target;
-- Gate T invokes public `PatchProcessor.Patch()` exactly once;
-- if patching succeeds, Gate V proves prefix/skip-original behavior through both interpreted routes, Gate W unpatches exactly that prefix once, and Gate Y proves original behavior is restored;
-- no MonoMod backend override is forced and Harmony internals are not modified again;
-- no StS2 member is reflected, patched, or invoked.
+- `StS2Launcher.Step28.AheadOfLoadFixture.dll` is built separately and copied into the `.app` only after `dotnet publish`;
+- the iOS project and host-test project do not reference the fixture project;
+- source IL has `Adjustment() => 1`, `Target(value) => value + Adjustment()`, and `InvokeTarget(value) => Target(value)`;
+- Gate A re-proves OfflineReady, hash/metadata-verifies the source fixture, clones it privately, and requires the fixture identity to be absent from the CLR;
+- Gate B changes only `Adjustment()` from `1` to `1000` in a new private transformed image with Mono.Cecil;
+- Gate C reopens and verifies source/transformed IL and hashes before load;
+- Gate D loads only transformed bytes into a dedicated private `AssemblyLoadContext` and requires `Adjustment()==1000`, `Target(41)==1041`, and the in-fixture direct-call `InvokeTarget(41)==1041`;
+- Gate E re-hashes all images and re-proves OfflineReady/isolation;
+- no Harmony/MonoMod patch API and no real StS2 member reflection/invocation are used by Step 28.0.
 
-This is the final Harmony decision experiment. If the post-publish interpreted fixture cannot patch, Step 27 stops iterating Harmony internals and Step 28 pivots to deterministic ahead-of-load managed IL transformation. If patch/unpatch succeeds, Harmony remains viable for the representative dynamically loaded managed target model.
-
-`MASTER-PLAN.md` remains unchanged from 0.0.107 for this candidate; the copy/no-link policy revision is already recorded there, and a patch-engine architecture pivot will be recorded only if the physical 0.0.108 result triggers it.
+The master plan is intentionally updated in this release because the runtime compatibility architecture has materially changed.
 
 ## Build
 
-Workflow: `ios-step-27`
+Workflow: `ios-step-28`
 
-Expected app version: `0.0.108 (108)`
+Expected app version: `0.0.109 (109)`
 
-Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
+Expected IPA: `artifacts/StS2-Launcher-Step-28.ipa`
 
-Physical acceptance remains A–Z **26/26**, then OfflineReady PASS and Foundation 5/5.
+Physical acceptance: Step 28 A–E **5/5 PASS**. Gate E includes the required OfflineReady re-verification.

@@ -81,12 +81,31 @@ Before changing one of these contracts:
 
 ## Step 27 — controlled launcher-owned Harmony patch decision
 
-- the copy/no-link host policy (`MtouchLink=None`, `TrimMode=copy`) and `MtouchInterpreter=-all` remain the dynamic-payload execution baseline established after physical 0.0.105/106 trimming failures;
-- canonical `0Harmony 2.4.2` may use only the bounded in-memory raw-body normalization of `HarmonySharedState::.cctor`; trusted prepared/live bytes remain immutable;
-- exactly one public `PatchProcessor.Patch()` invocation is admitted in the active A–Z sequence and exact prefix `Unpatch(MethodInfo)` is admitted only after patched behavior succeeds;
-- the final Step-27 decision target/prefix live in the launcher-owned `StS2Launcher.Step27.InterpretedPatchFixture.dll`, which must remain absent from iOS/test ProjectReference graphs and be copied into the app only after publish;
-- Gate P must bind a fresh processor to that exact interpreted Target through public `Harmony.CreateProcessor(MethodBase)` rather than mutating PatchProcessor internals;
-- baseline, patched, and restored behavior must each be tested through Target MethodInfo invocation plus `InvokeTarget`, whose post-publish IL directly calls Target;
-- no MonoMod backend override is allowed for this final experiment;
-- no StS2 member may be reflected, patched, or invoked in Step 27;
-- if the interpreted fixture cannot patch, the next architecture is ahead-of-load managed IL transformation and no further Harmony-internal workaround candidate is admitted.
+Step 27 is physically closed as a **negative architecture result** by 0.0.108. The current regression contract preserves the evidence needed to prevent the retired runtime-patch path from being accidentally reinterpreted as viable:
+
+- the copy/no-link host policy (`MtouchLink=None`, `TrimMode=copy`) and `MtouchInterpreter=-all` remain the dynamic-payload execution baseline established after the physical 0.0.105/106 trimming failures;
+- the final Step-27 target/prefix remain the launcher-owned `StS2Launcher.Step27.InterpretedPatchFixture.dll`, absent from iOS/test ProjectReference graphs and copied into the app only after publish;
+- Gate P binds a fresh processor to the exact interpreted `Target` through public `Harmony.CreateProcessor(MethodBase)`; Gate Q proves both Target reflection and the in-fixture direct managed IL call through `InvokeTarget` execute the unpatched post-publish image;
+- physical 0.0.108 must remain preserved as the decisive result: exact public `PatchProcessor.Patch()` fails at Gate T with `System.NotImplementedException: Arg_NotImplementedException` surfaced from `HarmonyLib.PatchFunctions.UpdateWrapper`;
+- the failure is architecture-decisive because it occurs against the representative post-publish interpreted target after the prior trimming ambiguity was removed; identifying the deeper unsupported MonoMod primitive is not a prerequisite for the product architecture;
+- runtime Harmony/MonoMod method replacement is therefore retired from the active compatibility path. No new candidate may modify Harmony internals or force an alternate MonoMod detour backend merely to continue Step 27;
+- the old Step-27 implementation, tests, preservation anchors, fixture, and physical reports remain regression/evidence assets even though active release/version/CI wiring advances.
+
+## Step 28 — ahead-of-load managed transformation
+
+Step 28 replaces runtime detouring with a deterministic transform-before-load contract. Step 28.0 proves the architecture on a project-owned post-publish fixture before any real StS2 behavior is changed.
+
+Current Step-28.0 regression contract:
+
+- OfflineReady is required and re-verified after transformed execution; the trusted Step-12 managed install remains immutable;
+- `StS2Launcher.Step28.AheadOfLoadFixture.dll` is built outside the iOS project/AOT graph and copied into the `.app` only after `dotnet publish`, with an exact SHA-256 manifest;
+- Gate A reads the fixture only as Cecil metadata, verifies its exact source IL, and clones verified bytes into launcher-private scratch storage; the fixture assembly identity must not already be CLR-loaded;
+- Gate B changes exactly one audited semantic point in a new private image: `Adjustment()` constant `1` becomes `1000`; bundle/source hashes remain unchanged and no CLR load occurs during transformation;
+- Gate C reopens source and transformed images and requires source `Adjustment()==1`, transformed `Adjustment()==1000`, and preserved direct calls `Target -> Adjustment` and `InvokeTarget -> Target`;
+- Gate D loads only the verified transformed bytes into a dedicated private `AssemblyLoadContext` and requires `Adjustment()==1000`, `Target(41)==1041`, and `InvokeTarget(41)==1041`; this proves an ordinary in-fixture direct managed IL call observes the transformed image;
+- the private context may delegate framework contracts to the host but must fail closed on unexpected non-framework dependency fallback;
+- Gate E re-hashes bundle/source/transformed images, re-proves OfflineReady, and requires exactly one Step-28 fixture identity resident in the dedicated private context;
+- Harmony/MonoMod runtime patching, real StS2 member reflection/transformation/invocation, Godot/game startup, and native game loading remain outside Step 28.0;
+- after Gate D is reached, a fresh process is required before another Step-28 run because the private context is intentionally non-collectible for physical evidence accounting.
+
+Only after this combined rewrite-before-load + interpreted-execution boundary closes physically may a later Step-28 candidate select a narrowly audited real StS2 compatibility transformation.

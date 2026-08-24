@@ -2,7 +2,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-mkdir -p artifacts/reports artifacts/test-results artifacts/logs artifacts/host-step20-fixtures artifacts/host-step27-fixtures
+mkdir -p artifacts/reports artifacts/test-results artifacts/logs artifacts/host-step20-fixtures artifacts/host-step27-fixtures artifacts/host-step28-ahead-of-load-fixture
 REPORT="artifacts/reports/host-unit-tests.txt"
 : > "$REPORT"
 exec > >(tee -a "$REPORT") 2>&1
@@ -12,8 +12,10 @@ DYNAMIC_PROJECT="fixtures/StS2Launcher.Step20.DynamicFixture/StS2Launcher.Step20
 DEPENDENCY_PROJECT="fixtures/StS2Launcher.Step20.DependencyFixture/StS2Launcher.Step20.DependencyFixture.csproj"
 ROOT_PROJECT="fixtures/StS2Launcher.Step20.RootFixture/StS2Launcher.Step20.RootFixture.csproj"
 STEP27_INTERPRETED_PROJECT="fixtures/StS2Launcher.Step27.InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.csproj"
+STEP28_AHEAD_OF_LOAD_PROJECT="fixtures/StS2Launcher.Step28.AheadOfLoadFixture/StS2Launcher.Step28.AheadOfLoadFixture.csproj"
 FIXTURE_DIR="artifacts/host-step20-fixtures"
 STEP27_INTERPRETED_DIR="artifacts/host-step27-interpreted-fixture"
+STEP28_AHEAD_OF_LOAD_DIR="artifacts/host-step28-ahead-of-load-fixture"
 STEP27_FIXTURE_DIR="artifacts/host-step27-fixtures"
 STEP27_HARMONY_RELEASE_URL="https://github.com/pardeike/Harmony/releases/download/v2.4.2.0/Harmony-Fat.2.4.2.0.zip"
 STEP27_HARMONY_ARCHIVE="$STEP27_FIXTURE_DIR/Harmony-Fat.2.4.2.0.zip"
@@ -28,7 +30,7 @@ command -v dotnet >/dev/null 2>&1 || { echo "ERROR: dotnet is required to run ho
 command -v curl >/dev/null 2>&1 || { echo "ERROR: curl is required to acquire the quarantined Step-27 Harmony fixture."; exit 2; }
 command -v unzip >/dev/null 2>&1 || { echo "ERROR: unzip is required to inspect the quarantined Step-27 Harmony fixture."; exit 2; }
 
-echo "StS2 Launcher — Step 27 canonical host regression tests"
+echo "StS2 Launcher — Step 28 canonical host regression tests"
 echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo ".NET: $(dotnet --version)"
 
@@ -82,7 +84,8 @@ dotnet build "$DYNAMIC_PROJECT" -c Release --nologo
 dotnet build "$DEPENDENCY_PROJECT" -c Release --nologo
 dotnet build "$ROOT_PROJECT" -c Release --nologo
 dotnet build "$STEP27_INTERPRETED_PROJECT" -c Release --nologo
-rm -rf "$FIXTURE_DIR" "$STEP27_INTERPRETED_DIR"
+dotnet build "$STEP28_AHEAD_OF_LOAD_PROJECT" -c Release --nologo
+rm -rf "$FIXTURE_DIR" "$STEP27_INTERPRETED_DIR" "$STEP28_AHEAD_OF_LOAD_DIR"
 mkdir -p "$FIXTURE_DIR"
 cp fixtures/StS2Launcher.Step20.DynamicFixture/bin/Release/net9.0/StS2Launcher.Step20.DynamicFixture.dll "$FIXTURE_DIR/"
 cp fixtures/StS2Launcher.Step20.DependencyFixture/bin/Release/net9.0/StS2Launcher.Step20.DependencyFixture.dll "$FIXTURE_DIR/"
@@ -103,13 +106,21 @@ cp fixtures/StS2Launcher.Step27.InterpretedPatchFixture/bin/Release/net9.0/StS2L
 )
 export STS2_STEP27_INTERPRETED_PATCH_FIXTURE="$ROOT/$STEP27_INTERPRETED_DIR/StS2Launcher.Step27.InterpretedPatchFixture.dll"
 
+mkdir -p "$STEP28_AHEAD_OF_LOAD_DIR"
+cp fixtures/StS2Launcher.Step28.AheadOfLoadFixture/bin/Release/net9.0/StS2Launcher.Step28.AheadOfLoadFixture.dll "$STEP28_AHEAD_OF_LOAD_DIR/"
+(
+  cd "$STEP28_AHEAD_OF_LOAD_DIR"
+  shasum -a 256 StS2Launcher.Step28.AheadOfLoadFixture.dll > step28-ahead-of-load-fixture.sha256
+)
+export STS2_STEP28_AHEAD_OF_LOAD_FIXTURE_ROOT="$ROOT/$STEP28_AHEAD_OF_LOAD_DIR"
+
 dotnet test "$TEST_PROJECT" \
   -c Release \
   --nologo \
   --results-directory artifacts/test-results \
-  --logger "trx;LogFileName=step27.trx" \
+  --logger "trx;LogFileName=step28.trx" \
   --logger "console;verbosity=normal"
 
 echo "HOST UNIT TESTS: PASS"
-echo "TRX: artifacts/test-results/step27.trx"
+echo "TRX: artifacts/test-results/step28.trx"
 echo "Text report: $REPORT"

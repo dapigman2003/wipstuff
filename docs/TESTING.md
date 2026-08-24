@@ -1,42 +1,37 @@
-# Testing — Step 27 Controlled Launcher-Owned Harmony Patch + Unpatch
+# Testing — Step 28 Ahead-of-Load Managed Transformation
 
 ## Static validation
 
 Run `bash scripts/validate.sh`.
 
-For Step 27.0.24 / `0.0.108 (108)`, validation retains the proven copy/no-link host policy, raw-body HarmonySharedState normalizer, exact public patch API surface, and single `PatchProcessor.Patch()` call. It additionally proves the final stop-rule fixture is genuinely outside the iOS build-time AOT graph.
+For Step 28.0 / `0.0.109 (109)`, validation preserves all protected earlier runtime/build policies while adding the architecture-pivot invariants:
 
-Required interpreted-fixture invariants:
+- runtime Harmony/MonoMod replacement remains historical only; Step 28 production code contains no Harmony patch API calls;
+- `MtouchLink=None`, `TrimMode=copy`, and `MtouchInterpreter=-all` remain the active dynamic-payload host policy;
+- `fixtures/StS2Launcher.Step28.AheadOfLoadFixture` exists as a standalone `net9.0` project;
+- neither the iOS project nor host-test project references the Step-28 fixture project;
+- `scripts/build-ios.sh` builds it separately and copies it into `Step28AheadOfLoadFixture/` only after `dotnet publish` returns;
+- `scripts/verify-ipa.sh` requires exactly one byte-identical Step-28 fixture DLL and a valid SHA-256 manifest;
+- source fixture IL is exact: `Adjustment()=>1`, `Target` directly calls `Adjustment`, and `InvokeTarget` directly calls `Target`;
+- production Step 28 rewrites only a launcher-private transformed copy before CLR load, then reopens/verifies that image;
+- the original bundled/private-source fixture identity must not already be CLR-loaded before Gate D;
+- Gate D loads only transformed bytes and requires `Adjustment()==1000`, `Target(41)==1041`, and `InvokeTarget(41)==1041`;
+- no real StS2 member reflection, rewrite, or invocation occurs in Step 28.0.
 
-- `fixtures/StS2Launcher.Step27.InterpretedPatchFixture` exists as a standalone net9.0 project;
-- neither the iOS project nor the host-test project contains a ProjectReference/Content/BundleResource reference to it;
-- `scripts/build-ios.sh` builds the fixture before publish if needed but copies it into `Step27InterpretedPatchFixture/` only **after** `dotnet publish` returns;
-- `scripts/verify-ipa.sh` requires exactly one byte-identical fixture DLL in that data-only directory plus a valid SHA-256 manifest;
-- the fixture is IL-only, unsigned, framework-only, has no module initializer, and exposes only the deterministic Target/InvokeTarget/Prefix/reset/counter surface required by the experiment;
-- `InvokeTarget` retains a direct IL `call` to `Target`;
-- Gate P loads the exact fixture bytes into the private context and creates a fresh processor through public `Harmony.CreateProcessor(MethodBase)` for the exact interpreted Target;
-- production Step 27 no longer references the old build-time `HarmonyPatchProbe` path;
-- Gate T still contains exactly one `PatchProcessor.Patch()` reflection invocation; Gate W contains exactly one exact `Unpatch(MethodInfo)` invocation if patching succeeds;
-- no `MONOMOD_DMD_TYPE`, forced Cecil/Emit backend, or other MonoMod backend override is introduced;
-- no StS2 member is reflected, patched, or invoked.
-
-The raw-body normalizer remains bounded to the canonical Harmony 2.4.2 target and changes only the admitted `HarmonySharedState::.cctor` slot in the in-memory image. The real upstream Harmony-Fat host surrogate remains content-addressed by the existing archive/DLL SHA-256 pins.
-
-Physical 0.0.107 must be archived as evidence that copy/no-link removed the two known trim blockers and that the new failure is `System.NotImplementedException` surfaced from `PatchFunctions.UpdateWrapper` during the real public Patch() call.
+The raw physical Step-27.0.24 negative report must remain preserved as the architecture-decision evidence.
 
 ## Host tests
 
 Run `bash scripts/test.sh`.
 
-In addition to the existing full suite and official Harmony normalizer regression, the script builds the Step-27 interpreted fixture separately, copies it into a host artifact directory, exports only its path through `STS2_STEP27_INTERPRETED_PATCH_FIXTURE`, and then runs the tests. The test project must not reference the fixture project.
+The full historical regression suite still runs, including the quarantined/hash-pinned Step-27 Harmony normalizer tests. Step 28 additionally builds its fixture separately, copies it to `artifacts/host-step28-ahead-of-load-fixture/`, exports only that directory through `STS2_STEP28_AHEAD_OF_LOAD_FIXTURE_ROOT`, and runs the Step-28 host regression without adding a ProjectReference.
 
-The fixture regression uses Cecil Deferred/read-only metadata to verify the exact type/method/field surface and direct `InvokeTarget -> Target` IL call, then loads the DLL from bytes in a collectible host ALC to prove baseline Target/InvokeTarget behavior and Prefix result semantics without creating an iOS project dependency.
+The Step-28 host regression creates a synthetic OfflineReady install, verifies source metadata/hash, performs the deterministic `1 -> 1000` rewrite into launcher-private scratch, reopens the transformed image, loads only transformed bytes, proves 1041 through both reflection and an in-fixture direct managed IL call, and verifies the synthetic trusted install plus bundled source remain unchanged.
 
 ## Codemagic / physical run
 
-Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.108 (108)` from a fresh process.
+Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.109 (109)` from a fresh process.
 
-The decisive outcomes are:
+Run Step 28 A–E in order. A physical **5/5 PASS** closes only the combined ahead-of-load transformation/execution mechanism. The next candidate may then select a narrowly audited real StS2 compatibility transformation.
 
-- **PASS:** Patch() returns for the interpreted target; both patched routes return 1041 with the original body skipped; exact unpatch restores 42 on both routes. Harmony remains viable for the representative post-publish managed model.
-- **FAIL:** the interpreted fixture cannot patch. Preserve the full Step-27 report/crash checkpoint and stop Harmony-internal iteration. The next major step is Step 28 ahead-of-load managed IL transformation with a master-plan architecture revision.
+If Gate D has run, force-quit before any Step-28 retry because the fixture identity remains resident in its non-collectible private `AssemblyLoadContext`.

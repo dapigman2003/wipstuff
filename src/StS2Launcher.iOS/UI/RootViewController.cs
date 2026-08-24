@@ -174,6 +174,9 @@ public sealed partial class RootViewController : UIViewController
         _controlledHarmonyPatchExecution = new ControlledHarmonyPatchExecution(
             _launcherDataRoot,
             Path.Combine(NSBundle.MainBundle.BundlePath, ControlledHarmonyPatchExecution.InterpretedPatchFixtureDirectoryName));
+        _aheadOfLoadManagedTransformation = new AheadOfLoadManagedTransformation(
+            _launcherDataRoot,
+            Path.Combine(NSBundle.MainBundle.BundlePath, AheadOfLoadManagedTransformation.BundleFixtureDirectoryName));
     }
 
     public override void ViewDidLoad()
@@ -765,6 +768,7 @@ public sealed partial class RootViewController : UIViewController
         AddControlledHarmonyConstructionControls(content);
         AddControlledHarmonyProcessorCreationControls(content);
         AddControlledHarmonyPatchExecutionControls(content);
+        AddAheadOfLoadManagedTransformationControls(content);
 
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();

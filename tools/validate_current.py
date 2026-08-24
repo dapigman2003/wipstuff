@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation")
+print("StS2 Launcher — Step 28 ahead-of-load managed transformation static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>108</ApplicationVersion>" in project_text, "build version is 108")
-require("<ApplicationDisplayVersion>0.0.108</ApplicationDisplayVersion>" in project_text, "display version is 0.0.108")
-require(plist.get("CFBundleVersion") == "108", "Info.plist build version is 108")
-require(plist.get("CFBundleShortVersionString") == "0.0.108", "Info.plist display version is 0.0.108")
+require("<ApplicationVersion>109</ApplicationVersion>" in project_text, "build version is 109")
+require("<ApplicationDisplayVersion>0.0.109</ApplicationDisplayVersion>" in project_text, "display version is 0.0.109")
+require(plist.get("CFBundleVersion") == "109", "Info.plist build version is 109")
+require(plist.get("CFBundleShortVersionString") == "0.0.109", "Info.plist display version is 0.0.109")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.24 — SINGLE POST-PUBLISH INTERPRETED HARMONY DECISION EXPERIMENT" in release_presentation, "top launcher banner identifies active Step 27.0.24 candidate")
-require("0.0.107" in release_presentation and "NotImplementedException" in release_presentation and "PatchFunctions.UpdateWrapper" in release_presentation and "post-publish interpreted" in release_presentation and "CreateProcessor(MethodBase)" in release_presentation and "Step 28" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner records physical 0.0.107 and scopes the single interpreted stop-rule decision experiment")
+require("STEP 28.0 — AHEAD-OF-LOAD MANAGED TRANSFORMATION ARCHITECTURE PIVOT" in release_presentation, "top launcher banner identifies active Step 28.0 candidate")
+require("0.0.108" in release_presentation and "NotImplementedException" in release_presentation and "PatchFunctions.UpdateWrapper" in release_presentation and "post-publish interpreted" in release_presentation and "Step 28.0" in release_presentation and "Cecil" in release_presentation and "No Harmony patch API" in release_presentation, "top launcher banner records physical Step-27 negative closure and scopes the Step-28 ahead-of-load pivot")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.108"' in release_presentation and 'ExpectedBuildVersion = "108"' in release_presentation, "Step 27.0.24 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.109"' in release_presentation and 'ExpectedBuildVersion = "109"' in release_presentation, "Step 28.0 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
 require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "post-publish interpreted Target+Prefix fixture" in release_presentation and "fresh processor via Harmony.CreateProcessor(MethodBase)" in release_presentation and "exactly one Patch()" in release_presentation, "Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
@@ -216,8 +216,8 @@ require("<TrimMode>copy</TrimMode>" in project_text and "<MtouchLink>None</Mtouc
 require("<MtouchInterpreter>-all</MtouchInterpreter>" in project_text, "Step 20 interpreter policy retained")
 require("'$(UseInterpreter)' == 'true'" in project_text, "build guard rejects broad UseInterpreter=true")
 require("'$(PublishAot)' == 'true'" in project_text, "build guard rejects NativeAOT")
-require("STEP27 RUNTIME POLICY" in project_text, "runtime policy emits Step 27 build telemetry")
-require("STEP27 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" in project_text, "dynamic-payload trimming policy emits exact build telemetry")
+require("STEP28 RUNTIME POLICY" in project_text, "runtime policy emits Step 28 build telemetry")
+require("STEP28 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" in project_text, "dynamic-payload trimming policy emits exact build telemetry")
 require("'$(MtouchLink)' != 'None'" in project_text and "'$(TrimMode)' != 'copy'" in project_text, "build guards reject drift from copy/no-link host policy")
 
 all_roots = re.findall(r'<TrimmerRootAssembly Include="([^"]+)"\s*/>', project_text)
@@ -238,9 +238,9 @@ require(all_roots.count("System.Linq") == 1, "historical Step 27.0.22 System.Lin
 expected_all_roots = set(step22_roots) | {"SteamKit2", "protobuf-net", "protobuf-net.Core", "System.Collections.Concurrent", "System.Linq"}
 require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_all_roots), "measured historical root descriptor set remains byte-bounded while copy/no-link supersedes it for preservation")
 require("Step 24 physically proved this additional post-publish dynamic-IL preservation root" in project_text, "physically proven Step 24 preservation root is documented as protected platform policy")
-require("STEP27 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 27 build telemetry identifies the physically proven framework preservation root")
-require("STEP27 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" in project_text, "build telemetry explicitly marks the System.Linq root as historical under copy/no-link")
-require("STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 27 build telemetry identifies the physically proven Harmony-constructor framework preservation surface")
+require("STEP28 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 28 build telemetry retains the physically proven framework preservation root")
+require("STEP28 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" in project_text, "build telemetry explicitly marks the System.Linq root as historical under copy/no-link")
+require("STEP28 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 28 build telemetry retains the physically proven Harmony-constructor surface as historical evidence")
 require("System.Private.CoreLib" not in all_roots, "Step 25 does not broaden trimming by rooting System.Private.CoreLib")
 step25_preservation_path = ROOT / "src/StS2Launcher.iOS/Platform/Step25HarmonyConstructorFrameworkPreservation.cs"
 require(step25_preservation_path.is_file(), "Step 25 bounded Harmony-constructor framework preservation anchor exists")
@@ -255,8 +255,8 @@ require(step25_preservation.count("[DynamicDependency(") == 9, "Step 25 candidat
 require("internal static void Activate()" in step25_preservation and "Intentionally empty" in step25_preservation, "Step 25 preservation anchor is metadata-only and executes no probe")
 require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyConstruction.cs"), "Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files")
 build_ios = read("scripts/build-ios.sh")
-require("STEP27 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" in build_ios, "iOS publish requires exact copy/no-link dynamic-payload telemetry")
-require("STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish requires Step 27 proven preservation telemetry")
+require("STEP28 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" in build_ios, "iOS publish requires exact copy/no-link dynamic-payload telemetry")
+require("STEP28 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish retains historical Harmony-constructor preservation telemetry")
 require("DiskArbitration" in project_text and '<_LinkerFrameworks Remove="DiskArbitration" />' in project_text, "DiskArbitration-only linker framework filter remains present")
 
 # ---------------------------------------------------------------------------
@@ -342,10 +342,10 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.108",
-    "STS2_BUILD_VERSION": "108",
-    "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-28.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.109",
+    "STS2_BUILD_VERSION": "109",
+    "STS2_RUNTIME_POLICY_MARKER": "STEP28 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
 
@@ -1020,7 +1020,7 @@ step27_patch_engine_preservation = read("src/StS2Launcher.iOS/Platform/Step27Pat
 require(all(marker in step27_patch_engine_preservation for marker in ["typeof(DynamicMethod)", "typeof(ILGenerator)", "typeof(RuntimeMethodHandle)", "typeof(AssemblyBuilder)", "typeof(ModuleBuilder)", "typeof(TypeBuilder)", "typeof(MethodBuilder)"]), "Step 27.0.8 retains only the bounded patch-engine Reflection.Emit/MethodHandle framework surface")
 require("TrimmerRootAssembly Include=\"System.Reflection.Emit" not in project_text, "Step 27.0.8 does not broaden preservation to a Reflection.Emit assembly root")
 require("Step27PatchEngineFrameworkPreservation.Activate();" in step27_ui, "Step 27 roots the bounded patch-engine DynamicDependency preservation anchor from candidate-owned UI")
-require("STEP27 CANDIDATE PATCH-ENGINE FRAMEWORK PRESERVATION" in project_text, "build telemetry declares the candidate patch-engine preservation anchor")
+require("STEP28 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION" in project_text, "build telemetry records the retired Step-27 patch-engine preservation anchor as historical evidence")
 require("cctor.Body.Instructions.Count != 57" in step27_source and "[Code.Ldc_I4_1] = 1" in step27_source and "Exact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight")
 require("expected false then false" in step27_source and "typedGetTypeCalls[0].Previous" in step27_source and "typedGetTypeCalls[1].Previous" in step27_source and "LockRecursionPolicy.SupportsRecursion" in step27_source and "ReaderWriterLockSlim recursion-policy operand changed" in step27_source, "Step 27 Gate O pins the physical RuntimeInformation Type.GetType operands and ReaderWriterLockSlim SupportsRecursion operand semantically")
 require("HarmonySharedState internalVersion: 102 — MATCH" in step27_source and "GetOrCreateSharedStateType" in step27_source and "MethodCreatorConfig.Prepare" in step27_source and "DetourFactory.Current.CreateDetour" in step27_source and "MethodHandle.GetFunctionPointer" in step27_source, "Step 27 Gate O pins the exact shared-state/replacement/detour/update patch-engine chain")
@@ -1077,20 +1077,93 @@ require(step27_source.count("InvokePatchProbeInt32(probe.Target, 41") == 3 and s
 require("finalCounters.TargetCalls != 2 || finalCounters.PrefixCalls != 2" in step27_source and "counters.TargetCalls != 4 || counters.PrefixCalls != 2" in step27_source, "Step 27.0.24 pins skip-original patched counters and exact restored counters")
 require("MONOMOD_DMD_TYPE" not in step27_source + build_ios_text + test_script_text + project_text, "Step 27.0.24 does not force a MonoMod DMD backend override")
 require("STEP-27.0.23-PHYSICAL-NOTIMPLEMENTED-PATCHENGINE.txt" in read("docs/CURRENT-STATUS.md") and "STEP-27.0.24-POST-PUBLISH-INTERPRETED-PATCH-EXPERIMENT.md" in read("docs/history/INDEX.md"), "active status/history index preserve the physical 0.0.107 evidence and final interpreted decision experiment")
-require(sha256(ROOT / "docs/MASTER-PLAN.md") == "a0dcd92c2b1d5670cc4f9bece8ce6f0e27533bbd9a858a95a40ef9c9df6668ea", "Step 27.0.24 leaves the 0.0.107 copy/no-link master plan byte-for-byte unchanged pending the physical decision")
+master_after_step27 = read("docs/MASTER-PLAN.md")
+require("physical Step 27.0.24 / 0.0.108" in master_after_step27 and "closed runtime Harmony/MonoMod replacement as a negative architecture result" in master_after_step27 and "deterministic ahead-of-load managed transformation" in master_after_step27, "master plan records the physical Step-27 negative architecture decision and Step-28 ahead-of-load pivot")
 
 step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
 require(step27_manifest.is_file(), "Step 27 candidate boundary hash manifest exists")
 if step27_manifest.is_file():
+    # Step 27 is now a physically closed negative architecture experiment. Keep its implementation,
+    # tests, framework-preservation evidence, UI/report surface, and fixture byte-pinned, but permit the
+    # active release/version/build wiring to advance to Step 28.
+    superseded_step27_release_wiring = {
+        "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.cs",
+        "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
+        "src/StS2Launcher.iOS/Info.plist",
+        "scripts/build-ios.sh",
+        "scripts/lib/current-release.sh",
+        "scripts/test.sh",
+        "scripts/codemagic.sh",
+        "scripts/verify-ipa.sh",
+        "codemagic.yaml",
+    }
     step27_mismatches: list[str] = []
     for line in step27_manifest.read_text().splitlines():
         if not line.strip():
             continue
         digest, relative = line.split("  ", 1)
+        if relative in superseded_step27_release_wiring:
+            continue
         path = ROOT / relative
         if not path.is_file() or sha256(path) != digest:
             step27_mismatches.append(relative)
-    require(not step27_mismatches, "Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned", ", ".join(step27_mismatches))
+    require(not step27_mismatches, "physically closed Step-27 implementation/evidence remains hash-pinned while active release wiring advances to Step 28", ", ".join(step27_mismatches))
+
+# Step 28.0 — deterministic ahead-of-load Cecil transformation before CLR admission.
+step28_source_path = ROOT / "src/StS2Launcher.Core/Compatibility/AheadOfLoadManagedTransformation.cs"
+step28_gate_path = ROOT / "src/StS2Launcher.Core/Compatibility/AheadOfLoadManagedTransformationGate.cs"
+step28_summary_path = ROOT / "src/StS2Launcher.Core/Compatibility/AheadOfLoadManagedTransformationSummary.cs"
+step28_fixture_project = ROOT / "fixtures/StS2Launcher.Step28.AheadOfLoadFixture/StS2Launcher.Step28.AheadOfLoadFixture.csproj"
+step28_fixture_source_path = ROOT / "fixtures/StS2Launcher.Step28.AheadOfLoadFixture/AheadOfLoadRewriteProbe.cs"
+step28_tests_path = ROOT / "tests/StS2Launcher.Core.Tests/Compatibility/AheadOfLoadManagedTransformationTests.cs"
+step28_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.AheadOfLoadTransformation.cs"
+for path, label in [
+    (step28_source_path, "Step 28 core transformation implementation"),
+    (step28_gate_path, "Step 28 gate enum"),
+    (step28_summary_path, "Step 28 summary"),
+    (step28_fixture_project, "Step 28 post-publish fixture project"),
+    (step28_fixture_source_path, "Step 28 post-publish fixture source"),
+    (step28_tests_path, "Step 28 host regression tests"),
+    (step28_ui_path, "Step 28 iOS UI/report surface"),
+]:
+    require(path.is_file(), f"{label} exists")
+
+step28_source = step28_source_path.read_text() if step28_source_path.is_file() else ""
+step28_gate = step28_gate_path.read_text() if step28_gate_path.is_file() else ""
+step28_summary = step28_summary_path.read_text() if step28_summary_path.is_file() else ""
+step28_fixture_source = step28_fixture_source_path.read_text() if step28_fixture_source_path.is_file() else ""
+step28_tests = step28_tests_path.read_text() if step28_tests_path.is_file() else ""
+step28_ui = step28_ui_path.read_text() if step28_ui_path.is_file() else ""
+require(all(marker in step28_gate for marker in ["FixtureAdmissionAndOfflineReady = 1", "DeterministicRewrite = 2", "TransformedImageVerification = 3", "TransformedExecution = 4", "FinalIsolationAudit = 5"]), "Step 28.0 exposes exactly the five intended architecture-proof gates")
+require("5/5" in step28_summary and "Gates.Count}/5" in step28_summary, "Step 28 summary closes only on five-of-five gate completion")
+require(all(marker in step28_fixture_source for marker in ["public static int Adjustment() => 1;", "public static int Target(int value) => value + Adjustment();", "public static int InvokeTarget(int value) => Target(value);"]), "Step 28 fixture pins baseline adjustment plus direct Target/InvokeTarget call chain")
+require("StS2Launcher.Step28.AheadOfLoadFixture" not in project_text, "Step 28 fixture remains absent from the iOS MSBuild/AOT graph")
+require('ProjectReference Include="../../fixtures/StS2Launcher.Step28.AheadOfLoadFixture' not in test_project_text, "Step 28 fixture is not a host-test ProjectReference")
+require("instructions[0].OpCode = Mono.Cecil.Cil.OpCodes.Ldc_I4" in step28_source and "instructions[0].Operand = TransformedAdjustment" in step28_source and step28_source.count("instructions[0].Operand = TransformedAdjustment") == 1, "Step 28 performs one exact Cecil semantic rewrite on the private image")
+require("context.LoadFromStream(stream)" in step28_source and step28_source.count("context.LoadFromStream(stream)") == 1, "Step 28 admits exactly the verified transformed image into its private CLR context")
+require("BaselineAdjustment = 1" in step28_source and "TransformedAdjustment = 1000" in step28_source and "TransformedExpectedResult = 1041" in step28_source, "Step 28 pins deterministic baseline/transformed semantics")
+require("HarmonyLib." not in step28_source and "PatchProcessor" not in step28_source and "MonoMod." not in step28_source, "Step 28 production boundary does not invoke or bind the retired Harmony/MonoMod runtime patch engine")
+require("Real StS2" in step28_source and "reflected or invoked: NO" in step28_source, "Step 28 explicitly keeps real StS2 behavior outside the first architecture-proof boundary")
+require("Step28AheadOfLoadFixture" in build_ios_text and "STEP28_AHEAD_OF_LOAD_FIXTURE_PROJECT" in build_ios_text and 'dotnet build "$STEP28_AHEAD_OF_LOAD_FIXTURE_PROJECT"' in build_ios_text, "iOS build separately compiles the Step-28 fixture outside the app graph")
+require('cp "$STEP28_AHEAD_OF_LOAD_FIXTURE_DLL" "$APP/Step28AheadOfLoadFixture/StS2Launcher.Step28.AheadOfLoadFixture.dll"' in build_ios_text and build_ios_text.index('dotnet publish "$PROJECT"') < build_ios_text.index('cp "$STEP28_AHEAD_OF_LOAD_FIXTURE_DLL" "$APP/Step28AheadOfLoadFixture/StS2Launcher.Step28.AheadOfLoadFixture.dll"'), "Step 28 fixture enters the .app only after iOS publish completes")
+require("STEP28_BUNDLED_COUNT" in verify_ipa_text and '[[ "$STEP28_BUNDLED_COUNT" == "1" ]]' in verify_ipa_text and "step28-ahead-of-load-fixture.sha256" in verify_ipa_text and 'cmp -s "$STEP28_FIXTURE_SOURCE" "$STEP28_FIXTURE"' in verify_ipa_text, "IPA verifier requires one byte-identical hash-pinned Step-28 data-only fixture")
+require("STS2_STEP28_AHEAD_OF_LOAD_FIXTURE_ROOT" in test_script_text and "STEP28_AHEAD_OF_LOAD_PROJECT" in test_script_text, "host runner separately builds and exports the Step-28 fixture root")
+require("VerifiedSourceIsRewrittenBeforeLoadAndOnlyTransformedBehaviorExecutes" in step28_tests and "STS2_STEP28_AHEAD_OF_LOAD_FIXTURE_ROOT" in step28_tests, "host regressions exercise transformed semantics through both reflection and in-fixture direct-call paths")
+require("Step28-AheadOfLoadManagedTransformation.txt" in step28_ui and "AheadOfLoadManagedTransformation" in step28_ui, "iOS UI persists the dedicated Step-28 physical report")
+
+step28_manifest = ROOT / "tools/validation/candidate-step28-ahead-of-load-boundary.sha256"
+require(step28_manifest.is_file(), "Step 28 candidate boundary hash manifest exists")
+if step28_manifest.is_file():
+    step28_mismatches: list[str] = []
+    for line in step28_manifest.read_text().splitlines():
+        if not line.strip():
+            continue
+        digest, relative = line.split("  ", 1)
+        path = ROOT / relative
+        if not path.is_file() or sha256(path) != digest:
+            step28_mismatches.append(relative)
+    require(not step28_mismatches, "Step 28 candidate implementation, release wiring, and architecture docs are hash-pinned", ", ".join(step28_mismatches))
 
 # ---------------------------------------------------------------------------
 # Documentation model
@@ -1098,6 +1171,9 @@ if step27_manifest.is_file():
 required_docs = [
     "README.md", "docs/README.md", "docs/MASTER-PLAN.md", "docs/CURRENT-STATUS.md", "docs/ARCHITECTURE.md",
     "docs/TESTING.md", "docs/REGRESSION-CONTRACTS.md", "docs/REPORTS.md", "docs/RELEASE-CHECKLIST.md", "docs/history/INDEX.md",
+    "docs/history/steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md",
+    "docs/history/steps/STEP-28-AHEAD-OF-LOAD-MANAGED-TRANSFORMATION.md",
+    "docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt",
     "docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md",
     "docs/history/steps/STEP-22.4.2-STEP19-REGRESSION-CONTRACT-CORRECTION.md",
     "docs/history/steps/STEP-23-FIRST-REAL-CLR-LOAD.md",
@@ -1241,17 +1317,21 @@ step27_build107_report = read("docs/history/reports/STEP-27.0.23-PHYSICAL-NOTIMP
 require("App version: 0.0.107 (107)" in step27_build107_report and "CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 19/26" in step27_build107_report and "Gate T — PatchEngineExecution: FAIL" in step27_build107_report, "physical build 107 evidence preserves the exact 19/26 Gate-T result under copy/no-link")
 require("System.NotImplementedException: Arg_NotImplementedException" in step27_build107_report and "at HarmonyLib.PatchFunctions.UpdateWrapper" in step27_build107_report and "at HarmonyLib.PatchProcessor.Patch" in step27_build107_report, "physical build 107 proves trimming ambiguity is gone and localizes the next blocker to real Patch() execution")
 require("System.Linq.Enumerable.Union" not in step27_build107_report[step27_build107_report.index("Gate T — PatchEngineExecution: FAIL"): ] and "System.Diagnostics.DebuggableAttribute" not in step27_build107_report[step27_build107_report.index("Gate T — PatchEngineExecution: FAIL"): ], "physical build 107 Gate-T failure is no longer either known trimmed-framework-member failure")
+regression_contracts = read("docs/REGRESSION-CONTRACTS.md")
+require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in regression_contracts and "runtime Harmony/MonoMod method replacement is therefore retired" in regression_contracts, "regression contracts preserve the decisive Step-27 negative physical result and retire runtime patching")
+require("## Step 28 — ahead-of-load managed transformation" in regression_contracts and "Target(41)==1041" in regression_contracts and "loads only the verified transformed bytes" in regression_contracts and "real StS2 member reflection/transformation/invocation" in regression_contracts, "regression contracts define the five-gate Step-28 transform-before-load capability boundary")
+
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.105 (105)" in current_status and "System.Linq.Enumerable.Union" in current_status and "0.0.106 (106)" in current_status and "DebuggableAttribute" in current_status and "0.0.107 (107)" in current_status and "NotImplementedException" in current_status and "PatchFunctions.UpdateWrapper" in current_status and "Step 27.0.24 / 0.0.108 (108)" in current_status and "post-publish interpreted" in current_status and "MtouchLink=None" in current_status and "TrimMode=copy" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and ("Step 28" in current_status or "Step-28" in current_status), "current status records the physical 0.0.107 patch-engine failure and advances to the single Step 27.0.24 interpreted decision experiment")
+require("Steps 01–26" in current_status and "0.0.107 (107)" in current_status and "Physical 0.0.108 result" in current_status and "0.0.108 (108)" in current_status and "19/26" in current_status and "post-publish interpreted" in current_status and "PatchFunctions.UpdateWrapper" in current_status and "negative" in current_status.lower() and "Step 28.0 / 0.0.109 (109)" in current_status and "ahead-of-load" in current_status.lower() and "MtouchLink=None" in current_status and "TrimMode=copy" in current_status and "5/5 PASS" in current_status and "Step28-AheadOfLoadManagedTransformation.txt" in current_status, "current status closes Step 27 negatively on physical 0.0.108 and advances to the five-gate Step-28 ahead-of-load architecture proof")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
     require(heading in master, f"master plan contains durable section: {heading}")
 require("docs/CURRENT-STATUS.md" in master and "docs/REGRESSION-CONTRACTS.md" in master and "docs/history/INDEX.md" in master, "master plan defines self-contained resumption path")
-require("Step 23 closed the first-real-load boundary" in master and "Step 24 physically closed the first known automatic-initialization boundary" in master and "Step 25 physically closed exact `HarmonyLib.Harmony` API resolution" in master and "Step 26 physically closed exact `Harmony.CreateProcessor(MethodBase)`" in master and "first real Harmony replacement on launcher-owned deterministic probes" in master and "MtouchLink=None" in master and "TrimMode=copy" in master, "master plan advances durable roadmap through Step 26 and records the copy/no-link correction before continuing the launcher-owned replacement frontier")
+require("Step 23" in master and "Steps 24–26" in master and "physical 0.0.108" in master and "closed runtime Harmony/MonoMod replacement as a negative architecture result" in master and "MtouchLink=None" in master and "TrimMode=copy" in master and "ahead-of-load managed transformation" in master, "master plan preserves the proven managed-runtime chain, records the Step-27 negative decision, and advances the Step-28 ahead-of-load frontier")
 require("several adjacent sequential gates" in master and "saves build/device cycles" in master, "master plan codifies gate batching for speed without losing discrete proof")
 require("https://github.com/Ekyso/StS2-Launcher" in master and "https://github.com/SocialHummingbird/StS2-Launcher-Overhaul" in master and "advisory references only" in master, "master plan records both Android StS2 reference implementations as advisory/non-authoritative inputs")
-require("MtouchLink=None" in master and "TrimMode=copy" in master and "publish-time trimming failures" in master and "Harmony remains on trial" in master, "master plan records the dynamic-payload copy/no-link architecture revision without prematurely pivoting from Harmony")
+require("MtouchLink=None" in master and "TrimMode=copy" in master and "publish-time trimming failures" in master and "runtime Harmony/MonoMod method replacement is **not** an active" in master and "deterministic ahead-of-load" in master, "master plan records both the copy/no-link dynamic-payload correction and the physically justified retirement of runtime Harmony replacement")
 require("global `TrimMode=full`" not in master, "master plan no longer protects the disproven full-trim dynamic-payload policy")
 
 top_level_step_docs = [p.name for p in (ROOT / "docs").glob("STEP-*.md")]
@@ -1267,17 +1347,18 @@ require(any(name.startswith("STEP-23") for name in history_names), "Step 23 desi
 require(any(name.startswith("STEP-24") for name in history_names), "Step 24 design/candidate/closure records are present")
 require(any(name.startswith("STEP-25") for name in history_names), "Step 25 design/candidate/closure records are present")
 require(any(name.startswith("STEP-26") for name in history_names), "Step 26 design/closure records are present")
-require(any(name.startswith("STEP-27") for name in history_names), "Step 27 design/candidate record is present")
+require(any(name.startswith("STEP-27") for name in history_names), "Step 27 design/candidate/negative-closure record is present")
+require(any(name.startswith("STEP-28") for name in history_names), "Step 28 ahead-of-load design record is present")
 require(len(history_steps) >= 60, "historical documentation set is comprehensive", f"count={len(history_steps)}")
 
 # ---------------------------------------------------------------------------
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-27:" in codemagic, "Codemagic exposes the Step 27 workflow")
-require("Step 27 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 27")
-require("LogFileName=step27.trx" in read("scripts/test.sh") and "artifacts/test-results/step27.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 27")
-require("Step 27 Controlled Launcher-Owned Harmony Patch + Unpatch Boundary build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 27")
+require("ios-step-28:" in codemagic, "Codemagic exposes the Step 28 workflow")
+require("Step 28 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 28")
+require("LogFileName=step28.trx" in read("scripts/test.sh") and "artifacts/test-results/step28.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 28")
+require("Step 28 Ahead-of-Load Managed Transformation build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 28")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")

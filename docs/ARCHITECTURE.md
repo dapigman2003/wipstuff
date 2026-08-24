@@ -10,9 +10,9 @@ Platform-neutral logic. Subsystems:
 
 - `Foundation` — state/controller/foundation primitives;
 - `Steam` — authentication, ownership, content, download, install/update/repair, offline state;
-- `Compatibility` — Cecil preparation/analysis/rewrite boundaries;
+- `Compatibility` — Cecil preparation/analysis/rewrite boundaries, including the active Step-28 ahead-of-load transformation pipeline;
 - `Godot` — managed gate model for the source-built Godot host;
-- `Runtime` — dynamic managed execution, runtime binding/framework closure, the physically proven first real game assembly load boundary, the physically proven controlled dependency-initialization boundary, and the active bounded Harmony patch/unpatch decision boundary;
+- `Runtime` — dynamic managed execution, runtime binding/framework closure, the physically proven first real game assembly load boundary, physically proven controlled dependency/Harmony initialization boundaries, and the preserved closed-negative Step-27 Harmony patch experiment;
 - `Diagnostics` — shareable report infrastructure.
 
 ### `src/StS2Launcher.iOS`
@@ -79,6 +79,6 @@ The canonicalization does not change:
 - Files-based diagnostic sharing;
 - the Step 23 rule that real StS2 CLR loading occurs only in the explicit dedicated private load subsystem;
 - initializer-bearing prepared dependencies remain excluded until an explicit controlled-initialization boundary admits a measured exact identity; Step 24 physically proved that exact admission and module-constructor completion for `0Harmony 2.4.2.0`;
-- strict managed-plan resolution and native-load refusal remain in force while crossing controlled Harmony boundaries; Step 25 physically proved the exact measured Harmony API/type-initializer surface and one inert Harmony object, and Step 26 physically proved the exact `CreateProcessor(MethodBase)` / `PatchProcessor` surface, measured PatchProcessor type initializer, launcher-owned inert target `MethodInfo`, and one empty processor object without replacement. Step 27 characterizes actual patch/unpatch execution only on launcher-owned deterministic probes. Its final representative probe is a dedicated DLL copied into the app only after iOS publish, then loaded into the private context so the target/prefix execute as post-publish managed IL rather than as build-time AOT launcher code. Failure of that single interpreted probe ends Harmony-internal iteration and moves Step 28 to ahead-of-load IL transformation; StS2 member reflection/patching/invocation, Godot/game startup, and native game loading remain later boundaries.
+- strict managed-plan resolution and native-load refusal remain in force across managed runtime boundaries. Steps 25–26 physically proved inert Harmony/PatchProcessor admission, while physical Step 27.0.24 / 0.0.108 closed runtime Harmony replacement negatively: the final representative post-publish interpreted target still failed at public `PatchProcessor.Patch()` with `NotImplementedException` from `PatchFunctions.UpdateWrapper`. Step 28 therefore moves behavior-changing compatibility work into `Compatibility`: verified immutable source -> private clone -> deterministic Cecil transformation before CLR load -> transformed-image verification -> transformed-only private runtime admission. StS2 member transformation/invocation, Godot/game startup, and native game loading remain later separately gated boundaries.
 
 See `MASTER-PLAN.md` for rationale and roadmap.

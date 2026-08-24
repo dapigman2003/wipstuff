@@ -1,6 +1,6 @@
 workflows:
-  ios-step-27:
-    name: Step 27 - Controlled Launcher-Owned Harmony Patch + Unpatch
+  ios-step-28:
+    name: Step 28 - Ahead-of-Load Managed Transformation
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -16,14 +16,14 @@ workflows:
         - $HOME/.cache/sts2launcher/godot-step15
 
     scripts:
-      - name: Validate, test, build, and verify Step 27
+      - name: Validate, test, build, and verify Step 28
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-27.ipa
+      - artifacts/StS2-Launcher-Step-28.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**

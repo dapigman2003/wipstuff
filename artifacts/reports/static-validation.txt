@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-24T17:30:04Z
+UTC: 2026-08-24T21:13:50Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.108.work/project
-PASS: all 9 project/props/targets XML files parse
+StS2 Launcher — Step 28 ahead-of-load managed transformation static validation
+Root: /mnt/data/sts2_work/StS2Launcher-Step27-0.0.108
+PASS: all 10 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 195 C# files
+PASS: lexical delimiter scan passes for 204 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 108
-PASS: display version is 0.0.108
-PASS: Info.plist build version is 108
-PASS: Info.plist display version is 0.0.108
+PASS: build version is 109
+PASS: display version is 0.0.109
+PASS: Info.plist build version is 109
+PASS: Info.plist display version is 0.0.109
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.24 candidate
-PASS: top launcher banner records physical 0.0.107 and scopes the single interpreted stop-rule decision experiment
+PASS: top launcher banner identifies active Step 28.0 candidate
+PASS: top launcher banner records physical Step-27 negative closure and scopes the Step-28 ahead-of-load pivot
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 27.0.24 source pins expected bundle release identity
+PASS: Step 28.0 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -45,7 +45,7 @@ PASS: dynamic-payload host disables managed trimming with copy/no-link policy
 PASS: Step 20 interpreter policy retained
 PASS: build guard rejects broad UseInterpreter=true
 PASS: build guard rejects NativeAOT
-PASS: runtime policy emits Step 27 build telemetry
+PASS: runtime policy emits Step 28 build telemetry
 PASS: dynamic-payload trimming policy emits exact build telemetry
 PASS: build guards reject drift from copy/no-link host policy
 PASS: all 22 physically proven Step 22 direct host roots remain rooted
@@ -55,9 +55,9 @@ PASS: physically proven Step 24.0.6 System.Collections.Concurrent preservation r
 PASS: historical Step 27.0.22 System.Linq preservation root remains recorded exactly once
 PASS: measured historical root descriptor set remains byte-bounded while copy/no-link supersedes it for preservation
 PASS: physically proven Step 24 preservation root is documented as protected platform policy
-PASS: Step 27 build telemetry identifies the physically proven framework preservation root
+PASS: Step 28 build telemetry retains the physically proven framework preservation root
 PASS: build telemetry explicitly marks the System.Linq root as historical under copy/no-link
-PASS: Step 27 build telemetry identifies the physically proven Harmony-constructor framework preservation surface
+PASS: Step 28 build telemetry retains the physically proven Harmony-constructor surface as historical evidence
 PASS: Step 25 does not broaden trimming by rooting System.Private.CoreLib
 PASS: Step 25 bounded Harmony-constructor framework preservation anchor exists
 PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Environment)
@@ -73,7 +73,7 @@ PASS: Step 25 candidate preservation is bounded to exactly nine measured framewo
 PASS: Step 25 preservation anchor is metadata-only and executes no probe
 PASS: Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files
 PASS: iOS publish requires exact copy/no-link dynamic-payload telemetry
-PASS: iOS publish requires Step 27 proven preservation telemetry
+PASS: iOS publish retains historical Harmony-constructor preservation telemetry
 PASS: DiskArbitration-only linker framework filter remains present
 PASS: all 97 physically proven Step 22.2 Core source files are retained
 PASS: 96 baseline Step 22.2 Core behavior files remain byte-for-byte unchanged and the one approved Step 19 regression delta is exact
@@ -600,7 +600,7 @@ PASS: Step 27 roots the AccessTools DynamicDependency preservation anchor from c
 PASS: Step 27.0.8 retains only the bounded patch-engine Reflection.Emit/MethodHandle framework surface
 PASS: Step 27.0.8 does not broaden preservation to a Reflection.Emit assembly root
 PASS: Step 27 roots the bounded patch-engine DynamicDependency preservation anchor from candidate-owned UI
-PASS: build telemetry declares the candidate patch-engine preservation anchor
+PASS: build telemetry records the retired Step-27 patch-engine preservation anchor as historical evidence
 PASS: Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight
 PASS: Step 27 Gate O pins the physical RuntimeInformation Type.GetType operands and ReaderWriterLockSlim SupportsRecursion operand semantically
 PASS: Step 27 Gate O pins the exact shared-state/replacement/detour/update patch-engine chain
@@ -635,9 +635,34 @@ PASS: baseline/patched/restored gates each exercise direct target reflection plu
 PASS: Step 27.0.24 pins skip-original patched counters and exact restored counters
 PASS: Step 27.0.24 does not force a MonoMod DMD backend override
 PASS: active status/history index preserve the physical 0.0.107 evidence and final interpreted decision experiment
-PASS: Step 27.0.24 leaves the 0.0.107 copy/no-link master plan byte-for-byte unchanged pending the physical decision
+PASS: master plan records the physical Step-27 negative architecture decision and Step-28 ahead-of-load pivot
 PASS: Step 27 candidate boundary hash manifest exists
-PASS: Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned
+PASS: physically closed Step-27 implementation/evidence remains hash-pinned while active release wiring advances to Step 28
+PASS: Step 28 core transformation implementation exists
+PASS: Step 28 gate enum exists
+PASS: Step 28 summary exists
+PASS: Step 28 post-publish fixture project exists
+PASS: Step 28 post-publish fixture source exists
+PASS: Step 28 host regression tests exists
+PASS: Step 28 iOS UI/report surface exists
+PASS: Step 28.0 exposes exactly the five intended architecture-proof gates
+PASS: Step 28 summary closes only on five-of-five gate completion
+PASS: Step 28 fixture pins baseline adjustment plus direct Target/InvokeTarget call chain
+PASS: Step 28 fixture remains absent from the iOS MSBuild/AOT graph
+PASS: Step 28 fixture is not a host-test ProjectReference
+PASS: Step 28 performs one exact Cecil semantic rewrite on the private image
+PASS: Step 28 admits exactly the verified transformed image into its private CLR context
+PASS: Step 28 pins deterministic baseline/transformed semantics
+PASS: Step 28 production boundary does not invoke or bind the retired Harmony/MonoMod runtime patch engine
+PASS: Step 28 explicitly keeps real StS2 behavior outside the first architecture-proof boundary
+PASS: iOS build separately compiles the Step-28 fixture outside the app graph
+PASS: Step 28 fixture enters the .app only after iOS publish completes
+PASS: IPA verifier requires one byte-identical hash-pinned Step-28 data-only fixture
+PASS: host runner separately builds and exports the Step-28 fixture root
+PASS: host regressions exercise transformed semantics through both reflection and in-fixture direct-call paths
+PASS: iOS UI persists the dedicated Step-28 physical report
+PASS: Step 28 candidate boundary hash manifest exists
+PASS: Step 28 candidate implementation, release wiring, and architecture docs are hash-pinned
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -648,6 +673,9 @@ PASS: authoritative documentation exists: docs/REGRESSION-CONTRACTS.md
 PASS: authoritative documentation exists: docs/REPORTS.md
 PASS: authoritative documentation exists: docs/RELEASE-CHECKLIST.md
 PASS: authoritative documentation exists: docs/history/INDEX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-28-AHEAD-OF-LOAD-MANAGED-TRANSFORMATION.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-22.4.2-STEP19-REGRESSION-CONTRACT-CORRECTION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-23-FIRST-REAL-CLR-LOAD.md
@@ -763,7 +791,9 @@ PASS: physical build 106 still does not establish actual MonoMod detour executio
 PASS: physical build 107 evidence preserves the exact 19/26 Gate-T result under copy/no-link
 PASS: physical build 107 proves trimming ambiguity is gone and localizes the next blocker to real Patch() execution
 PASS: physical build 107 Gate-T failure is no longer either known trimmed-framework-member failure
-PASS: current status records the physical 0.0.107 patch-engine failure and advances to the single Step 27.0.24 interpreted decision experiment
+PASS: regression contracts preserve the decisive Step-27 negative physical result and retire runtime patching
+PASS: regression contracts define the five-gate Step-28 transform-before-load capability boundary
+PASS: current status closes Step 27 negatively on physical 0.0.108 and advances to the five-gate Step-28 ahead-of-load architecture proof
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -772,10 +802,10 @@ PASS: master plan contains durable section: Major roadmap
 PASS: master plan contains durable section: Definition of a closed step
 PASS: master plan contains durable section: Resumption rule
 PASS: master plan defines self-contained resumption path
-PASS: master plan advances durable roadmap through Step 26 and records the copy/no-link correction before continuing the launcher-owned replacement frontier
+PASS: master plan preserves the proven managed-runtime chain, records the Step-27 negative decision, and advances the Step-28 ahead-of-load frontier
 PASS: master plan codifies gate batching for speed without losing discrete proof
 PASS: master plan records both Android StS2 reference implementations as advisory/non-authoritative inputs
-PASS: master plan records the dynamic-payload copy/no-link architecture revision without prematurely pivoting from Harmony
+PASS: master plan records both the copy/no-link dynamic-payload correction and the physically justified retirement of runtime Harmony replacement
 PASS: master plan no longer protects the disproven full-trim dynamic-payload policy
 PASS: top-level docs are durable/current; step records live under docs/history/steps
 PASS: readable historical documentation retained for Step 01
@@ -810,12 +840,13 @@ PASS: Step 23 design/test/closure records are present
 PASS: Step 24 design/candidate/closure records are present
 PASS: Step 25 design/candidate/closure records are present
 PASS: Step 26 design/closure records are present
-PASS: Step 27 design/candidate record is present
+PASS: Step 27 design/candidate/negative-closure record is present
+PASS: Step 28 ahead-of-load design record is present
 PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes the Step 27 workflow
-PASS: host-test report heading identifies Step 27
-PASS: host-test TRX artifact identifies Step 27
-PASS: Codemagic build-environment report heading identifies Step 27
+PASS: Codemagic exposes the Step 28 workflow
+PASS: host-test report heading identifies Step 28
+PASS: host-test TRX artifact identifies Step 28
+PASS: Codemagic build-environment report heading identifies Step 28
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: Codemagic workflow has no history dependency
@@ -828,4 +859,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 814 checks
+VALIDATION PASS: 845 checks
