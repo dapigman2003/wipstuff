@@ -68,14 +68,14 @@ Historical wrappers are optional reference data inside `history.zip` and are nev
 
 The canonicalization does not change:
 
-- full trimming;
+- dynamic-payload-compatible iOS host preservation: `MtouchLink=None` + `TrimMode=copy` (managed trimming disabled);
 - SteamKit/protobuf roots and iOS build-only patch;
 - DiskArbitration linker filtering;
 - Godot 4.5.1 source/native link policy;
 - Mono.Cecil 0.11.6 behavior;
 - `MtouchInterpreter=-all`;
-- the exact measured 22 Step 22 direct framework roots;
-- the separately classified `System.Collections.Concurrent` preservation root is physically proven by Step 24.0.6 for the post-publish MonoMod/Harmony initialization path. It remains distinct from the exact Step-22 22-root direct framework set;
+- the exact measured 22 Step 22 direct framework identities remain the proven binding frontier; their TrimmerRootAssembly descriptors are retained as historical/protection evidence but are not relied upon while copy/no-link is active;
+- the separately classified `System.Collections.Concurrent` and later `System.Linq` roots remain physical evidence of why trimming was unsafe for post-publish payloads; copy/no-link supersedes them as the active preservation mechanism;
 - Files-based diagnostic sharing;
 - the Step 23 rule that real StS2 CLR loading occurs only in the explicit dedicated private load subsystem;
 - initializer-bearing prepared dependencies remain excluded until an explicit controlled-initialization boundary admits a measured exact identity; Step 24 physically proved that exact admission and module-constructor completion for `0Harmony 2.4.2.0`;

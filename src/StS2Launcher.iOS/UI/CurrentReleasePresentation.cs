@@ -10,23 +10,23 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.22 — POST-PUBLISH SYSTEM.LINQ FRAMEWORK PRESERVATION";
+        "STEP 27.0.23 — DYNAMIC PAYLOAD NO-TRIM HOST POLICY";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.105 PROVED RAW HARMONYSHAREDSTATE NORMALIZATION • T7 REACHED • SYSTEM.LINQ MEMBER TRIM IDENTIFIED";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.106 PASSED LINQ CLOSURE • DYNAMICMETHODDEFINITION REACHED • DEBUGGABLEATTRIBUTE TRIM IDENTIFIED";
 
     public const string Summary =
-        "Physical 0.0.105 proved the raw PE HarmonySharedState normalization on-device and advanced Gate T into the first public PatchProcessor.Patch() call. Patch() then threw a managed MissingMethodException before replacement generation completed because the post-publish 0Harmony MethodCreator called System.Linq.Enumerable.Union<T>, which full trimming had removed from the host framework surface. Step 27.0.22 treats this as a dynamic-payload linker contract, not a Harmony detour failure: System.Linq is now an explicit TrimmerRootAssembly, and Gate T performs an exact Select/Union/ToDictionary callable-surface preflight after T6 and before T7. The master plan and runtime Harmony normalization remain unchanged; no StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.106 proved the System.Linq root fixed the prior Union<T> blocker and advanced the first public PatchProcessor.Patch() call into Harmony MethodPatcherTools.CreateDynamicMethod. MonoMod.Utils.DynamicMethodDefinition then failed type initialization because full trimming had removed System.Diagnostics.DebuggableAttribute from the host framework surface. This is a second independent post-publish BCL trimming failure before PatchTools.DetourMethod. Step 27.0.23 therefore changes the host architecture from full trimming to the macios copy/no-link policy (MtouchLink=None + TrimMode=copy) so the dynamically loaded StS2/Harmony/mod world is not constrained by ILLink's publish-time visibility. Harmony patch execution itself is otherwise unchanged and remains on trial; no StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Physical 0.0.105 reached Gate T7 after the normalized HarmonySharedState cctor returned successfully, then PatchProcessor.Patch() failed in Harmony MethodCreator with MissingMethodException for Enumerable.Union<T>. Build 0.0.106 roots the complete System.Linq framework assembly for post-publish dynamic payload use and adds a pre-Patch LINQ member-closure check. If that closure passes, the next evidence will finally distinguish replacement-generation/dynamic-code behavior from the later MonoMod detour boundary.";
+        "Status: Steps 01–26 are physically closed. Physical 0.0.106 reached PatchProcessor.Patch() after the normalized HarmonySharedState cctor and the exact LINQ closure preflight, then failed in MonoMod.Utils.DynamicMethodDefinition type initialization because DebuggableAttribute had been trimmed from the host framework. Build 0.0.107 disables managed trimming with MtouchLink=None + TrimMode=copy while retaining MtouchInterpreter=-all and the exact same Harmony patch boundary. The next device run should distinguish another true runtime/dynamic-code limitation from the now-removed linker ambiguity.";
 
-    public const string ExpectedDisplayVersion = "0.0.106";
-    public const string ExpectedBuildVersion = "106";
+    public const string ExpectedDisplayVersion = "0.0.107";
+    public const string ExpectedBuildVersion = "107";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
     public const string GateTImplementationMarker =
-        "Gate-A raw PE method-body normalized HarmonySharedState cctor; System.Linq rooted for post-publish payload; T6a/T6b Select/Union/ToDictionary closure preflight; PatchProcessor.Patch() remains after T6";
+        "Gate-A raw PE method-body normalized HarmonySharedState cctor; host MtouchLink=None + TrimMode=copy dynamic-payload policy; T6a/T6b LINQ closure retained; PatchProcessor.Patch() unchanged after T6";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

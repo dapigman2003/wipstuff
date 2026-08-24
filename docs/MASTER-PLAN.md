@@ -99,19 +99,19 @@ These are architecture, not temporary step hacks:
 
 - target `net9.0-ios`, `ios-arm64`, minimum iOS 18;
 - bundle ID `com.community.sts2launcher`;
-- global `TrimMode=full`;
+- dynamic-payload-compatible iOS managed host: `MtouchLink=None` + `TrimMode=copy`, so framework/user assemblies shipped with the host are not member-trimmed before receipt-backed StS2/Harmony/mod assemblies arrive after publish;
 - SteamKit2 3.4.0;
 - Steam CM WebSocket transport;
 - dedicated `SocketsHttpHandler` only for the CM WebSocket purpose while WebAPI/CDN remain on platform-default HTTP handling;
-- trimmer roots `SteamKit2`, `protobuf-net`, `protobuf-net.Core`;
+- historical SteamKit/protobuf trimmer-root descriptors remain recorded, but copy/no-link is now the authoritative preservation mechanism for dynamic post-publish managed payload compatibility;
 - build-only SteamKit iOS `Process.StartTime` compatibility patch against an isolated NuGet copy;
 - remove only the generated `DiskArbitration` linker framework from the iOS link;
 - source-built Godot 4.5.1-stable iOS host with the proven native bridge/link policy;
 - Mono.Cecil 0.11.6 for controlled metadata/IL work;
 - `MtouchInterpreter=-all`, with broad `UseInterpreter=true` and NativeAOT prohibited;
-- the measured 22 direct host framework roots established by Step 22;
-- the separately classified `System.Collections.Concurrent` preservation root physically proven by Step 24 for post-publish MonoMod/Harmony initialization while full trimming remains enabled;
-- the bounded Step-25 `DynamicDependency` preservation anchor for framework types referenced by the physically measured `Harmony(string)` constructor IL, while full trimming and `MtouchInterpreter=-all` remain enabled;
+- the measured 22 direct host framework identities established by Step 22 remain the authoritative binding frontier; their root descriptors are retained as evidence, not as the complete member-preservation mechanism;
+- the separately classified `System.Collections.Concurrent` and `System.Linq` preservation failures/roots are retained as physical evidence that publish-time trimming is unsafe for the post-publish managed payload model;
+- the bounded Step-25 `DynamicDependency` preservation anchor remains historical/protection evidence for the measured `Harmony(string)` surface; `MtouchInterpreter=-all` remains enabled under the copy/no-link host policy;
 - iOS Files access enabled for shareable diagnostic reports;
 - no real StS2 assembly CLR load before the explicit first-load subsystem;
 - no initializer-bearing prepared dependency is admitted automatically outside an explicit controlled-initialization subsystem with a measured target and fail-closed resolver/native policy.
@@ -151,7 +151,7 @@ Load the prepared real `sts2.dll` into the private execution context with exact 
 
 ### Phase D — controlled managed initialization
 
-This is the active major phase. Step 24 physically closed the first known automatic-initialization boundary: exact `0Harmony 2.4.2.0` can enter the dedicated private context and complete its module constructor under strict managed-plan resolution/native refusal, with the separately measured `System.Collections.Concurrent` preservation root. Step 25 then physically closed exact `HarmonyLib.Harmony` API resolution, explicit Harmony type initialization, and one inert `Harmony(string)` object construction, including the bounded framework-surface preservation required by the post-publish constructor IL. Step 26 physically closed exact `Harmony.CreateProcessor(MethodBase)` / `HarmonyLib.PatchProcessor` admission, explicit PatchProcessor type initialization, launcher-owned inert target metadata resolution, and empty processor construction without method replacement. The active frontier is now first real Harmony replacement on launcher-owned deterministic probes, including explicit pre-patch audit, observed patched behavior, exact unpatch, and observed restoration before any StS2 member is reflected or patched. After that launcher-only patch-engine boundary is physically characterized, the next major sub-boundary is targeted StS2 member reflection without invocation or patching. Keep StS2 game-member invocation, broad game reflection, Godot/game startup, and native game loading separately gated. Identify AOT/reflection/Harmony/runtime-service issues with one causal class per subsystem.
+This is the active major phase. Step 24 physically closed the first known automatic-initialization boundary: exact `0Harmony 2.4.2.0` can enter the dedicated private context and complete its module constructor under strict managed-plan resolution/native refusal. Step 25 physically closed exact `HarmonyLib.Harmony` API resolution, explicit Harmony type initialization, and one inert `Harmony(string)` object construction. Step 26 physically closed exact `Harmony.CreateProcessor(MethodBase)` / `HarmonyLib.PatchProcessor` admission, explicit PatchProcessor type initialization, launcher-owned inert target metadata resolution, and empty processor construction without method replacement. Step 27 then proved the iOS-specific `HarmonySharedState` normalization but exposed two successive publish-time trimming failures inside the first real `PatchProcessor.Patch()` path (`Enumerable.Union<T>` followed by `DebuggableAttribute`) before MonoMod detouring. Because receipt-backed StS2/Harmony/mod assemblies arrive after publish and are invisible to ILLink, the host now uses `MtouchLink=None` + `TrimMode=copy` as an architectural dynamic-payload compatibility policy rather than expanding one framework root at a time. Harmony remains on trial: the active frontier is still first real Harmony replacement on launcher-owned deterministic probes, followed by exact unpatch/restoration, before any StS2 member is reflected or patched. A pivot to ahead-of-load patching is justified only by representative replacement/detour evidence after trimming ambiguity is removed. Keep StS2 game-member invocation, broad game reflection, Godot/game startup, and native game loading separately gated.
 
 ### Phase E — Godot/game integration
 
@@ -182,7 +182,7 @@ Startup time, memory, prepared-payload caching, deterministic repair/update migr
 - A diagnostic-only failure that intentionally reports readiness `NO` can still close a subsystem if that was the defined purpose, but runtime actions must honor the readiness state.
 - Avoid tests whose success depends on framework implementation details that are not actual consumer binding requirements.
 - Prefer proving host/platform behavior directly over rewriting copied desktop framework binaries.
-- Do not broaden roots, fallbacks, reflection preservation, native frameworks, or resolver search paths without measured evidence.
+- Do not re-enable trimming, broaden fallbacks/reflection preservation, add native frameworks, or widen resolver search paths without measured evidence and an explicit architecture review.
 
 ## Definition of a closed step
 

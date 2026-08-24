@@ -4,7 +4,9 @@
 
 Run `bash scripts/validate.sh`.
 
-For Step 27.0.22 / `0.0.106 (106)`, validation must retain every 0.0.105 raw-body normalization invariant and additionally prove the measured post-publish `System.Linq` framework-member preservation contract. `System.Linq` must be an exact `TrimmerRootAssembly` root, build telemetry must report it, and Gate T must perform T6a/T6b exact `Enumerable.Select` / two-sequence `Union` / three-selector `ToDictionary` signature checks after normalized shared-state validation and before the single public `PatchProcessor.Patch()` call.
+For Step 27.0.23 / `0.0.107 (107)`, validation must retain every 0.0.106 raw-body and LINQ-closure invariant while proving the new dynamic-payload host policy: `MtouchLink=None`, `TrimMode=copy`, and `MtouchInterpreter=-all`. Static validation must reject any return to `TrimMode=full` for this candidate and must keep the single public `PatchProcessor.Patch()` call in the same location after T6/T6a/T6b. The production Harmony normalizer is unchanged except for diagnostic wording.
+
+Physical 0.0.106 must be archived as evidence that the System.Linq root worked and that the next failure was `System.Diagnostics.DebuggableAttribute` during `MonoMod.Utils.DynamicMethodDefinition` type initialization, still before `PatchTools.DetourMethod`.
 
 The raw-body contract must require:
 
@@ -29,4 +31,4 @@ The complete 0.0.105 physical report is archived as evidence that raw-body Harmo
 
 ## Codemagic / physical run
 
-Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.106 (106)` from a fresh process. T6 is already physically crossed by 0.0.105; the new immediate proof is T6a/T6b confirming the linked host retains the exact Harmony LINQ surface. If that passes, T7/T8 may finally reach replacement generation and, potentially, the MonoMod detour boundary. Do not trigger the Step-28 pivot solely from a framework-member trimming failure.
+Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.107 (107)` from a fresh process. T6 and the LINQ preservation lesson are already physically established. The new proof is that the same `PatchProcessor.Patch()` path can initialize `DynamicMethodDefinition` and continue without another linker-induced missing BCL member. Only a failure after the copy/no-link policy has removed trimming ambiguity should influence the Harmony-versus-Step-28 decision.

@@ -73,7 +73,7 @@ set -e
 
 grep -Fq "$STS2_RUNTIME_POLICY_MARKER MtouchInterpreter=-all" "$PUBLISH_LOG" || { echo "ERROR: runtime-policy telemetry missing." >&2; exit 15; }
 grep -Fq "STEP27 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" "$PUBLISH_LOG" || { echo "ERROR: proven System.Collections.Concurrent preservation telemetry missing." >&2; exit 15; }
-grep -Fq "STEP27 CANDIDATE POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq" "$PUBLISH_LOG" || { echo "ERROR: Step 27 System.Linq dynamic-payload preservation telemetry missing." >&2; exit 15; }
+grep -Fq "STEP27 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" "$PUBLISH_LOG" || { echo "ERROR: Step 27 copy/no-link dynamic-payload trimming telemetry missing." >&2; exit 15; }
 grep -Fq "STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" "$PUBLISH_LOG" || { echo "ERROR: Step 27 Harmony-constructor framework-preservation telemetry missing." >&2; exit 15; }
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'UseInterpreter=true'; then echo "ERROR: broad UseInterpreter=true policy resolved." >&2; exit 15; fi
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'PublishAot=true'; then echo "ERROR: NativeAOT unexpectedly enabled." >&2; exit 15; fi

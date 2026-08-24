@@ -117,19 +117,23 @@ The correct conclusion is broader than “allow BindingFlags”: Cecil 0.11.6 wh
 
 ### 0.0.105 (105) — raw HarmonySharedState normalization physically succeeds; T7 exposes trimmed System.Linq member
 
-Physical Step 27.0.21 reached **Gate T / PatchEngineExecution** after the raw-PE normalized `HarmonySharedState::.cctor` completed successfully. Gate A reported a byte-distinct runtime image with direct `state` / `originals` / `originalsMono`, `actualVersion=102`, null `methodAddressRef`, no generated shared-state/FieldRef path, and no prepared/source/live mutation. Gates P/Q/R/S also passed.
+Physical Step 27.0.21 reached Gate T after the raw-PE normalized `HarmonySharedState::.cctor` completed successfully. Gate A reported a byte-distinct runtime image with direct `state` / `originals` / `originalsMono`, `actualVersion=102`, null `methodAddressRef`, no generated shared-state/FieldRef path, and no prepared/source/live mutation.
 
-The first public `PatchProcessor.Patch()` call then threw a normal managed exception:
+The first public `PatchProcessor.Patch()` call then threw `MissingMethodException` for `System.Linq.Enumerable.Union<T>`. The stack stopped in `HarmonyLib.MethodCreator..ctor -> PatchFunctions.UpdateWrapper -> PatchProcessor.Patch`, before `PatchTools.DetourMethod`. This established the first post-publish BCL member-trimming failure and did not satisfy the Harmony detour stop rule. The full report is preserved at `docs/history/reports/STEP-27.0.21-PHYSICAL-T7-SYSTEM-LINQ-TRIM-FAILURE.txt`.
 
-`System.MissingMethodException: Method not found: System.Linq.Enumerable.Union<T>(IEnumerable<T>, IEnumerable<T>)`
+### 0.0.106 (106) — System.Linq preservation works; DynamicMethodDefinition exposes second trim failure
 
-The stack is `HarmonyLib.MethodCreator..ctor -> HarmonyLib.PatchFunctions.UpdateWrapper -> HarmonyLib.PatchProcessor.Patch`. This means 0.0.105 did **not** prove a MonoMod native-detour failure: replacement construction stopped before `PatchTools.DetourMethod -> DetourFactory.Current.CreateDetour`. The physical report is preserved at `docs/history/reports/STEP-27.0.21-PHYSICAL-T7-SYSTEM-LINQ-TRIM-FAILURE.txt`.
+Physical Step 27.0.22 again reached **19/26 / Gate T**. The exact System.Linq preservation change did its job: the previous `Enumerable.Union<T>` failure disappeared and Harmony advanced into `HarmonyLib.MethodPatcherTools.CreateDynamicMethod`.
 
-The cause is now classified as post-publish dynamic-payload trimming. `0Harmony.dll` arrives only after iOS publish, so ILLink cannot see its framework calls. Step 22 proved that `System.Linq` can bind to the iOS host, but full trimming can still remove individual BCL members that no build-time launcher path roots. Gate O had already audited the immediately adjacent Harmony MethodCreator LINQ calls `Select`, two-sequence `Union`, and `ToDictionary`.
+`MonoMod.Utils.DynamicMethodDefinition` then failed type initialization with:
 
-This evidence means the existing detour stop rule is **not yet satisfied** and the master-plan Step-28 pivot is premature.
+`System.TypeLoadException: Could not resolve ... System.Diagnostics.DebuggableAttribute ... System.Runtime, Version=9.0.0.0`
 
-## Active candidate — Step 27.0.22 / 0.0.106 (106)
+The stack is `MethodPatcherTools.CreateDynamicMethod -> MethodCreatorConfig.Prepare -> MethodCreator..ctor -> PatchFunctions.UpdateWrapper -> PatchProcessor.Patch`. `PatchTools.DetourMethod -> DetourFactory.Current.CreateDetour` was still not reached. This is the second independent ordinary-framework trimming failure caused by the real Harmony/MonoMod payload arriving only after publish. The full report is preserved at `docs/history/reports/STEP-27.0.22-PHYSICAL-DYNAMICMETHODDEFINITION-DEBUGGABLEATTRIBUTE-TRIM-FAILURE.txt`.
+
+Two successive failures now establish that adding one framework root/member at a time is not an acceptable dynamic-plugin preservation architecture.
+
+## Active candidate — Step 27.0.23 / 0.0.107 (107)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -138,34 +142,29 @@ This evidence means the existing detour stop rule is **not yet satisfied** and t
 - Closed prerequisite: Step 26.0 + OfflineReady + Foundation 5/5
 - StS2 reflection/patching/invocation: **forbidden**
 
-### Dynamic-payload framework member preservation
+### Dynamic-payload no-trim host policy
 
-0.0.106 keeps the 0.0.105 production raw-PE Harmony normalizer and all Gate A–T ordering unchanged except for one new managed preflight between T6 and T7.
+0.0.107 changes the iOS host architecture from `TrimMode=full` to the macios copy/no-link policy:
 
-The iOS host now roots complete `System.Linq` with `TrimmerRootAssembly`. This is intentionally broader than a single `DynamicDependency` on `Union<T>`: the exact audited Harmony MethodCreator path immediately uses multiple LINQ operators, and the post-publish Harmony payload is unavailable to ILLink during publish. Rooting the assembly preserves its public/member implementation closure instead of iterating one trimmed operator at a time.
+- `MtouchLink=None`;
+- `TrimMode=copy`;
+- `MtouchInterpreter=-all` remains unchanged;
+- broad `UseInterpreter=true` and NativeAOT remain prohibited.
 
-All physically proven earlier roots remain unchanged, including the 22 Step-22 host roots and `System.Collections.Concurrent`. `TrimMode=full` and `MtouchInterpreter=-all` remain protected.
+The reason is architectural rather than Harmony-specific: the launcher's defining runtime model includes receipt-backed StS2/Harmony/mod assemblies that arrive only after publish, so ILLink cannot statically know their complete BCL/framework member usage. Physical 0.0.105 and 0.0.106 proved that framework assembly availability is not enough when member trimming remains active.
 
-### Gate T update
+The prior Step-22/24/27 TrimmerRootAssembly descriptors remain recorded as measured evidence and protection history, but 0.0.107 no longer relies on them as the complete preservation mechanism. No additional one-off `DebuggableAttribute` root is added.
 
-The physically proven T1–T6 path is retained exactly. After T6 validates normalized Harmony shared state:
+The production Harmony patch path is otherwise unchanged: raw-PE `HarmonySharedState` normalization, T6a/T6b LINQ closure, prefix descriptor, and the single public `PatchProcessor.Patch()` acceptance call stay in the same order.
 
-- **T6a** enters a host-only `System.Linq` callable-surface preflight.
-- **T6b** requires the exact public non-indexed `Enumerable.Select<TSource,TResult>`, two-sequence `Enumerable.Union<TSource>`, and three-selector `Enumerable.ToDictionary<TSource,TKey,TElement>` signatures used by the Gate-O-audited MethodCreator path. The preflight invokes none of those LINQ operators and does not invoke Harmony Patch or the launcher target.
-- **T7/T8** then invoke exactly one public `PatchProcessor.Patch()` as before.
+### Master-plan decision
 
-This converts the current failure class into an explicit gate: if the linked host still lacks one of those methods, Step 27 fails before Patch with a direct preservation diagnostic. If T6a/T6b pass and Patch then fails deeper in replacement generation or the MonoMod detour path, that new evidence determines whether the existing interpreted-fixture stop rule or a master-plan pivot is warranted.
-
-### Step-28 decision
-
-Do **not** revise `MASTER-PLAN.md` for 0.0.106. Physical 0.0.105 proves the HarmonySharedState workaround and identifies a framework trimming failure, not an iOS detour failure. The current master plan already says a pivot requires representative patch/detour evidence after T6. That condition remains open.
+`MASTER-PLAN.md` is revised for this candidate because global full trimming was previously a protected architecture policy and two physical failures now show that it conflicts with post-publish dynamic managed payloads. This is **not** a Step-28 patch-engine pivot. Harmony remains on trial until the same patch path reaches replacement generation and the actual MonoMod detour boundary without linker-induced missing framework members.
 
 ## Fresh-process rule
 
-**Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
-
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.106 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T raw-method-body normalization marker.
+**Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Preserve `Step27-CrashCheckpoint.txt` before another attempt after abrupt termination.
 
 ## Acceptance
 
-Codemagic must compile and run the complete host suite, pass iOS publish/IPA verification, and emit the exact candidate `System.Linq` root telemetry. Then install `0.0.106 (106)` and start Step 27 from a fresh process. T6a/T6b must prove the linked host retains the exact LINQ callable surface before T7/T8 re-enters `PatchProcessor.Patch()`. Full Step-27 acceptance remains A–Z **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. A Step-28 architecture pivot remains conditional on evidence from the actual replacement/detour path after framework closure, not on another trimming failure.
+Codemagic must compile/run the complete host suite, publish/verify the IPA, and emit the exact `MtouchLink=None; TrimMode=copy` telemetry. Install `0.0.107 (107)` and run Step 27 from a fresh process. Full acceptance remains A–Z **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. A Step-28 architecture pivot remains conditional on representative replacement/detour evidence after trimming ambiguity has been removed.

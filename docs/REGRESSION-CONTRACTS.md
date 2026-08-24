@@ -44,7 +44,7 @@ Step 20 regression remains authoritative for actual post-publish IL execution an
 
 The current contract remains:
 
-- exactly the measured 22 direct framework roots are preserved;
+- the measured 22 direct framework identities remain the authoritative binding frontier; under the current copy/no-link host policy all published framework members are preserved rather than relying on those roots for member survival;
 - Step 22 A–D pass;
 - explicit binding blockers are zero;
 - runtime closure readiness is YES;
@@ -60,7 +60,7 @@ Step 24.0.6 is physically closed. Its current regression contract is capability-
 - the exact physically measured automatic-initializer/conditional MonoMod logger policy remains fail-closed;
 - the dedicated private context may admit exact `0Harmony` only after the initializer-free Step-23 closure has been reproduced;
 - `RuntimeHelpers.RunModuleConstructor` completes;
-- the separately classified `System.Collections.Concurrent` preservation root remains present while `TrimMode=full` and `MtouchInterpreter=-all` remain unchanged;
+- the physically proven `System.Collections.Concurrent` preservation evidence remains recorded; the active host policy is `MtouchLink=None` + `TrimMode=copy`, while `MtouchInterpreter=-all` remains unchanged;
 - native resolution and rejected/unplanned managed resolution remain zero;
 - final private-context membership equals the Step-23 initializer-free closure plus exactly `0Harmony`;
 - plan/prepared/live bytes and OfflineReady remain exact;

@@ -10,19 +10,24 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>106</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.106</ApplicationDisplayVersion>
+    <ApplicationVersion>107</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.107</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
     <!--
-      Step 15 retains the final Step 05 policy: keep full trimming globally, while preserving the
-      three assemblies protobuf-net reflects over during SteamKit message
-      serialization. Physical-iPhone Step 05.15 proved this is required for
-      the initial ClientHello path.
+      Step 27.0.23 dynamic-payload compatibility policy. Physical 0.0.105 and 0.0.106 proved that
+      full trimming can remove ordinary BCL members/types referenced only by assemblies that arrive
+      after publish (first System.Linq.Enumerable.Union<T>, then System.Diagnostics.DebuggableAttribute
+      while MonoMod.Utils.DynamicMethodDefinition initializes). This launcher intentionally loads the
+      receipt-backed StS2/Harmony/mod managed world after publish, so ILLink cannot statically see its
+      complete framework usage. Disable managed IL trimming for the iOS host instead of chasing one
+      framework member at a time. The macios SDK supports this explicit copy/no-link policy. AOT remains
+      enabled for build-time assemblies; MtouchInterpreter=-all remains the dynamic managed-code policy.
     -->
-    <TrimMode>full</TrimMode>
+    <TrimMode>copy</TrimMode>
+    <MtouchLink>None</MtouchLink>
 
     <!--
       Step 21 retains the physically proven Step 20 Dynamic Managed Execution Foundation interpreter policy: keep every build-time launcher assembly on
@@ -47,12 +52,12 @@
   </ItemGroup>
 
   <!--
-    Step 22 Host Framework Closure Foundation. The physical Step 21.1 report showed that every
-    remaining dependency blocker was a framework-shaped assembly whose only workspace fallback
-    was a non-IL-only macOS runtime image. These 22 measured seed roots keep the corresponding
-    iOS/.NET host framework contracts (and their statically understood dependencies) in the
-    fully-trimmed Release app. The larger 44-name observed frontier is verified on-device before
-    the Step 21 binding plan is recomputed. No downloaded System.* implementation is added here.
+    Step 22 Host Framework Closure Foundation. These 22 names remain the physically measured
+    direct host-binding frontier and are retained as historical/protection descriptors. Under the
+    Step 27.0.23 copy/no-link host policy they are no longer relied upon to prevent member trimming;
+    the host framework assemblies are preserved wholesale. The larger 44-name observed frontier is
+    still verified on-device before the Step 21 binding plan is recomputed. No downloaded System.*
+    implementation is added here.
   -->
   <ItemGroup>
     <TrimmerRootAssembly Include="netstandard" />
@@ -83,22 +88,20 @@
     Step 24 physically proved this additional post-publish dynamic-IL preservation root. Build 78
     reached MonoMod.Logs.DebugLog::.cctor and exposed a trimmed ConcurrentBag<T> constructor;
     Step 24.0.6 / 0.0.79 then passed all four physical gates plus OfflineReady and Foundation 5/5
-    with System.Collections.Concurrent rooted. Keep it as protected platform policy while retaining
-    TrimMode=full and MtouchInterpreter=-all. It remains separately classified from the exact
-    22-root Step 22 direct-host-framework closure.
+    with System.Collections.Concurrent rooted. Keep that measured root as historical/protection
+    evidence, while the active Step 27.0.23 host now preserves all managed publish assemblies with
+    MtouchLink=None + TrimMode=copy. MtouchInterpreter=-all remains unchanged.
   -->
   <ItemGroup>
     <TrimmerRootAssembly Include="System.Collections.Concurrent" />
   </ItemGroup>
 
   <!--
-    Step 27.0.22 post-publish dynamic-payload member preservation. Physical 0.0.105 crossed
-    normalized HarmonySharedState initialization and then PatchProcessor.Patch() threw
-    MissingMethodException for System.Linq.Enumerable.Union<T>, even though System.Linq itself was
-    host-bound. The real 0Harmony image arrives only after publish, so ILLink cannot see its LINQ
-    calls. Root the complete System.Linq assembly rather than chasing individual operators; this
-    preserves the exact Select/Union/ToDictionary family reached by Harmony MethodCreator and its
-    statically understood implementation dependencies while retaining TrimMode=full.
+    Step 27.0.22 measured System.Linq as the first whole-assembly dynamic-payload preservation root.
+    Physical 0.0.106 proved that this fixed the LINQ blocker but immediately exposed the same class
+    of failure in System.Runtime/System.Private.CoreLib: DynamicMethodDefinition could not resolve
+    System.Diagnostics.DebuggableAttribute. Keep the System.Linq root as historical evidence only;
+    Step 27.0.23 no longer relies on isolated roots because managed trimming is disabled globally.
   -->
   <ItemGroup>
     <TrimmerRootAssembly Include="System.Linq" />
@@ -108,15 +111,21 @@
     <Message Importance="High"
              Text="STEP27 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Message Importance="High"
+             Text="STEP27 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" />
+    <Message Importance="High"
              Text="STEP27 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
     <Message Importance="High"
-             Text="STEP27 CANDIDATE POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq" />
+             Text="STEP27 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" />
     <Message Importance="High"
              Text="STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
     <Message Importance="High"
              Text="STEP27 CANDIDATE ACCESSTOOLS FRAMEWORK PRESERVATION: DynamicDependency RuntimeInformation/PropertyInfo/Dictionary/ReaderWriterLockSlim measured initializer surface" />
     <Message Importance="High"
              Text="STEP27 CANDIDATE PATCH-ENGINE FRAMEWORK PRESERVATION: bounded DynamicDependency Reflection.Emit/MethodHandle surface from exact Harmony 2.4.2 shared-state/replacement/detour audit" />
+    <Error Condition="'$(MtouchLink)' != 'None'"
+           Text="Canonical dynamic-payload host policy requires MtouchLink=None so post-publish StS2/Harmony/mod framework dependencies are not member-trimmed." />
+    <Error Condition="'$(TrimMode)' != 'copy'"
+           Text="Canonical dynamic-payload host policy requires TrimMode=copy together with MtouchLink=None." />
     <Error Condition="'$(MtouchInterpreter)' != '-all'"
            Text="Canonical foundation preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
     <Error Condition="'$(UseInterpreter)' == 'true'"

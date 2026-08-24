@@ -327,7 +327,7 @@ public sealed partial class RootViewController
         }
 
         lines.Add("Step 27 prerequisite: physical Step 26.0 / 0.0.83 is closed — Gates A–N PASS, OfflineReady PASS, Foundation 5/5 PASS.");
-        lines.Add("Gates A–N replay the closed Step 26 chain in the exact Step 27 private context, preserving the proven System.Collections.Concurrent root and Step-25 constructor framework-preservation anchor with TrimMode=full and MtouchInterpreter=-all.");
+        lines.Add("Gates A–N replay the closed Step 26 chain in the exact Step 27 private context, preserving the proven runtime/framework behavior under MtouchLink=None + TrimMode=copy with MtouchInterpreter=-all.");
         lines.Add("Gate O metadata-audits exact PatchProcessor.AddPrefix(MethodInfo), Patch(), Unpatch(MethodInfo), both HarmonyMethod constructors/fields, the physically traversed AccessTools initializer, and the exact HarmonySharedState/GetOrCreateSharedStateType -> MethodCreatorConfig.Prepare -> PatchFunctions.UpdateWrapper -> PatchTools.DetourMethod -> UpdatePatchInfo chain. Its runtime reflection is deliberately restored to the physically passing 0.0.90 PatchProcessor/HarmonyMethod/AccessTools surface; bounded Reflection.Emit/RuntimeMethodHandle preflight and HarmonySharedState runtime reflection are deferred to Gate T so their loader effects are measured.");
         lines.Add("Gate P resolves only launcher-owned HarmonyPatchProbe.Target(int) + Prefix(int, ref int __result), including exact parameter names required by Harmony. No StS2 member is reflected.");
         lines.Add("Gate Q invokes the launcher target through direct + reflection routes before patching and requires original value+1 behavior with prefix count zero.");

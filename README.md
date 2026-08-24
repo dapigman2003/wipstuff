@@ -4,34 +4,29 @@ Steps 01–26 are physically closed. Step 27 remains focused on proving one laun
 
 ## Active candidate
 
-**Step 27.0.22 / `0.0.106 (106)` — post-publish System.Linq framework preservation**
+**Step 27.0.23 / `0.0.107 (107)` — dynamic-payload no-trim host policy**
 
-Physical 0.0.105 proved the new raw-method-body normalizer on the actual iPhone. The normalized `HarmonySharedState::.cctor` returned successfully and Gate T advanced into the first exact public `PatchProcessor.Patch()` call. Patch then failed normally in `HarmonyLib.MethodCreator..ctor` with:
+Physical 0.0.106 proved the `System.Linq` whole-assembly root fixed the previous `Enumerable.Union<T>` blocker. `PatchProcessor.Patch()` advanced into `HarmonyLib.MethodPatcherTools.CreateDynamicMethod`, where `MonoMod.Utils.DynamicMethodDefinition` type initialization failed because `System.Diagnostics.DebuggableAttribute` could not be resolved from the trimmed host framework.
 
-`System.MissingMethodException: System.Linq.Enumerable.Union<T>(IEnumerable<T>, IEnumerable<T>)`
+This is the second independent ordinary-BCL trimming failure caused by the real Harmony/MonoMod payload arriving only after iOS publish. It still occurs before `PatchTools.DetourMethod -> DetourFactory.Current.CreateDetour`, so it is not evidence that Harmony's detour backend itself is incompatible with iOS.
 
-This is not a MonoMod detour failure. `MethodCreator` did not finish constructing the replacement and `PatchTools.DetourMethod` was not reached. The cause is full trimming: the real Harmony assembly is loaded only after publish, so ILLink cannot see its LINQ calls and had removed `Union<T>` from the host `System.Linq` surface even though the assembly itself was loadable.
+0.0.107 changes the host policy instead of adding another one-off root:
 
-0.0.106 therefore treats framework binding and framework member preservation as separate contracts:
+- `MtouchLink=None`;
+- `TrimMode=copy`;
+- `MtouchInterpreter=-all` remains unchanged;
+- the raw-PE `HarmonySharedState` normalization and public `PatchProcessor.Patch()` boundary remain otherwise unchanged;
+- prior measured roots remain in the project as historical/protection descriptors but are no longer the mechanism relied upon for post-publish member survival;
+- no StS2 member is reflected, patched, or invoked.
 
-- retains `TrimMode=full` and all physically proven earlier roots;
-- adds one measured whole-assembly root, `System.Linq`, rather than chasing only `Union<T>`;
-- keeps the 0.0.105 raw-PE `HarmonySharedState` normalizer unchanged;
-- after T6 and before public `PatchProcessor.Patch()`, T6a/T6b verifies the exact `Enumerable.Select`, two-sequence `Union`, and three-selector `ToDictionary` public signatures used by the audited Harmony MethodCreator path;
-- invokes none of those LINQ operators during the preflight and still does not touch a StS2 member.
-
-The complete 0.0.105 device report is preserved in project history.
-
-## iOS detour decision rule
-
-The stop rule remains unchanged in substance but is now stated more precisely: a framework-member trimming failure does **not** count as a Harmony detour failure. Once T6a/T6b proves the required post-publish framework callable surface, let `PatchProcessor.Patch()` proceed. If replacement generation/dynamic execution or the actual `PatchTools.DetourMethod -> DetourFactory.Current.CreateDetour` path then fails for an iOS execution reason, perform the one representative post-publish interpreted fixture experiment. Pivot to ahead-of-load transforms only if that representative patch path also fails.
+The master plan is revised only for this trimming-policy architecture change. Harmony remains on trial until the patch path reaches replacement generation and the real MonoMod detour boundary without linker-induced missing framework members.
 
 ## Build
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.106 (106)`
+Expected app version: `0.0.107 (107)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 
-Codemagic must pass the hash-pinned official Harmony 2.4.2 normalizer regression and the complete host suite before publish. Physical acceptance remains A–Z **26/26**, then OfflineReady PASS and Foundation 5/5.
+Physical acceptance remains A–Z **26/26**, then OfflineReady PASS and Foundation 5/5.

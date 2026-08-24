@@ -2345,7 +2345,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 "T6a — entering exact host System.Linq callable-surface preflight for Harmony MethodCreator Select/Union/ToDictionary; PatchProcessor.Patch() and launcher target remain uninvoked.");
             var linqFrameworkSurface = ValidatePatchEngineLinqFrameworkPreservationSurface();
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T6b — host System.Linq MethodCreator callable surface is present after full trimming: " + linqFrameworkSurface + ". Entering PatchProcessor.Patch() is now permitted.");
+                "T6b — host System.Linq MethodCreator callable surface is present under the copy/no-link host policy: " + linqFrameworkSurface + ". Entering PatchProcessor.Patch() is now permitted.");
 
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;

@@ -112,3 +112,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-27.0.21-RAW-METHOD-BODY-NORMALIZATION.md` — 0.0.105 removes Cecil whole-module writing from Gate A and replaces only the already-audited `HarmonySharedState::.cctor` PE method-body slot in the private in-memory runtime image using existing metadata tokens.
 - `reports/STEP-27.0.21-PHYSICAL-T7-SYSTEM-LINQ-TRIM-FAILURE.txt` — physical 0.0.105 proof that raw-body HarmonySharedState normalization succeeded and public PatchProcessor.Patch() then failed in MethodCreator on trimmed `Enumerable.Union<T>` before the detour boundary.
 - `steps/STEP-27.0.22-POST-PUBLISH-SYSTEM-LINQ-PRESERVATION.md` — 0.0.106 roots complete `System.Linq` for post-publish dynamic payloads and adds T6a/T6b exact LINQ callable-surface preflight; master plan remains unchanged because the native detour boundary is still untested.
+
+- `steps/STEP-27.0.23-DYNAMIC-PAYLOAD-NO-TRIM-HOST-POLICY.md` — replaces full trimming with copy/no-link after physical 0.0.106 exposed the second post-publish BCL trim failure.
+- `reports/STEP-27.0.22-PHYSICAL-DYNAMICMETHODDEFINITION-DEBUGGABLEATTRIBUTE-TRIM-FAILURE.txt` — full physical 0.0.106 Gate-T report.
