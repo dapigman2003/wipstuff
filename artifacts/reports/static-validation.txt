@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-24T09:10:17Z
+UTC: 2026-08-24T17:30:04Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,20 +11,20 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.107.work
-PASS: all 8 project/props/targets XML files parse
+Root: /mnt/data/StS2Launcher-Step27-0.0.108.work/project
+PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 194 C# files
+PASS: lexical delimiter scan passes for 195 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 107
-PASS: display version is 0.0.107
-PASS: Info.plist build version is 107
-PASS: Info.plist display version is 0.0.107
+PASS: build version is 108
+PASS: display version is 0.0.108
+PASS: Info.plist build version is 108
+PASS: Info.plist display version is 0.0.108
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,12 +32,12 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.23 candidate
-PASS: top launcher banner records the physical 0.0.106 second BCL trim failure and scopes the 0.0.107 no-trim host correction
+PASS: top launcher banner identifies active Step 27.0.24 candidate
+PASS: top launcher banner records physical 0.0.107 and scopes the single interpreted stop-rule decision experiment
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 27.0.23 source pins expected bundle release identity
+PASS: Step 27.0.24 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
-PASS: Step 27.0.23 source pins the raw-body + no-trim Gate-T implementation marker
+PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
 PASS: stale prior Step-27 candidate banner identity is removed
@@ -498,15 +498,19 @@ PASS: Step 27 production boundary contains required invariant: Name.Equals("Unpa
 PASS: Step 27 production boundary contains required invariant: GetType("HarmonyLib.HarmonyMethod", throwOnError: false, ignoreCase: false)
 PASS: Step 27 production boundary contains required invariant: GetField("prefix", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
 PASS: Step 27 production boundary contains required invariant: GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-PASS: Step 27 production boundary contains required invariant: typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Target)
-PASS: Step 27 production boundary contains required invariant: typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Prefix)
+PASS: Step 27 production boundary contains required invariant: InterpretedPatchFixtureDirectoryName = "Step27InterpretedPatchFixture"
+PASS: Step 27 production boundary contains required invariant: InterpretedPatchFixtureFileName = "StS2Launcher.Step27.InterpretedPatchFixture.dll"
+PASS: Step 27 production boundary contains required invariant: LoadVerifiedInterpretedFixture(
+PASS: Step 27 production boundary contains required invariant: GetMethod("InvokeTarget"
+PASS: Step 27 production boundary contains required invariant: processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])
+PASS: Step 27 production boundary contains required invariant: processorApi.OriginalField.GetValue(interpretedProcessor), target
+PASS: Step 27 production boundary contains required invariant: InvokePatchProbeInt32(probe.Target, 41
+PASS: Step 27 production boundary contains required invariant: InvokePatchProbeInt32(probe.InvokeTarget, 41
 PASS: Step 27 production boundary contains required invariant: patchApi.HarmonyMethodDefaultConstructor.Invoke([])
 PASS: Step 27 production boundary contains required invariant: patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)
 PASS: Step 27 production boundary contains required invariant: patchApi.PrefixField.SetValue(processor, descriptor)
 PASS: Step 27 production boundary contains required invariant: patchApi.PatchMethod.Invoke(processor, null)
 PASS: Step 27 production boundary contains required invariant: patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])
-PASS: Step 27 production boundary contains required invariant: probe.Target.Invoke(null, [41])
-PASS: Step 27 production boundary contains required invariant: HarmonyPatchProbe.Target(41)
 PASS: Step 27 replays exactly one inert Harmony(string) constructor invocation
 PASS: Step 27 replays exactly one empty CreateProcessor(MethodBase) invocation
 PASS: Step 27 does not invoke the physically crashing AddPrefix(MethodInfo) wrapper
@@ -514,8 +518,10 @@ PASS: Step 27 has exactly one bounded HarmonyMethod() descriptor construction
 PASS: Step 27 bounded descriptor path performs exactly one method assignment and one processor-prefix assignment
 PASS: Step 27 has exactly one intentional PatchProcessor.Patch() invocation
 PASS: Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation
-PASS: Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates
-PASS: Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates
+PASS: Step 27 invokes the post-publish interpreted Target exactly at baseline, patched, and restored gates
+PASS: Step 27 exercises the in-fixture interpreted direct-call route exactly at baseline, patched, and restored gates
+PASS: Step 27 production boundary no longer depends on the build-time AOT HarmonyPatchProbe target
+PASS: Step 27 creates exactly one fresh processor for the admitted post-publish interpreted target
 PASS: Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier
 PASS: Step 27.0.14 creates exactly one bounded normalized Harmony runtime image during Gate A
 PASS: Step 27.0.14 retains exactly one internal synthetic passthrough path alongside canonical normalization
@@ -611,6 +617,25 @@ PASS: Step 27.0.23 retains the exact LINQ preflight overload shapes as a regress
 PASS: Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape
 PASS: Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path
 PASS: Step 27 host tests retain synthetic runtime identity isolation
+PASS: Step 27.0.24 dedicated interpreted patch fixture project/source exist
+PASS: Step 27.0.24 fixture pins deterministic Target/InvokeTarget/Prefix/counter behavior
+PASS: Step 27.0.24 interpreted fixture is absent from the iOS MSBuild/AOT project graph
+PASS: Step 27.0.24 interpreted fixture is not a host-test ProjectReference
+PASS: host suite validates the separately supplied interpreted fixture without a project reference
+PASS: iOS UI passes the explicit bundled post-publish fixture directory into Step 27
+PASS: iOS build explicitly builds the Step 27 interpreted fixture outside the iOS project graph
+PASS: iOS build explicitly copies the interpreted fixture into the app
+PASS: Step 27 interpreted fixture copy occurs strictly after dotnet publish returns
+PASS: IPA verifier requires exactly one byte-identical hash-verified interpreted fixture in its data-only directory
+PASS: host runner builds the interpreted fixture separately and exports only its path to MSTest
+PASS: Gate P creates a fresh public processor bound to the exact interpreted target without private original-field mutation
+PASS: Step 27.0.24 never mutates PatchProcessor.original directly
+PASS: interpreted fixture baseline counters are reset and physically re-established before patching
+PASS: baseline/patched/restored gates each exercise direct target reflection plus in-fixture interpreted call route
+PASS: Step 27.0.24 pins skip-original patched counters and exact restored counters
+PASS: Step 27.0.24 does not force a MonoMod DMD backend override
+PASS: active status/history index preserve the physical 0.0.107 evidence and final interpreted decision experiment
+PASS: Step 27.0.24 leaves the 0.0.107 copy/no-link master plan byte-for-byte unchanged pending the physical decision
 PASS: Step 27 candidate boundary hash manifest exists
 PASS: Step 27 candidate patch/unpatch implementation and release wiring are hash-pinned
 PASS: authoritative documentation exists: README.md
@@ -735,7 +760,10 @@ PASS: physical build 105 localizes the current blocker to a trimmed LINQ member 
 PASS: physical build 106 evidence preserves the exact 19/26 Gate-T failure
 PASS: physical build 106 proves the LINQ fix advanced Patch() into DynamicMethodDefinition before the next BCL trim failure
 PASS: physical build 106 still does not establish actual MonoMod detour execution
-PASS: current status records both physical trimming failures and advances to Step 27.0.23 / 0.0.107 copy/no-link policy
+PASS: physical build 107 evidence preserves the exact 19/26 Gate-T result under copy/no-link
+PASS: physical build 107 proves trimming ambiguity is gone and localizes the next blocker to real Patch() execution
+PASS: physical build 107 Gate-T failure is no longer either known trimmed-framework-member failure
+PASS: current status records the physical 0.0.107 patch-engine failure and advances to the single Step 27.0.24 interpreted decision experiment
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -800,4 +828,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 786 checks
+VALIDATION PASS: 814 checks

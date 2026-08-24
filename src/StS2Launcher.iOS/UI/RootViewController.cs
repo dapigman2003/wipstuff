@@ -171,7 +171,9 @@ public sealed partial class RootViewController : UIViewController
         _controlledManagedInitialization = new ControlledManagedInitialization(_launcherDataRoot);
         _controlledHarmonyConstruction = new ControlledHarmonyConstruction(_launcherDataRoot);
         _controlledHarmonyProcessorCreation = new ControlledHarmonyProcessorCreation(_launcherDataRoot);
-        _controlledHarmonyPatchExecution = new ControlledHarmonyPatchExecution(_launcherDataRoot);
+        _controlledHarmonyPatchExecution = new ControlledHarmonyPatchExecution(
+            _launcherDataRoot,
+            Path.Combine(NSBundle.MainBundle.BundlePath, ControlledHarmonyPatchExecution.InterpretedPatchFixtureDirectoryName));
     }
 
     public override void ViewDidLoad()

@@ -78,3 +78,15 @@ Before changing one of these contracts:
 4. add or update a pure unit-testable policy where possible;
 5. update static validation to reject the obsolete assertion;
 6. require a new physical regression pass before advancing the project boundary.
+
+## Step 27 — controlled launcher-owned Harmony patch decision
+
+- the copy/no-link host policy (`MtouchLink=None`, `TrimMode=copy`) and `MtouchInterpreter=-all` remain the dynamic-payload execution baseline established after physical 0.0.105/106 trimming failures;
+- canonical `0Harmony 2.4.2` may use only the bounded in-memory raw-body normalization of `HarmonySharedState::.cctor`; trusted prepared/live bytes remain immutable;
+- exactly one public `PatchProcessor.Patch()` invocation is admitted in the active A–Z sequence and exact prefix `Unpatch(MethodInfo)` is admitted only after patched behavior succeeds;
+- the final Step-27 decision target/prefix live in the launcher-owned `StS2Launcher.Step27.InterpretedPatchFixture.dll`, which must remain absent from iOS/test ProjectReference graphs and be copied into the app only after publish;
+- Gate P must bind a fresh processor to that exact interpreted Target through public `Harmony.CreateProcessor(MethodBase)` rather than mutating PatchProcessor internals;
+- baseline, patched, and restored behavior must each be tested through Target MethodInfo invocation plus `InvokeTarget`, whose post-publish IL directly calls Target;
+- no MonoMod backend override is allowed for this final experiment;
+- no StS2 member may be reflected, patched, or invoked in Step 27;
+- if the interpreted fixture cannot patch, the next architecture is ahead-of-load managed IL transformation and no further Harmony-internal workaround candidate is admitted.

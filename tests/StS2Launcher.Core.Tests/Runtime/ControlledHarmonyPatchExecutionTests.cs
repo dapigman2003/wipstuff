@@ -158,6 +158,77 @@ public sealed class ControlledHarmonyPatchExecutionTests
             "The real Harmony fixture must remain byte-for-byte immutable after in-memory normalization.");
     }
 
+    [TestMethod]
+    public void PostPublishInterpretedPatchFixtureHasExactPatchSurfaceWithoutProjectReference()
+    {
+        var fixturePath = Environment.GetEnvironmentVariable("STS2_STEP27_INTERPRETED_PATCH_FIXTURE");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(fixturePath),
+            "STS2_STEP27_INTERPRETED_PATCH_FIXTURE must point to the launcher-owned Step-27 fixture built separately from the test/iOS project graph.");
+        fixturePath = Path.GetFullPath(fixturePath!);
+        Assert.IsTrue(File.Exists(fixturePath), $"Step-27 interpreted patch fixture is missing: {fixturePath}");
+
+        using (var module = ModuleDefinition.ReadModule(fixturePath, new ReaderParameters
+        {
+            InMemory = true,
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+        }))
+        {
+            Assert.AreEqual(ControlledHarmonyPatchExecution.InterpretedPatchFixtureAssemblySimpleName, module.Assembly.Name.Name);
+            Assert.AreEqual(new Version(1, 0, 0, 0), module.Assembly.Name.Version);
+            Assert.IsTrue(module.Attributes.HasFlag(Mono.Cecil.ModuleAttributes.ILOnly));
+            Assert.IsFalse(module.Assembly.Name.HasPublicKey);
+            Assert.IsFalse(module.Types.Single(type => type.Name == "<Module>").Methods.Any(method => method.Name == ".cctor"));
+
+            var probe = EnumerateFixtureTypes(module.Types).Single(type => type.FullName == ControlledHarmonyPatchExecution.InterpretedPatchFixtureTypeFullName);
+            Assert.IsTrue(probe.IsPublic && probe.IsAbstract && probe.IsSealed);
+            var target = probe.Methods.Single(method => method.Name == "Target");
+            var invokeTarget = probe.Methods.Single(method => method.Name == "InvokeTarget");
+            var prefix = probe.Methods.Single(method => method.Name == "Prefix");
+            var reset = probe.Methods.Single(method => method.Name == "ResetCounters");
+            Assert.IsTrue(target.HasBody && invokeTarget.HasBody && prefix.HasBody && reset.HasBody);
+            Assert.AreEqual("System.Int32", target.ReturnType.FullName);
+            Assert.AreEqual("System.Int32", invokeTarget.ReturnType.FullName);
+            Assert.AreEqual("System.Boolean", prefix.ReturnType.FullName);
+            CollectionAssert.AreEqual(new[] { "System.Int32", "System.Int32&" }, prefix.Parameters.Select(parameter => parameter.ParameterType.FullName).ToArray());
+            CollectionAssert.AreEqual(new[] { "value", "__result" }, prefix.Parameters.Select(parameter => parameter.Name).ToArray());
+            Assert.IsTrue(invokeTarget.Body.Instructions.Any(instruction =>
+                instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference reference && reference.Name == "Target"),
+                "InvokeTarget must retain a direct managed IL call to Target so the device experiment exercises an in-fixture interpreted call route.");
+        }
+
+        var bytes = File.ReadAllBytes(fixturePath);
+        var loadContext = new System.Runtime.Loader.AssemblyLoadContext("Step27InterpretedFixtureHostRegression", isCollectible: true);
+        try
+        {
+            using var stream = new MemoryStream(bytes, writable: false);
+            var assembly = loadContext.LoadFromStream(stream);
+            var type = assembly.GetType(ControlledHarmonyPatchExecution.InterpretedPatchFixtureTypeFullName, throwOnError: true)!;
+            var reset = type.GetMethod("ResetCounters", BindingFlags.Public | BindingFlags.Static)!;
+            var target = type.GetMethod("Target", BindingFlags.Public | BindingFlags.Static)!;
+            var invokeTarget = type.GetMethod("InvokeTarget", BindingFlags.Public | BindingFlags.Static)!;
+            var prefix = type.GetMethod("Prefix", BindingFlags.Public | BindingFlags.Static)!;
+            var targetCalls = type.GetField("TargetCalls", BindingFlags.Public | BindingFlags.Static)!;
+            var prefixCalls = type.GetField("PrefixCalls", BindingFlags.Public | BindingFlags.Static)!;
+
+            reset.Invoke(null, null);
+            Assert.AreEqual(42, (int)target.Invoke(null, [41])!);
+            Assert.AreEqual(42, (int)invokeTarget.Invoke(null, [41])!);
+            Assert.AreEqual(2, (int)targetCalls.GetValue(null)!);
+            Assert.AreEqual(0, (int)prefixCalls.GetValue(null)!);
+
+            object?[] prefixArguments = [41, 0];
+            Assert.AreEqual(false, (bool)prefix.Invoke(null, prefixArguments)!);
+            Assert.AreEqual(1041, (int)prefixArguments[1]!);
+            Assert.AreEqual(2, (int)targetCalls.GetValue(null)!);
+            Assert.AreEqual(1, (int)prefixCalls.GetValue(null)!);
+        }
+        finally
+        {
+            loadContext.Unload();
+        }
+    }
+
     private static bool HasEditorBrowsableAttributeSurface(ModuleDefinition module)
     {
         const string attributeName = "System.ComponentModel.EditorBrowsableAttribute";
@@ -581,6 +652,7 @@ public sealed class ControlledHarmonyPatchExecutionTests
     private static ControlledHarmonyPatchExecution CreateSyntheticBoundary(string launcherRoot, SyntheticNames names)
         => new(
             launcherRoot,
+            interpretedPatchFixtureRoot: Path.Combine(launcherRoot, "Step27SyntheticInterpretedFixture"),
             collectibleLoadContext: true,
             expectedPrimarySimpleName: names.PrimarySimpleName,
             targetSimpleName: names.TargetSimpleName,

@@ -4,31 +4,39 @@
 
 Run `bash scripts/validate.sh`.
 
-For Step 27.0.23 / `0.0.107 (107)`, validation must retain every 0.0.106 raw-body and LINQ-closure invariant while proving the new dynamic-payload host policy: `MtouchLink=None`, `TrimMode=copy`, and `MtouchInterpreter=-all`. Static validation must reject any return to `TrimMode=full` for this candidate and must keep the single public `PatchProcessor.Patch()` call in the same location after T6/T6a/T6b. The production Harmony normalizer is unchanged except for diagnostic wording.
+For Step 27.0.24 / `0.0.108 (108)`, validation retains the proven copy/no-link host policy, raw-body HarmonySharedState normalizer, exact public patch API surface, and single `PatchProcessor.Patch()` call. It additionally proves the final stop-rule fixture is genuinely outside the iOS build-time AOT graph.
 
-Physical 0.0.106 must be archived as evidence that the System.Linq root worked and that the next failure was `System.Diagnostics.DebuggableAttribute` during `MonoMod.Utils.DynamicMethodDefinition` type initialization, still before `PatchTools.DetourMethod`.
+Required interpreted-fixture invariants:
 
-The raw-body contract must require:
+- `fixtures/StS2Launcher.Step27.InterpretedPatchFixture` exists as a standalone net9.0 project;
+- neither the iOS project nor the host-test project contains a ProjectReference/Content/BundleResource reference to it;
+- `scripts/build-ios.sh` builds the fixture before publish if needed but copies it into `Step27InterpretedPatchFixture/` only **after** `dotnet publish` returns;
+- `scripts/verify-ipa.sh` requires exactly one byte-identical fixture DLL in that data-only directory plus a valid SHA-256 manifest;
+- the fixture is IL-only, unsigned, framework-only, has no module initializer, and exposes only the deterministic Target/InvokeTarget/Prefix/reset/counter surface required by the experiment;
+- `InvokeTarget` retains a direct IL `call` to `Target`;
+- Gate P loads the exact fixture bytes into the private context and creates a fresh processor through public `Harmony.CreateProcessor(MethodBase)` for the exact interpreted Target;
+- production Step 27 no longer references the old build-time `HarmonyPatchProbe` path;
+- Gate T still contains exactly one `PatchProcessor.Patch()` reflection invocation; Gate W contains exactly one exact `Unpatch(MethodInfo)` invocation if patching succeeds;
+- no `MONOMOD_DMD_TYPE`, forced Cecil/Emit backend, or other MonoMod backend override is introduced;
+- no StS2 member is reflected, patched, or invoked.
 
-- `PEReader` RVA-to-section mapping;
-- a fat ECMA-335 method header;
-- no exception handlers / `MoreSects`;
-- exact existing MemberRef tokens for the three required dictionary constructors;
-- exact FieldDef tokens for the five written HarmonySharedState fields;
-- a 12-byte replacement fat header with `MaxStack=1`, `CodeSize=47`, and `LocalVarSigTok=0`;
-- the same exact 11-instruction post-write Cecil audit;
-- a byte-for-byte invariant that all bytes outside the admitted original cctor slot remain unchanged.
+The raw-body normalizer remains bounded to the canonical Harmony 2.4.2 target and changes only the admitted `HarmonySharedState::.cctor` slot in the in-memory image. The real upstream Harmony-Fat host surrogate remains content-addressed by the existing archive/DLL SHA-256 pins.
 
-The host surrogate remains content-addressed instead of inferred from merged AssemblyRef topology. Validation requires the exact Harmony-Fat 2.4.2 release URL, exact root-or-wrapped `net9.0/0Harmony.dll` selection, archive SHA-256 `a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774`, DLL SHA-256 `a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab`, independent C# DLL re-hash, `EditorBrowsableAttribute` surface detection without `ConstructorArguments`, and direct invocation of `CreateIosNormalizedHarmonyRuntimeImage`.
+Physical 0.0.107 must be archived as evidence that copy/no-link removed the two known trim blockers and that the new failure is `System.NotImplementedException` surfaced from `PatchFunctions.UpdateWrapper` during the real public Patch() call.
 
 ## Host tests
 
 Run `bash scripts/test.sh`.
 
-The script downloads the exact official `Harmony-Fat.2.4.2.0.zip`, verifies the pinned archive hash, selects exactly one `net9.0/0Harmony.dll`, verifies the pinned DLL hash, and exports its path/member to the test process. The C# regression now has to pass through the real production raw-body normalizer, require the runtime image length to equal the source image length, require the runtime bytes to differ, preserve the source fixture byte-for-byte, and retain the exact 11-instruction normalized cctor audit.
+In addition to the existing full suite and official Harmony normalizer regression, the script builds the Step-27 interpreted fixture separately, copies it into a host artifact directory, exports only its path through `STS2_STEP27_INTERPRETED_PATCH_FIXTURE`, and then runs the tests. The test project must not reference the fixture project.
 
-The complete 0.0.105 physical report is archived as evidence that raw-body HarmonySharedState normalization succeeded on-device and the first public `PatchProcessor.Patch()` call then failed in `HarmonyLib.MethodCreator..ctor` on trimmed `Enumerable.Union<T>` before `PatchTools.DetourMethod` was reached.
+The fixture regression uses Cecil Deferred/read-only metadata to verify the exact type/method/field surface and direct `InvokeTarget -> Target` IL call, then loads the DLL from bytes in a collectible host ALC to prove baseline Target/InvokeTarget behavior and Prefix result semantics without creating an iOS project dependency.
 
 ## Codemagic / physical run
 
-Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.107 (107)` from a fresh process. T6 and the LINQ preservation lesson are already physically established. The new proof is that the same `PatchProcessor.Patch()` path can initialize `DynamicMethodDefinition` and continue without another linker-induced missing BCL member. Only a failure after the copy/no-link policy has removed trimming ambiguity should influence the Harmony-versus-Step-28 decision.
+Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.108 (108)` from a fresh process.
+
+The decisive outcomes are:
+
+- **PASS:** Patch() returns for the interpreted target; both patched routes return 1041 with the original body skipped; exact unpatch restores 42 on both routes. Harmony remains viable for the representative post-publish managed model.
+- **FAIL:** the interpreted fixture cannot patch. Preserve the full Step-27 report/crash checkpoint and stop Harmony-internal iteration. The next major step is Step 28 ahead-of-load managed IL transformation with a master-plan architecture revision.

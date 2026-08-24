@@ -133,7 +133,13 @@ The stack is `MethodPatcherTools.CreateDynamicMethod -> MethodCreatorConfig.Prep
 
 Two successive failures now establish that adding one framework root/member at a time is not an acceptable dynamic-plugin preservation architecture.
 
-## Active candidate — Step 27.0.23 / 0.0.107 (107)
+## Physical 0.0.107 result — trimming ambiguity removed; Patch() now reaches unsupported runtime behavior
+
+Physical `0.0.107 (107)` preserved the normalized HarmonySharedState proof and removed the prior full-trim BCL failures under `MtouchLink=None + TrimMode=copy`. The exact public `PatchProcessor.Patch()` call then failed at Gate T with `System.NotImplementedException: Arg_NotImplementedException`, surfaced from `HarmonyLib.PatchFunctions.UpdateWrapper`. The complete report is preserved at `docs/history/reports/STEP-27.0.23-PHYSICAL-NOTIMPLEMENTED-PATCHENGINE.txt`.
+
+This is materially different from 0.0.105/106: no missing LINQ or `DebuggableAttribute` member appears. However, `UpdateWrapper` encompasses both replacement generation and later detour installation, so this stack alone does not prove which substage is unsupported.
+
+## Active candidate — Step 27.0.24 / 0.0.108 (108)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -142,24 +148,24 @@ Two successive failures now establish that adding one framework root/member at a
 - Closed prerequisite: Step 26.0 + OfflineReady + Foundation 5/5
 - StS2 reflection/patching/invocation: **forbidden**
 
-### Dynamic-payload no-trim host policy
+### Single post-publish interpreted decision experiment
 
-0.0.107 changes the iOS host architecture from `TrimMode=full` to the macios copy/no-link policy:
+0.0.108 is the one representative interpreted-target trial required by the Step-27 stop rule. A dedicated launcher-owned `StS2Launcher.Step27.InterpretedPatchFixture.dll` is built separately from the iOS project and copied into the final `.app` only after `dotnet publish`, matching the established post-publish interpreted execution model rather than the launcher's build-time AOT method body.
 
-- `MtouchLink=None`;
-- `TrimMode=copy`;
-- `MtouchInterpreter=-all` remains unchanged;
-- broad `UseInterpreter=true` and NativeAOT remain prohibited.
+The fixture exposes deterministic `Target(int)`, `InvokeTarget(int)`, `Prefix(int, ref int __result)`, reset, and counter surfaces. `InvokeTarget` contains an actual managed IL call to `Target`, so the physical proof covers both direct MethodInfo invocation of the target and an in-fixture interpreted call site.
 
-The reason is architectural rather than Harmony-specific: the launcher's defining runtime model includes receipt-backed StS2/Harmony/mod assemblies that arrive only after publish, so ILLink cannot statically know their complete BCL/framework member usage. Physical 0.0.105 and 0.0.106 proved that framework assembly availability is not enough when member trimming remains active.
+Gate P admits the exact fixture metadata/bytes, loads it into the Step-27 private context, and creates a fresh PatchProcessor for its exact Target via public `Harmony.CreateProcessor(MethodBase)`. This also corrects the historical test-harness target mismatch where Gate M's Step-26 replay processor and Gate P's separate patch probe were not the same target; no private PatchProcessor field mutation is used.
 
-The prior Step-22/24/27 TrimmerRootAssembly descriptors remain recorded as measured evidence and protection history, but 0.0.107 no longer relies on them as the complete preservation mechanism. No additional one-off `DebuggableAttribute` root is added.
+Gate Q proves baseline 42/42 with `TargetCalls=2`, `PrefixCalls=0`. Gate S registers only the interpreted prefix descriptor. Gate T keeps the normalized HarmonySharedState and host-framework preflights and invokes public `PatchProcessor.Patch()` exactly once. If that succeeds, Gate V must produce 1041 on both interpreted routes while the original target counter remains unchanged; Gate W then unpatches exactly one prefix and Gate Y must restore 42/42.
 
-The production Harmony patch path is otherwise unchanged: raw-PE `HarmonySharedState` normalization, T6a/T6b LINQ closure, prefix descriptor, and the single public `PatchProcessor.Patch()` acceptance call stay in the same order.
+No MonoMod backend switch or environment override is forced. No further Harmony-internal workaround is admitted in this candidate.
 
-### Master-plan decision
+### Master-plan / pivot decision
 
-`MASTER-PLAN.md` is revised for this candidate because global full trimming was previously a protected architecture policy and two physical failures now show that it conflicts with post-publish dynamic managed payloads. This is **not** a Step-28 patch-engine pivot. Harmony remains on trial until the same patch path reaches replacement generation and the actual MonoMod detour boundary without linker-induced missing framework members.
+`MASTER-PLAN.md` is unchanged from 0.0.107. Its copy/no-link dynamic-payload policy remains active. The Harmony architecture decision now has a hard physical branch:
+
+- interpreted fixture patch/unpatch succeeds → Harmony remains viable for the representative dynamically loaded managed target and Step 27 can close after the normal acceptance chain;
+- interpreted fixture cannot patch → stop Harmony-internal iteration, revise the master plan, and begin Step 28 as deterministic ahead-of-load managed IL transformation.
 
 ## Fresh-process rule
 
@@ -167,4 +173,4 @@ The production Harmony patch path is otherwise unchanged: raw-PE `HarmonySharedS
 
 ## Acceptance
 
-Codemagic must compile/run the complete host suite, publish/verify the IPA, and emit the exact `MtouchLink=None; TrimMode=copy` telemetry. Install `0.0.107 (107)` and run Step 27 from a fresh process. Full acceptance remains A–Z **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. A Step-28 architecture pivot remains conditional on representative replacement/detour evidence after trimming ambiguity has been removed.
+Codemagic must compile/run the complete host suite, including the separately built interpreted-fixture regression, publish the IPA, and verify the fixture exists exactly once in `Step27InterpretedPatchFixture/` and is byte-identical to its just-built source. Install `0.0.108 (108)` and run Step 27 from a fresh process. Full success remains A–Z **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. A physical Patch() failure on this interpreted fixture triggers the Step-28 pivot; no further Harmony-internal candidate follows.

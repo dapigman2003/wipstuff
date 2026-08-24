@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>107</ApplicationVersion>" in project_text, "build version is 107")
-require("<ApplicationDisplayVersion>0.0.107</ApplicationDisplayVersion>" in project_text, "display version is 0.0.107")
-require(plist.get("CFBundleVersion") == "107", "Info.plist build version is 107")
-require(plist.get("CFBundleShortVersionString") == "0.0.107", "Info.plist display version is 0.0.107")
+require("<ApplicationVersion>108</ApplicationVersion>" in project_text, "build version is 108")
+require("<ApplicationDisplayVersion>0.0.108</ApplicationDisplayVersion>" in project_text, "display version is 0.0.108")
+require(plist.get("CFBundleVersion") == "108", "Info.plist build version is 108")
+require(plist.get("CFBundleShortVersionString") == "0.0.108", "Info.plist display version is 0.0.108")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,12 +198,12 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.23 — DYNAMIC PAYLOAD NO-TRIM HOST POLICY" in release_presentation, "top launcher banner identifies active Step 27.0.23 candidate")
-require("0.0.106" in release_presentation and "DebuggableAttribute" in release_presentation and "DynamicMethodDefinition" in release_presentation and "MtouchLink=None" in release_presentation and "TrimMode=copy" in release_presentation and "before PatchTools.DetourMethod" in release_presentation and "no StS2 member" in release_presentation, "top launcher banner records the physical 0.0.106 second BCL trim failure and scopes the 0.0.107 no-trim host correction")
+require("STEP 27.0.24 — SINGLE POST-PUBLISH INTERPRETED HARMONY DECISION EXPERIMENT" in release_presentation, "top launcher banner identifies active Step 27.0.24 candidate")
+require("0.0.107" in release_presentation and "NotImplementedException" in release_presentation and "PatchFunctions.UpdateWrapper" in release_presentation and "post-publish interpreted" in release_presentation and "CreateProcessor(MethodBase)" in release_presentation and "Step 28" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner records physical 0.0.107 and scopes the single interpreted stop-rule decision experiment")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.107"' in release_presentation and 'ExpectedBuildVersion = "107"' in release_presentation, "Step 27.0.23 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.108"' in release_presentation and 'ExpectedBuildVersion = "108"' in release_presentation, "Step 27.0.24 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
-require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "MtouchLink=None + TrimMode=copy" in release_presentation and "T6a/T6b LINQ closure retained" in release_presentation and "PatchProcessor.Patch() unchanged after T6" in release_presentation, "Step 27.0.23 source pins the raw-body + no-trim Gate-T implementation marker")
+require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "post-publish interpreted Target+Prefix fixture" in release_presentation and "fresh processor via Harmony.CreateProcessor(MethodBase)" in release_presentation and "exactly one Patch()" in release_presentation, "Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
 require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
@@ -343,8 +343,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.107",
-    "STS2_BUILD_VERSION": "107",
+    "STS2_DISPLAY_VERSION": "0.0.108",
+    "STS2_BUILD_VERSION": "108",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -910,15 +910,19 @@ for required in [
     'GetType("HarmonyLib.HarmonyMethod", throwOnError: false, ignoreCase: false)',
     'GetField("prefix", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)',
     'GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)',
-    'typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Target)',
-    'typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Prefix)',
+    'InterpretedPatchFixtureDirectoryName = "Step27InterpretedPatchFixture"',
+    'InterpretedPatchFixtureFileName = "StS2Launcher.Step27.InterpretedPatchFixture.dll"',
+    'LoadVerifiedInterpretedFixture(',
+    'GetMethod("InvokeTarget"',
+    'processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])',
+    'processorApi.OriginalField.GetValue(interpretedProcessor), target',
+    'InvokePatchProbeInt32(probe.Target, 41',
+    'InvokePatchProbeInt32(probe.InvokeTarget, 41',
     'patchApi.HarmonyMethodDefaultConstructor.Invoke([])',
     'patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)',
     'patchApi.PrefixField.SetValue(processor, descriptor)',
     'patchApi.PatchMethod.Invoke(processor, null)',
     'patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])',
-    'probe.Target.Invoke(null, [41])',
-    'HarmonyPatchProbe.Target(41)',
 ]:
     require(required in step27_source, f"Step 27 production boundary contains required invariant: {required}")
 require(step27_source.count("api.Constructor.Invoke([HarmonyId])") == 1, "Step 27 replays exactly one inert Harmony(string) constructor invocation")
@@ -928,8 +932,10 @@ require(step27_source.count("patchApi.HarmonyMethodDefaultConstructor.Invoke([])
 require(step27_source.count("patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)") == 1 and step27_source.count("patchApi.PrefixField.SetValue(processor, descriptor)") == 1, "Step 27 bounded descriptor path performs exactly one method assignment and one processor-prefix assignment")
 require(step27_source.count("patchApi.PatchMethod.Invoke(processor, null)") == 1, "Step 27 has exactly one intentional PatchProcessor.Patch() invocation")
 require(step27_source.count("patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])") == 1, "Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation")
-require(step27_source.count("probe.Target.Invoke(null, [41])") == 3, "Step 27 invokes the launcher target by reflection exactly at baseline, patched, and restored gates")
-require(step27_source.count("HarmonyPatchProbe.Target(41)") == 3, "Step 27 invokes the launcher target directly exactly at baseline, patched, and restored gates")
+require(step27_source.count("InvokePatchProbeInt32(probe.Target, 41") == 3, "Step 27 invokes the post-publish interpreted Target exactly at baseline, patched, and restored gates")
+require(step27_source.count("InvokePatchProbeInt32(probe.InvokeTarget, 41") == 3, "Step 27 exercises the in-fixture interpreted direct-call route exactly at baseline, patched, and restored gates")
+require("HarmonyPatchProbe" not in step27_source, "Step 27 production boundary no longer depends on the build-time AOT HarmonyPatchProbe target")
+require(step27_source.count("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])") == 1, "Step 27 creates exactly one fresh processor for the admitted post-publish interpreted target")
 require(step27_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2 and step27_source.count("RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)") == 1 and step27_source.count("RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)") == 1, "Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier")
 require(step27_source.count("CreateIosNormalizedHarmonyRuntimeImage(target.PreparedPath)") == 1, "Step 27.0.14 creates exactly one bounded normalized Harmony runtime image during Gate A")
 require(step27_source.count("CreateSyntheticPassthroughRuntimeImage(target.PreparedPath)") == 1, "Step 27.0.14 retains exactly one internal synthetic passthrough path alongside canonical normalization")
@@ -1043,6 +1049,35 @@ require("IsExactTwoSequenceUnion" in step27_source and "IsExactNonIndexedSelect"
 require("defaultCtorIl.Count == 6" in step27_source and "Code.Ldc_I4_M1" in step27_source and "HarmonyMethod() no longer matches exact priority=-1" in step27_source, "Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape")
 require("harmonyAnnotations.Length != 0" in step27_source and "HarmonyMethod(MethodInfo)/ImportMethod invoked: NO" in step27_source and "PatchProcessor.AddPrefix invoked: NO" in step27_source, "Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
+
+# Step 27.0.24 — single post-publish interpreted target/prefix decision experiment.
+step27_interpreted_project = ROOT / "fixtures/StS2Launcher.Step27.InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.csproj"
+step27_interpreted_source_path = ROOT / "fixtures/StS2Launcher.Step27.InterpretedPatchFixture/InterpretedPatchProbe.cs"
+require(step27_interpreted_project.is_file() and step27_interpreted_source_path.is_file(), "Step 27.0.24 dedicated interpreted patch fixture project/source exist")
+step27_interpreted_source = step27_interpreted_source_path.read_text() if step27_interpreted_source_path.is_file() else ""
+require(all(marker in step27_interpreted_source for marker in ["public static int TargetCalls", "public static int PrefixCalls", "public static void ResetCounters()", "public static int Target(int value)", "public static int InvokeTarget(int value) => Target(value);", "public static bool Prefix(int value, ref int __result)", "__result = value + 1000", "return false"]), "Step 27.0.24 fixture pins deterministic Target/InvokeTarget/Prefix/counter behavior")
+require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text, "Step 27.0.24 interpreted fixture is absent from the iOS MSBuild/AOT project graph")
+test_project_text = read("tests/StS2Launcher.Core.Tests/StS2Launcher.Core.Tests.csproj")
+require('ProjectReference Include="../../fixtures/StS2Launcher.Step27.InterpretedPatchFixture' not in test_project_text, "Step 27.0.24 interpreted fixture is not a host-test ProjectReference")
+require("PostPublishInterpretedPatchFixtureHasExactPatchSurfaceWithoutProjectReference" in step27_tests and "STS2_STEP27_INTERPRETED_PATCH_FIXTURE" in step27_tests and "InvokeTarget must retain a direct managed IL call to Target" in step27_tests, "host suite validates the separately supplied interpreted fixture without a project reference")
+require("InterpretedPatchFixtureDirectoryName" in root_ui_text and "NSBundle.MainBundle.BundlePath" in root_ui_text and "new ControlledHarmonyPatchExecution(" in root_ui_text, "iOS UI passes the explicit bundled post-publish fixture directory into Step 27")
+
+build_ios_text = read("scripts/build-ios.sh")
+require("STEP27_INTERPRETED_FIXTURE_PROJECT" in build_ios_text and 'dotnet build "$STEP27_INTERPRETED_FIXTURE_PROJECT"' in build_ios_text, "iOS build explicitly builds the Step 27 interpreted fixture outside the iOS project graph")
+require('dotnet publish "$PROJECT"' in build_ios_text and 'cp "$STEP27_INTERPRETED_FIXTURE_DLL" "$APP/Step27InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.dll"' in build_ios_text, "iOS build explicitly copies the interpreted fixture into the app")
+require(build_ios_text.index('dotnet publish "$PROJECT"') < build_ios_text.index('cp "$STEP27_INTERPRETED_FIXTURE_DLL" "$APP/Step27InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.dll"'), "Step 27 interpreted fixture copy occurs strictly after dotnet publish returns")
+verify_ipa_text = read("scripts/verify-ipa.sh")
+require("Step27InterpretedPatchFixture" in verify_ipa_text and "STEP27_BUNDLED_COUNT" in verify_ipa_text and '[[ "$STEP27_BUNDLED_COUNT" == "1" ]]' in verify_ipa_text and 'cmp -s "$STEP27_FIXTURE_SOURCE" "$STEP27_FIXTURE"' in verify_ipa_text and "step27-interpreted-patch-fixture.sha256" in verify_ipa_text, "IPA verifier requires exactly one byte-identical hash-verified interpreted fixture in its data-only directory")
+test_script_text = read("scripts/test.sh")
+require("STEP27_INTERPRETED_PROJECT" in test_script_text and "STS2_STEP27_INTERPRETED_PATCH_FIXTURE" in test_script_text and 'dotnet build "$STEP27_INTERPRETED_PROJECT"' in test_script_text, "host runner builds the interpreted fixture separately and exports only its path to MSTest")
+require("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])" in step27_source and "processorApi.OriginalField.GetValue(interpretedProcessor), target" in step27_source, "Gate P creates a fresh public processor bound to the exact interpreted target without private original-field mutation")
+require("processorApi.OriginalField.SetValue" not in step27_source and "patchApi.OriginalField.SetValue" not in step27_source, "Step 27.0.24 never mutates PatchProcessor.original directly")
+require("ResetPatchProbeCounters(probe);" in step27_source and "RequirePatchProbeCounters(2, 0" in step27_source and "RequirePatchProbeCounters(2, 2" not in step27_source, "interpreted fixture baseline counters are reset and physically re-established before patching")
+require(step27_source.count("InvokePatchProbeInt32(probe.Target, 41") == 3 and step27_source.count("InvokePatchProbeInt32(probe.InvokeTarget, 41") == 3, "baseline/patched/restored gates each exercise direct target reflection plus in-fixture interpreted call route")
+require("finalCounters.TargetCalls != 2 || finalCounters.PrefixCalls != 2" in step27_source and "counters.TargetCalls != 4 || counters.PrefixCalls != 2" in step27_source, "Step 27.0.24 pins skip-original patched counters and exact restored counters")
+require("MONOMOD_DMD_TYPE" not in step27_source + build_ios_text + test_script_text + project_text, "Step 27.0.24 does not force a MonoMod DMD backend override")
+require("STEP-27.0.23-PHYSICAL-NOTIMPLEMENTED-PATCHENGINE.txt" in read("docs/CURRENT-STATUS.md") and "STEP-27.0.24-POST-PUBLISH-INTERPRETED-PATCH-EXPERIMENT.md" in read("docs/history/INDEX.md"), "active status/history index preserve the physical 0.0.107 evidence and final interpreted decision experiment")
+require(sha256(ROOT / "docs/MASTER-PLAN.md") == "a0dcd92c2b1d5670cc4f9bece8ce6f0e27533bbd9a858a95a40ef9c9df6668ea", "Step 27.0.24 leaves the 0.0.107 copy/no-link master plan byte-for-byte unchanged pending the physical decision")
 
 step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
 require(step27_manifest.is_file(), "Step 27 candidate boundary hash manifest exists")
@@ -1202,8 +1237,12 @@ step27_build106_report = read("docs/history/reports/STEP-27.0.22-PHYSICAL-DYNAMI
 require("App version: 0.0.106 (106)" in step27_build106_report and "CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 19/26" in step27_build106_report and "Gate T — PatchEngineExecution: FAIL" in step27_build106_report, "physical build 106 evidence preserves the exact 19/26 Gate-T failure")
 require("System.Diagnostics.DebuggableAttribute" in step27_build106_report and "MonoMod.Utils.DynamicMethodDefinition" in step27_build106_report and "HarmonyLib.MethodPatcherTools.CreateDynamicMethod" in step27_build106_report and "HarmonyLib.PatchProcessor.Patch" in step27_build106_report, "physical build 106 proves the LINQ fix advanced Patch() into DynamicMethodDefinition before the next BCL trim failure")
 require("PatchTools.DetourMethod: DetourFactory.Current.CreateDetour — PRESENT" in step27_build106_report and "at HarmonyLib.PatchTools.DetourMethod" not in step27_build106_report, "physical build 106 still does not establish actual MonoMod detour execution")
+step27_build107_report = read("docs/history/reports/STEP-27.0.23-PHYSICAL-NOTIMPLEMENTED-PATCHENGINE.txt")
+require("App version: 0.0.107 (107)" in step27_build107_report and "CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 19/26" in step27_build107_report and "Gate T — PatchEngineExecution: FAIL" in step27_build107_report, "physical build 107 evidence preserves the exact 19/26 Gate-T result under copy/no-link")
+require("System.NotImplementedException: Arg_NotImplementedException" in step27_build107_report and "at HarmonyLib.PatchFunctions.UpdateWrapper" in step27_build107_report and "at HarmonyLib.PatchProcessor.Patch" in step27_build107_report, "physical build 107 proves trimming ambiguity is gone and localizes the next blocker to real Patch() execution")
+require("System.Linq.Enumerable.Union" not in step27_build107_report[step27_build107_report.index("Gate T — PatchEngineExecution: FAIL"): ] and "System.Diagnostics.DebuggableAttribute" not in step27_build107_report[step27_build107_report.index("Gate T — PatchEngineExecution: FAIL"): ], "physical build 107 Gate-T failure is no longer either known trimmed-framework-member failure")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.105 (105)" in current_status and "System.Linq.Enumerable.Union" in current_status and "0.0.106 (106)" in current_status and "DebuggableAttribute" in current_status and "DynamicMethodDefinition" in current_status and "Step 27.0.23 / 0.0.107 (107)" in current_status and "MtouchLink=None" in current_status and "TrimMode=copy" in current_status and "master" in current_status.lower() and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and ("Step 28" in current_status or "Step-28" in current_status), "current status records both physical trimming failures and advances to Step 27.0.23 / 0.0.107 copy/no-link policy")
+require("Steps 01–26" in current_status and "0.0.105 (105)" in current_status and "System.Linq.Enumerable.Union" in current_status and "0.0.106 (106)" in current_status and "DebuggableAttribute" in current_status and "0.0.107 (107)" in current_status and "NotImplementedException" in current_status and "PatchFunctions.UpdateWrapper" in current_status and "Step 27.0.24 / 0.0.108 (108)" in current_status and "post-publish interpreted" in current_status and "MtouchLink=None" in current_status and "TrimMode=copy" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and ("Step 28" in current_status or "Step-28" in current_status), "current status records the physical 0.0.107 patch-engine failure and advances to the single Step 27.0.24 interpreted decision experiment")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

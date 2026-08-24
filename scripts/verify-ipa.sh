@@ -110,6 +110,35 @@ while IFS= read -r path; do
   }
 done < "$STEP20_BUNDLED_LIST"
 
+# Step 27.0.24 interpreted patch fixture is the single bounded post-publish Harmony experiment.
+# It must exist exactly once, only in its data-only directory, and must be byte-identical to the
+# launcher-owned net9.0 fixture built before publish but copied into the .app only after publish.
+STEP27_FIXTURE_DIR="$APP/Step27InterpretedPatchFixture"
+STEP27_FIXTURE="$STEP27_FIXTURE_DIR/StS2Launcher.Step27.InterpretedPatchFixture.dll"
+STEP27_FIXTURE_SOURCE="$ROOT/fixtures/StS2Launcher.Step27.InterpretedPatchFixture/bin/Release/net9.0/StS2Launcher.Step27.InterpretedPatchFixture.dll"
+STEP27_FIXTURE_MANIFEST="$STEP27_FIXTURE_DIR/step27-interpreted-patch-fixture.sha256"
+[[ -d "$STEP27_FIXTURE_DIR" ]] || { echo "ERROR: Step 27 interpreted patch fixture directory missing from IPA." >&2; exit 5; }
+[[ -f "$STEP27_FIXTURE_SOURCE" ]] || { echo "ERROR: just-built Step 27 interpreted fixture source missing." >&2; exit 5; }
+[[ -s "$STEP27_FIXTURE" ]] || { echo "ERROR: bundled Step 27 interpreted patch fixture missing/empty." >&2; exit 5; }
+[[ -f "$STEP27_FIXTURE_MANIFEST" ]] || { echo "ERROR: Step 27 interpreted patch fixture SHA-256 manifest missing." >&2; exit 5; }
+cmp -s "$STEP27_FIXTURE_SOURCE" "$STEP27_FIXTURE" || { echo "ERROR: bundled Step 27 interpreted patch fixture differs from exact just-built source." >&2; exit 5; }
+(
+  cd "$STEP27_FIXTURE_DIR"
+  shasum -a 256 -c step27-interpreted-patch-fixture.sha256 >/dev/null
+) || { echo "ERROR: bundled Step 27 interpreted patch fixture manifest verification failed." >&2; exit 5; }
+STEP27_BUNDLED_LIST="$TMP/step27-interpreted-fixture-dlls.txt"
+find "$APP" -type f -name 'StS2Launcher.Step27.InterpretedPatchFixture.dll' -print | sort > "$STEP27_BUNDLED_LIST"
+STEP27_BUNDLED_COUNT="$(wc -l < "$STEP27_BUNDLED_LIST" | tr -d '[:space:]')"
+[[ "$STEP27_BUNDLED_COUNT" == "1" ]] || {
+  echo "ERROR: expected exactly one Step 27 interpreted patch fixture DLL in final .app, found $STEP27_BUNDLED_COUNT." >&2
+  sed 's/^/  /' "$STEP27_BUNDLED_LIST" >&2
+  exit 5
+}
+[[ "$(cat "$STEP27_BUNDLED_LIST")" == "$STEP27_FIXTURE" ]] || {
+  echo "ERROR: Step 27 interpreted patch fixture escaped its exact data-only directory." >&2
+  exit 5
+}
+
 # Every Step 15 native bridge symbol must still survive final linking.
 NATIVE_SYMBOLS_FILE="$TMP/native-symbols.txt"
 nm -gU "$EXECUTABLE" > "$NATIVE_SYMBOLS_FILE" 2>/dev/null || { echo "ERROR: nm could not inspect final executable." >&2; exit 6; }
@@ -210,11 +239,12 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  Mono.Cecil 0.11.6 compatibility-analysis/runtime-planning dependency: linked/AOT input"
   echo "  Project-owned Step 16 regression fixture: bundled as inert raw assembly data"
   echo "  Step 20 external IL fixtures: exactly 3, SHA-256 manifest verified, post-publish data-only directory"
+  echo "  Step 27 interpreted patch fixture: exactly 1, SHA-256 manifest verified, copied only after publish"
   echo "  Build-time launcher assemblies: remain AOT-targeted; MtouchInterpreter=-all retained from physically proven Step 20"
   echo "  Real StS2/proprietary payload in IPA: none (Step 27 still loads only the user-owned prepared copy from Documents at runtime)"
   echo "  Dynamic dependency audit: system or bundled only"
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 24 — CONTROLLED 0HARMONY MODULE INITIALIZATION BOUNDARY"
+  echo "  Expected device UI: STEP 27.0.24 — SINGLE POST-PUBLISH INTERPRETED HARMONY DECISION EXPERIMENT"
 } | tee artifacts/logs/step27-ipa-verification-summary.log

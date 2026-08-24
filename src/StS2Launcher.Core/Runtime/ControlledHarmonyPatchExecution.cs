@@ -35,6 +35,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     public const string AccessToolsTypeFullName = "HarmonyLib.AccessTools";
     public const string HarmonySharedStateTypeFullName = "HarmonyLib.HarmonySharedState";
     public const int HarmonySharedStateInternalVersion = 102;
+    public const string InterpretedPatchFixtureDirectoryName = "Step27InterpretedPatchFixture";
+    public const string InterpretedPatchFixtureFileName = "StS2Launcher.Step27.InterpretedPatchFixture.dll";
+    public const string InterpretedPatchFixtureAssemblySimpleName = "StS2Launcher.Step27.InterpretedPatchFixture";
+    public const string InterpretedPatchFixtureTypeFullName = "StS2Launcher.Step27.InterpretedPatchFixture.InterpretedPatchProbe";
 
     // Exact runtime-generated assembly names reached by the tagged Harmony 2.4.2 shared-state /
     // MonoMod ILGenerator path. These are not prepared dependencies and are admitted only after
@@ -72,6 +76,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     ];
 
     private readonly string _launcherDataRoot;
+    private readonly string _interpretedPatchFixturePath;
     private readonly string _step21WorkRoot;
     private readonly string _preparedRoot;
     private readonly string _planPath;
@@ -119,16 +124,29 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     public ControlledHarmonyPatchExecution(string launcherDataRoot, bool collectibleLoadContext = false)
         : this(
             launcherDataRoot,
+            Path.Combine(AppContext.BaseDirectory, InterpretedPatchFixtureDirectoryName),
+            collectibleLoadContext)
+    {
+    }
+
+    public ControlledHarmonyPatchExecution(
+        string launcherDataRoot,
+        string interpretedPatchFixtureRoot,
+        bool collectibleLoadContext = false)
+        : this(
+            launcherDataRoot,
+            interpretedPatchFixtureRoot,
             collectibleLoadContext,
             FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName,
             TargetSimpleName,
             TargetVersion,
-            [FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, "SlayTheSpire2", TargetSimpleName, "HarmonySharedState", "MonoMod.Utils.Cil.ILGeneratorProxy"])
+            [FirstRealGameAssemblyLoad.ExpectedPrimarySimpleName, "SlayTheSpire2", TargetSimpleName, "HarmonySharedState", "MonoMod.Utils.Cil.ILGeneratorProxy", InterpretedPatchFixtureAssemblySimpleName])
     {
     }
 
     internal ControlledHarmonyPatchExecution(
         string launcherDataRoot,
+        string interpretedPatchFixtureRoot,
         bool collectibleLoadContext,
         string expectedPrimarySimpleName,
         string targetSimpleName,
@@ -137,6 +155,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     {
         if (string.IsNullOrWhiteSpace(launcherDataRoot))
             throw new ArgumentException("Launcher data root is required.", nameof(launcherDataRoot));
+        if (string.IsNullOrWhiteSpace(interpretedPatchFixtureRoot))
+            throw new ArgumentException("Step 27 interpreted patch fixture root is required.", nameof(interpretedPatchFixtureRoot));
         if (string.IsNullOrWhiteSpace(expectedPrimarySimpleName))
             throw new ArgumentException("Expected primary simple name is required.", nameof(expectedPrimarySimpleName));
         if (string.IsNullOrWhiteSpace(targetSimpleName))
@@ -147,6 +167,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             throw new ArgumentException("At least one fresh-process assembly identity is required.", nameof(freshProcessAssemblyNames));
 
         _launcherDataRoot = Path.GetFullPath(launcherDataRoot);
+        _interpretedPatchFixturePath = Path.Combine(Path.GetFullPath(interpretedPatchFixtureRoot), InterpretedPatchFixtureFileName);
         _step21WorkRoot = Path.Combine(_launcherDataRoot, PreparedRuntimeFrameworkBinding.WorkRootName);
         _preparedRoot = Path.Combine(_step21WorkRoot, PreparedRuntimeFrameworkBinding.PreparedRootName);
         _planPath = Path.Combine(
@@ -1818,57 +1839,209 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [DynamicDependency(nameof(HarmonyPatchProbe.Target), typeof(HarmonyPatchProbe))]
-    [DynamicDependency(nameof(HarmonyPatchProbe.Prefix), typeof(HarmonyPatchProbe))]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 deliberately inspects and loads an exact-hash launcher-owned assembly that is copied into the app only after publish, so it is outside the build-time trimmer/AOT graph.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "All reflected fixture members are exact-name/exact-signature checked from the same Cecil-audited post-publish image before use.")]
     public ControlledHarmonyPatchExecutionGateResult RunLauncherPatchProbeResolution()
     {
-        var stage = "launcher patch probe MethodInfo resolution";
+        var stage = "post-publish interpreted patch fixture admission";
         try
         {
             ThrowIfDisposed();
             _ = RequirePatchApi();
+            var processorApi = RequireProcessorApi();
+            var harmonyInstance = _harmonyInstance ?? throw new InvalidOperationException("Step 27 retained Harmony instance is missing before interpreted-target processor creation.");
             var context = RequireLoadContext();
+            if (!File.Exists(_interpretedPatchFixturePath))
+                throw new FileNotFoundException("Step 27.0.24 post-publish interpreted patch fixture is missing.", _interpretedPatchFixturePath);
+
+            var fixtureBytes = File.ReadAllBytes(_interpretedPatchFixturePath);
+            if (fixtureBytes.Length == 0)
+                throw new InvalidDataException("Step 27.0.24 post-publish interpreted patch fixture is empty.");
+            var fixtureSha256 = Convert.ToHexString(SHA256.HashData(fixtureBytes)).ToLowerInvariant();
+
+            using var resolver = new Step27MetadataOnlyResolver(_interpretedPatchFixturePath);
+            using var module = ModuleDefinition.ReadModule(new MemoryStream(fixtureBytes, writable: false), new ReaderParameters
+            {
+                InMemory = true,
+                ReadSymbols = false,
+                ReadingMode = ReadingMode.Deferred,
+                AssemblyResolver = resolver,
+                MetadataResolver = resolver,
+            });
+            if (module.Assembly?.Name is null)
+                throw new BadImageFormatException("Step 27.0.24 interpreted patch fixture has no managed assembly manifest.");
+            if (!module.Assembly.Name.Name.Equals(InterpretedPatchFixtureAssemblySimpleName, StringComparison.Ordinal) ||
+                module.Assembly.Name.Version != new Version(1, 0, 0, 0))
+            {
+                throw new InvalidDataException("Step 27.0.24 interpreted patch fixture identity changed: " + module.Assembly.Name.FullName);
+            }
+            if (module.Attributes.HasFlag(Mono.Cecil.ModuleAttributes.ILOnly) == false)
+                throw new InvalidDataException("Step 27.0.24 interpreted patch fixture must be IL-only.");
+            if (module.Assembly.Name.HasPublicKey)
+                throw new InvalidDataException("Step 27.0.24 interpreted patch fixture must remain launcher-owned and unsigned.");
+
+            foreach (var reference in module.AssemblyReferences)
+            {
+                var simple = reference.Name;
+                if (simple.Equals("mscorlib", StringComparison.Ordinal) ||
+                    simple.Equals("netstandard", StringComparison.Ordinal) ||
+                    simple.Equals("System", StringComparison.Ordinal) ||
+                    simple.StartsWith("System.", StringComparison.Ordinal) ||
+                    simple.Equals("Microsoft.CSharp", StringComparison.Ordinal) ||
+                    simple.StartsWith("Microsoft.VisualBasic", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+                throw new InvalidDataException("Step 27.0.24 interpreted patch fixture has an unexpected non-framework dependency: " + reference.FullName);
+            }
+
+            var moduleType = module.Types.SingleOrDefault(type => type.Name.Equals("<Module>", StringComparison.Ordinal));
+            if (moduleType?.Methods.Any(method => method.Name.Equals(".cctor", StringComparison.Ordinal)) == true)
+                throw new InvalidDataException("Step 27.0.24 interpreted patch fixture must not contain a module initializer.");
+
+            var probeTypeDefinition = EnumerateTypes(module.Types).SingleOrDefault(type => type.FullName.Equals(InterpretedPatchFixtureTypeFullName, StringComparison.Ordinal))
+                ?? throw new MissingMemberException(InterpretedPatchFixtureTypeFullName);
+            if (!probeTypeDefinition.IsPublic || !probeTypeDefinition.IsAbstract || !probeTypeDefinition.IsSealed)
+                throw new InvalidDataException("Step 27.0.24 interpreted patch fixture probe is no longer the expected public static type.");
+
+            MethodDefinition ExactMethod(string name, string returnType, params string[] parameterTypes)
+            {
+                var candidates = probeTypeDefinition.Methods.Where(method =>
+                    method.IsPublic && method.IsStatic && !method.HasGenericParameters &&
+                    method.Name.Equals(name, StringComparison.Ordinal) &&
+                    method.ReturnType.FullName.Equals(returnType, StringComparison.Ordinal) &&
+                    method.Parameters.Select(parameter => parameter.ParameterType.FullName).SequenceEqual(parameterTypes, StringComparer.Ordinal)).ToArray();
+                if (candidates.Length != 1)
+                    throw new MissingMethodException(InterpretedPatchFixtureTypeFullName, name);
+                if (!candidates[0].HasBody)
+                    throw new InvalidDataException($"Step 27.0.24 interpreted patch fixture method {name} has no managed IL body.");
+                return candidates[0];
+            }
+
+            _ = ExactMethod("ResetCounters", "System.Void");
+            _ = ExactMethod("Target", "System.Int32", "System.Int32");
+            _ = ExactMethod("InvokeTarget", "System.Int32", "System.Int32");
+            var prefixDefinition = ExactMethod("Prefix", "System.Boolean", "System.Int32", "System.Int32&");
+            if (!prefixDefinition.Parameters[0].Name.Equals("value", StringComparison.Ordinal) ||
+                !prefixDefinition.Parameters[1].Name.Equals("__result", StringComparison.Ordinal))
+                throw new InvalidDataException("Step 27.0.24 interpreted prefix parameter names changed from value + __result.");
+
+            var exactInt32Fields = probeTypeDefinition.Fields.Where(field =>
+                field.IsPublic && field.IsStatic && field.FieldType.FullName.Equals("System.Int32", StringComparison.Ordinal)).ToArray();
+            if (exactInt32Fields.Count(field => field.Name.Equals("TargetCalls", StringComparison.Ordinal)) != 1 ||
+                exactInt32Fields.Count(field => field.Name.Equals("PrefixCalls", StringComparison.Ordinal)) != 1)
+                throw new InvalidDataException("Step 27.0.24 interpreted fixture counter fields changed.");
+
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;
             var hostBefore = context.HostLoads.Count;
             var nativeBefore = context.NativeLoadAttempts.Count;
+            var rejectedBefore = context.RejectedManagedRequests.Count;
+            var membershipBefore = SnapshotPrivateContextMembership(context);
 
-            var target = typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Target), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-                ?? throw new MissingMethodException(typeof(HarmonyPatchProbe).FullName, nameof(HarmonyPatchProbe.Target));
-            var prefix = typeof(HarmonyPatchProbe).GetMethod(nameof(HarmonyPatchProbe.Prefix), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-                ?? throw new MissingMethodException(typeof(HarmonyPatchProbe).FullName, nameof(HarmonyPatchProbe.Prefix));
+            stage = "exact-hash post-publish interpreted fixture LoadFromStream";
+            var fixtureAssembly = context.LoadVerifiedInterpretedFixture(
+                fixtureBytes,
+                module.Assembly.Name.FullName,
+                "Step 27.0.24 post-publish interpreted patch fixture");
+            if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(fixtureAssembly), context))
+                throw new InvalidDataException("Step 27.0.24 interpreted patch fixture did not load into the Step 27 private context.");
+            if (context.PrivateLoads.Count != privateBefore + 1)
+                throw new InvalidDataException("Step 27.0.24 interpreted fixture load was not recorded as exactly one private load.");
+            if (context.NativeLoadAttempts.Count != nativeBefore || context.RejectedManagedRequests.Count != rejectedBefore)
+                throw new InvalidDataException("Step 27.0.24 interpreted fixture admission caused native or rejected managed resolution.");
 
-            if (target.ReturnType != typeof(int) || target.IsGenericMethod || !target.IsStatic)
-                throw new InvalidDataException("Step 27 launcher patch target shape changed.");
-            var targetParameters = target.GetParameters();
-            if (targetParameters.Length != 1 || targetParameters[0].ParameterType != typeof(int) || !string.Equals(targetParameters[0].Name, "value", StringComparison.Ordinal))
-                throw new InvalidDataException("Step 27 launcher patch target signature/parameter metadata changed.");
+            var membershipAfter = SnapshotPrivateContextMembership(context);
+            var added = membershipAfter.Except(membershipBefore, StringComparer.Ordinal).ToArray();
+            if (added.Length != 1 || !string.Equals(new AssemblyName(added[0]).Name, InterpretedPatchFixtureAssemblySimpleName, StringComparison.Ordinal))
+                throw new InvalidDataException("Step 27.0.24 fixture admission changed private-context membership by anything other than the exact interpreted fixture.");
 
-            if (prefix.ReturnType != typeof(bool) || prefix.IsGenericMethod || !prefix.IsStatic)
-                throw new InvalidDataException("Step 27 launcher prefix shape changed.");
+            stage = "interpreted fixture MethodInfo/FieldInfo resolution";
+            var probeType = fixtureAssembly.GetType(InterpretedPatchFixtureTypeFullName, throwOnError: true, ignoreCase: false)
+                ?? throw new MissingMemberException(InterpretedPatchFixtureTypeFullName);
+            var target = probeType.GetMethod("Target", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly, binder: null, [typeof(int)], modifiers: null)
+                ?? throw new MissingMethodException(InterpretedPatchFixtureTypeFullName, "Target");
+            var invokeTarget = probeType.GetMethod("InvokeTarget", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly, binder: null, [typeof(int)], modifiers: null)
+                ?? throw new MissingMethodException(InterpretedPatchFixtureTypeFullName, "InvokeTarget");
+            var prefix = probeType.GetMethod("Prefix", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingMethodException(InterpretedPatchFixtureTypeFullName, "Prefix");
+            var resetCounters = probeType.GetMethod("ResetCounters", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly, binder: null, Type.EmptyTypes, modifiers: null)
+                ?? throw new MissingMethodException(InterpretedPatchFixtureTypeFullName, "ResetCounters");
+            var targetCallsField = probeType.GetField("TargetCalls", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(InterpretedPatchFixtureTypeFullName, "TargetCalls");
+            var prefixCallsField = probeType.GetField("PrefixCalls", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                ?? throw new MissingFieldException(InterpretedPatchFixtureTypeFullName, "PrefixCalls");
+
+            if (!ReferenceEquals(target.DeclaringType?.Assembly, fixtureAssembly) ||
+                !ReferenceEquals(invokeTarget.DeclaringType?.Assembly, fixtureAssembly) ||
+                !ReferenceEquals(prefix.DeclaringType?.Assembly, fixtureAssembly))
+                throw new InvalidDataException("Step 27.0.24 interpreted fixture member resolution escaped the exact loaded fixture.");
+            if (target.ReturnType != typeof(int) || invokeTarget.ReturnType != typeof(int) || prefix.ReturnType != typeof(bool) ||
+                targetCallsField.FieldType != typeof(int) || prefixCallsField.FieldType != typeof(int))
+                throw new InvalidDataException("Step 27.0.24 interpreted fixture runtime member shapes changed.");
             var prefixParameters = prefix.GetParameters();
             if (prefixParameters.Length != 2 ||
                 prefixParameters[0].ParameterType != typeof(int) || !string.Equals(prefixParameters[0].Name, "value", StringComparison.Ordinal) ||
                 prefixParameters[1].ParameterType != typeof(int).MakeByRefType() || !string.Equals(prefixParameters[1].Name, "__result", StringComparison.Ordinal))
-                throw new InvalidDataException("Step 27 launcher prefix signature/parameter metadata changed.");
+                throw new InvalidDataException("Step 27.0.24 interpreted fixture prefix runtime signature changed.");
 
-            if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(target.DeclaringType!.Assembly), AssemblyLoadContext.Default) ||
-                !ReferenceEquals(AssemblyLoadContext.GetLoadContext(prefix.DeclaringType!.Assembly), AssemblyLoadContext.Default))
-                throw new InvalidDataException("Step 27 launcher patch probe is not in the default host load context.");
-            if (context.ManagedResolverRequests.Count != managedBefore || context.PrivateLoads.Count != privateBefore || context.HostLoads.Count != hostBefore || context.NativeLoadAttempts.Count != nativeBefore)
-                throw new InvalidDataException("Resolving the launcher patch probe unexpectedly affected the private Harmony context.");
+            stage = "fresh interpreted-target PatchProcessor creation";
+            object interpretedProcessor;
+            try
+            {
+                interpretedProcessor = processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])
+                    ?? throw new InvalidDataException("Harmony.CreateProcessor(interpreted Target) returned null.");
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException is not null)
+            {
+                throw new InvalidOperationException("Harmony.CreateProcessor(interpreted Target) threw.", ex.InnerException);
+            }
+            if (!ReferenceEquals(interpretedProcessor.GetType(), processorApi.PatchProcessorType) ||
+                !ReferenceEquals(processorApi.InstanceField.GetValue(interpretedProcessor), harmonyInstance) ||
+                !ReferenceEquals(processorApi.OriginalField.GetValue(interpretedProcessor), target))
+                throw new InvalidDataException("Fresh interpreted-target PatchProcessor did not retain the exact Harmony instance and interpreted target MethodBase.");
+            _patchProcessorInstance = interpretedProcessor;
+            if (context.NativeLoadAttempts.Count != nativeBefore || context.RejectedManagedRequests.Count != rejectedBefore)
+                throw new InvalidDataException("Interpreted-target PatchProcessor creation caused native or rejected managed resolution.");
+            var postProcessorMembership = SnapshotPrivateContextMembership(context);
+            if (!postProcessorMembership.SequenceEqual(membershipAfter, StringComparer.Ordinal))
+                throw new InvalidDataException("Interpreted-target PatchProcessor creation changed private-context membership.");
+            if (targetCallsField.GetValue(null) is not int initialTargetCalls || initialTargetCalls != 0 ||
+                prefixCallsField.GetValue(null) is not int initialPrefixCalls || initialPrefixCalls != 0)
+                throw new InvalidDataException("Interpreted patch fixture counters changed during admission/processor creation.");
 
-            var targetSignature = $"{target.ReturnType.FullName} {target.DeclaringType.FullName}::{target.Name}({string.Join(",", targetParameters.Select(p => p.ParameterType.FullName))})";
-            var prefixSignature = $"{prefix.ReturnType.FullName} {prefix.DeclaringType.FullName}::{prefix.Name}({string.Join(",", prefixParameters.Select(p => p.ParameterType.FullName))})";
-            _patchProbe = new LauncherPatchProbeSnapshot(target, prefix, targetSignature, prefixSignature);
+            var targetSignature = $"{target.ReturnType.FullName} {target.DeclaringType!.FullName}::{target.Name}(System.Int32)";
+            var invokeTargetSignature = $"{invokeTarget.ReturnType.FullName} {invokeTarget.DeclaringType!.FullName}::{invokeTarget.Name}(System.Int32)";
+            var prefixSignature = $"{prefix.ReturnType.FullName} {prefix.DeclaringType!.FullName}::{prefix.Name}(System.Int32,System.Int32&)";
+            _patchProbe = new LauncherPatchProbeSnapshot(
+                fixtureAssembly,
+                _interpretedPatchFixturePath,
+                fixtureSha256,
+                target,
+                invokeTarget,
+                prefix,
+                resetCounters,
+                targetCallsField,
+                prefixCallsField,
+                targetSignature,
+                invokeTargetSignature,
+                prefixSignature);
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.LauncherPatchProbeResolution,
-                "LAUNCHER-OWNED PATCH TARGET + PREFIX RESOLVED WITHOUT INVOCATION.\n" +
+                "LAUNCHER-OWNED POST-PUBLISH INTERPRETED PATCH FIXTURE ADMITTED + RESOLVED WITHOUT INVOCATION.\n" +
+                $"Fixture: {InterpretedPatchFixtureFileName}\n" +
+                $"Fixture SHA-256: {fixtureSha256}\n" +
+                $"Fixture bytes: {fixtureBytes.Length:N0}\n" +
+                $"Assembly: {fixtureAssembly.GetName().FullName}\n" +
+                "Load timing: copied into .app only AFTER dotnet publish; not an iOS project/content reference or AOT input\n" +
+                $"Load context: {AssemblyLoadContext.GetLoadContext(fixtureAssembly)?.Name}\n" +
                 $"Target: {targetSignature}\n" +
+                $"In-fixture direct caller: {invokeTargetSignature}\n" +
                 $"Prefix: {prefixSignature}\n" +
+                "Fresh PatchProcessor target: exact interpreted Target MethodInfo via audited Harmony.CreateProcessor(MethodBase)\n" +
                 "Prefix parameter names: value + __result — EXACT\n" +
-                "Declaring assembly load context: DEFAULT HOST\n" +
+                $"Resolver/load deltas during fixture admission: managed={context.ManagedResolverRequests.Count - managedBefore}; private={context.PrivateLoads.Count - privateBefore}; host={context.HostLoads.Count - hostBefore}; native=0\n" +
                 "Target invoked: NO\n" +
                 "Prefix invoked: NO\n" +
                 "Harmony patch API invoked: NO\n" +
@@ -1880,10 +2053,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes only the exact launcher-owned probe MethodInfo already rooted and signature-verified in Gate P.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 invokes only exact members of the launcher-owned post-publish interpreted fixture admitted in Gate P.")]
     public ControlledHarmonyPatchExecutionGateResult RunBaselineProbeInvocation()
     {
-        var stage = "launcher baseline probe invocation";
+        var stage = "post-publish interpreted fixture baseline invocation";
         try
         {
             ThrowIfDisposed();
@@ -1893,38 +2066,36 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var privateBefore = context.PrivateLoads.Count;
             var hostBefore = context.HostLoads.Count;
             var nativeBefore = context.NativeLoadAttempts.Count;
+            var membershipBefore = SnapshotPrivateContextMembership(context);
 
-            HarmonyPatchProbe.ResetCounters();
-            stage = "direct baseline target invocation";
-            var directResult = HarmonyPatchProbe.Target(41);
+            ResetPatchProbeCounters(probe);
             stage = "reflection baseline target invocation";
-            var reflectedRaw = probe.Target.Invoke(null, [41]);
-            if (reflectedRaw is not int reflectedResult)
-                throw new InvalidDataException("Step 27 baseline reflection invocation did not return System.Int32.");
+            var reflectedResult = InvokePatchProbeInt32(probe.Target, 41, "Step 27.0.24 baseline Target reflection invocation");
+            stage = "interpreted in-fixture direct-call baseline invocation";
+            var directResult = InvokePatchProbeInt32(probe.InvokeTarget, 41, "Step 27.0.24 baseline InvokeTarget invocation");
 
-            var targetCalls = HarmonyPatchProbe.TargetCalls;
-            var prefixCalls = HarmonyPatchProbe.PrefixCalls;
-            if (directResult != 42 || reflectedResult != 42 || targetCalls != 2 || prefixCalls != 0)
-                throw new InvalidDataException($"Launcher baseline behavior changed: direct={directResult}, reflection={reflectedResult}, targetCalls={targetCalls}, prefixCalls={prefixCalls}.");
+            var counters = ReadPatchProbeCounters(probe);
+            if (directResult != 42 || reflectedResult != 42 || counters.TargetCalls != 2 || counters.PrefixCalls != 0)
+                throw new InvalidDataException($"Interpreted fixture baseline behavior changed: direct={directResult}, reflection={reflectedResult}, targetCalls={counters.TargetCalls}, prefixCalls={counters.PrefixCalls}.");
             if (context.ManagedResolverRequests.Count != managedBefore || context.PrivateLoads.Count != privateBefore || context.HostLoads.Count != hostBefore || context.NativeLoadAttempts.Count != nativeBefore)
-                throw new InvalidDataException("Launcher baseline invocation unexpectedly affected the private Harmony context.");
+                throw new InvalidDataException("Interpreted fixture baseline invocation unexpectedly changed the Step 27 private resolver/load counters.");
+            var membershipAfter = SnapshotPrivateContextMembership(context);
+            if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
+                throw new InvalidDataException("Interpreted fixture baseline invocation changed private-context membership.");
 
-            _baselineProbeInvocation = new BaselineProbeInvocationSnapshot(directResult, reflectedResult, targetCalls, prefixCalls);
+            _baselineProbeInvocation = new BaselineProbeInvocationSnapshot(directResult, reflectedResult, counters.TargetCalls, counters.PrefixCalls);
             return Pass(
                 ControlledHarmonyPatchExecutionGate.BaselineProbeInvocation,
-                "LAUNCHER-OWNED PROBE BASELINE BEHAVIOR ESTABLISHED BEFORE PATCHING.\n" +
+                "POST-PUBLISH INTERPRETED FIXTURE BASELINE BEHAVIOR ESTABLISHED BEFORE PATCHING.\n" +
                 "Input: 41\n" +
-                $"Direct result: {directResult}\n" +
-                $"Reflection result: {reflectedResult}\n" +
-                $"Target calls: {targetCalls}\n" +
-                $"Prefix calls: {prefixCalls}\n" +
+                $"Target reflection result: {reflectedResult}\n" +
+                $"In-fixture direct-call result: {directResult}\n" +
+                $"Target calls: {counters.TargetCalls}\n" +
+                $"Prefix calls: {counters.PrefixCalls}\n" +
                 "Expected original behavior value + 1: YES\n" +
+                "Both invocation routes executed managed IL from the post-publish fixture: YES\n" +
                 "PatchProcessor.Patch invoked: NO\n" +
                 "StS2 type/member reflected or invoked: NO");
-        }
-        catch (TargetInvocationException ex) when (ex.InnerException is not null)
-        {
-            return Fail(ControlledHarmonyPatchExecutionGate.BaselineProbeInvocation, stage, ex.InnerException);
         }
         catch (Exception ex)
         {
@@ -1932,7 +2103,6 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 explicitly initializes only the exact physically measured HarmonyLib.AccessTools runtime-detection/cache initializer before HarmonyMethod construction.")]
     [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "AccessTools is post-publish Harmony code unavailable to the build-time trimmer; Gate O bounds its exact physical runtime-detection/cache initializer and verifies the string-reflected framework surface before this explicit completion barrier.")]
     public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization(
         IProgress<ControlledHarmonyPatchExecutionProgress>? progress = null)
@@ -2009,8 +2179,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var postSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!postSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("0Harmony prepared bytes changed across AccessTools type initialization.");
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("AccessTools type initialization unexpectedly invoked the launcher target or prefix.");
+            RequirePatchProbeCounters(2, 0, "AccessTools type initialization unexpectedly invoked the interpreted fixture target or prefix.");
 
             _accessToolsTypeInitialization = new AccessToolsTypeInitializationSnapshot(
                 postSha1, all, allDeclared, isMonoRuntime, isNetFrameworkRuntime, isNetCoreRuntime, frameworkDescription,
@@ -2133,8 +2302,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var postSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!postSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("0Harmony prepared bytes changed across prefix descriptor registration.");
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("Prefix descriptor registration unexpectedly invoked the launcher probe or prefix.");
+            RequirePatchProbeCounters(2, 0, "Prefix descriptor registration unexpectedly invoked the launcher probe or prefix.");
 
             _prefixDescriptor = descriptor;
             _prefixRegistration = new PrefixRegistrationSnapshot(
@@ -2190,8 +2358,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var targetSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!targetSha1.Equals(preflight.Target.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step 27 0Harmony SHA-1 changed immediately before the Gate-T patch-engine runtime boundary.");
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("Launcher patch probe counters changed before the Gate-T patch-engine runtime boundary.");
+            RequirePatchProbeCounters(2, 0, "Launcher patch probe counters changed before the Gate-T patch-engine runtime boundary.");
             if (context.RejectedManagedRequests.Count != 0)
                 throw new FileLoadException("Gate T started with prior rejected managed requests: " + string.Join(" | ", context.RejectedManagedRequests));
 
@@ -2207,7 +2374,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             stage = "bounded patch-engine host-framework preservation preflight";
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T1 — entering bounded Reflection.Emit/RuntimeMethodHandle runtime preservation preflight; no HarmonySharedState runtime reflection, initializer, Patch(), or launcher target invocation yet.");
+                "T1 — entering bounded Reflection.Emit/RuntimeMethodHandle runtime preservation preflight; no HarmonySharedState runtime reflection, initializer, Patch(), or interpreted target invocation yet.");
             ValidatePatchEngineHostFrameworkPreservationSurface();
             var frameworkMembershipAfter = SnapshotPrivateContextMembership(context);
             if (!frameworkMembershipAfter.SequenceEqual(frameworkMembershipBefore, StringComparer.Ordinal))
@@ -2216,8 +2383,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new DllNotFoundException("Bounded patch-engine host-framework preflight attempted private-context native resolution.");
             if (context.RejectedManagedRequests.Count != frameworkRejectedBefore)
                 throw new FileLoadException("Bounded patch-engine host-framework preflight triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests.Skip(frameworkRejectedBefore)));
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("Bounded patch-engine host-framework preflight unexpectedly invoked the launcher target or prefix.");
+            RequirePatchProbeCounters(2, 0, "Bounded patch-engine host-framework preflight unexpectedly invoked the interpreted fixture target or prefix.");
             var frameworkPostSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!frameworkPostSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("0Harmony prepared bytes changed across the bounded patch-engine host-framework preflight.");
@@ -2270,8 +2436,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new DllNotFoundException("HarmonySharedState runtime reflection attempted private-context native resolution.");
             if (context.RejectedManagedRequests.Count != sharedResolutionRejectedBefore)
                 throw new FileLoadException("HarmonySharedState runtime reflection triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests.Skip(sharedResolutionRejectedBefore)));
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("HarmonySharedState runtime reflection unexpectedly invoked the launcher target or prefix.");
+            RequirePatchProbeCounters(2, 0, "HarmonySharedState runtime reflection unexpectedly invoked the interpreted fixture target or prefix.");
             var sharedResolutionPostSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!sharedResolutionPostSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("0Harmony prepared bytes changed across HarmonySharedState runtime reflection.");
@@ -2297,9 +2462,9 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (!runtimeImageHash.Equals(preflight.HarmonyRuntimeImage.RuntimeImageSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("The bounded iOS-normalized Harmony runtime image changed after Gate A.");
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T5a — bounded iOS-normalized HarmonySharedState cctor image reverified in memory; no generated HarmonySharedState/ILGeneratorProxy assembly exists before initialization. PatchProcessor.Patch() and launcher target remain uninvoked.");
+                "T5a — bounded iOS-normalized HarmonySharedState cctor image reverified in memory; no generated HarmonySharedState/ILGeneratorProxy assembly exists before initialization. PatchProcessor.Patch() and interpreted target remain uninvoked.");
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T5b — entering RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) against the normalized direct-state initializer; dynamic shared-state assembly creation and StackFrame FieldRefAccess initialization are absent from this runtime cctor. PatchProcessor.Patch() and launcher target remain uninvoked.");
+                "T5b — entering RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) against the normalized direct-state initializer; dynamic shared-state assembly creation and StackFrame FieldRefAccess initialization are absent from this runtime cctor. PatchProcessor.Patch() and interpreted target remain uninvoked.");
             RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle);
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
                 "T6 — normalized HarmonySharedState::.cctor returned; validating direct state dictionaries, null methodAddressRef, actualVersion=102, zero generated shared-state assemblies, hashes, and isolation before Patch().");
@@ -2313,8 +2478,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new InvalidDataException("Normalized HarmonySharedState initialization did not initialize all three direct state dictionaries.");
             if (harmonySharedStateMethodAddressRefField.GetValue(null) is not null)
                 throw new InvalidDataException("Normalized HarmonySharedState.methodAddressRef must remain null on the bounded iOS runtime path.");
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("HarmonySharedState initialization unexpectedly invoked the launcher target or prefix.");
+            RequirePatchProbeCounters(2, 0, "HarmonySharedState initialization unexpectedly invoked the interpreted fixture target or prefix.");
             if (context.NativeLoadAttempts.Count != sharedNativeBefore)
                 throw new DllNotFoundException("HarmonySharedState initialization attempted private-context native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(sharedNativeBefore)));
             if (context.RejectedManagedRequests.Count != sharedRejectedBefore)
@@ -2342,7 +2506,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
 
             stage = "post-publish System.Linq patch-engine member preservation preflight";
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T6a — entering exact host System.Linq callable-surface preflight for Harmony MethodCreator Select/Union/ToDictionary; PatchProcessor.Patch() and launcher target remain uninvoked.");
+                "T6a — entering exact host System.Linq callable-surface preflight for Harmony MethodCreator Select/Union/ToDictionary; PatchProcessor.Patch() and interpreted target remain uninvoked.");
             var linqFrameworkSurface = ValidatePatchEngineLinqFrameworkPreservationSurface();
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
                 "T6b — host System.Linq MethodCreator callable surface is present under the copy/no-link host policy: " + linqFrameworkSurface + ". Entering PatchProcessor.Patch() is now permitted.");
@@ -2359,7 +2523,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             try
             {
                 ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                    "T7 — entering the first exact PatchProcessor.Patch() reflection invocation after explicit HarmonySharedState initialization; launcher target is still not invoked.");
+                    "T7 — entering the first exact PatchProcessor.Patch() reflection invocation after explicit HarmonySharedState initialization; interpreted target is still not invoked.");
                 rawReplacement = patchApi.PatchMethod.Invoke(processor, null);
                 ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
                     "T8 — PatchProcessor.Patch() returned; validating replacement MethodInfo and bounded isolation state.");
@@ -2371,10 +2535,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             if (rawReplacement is not MethodInfo replacement)
                 throw new InvalidDataException("PatchProcessor.Patch() did not return a System.Reflection.MethodInfo replacement.");
             if (replacement.ReturnType != typeof(int))
-                throw new InvalidDataException("Harmony replacement return type does not match the launcher-owned Int32 target.");
+                throw new InvalidDataException("Harmony replacement return type does not match the post-publish interpreted Int32 target.");
             var replacementParameters = replacement.GetParameters();
             if (replacementParameters.Length != 1 || replacementParameters[0].ParameterType != typeof(int))
-                throw new InvalidDataException("Harmony replacement parameter surface does not match the launcher-owned Int32 target.");
+                throw new InvalidDataException("Harmony replacement parameter surface does not match the post-publish interpreted Int32 target.");
 
             if (context.NativeLoadAttempts.Count != nativeBefore)
                 throw new DllNotFoundException("PatchProcessor.Patch attempted private-context native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
@@ -2388,8 +2552,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var postSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
             if (!postSha1.Equals(targetSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("0Harmony prepared bytes changed across Patch().");
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("Patch installation unexpectedly invoked the launcher target or prefix.");
+            RequirePatchProbeCounters(2, 0, "Patch installation unexpectedly invoked the interpreted fixture target or prefix.");
 
             _replacementMethod = replacement;
             _patchExecution = new PatchExecutionSnapshot(
@@ -2404,11 +2567,11 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 generatedAssembliesAfterPatch);
 
             ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "T9 — measured host/runtime resolution, explicit HarmonySharedState initialization, and exact PatchProcessor.Patch() all completed with replacement/isolation validation; launcher target remains uninvoked until Gate V.");
+                "T9 — measured host/runtime resolution, explicit HarmonySharedState initialization, and exact PatchProcessor.Patch() all completed with replacement/isolation validation; interpreted target remains uninvoked until Gate V.");
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
-                "MEASURED PATCH-ENGINE RUNTIME RESOLUTION + IOS-NORMALIZED HARMONY SHARED-STATE INITIALIZATION + FIRST REAL HARMONY PATCH ENGINE EXECUTION COMPLETED AGAINST LAUNCHER-OWNED TARGET.\n" +
+                "MEASURED PATCH-ENGINE RUNTIME RESOLUTION + IOS-NORMALIZED HARMONY SHARED-STATE INITIALIZATION + FIRST REAL HARMONY PATCH ENGINE EXECUTION COMPLETED AGAINST POST-PUBLISH INTERPRETED TARGET.\n" +
                 $"Bounded host-framework preflight deltas: managed={frameworkManagedDelta:N0}; private={frameworkPrivateDelta:N0}; host={frameworkHostDelta:N0}; native=0\n" +
                 $"HarmonySharedState runtime-reflection deltas: managed={sharedResolutionManagedDelta:N0}; private={sharedResolutionPrivateDelta:N0}; host={sharedResolutionHostDelta:N0}; native=0\n" +
                 "HarmonySharedState source metadata: exact Gate-O-audited 2.4.2 shape; runtime cctor: Gate-A-audited 11-instruction iOS-normalized direct-state shape\n" +
@@ -2428,7 +2591,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 $"Host loads during Patch(): {_patchExecution.HostLoads:N0}\n" +
                 $"Native load attempts during Patch(): {_patchExecution.NativeLoadAttempts:N0}\n" +
                 $"Known generated assemblies after Patch(): {FormatNames(_patchExecution.KnownGeneratedAssemblies)}\n" +
-                "Launcher target invoked after patch: NO — Gate V owns execution of patched behavior\n" +
+                "Interpreted target invoked after patch: NO — Gate V owns execution of patched behavior\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
         }
         catch (Exception ex)
@@ -2497,8 +2660,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new FileLoadException("Step 27 observed rejected/unplanned managed requests during patch installation: " + string.Join(" | ", context.RejectedManagedRequests));
             if (!ReferenceEquals(patchApi.PrefixField.GetValue(processor), descriptor) || !ReferenceEquals(patchApi.HarmonyMethodMethodField.GetValue(descriptor), probe.Prefix))
                 throw new InvalidDataException("Step 27 registered prefix descriptor changed across Patch().");
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("Patch installation audit observed unexpected launcher target/prefix invocation.");
+            RequirePatchProbeCounters(2, 0, "Patch installation audit observed unexpected interpreted fixture target/prefix invocation.");
             var targetSha1 = await ComputeSha1HexAsync(preflight.Target.PreparedPath, cancellationToken).ConfigureAwait(false);
             if (!targetSha1.Equals(registration.PreparedSha1, StringComparison.OrdinalIgnoreCase) || !targetSha1.Equals(patchExecution.PreparedSha1, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step 27 0Harmony prepared hash changed across prefix registration/Patch().");
@@ -2527,62 +2689,57 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes only the exact launcher-owned MethodInfo rooted and verified in Gate P.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 invokes only exact MethodInfo objects from the launcher-owned post-publish interpreted fixture admitted in Gate P.")]
     public ControlledHarmonyPatchExecutionGateResult RunPatchedProbeInvocation()
     {
-        var stage = "patched launcher probe invocation";
+        var stage = "patched post-publish interpreted fixture invocation";
         try
         {
             ThrowIfDisposed();
             var probe = RequirePatchProbe();
             _ = RequirePatchExecution();
             if (!_postPatchAuditPassed)
-                throw new InvalidOperationException("Step 27 Gate U must pass before invoking patched launcher behavior.");
+                throw new InvalidOperationException("Step 27 Gate U must pass before invoking patched interpreted fixture behavior.");
             var context = RequireLoadContext();
-            var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            var membershipBefore = SnapshotPrivateContextMembership(context);
             var nativeBefore = context.NativeLoadAttempts.Count;
 
-            if (HarmonyPatchProbe.TargetCalls != 2 || HarmonyPatchProbe.PrefixCalls != 0)
-                throw new InvalidDataException("Step 27 patched invocation did not begin from the established baseline counters.");
+            RequirePatchProbeCounters(2, 0, "Step 27.0.24 patched fixture invocation did not begin from the established baseline counters.");
 
-            stage = "patched reflection invocation";
-            var reflectedRaw = probe.Target.Invoke(null, [41]);
-            if (reflectedRaw is not int reflectedResult)
-                throw new InvalidDataException("Patched reflection invocation did not return System.Int32.");
-            var afterReflectionTargetCalls = HarmonyPatchProbe.TargetCalls;
-            var afterReflectionPrefixCalls = HarmonyPatchProbe.PrefixCalls;
+            stage = "patched Target reflection invocation";
+            var reflectedResult = InvokePatchProbeInt32(probe.Target, 41, "Step 27.0.24 patched Target reflection invocation");
+            var afterReflection = ReadPatchProbeCounters();
 
-            stage = "patched direct invocation";
-            var directResult = HarmonyPatchProbe.Target(41);
-            var finalTargetCalls = HarmonyPatchProbe.TargetCalls;
-            var finalPrefixCalls = HarmonyPatchProbe.PrefixCalls;
+            stage = "patched in-fixture direct-call invocation";
+            var directResult = InvokePatchProbeInt32(probe.InvokeTarget, 41, "Step 27.0.24 patched InvokeTarget invocation");
+            var finalCounters = ReadPatchProbeCounters();
 
-            if (reflectedResult != 1041 || afterReflectionTargetCalls != 2 || afterReflectionPrefixCalls != 1)
-                throw new InvalidDataException($"Patched reflection route did not execute the exact prefix/skip-original behavior: result={reflectedResult}, targetCalls={afterReflectionTargetCalls}, prefixCalls={afterReflectionPrefixCalls}.");
-            if (directResult != 1041 || finalTargetCalls != 2 || finalPrefixCalls != 2)
-                throw new InvalidDataException($"Patched direct route did not execute the exact prefix/skip-original behavior: result={directResult}, targetCalls={finalTargetCalls}, prefixCalls={finalPrefixCalls}.");
+            if (reflectedResult != 1041 || afterReflection.TargetCalls != 2 || afterReflection.PrefixCalls != 1)
+                throw new InvalidDataException($"Patched interpreted reflection route did not execute exact prefix/skip-original behavior: result={reflectedResult}, targetCalls={afterReflection.TargetCalls}, prefixCalls={afterReflection.PrefixCalls}.");
+            if (directResult != 1041 || finalCounters.TargetCalls != 2 || finalCounters.PrefixCalls != 2)
+                throw new InvalidDataException($"Patched interpreted in-fixture direct route did not execute exact prefix/skip-original behavior: result={directResult}, targetCalls={finalCounters.TargetCalls}, prefixCalls={finalCounters.PrefixCalls}.");
             if (context.NativeLoadAttempts.Count != nativeBefore || context.RejectedManagedRequests.Count != 0)
-                throw new InvalidDataException("Patched launcher invocation caused native or rejected managed resolution.");
-            var membershipAfter = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+                throw new InvalidDataException("Patched interpreted fixture invocation caused native or rejected managed resolution.");
+            var membershipAfter = SnapshotPrivateContextMembership(context);
             if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
-                throw new InvalidDataException("Patched launcher invocation changed private-context membership.");
+                throw new InvalidDataException("Patched interpreted fixture invocation changed private-context membership.");
 
-            _patchedProbeInvocation = new ProbeInvocationSnapshot(reflectedResult, directResult, finalTargetCalls, finalPrefixCalls);
+            _patchedProbeInvocation = new ProbeInvocationSnapshot(
+                reflectedResult,
+                directResult,
+                finalCounters.TargetCalls,
+                finalCounters.PrefixCalls);
             return Pass(
                 ControlledHarmonyPatchExecutionGate.PatchedProbeInvocation,
-                "LAUNCHER-OWNED PATCHED METHOD EXECUTION SUCCEEDED THROUGH REFLECTION AND DIRECT CALL ROUTES.\n" +
+                "POST-PUBLISH INTERPRETED PATCHED METHOD EXECUTION SUCCEEDED THROUGH REFLECTION + IN-FIXTURE DIRECT CALL.\n" +
                 "Input: 41\n" +
-                $"Patched reflection result: {reflectedResult}\n" +
-                $"Patched direct result: {directResult}\n" +
-                $"Target-body calls after both patched invocations: {finalTargetCalls} — unchanged from baseline 2\n" +
-                $"Prefix calls after both patched invocations: {finalPrefixCalls}\n" +
+                $"Patched Target reflection result: {reflectedResult}\n" +
+                $"Patched InvokeTarget result: {directResult}\n" +
+                $"Target-body calls after both patched invocations: {finalCounters.TargetCalls} — unchanged from baseline 2\n" +
+                $"Prefix calls after both patched invocations: {finalCounters.PrefixCalls}\n" +
                 "Prefix set __result = value + 1000 and returned false: PHYSICALLY OBSERVED\n" +
-                "Original target body skipped by both patched routes: YES\n" +
+                "Original interpreted Target body skipped on both routes: YES\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
-        }
-        catch (TargetInvocationException ex) when (ex.InnerException is not null)
-        {
-            return Fail(ControlledHarmonyPatchExecutionGate.PatchedProbeInvocation, stage, ex.InnerException);
         }
         catch (Exception ex)
         {
@@ -2590,7 +2747,7 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes exactly PatchProcessor.Unpatch(MethodInfo) with the launcher-owned prefix already verified in Gate P.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 invokes exactly PatchProcessor.Unpatch(MethodInfo) with the exact post-publish interpreted prefix admitted in Gate P.")]
     public ControlledHarmonyPatchExecutionGateResult RunExactPrefixUnpatch()
     {
         var stage = "exact PatchProcessor.Unpatch(MethodInfo) invocation";
@@ -2613,9 +2770,8 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             var privateBefore = context.PrivateLoads.Count;
             var hostBefore = context.HostLoads.Count;
             var nativeBefore = context.NativeLoadAttempts.Count;
-            var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
-            var targetCallsBefore = HarmonyPatchProbe.TargetCalls;
-            var prefixCallsBefore = HarmonyPatchProbe.PrefixCalls;
+            var membershipBefore = SnapshotPrivateContextMembership(context);
+            var countersBefore = ReadPatchProbeCounters();
 
             object? returned;
             try
@@ -2628,13 +2784,14 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             }
             if (!ReferenceEquals(returned, processor))
                 throw new InvalidDataException("PatchProcessor.Unpatch(MethodInfo) did not return the same processor instance.");
-            if (HarmonyPatchProbe.TargetCalls != targetCallsBefore || HarmonyPatchProbe.PrefixCalls != prefixCallsBefore)
-                throw new InvalidDataException("Exact prefix unpatch unexpectedly invoked the launcher target or prefix.");
+            var countersAfter = ReadPatchProbeCounters();
+            if (countersAfter != countersBefore)
+                throw new InvalidDataException("Exact prefix unpatch unexpectedly invoked the interpreted fixture target or prefix.");
             if (context.NativeLoadAttempts.Count != nativeBefore)
                 throw new DllNotFoundException("Exact prefix unpatch attempted native resolution: " + string.Join(" | ", context.NativeLoadAttempts.Skip(nativeBefore)));
             if (context.RejectedManagedRequests.Count != 0)
                 throw new FileLoadException("Exact prefix unpatch triggered an unplanned managed request: " + string.Join(" | ", context.RejectedManagedRequests));
-            var membershipAfter = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            var membershipAfter = SnapshotPrivateContextMembership(context);
             if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
                 throw new InvalidDataException("Exact prefix unpatch changed private-context membership.");
             var postSha1 = ComputeSha1Hex(preflight.Target.PreparedPath);
@@ -2647,19 +2804,19 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 context.PrivateLoads.Count - privateBefore,
                 context.HostLoads.Count - hostBefore,
                 context.NativeLoadAttempts.Count - nativeBefore,
-                targetCallsBefore,
-                prefixCallsBefore);
+                countersBefore.TargetCalls,
+                countersBefore.PrefixCalls);
 
             return Pass(
                 ControlledHarmonyPatchExecutionGate.ExactPrefixUnpatch,
-                "EXACT LAUNCHER-OWNED HARMONY PREFIX REMOVAL COMPLETED.\n" +
+                "EXACT POST-PUBLISH INTERPRETED HARMONY PREFIX REMOVAL COMPLETED.\n" +
                 "API invoked: PatchProcessor.Unpatch(System.Reflection.MethodInfo) — exact prefix MethodInfo only\n" +
                 $"Removed prefix: {probe.PrefixSignature}\n" +
                 $"Managed resolver requests during unpatch: {_unpatch.ManagedResolverRequests:N0}\n" +
                 $"Private loads during unpatch: {_unpatch.PrivateLoads:N0}\n" +
                 $"Host loads during unpatch: {_unpatch.HostLoads:N0}\n" +
                 $"Native load attempts during unpatch: {_unpatch.NativeLoadAttempts:N0}\n" +
-                "Launcher target/prefix invoked during unpatch: NO\n" +
+                "Interpreted target/prefix invoked during unpatch: NO\n" +
                 "Restored behavior not yet invoked — Gate Y owns that proof\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
         }
@@ -2691,20 +2848,21 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new DllNotFoundException("Step 27 observed native-library resolution during patch/unpatch: " + string.Join(" | ", context.NativeLoadAttempts));
             if (context.RejectedManagedRequests.Count != 0)
                 throw new FileLoadException("Step 27 observed rejected/unplanned managed requests during patch/unpatch: " + string.Join(" | ", context.RejectedManagedRequests));
-            if (HarmonyPatchProbe.TargetCalls != unpatch.TargetCallsAtUnpatch || HarmonyPatchProbe.PrefixCalls != unpatch.PrefixCallsAtUnpatch)
-                throw new InvalidDataException("Step 27 post-unpatch audit observed unexpected launcher target/prefix invocation.");
+            var counters = ReadPatchProbeCounters();
+            if (counters.TargetCalls != unpatch.TargetCallsAtUnpatch || counters.PrefixCalls != unpatch.PrefixCallsAtUnpatch)
+                throw new InvalidDataException("Step 27 post-unpatch audit observed unexpected interpreted fixture target/prefix invocation.");
 
             _postUnpatchAuditPassed = true;
             return Pass(
                 ControlledHarmonyPatchExecutionGate.PostUnpatchAudit,
-                "POST-UNPATCH ISOLATION AUDIT PASSED BEFORE RESTORED TARGET INVOCATION.\n" +
+                "POST-UNPATCH ISOLATION AUDIT PASSED BEFORE RESTORED INTERPRETED TARGET INVOCATION.\n" +
                 $"Private context: {actual.Length:N0}/{expected.Length:N0} expected assemblies\n" +
                 "0Harmony prepared SHA-1 unchanged: YES\n" +
                 "Native load attempts: 0\n" +
                 "Rejected/unplanned managed requests: 0\n" +
-                $"Target calls remain: {HarmonyPatchProbe.TargetCalls}\n" +
-                $"Prefix calls remain: {HarmonyPatchProbe.PrefixCalls}\n" +
-                "Restored launcher behavior not yet invoked: YES\n" +
+                $"Target calls remain: {counters.TargetCalls}\n" +
+                $"Prefix calls remain: {counters.PrefixCalls}\n" +
+                "Restored interpreted behavior not yet invoked: YES\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
         }
         catch (Exception ex)
@@ -2713,58 +2871,54 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27 invokes only the exact launcher-owned MethodInfo rooted and verified in Gate P.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 invokes only exact MethodInfo objects from the launcher-owned post-publish interpreted fixture admitted in Gate P.")]
     public ControlledHarmonyPatchExecutionGateResult RunRestoredProbeInvocation()
     {
-        var stage = "restored launcher probe invocation";
+        var stage = "restored post-publish interpreted fixture invocation";
         try
         {
             ThrowIfDisposed();
             var probe = RequirePatchProbe();
             _ = RequireUnpatch();
             if (!_postUnpatchAuditPassed)
-                throw new InvalidOperationException("Step 27 Gate X must pass before verifying restored launcher behavior.");
+                throw new InvalidOperationException("Step 27 Gate X must pass before verifying restored interpreted fixture behavior.");
             var context = RequireLoadContext();
-            var membershipBefore = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+            var membershipBefore = SnapshotPrivateContextMembership(context);
             var nativeBefore = context.NativeLoadAttempts.Count;
 
-            var targetCallsBefore = HarmonyPatchProbe.TargetCalls;
-            var prefixCallsBefore = HarmonyPatchProbe.PrefixCalls;
-            if (targetCallsBefore != 2 || prefixCallsBefore != 2)
-                throw new InvalidDataException($"Step 27 restored invocation expected patched-phase counters target=2/prefix=2, observed target={targetCallsBefore}/prefix={prefixCallsBefore}.");
+            var countersBefore = ReadPatchProbeCounters();
+            if (countersBefore.TargetCalls != 2 || countersBefore.PrefixCalls != 2)
+                throw new InvalidDataException($"Step 27 restored invocation expected patched-phase counters target=2/prefix=2, observed target={countersBefore.TargetCalls}/prefix={countersBefore.PrefixCalls}.");
 
-            stage = "restored reflection invocation";
-            var reflectedRaw = probe.Target.Invoke(null, [41]);
-            if (reflectedRaw is not int reflectedResult)
-                throw new InvalidDataException("Restored reflection invocation did not return System.Int32.");
-            stage = "restored direct invocation";
-            var directResult = HarmonyPatchProbe.Target(41);
-            var targetCalls = HarmonyPatchProbe.TargetCalls;
-            var prefixCalls = HarmonyPatchProbe.PrefixCalls;
+            stage = "restored Target reflection invocation";
+            var reflectedResult = InvokePatchProbeInt32(probe.Target, 41, "Step 27.0.24 restored Target reflection invocation");
+            stage = "restored in-fixture direct-call invocation";
+            var directResult = InvokePatchProbeInt32(probe.InvokeTarget, 41, "Step 27.0.24 restored InvokeTarget invocation");
+            var counters = ReadPatchProbeCounters();
 
-            if (reflectedResult != 42 || directResult != 42 || targetCalls != 4 || prefixCalls != 2)
-                throw new InvalidDataException($"Exact unpatch did not restore baseline behavior on both invocation routes: reflection={reflectedResult}, direct={directResult}, targetCalls={targetCalls}, prefixCalls={prefixCalls}.");
+            if (reflectedResult != 42 || directResult != 42 || counters.TargetCalls != 4 || counters.PrefixCalls != 2)
+                throw new InvalidDataException($"Exact unpatch did not restore interpreted baseline behavior on both routes: reflection={reflectedResult}, direct={directResult}, targetCalls={counters.TargetCalls}, prefixCalls={counters.PrefixCalls}.");
             if (context.NativeLoadAttempts.Count != nativeBefore || context.RejectedManagedRequests.Count != 0)
-                throw new InvalidDataException("Restored launcher invocation caused native or rejected managed resolution.");
-            var membershipAfter = context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? string.Empty).OrderBy(v => v, StringComparer.Ordinal).ToArray();
+                throw new InvalidDataException("Restored interpreted fixture invocation caused native or rejected managed resolution.");
+            var membershipAfter = SnapshotPrivateContextMembership(context);
             if (!membershipAfter.SequenceEqual(membershipBefore, StringComparer.Ordinal))
-                throw new InvalidDataException("Restored launcher invocation changed private-context membership.");
+                throw new InvalidDataException("Restored interpreted fixture invocation changed private-context membership.");
 
-            _restoredProbeInvocation = new ProbeInvocationSnapshot(reflectedResult, directResult, targetCalls, prefixCalls);
+            _restoredProbeInvocation = new ProbeInvocationSnapshot(
+                reflectedResult,
+                directResult,
+                counters.TargetCalls,
+                counters.PrefixCalls);
             return Pass(
                 ControlledHarmonyPatchExecutionGate.RestoredProbeInvocation,
-                "LAUNCHER-OWNED ORIGINAL BEHAVIOR RESTORED AFTER EXACT PREFIX UNPATCH.\n" +
+                "POST-PUBLISH INTERPRETED ORIGINAL BEHAVIOR RESTORED AFTER EXACT PREFIX UNPATCH.\n" +
                 "Input: 41\n" +
-                $"Restored reflection result: {reflectedResult}\n" +
-                $"Restored direct result: {directResult}\n" +
-                $"Target-body calls: {targetCalls}\n" +
-                $"Prefix calls: {prefixCalls} — unchanged across restored invocations\n" +
-                "Original value + 1 behavior restored on both invocation routes: YES\n" +
+                $"Restored Target reflection result: {reflectedResult}\n" +
+                $"Restored InvokeTarget result: {directResult}\n" +
+                $"Target-body calls: {counters.TargetCalls}\n" +
+                $"Prefix calls: {counters.PrefixCalls} — unchanged across restored invocations\n" +
+                "Original value + 1 behavior restored on both interpreted routes: YES\n" +
                 "StS2 type/member reflected, patched, or invoked: NO");
-        }
-        catch (TargetInvocationException ex) when (ex.InnerException is not null)
-        {
-            return Fail(ControlledHarmonyPatchExecutionGate.RestoredProbeInvocation, stage, ex.InnerException);
         }
         catch (Exception ex)
         {
@@ -2834,8 +2988,10 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 throw new DllNotFoundException("Step 27 observed native-library resolution: " + string.Join(" | ", context.NativeLoadAttempts));
             if (context.RejectedManagedRequests.Count != 0)
                 throw new FileLoadException("Step 27 observed rejected/unplanned managed requests: " + string.Join(" | ", context.RejectedManagedRequests));
-            if (!ReferenceEquals(processor.GetType(), processorApi.PatchProcessorType) || !ReferenceEquals(processorApi.InstanceField.GetValue(processor), harmonyInstance))
-                throw new InvalidDataException("Step 27 retained PatchProcessor/Harmony identity changed.");
+            if (!ReferenceEquals(processor.GetType(), processorApi.PatchProcessorType) ||
+                !ReferenceEquals(processorApi.InstanceField.GetValue(processor), harmonyInstance) ||
+                !ReferenceEquals(processorApi.OriginalField.GetValue(processor), probe.Target))
+                throw new InvalidDataException("Step 27 retained interpreted-target PatchProcessor/Harmony/original identity changed.");
             if (!ReferenceEquals(patchApi.PrefixField.GetValue(processor), descriptor) || !ReferenceEquals(patchApi.HarmonyMethodMethodField.GetValue(descriptor), probe.Prefix))
                 throw new InvalidDataException("Step 27 retained prefix descriptor identity changed.");
             if (harmonyApi.DebugField.GetValue(null) is not bool debug || debug)
@@ -2856,11 +3012,12 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 $"Private context: {actual.Length:N0}/{expected.Length:N0} expected assemblies\n" +
                 "OfflineReady exact-tree verification: YES\n" +
                 "Harmony.DEBUG: false\n" +
-                "Patch lifecycle: bounded HarmonyMethod descriptor registration → Patch() → patched reflection/direct invocation → Unpatch(MethodInfo) → restored reflection/direct invocation\n" +
+                "Patch lifecycle: post-publish interpreted target admission → bounded HarmonyMethod descriptor registration → Patch() → patched reflection/in-fixture-direct invocation → Unpatch(MethodInfo) → restored reflection/in-fixture-direct invocation\n" +
+                $"Interpreted fixture SHA-256: {probe.FixtureSha256}\n" +
                 "Patched result: 1041 on both routes\n" +
                 "Restored result: 42 on both routes\n" +
-                $"Final launcher target calls: {restored.TargetCalls}\n" +
-                $"Final launcher prefix calls: {restored.PrefixCalls}\n" +
+                $"Final interpreted target calls: {restored.TargetCalls}\n" +
+                $"Final interpreted prefix calls: {restored.PrefixCalls}\n" +
                 "Native load attempts: 0\n" +
                 "Rejected/unplanned managed requests: 0\n" +
                 "Trusted Step 12 managed install unchanged: YES\n" +
@@ -2915,7 +3072,6 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         _harmonyConstruction = null;
         _initialization = null;
         _replay = null;
-        HarmonyPatchProbe.ResetCounters();
     }
 
     private void ReleaseLoadContext()
@@ -4745,6 +4901,61 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
     private static string NormalizeRelative(string path)
         => path.Replace('\\', '/').TrimStart('/');
 
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 accesses only exact reflected members of the Cecil-audited launcher-owned post-publish fixture.")]
+    private static (int TargetCalls, int PrefixCalls) ReadPatchProbeCounters(LauncherPatchProbeSnapshot probe)
+    {
+        var targetValue = probe.TargetCallsField.GetValue(null);
+        var prefixValue = probe.PrefixCallsField.GetValue(null);
+        if (targetValue is not int targetCalls || prefixValue is not int prefixCalls)
+            throw new InvalidDataException("Step 27.0.24 interpreted patch fixture counter fields did not return Int32 values.");
+        return (targetCalls, prefixCalls);
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 invokes only exact reflected members of the Cecil-audited launcher-owned post-publish fixture.")]
+    private static void ResetPatchProbeCounters(LauncherPatchProbeSnapshot probe)
+    {
+        try
+        {
+            _ = probe.ResetCounters.Invoke(null, null);
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw new InvalidOperationException("Step 27.0.24 interpreted patch fixture ResetCounters() threw.", ex.InnerException);
+        }
+        var counters = ReadPatchProbeCounters(probe);
+        if (counters.TargetCalls != 0 || counters.PrefixCalls != 0)
+            throw new InvalidDataException($"Step 27.0.24 interpreted patch fixture counters did not reset: target={counters.TargetCalls}, prefix={counters.PrefixCalls}.");
+    }
+
+    private (int TargetCalls, int PrefixCalls) ReadPatchProbeCounters()
+        => ReadPatchProbeCounters(RequirePatchProbe());
+
+    private void RequirePatchProbeCounters(int expectedTargetCalls, int expectedPrefixCalls, string operation)
+    {
+        var counters = ReadPatchProbeCounters();
+        if (counters.TargetCalls != expectedTargetCalls || counters.PrefixCalls != expectedPrefixCalls)
+        {
+            throw new InvalidDataException(
+                $"{operation}: expected target={expectedTargetCalls}, prefix={expectedPrefixCalls}; observed target={counters.TargetCalls}, prefix={counters.PrefixCalls}.");
+        }
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 invokes only exact reflected Int32 methods of the Cecil-audited launcher-owned post-publish fixture.")]
+    private static int InvokePatchProbeInt32(MethodInfo method, int value, string operation)
+    {
+        try
+        {
+            var raw = method.Invoke(null, [value]);
+            return raw is int result
+                ? result
+                : throw new InvalidDataException($"{operation} did not return System.Int32.");
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw new InvalidOperationException($"{operation} threw.", ex.InnerException);
+        }
+    }
+
     private InitializationPreflightSnapshot RequirePreflight()
         => _preflight ?? throw new InvalidOperationException("Step 24 Gate A must pass before Gate B.");
 
@@ -5047,9 +5258,17 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
         string HarmonyMethodConstructorAudit);
 
     private sealed record LauncherPatchProbeSnapshot(
+        Assembly FixtureAssembly,
+        string FixturePath,
+        string FixtureSha256,
         MethodInfo Target,
+        MethodInfo InvokeTarget,
         MethodInfo Prefix,
+        MethodInfo ResetCounters,
+        FieldInfo TargetCallsField,
+        FieldInfo PrefixCallsField,
         string TargetSignature,
+        string InvokeTargetSignature,
         string PrefixSignature);
 
     private sealed record BaselineProbeInvocationSnapshot(
@@ -5186,6 +5405,22 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 DiagnosticObserver?.Invoke("private load completed: " + privateLoadDetail);
                 return loaded;
             }
+        }
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Step 27.0.24 loads only the exact-hash launcher-owned post-publish interpreted patch fixture admitted by Gate P.")]
+        public Assembly LoadVerifiedInterpretedFixture(byte[] bytes, string expectedFullName, string explicitReason)
+        {
+            if (bytes is null || bytes.Length == 0)
+                throw new InvalidDataException("Step 27 interpreted patch fixture bytes are empty.");
+            using var stream = new MemoryStream(bytes, writable: false);
+            var loaded = LoadFromStream(stream);
+            var actualFullName = loaded.GetName().FullName ?? loaded.FullName ?? string.Empty;
+            if (!actualFullName.Equals(expectedFullName, StringComparison.Ordinal))
+                throw new InvalidDataException($"Step 27 interpreted patch fixture identity changed during load: {actualFullName} != {expectedFullName}");
+            var privateLoadDetail = $"{explicitReason}: {expectedFullName} => {actualFullName}";
+            PrivateLoads.Add(privateLoadDetail);
+            DiagnosticObserver?.Invoke("private interpreted fixture load completed: " + privateLoadDetail);
+            return loaded;
         }
 
         public Assembly ResolvePlanned(AssemblyName assemblyName)

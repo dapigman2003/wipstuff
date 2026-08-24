@@ -10,14 +10,14 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>107</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.107</ApplicationDisplayVersion>
+    <ApplicationVersion>108</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.108</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
     <!--
-      Step 27.0.23 dynamic-payload compatibility policy. Physical 0.0.105 and 0.0.106 proved that
+      Step 27.0.24 retains the Step 27.0.23 dynamic-payload compatibility policy. Physical 0.0.105 and 0.0.106 proved that
       full trimming can remove ordinary BCL members/types referenced only by assemblies that arrive
       after publish (first System.Linq.Enumerable.Union<T>, then System.Diagnostics.DebuggableAttribute
       while MonoMod.Utils.DynamicMethodDefinition initializes). This launcher intentionally loads the
@@ -54,7 +54,7 @@
   <!--
     Step 22 Host Framework Closure Foundation. These 22 names remain the physically measured
     direct host-binding frontier and are retained as historical/protection descriptors. Under the
-    Step 27.0.23 copy/no-link host policy they are no longer relied upon to prevent member trimming;
+    retained Step 27.0.23/27.0.24 copy/no-link host policy they are no longer relied upon to prevent member trimming;
     the host framework assemblies are preserved wholesale. The larger 44-name observed frontier is
     still verified on-device before the Step 21 binding plan is recomputed. No downloaded System.*
     implementation is added here.
@@ -89,7 +89,7 @@
     reached MonoMod.Logs.DebugLog::.cctor and exposed a trimmed ConcurrentBag<T> constructor;
     Step 24.0.6 / 0.0.79 then passed all four physical gates plus OfflineReady and Foundation 5/5
     with System.Collections.Concurrent rooted. Keep that measured root as historical/protection
-    evidence, while the active Step 27.0.23 host now preserves all managed publish assemblies with
+    evidence, while the active Step 27.0.24 host now preserves all managed publish assemblies with
     MtouchLink=None + TrimMode=copy. MtouchInterpreter=-all remains unchanged.
   -->
   <ItemGroup>
@@ -101,7 +101,7 @@
     Physical 0.0.106 proved that this fixed the LINQ blocker but immediately exposed the same class
     of failure in System.Runtime/System.Private.CoreLib: DynamicMethodDefinition could not resolve
     System.Diagnostics.DebuggableAttribute. Keep the System.Linq root as historical evidence only;
-    Step 27.0.23 no longer relies on isolated roots because managed trimming is disabled globally.
+    Step 27.0.24 continues the Step 27.0.23 policy and does not rely on isolated roots because managed trimming is disabled globally.
   -->
   <ItemGroup>
     <TrimmerRootAssembly Include="System.Linq" />

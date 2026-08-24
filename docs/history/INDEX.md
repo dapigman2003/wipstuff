@@ -115,3 +115,6 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `steps/STEP-27.0.23-DYNAMIC-PAYLOAD-NO-TRIM-HOST-POLICY.md` — replaces full trimming with copy/no-link after physical 0.0.106 exposed the second post-publish BCL trim failure.
 - `reports/STEP-27.0.22-PHYSICAL-DYNAMICMETHODDEFINITION-DEBUGGABLEATTRIBUTE-TRIM-FAILURE.txt` — full physical 0.0.106 Gate-T report.
+
+- `reports/STEP-27.0.23-PHYSICAL-NOTIMPLEMENTED-PATCHENGINE.txt` — physical 0.0.107 removed the known trimming ambiguity and reached the first real PatchProcessor.Patch(), which threw NotImplementedException from PatchFunctions.UpdateWrapper.
+- `steps/STEP-27.0.24-POST-PUBLISH-INTERPRETED-PATCH-EXPERIMENT.md` — the single stop-rule trial against a launcher-owned target/prefix DLL copied only after iOS publish; failure to patch ends Harmony-internal iteration and triggers the Step-28 ahead-of-load pivot.
