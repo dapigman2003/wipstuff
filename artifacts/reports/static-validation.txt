@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-23T22:03:27Z
+UTC: 2026-08-24T05:28:53Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,7 +11,7 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 27 controlled launcher-owned Harmony patch/unpatch static validation
-Root: /mnt/data/StS2Launcher-Step27-0.0.105.work
+Root: /mnt/data/StS2Launcher-Step27-0.0.106
 PASS: all 8 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 194 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 105
-PASS: display version is 0.0.105
-PASS: Info.plist build version is 105
-PASS: Info.plist display version is 0.0.105
+PASS: build version is 106
+PASS: display version is 0.0.106
+PASS: Info.plist build version is 106
+PASS: Info.plist display version is 0.0.106
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,12 +32,12 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 27.0.21 candidate
-PASS: top launcher banner records the 0.0.104 real Cecil-writer failure and scopes the 0.0.105 raw-body correction
+PASS: top launcher banner identifies active Step 27.0.22 candidate
+PASS: top launcher banner records the physical 0.0.105 LINQ trim failure and scopes the 0.0.106 framework-preservation correction
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 27.0.21 source pins expected bundle release identity
+PASS: Step 27.0.22 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
-PASS: Step 27.0.21 source pins the Gate-T raw-body normalized-cctor implementation marker
+PASS: Step 27.0.22 source pins the raw-body + post-publish LINQ preservation Gate-T implementation marker
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
 PASS: stale prior Step-27 candidate banner identity is removed
@@ -50,9 +50,11 @@ PASS: all 22 physically proven Step 22 direct host roots remain rooted
 PASS: Step 22 direct root set contains exactly 22 unique roots
 PASS: SteamKit/protobuf reflection roots remain protected
 PASS: physically proven Step 24.0.6 System.Collections.Concurrent preservation root remains exact
-PASS: Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root
+PASS: Step 27.0.22 candidate roots complete System.Linq exactly once for post-publish Harmony MethodCreator calls
+PASS: Step 27.0.22 root set is exactly prior protected roots plus one measured System.Linq dynamic-payload root
 PASS: physically proven Step 24 preservation root is documented as protected platform policy
 PASS: Step 27 build telemetry identifies the physically proven framework preservation root
+PASS: Step 27.0.22 build telemetry identifies the candidate System.Linq dynamic-payload root
 PASS: Step 27 build telemetry identifies the physically proven Harmony-constructor framework preservation surface
 PASS: Step 25 does not broaden trimming by rooting System.Private.CoreLib
 PASS: Step 25 bounded Harmony-constructor framework preservation anchor exists
@@ -598,9 +600,11 @@ PASS: Step 27.0.8 restores Gate-O runtime reflection to the physically passing 0
 PASS: Step 27 Gate O retains HarmonySharedState/replacement/detour admission as metadata-only audit
 PASS: Step 27.0.8 Gate O exposes eleven durable crash-localization substages on the restored runtime surface
 PASS: Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages
-PASS: Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages
+PASS: Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages including LINQ closure T6a/T6b
 PASS: Step 27.0.8 Gate T measures the new host/shared-state runtime reflection instead of weakening Gate-O purity
-PASS: Step 27 Gate T orders reflection -> normalized shared-state initialization -> one public Patch() acceptance call
+PASS: Step 27 Gate T orders reflection -> normalized shared-state initialization -> LINQ preservation preflight -> one public Patch() acceptance call
+PASS: Step 27.0.22 T6a/T6b LINQ closure preflight is strictly after shared-state cctor completion and before Patch()
+PASS: Step 27.0.22 LINQ preflight pins the exact non-indexed Select, two-sequence Union, and three-selector ToDictionary overload shapes
 PASS: Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape
 PASS: Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path
 PASS: Step 27 host tests retain synthetic runtime identity isolation
@@ -655,6 +659,8 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.15-REAL-H
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.16-REAL-HARMONY-FAT-RELEASE-FIXTURE-HARDENING.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.20-HASH-PINNED-REAL-HARMONY-NORMALIZER-EXECUTION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.21-RAW-METHOD-BODY-NORMALIZATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.22-POST-PUBLISH-SYSTEM-LINQ-PRESERVATION.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.21-PHYSICAL-T7-SYSTEM-LINQ-TRIM-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.20-CODEMAGIC-CECIL-WRITER-ENUM-CONSTANT-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.19-CODEMAGIC-DUPLICATE-SYSTEM-RUNTIME-ASSEMBLYREF-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt
@@ -720,7 +726,10 @@ PASS: Codemagic build 103 evidence pins the exact official fixture bytes and pro
 PASS: Codemagic build 103 localizes the sole failure to duplicate System.Runtime AssemblyRef handling before the production normalizer call
 PASS: Codemagic build 104 evidence proves the hash-pinned real Harmony surrogate reached the production normalizer in the 212-test host suite
 PASS: Codemagic build 104 evidence localizes the genuine failure to Cecil whole-module enum-constant serialization
-PASS: current status preserves Step 27 evidence and advances to Step 27.0.21 / 0.0.105 raw method-body normalization
+PASS: physical build 105 evidence preserves the exact 19/26 Gate-T failure
+PASS: physical build 105 proves raw-body HarmonySharedState normalization completed without source mutation
+PASS: physical build 105 localizes the current blocker to a trimmed LINQ member during Harmony replacement construction
+PASS: current status preserves prior evidence, records the physical 0.0.105 LINQ trim failure, and advances to Step 27.0.22 / 0.0.106
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -783,4 +792,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 769 checks
+VALIDATION PASS: 778 checks

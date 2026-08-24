@@ -115,7 +115,21 @@ The Deferred Cecil source read succeeded. The failure occurred later at `Mono.Ce
 
 The correct conclusion is broader than “allow BindingFlags”: Cecil 0.11.6 whole-module serialization can require external enum definitions for unrelated Constant rows. Whitelisting individual framework enums would create another moving target and would weaken Gate A's resolution-free boundary.
 
-## Active candidate — Step 27.0.21 / 0.0.105 (105)
+### 0.0.105 (105) — raw HarmonySharedState normalization physically succeeds; T7 exposes trimmed System.Linq member
+
+Physical Step 27.0.21 reached **Gate T / PatchEngineExecution** after the raw-PE normalized `HarmonySharedState::.cctor` completed successfully. Gate A reported a byte-distinct runtime image with direct `state` / `originals` / `originalsMono`, `actualVersion=102`, null `methodAddressRef`, no generated shared-state/FieldRef path, and no prepared/source/live mutation. Gates P/Q/R/S also passed.
+
+The first public `PatchProcessor.Patch()` call then threw a normal managed exception:
+
+`System.MissingMethodException: Method not found: System.Linq.Enumerable.Union<T>(IEnumerable<T>, IEnumerable<T>)`
+
+The stack is `HarmonyLib.MethodCreator..ctor -> HarmonyLib.PatchFunctions.UpdateWrapper -> HarmonyLib.PatchProcessor.Patch`. This means 0.0.105 did **not** prove a MonoMod native-detour failure: replacement construction stopped before `PatchTools.DetourMethod -> DetourFactory.Current.CreateDetour`. The physical report is preserved at `docs/history/reports/STEP-27.0.21-PHYSICAL-T7-SYSTEM-LINQ-TRIM-FAILURE.txt`.
+
+The cause is now classified as post-publish dynamic-payload trimming. `0Harmony.dll` arrives only after iOS publish, so ILLink cannot see its framework calls. Step 22 proved that `System.Linq` can bind to the iOS host, but full trimming can still remove individual BCL members that no build-time launcher path roots. Gate O had already audited the immediately adjacent Harmony MethodCreator LINQ calls `Select`, two-sequence `Union`, and `ToDictionary`.
+
+This evidence means the existing detour stop rule is **not yet satisfied** and the master-plan Step-28 pivot is premature.
+
+## Active candidate — Step 27.0.22 / 0.0.106 (106)
 
 - Workflow: **`ios-step-27`**
 - IPA: **`artifacts/StS2-Launcher-Step-27.ipa`**
@@ -124,71 +138,34 @@ The correct conclusion is broader than “allow BindingFlags”: Cecil 0.11.6 wh
 - Closed prerequisite: Step 26.0 + OfflineReady + Foundation 5/5
 - StS2 reflection/patching/invocation: **forbidden**
 
-### Gate A — resolution-free raw method-body normalization
+### Dynamic-payload framework member preservation
 
-Step 27.0.21 keeps the exact production admission rules but removes Cecil's whole-module writer.
+0.0.106 keeps the 0.0.105 production raw-PE Harmony normalizer and all Gate A–T ordering unchanged except for one new managed preflight between T6 and T7.
 
-The production normalizer still requires exact `0Harmony, Version=2.4.2.0`, the exact prepared StS2 patch-engine metadata fingerprint, Deferred Cecil reads, and the rejecting metadata resolver. Internal randomized synthetic fixtures still use byte-identical passthrough.
+The iOS host now roots complete `System.Linq` with `TrimmerRootAssembly`. This is intentionally broader than a single `DynamicDependency` on `Union<T>`: the exact audited Harmony MethodCreator path immediately uses multiple LINQ operators, and the post-publish Harmony payload is unavailable to ILLink during publish. Rooting the assembly preserves its public/member implementation closure instead of iterating one trimmed operator at a time.
 
-For the canonical Harmony image, Cecil is now read-only. It discovers:
+All physically proven earlier roots remain unchanged, including the 22 Step-22 host roots and `System.Collections.Concurrent`. `TrimMode=full` and `MtouchInterpreter=-all` remain protected.
 
-- the exact `HarmonySharedState` type/cctor and required fields;
-- the exact existing MemberRef tokens already used by the original cctor for the three parameterless `Dictionary<...>` constructors;
-- the exact FieldDef tokens for `state`, `originals`, `originalsMono`, `methodAddressRef`, and `actualVersion`.
+### Gate T update
 
-The normalizer then clones the prepared source bytes, maps the cctor RVA into the PE section with `PEReader.PEHeaders`, and fail-closes unless the source is IL-only and unsigned, the original method uses a fat ECMA-335 header, has no exception/extra sections, its storage contains no other managed-method RVA, and it has enough physical body capacity.
+The physically proven T1–T6 path is retained exactly. After T6 validates normalized Harmony shared state:
 
-Only the original cctor method-body slot (its header+IL storage) is rewritten. The replacement is a 12-byte fat header plus 47 bytes of IL encoding the same exact 11 logical instructions admitted since 0.0.95:
+- **T6a** enters a host-only `System.Linq` callable-surface preflight.
+- **T6b** requires the exact public non-indexed `Enumerable.Select<TSource,TResult>`, two-sequence `Enumerable.Union<TSource>`, and three-selector `Enumerable.ToDictionary<TSource,TKey,TElement>` signatures used by the Gate-O-audited MethodCreator path. The preflight invokes none of those LINQ operators and does not invoke Harmony Patch or the launcher target.
+- **T7/T8** then invoke exactly one public `PatchProcessor.Patch()` as before.
 
-- three `newobj`;
-- five `stsfld`;
-- `ldnull`;
-- `ldc.i4 102`;
-- `ret`.
+This converts the current failure class into an explicit gate: if the linked host still lacks one of those methods, Step 27 fails before Patch with a direct preservation diagnostic. If T6a/T6b pass and Patch then fails deeper in replacement generation or the MonoMod detour path, that new evidence determines whether the existing interpreted-fixture stop rule or a master-plan pivot is warranted.
 
-No new metadata token is created. No metadata table, heap/blob, Constant, CustomAttribute, AssemblyRef, MemberRef, TypeSpec, resource, signature, or unrelated method is serialized, moved, or renumbered. A byte-for-byte loop rejects any change outside the original cctor slot. The resulting image is reopened with Deferred Cecil and must still pass the exact 11-instruction fingerprint.
+### Step-28 decision
 
-The source/live/prepared Harmony file remains immutable; only the retained private in-memory runtime image differs.
-
-### Host real-Harmony regression
-
-The host regression remains content-addressed to the exact official Harmony-Fat 2.4.2 release bytes already observed by Codemagic:
-
-- archive SHA-256: `a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774`
-- selected member: `net9.0/0Harmony.dll`
-- DLL SHA-256: `a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab`
-
-The C# test now directly exercises the raw-body normalizer, requires source and runtime image lengths to match exactly, requires the runtime bytes to differ, verifies source immutability, and requires the exact normalized 11-instruction audit.
-
-### Gates B–S
-
-Unchanged. Gate B loads the retained normalized bytes only for the exact admitted production identity. Gate O remains the physically passing runtime-reflection surface plus metadata-only patch-engine audit. Gate R initializes the measured AccessTools surface. Gate S uses the bounded annotation-free `HarmonyMethod()` descriptor and never invokes `AddPrefix(MethodInfo)`.
-
-### Gate T — normalized HarmonySharedState compatibility boundary
-
-The execution order remains unchanged:
-
-- **T1/T2** — bounded Reflection.Emit/RuntimeMethodHandle host-preservation preflight.
-- **T3/T4** — exact runtime reflection of the raw-body-normalized `HarmonySharedState` type/cctor/state fields without initialization.
-- **T5a** — re-hash the retained normalized runtime image and require zero pre-existing generated patch-engine assemblies.
-- **T5b** — execute exactly one `RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle)` against the direct-state cctor.
-- **T6** — require the three dictionaries non-null, `methodAddressRef == null`, `actualVersion == 102`, no generated shared-state/proxy assemblies, unchanged prepared bytes, and bounded isolation.
-- **T7/T8/T9** — only after T6, invoke exactly one public `PatchProcessor.Patch()` and validate replacement/isolation. The launcher target remains uninvoked until Gate V.
-
-### Detour stop rule
-
-`MtouchInterpreter=-all` is still sufficient to justify the normalized managed-code experiment but is not proof that MonoMod's native detour backend can modify iOS executable code. If 0.0.105 reaches T6 but fails at T7/T8, the next candidate performs one post-publish interpreted fixture patch/unpatch experiment on a launcher-owned target. If that representative interpreted target also cannot be patched, stop iterating Harmony internals and propose ahead-of-load transformation; that would require a master-plan update.
-
-### Gates U–Z
-
-Unchanged. U audits before patched execution; V proves patched launcher behavior; W removes exactly the prefix; X audits; Y proves restoration; Z performs final byte/OfflineReady/context/native isolation. No StS2 member is touched.
+Do **not** revise `MASTER-PLAN.md` for 0.0.106. Physical 0.0.105 proves the HarmonySharedState workaround and identifies a framework trimming failure, not an iOS detour failure. The current master plan already says a pivot requires representative patch/detour evidence after T6. That condition remains open.
 
 ## Fresh-process rule
 
 **Force-quit/relaunch before every Step-27 retry once any previous attempt reached Gate B.** Gate A intentionally rejects a process where `sts2` or Harmony remains loaded. If Gate T or later ran, also assume launcher/shared patch-engine state may remain process-resident.
 
-If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.105 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T raw-method-body normalization marker.
+If the app hard-crashes, copy `Step27-CrashCheckpoint.txt` before starting another run. Candidate 0.0.106 checkpoints include installed app version/build, expected source version/build, active candidate identity, the exact Gate-S implementation marker, and the Gate-T raw-method-body normalization marker.
 
 ## Acceptance
 
-Codemagic must compile and run the full host suite, including the hash-pinned official Harmony 2.4.2 raw-body normalizer regression, before iOS publish/IPA verification. Then install `0.0.105 (105)` and from a fresh process run A–Z to **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. T6 is the first proof that the normalized cctor fix actually ran on-device; T7/T8 is the first proof point for the public runtime detour boundary. If Step 27 closes, Step 28 is the first targeted StS2 member-reflection boundary.
+Codemagic must compile and run the complete host suite, pass iOS publish/IPA verification, and emit the exact candidate `System.Linq` root telemetry. Then install `0.0.106 (106)` and start Step 27 from a fresh process. T6a/T6b must prove the linked host retains the exact LINQ callable surface before T7/T8 re-enters `PatchProcessor.Patch()`. Full Step-27 acceptance remains A–Z **26/26 PASS**, followed by OfflineReady PASS and Foundation 5/5 PASS. A Step-28 architecture pivot remains conditional on evidence from the actual replacement/detour path after framework closure, not on another trimming failure.

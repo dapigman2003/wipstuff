@@ -10,23 +10,23 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 27.0.21 — RAW HARMONYSHAREDSTATE METHOD-BODY NORMALIZATION";
+        "STEP 27.0.22 — POST-PUBLISH SYSTEM.LINQ FRAMEWORK PRESERVATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.104 RAN 212 HOST TESTS • 211 PASS / 1 REAL CECIL-WRITER FAILURE • WHOLE-MODULE REWRITE REMOVED";
+        "STEPS 01–26 PHYSICALLY CLOSED • 0.0.105 PROVED RAW HARMONYSHAREDSTATE NORMALIZATION • T7 REACHED • SYSTEM.LINQ MEMBER TRIM IDENTIFIED";
 
     public const string Summary =
-        "Codemagic 0.0.104 compiled production and tests and executed all 212 host tests. The hash-pinned official Harmony-Fat 2.4.2 net9.0 surrogate finally entered the production normalizer, where the Deferred Cecil read succeeded but Mono.Cecil.ModuleDefinition.Write failed while rebuilding enum-typed Constant metadata and attempted forbidden resolution of System.Reflection.BindingFlags. Step 27.0.21 removes Cecil's whole-module writer instead of whitelisting framework enums: Gate A keeps Deferred Cecil read-only for exact admission and existing-token discovery, clones the prepared bytes, and replaces only the existing HarmonySharedState::.cctor PE method-body slot with the same exact 11-instruction direct-state body using metadata tokens already present in the source image. No byte outside that original method-body slot may change. No StS2 member is reflected, patched, or invoked.";
+        "Physical 0.0.105 proved the raw PE HarmonySharedState normalization on-device and advanced Gate T into the first public PatchProcessor.Patch() call. Patch() then threw a managed MissingMethodException before replacement generation completed because the post-publish 0Harmony MethodCreator called System.Linq.Enumerable.Union<T>, which full trimming had removed from the host framework surface. Step 27.0.22 treats this as a dynamic-payload linker contract, not a Harmony detour failure: System.Linq is now an explicit TrimmerRootAssembly, and Gate T performs an exact Select/Union/ToDictionary callable-surface preflight after T6 and before T7. The master plan and runtime Harmony normalization remain unchanged; no StS2 member is reflected, patched, or invoked.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed. Codemagic 0.0.104 ran 212 tests at 211/212; the only failure was the first genuine production-normalizer failure, inside Cecil's metadata writer while resolving BindingFlags for an unrelated enum constant. Build 0.0.105 removes whole-module serialization and performs a bounded in-place PE method-body substitution. If CI passes, the next meaningful evidence is on-device T6, then the single public PatchProcessor.Patch() boundary at T7/T8.";
+        "Status: Steps 01–26 are physically closed. Physical 0.0.105 reached Gate T7 after the normalized HarmonySharedState cctor returned successfully, then PatchProcessor.Patch() failed in Harmony MethodCreator with MissingMethodException for Enumerable.Union<T>. Build 0.0.106 roots the complete System.Linq framework assembly for post-publish dynamic payload use and adds a pre-Patch LINQ member-closure check. If that closure passes, the next evidence will finally distinguish replacement-generation/dynamic-code behavior from the later MonoMod detour boundary.";
 
-    public const string ExpectedDisplayVersion = "0.0.105";
-    public const string ExpectedBuildVersion = "105";
+    public const string ExpectedDisplayVersion = "0.0.106";
+    public const string ExpectedBuildVersion = "106";
     public const string GateSImplementationMarker =
         "bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden";
     public const string GateTImplementationMarker =
-        "Gate-A raw PE method-body normalized HarmonySharedState cctor; Deferred Cecil read/audit only; no Cecil whole-module write; T5b RunClassConstructor uses direct state only; PatchProcessor.Patch() remains after T6";
+        "Gate-A raw PE method-body normalized HarmonySharedState cctor; System.Linq rooted for post-publish payload; T6a/T6b Select/Union/ToDictionary closure preflight; PatchProcessor.Patch() remains after T6";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

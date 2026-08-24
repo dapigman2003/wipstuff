@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>105</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.105</ApplicationDisplayVersion>
+    <ApplicationVersion>106</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.106</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -91,11 +91,26 @@
     <TrimmerRootAssembly Include="System.Collections.Concurrent" />
   </ItemGroup>
 
+  <!--
+    Step 27.0.22 post-publish dynamic-payload member preservation. Physical 0.0.105 crossed
+    normalized HarmonySharedState initialization and then PatchProcessor.Patch() threw
+    MissingMethodException for System.Linq.Enumerable.Union<T>, even though System.Linq itself was
+    host-bound. The real 0Harmony image arrives only after publish, so ILLink cannot see its LINQ
+    calls. Root the complete System.Linq assembly rather than chasing individual operators; this
+    preserves the exact Select/Union/ToDictionary family reached by Harmony MethodCreator and its
+    statically understood implementation dependencies while retaining TrimMode=full.
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="System.Linq" />
+  </ItemGroup>
+
   <Target Name="ValidateRuntimeAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
              Text="STEP27 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Message Importance="High"
              Text="STEP27 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
+    <Message Importance="High"
+             Text="STEP27 CANDIDATE POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq" />
     <Message Importance="High"
              Text="STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
     <Message Importance="High"

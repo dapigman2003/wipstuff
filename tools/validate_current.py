@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>105</ApplicationVersion>" in project_text, "build version is 105")
-require("<ApplicationDisplayVersion>0.0.105</ApplicationDisplayVersion>" in project_text, "display version is 0.0.105")
-require(plist.get("CFBundleVersion") == "105", "Info.plist build version is 105")
-require(plist.get("CFBundleShortVersionString") == "0.0.105", "Info.plist display version is 0.0.105")
+require("<ApplicationVersion>106</ApplicationVersion>" in project_text, "build version is 106")
+require("<ApplicationDisplayVersion>0.0.106</ApplicationDisplayVersion>" in project_text, "display version is 0.0.106")
+require(plist.get("CFBundleVersion") == "106", "Info.plist build version is 106")
+require(plist.get("CFBundleShortVersionString") == "0.0.106", "Info.plist display version is 0.0.106")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,12 +198,12 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 27.0.21 — RAW HARMONYSHAREDSTATE METHOD-BODY NORMALIZATION" in release_presentation, "top launcher banner identifies active Step 27.0.21 candidate")
-require("0.0.104" in release_presentation and "212 host tests" in release_presentation and "211" in release_presentation and "System.Reflection.BindingFlags" in release_presentation and "Mono.Cecil.ModuleDefinition.Write" in release_presentation and "only the existing HarmonySharedState::.cctor PE method-body slot" in release_presentation and "No StS2 member" in release_presentation, "top launcher banner records the 0.0.104 real Cecil-writer failure and scopes the 0.0.105 raw-body correction")
+require("STEP 27.0.22 — POST-PUBLISH SYSTEM.LINQ FRAMEWORK PRESERVATION" in release_presentation, "top launcher banner identifies active Step 27.0.22 candidate")
+require("0.0.105" in release_presentation and "MissingMethodException" in release_presentation and "System.Linq.Enumerable.Union<T>" in release_presentation and "TrimmerRootAssembly" in release_presentation and "Select/Union/ToDictionary" in release_presentation and "not a Harmony detour failure" in release_presentation and "no StS2 member" in release_presentation, "top launcher banner records the physical 0.0.105 LINQ trim failure and scopes the 0.0.106 framework-preservation correction")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.105"' in release_presentation and 'ExpectedBuildVersion = "105"' in release_presentation, "Step 27.0.21 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.106"' in release_presentation and 'ExpectedBuildVersion = "106"' in release_presentation, "Step 27.0.22 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
-require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "Deferred Cecil read/audit only" in release_presentation and "no Cecil whole-module write" in release_presentation and "direct state only" in release_presentation and "PatchProcessor.Patch() remains after T6" in release_presentation, "Step 27.0.21 source pins the Gate-T raw-body normalized-cctor implementation marker")
+require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "System.Linq rooted for post-publish payload" in release_presentation and "T6a/T6b Select/Union/ToDictionary closure preflight" in release_presentation and "PatchProcessor.Patch() remains after T6" in release_presentation, "Step 27.0.22 source pins the raw-body + post-publish LINQ preservation Gate-T implementation marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
 require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
@@ -232,10 +232,12 @@ require(set(step22_roots).issubset(set(all_roots)), "all 22 physically proven St
 require(len([x for x in all_roots if x in step22_roots]) == 22, "Step 22 direct root set contains exactly 22 unique roots")
 require({"SteamKit2", "protobuf-net", "protobuf-net.Core"}.issubset(set(all_roots)), "SteamKit/protobuf reflection roots remain protected")
 require(all_roots.count("System.Collections.Concurrent") == 1, "physically proven Step 24.0.6 System.Collections.Concurrent preservation root remains exact")
-expected_all_roots = set(step22_roots) | {"SteamKit2", "protobuf-net", "protobuf-net.Core", "System.Collections.Concurrent"}
-require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_all_roots), "Step 24.0.6 root set is exactly Step 22 roots + protected Steam/protobuf roots + one measured concurrent-collections root")
+require(all_roots.count("System.Linq") == 1, "Step 27.0.22 candidate roots complete System.Linq exactly once for post-publish Harmony MethodCreator calls")
+expected_all_roots = set(step22_roots) | {"SteamKit2", "protobuf-net", "protobuf-net.Core", "System.Collections.Concurrent", "System.Linq"}
+require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_all_roots), "Step 27.0.22 root set is exactly prior protected roots plus one measured System.Linq dynamic-payload root")
 require("Step 24 physically proved this additional post-publish dynamic-IL preservation root" in project_text, "physically proven Step 24 preservation root is documented as protected platform policy")
 require("STEP27 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 27 build telemetry identifies the physically proven framework preservation root")
+require("STEP27 CANDIDATE POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq" in project_text, "Step 27.0.22 build telemetry identifies the candidate System.Linq dynamic-payload root")
 require("STEP27 PROVEN HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 27 build telemetry identifies the physically proven Harmony-constructor framework preservation surface")
 require("System.Private.CoreLib" not in all_roots, "Step 25 does not broaden trimming by rooting System.Private.CoreLib")
 step25_preservation_path = ROOT / "src/StS2Launcher.iOS/Platform/Step25HarmonyConstructorFrameworkPreservation.cs"
@@ -338,8 +340,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-27.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.105",
-    "STS2_BUILD_VERSION": "105",
+    "STS2_DISPLAY_VERSION": "0.0.106",
+    "STS2_BUILD_VERSION": "106",
     "STS2_RUNTIME_POLICY_MARKER": "STEP27 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1024,12 +1026,17 @@ gate_r_start = step27_source.index("public ControlledHarmonyPatchExecutionGateRe
 gate_r_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(", gate_r_start)
 gate_r_body = step27_source[gate_r_start:gate_r_end]
 require("patchApi.RuntimeFrameworkDescriptionProperty.GetValue(null)" in gate_r_body and all(marker in gate_r_body for marker in ["R1 —", "R2 —", "R3 —"]), "Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages")
-require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —", "T3 —", "T4 —", "T5a —", "T5b —", "T6 —", "T7 —", "T8 —", "T9 —"]), "Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages")
+require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —", "T3 —", "T4 —", "T5a —", "T5b —", "T6 —", "T6a —", "T6b —", "T7 —", "T8 —", "T9 —"]), "Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages including LINQ closure T6a/T6b")
 gate_t_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPatchEngineExecution(")
 gate_t_end = step27_source.index("public async Task<ControlledHarmonyPatchExecutionGateResult> RunPostPatchAuditAsync(", gate_t_start)
 gate_t_body = step27_source[gate_t_start:gate_t_end]
 require("ValidatePatchEngineHostFrameworkPreservationSurface();" in gate_t_body and "GetType(HarmonySharedStateTypeFullName" in gate_t_body and "sharedResolutionManagedDelta" in gate_t_body and "sharedResolutionMembershipAfter.SequenceEqual" in gate_t_body, "Step 27.0.8 Gate T measures the new host/shared-state runtime reflection instead of weakening Gate-O purity")
-require("Static field values were NOT read and the cctor was NOT run" in gate_t_body and "RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)" in gate_t_body and "patchApi.PatchMethod.Invoke(processor, null)" in gate_t_body, "Step 27 Gate T orders reflection -> normalized shared-state initialization -> one public Patch() acceptance call")
+require("Static field values were NOT read and the cctor was NOT run" in gate_t_body and "RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)" in gate_t_body and "ValidatePatchEngineLinqFrameworkPreservationSurface()" in gate_t_body and "patchApi.PatchMethod.Invoke(processor, null)" in gate_t_body, "Step 27 Gate T orders reflection -> normalized shared-state initialization -> LINQ preservation preflight -> one public Patch() acceptance call")
+linq_preflight_index = gate_t_body.index("ValidatePatchEngineLinqFrameworkPreservationSurface()")
+shared_state_cctor_index = gate_t_body.index("RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)")
+patch_invoke_index = gate_t_body.index("patchApi.PatchMethod.Invoke(processor, null)")
+require(shared_state_cctor_index < linq_preflight_index < patch_invoke_index, "Step 27.0.22 T6a/T6b LINQ closure preflight is strictly after shared-state cctor completion and before Patch()")
+require("IsExactTwoSequenceUnion" in step27_source and "IsExactNonIndexedSelect" in step27_source and "IsExactThreeSelectorToDictionary" in step27_source and "SingleOrDefault(IsExactTwoSequenceUnion)" in step27_source and "SingleOrDefault(IsExactNonIndexedSelect)" in step27_source and "SingleOrDefault(IsExactThreeSelectorToDictionary)" in step27_source, "Step 27.0.22 LINQ preflight pins the exact non-indexed Select, two-sequence Union, and three-selector ToDictionary overload shapes")
 require("defaultCtorIl.Count == 6" in step27_source and "Code.Ldc_I4_M1" in step27_source and "HarmonyMethod() no longer matches exact priority=-1" in step27_source, "Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape")
 require("harmonyAnnotations.Length != 0" in step27_source and "HarmonyMethod(MethodInfo)/ImportMethod invoked: NO" in step27_source and "PatchProcessor.AddPrefix invoked: NO" in step27_source, "Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path")
 require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
@@ -1092,6 +1099,8 @@ required_docs = [
     "docs/history/steps/STEP-27.0.16-REAL-HARMONY-FAT-RELEASE-FIXTURE-HARDENING.md",
     "docs/history/steps/STEP-27.0.20-HASH-PINNED-REAL-HARMONY-NORMALIZER-EXECUTION.md",
     "docs/history/steps/STEP-27.0.21-RAW-METHOD-BODY-NORMALIZATION.md",
+    "docs/history/steps/STEP-27.0.22-POST-PUBLISH-SYSTEM-LINQ-PRESERVATION.md",
+    "docs/history/reports/STEP-27.0.21-PHYSICAL-T7-SYSTEM-LINQ-TRIM-FAILURE.txt",
     "docs/history/reports/STEP-27.0.20-CODEMAGIC-CECIL-WRITER-ENUM-CONSTANT-FAILURE.txt",
     "docs/history/reports/STEP-27.0.19-CODEMAGIC-DUPLICATE-SYSTEM-RUNTIME-ASSEMBLYREF-FAILURE.txt",
     "docs/history/reports/STEP-27.0.14-CODEMAGIC-TEST-COMPILE-FAILURE.txt",
@@ -1182,8 +1191,12 @@ require("Sequence contains more than one matching element" in step27_build103_ho
 step27_build104_host = read("docs/history/reports/STEP-27.0.20-CODEMAGIC-CECIL-WRITER-ENUM-CONSTANT-FAILURE.txt")
 require("executed all 212 host tests" in step27_build104_host and "211 passed / 1 failed" in step27_build104_host and "Real Harmony 2.4.2 normalization failed:" in step27_build104_host, "Codemagic build 104 evidence proves the hash-pinned real Harmony surrogate reached the production normalizer in the 212-test host suite")
 require("System.Reflection.BindingFlags" in step27_build104_host and "MetadataBuilder.GetConstantType" in step27_build104_host and "Mono.Cecil.ModuleDefinition.Write" in step27_build104_host and "CreateIosNormalizedHarmonyRuntimeImage" in step27_build104_host, "Codemagic build 104 evidence localizes the genuine failure to Cecil whole-module enum-constant serialization")
+step27_build105_report = read("docs/history/reports/STEP-27.0.21-PHYSICAL-T7-SYSTEM-LINQ-TRIM-FAILURE.txt")
+require("App version: 0.0.105 (105)" in step27_build105_report and "CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 19/26" in step27_build105_report and "Gate T — PatchEngineExecution: FAIL" in step27_build105_report, "physical build 105 evidence preserves the exact 19/26 Gate-T failure")
+require("HarmonySharedState iOS runtime-image normalization: PASS" in step27_build105_report and "Runtime dynamic HarmonySharedState singleton creation/ReflectionHelper.Load/StackFrame FieldRefAccess initialization: REMOVED FROM NORMALIZED CCTOR" in step27_build105_report and "Prepared/source/live file mutation: NO" in step27_build105_report, "physical build 105 proves raw-body HarmonySharedState normalization completed without source mutation")
+require("System.Linq.Enumerable.Union" in step27_build105_report and "HarmonyLib.MethodCreator..ctor" in step27_build105_report and "HarmonyLib.PatchFunctions.UpdateWrapper" in step27_build105_report and "HarmonyLib.PatchProcessor.Patch" in step27_build105_report, "physical build 105 localizes the current blocker to a trimmed LINQ member during Harmony replacement construction")
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "0.0.93 (93)" in current_status and "0.0.94 (94)" in current_status and "0.0.97 (97)" in current_status and "EditorBrowsableState" in current_status and "ReadingMode.Deferred" in current_status and "0.0.102 (102)" in current_status and "0.0.103 (103)" in current_status and "0.0.104 (104)" in current_status and "System.Reflection.BindingFlags" in current_status and "MetadataBuilder.GetConstantType" in current_status and "Step 27.0.21 / 0.0.105 (105)" in current_status and "PEReader.PEHeaders" in current_status and "method-body slot" in current_status and "post-publish interpreted fixture" in current_status and "ahead-of-load transformation" in current_status and "T6" in current_status and "T7/T8" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and "Step 28" in current_status, "current status preserves Step 27 evidence and advances to Step 27.0.21 / 0.0.105 raw method-body normalization")
+require("Steps 01–26" in current_status and "0.0.89 (89)" in current_status and "0.0.90 (90)" in current_status and "0.0.93 (93)" in current_status and "0.0.94 (94)" in current_status and "0.0.97 (97)" in current_status and "EditorBrowsableState" in current_status and "ReadingMode.Deferred" in current_status and "0.0.102 (102)" in current_status and "0.0.103 (103)" in current_status and "0.0.104 (104)" in current_status and "System.Reflection.BindingFlags" in current_status and "MetadataBuilder.GetConstantType" in current_status and "0.0.105 (105)" in current_status and "System.Linq.Enumerable.Union" in current_status and "Step 27.0.22 / 0.0.106 (106)" in current_status and "TrimmerRootAssembly" in current_status and "T6a" in current_status and "T6b" in current_status and "not yet satisfied" in current_status and "Step27-CrashCheckpoint.txt" in current_status and "Force-quit/relaunch before every Step-27 retry" in current_status and "26/26 PASS" in current_status and ("Step 28" in current_status or "Step-28" in current_status), "current status preserves prior evidence, records the physical 0.0.105 LINQ trim failure, and advances to Step 27.0.22 / 0.0.106")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

@@ -4,38 +4,33 @@ Steps 01–26 are physically closed. Step 27 remains focused on proving one laun
 
 ## Active candidate
 
-**Step 27.0.21 / `0.0.105 (105)` — raw HarmonySharedState method-body normalization**
+**Step 27.0.22 / `0.0.106 (106)` — post-publish System.Linq framework preservation**
 
-Codemagic 0.0.104 compiled production and tests and executed all **212** host tests. **211 passed / 1 failed**. This time the failure was inside the real production normalizer: the exact hash-pinned official Harmony-Fat 2.4.2 net9.0 surrogate entered `CreateIosNormalizedHarmonyRuntimeImage`, the Deferred Cecil read succeeded, and `Mono.Cecil.ModuleDefinition.Write` failed while rebuilding unrelated enum-typed Constant metadata because the fail-closed resolver correctly refused `System.Reflection.BindingFlags`.
+Physical 0.0.105 proved the new raw-method-body normalizer on the actual iPhone. The normalized `HarmonySharedState::.cctor` returned successfully and Gate T advanced into the first exact public `PatchProcessor.Patch()` call. Patch then failed normally in `HarmonyLib.MethodCreator..ctor` with:
 
-That exposed the remaining design flaw: even Deferred Cecil cannot round-trip the full assembly without resolving enum definitions during metadata serialization. 0.0.105 removes that dependency rather than adding a framework-enum whitelist.
+`System.MissingMethodException: System.Linq.Enumerable.Union<T>(IEnumerable<T>, IEnumerable<T>)`
 
-Gate A now:
+This is not a MonoMod detour failure. `MethodCreator` did not finish constructing the replacement and `PatchTools.DetourMethod` was not reached. The cause is full trimming: the real Harmony assembly is loaded only after publish, so ILLink cannot see its LINQ calls and had removed `Union<T>` from the host `System.Linq` surface even though the assembly itself was loadable.
 
-- keeps the exact original 0Harmony 2.4.2 patch-engine fingerprint and rejecting metadata resolver;
-- uses Deferred Cecil **read-only** for identity, field/cctor shape, and existing metadata-token discovery;
-- reuses the original cctor's already-existing parameterless `Dictionary<...>` constructor MemberRef tokens and exact HarmonySharedState FieldDef tokens;
-- maps the existing cctor RVA to its PE file offset with `PEReader.PEHeaders`;
-- requires a fat ECMA-335 header, no exception/extra sections, and sufficient existing body capacity;
-- clones the prepared bytes and replaces **only that existing method-body slot** with a 12-byte fat header plus the exact 47-byte / 11-instruction direct-state IL;
-- verifies no byte outside the original cctor slot changed;
-- reopens the in-memory result with Deferred Cecil and requires the exact 11-instruction fingerprint.
+0.0.106 therefore treats framework binding and framework member preservation as separate contracts:
 
-No metadata table, heap/blob, AssemblyRef, MemberRef, TypeSpec, Constant, CustomAttribute, resource, signature, or unrelated method is rebuilt or moved. The source/live/prepared Harmony files remain immutable.
+- retains `TrimMode=full` and all physically proven earlier roots;
+- adds one measured whole-assembly root, `System.Linq`, rather than chasing only `Union<T>`;
+- keeps the 0.0.105 raw-PE `HarmonySharedState` normalizer unchanged;
+- after T6 and before public `PatchProcessor.Patch()`, T6a/T6b verifies the exact `Enumerable.Select`, two-sequence `Union`, and three-selector `ToDictionary` public signatures used by the audited Harmony MethodCreator path;
+- invokes none of those LINQ operators during the preflight and still does not touch a StS2 member.
 
-The official Harmony-Fat host regression remains content-addressed by the already-observed release archive and selected net9.0 DLL SHA-256 values. It now serves its intended purpose: exercising the production normalizer against a real merged Harmony 2.4.2 image before IPA publication.
-
-The full 0.0.104 Codemagic 211/212 report and Cecil-writer stack are preserved in project history.
+The complete 0.0.105 device report is preserved in project history.
 
 ## iOS detour decision rule
 
-The stop rule remains unchanged: reach T6 with the normalized cctor; if public `PatchProcessor.Patch()` works, continue Harmony. If T6 passes but T7/T8 fails, perform one representative patch/unpatch on a launcher-owned post-publish interpreted fixture. If that also fails, stop iterating Harmony internals and propose deterministic ahead-of-load transforms on derived runtime copies; that would be a master-plan-level architecture change.
+The stop rule remains unchanged in substance but is now stated more precisely: a framework-member trimming failure does **not** count as a Harmony detour failure. Once T6a/T6b proves the required post-publish framework callable surface, let `PatchProcessor.Patch()` proceed. If replacement generation/dynamic execution or the actual `PatchTools.DetourMethod -> DetourFactory.Current.CreateDetour` path then fails for an iOS execution reason, perform the one representative post-publish interpreted fixture experiment. Pivot to ahead-of-load transforms only if that representative patch path also fails.
 
 ## Build
 
 Workflow: `ios-step-27`
 
-Expected app version: `0.0.105 (105)`
+Expected app version: `0.0.106 (106)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-27.ipa`
 

@@ -4,7 +4,7 @@
 
 Run `bash scripts/validate.sh`.
 
-For Step 27.0.21 / `0.0.105 (105)`, validation must prove that production normalization no longer calls `Mono.Cecil.ModuleDefinition.Write`, keeps both Cecil reads Deferred, retains the fail-closed resolver, and changes only the existing `HarmonySharedState::.cctor` PE method-body slot in the cloned runtime image. The source must be IL-only; a `StrongNameSigned` source must be rejected because in-place IL substitution would invalidate its signature. The admitted cctor storage must contain no other managed-method RVA.
+For Step 27.0.22 / `0.0.106 (106)`, validation must retain every 0.0.105 raw-body normalization invariant and additionally prove the measured post-publish `System.Linq` framework-member preservation contract. `System.Linq` must be an exact `TrimmerRootAssembly` root, build telemetry must report it, and Gate T must perform T6a/T6b exact `Enumerable.Select` / two-sequence `Union` / three-selector `ToDictionary` signature checks after normalized shared-state validation and before the single public `PatchProcessor.Patch()` call.
 
 The raw-body contract must require:
 
@@ -25,8 +25,8 @@ Run `bash scripts/test.sh`.
 
 The script downloads the exact official `Harmony-Fat.2.4.2.0.zip`, verifies the pinned archive hash, selects exactly one `net9.0/0Harmony.dll`, verifies the pinned DLL hash, and exports its path/member to the test process. The C# regression now has to pass through the real production raw-body normalizer, require the runtime image length to equal the source image length, require the runtime bytes to differ, preserve the source fixture byte-for-byte, and retain the exact 11-instruction normalized cctor audit.
 
-The complete 0.0.104 Codemagic report is archived as evidence that all 212 tests executed at 211/212 and that the sole failure occurred in Cecil's writer at `MetadataBuilder.GetConstantType` while resolving `System.Reflection.BindingFlags`.
+The complete 0.0.105 physical report is archived as evidence that raw-body HarmonySharedState normalization succeeded on-device and the first public `PatchProcessor.Patch()` call then failed in `HarmonyLib.MethodCreator..ctor` on trimmed `Enumerable.Union<T>` before `PatchTools.DetourMethod` was reached.
 
 ## Codemagic / physical run
 
-Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.105 (105)` from a fresh process. The first meaningful device proof is T6. If T6 passes, the unresolved platform question becomes T7/T8 `PatchProcessor.Patch()` viability. The existing interpreted-fixture stop rule remains in force.
+Codemagic must pass static validation, the complete host suite, iOS publish, and IPA verification. Then install `0.0.106 (106)` from a fresh process. T6 is already physically crossed by 0.0.105; the new immediate proof is T6a/T6b confirming the linked host retains the exact Harmony LINQ surface. If that passes, T7/T8 may finally reach replacement generation and, potentially, the MonoMod detour boundary. Do not trigger the Step-28 pivot solely from a framework-member trimming failure.

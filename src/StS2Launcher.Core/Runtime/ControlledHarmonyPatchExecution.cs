@@ -2340,6 +2340,13 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
                 sharedMembershipAfter,
                 sharedGeneratedAssemblies);
 
+            stage = "post-publish System.Linq patch-engine member preservation preflight";
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T6a — entering exact host System.Linq callable-surface preflight for Harmony MethodCreator Select/Union/ToDictionary; PatchProcessor.Patch() and launcher target remain uninvoked.");
+            var linqFrameworkSurface = ValidatePatchEngineLinqFrameworkPreservationSurface();
+            ReportProgress(progress, ControlledHarmonyPatchExecutionGate.PatchEngineExecution,
+                "T6b — host System.Linq MethodCreator callable surface is present after full trimming: " + linqFrameworkSurface + ". Entering PatchProcessor.Patch() is now permitted.");
+
             var managedBefore = context.ManagedResolverRequests.Count;
             var privateBefore = context.PrivateLoads.Count;
             var hostBefore = context.HostLoads.Count;
@@ -3165,6 +3172,124 @@ public sealed class ControlledHarmonyPatchExecution : IDisposable
             ?? throw new MissingMemberException(typeof(MethodBase).FullName, nameof(MethodBase.MethodHandle));
         if (!typeof(RuntimeMethodHandle).GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name.Equals(nameof(RuntimeMethodHandle.GetFunctionPointer), StringComparison.Ordinal)))
             throw new MissingMethodException(typeof(RuntimeMethodHandle).FullName, nameof(RuntimeMethodHandle.GetFunctionPointer));
+    }
+
+    private static string ValidatePatchEngineLinqFrameworkPreservationSurface()
+    {
+        // Physical 0.0.105 proved that assembly binding alone is insufficient for post-publish
+        // payloads under TrimMode=full: 0Harmony resolved System.Linq but MethodCreator failed on
+        // the trimmed two-sequence Enumerable.Union<T> member. Keep this runtime check independent
+        // of Harmony and do not invoke any LINQ operator; it verifies the exact public signatures
+        // that the Gate-O-audited MethodCreatorConfig.Prepare path calls immediately.
+        var enumerableType = typeof(Enumerable);
+        var methods = enumerableType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+
+        static bool IsIEnumerableOfGenericParameter(Type type, int genericParameterPosition)
+            => type.IsGenericType &&
+               type.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
+               type.GetGenericArguments()[0].IsGenericParameter &&
+               type.GetGenericArguments()[0].GenericParameterPosition == genericParameterPosition;
+
+        static bool IsExactTwoSequenceUnion(MethodInfo method)
+        {
+            if (!method.Name.Equals(nameof(Enumerable.Union), StringComparison.Ordinal) ||
+                !method.IsGenericMethodDefinition ||
+                method.GetGenericArguments().Length != 1)
+            {
+                return false;
+            }
+
+            var parameters = method.GetParameters();
+            return parameters.Length == 2 &&
+                   IsIEnumerableOfGenericParameter(parameters[0].ParameterType, 0) &&
+                   IsIEnumerableOfGenericParameter(parameters[1].ParameterType, 0);
+        }
+
+        static bool IsExactNonIndexedSelect(MethodInfo method)
+        {
+            if (!method.Name.Equals(nameof(Enumerable.Select), StringComparison.Ordinal) ||
+                !method.IsGenericMethodDefinition ||
+                method.GetGenericArguments().Length != 2)
+            {
+                return false;
+            }
+
+            var parameters = method.GetParameters();
+            if (parameters.Length != 2 ||
+                !IsIEnumerableOfGenericParameter(parameters[0].ParameterType, 0) ||
+                !parameters[1].ParameterType.IsGenericType ||
+                parameters[1].ParameterType.GetGenericTypeDefinition() != typeof(Func<,>))
+            {
+                return false;
+            }
+
+            var selectorArguments = parameters[1].ParameterType.GetGenericArguments();
+            return selectorArguments.Length == 2 &&
+                   selectorArguments[0].IsGenericParameter &&
+                   selectorArguments[0].GenericParameterPosition == 0 &&
+                   selectorArguments[1].IsGenericParameter &&
+                   selectorArguments[1].GenericParameterPosition == 1;
+        }
+
+        static bool IsExactThreeSelectorToDictionary(MethodInfo method)
+        {
+            if (!method.Name.Equals(nameof(Enumerable.ToDictionary), StringComparison.Ordinal) ||
+                !method.IsGenericMethodDefinition ||
+                method.GetGenericArguments().Length != 3)
+            {
+                return false;
+            }
+
+            var parameters = method.GetParameters();
+            if (parameters.Length != 3 ||
+                !IsIEnumerableOfGenericParameter(parameters[0].ParameterType, 0))
+            {
+                return false;
+            }
+
+            var keySelector = parameters[1].ParameterType;
+            var elementSelector = parameters[2].ParameterType;
+            if (!keySelector.IsGenericType || keySelector.GetGenericTypeDefinition() != typeof(Func<,>) ||
+                !elementSelector.IsGenericType || elementSelector.GetGenericTypeDefinition() != typeof(Func<,>))
+            {
+                return false;
+            }
+
+            var keyArguments = keySelector.GetGenericArguments();
+            var elementArguments = elementSelector.GetGenericArguments();
+            return keyArguments.Length == 2 &&
+                   keyArguments[0].IsGenericParameter && keyArguments[0].GenericParameterPosition == 0 &&
+                   keyArguments[1].IsGenericParameter && keyArguments[1].GenericParameterPosition == 1 &&
+                   elementArguments.Length == 2 &&
+                   elementArguments[0].IsGenericParameter && elementArguments[0].GenericParameterPosition == 0 &&
+                   elementArguments[1].IsGenericParameter && elementArguments[1].GenericParameterPosition == 2;
+        }
+
+        var union = methods.SingleOrDefault(IsExactTwoSequenceUnion);
+        if (union is null)
+        {
+            throw new MissingMethodException(
+                "System.Linq.Enumerable",
+                "Union<TSource>(IEnumerable<TSource>, IEnumerable<TSource>)");
+        }
+
+        var select = methods.SingleOrDefault(IsExactNonIndexedSelect);
+        if (select is null)
+        {
+            throw new MissingMethodException(
+                "System.Linq.Enumerable",
+                "Select<TSource,TResult>(IEnumerable<TSource>, Func<TSource,TResult>)");
+        }
+
+        var toDictionary = methods.SingleOrDefault(IsExactThreeSelectorToDictionary);
+        if (toDictionary is null)
+        {
+            throw new MissingMethodException(
+                "System.Linq.Enumerable",
+                "ToDictionary<TSource,TKey,TElement>(IEnumerable<TSource>, Func<TSource,TKey>, Func<TSource,TElement>)");
+        }
+
+        return $"{enumerableType.Assembly.GetName().Name}: Select/Union/ToDictionary";
     }
 
     private static string[] SnapshotPrivateContextMembership(Step27LoadContext context)
