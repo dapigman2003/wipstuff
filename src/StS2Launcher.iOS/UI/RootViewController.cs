@@ -50,6 +50,7 @@ public sealed partial class RootViewController : UIViewController
     private readonly ControlledHarmonyProcessorCreationGateSequence _controlledHarmonyProcessorCreationGates = new();
     private readonly RealStS2CompatibilityTargetAudit _realStS2CompatibilityTargetAudit;
     private readonly RealStS2CompatibilityTargetAuditGateSequence _realStS2CompatibilityTargetAuditGates = new();
+    private readonly RealStS2SelectedTargetSemanticAudit _realStS2SelectedTargetSemanticAudit;
 
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
@@ -180,6 +181,7 @@ public sealed partial class RootViewController : UIViewController
             _launcherDataRoot,
             Path.Combine(NSBundle.MainBundle.BundlePath, AheadOfLoadManagedTransformation.BundleFixtureDirectoryName));
         _realStS2CompatibilityTargetAudit = new RealStS2CompatibilityTargetAudit(_launcherDataRoot);
+        _realStS2SelectedTargetSemanticAudit = new RealStS2SelectedTargetSemanticAudit(_launcherDataRoot);
     }
 
     public override void ViewDidLoad()
@@ -773,6 +775,7 @@ public sealed partial class RootViewController : UIViewController
         AddControlledHarmonyPatchExecutionControls(content);
         AddAheadOfLoadManagedTransformationControls(content);
         AddRealStS2CompatibilityTargetAuditControls(content);
+        AddRealStS2SelectedTargetSemanticAuditControls(content);
 
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();

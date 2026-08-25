@@ -1,28 +1,17 @@
-# StS2 Launcher iOS — Step 29 Real StS2 Compatibility Target Audit
+# StS2 Launcher iOS — Step 30 Selected Harmony Target Semantic Context Audit
 
-Steps 01–26 are physically closed. Step 27 is a **closed negative architecture result**: physical `0.0.108 (108)` proved runtime Harmony/MonoMod replacement is not viable on this host. Step 28 is now a **closed positive architecture result**: physical `0.0.111 (111)` passed A–E **5/5**, including transformed execution **1000 / 1041 / 1041**, transformed-only CLR admission, stable source/transformed hashes, and post-execution OfflineReady **428/428**.
+Steps 01–26 are physically closed. Step 27 is closed negative for runtime Harmony/MonoMod replacement. Step 28 is closed positive at **5/5** for deterministic transform-before-load + transformed-only interpreted execution. Step 29 is now closed positive at **4/4** for exact receipt-backed real-StS2 target auditing/selection.
 
-Raw Step-28 closure evidence is preserved at `docs/history/reports/STEP-28.0.2-PHYSICAL-CLOSURE.txt`.
+Physical Step 29 selected exactly `MegaCrit.Sts2.Core.Modding.ModManager::TryLoadMod(Mod)` token `0x06007927`, `IL_0D9D Callvirt -> Harmony.PatchAll(Assembly)`, body SHA-256 `50c8c4394082f3c73df414fad8675540cfc00a99ccc4f350b616cec574cdbcbd`.
 
 ## Active candidate
 
-**Step 29.0 / `0.0.112 (112)` — exact receipt-backed real-StS2 compatibility target audit**
+**Step 30.0 / `0.0.113 (113)` — selected-target semantic context audit**
 
-The repository does not preserve the old physical Step-17 exact source→target call-site samples. Rather than guess the first semantic patch, Step 29.0 regenerates current evidence from the verified macOS ARM64 `sts2.dll`:
+Step 30 remains read-only. It re-binds the exact physical Step-29 source evidence, records the selected method's exact bounded IL/control-flow/exception context, and applies the existing product boundary that Harmony/mod compatibility is later and must not block base-game startup. If the selected site remains structurally `ModManager.TryLoadMod(Mod) -> Harmony.PatchAll(Assembly)`, Gate C must defer it and authorize **no rewrite**.
 
-1. re-prove OfflineReady and admit only the exact receipt-backed primary assembly as deferred Cecil metadata;
-2. fingerprint concrete compatibility-risk IL call sites without dependency resolution;
-3. deterministically select at most one audit candidate with exact method token, IL offset/opcode, target scope/member and source method-body SHA-256;
-4. re-hash source bytes and re-prove OfflineReady/isolation.
+Workflow: `ios-step-30`
 
-Step 29 performs **zero Cecil writes**, never CLR-loads or invokes `sts2.dll`, and does not run Harmony/MonoMod detours, Godot/game startup, or native game loading. A selected candidate is evidence for the next iteration, not authorization to rewrite it in this build.
+Expected IPA: `artifacts/StS2-Launcher-Step-30.ipa`
 
-## Build
-
-Workflow: `ios-step-29`
-
-Expected app version: `0.0.112 (112)`
-
-Expected IPA: `artifacts/StS2-Launcher-Step-29.ipa`
-
-Next authority: Codemagic static validation → complete host suite → iOS publish → IPA verification → physical Step 29 A–D **4/4 PASS**. Preserve `Step29-RealStS2CompatibilityTargetAudit.txt` as the authority for the next semantic-transformation design.
+Next authority: Codemagic static validation → complete host suite → iOS publish → IPA verification → physical Step 30 A–D **4/4 PASS**. Preserve `Step30-SelectedTargetSemanticContextAudit.txt`.

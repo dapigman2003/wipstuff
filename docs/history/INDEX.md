@@ -132,3 +132,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-28.0.2-PHYSICAL-CLOSURE.md` — formal positive closure of deterministic transform-before-load + post-publish interpreted execution.
 - `steps/STEP-29-REAL-STS2-COMPATIBILITY-TARGET-AUDIT.md` — active read-only exact ARM64 `sts2.dll` target re-audit/selection boundary.
 - `steps/STEP-29-TEST.md` — physical Step-29 A–D acceptance procedure.
+
+## Step 29 physical closure / Step 30 frontier
+
+- `reports/STEP-29.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.112 report: Step 29 A–D 4/4 PASS; exact receipt-backed source preserved; selected `ModManager.TryLoadMod(Mod)` token `0x06007927` @ `IL_0D9D` -> `Harmony.PatchAll(Assembly)`; zero writes/CLR load; OfflineReady 428/428.
+- `steps/STEP-29.0-PHYSICAL-CLOSURE.md` — formal positive closure of exact real-StS2 read-only target selection.
+- `steps/STEP-30-SELECTED-HARMONY-TARGET-SEMANTIC-CONTEXT-AUDIT.md` — active read-only exact selected-method semantic-context/product-scope audit.
+- `steps/STEP-30-TEST.md` — physical Step-30 A–D acceptance procedure.

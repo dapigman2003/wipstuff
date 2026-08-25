@@ -10,23 +10,25 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 29.0 — REAL STS2 COMPATIBILITY TARGET AUDIT";
+        "STEP 30.0 — SELECTED HARMONY TARGET SEMANTIC CONTEXT AUDIT";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 ON 0.0.111 • STEP 29 EXACT REAL-STS2 TARGET AUDIT";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 SELECTED-TARGET SEMANTIC AUDIT";
 
     public const string Summary =
-        "Physical 0.0.111 closed Step 28 positively: all A–E gates passed, only the verified transformed fixture entered the private CLR context, Adjustment()/Target(41)/InvokeTarget(41) returned 1000 / 1041 / 1041, source/transformed hashes remained stable, and post-execution OfflineReady passed 428/428. The ahead-of-load transform-before-load architecture is therefore physically established. Step 29.0 now returns to the exact receipt-backed macOS arm64 sts2.dll to regenerate the missing concrete target evidence before the first real semantic transformation. It is deliberately read-only: deferred Cecil metadata/IL inspection with a rejecting resolver, deterministic at-most-one audit-candidate selection, no Cecil write, no sts2 CLR load/invocation, no Harmony/MonoMod runtime patching, no Godot/game startup, and no native game loading.";
+        "Physical 0.0.112 closed Step 29 positively at 4/4 on the exact receipt-backed macOS arm64 sts2.dll and selected one fingerprinted audit candidate: MegaCrit.Sts2.Core.Modding.ModManager::TryLoadMod(Mod), token 0x06007927, IL_0D9D Callvirt -> Harmony.PatchAll(Assembly), body SHA-256 50c8c4394082f3c73df414fad8675540cfc00a99ccc4f350b616cec574cdbcbd. Step 30.0 binds that physical evidence back to the same source and records the exact bounded IL/control-flow/exception context before any real-game rewrite can be authorized. Because the selected site is structurally in the mod-loading path, Gate C applies the existing product boundary that Harmony/Workshop compatibility is later and must not block base-game startup. Step 30 is read-only: deferred Cecil inspection with a rejecting resolver, no Cecil write, no sts2 CLR load/invocation, no Harmony/MonoMod runtime patching, no Godot/game startup, and no native game loading.";
 
     public const string InitialStatus =
-        "Status: Step 28 is CLOSED POSITIVE by physical 0.0.111 A–E 5/5, including 1000 / 1041 / 1041 transformed execution and OfflineReady 428/428 after execution. Build 0.0.112 is Step 29.0: a fresh-process, read-only exact-IL audit of receipt-backed ARM64 sts2.dll that selects at most one fingerprinted compatibility candidate for the next transformation iteration. Run Codemagic first; after compile/host/IPA verification, run Step 29 A–D on device and preserve Step29-RealStS2CompatibilityTargetAudit.txt.";
+        "Status: Step 29 is CLOSED POSITIVE by physical 0.0.112 A–D 4/4. Build 0.0.113 is Step 30.0: bind the exact selected ModManager.TryLoadMod -> Harmony.PatchAll site, inspect its surrounding semantics, and deterministically decide whether it belongs on the base-game transformation frontier. No rewrite is authorized by this build. Run Codemagic first; after compile/host/IPA verification, run Step 30 A–D on device and preserve Step30-SelectedTargetSemanticContextAudit.txt.";
 
-    public const string ExpectedDisplayVersion = "0.0.112";
-    public const string ExpectedBuildVersion = "112";
+    public const string ExpectedDisplayVersion = "0.0.113";
+    public const string ExpectedBuildVersion = "113";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
         "receipt-backed arm64 sts2.dll -> deferred rejecting-resolver Cecil audit -> exact token/IL/target/body fingerprint -> at-most-one audit candidate -> zero writes/zero CLR load -> OfflineReady reproof";
+    public const string Step30ImplementationMarker =
+        "physical Step29 exact source+token+IL+target+body fingerprint -> deferred rejecting-resolver semantic context audit -> mod-path disposition -> zero writes/zero CLR load -> OfflineReady reproof";
 
     // Historical Step-27 crash-report provenance markers remain available as regression/evidence tooling.
     public const string GateSImplementationMarker =

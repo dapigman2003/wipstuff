@@ -2,28 +2,21 @@
 
 Current on-device diagnostics write text reports beneath `Documents/StS2Launcher/Reports/*.txt` and are visible through Files. Reports are output-only and never trusted runtime input.
 
-## Active Step 29 report
+## Active Step 30 report
 
-`Documents/StS2Launcher/Reports/Step29-RealStS2CompatibilityTargetAudit.txt`
+`Documents/StS2Launcher/Reports/Step30-SelectedTargetSemanticContextAudit.txt`
 
-It records ordered Gates A–D: OfflineReady + exact receipt-backed ARM64 `sts2.dll` metadata admission, concrete compatibility-risk IL call-site fingerprints, deterministic at-most-one candidate selection, and final source-hash/OfflineReady/no-CLR-load isolation.
+It records exact Step-29 evidence binding, bounded IL/control-flow/exception context for the selected `ModManager.TryLoadMod -> Harmony.PatchAll` site, deterministic product-scope disposition, and final source-hash/OfflineReady/no-CLR-load isolation.
+
+## Physically closed Step 29 evidence
+
+- `docs/history/reports/STEP-29.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.112 report, 4/4 PASS.
+- `docs/history/steps/STEP-29.0-PHYSICAL-CLOSURE.md` — closure note and selected exact fingerprint.
 
 ## Physically closed Step 28 evidence
 
-Raw device report:
-
-`docs/history/reports/STEP-28.0.2-PHYSICAL-CLOSURE.txt`
-
-Closure note:
-
-`docs/history/steps/STEP-28.0.2-PHYSICAL-CLOSURE.md`
-
-The report records A–E **5/5 PASS**, Gate-D **1000 / 1041 / 1041**, exactly one transformed fixture identity in the CLR, and post-execution OfflineReady **428/428**.
-
-## Preserved Step-28 CI evidence
-
-- `docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt` — 0.0.109 CS0246 compile stop.
-- `docs/history/reports/STEP-28.0.1-CODEMAGIC-HOST-TEST-FAILURE.txt` — 0.0.110 compile pass / host 216/217 / Gate-A eager Cecil `System.Runtime` resolution.
+- `docs/history/reports/STEP-28.0.2-PHYSICAL-CLOSURE.txt` — raw 0.0.111 report, 5/5 PASS with 1000 / 1041 / 1041 and OfflineReady 428/428.
+- `docs/history/steps/STEP-28.0.2-PHYSICAL-CLOSURE.md` — formal positive closure note.
 
 ## Preserved Step-27 architecture-decision evidence
 

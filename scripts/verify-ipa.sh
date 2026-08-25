@@ -39,10 +39,10 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 29 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 29 build version: $BUILD_VERSION" >&2; exit 4; }
-[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 29 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
-[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 29 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
+[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 30 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 30 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 30 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
+[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 30 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 

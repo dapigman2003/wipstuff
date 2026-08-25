@@ -131,14 +131,18 @@ The Step-28 implementation is now a protected positive runtime boundary. Active 
 
 ## Step 29 — real StS2 compatibility target audit
 
-Step 29.0 exists because Step 28 is physically closed but the repository does not preserve the exact old Step-17 physical source→target samples needed to justify a real semantic rewrite. The active regression contract is therefore read-only target re-audit/selection:
+Step 29.0 is physically closed at **4/4 PASS** on `0.0.112 (112)`. Preserve the raw report `docs/history/reports/STEP-29.0-PHYSICAL-CLOSURE.txt` and the exact selected fingerprint: source SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, `ModManager.TryLoadMod(Mod)` token `0x06007927`, `IL_0D9D Callvirt -> Harmony.PatchAll(Assembly)`, body SHA-256 `50c8c4394082f3c73df414fad8675540cfc00a99ccc4f350b616cec574cdbcbd`. Step 29 performed zero writes, zero CLR load/invocation, zero resolver requests, and retained OfflineReady 428/428. Selection remains **audit evidence only**.
 
-- Gate A requires a fresh process, OfflineReady, exactly one receipt-backed `data_sts2_macos_arm64/sts2.dll`, receipt SHA-1 verification, diagnostic SHA-256, `ReadingMode.Deferred`, a rejecting Cecil resolver, zero resolver requests, and no CLR-resident `sts2`;
-- Gate B inspects concrete primary `sts2.dll` IL only and fingerprints candidate sites by source method, metadata token, IL offset/opcode, target scope/member and canonical method-body SHA-256;
-- candidate categories are bounded to Harmony runtime patch APIs, MonoMod runtime detours, Reflection.Emit, PrepareMethod, dynamic assembly loading, selected platform/native managed APIs, and indirect `calli`;
-- `Expression.Compile` is counted but excluded from candidacy because the Step-19 host-interpreter compatibility boundary is already physically closed;
-- Gate C deterministically selects at most one audit candidate; `NO DIRECT PRIMARY TARGET` is a valid evidence outcome and must not be replaced by an ad-hoc broad target;
-- Gate C selection is **audit evidence only** and Step 29 performs zero Cecil writes;
-- Gate D re-hashes the source, re-proves OfflineReady, requires zero `sts2` CLR load/invocation and zero Cecil resolver requests, and retains the no-Harmony/no-Godot/no-native-game boundary.
+## Step 30 — selected Harmony target semantic context audit
 
-A physical **4/4 PASS** closes target selection only. The next candidate must inspect the selected exact method semantics and predeclare one transformation before any real StS2 write is introduced.
+The active Step-30 contract is read-only:
+
+- Gate A binds the exact physical Step-29 source/token/offset/target/body fingerprint to the same receipt-backed ARM64 `sts2.dll` under OfflineReady and fresh-process conditions;
+- Cecil remains `ReadingMode.Deferred` with an explicit rejecting resolver and zero resolution requests;
+- Gate B inspects only the exact selected method context and records a bounded IL window, branch sources, covering exception regions, nearby strings, method-body shape, Harmony-call count and dynamic-load-call count;
+- no `ModuleDefinition.Write`, `Assembly.Load`, private `AssemblyLoadContext` admission, StS2 reflection/invocation, Harmony/MonoMod patching, Godot/game startup or native game loading is permitted;
+- Gate C may defer the selected site only when it remains structurally `MegaCrit.Sts2.Core.Modding.ModManager::TryLoadMod(Mod) -> Harmony.PatchAll(Assembly)`; the required disposition is **`DEFER — MOD/HARMONY COMPATIBILITY PATH; NO BASE-GAME REWRITE AUTHORIZED`**;
+- Step 30 makes no runtime-reachability claim and predeclares **no behavior change** for the selected PatchAll site;
+- Gate D re-hashes source, re-proves OfflineReady, and reasserts zero CLR load/write/resolver activity.
+
+Physical **4/4 PASS** closes this semantic-context/product-scope audit only. The next candidate may inspect the highest-priority non-mod Step-29 family, but still may not write real StS2 bytes until that exact family's semantics are separately audited and one behavior change is predeclared.

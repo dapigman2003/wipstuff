@@ -1,4 +1,4 @@
-# Current Status — Step 29 Real StS2 Compatibility Target Audit
+# Current Status — Step 30 Selected Harmony Target Semantic Context Audit
 
 ## Physically closed boundary
 
@@ -183,29 +183,37 @@ Decisive Gate-D proof:
 
 Gate E then re-proved **OfflineReady 428/428**, source/transformed hash stability, trusted Step-12 immutability, and no unexpected private dependency/native activity. Runtime Harmony/MonoMod replacement therefore remains closed negative, while deterministic transform-before-load + transformed-only interpreted execution is now **physically closed positive**.
 
-## Active candidate — Step 29.0 / 0.0.112 (112)
+## Physical 0.0.112 result — Step 29 CLOSED POSITIVE at 4/4
 
-- Workflow: **`ios-step-29`**
-- IPA: **`artifacts/StS2-Launcher-Step-29.ipa`**
-- TRX: **`artifacts/test-results/step29.trx`**
-- Main device report: `Documents/StS2Launcher/Reports/Step29-RealStS2CompatibilityTargetAudit.txt`
-- Closed prerequisite: Step 28 physical 5/5 on 0.0.111
-- Purpose: regenerate exact current receipt-backed ARM64 `sts2.dll` target evidence before the first real semantic transformation
+The raw report is preserved at `docs/history/reports/STEP-29.0-PHYSICAL-CLOSURE.txt`. Physical Step 29 re-proved OfflineReady **428/428** before/after the audit, matched source SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18` and MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, performed zero Cecil writes / zero CLR load, and selected exactly:
+
+- `MegaCrit.Sts2.Core.Modding.ModManager::TryLoadMod(MegaCrit.Sts2.Core.Modding.Mod)`
+- token `0x06007927`
+- `IL_0D9D Callvirt`
+- `[0Harmony] System.Void HarmonyLib.Harmony::PatchAll(System.Reflection.Assembly)`
+- method-body SHA-256 `50c8c4394082f3c73df414fad8675540cfc00a99ccc4f350b616cec574cdbcbd`
+
+This closes exact target selection only; the report explicitly labels the result audit-only.
+
+## Active candidate — Step 30.0 / 0.0.113 (113)
+
+- Workflow: **`ios-step-30`**
+- IPA: **`artifacts/StS2-Launcher-Step-30.ipa`**
+- TRX: **`artifacts/test-results/step30.trx`**
+- Main device report: `Documents/StS2Launcher/Reports/Step30-SelectedTargetSemanticContextAudit.txt`
+- Closed prerequisites: Step 28 physical 5/5; Step 29 physical 4/4
+- Purpose: bind and inspect the exact selected Harmony call before any real-game rewrite
 - Real StS2 writes: **0**
 - Real StS2 CLR load/invocation: **forbidden**
 - Cecil dependency resolution: **forbidden / rejecting resolver**
 
-### Why Step 29 is an audit instead of an immediate real patch
+### Step 30 gates
 
-The repository does not preserve the old physical Step-17 report containing the exact concrete `sts2.dll` source→target samples. The scanner implementation remains, but selecting a semantic rewrite from broad categories or memory would violate the project's evidence model. Step 29 therefore re-establishes the exact current type/method/token/IL/target/body fingerprint first.
-
-### Step 29 gates
-
-- **Gate A — SourceAdmissionAndOfflineReady:** fresh process; re-prove OfflineReady; select exactly one receipt-backed `data_sts2_macos_arm64/sts2.dll`; verify receipt SHA-1 + diagnostic SHA-256; open only with `ReadingMode.Deferred` + rejecting resolver; require zero resolver requests and no CLR-resident `sts2`.
-- **Gate B — ExactRiskCallSiteAudit:** inspect concrete IL only; fingerprint exact candidate source method/token/IL offset/opcode/target/body SHA-256; count but exclude `Expression.Compile` because Step 19 already closed that compatibility question.
-- **Gate C — DeterministicCandidateSelection:** select at most one audit candidate under the predeclared priority (Harmony runtime patch → MonoMod detour → Reflection.Emit/PrepareMethod/dynamic load → platform/native managed APIs → `calli`). If none exists, report `NO DIRECT PRIMARY TARGET` rather than inventing a rewrite.
-- **Gate D — FinalIsolationAudit:** re-hash primary source, re-prove OfflineReady, require zero `sts2` CLR load, zero Cecil writes, zero resolver requests, zero runtime detours/game startup/native game loading.
+- **Gate A — SelectedEvidenceBindingAndOfflineReady:** re-prove OfflineReady; require the exact physical Step-29 source SHA-1/SHA-256/bytes/MVID plus token `0x06007927`, IL `0x0D9D`, `Harmony.PatchAll(Assembly)` target, and body fingerprint.
+- **Gate B — ExactSemanticContextAudit:** report the selected method/body shape, bounded 14-instruction-before/after IL window, branches into the selected instruction, exception regions covering it, nearby strings, and Harmony/dynamic-load call counts; zero resolution/write/CLR execution.
+- **Gate C — DeterministicDisposition:** if the physical fingerprint still resolves structurally to `ModManager.TryLoadMod(Mod) -> Harmony.PatchAll(Assembly)`, record `DEFER — MOD/HARMONY COMPATIBILITY PATH; NO BASE-GAME REWRITE AUTHORIZED`. This is a product-scope disposition, not a runtime-reachability claim.
+- **Gate D — FinalIsolationAudit:** re-hash source, re-prove OfflineReady, require zero CLR-resident `sts2`, zero writes, zero resolver requests, and no game/Godot/native execution.
 
 ### Acceptance / next authority
 
-Codemagic must pass static validation, the complete host suite, iOS publish and IPA verification before device testing. Physical Step 29 closes only at **A–D / 4/4 PASS**. Preserve the report unchanged; if Gate C selects a candidate, the next iteration must inspect that exact method's surrounding semantics and predeclare one transformation before any real-game Cecil write.
+Codemagic must pass static validation, the complete host suite, iOS publish and IPA verification before device testing. Physical Step 30 closes only at **A–D / 4/4 PASS**. A pass explicitly authorizes no rewrite of the selected Harmony site. The next evidence frontier is the highest-priority non-mod Step-29 family, currently the `RuntimeHelpers.PrepareMethod` calls in `OneTimeInitialization::PrewarmJit()`, which must receive its own exact semantic audit before any Cecil write.
