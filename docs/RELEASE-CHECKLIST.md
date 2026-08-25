@@ -1,35 +1,31 @@
-# Release Checklist — Step 31.0
+# Release Checklist — Step 32.0
 
-## Source / policy
+## Candidate identity
 
-- Step 28 is physically closed positive 5/5; Step 29 and Step 30 are physically closed positive 4/4.
-- Step 27 remains closed negative; do not revive runtime Harmony/MonoMod replacement.
-- `MtouchLink=None`, `TrimMode=copy`, and `MtouchInterpreter=-all` remain active host policy.
-- Trusted Step-12 install remains immutable.
-- Step 31 is read-only: zero real-StS2 Cecil writes and zero CLR load/invocation.
-- Gate A hard-binds exact source SHA/MVID plus `PrewarmJit()` token/body fingerprint and ten exact PrepareMethod sites.
-- Gate B uses Deferred Cecil + rejecting resolver and records per-site semantic context.
-- Gate C may record rewrite-design eligibility but must still say **NO WRITE AUTHORIZED** and make no runtime-reachability claim.
-- Gate D re-hashes source and re-proves OfflineReady/isolation.
+- step/candidate: **Step 32.0**
+- version: `0.0.115 (115)`
+- workflow: `ios-step-32`
+- IPA: `artifacts/StS2-Launcher-Step-32.ipa`
+- TRX: `artifacts/test-results/step32.trx`
+- top banner: **STEP 32.0 — FIRST REAL STS2 PREPAREMETHOD REWRITE**
 
-## Build identity
+## Required invariants
 
-- step/candidate: **Step 31.0**
-- version: `0.0.114 (114)`
-- workflow: `ios-step-31`
-- IPA: `artifacts/StS2-Launcher-Step-31.ipa`
-- TRX: `artifacts/test-results/step31.trx`
-- top banner: **STEP 31.0 — PREPAREMETHOD SEMANTIC CONTEXT AUDIT**
+- receipt-backed Step-12 install is never written;
+- exact physical Step-31 source/method/site evidence remains pinned;
+- private transformed image changes only the ten exact `PrepareMethod` sites using the predeclared stack-neutral replacement;
+- no arbitrary Cecil resolver fallback;
+- no real-StS2 CLR admission/invocation in Step 32;
+- no Harmony/MonoMod runtime patching;
+- no Godot/game startup or native game loading;
+- `MASTER-PLAN.md` is not changed for this routine execution of the already-selected transform-before-load architecture.
 
-## Pre-device authority
+## Before device run
 
-Canonical static validation, complete host suite, iOS publish, and IPA verification must all pass. Preserve any first failure and make only the smallest correction.
+- Codemagic static validation PASS;
+- complete host suite PASS;
+- iOS publish PASS;
+- IPA verification PASS;
+- force-quit/relaunch before Step 32.
 
-## Device-run discipline
-
-- force-quit/relaunch before Step 31;
-- preserve `Step31-PrepareMethodSemanticContextAudit.txt`;
-- do not transform any PrepareMethod site in this build;
-- do not run Godot/game startup or native game loading as part of Step 31.
-
-Physical iPhone remains final authority. Step 31 closes only at **A–D / 4/4 PASS**.
+Physical iPhone remains final authority. Step 32 closes only at **A–D / 4/4 PASS** with the dedicated report preserved.

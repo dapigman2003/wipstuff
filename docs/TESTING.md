@@ -1,43 +1,32 @@
-# Testing — Step 31 PrepareMethod Semantic Context Audit
+# Testing — Step 32 First Real StS2 PrepareMethod Rewrite
 
-## Static validation
+Active candidate: Step 32.0 / `0.0.115 (115)`.
 
-Run `bash scripts/validate.sh`.
+## Static/host authority
 
-The active candidate is Step 31.0 / `0.0.114 (114)`. Validation must preserve the physically closed Step-28/29/30 evidence while pinning the new read-only PrepareMethod semantic audit:
+Canonical entry points remain `scripts/validate.sh` and `scripts/test.sh`. Validation must pin:
 
-- Step 30 raw physical report remains present and records **4/4 PASS**, exact Harmony/mod disposition, zero writes/CLR load/resolver fallback, and OfflineReady 428/428;
-- Step 31 hard-pins the receipt-backed source SHA/MVID, `PrewarmJit()` token `0x06007D05`, body fingerprint, and all ten Step-29 `PrepareMethod` offsets/signatures;
-- `ReadingMode.Deferred` plus rejecting Cecil resolver remains mandatory;
-- Step 31 contains no Cecil write or real-StS2 CLR admission/invocation path;
-- Gate B records exact per-site IL/control-flow/exception context;
-- Gate C can record rewrite-design eligibility only and must still authorize no write;
-- version/build/workflow/IPA/TRX identity is `0.0.114 (114)` / `ios-step-31` / `StS2-Launcher-Step-31.ipa` / `step31.trx`.
+- release identity `0.0.115 (115)`, workflow `ios-step-32`, IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`;
+- physically closed Step-28/29/30/31 implementation/evidence hashes;
+- exact Step-31 source SHA/MVID/PrewarmJit token/body fingerprint and ten offsets;
+- Step-32 rewrite contract: six one-argument calls become one `Pop`; four two-argument calls become `Pop + Pop`;
+- `ReadingMode.Deferred` plus rejecting Cecil resolver;
+- no real-StS2 CLR load/invocation path in Step-32 production code;
+- trusted-install path is read-only and transformation output lives beneath `Step32-RealStS2PrepareMethodRewrite/`.
 
-## Host tests
+Host regressions use a synthetic `sts2` assembly to prove exact private-copy mutation, source immutability, 10→0 `PrepareMethod` references, +4 instruction count for the four inserted pops, +14 pop delta, and refusal when a selected call becomes a branch target.
 
-Run `bash scripts/test.sh`.
+Authority sequence: canonical static validation → complete host tests → iOS publish → IPA verification → physical iPhone. CI is not physical closure.
 
-The host suite retains all prior regressions and adds synthetic Step-31 coverage proving ordered 4/4 gating, exact ten-site evidence rebinding, per-site semantic-context capture, rewrite-design-only disposition, source byte stability, zero CLR load, and zero Cecil write.
+## Physical Step 32
 
-## Codemagic
+Force-quit/relaunch first. Run Step 32 A–D once from a fresh CLR/game state and preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
 
-Run workflow `ios-step-31`.
+Acceptance:
 
-Authority sequence: canonical static validation → complete host tests → iOS publish → IPA verification → physical iPhone Step 31 A–D. CI is not physical closure.
+- Gate A: OfflineReady and exact source evidence pass; source clone is exact; no `sts2` CLR identity is resident.
+- Gate B: 6/6 one-argument + 4/4 two-argument sites rewritten; source hash remains unchanged; transformed hash is distinct.
+- Gate C: source/transformed `PrepareMethod` references are 10/0; reopened transformed semantic fingerprint equals the exact in-memory pre-write plan; assembly identity/MVID and exception-handler count remain preserved.
+- Gate D: trusted source/private source/transformed hashes remain stable; OfflineReady re-passes; no real-StS2 CLR load/invocation or runtime detour/native/game startup occurred.
 
-## Physical Step 31
-
-Force-quit/relaunch and use the existing good Step-12 OfflineReady install. Preserve:
-
-`Documents/StS2Launcher/Reports/Step31-PrepareMethodSemanticContextAudit.txt`
-
-Close condition:
-
-`PREPAREMETHOD SEMANTIC CONTEXT AUDIT PASS — 4/4`
-
-Expected Gate-C disposition if the exact physical evidence still matches:
-
-`BASE-GAME COMPATIBILITY FAMILY CONFIRMED — ELIGIBLE FOR EXPLICIT REWRITE DESIGN; NO WRITE AUTHORIZED`
-
-If any source/method/site fingerprint changes, stop and preserve the failure rather than adapting the evidence in the same candidate.
+Physical close: **4/4 PASS**.

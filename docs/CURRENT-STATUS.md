@@ -1,4 +1,16 @@
-# Current Status — Step 31 PrepareMethod Semantic Context Audit
+# Current Status — Step 32 First Real StS2 PrepareMethod Rewrite
+
+## Active candidate — Step 32.0 / 0.0.115 (115)
+
+Physical baseline summary: Steps 01–26 closed; Step 27 CLOSED NEGATIVE; Step 28 CLOSED POSITIVE 5/5; Step 29 CLOSED POSITIVE 4/4; Step 30 CLOSED POSITIVE 4/4; Step 31 CLOSED POSITIVE 4/4.
+
+Physical Step 31.0 / 0.0.114 is **CLOSED POSITIVE — 4/4**. The exact receipt-backed `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` method, token `0x06007D05`, body SHA-256 `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`, and all ten `RuntimeHelpers.PrepareMethod` sites were rebound without writes or CLR admission. Gate C retained the family on the base-game frontier as eligible for explicit rewrite design. Preserve `docs/history/reports/STEP-31.0-PHYSICAL-CLOSURE.txt`.
+
+Step 32 is the first real-game semantic write, but only to a launcher-private copy. The predeclared transformation is exactly **6 × one-argument `PrepareMethod(handle)` → `Pop`** and **4 × two-argument `PrepareMethod(handle, instantiation[])` → `Pop + Pop`**. This consumes the same stack arguments as the original void calls while preserving preceding reflection/GetMethod/get_MethodHandle/array construction and surrounding method control flow. The receipt-backed Step-12 install remains immutable and Step 32 performs no real-StS2 CLR load/invocation.
+
+Physical close condition: Gates A–D **4/4 PASS**. Preserve `Step32-RealStS2PrepareMethodRewrite.txt`. A pass authorizes only a later separately gated transformed-real-StS2 CLR admission/execution experiment.
+
+---
 
 ## Physically closed boundary
 
@@ -205,7 +217,7 @@ The selected call remained `IL_0D9D Callvirt -> HarmonyLib.Harmony::PatchAll(Sys
 
 Post-audit OfflineReady remained **428/428** and the receipt-backed `sts2.dll` SHA-1/SHA-256/byte count remained unchanged. Step 30 therefore closes the selected Harmony/mod semantic-context boundary positively while authorizing no rewrite of that site.
 
-## Active candidate — Step 31.0 / 0.0.114 (114)
+## Previous candidate — Step 31.0 / 0.0.114 (114)
 
 - Workflow: **`ios-step-31`**
 - IPA: **`artifacts/StS2-Launcher-Step-31.ipa`**

@@ -30,7 +30,7 @@ command -v dotnet >/dev/null 2>&1 || { echo "ERROR: dotnet is required to run ho
 command -v curl >/dev/null 2>&1 || { echo "ERROR: curl is required to acquire the quarantined Step-27 Harmony fixture."; exit 2; }
 command -v unzip >/dev/null 2>&1 || { echo "ERROR: unzip is required to inspect the quarantined Step-27 Harmony fixture."; exit 2; }
 
-echo "StS2 Launcher — Step 31 canonical host regression tests"
+echo "StS2 Launcher — Step 32 canonical host regression tests"
 echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo ".NET: $(dotnet --version)"
 
@@ -118,9 +118,9 @@ dotnet test "$TEST_PROJECT" \
   -c Release \
   --nologo \
   --results-directory artifacts/test-results \
-  --logger "trx;LogFileName=step31.trx" \
+  --logger "trx;LogFileName=step32.trx" \
   --logger "console;verbosity=normal"
 
 echo "HOST UNIT TESTS: PASS"
-echo "TRX: artifacts/test-results/step31.trx"
+echo "TRX: artifacts/test-results/step32.trx"
 echo "Text report: $REPORT"

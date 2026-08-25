@@ -2,9 +2,7 @@ using Foundation;
 using StS2Launcher.Core;
 using StS2Launcher.iOS.Platform;
 using UIKit;
-
 namespace StS2Launcher.iOS;
-
 public sealed partial class RootViewController : UIViewController
 {
     private readonly string _launcherDataRoot;
@@ -52,7 +50,7 @@ public sealed partial class RootViewController : UIViewController
     private readonly RealStS2CompatibilityTargetAuditGateSequence _realStS2CompatibilityTargetAuditGates = new();
     private readonly RealStS2SelectedTargetSemanticAudit _realStS2SelectedTargetSemanticAudit;
     private readonly RealStS2PrepareMethodSemanticAudit _realStS2PrepareMethodSemanticAudit;
-
+    private readonly RealStS2PrepareMethodRewrite _realStS2PrepareMethodRewrite;
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
     private UILabel? _authResultLabel;
@@ -142,7 +140,6 @@ public sealed partial class RootViewController : UIViewController
     private bool _automaticRestoreStarted;
     private bool _godotSessionStarted;
     private bool _godotProcessRequiresRestart;
-
     public RootViewController()
     {
         _keychainProbe = new KeychainProbe(_credentialStore);
@@ -184,20 +181,17 @@ public sealed partial class RootViewController : UIViewController
         _realStS2CompatibilityTargetAudit = new RealStS2CompatibilityTargetAudit(_launcherDataRoot);
         _realStS2SelectedTargetSemanticAudit = new RealStS2SelectedTargetSemanticAudit(_launcherDataRoot);
         _realStS2PrepareMethodSemanticAudit = new RealStS2PrepareMethodSemanticAudit(_launcherDataRoot);
+        _realStS2PrepareMethodRewrite = new RealStS2PrepareMethodRewrite(_launcherDataRoot);
     }
-
     public override void ViewDidLoad()
     {
         base.ViewDidLoad();
-
         View!.BackgroundColor = UIColor.SystemBackground;
-
         var scroll = new UIScrollView
         {
             TranslatesAutoresizingMaskIntoConstraints = false
         };
         View.AddSubview(scroll);
-
         var content = new UIStackView
         {
             TranslatesAutoresizingMaskIntoConstraints = false,
@@ -208,81 +202,65 @@ public sealed partial class RootViewController : UIViewController
             LayoutMargins = new UIEdgeInsets(28, 24, 28, 24)
         };
         scroll.AddSubview(content);
-
         NSLayoutConstraint.ActivateConstraints(
         [
             scroll.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
             scroll.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
             scroll.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
             scroll.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
-
             content.TopAnchor.ConstraintEqualTo(scroll.ContentLayoutGuide.TopAnchor),
             content.BottomAnchor.ConstraintEqualTo(scroll.ContentLayoutGuide.BottomAnchor),
             content.LeadingAnchor.ConstraintEqualTo(scroll.ContentLayoutGuide.LeadingAnchor),
             content.TrailingAnchor.ConstraintEqualTo(scroll.ContentLayoutGuide.TrailingAnchor),
             content.WidthAnchor.ConstraintEqualTo(scroll.FrameLayoutGuide.WidthAnchor)
         ]);
-
         content.AddArrangedSubview(Label(
             "StS2 Launcher",
             UIFont.BoldSystemFontOfSize(34),
             UIColor.Label));
-
         content.AddArrangedSubview(Label(
             CurrentReleasePresentation.StepTitle,
             UIFont.BoldSystemFontOfSize(18),
             UIColor.SecondaryLabel));
-
         content.AddArrangedSubview(Label(
             $"Version {CurrentReleasePresentation.DisplayVersion}",
             UIFont.SystemFontOfSize(17),
             UIColor.SecondaryLabel));
-
         content.AddArrangedSubview(Label(
             CurrentReleasePresentation.MilestoneLine,
             UIFont.BoldSystemFontOfSize(14),
             UIColor.SecondaryLabel));
-
         content.AddArrangedSubview(Label(
             CurrentReleasePresentation.Summary,
             UIFont.SystemFontOfSize(15),
             UIColor.Label));
-
         content.AddArrangedSubview(Label(
             "Automatic test reports: Files → On My iPhone → StS2 Launcher → StS2Launcher → Reports. Each current verification overwrites one deterministic latest .txt file so results can be shared without screenshots.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel));
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Steps 01–05 regression",
             UIFont.BoldSystemFontOfSize(24),
             UIColor.Label));
-
         _foundationButton = SystemButton("Run Foundation 5/5 Regression", 16);
         _foundationButton.TouchUpInside += async (_, _) => await RunFoundationVerificationAsync();
         content.AddArrangedSubview(_foundationButton);
-
         _foundationResultLabel = Label(
             "FOUNDATION: NOT RUN",
             UIFont.BoldSystemFontOfSize(19),
             UIColor.Label);
         content.AddArrangedSubview(_foundationResultLabel);
-
         _foundationDetailLabel = Label(
             "The proven Steps 01–05 checks remain available unchanged.",
             UIFont.SystemFontOfSize(14),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_foundationDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Create / replace saved Steam session",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _usernameField = TextField(
             placeholder: "Steam account name",
             secure: false,
@@ -290,264 +268,208 @@ public sealed partial class RootViewController : UIViewController
         _usernameField.AutocorrectionType = UITextAutocorrectionType.No;
         _usernameField.AutocapitalizationType = UITextAutocapitalizationType.None;
         content.AddArrangedSubview(_usernameField);
-
         _passwordField = TextField(
             placeholder: "Steam password",
             secure: true,
             contentType: UITextContentType.Password);
         content.AddArrangedSubview(_passwordField);
-
         _authButton = SystemButton("Authenticate + Save Session", 17);
         _authButton.TouchUpInside += async (_, _) => await RunAuthenticationAsync();
         content.AddArrangedSubview(_authButton);
-
         _authResultLabel = Label(
             "STEAM AUTH: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_authResultLabel);
-
         _authDetailLabel = Label(
             "Use the proven Step 06.1 flow once. If Steam sends a mobile Guard prompt, approve it in Steam and return here. The refresh token is saved only after LoggedOnCallback returns OK.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_authDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Saved-session diagnostics / manual retry",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _savedSessionLabel = Label(
             "Saved session: checking Keychain…",
             UIFont.BoldSystemFontOfSize(16),
             UIColor.Label);
         content.AddArrangedSubview(_savedSessionLabel);
-
         _autoRestoreResultLabel = Label(
             "AUTO SESSION: WAITING FOR ACTIVE LIFECYCLE",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_autoRestoreResultLabel);
-
         _autoRestoreDetailLabel = Label(
             "The proven 06.3.1 saved-session regression automatically tests the Keychain session once after launch. No password or new Guard prompt is used.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_autoRestoreDetailLabel);
-
         _resumeButton = SystemButton("Retry Saved Session Now (No Password)", 17);
         _resumeButton.TouchUpInside += async (_, _) => await RunSavedSessionResumeAsync();
         content.AddArrangedSubview(_resumeButton);
-
         _resumeResultLabel = Label(
             "SAVED SESSION: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_resumeResultLabel);
-
         _resumeDetailLabel = Label(
             "Manual retry now uses a fresh LoginID and the same persistent-token settings as automatic restore. AccessDenied remains non-destructive unless Steam reports a definitive expired/revoked credential.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_resumeDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 07 regression — Slay the Spire 2 ownership",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _ownershipButton = SystemButton("Verify Slay the Spire 2 Ownership", 17);
         _ownershipButton.TouchUpInside += async (_, _) => await RunOwnershipVerificationAsync();
         content.AddArrangedSubview(_ownershipButton);
-
         _ownershipResultLabel = Label(
             "OWNERSHIP: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_ownershipResultLabel);
-
         _ownershipDetailLabel = Label(
             "Uses only the saved Keychain session and SteamApps.GetAppOwnershipTicket for App ID 2868840. A non-empty OK ticket proves this account owns the target app. The ticket payload is discarded immediately; no content request follows.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_ownershipDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 08 — depot / manifest discovery",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _discoveryButton = SystemButton("Discover StS2 Depots + Manifests", 17);
         _discoveryButton.TouchUpInside += async (_, _) => await RunContentDiscoveryAsync();
         content.AddArrangedSubview(_discoveryButton);
-
         _discoveryResultLabel = Label(
             "DISCOVERY: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_discoveryResultLabel);
-
         _discoveryDetailLabel = Label(
             "Metadata only: after the Step 07 ownership gate, request PICS app info for App ID 2868840 and list numeric depot IDs plus visible branch manifest IDs. No depot key, manifest body, CDN request, chunk, or file download is allowed in this step.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_discoveryDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 09 — one controlled small StS2 file",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _singleFileButton = SystemButton("Download One Small StS2 File", 17);
         _singleFileButton.TouchUpInside += async (_, _) => await RunSingleFileDownloadAsync();
         content.AddArrangedSubview(_singleFileButton);
-
         _singleFileResultLabel = Label(
             "SINGLE-FILE: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_singleFileResultLabel);
-
         _singleFileDetailLabel = Label(
             "Bounded Step 09 regression: one direct public depot, one in-memory manifest, one safe regular file <= 2 MiB, SHA-1 verification, then one atomic Documents write. Depot keys, request codes, CDN auth tokens, manifest bytes and chunk buffers are never displayed or persisted.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_singleFileDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 10 — minimal full-depot downloader",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _fullDepotButton = SystemButton("Download One Full Public Depot", 17);
         _fullDepotButton.TouchUpInside += async (_, _) => await RunFullDepotDownloadAsync();
         content.AddArrangedSubview(_fullDepotButton);
-
         _fullDepotResultLabel = Label(
             "DEPOT: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_fullDepotResultLabel);
-
         _fullDepotDetailLabel = Label(
             "Step 10 regression remains unchanged: one selected direct public depot, temporary staging removed on cancel, per-file SHA-1 verification, and one atomic final-directory commit.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_fullDepotDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 11 — interrupted-download resume",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _resumableDepotButton = SystemButton("Resume / Download One Public Depot", 17);
         _resumableDepotButton.TouchUpInside += async (_, _) => await RunResumableDepotDownloadAsync();
         content.AddArrangedSubview(_resumableDepotButton);
-
         _resumableDepotResultLabel = Label(
             "RESUME: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_resumableDepotResultLabel);
-
         _resumableDepotDetailLabel = Label(
             "For the physical Step 11 gate: start this download, wait until chunk/byte progress is non-zero, then force-quit the app from the app switcher. Relaunch and tap this same button. Step 11 must detect the deterministic staging tree, revalidate existing complete files/chunks, download only missing data, SHA-1 verify every file, and atomically commit the complete depot.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_resumableDepotDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 12.4.1 — completed install/update/repair + cache regression controls",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _managedInstallButton = SystemButton("Inspect + Install / Update / Repair", 17);
         _managedInstallButton.TouchUpInside += async (_, _) => await RunManagedInstallAsync();
         content.AddArrangedSubview(_managedInstallButton);
-
         _prepareRepairTestButton = SystemButton("Prepare Repair Test (Corrupt One Managed File)", 15);
         _prepareRepairTestButton.TouchUpInside += async (_, _) => await PrepareRepairTestAsync();
         content.AddArrangedSubview(_prepareRepairTestButton);
-
         _prepareUpdateTestButton = SystemButton("Prepare Update Test (Stale Receipt + One Changed File Identity)", 15);
         _prepareUpdateTestButton.TouchUpInside += async (_, _) => await PrepareUpdateStateTestAsync();
         content.AddArrangedSubview(_prepareUpdateTestButton);
-
         _clearDownloadCacheButton = SystemButton("Clear Download Cache Only (Keep Managed Install)", 15);
         _clearDownloadCacheButton.TouchUpInside += async (_, _) => await ClearDownloadCacheAsync();
         content.AddArrangedSubview(_clearDownloadCacheButton);
-
         _prepareFreshDownloadTestButton = SystemButton("Prepare Fresh Download Test (Force Update + Clear Cache)", 15);
         _prepareFreshDownloadTestButton.TouchUpInside += async (_, _) => await PrepareFreshDownloadTestAsync();
         content.AddArrangedSubview(_prepareFreshDownloadTestButton);
-
         _managedInstallResultLabel = Label(
             "INSTALL MANAGER: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_managedInstallResultLabel);
-
         _managedInstallDetailLabel = Label(
             "The existing Install / Repair / Update regression helpers remain unchanged. Clear Download Cache deletes only Step11-ResumableDepot (complete + resume cache) and leaves the managed Step 12 install plus Keychain session untouched. Prepare Fresh Download Test first makes the project-owned install receipt synthetic-update stale, then deletes the Step 11 cache. The next manager run must therefore acquire the real current depot from Steam again, verify it, exercise Update, and atomically return to UpToDate.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_managedInstallDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 13 — offline launcher state",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _offlineInstallButton = SystemButton("Verify Offline-Ready Install (Local Only)", 17);
         _offlineInstallButton.TouchUpInside += async (_, _) => await RunOfflineInstallInspectionAsync();
         content.AddArrangedSubview(_offlineInstallButton);
-
         _offlineInstallResultLabel = Label(
             "OFFLINE STATE: NOT CHECKED",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_offlineInstallResultLabel);
-
         _offlineInstallDetailLabel = Label(
             "Physical Step 13 gate: keep the already-proven Step 12 managed install, enable Airplane Mode and disable Wi-Fi, force-quit/relaunch, let the saved-session attempt finish or time out without clearing the token, then run this local-only check. It must hash-verify the exact managed tree and report OFFLINE READY PASS without consulting Steam/session state. Manifest freshness is intentionally UNKNOWN offline, and Play remains unimplemented.",
             UIFont.SystemFontOfSize(15),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_offlineInstallDetailLabel);
-
         content.AddArrangedSubview(Separator());
-
         content.AddArrangedSubview(Label(
             "Step 14 — read-only compatibility inventory",
             UIFont.BoldSystemFontOfSize(25),
             UIColor.Label));
-
         _compatibilityInventoryButton = SystemButton("Inventory Installed Game Compatibility (Read Only)", 17);
         _compatibilityInventoryButton.TouchUpInside += async (_, _) => await RunCompatibilityInventoryAsync();
         content.AddArrangedSubview(_compatibilityInventoryButton);
-
         _compatibilityInventoryResultLabel = Label(
             "COMPATIBILITY INVENTORY: NOT RUN",
             UIFont.BoldSystemFontOfSize(21),
             UIColor.Label);
         content.AddArrangedSubview(_compatibilityInventoryResultLabel);
-
         _compatibilityInventoryDetailLabel = Label(
             "Step 14 first re-proves the Step 13 OfflineReady local tree, then classifies the receipt-backed installed files and scans only managed-binary metadata strings for compatibility indicators. Evidence is heuristic: a marker means a later boundary needs targeted inspection, not that the marked API is definitely executed. No game assembly is loaded, no managed/native game code is executed, and no file inside the managed install is changed.",
             UIFont.SystemFontOfSize(15),
@@ -779,6 +701,7 @@ public sealed partial class RootViewController : UIViewController
         AddRealStS2CompatibilityTargetAuditControls(content);
         AddRealStS2SelectedTargetSemanticAuditControls(content);
         AddRealStS2PrepareMethodSemanticAuditControls(content);
+        AddRealStS2PrepareMethodRewriteControls(content);
 
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();

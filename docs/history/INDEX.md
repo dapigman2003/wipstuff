@@ -143,3 +143,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-30.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.113 Step-30 report.
 - `steps/STEP-31-PREPAREMETHOD-SEMANTIC-CONTEXT-AUDIT.md` — active read-only PrewarmJit/PrepareMethod semantic-context audit.
 - `steps/STEP-31-TEST.md` — physical Step-31 A–D acceptance procedure.
+
+## Step 31 physical closure / Step 32 frontier
+
+- `reports/STEP-31.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.114 report: Step 31 A–D 4/4 PASS; exact PrewarmJit token/body + ten PrepareMethod sites rebound; rewrite-design eligibility confirmed; zero writes/CLR load; OfflineReady 428/428.
+- `steps/STEP-31.0-PHYSICAL-CLOSURE.md` — formal positive closure of the PrepareMethod semantic-context audit.
+- `steps/STEP-32-FIRST-REAL-STS2-PREPAREMETHOD-REWRITE.md` — active first real-game launcher-private transformation design with exact stack-neutral rewrite semantics.
+- `steps/STEP-32-TEST.md` — physical Step-32 A–D acceptance procedure.

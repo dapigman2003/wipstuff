@@ -163,3 +163,23 @@ Step 31.0 is the next read-only evidence boundary for the first non-mod Step-29 
 - Gate D re-hashes the source and re-proves OfflineReady/isolation.
 
 Physical **4/4 PASS** is required before a following candidate may design one exact ahead-of-load semantic transformation for this fingerprinted family.
+
+## Step 31 physical closure — PrepareMethod semantic context audit
+
+Physical 0.0.114 closed Step 31 **4/4 PASS**; Step 31 is now CLOSED POSITIVE 4/4. The exact source SHA/MVID, `PrewarmJit()` token `0x06007D05`, body fingerprint `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`, and all ten exact PrepareMethod offsets/signatures are now protected physical evidence. The closure preserved zero writes/zero CLR load and recorded `BASE-GAME COMPATIBILITY FAMILY CONFIRMED — ELIGIBLE FOR EXPLICIT REWRITE DESIGN; NO WRITE AUTHORIZED`.
+
+## Step 32 — first real StS2 PrepareMethod rewrite
+
+Step 32.0 / 0.0.115 is the first real-game semantic transformation under the physically proven Step-28 transform-before-load architecture. Its candidate regression contract is:
+
+- hard-pin the physical Step-31 source identity, method token/body fingerprint, and ten exact PrepareMethod sites;
+- require zero incoming branches to each selected call before writing;
+- clone the exact source to launcher-private storage and never mutate the receipt-backed Step-12 install;
+- use `ReadingMode.Deferred` plus the rejecting resolver; any dependency-resolution request is blocking;
+- replace exactly six `PrepareMethod(RuntimeMethodHandle)` calls with one `Pop`;
+- replace exactly four `PrepareMethod(RuntimeMethodHandle, RuntimeTypeHandle[])` calls with `Pop + Pop`;
+- preserve preceding reflection/GetMethod/get_MethodHandle/generic-instantiation-array construction; no launcher helper dependency is added;
+- reopen source and transformed images, require source/transformed PrepareMethod counts 10/0, unchanged source body fingerprint, preserved assembly identity/MVID and exception-handler count, and exact transformed semantic-fingerprint match;
+- perform no real-StS2 CLR load/invocation, Harmony/MonoMod runtime patching, Godot/game startup, or native loading;
+- re-prove OfflineReady and all source/transformed hashes at Gate D;
+- a Step-32 PASS authorizes only a separately gated transformed-real-StS2 CLR admission/execution boundary.

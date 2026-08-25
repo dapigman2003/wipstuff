@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 31 PrepareMethod semantic context audit static validation")
+print("StS2 Launcher — Step 32 first real StS2 PrepareMethod rewrite static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>114</ApplicationVersion>" in project_text, "build version is 114")
-require("<ApplicationDisplayVersion>0.0.114</ApplicationDisplayVersion>" in project_text, "display version is 0.0.114")
-require(plist.get("CFBundleVersion") == "114", "Info.plist build version is 114")
-require(plist.get("CFBundleShortVersionString") == "0.0.114", "Info.plist display version is 0.0.114")
+require("<ApplicationVersion>115</ApplicationVersion>" in project_text, "build version is 115")
+require("<ApplicationDisplayVersion>0.0.115</ApplicationDisplayVersion>" in project_text, "display version is 0.0.115")
+require(plist.get("CFBundleVersion") == "115", "Info.plist build version is 115")
+require(plist.get("CFBundleShortVersionString") == "0.0.115", "Info.plist display version is 0.0.115")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 31.0 — PREPAREMETHOD SEMANTIC CONTEXT AUDIT" in release_presentation, "top launcher banner identifies active Step 31.0 candidate")
-require("STEP 30 CLOSED POSITIVE 4/4" in release_presentation and "0x06007D05" in release_presentation and "PrepareMethod" in release_presentation and "read-only" in release_presentation and "rejecting resolver" in release_presentation, "top launcher banner preserves Step-30 physical closure and identifies the read-only Step-31 PrepareMethod boundary")
+require("STEP 32.0 — FIRST REAL STS2 PREPAREMETHOD REWRITE" in release_presentation, "top launcher banner identifies active Step 32.0 candidate")
+require("STEP 31 CLOSED POSITIVE 4/4" in release_presentation and "0x06007D05" in release_presentation and "PrepareMethod" in release_presentation and "private" in release_presentation and "zero CLR load" in release_presentation, "top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.114"' in release_presentation and 'ExpectedBuildVersion = "114"' in release_presentation, "Step 31.0 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.115"' in release_presentation and 'ExpectedBuildVersion = "115"' in release_presentation, "Step 32.0 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
 require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "post-publish interpreted Target+Prefix fixture" in release_presentation and "fresh processor via Harmony.CreateProcessor(MethodBase)" in release_presentation and "exactly one Patch()" in release_presentation, "Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
@@ -216,8 +216,8 @@ require("<TrimMode>copy</TrimMode>" in project_text and "<MtouchLink>None</Mtouc
 require("<MtouchInterpreter>-all</MtouchInterpreter>" in project_text, "Step 20 interpreter policy retained")
 require("'$(UseInterpreter)' == 'true'" in project_text, "build guard rejects broad UseInterpreter=true")
 require("'$(PublishAot)' == 'true'" in project_text, "build guard rejects NativeAOT")
-require("STEP31 RUNTIME POLICY" in project_text, "runtime policy emits Step 31 build telemetry")
-require("STEP31 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" in project_text, "dynamic-payload trimming policy emits exact Step-31 build telemetry")
+require("STEP32 RUNTIME POLICY" in project_text, "runtime policy emits Step 32 build telemetry")
+require("STEP32 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" in project_text, "dynamic-payload trimming policy emits exact Step-32 build telemetry")
 require("'$(MtouchLink)' != 'None'" in project_text and "'$(TrimMode)' != 'copy'" in project_text, "build guards reject drift from copy/no-link host policy")
 
 all_roots = re.findall(r'<TrimmerRootAssembly Include="([^"]+)"\s*/>', project_text)
@@ -238,9 +238,9 @@ require(all_roots.count("System.Linq") == 1, "historical Step 27.0.22 System.Lin
 expected_all_roots = set(step22_roots) | {"SteamKit2", "protobuf-net", "protobuf-net.Core", "System.Collections.Concurrent", "System.Linq"}
 require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_all_roots), "measured historical root descriptor set remains byte-bounded while copy/no-link supersedes it for preservation")
 require("Step 24 physically proved this additional post-publish dynamic-IL preservation root" in project_text, "physically proven Step 24 preservation root is documented as protected platform policy")
-require("STEP31 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 31 build telemetry retains the physically proven framework preservation root")
-require("STEP31 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" in project_text, "build telemetry explicitly marks the System.Linq root as historical under copy/no-link")
-require("STEP31 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 31 build telemetry retains the physically proven Harmony-constructor surface as historical evidence")
+require("STEP32 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 32 build telemetry retains the physically proven framework preservation root")
+require("STEP32 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" in project_text, "build telemetry explicitly marks the System.Linq root as historical under copy/no-link")
+require("STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 32 build telemetry retains the physically proven Harmony-constructor surface as historical evidence")
 require("System.Private.CoreLib" not in all_roots, "Step 25 does not broaden trimming by rooting System.Private.CoreLib")
 step25_preservation_path = ROOT / "src/StS2Launcher.iOS/Platform/Step25HarmonyConstructorFrameworkPreservation.cs"
 require(step25_preservation_path.is_file(), "Step 25 bounded Harmony-constructor framework preservation anchor exists")
@@ -255,8 +255,8 @@ require(step25_preservation.count("[DynamicDependency(") == 9, "Step 25 candidat
 require("internal static void Activate()" in step25_preservation and "Intentionally empty" in step25_preservation, "Step 25 preservation anchor is metadata-only and executes no probe")
 require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyConstruction.cs"), "Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files")
 build_ios = read("scripts/build-ios.sh")
-require("STEP31 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" in build_ios, "iOS publish requires exact Step-31 copy/no-link dynamic-payload telemetry")
-require("STEP31 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish retains historical Harmony-constructor preservation telemetry")
+require("STEP32 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" in build_ios, "iOS publish requires exact Step-32 copy/no-link dynamic-payload telemetry")
+require("STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish retains historical Harmony-constructor preservation telemetry")
 require("DiskArbitration" in project_text and '<_LinkerFrameworks Remove="DiskArbitration" />' in project_text, "DiskArbitration-only linker framework filter remains present")
 
 # ---------------------------------------------------------------------------
@@ -342,10 +342,10 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-31.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.114",
-    "STS2_BUILD_VERSION": "114",
-    "STS2_RUNTIME_POLICY_MARKER": "STEP31 RUNTIME POLICY:",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-32.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.115",
+    "STS2_BUILD_VERSION": "115",
+    "STS2_RUNTIME_POLICY_MARKER": "STEP32 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
 
@@ -1021,7 +1021,7 @@ step27_patch_engine_preservation = read("src/StS2Launcher.iOS/Platform/Step27Pat
 require(all(marker in step27_patch_engine_preservation for marker in ["typeof(DynamicMethod)", "typeof(ILGenerator)", "typeof(RuntimeMethodHandle)", "typeof(AssemblyBuilder)", "typeof(ModuleBuilder)", "typeof(TypeBuilder)", "typeof(MethodBuilder)"]), "Step 27.0.8 retains only the bounded patch-engine Reflection.Emit/MethodHandle framework surface")
 require("TrimmerRootAssembly Include=\"System.Reflection.Emit" not in project_text, "Step 27.0.8 does not broaden preservation to a Reflection.Emit assembly root")
 require("Step27PatchEngineFrameworkPreservation.Activate();" in step27_ui, "Step 27 roots the bounded patch-engine DynamicDependency preservation anchor from candidate-owned UI")
-require("STEP31 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION" in project_text, "build telemetry records the retired Step-27 patch-engine preservation anchor as historical evidence")
+require("STEP32 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION" in project_text, "build telemetry records the retired Step-27 patch-engine preservation anchor as historical evidence")
 require("cctor.Body.Instructions.Count != 57" in step27_source and "[Code.Ldc_I4_1] = 1" in step27_source and "Exact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight")
 require("expected false then false" in step27_source and "typedGetTypeCalls[0].Previous" in step27_source and "typedGetTypeCalls[1].Previous" in step27_source and "LockRecursionPolicy.SupportsRecursion" in step27_source and "ReaderWriterLockSlim recursion-policy operand changed" in step27_source, "Step 27 Gate O pins the physical RuntimeInformation Type.GetType operands and ReaderWriterLockSlim SupportsRecursion operand semantically")
 require("HarmonySharedState internalVersion: 102 — MATCH" in step27_source and "GetOrCreateSharedStateType" in step27_source and "MethodCreatorConfig.Prepare" in step27_source and "DetourFactory.Current.CreateDetour" in step27_source and "MethodHandle.GetFunctionPointer" in step27_source, "Step 27 Gate O pins the exact shared-state/replacement/detour/update patch-engine chain")
@@ -1273,6 +1273,38 @@ require("new RealStS2PrepareMethodSemanticAudit(_launcherDataRoot)" in root_ui_t
 require("Step31ImplementationMarker" in release_presentation and "10 PrepareMethod offsets" in release_presentation and "zero writes/zero CLR load" in release_presentation, "release presentation pins the Step-31 read-only PrepareMethod boundary")
 
 # ---------------------------------------------------------------------------
+# Step 32.0 — first real StS2 private PrepareMethod rewrite.
+# ---------------------------------------------------------------------------
+step32_source_path = ROOT / "src/StS2Launcher.Core/Compatibility/RealStS2PrepareMethodRewrite.cs"
+step32_gate_path = ROOT / "src/StS2Launcher.Core/Compatibility/RealStS2PrepareMethodRewriteGate.cs"
+step32_summary_path = ROOT / "src/StS2Launcher.Core/Compatibility/RealStS2PrepareMethodRewriteSummary.cs"
+step32_tests_path = ROOT / "tests/StS2Launcher.Core.Tests/Compatibility/RealStS2PrepareMethodRewriteTests.cs"
+step32_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.RealStS2PrepareMethodRewrite.cs"
+for path, label in [(step32_source_path,"Step 32 real rewrite core"),(step32_gate_path,"Step 32 gate enum"),(step32_summary_path,"Step 32 summary"),(step32_tests_path,"Step 32 host regressions"),(step32_ui_path,"Step 32 iOS report surface")]:
+    require(path.is_file(), f"{label} exists")
+step32_source = step32_source_path.read_text() if step32_source_path.is_file() else ""
+step32_gate = step32_gate_path.read_text() if step32_gate_path.is_file() else ""
+step32_summary = step32_summary_path.read_text() if step32_summary_path.is_file() else ""
+step32_tests = step32_tests_path.read_text() if step32_tests_path.is_file() else ""
+step32_ui = step32_ui_path.read_text() if step32_ui_path.is_file() else ""
+require(all(marker in step32_gate for marker in ["SourceAdmissionAndPrivateClone = 1", "DeterministicStackNeutralRewrite = 2", "TransformedImageVerification = 3", "FinalIsolationAudit = 4"]), "Step 32 exposes exactly four ordered real-rewrite gates")
+require("4/4" in step32_summary and "Gates.Count(g => g.Passed)}/4" in step32_summary, "Step 32 summary closes only on four-of-four gate completion")
+for marker in ["e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18", "518e4758-52d7-47c2-b776-471a0e29e49d", "0x06007D05", "7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9", "0x003D", "0x0178", "SourceInstructionCount: 117", "SourceExceptionHandlerCount: 2"]:
+    require(marker in step32_source, f"Step 32 hard-pins physical Step-31 evidence: {marker}")
+require(step32_source.count("new(0x") >= 10 and all(offset in step32_source for offset in ["0x003D","0x0052","0x007A","0x00A2","0x00CA","0x00F2","0x0136","0x014C","0x0162","0x0178"]), "Step 32 pins all ten physical PrepareMethod offsets")
+require("oneArgumentReplacements != 6 || twoArgumentReplacements != 4" in step32_source and "PrepareMethod(handle) -> Pop" in step32_source and "PrepareMethod(handle, instantiation[]) -> Pop + Pop" in step32_source, "Step 32 predeclares exact 6 one-pop + 4 two-pop stack-neutral rewrite")
+require("il.InsertBefore(instruction, il.Create(OpCodes.Pop))" in step32_source and "instruction.OpCode = OpCodes.Pop" in step32_source and "instruction.Operand = null" in step32_source, "Step 32 implementation performs only the predeclared Pop replacements")
+require("FindIncomingBranchSources" in step32_source and "refuses to rewrite branch-targeted PrepareMethod site" in step32_source, "Step 32 rejects selected sites that become branch targets")
+require("ReadingMode = ReadingMode.Deferred" in step32_source and "throw new AssemblyResolutionException(name)" in step32_source and "Cecil dependency resolution requests" in step32_source, "Step 32 retains deferred/rejecting-resolver Cecil policy")
+require("module.Write(transformedPath)" in step32_source and "Step32-RealStS2PrepareMethodRewrite" in step32_source, "Step 32 writes only a named launcher-private transformed image")
+require("Assembly.Load(" not in step32_source and "LoadFromStream(" not in step32_source and "LoadFromAssemblyPath(" not in step32_source and "LoadFromAssemblyName(" not in step32_source, "Step 32 production source contains no real-StS2 CLR admission path")
+require("ComputeMethodSemanticFingerprint" in step32_source and "ExpectedTransformedSemanticSha256" in step32_source and "PrepareMethod references source/transformed" in step32_source, "Step 32 reopens and verifies the exact planned transformed method semantics")
+require("ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly" in step32_tests and "CollectionAssert.AreEqual(before, after)" in step32_tests and "CountPrepareMethod(transformedMethod)" in step32_tests and "BranchTargetedPrepareMethodSiteIsRejectedBeforeAnyRewrite" in step32_tests, "Step 32 host regressions prove private-only rewrite and branch-target refusal")
+require("Step32-RealStS2PrepareMethodRewrite.txt" in step32_ui and "REAL STS2 PREPAREMETHOD REWRITE" in step32_ui, "iOS UI persists the dedicated Step-32 physical report")
+require("new RealStS2PrepareMethodRewrite(_launcherDataRoot)" in root_ui_text and "AddRealStS2PrepareMethodRewriteControls(content)" in root_ui_text, "RootViewController wires Step 32 into the active device surface")
+require("Step32ImplementationMarker" in release_presentation and "6 one-arg PrepareMethod calls to Pop" in release_presentation and "4 two-arg calls to Pop+Pop" in release_presentation and "zero CLR load" in release_presentation, "release presentation pins the Step-32 first-real-rewrite boundary")
+
+# ---------------------------------------------------------------------------
 # Documentation model
 # ---------------------------------------------------------------------------
 required_docs = [
@@ -1295,6 +1327,10 @@ required_docs = [
     "docs/history/reports/STEP-30.0-PHYSICAL-CLOSURE.txt",
     "docs/history/steps/STEP-31-PREPAREMETHOD-SEMANTIC-CONTEXT-AUDIT.md",
     "docs/history/steps/STEP-31-TEST.md",
+    "docs/history/steps/STEP-31.0-PHYSICAL-CLOSURE.md",
+    "docs/history/reports/STEP-31.0-PHYSICAL-CLOSURE.txt",
+    "docs/history/steps/STEP-32-FIRST-REAL-STS2-PREPAREMETHOD-REWRITE.md",
+    "docs/history/steps/STEP-32-TEST.md",
     "docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt",
     "docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt",
     "docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md",
@@ -1458,10 +1494,10 @@ require("## Step 30 — selected Harmony target semantic context audit" in regre
 step30_physical_report = read("docs/history/reports/STEP-30.0-PHYSICAL-CLOSURE.txt")
 require("SELECTED TARGET SEMANTIC CONTEXT AUDIT PASS — 4/4" in step30_physical_report and "App version: 0.0.113 (113)" in step30_physical_report and "DEFER — MOD/HARMONY COMPATIBILITY PATH; NO BASE-GAME REWRITE AUTHORIZED" in step30_physical_report and "Post-audit OfflineReady: PASS (428/428 files)" in step30_physical_report, "raw Step-30 physical report preserves decisive 4/4 product-scope disposition evidence")
 require("Cecil writes performed by Step 30: 0" in step30_physical_report and "sts2 assembly/type/member CLR load or invocation by Step 30: NO" in step30_physical_report and "Cecil dependency resolution requests across audit: 0" in step30_physical_report, "raw Step-30 physical report preserves read-only/no-resolution isolation")
-require("## Step 31 — PrepareMethod semantic context audit" in regression_contracts and "0x06007D05" in regression_contracts and "IL_003D" in regression_contracts and "IL_0178" in regression_contracts and "NO WRITE AUTHORIZED" in regression_contracts and "no behavior change" in regression_contracts, "regression contracts define Step 31 as read-only exact PrepareMethod semantic audit")
+require("## Step 31 — PrepareMethod semantic context audit" in regression_contracts and "0x06007D05" in regression_contracts and "NO WRITE AUTHORIZED" in regression_contracts and "closed positive 4/4" in regression_contracts.lower(), "regression contracts protect Step 31 physical PrepareMethod semantic-audit closure")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "Physical 0.0.108 result" in current_status and "Physical 0.0.111 result — Step 28 CLOSED POSITIVE at 5/5" in current_status and "Physical 0.0.112 result — Step 29 CLOSED POSITIVE at 4/4" in current_status and "Physical 0.0.113 result — Step 30 CLOSED POSITIVE at 4/4" in current_status and "NO BASE-GAME REWRITE AUTHORIZED" in current_status and "Active candidate — Step 31.0 / 0.0.114 (114)" in current_status and "0x06007D05" in current_status and "IL_003D" in current_status and "IL_0178" in current_status and "Step31-PrepareMethodSemanticContextAudit.txt" in current_status, "current status preserves prior evidence, closes Step 30 physically, and advances Step 31 read-only PrepareMethod semantic audit")
+require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0 / 0.0.115 (115)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines and advances the first real private StS2 rewrite")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
@@ -1478,7 +1514,7 @@ require(not top_level_step_docs, "top-level docs are durable/current; step recor
 
 history_steps = list((ROOT / "docs/history/steps").glob("*.md"))
 history_names = [p.name for p in history_steps]
-for major in range(1, 32):
+for major in range(1, 33):
     prefix = f"STEP-{major:02d}"
     require(any(name.startswith(prefix) for name in history_names), f"readable historical documentation retained for Step {major:02d}")
 require(any(name.startswith("STEP-22.4") for name in history_names), "Step 22.4 design/history record is present")
@@ -1490,17 +1526,18 @@ require(any(name.startswith("STEP-27") for name in history_names), "Step 27 desi
 require(any(name.startswith("STEP-28") for name in history_names), "Step 28 ahead-of-load design/closure record is present")
 require(any(name.startswith("STEP-29") for name in history_names), "Step 29 target-audit design/test/closure record is present")
 require(any(name.startswith("STEP-30") for name in history_names), "Step 30 semantic-audit design/test/closure record is present")
-require(any(name.startswith("STEP-31") for name in history_names), "Step 31 PrepareMethod semantic-audit design/test record is present")
+require(any(name.startswith("STEP-31") for name in history_names), "Step 31 PrepareMethod semantic-audit design/test/closure record is present")
+require(any(name.startswith("STEP-32") for name in history_names), "Step 32 first real StS2 rewrite design/test record is present")
 require(len(history_steps) >= 60, "historical documentation set is comprehensive", f"count={len(history_steps)}")
 
 # ---------------------------------------------------------------------------
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("ios-step-31:" in codemagic, "Codemagic exposes the Step 31 workflow")
-require("Step 31 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 31")
-require("LogFileName=step31.trx" in read("scripts/test.sh") and "artifacts/test-results/step31.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 31")
-require("Step 31 PrepareMethod Semantic Context Audit build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 31")
+require("ios-step-32:" in codemagic, "Codemagic exposes the Step 32 workflow")
+require("Step 32 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 32")
+require("LogFileName=step32.trx" in read("scripts/test.sh") and "artifacts/test-results/step32.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 32")
+require("Step 32 PrepareMethod Semantic Context Audit build environment" in read("scripts/codemagic.sh") or "Step 32" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 32")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1517,7 +1554,7 @@ require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
 
-# Closed Step-29/30 provenance and active Step-31 candidate provenance.
+# Closed Step-29/30/31 provenance and active Step-32 candidate provenance.
 step29_manifest = ROOT / "tools/validation/protected-step29.0-real-sts2-target-audit.sha256"
 require(step29_manifest.is_file(), "physically closed Step 29 implementation/evidence hash manifest exists")
 if step29_manifest.is_file():
@@ -1538,15 +1575,25 @@ if step30_manifest.is_file():
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
     require(not mismatches, "physically closed Step-30 implementation, tests, and closure evidence remain hash-pinned", ", ".join(mismatches))
 
-step31_manifest = ROOT / "tools/validation/candidate-step31-preparemethod-semantic-audit.sha256"
-require(step31_manifest.is_file(), "Step 31 candidate boundary hash manifest exists")
+step31_manifest = ROOT / "tools/validation/protected-step31.0-preparemethod-semantic-audit.sha256"
+require(step31_manifest.is_file(), "physically closed Step 31 implementation/evidence hash manifest exists")
 if step31_manifest.is_file():
     mismatches=[]
     for line in step31_manifest.read_text().splitlines():
         if not line.strip(): continue
         digest, relative = line.split("  ",1); path=ROOT/relative
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
-    require(not mismatches, "Step 31 implementation, active release wiring, and evidence docs are hash-pinned", ", ".join(mismatches))
+    require(not mismatches, "physically closed Step-31 implementation, tests, and closure evidence remain hash-pinned", ", ".join(mismatches))
+
+step32_manifest = ROOT / "tools/validation/candidate-step32-real-sts2-preparemethod-rewrite.sha256"
+require(step32_manifest.is_file(), "Step 32 candidate boundary hash manifest exists")
+if step32_manifest.is_file():
+    mismatches=[]
+    for line in step32_manifest.read_text().splitlines():
+        if not line.strip(): continue
+        digest, relative = line.split("  ",1); path=ROOT/relative
+        if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
+    require(not mismatches, "Step 32 implementation, active release wiring, and evidence docs are hash-pinned", ", ".join(mismatches))
 
 # ---------------------------------------------------------------------------
 # Source archive cleanliness/security
