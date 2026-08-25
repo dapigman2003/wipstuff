@@ -1,6 +1,6 @@
 # Documentation Map
 
-Start here when resuming the project. The active frontier is Step 32.0.1 / 0.0.116 after Codemagic 0.0.115 reached 230/231 host tests and exposed an offset-sensitive pre-write fingerprint verification defect:
+Start here when resuming the project. The active frontier is Step 32.0.2 / 0.0.117 after physical 0.0.116 passed Gate A and exposed a bounded Cecil serialization dependency: `module.Write` needed exact `System.Runtime 9.0.0.0` enum metadata to encode unrelated Constant-table rows.
 
 1. `MASTER-PLAN.md` — long-lived architecture, safety rules, authority model, and roadmap. Step 32 does not change that architecture.
 2. `CURRENT-STATUS.md` — exact physical baseline/candidate and acceptance state.

@@ -175,7 +175,7 @@ Step 32.0 / 0.0.115 is the first real-game semantic transformation under the phy
 - hard-pin the physical Step-31 source identity, method token/body fingerprint, and ten exact PrepareMethod sites;
 - require zero incoming branches to each selected call before writing;
 - clone the exact source to launcher-private storage and never mutate the receipt-backed Step-12 install;
-- use `ReadingMode.Deferred` plus the rejecting resolver; any dependency-resolution request is blocking;
+- use `ReadingMode.Deferred`; source-admission and reopened-verification resolvers remain fully rejecting with zero requests; serialization may use only the separately pinned Step-32.0.2 constant-metadata surrogate policy;
 - replace exactly six `PrepareMethod(RuntimeMethodHandle)` calls with one `Pop`;
 - replace exactly four `PrepareMethod(RuntimeMethodHandle, RuntimeTypeHandle[])` calls with `Pop + Pop`;
 - preserve preceding reflection/GetMethod/get_MethodHandle/generic-instantiation-array construction; no launcher helper dependency is added;
@@ -198,3 +198,21 @@ Codemagic 0.0.115 is preserved as host-test evidence: static validation passed *
 - retain all existing 10/0 PrepareMethod, instruction-count, Pop-count, exception-handler, identity/MVID, rejecting-resolver, trusted-source immutability, and no-CLR-admission checks.
 
 Static validation pins this distinction so a pre-serialization offset-sensitive body hash cannot silently return as a Gate-C acceptance condition.
+## Step 32.0.2 — bounded Cecil write-time constant-metadata resolver
+
+Physical 0.0.116 is preserved as **device evidence at 1/4**: Gate A passed with OfflineReady 428/428, exact source identity, all ten PrepareMethod sites, zero Cecil read-time resolution, zero CLR admission, and unchanged trusted bytes. Gate B then failed inside `Mono.Cecil.MetadataBuilder.GetConstantType` during `ModuleDefinition.Write` when Cecil requested exact `System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a` to determine an unrelated field constant's serialized element type.
+
+Step 32.0.2 / 0.0.117 uses a **write-only in-memory** constant-metadata surrogate and must:
+
+- keep the exact 6 + 4 PrepareMethod→Pop rewrite unchanged;
+- keep Gate-A and Gate-C Cecil readers on `ReadingMode.Deferred` with fully rejecting resolvers and zero dependency requests;
+- forbid `DefaultAssemblyResolver`, resolver search directories, filesystem framework probing, and CLR assembly loading in the Step-32 transformation;
+- before `module.Write`, enumerate constant-bearing fields/properties/parameters without resolution and derive primitive Constant-table storage types only from values already decoded from the verified source metadata;
+- permit the write resolver to satisfy **only** exact `System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a`; every other assembly identity is blocking;
+- synthesize only the required enum metadata in memory and open zero external framework/game assembly bytes;
+- require at least one physical/write-test request through that bounded surrogate so the regression actually exercises the 0.0.116 failure path;
+- fingerprint all Constant-table providers before write and require the reopened transformed image to match the source fingerprint exactly;
+- preserve the Step-32.0.1 offset-independent method semantic fingerprint as the pre-write→reopen IL invariant and the reopened body hash as post-write evidence;
+- continue to forbid real-StS2 CLR admission/invocation, Harmony/MonoMod runtime patching, Godot/game startup, native loading, or trusted-install mutation.
+
+A Step-32.0.2 PASS still authorizes only the next separately gated transformed-real-StS2 admission/execution experiment.

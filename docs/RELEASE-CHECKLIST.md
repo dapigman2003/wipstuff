@@ -1,32 +1,29 @@
-# Release Checklist — Step 32.0.1
+# Release Checklist — Step 32.0.2
 
 ## Candidate identity
 
-- step/candidate: **Step 32.0.1**
-- version: `0.0.116 (116)`
+- step/candidate: **Step 32.0.2**
+- version: `0.0.117 (117)`
 - workflow: `ios-step-32`
 - IPA: `artifacts/StS2-Launcher-Step-32.ipa`
-- TRX: `artifacts/test-results/step32.trx`
-- top banner: **STEP 32.0.1 — SERIALIZED-FINGERPRINT VERIFICATION FIX**
+- physical report: `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`
 
-## Required invariants
+## Required before device install
 
-- receipt-backed Step-12 install is never written;
-- exact physical Step-31 source/method/site evidence remains pinned;
-- private transformed image changes only the ten exact `PrepareMethod` sites using the predeclared stack-neutral replacement;
-- Gate C compares the reopened method to the pre-write plan using the offset-independent semantic fingerprint; concrete IL-offset body SHA-256 is post-write evidence only;
-- no arbitrary Cecil resolver fallback;
-- no real-StS2 CLR admission/invocation in Step 32;
-- no Harmony/MonoMod runtime patching;
-- no Godot/game startup or native game loading;
-- `MASTER-PLAN.md` is not changed for this routine execution of the already-selected transform-before-load architecture.
+- [ ] canonical static validation passes;
+- [ ] complete host suite passes;
+- [ ] Step-32 host regression exercises an external System.Runtime enum constant and the bounded synthetic write resolver;
+- [ ] iOS publish succeeds;
+- [ ] IPA verification succeeds;
+- [ ] release identity is exactly `0.0.117 (117)`;
+- [ ] no proprietary StS2 payload is packaged in source artifacts.
 
-## Before device run
+## Physical Step-32 acceptance
 
-- Codemagic static validation PASS;
-- complete host suite PASS;
-- iOS publish PASS;
-- IPA verification PASS;
-- force-quit/relaunch before Step 32.
+- [ ] Gate A PASS — exact source/private clone, OfflineReady, no CLR admission;
+- [ ] Gate B PASS — exact 6 + 4 rewrite; only exact System.Runtime write-time synthetic metadata resolution; zero external framework/game bytes opened;
+- [ ] Gate C PASS — 10 / 0 PrepareMethod references, exact semantic fingerprint, identical Constant-table semantic fingerprint, source unchanged;
+- [ ] Gate D PASS — hashes stable, OfflineReady re-proved, trusted install unchanged, no `sts2` CLR load/invocation;
+- [ ] overall `REAL STS2 PREPAREMETHOD REWRITE PASS — 4/4`.
 
-Physical iPhone remains final authority. Step 32 closes only at **A–D / 4/4 PASS** with the dedicated report preserved.
+If any gate fails, preserve the raw report and stop. Do not broaden resolver search/fallback or advance into transformed-real-StS2 CLR admission.

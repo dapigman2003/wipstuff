@@ -1,32 +1,32 @@
-# Testing — Step 32.0.1 Serialized-Fingerprint Verification Fix
+# Testing — Step 32.0.2 Bounded Cecil Write-Metadata Resolver Fix
 
-Active candidate: Step 32.0.1 / `0.0.116 (116)`.
+Active candidate: Step 32.0.2 / `0.0.117 (117)`.
 
-## Static/host authority
+## Authority sequence
 
-Canonical entry points remain `scripts/validate.sh` and `scripts/test.sh`. Validation must pin:
+1. `scripts/validate.sh` — canonical static policy/provenance validation.
+2. `scripts/test.sh` — complete host regression suite.
+3. `scripts/build-ios.sh` — publish/package the iOS candidate.
+4. `scripts/verify-ipa.sh` — verify release identity, native closure, fixture rules, and IPA structure.
+5. Physical iPhone — final Step-32 A–D authority.
 
-- release identity `0.0.116 (116)`, workflow `ios-step-32`, IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`;
-- physically closed Step-28/29/30/31 implementation/evidence hashes;
-- exact Step-31 source SHA/MVID/PrewarmJit token/body fingerprint and ten offsets;
-- Step-32 rewrite contract: six one-argument calls become one `Pop`; four two-argument calls become `Pop + Pop`;
-- `ReadingMode.Deferred` plus rejecting Cecil resolver;
-- no real-StS2 CLR load/invocation path in Step-32 production code;
-- trusted-install path is read-only and transformation output lives beneath `Step32-RealStS2PrepareMethodRewrite/`.
+Release identity remains workflow `ios-step-32`, IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, now version `0.0.117 (117)`.
 
-Host regressions use a synthetic `sts2` assembly to prove exact private-copy mutation, source immutability, 10→0 `PrepareMethod` references, +4 instruction count for the four inserted pops, +14 pop delta, refusal when a selected call becomes a branch target, and successful pre-write→reopen semantic-fingerprint verification without an invalid pre-write physical-offset hash prediction.
+### Step 32.0.2 regression focus
 
-Authority sequence: canonical static validation → complete host tests → iOS publish → IPA verification → physical iPhone. CI is not physical closure.
+The host end-to-end Step-32 fixture must include an unrelated constant whose declared type is an external enum scoped to exact `System.Runtime 9.0.0.0`. Gate B must reproduce Cecil's Constant-table write-time resolution need and satisfy it only through the production in-memory constant-metadata surrogate. The test must still prove source bytes unchanged, exact 10→0 PrepareMethod rewrite, 6+4 Pop semantics, and reopened verification.
 
-## Physical Step 32
+Static/runtime guards must require:
 
-Force-quit/relaunch first. Run Step 32 A–D once from a fresh CLR/game state and preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
+- `ReadingMode.Deferred` and rejecting resolvers for source admission and reopened verification;
+- no `DefaultAssemblyResolver`, search directories, framework file probing, `Assembly.Load`, `LoadFromStream`, `LoadFromAssemblyPath`, or `LoadFromAssemblyName` in Step 32;
+- the only Gate-B write-time assembly identity permitted is exact `System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a`;
+- the write resolver synthesizes only constant enum metadata from values already present in the verified source module;
+- zero external framework/game assembly bytes are opened by that resolver;
+- source/transformed Constant-table semantic fingerprints match exactly;
+- the offset-independent transformed method semantic fingerprint remains the pre-write→reopen IL invariant;
+- the physical transformed body hash remains post-write evidence only.
 
-Acceptance:
+### Physical acceptance
 
-- Gate A: OfflineReady and exact source evidence pass; source clone is exact; no `sts2` CLR identity is resident.
-- Gate B: 6/6 one-argument + 4/4 two-argument sites rewritten; source hash remains unchanged; transformed hash is distinct.
-- Gate C: source/transformed `PrepareMethod` references are 10/0; reopened transformed **offset-independent semantic fingerprint** equals the exact in-memory pre-write plan; the reopened physical method-body fingerprint is recorded as post-write evidence and differs from source; assembly identity/MVID and exception-handler count remain preserved.
-- Gate D: trusted source/private source/transformed hashes remain stable; OfflineReady re-passes; no real-StS2 CLR load/invocation or runtime detour/native/game startup occurred.
-
-Physical close: **4/4 PASS**.
+Force-quit before running Step 32. Require A–D **4/4 PASS**. Gate B should report 6/6 + 4/4 replacements plus only exact System.Runtime synthetic write-time resolution; Gate C should report PrepareMethod references **10 / 0** and identical source/transformed constant-metadata fingerprints; Gate D must re-prove OfflineReady and immutable source/no-CLR isolation.

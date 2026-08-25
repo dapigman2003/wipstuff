@@ -154,3 +154,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-32.0.1-SERIALIZED-FINGERPRINT-VERIFICATION-FIX.md` — 0.0.116 keeps the exact 6+4 rewrite and corrects only the pre-write→reopen fingerprint model: offset-independent semantic hash is predictive; physical body hash is post-write evidence.
 - `steps/STEP-32.0.1-TEST.md` — physical acceptance procedure for 0.0.116 after the serialized-fingerprint verification correction.
 - `reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt` — raw 0.0.115 static report: 996/996 PASS.
+- `reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt` — raw physical 0.0.116 report: Gate A PASS; Gate B failed inside Cecil Constant-table serialization on exact `System.Runtime 9.0.0.0` resolution before any CLR admission.
+- `steps/STEP-32.0.2-BOUNDED-CONSTANT-METADATA-WRITE-RESOLVER.md` — 0.0.117 keeps the 6+4 rewrite unchanged and introduces an exact-identity, in-memory write-only constant-metadata surrogate instead of broad resolver fallback.
+- `steps/STEP-32.0.2-TEST.md` — Codemagic + physical A–D acceptance procedure for the bounded write resolver correction.
