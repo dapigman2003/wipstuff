@@ -135,7 +135,7 @@ Step 29.0 is physically closed at **4/4 PASS** on `0.0.112 (112)`. Preserve the 
 
 ## Step 30 — selected Harmony target semantic context audit
 
-The active Step-30 contract is read-only:
+Physical 0.0.113 closed Step 30 at **4/4 PASS**. Preserve `docs/history/reports/STEP-30.0-PHYSICAL-CLOSURE.txt`. The closed Step-30 contract is read-only:
 
 - Gate A binds the exact physical Step-29 source/token/offset/target/body fingerprint to the same receipt-backed ARM64 `sts2.dll` under OfflineReady and fresh-process conditions;
 - Cecil remains `ReadingMode.Deferred` with an explicit rejecting resolver and zero resolution requests;
@@ -145,4 +145,21 @@ The active Step-30 contract is read-only:
 - Step 30 makes no runtime-reachability claim and predeclares **no behavior change** for the selected PatchAll site;
 - Gate D re-hashes source, re-proves OfflineReady, and reasserts zero CLR load/write/resolver activity.
 
-Physical **4/4 PASS** closes this semantic-context/product-scope audit only. The next candidate may inspect the highest-priority non-mod Step-29 family, but still may not write real StS2 bytes until that exact family's semantics are separately audited and one behavior change is predeclared.
+Physical **4/4 PASS** closes this semantic-context/product-scope audit only. The selected Harmony/mod site is formally deferred from the base-game frontier and remains unauthorized for rewrite.
+
+
+## Step 31 — PrepareMethod semantic context audit
+
+Step 31.0 is the next read-only evidence boundary for the first non-mod Step-29 family. Its regression contract is:
+
+- preserve the exact receipt-backed `sts2.dll` source SHA-1 `e424ace9399a82edea4dd7e0fa5761635dfd6c5d`, SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, byte count `9,363,456`, and MVID `518e4758-52d7-47c2-b776-471a0e29e49d`;
+- bind exactly `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` token `0x06007D05`, body SHA-256 `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`;
+- bind exactly ten `RuntimeHelpers.PrepareMethod` sites at `IL_003D`, `IL_0052`, `IL_007A`, `IL_00A2`, `IL_00CA`, `IL_00F2`, `IL_0136`, `IL_014C`, `IL_0162`, and `IL_0178`, with the one-argument/two-argument signatures physically recorded by Step 29;
+- retain `ReadingMode.Deferred` plus an explicitly rejecting Cecil resolver and require zero resolver requests;
+- Gate B records bounded per-site IL, incoming branch, and covering-exception context without resolving dependencies;
+- no `ModuleDefinition.Write`, CLR admission/invocation of `sts2`, Harmony/MonoMod runtime patching, Godot/game startup, or native game loading is permitted;
+- Gate C may record `BASE-GAME COMPATIBILITY FAMILY CONFIRMED — ELIGIBLE FOR EXPLICIT REWRITE DESIGN; NO WRITE AUTHORIZED` only when the exact method/body/site set remains intact;
+- Step 31 makes no runtime-reachability claim and predeclares **no behavior change**; rewrite-design eligibility is not rewrite authorization;
+- Gate D re-hashes the source and re-proves OfflineReady/isolation.
+
+Physical **4/4 PASS** is required before a following candidate may design one exact ahead-of-load semantic transformation for this fingerprinted family.

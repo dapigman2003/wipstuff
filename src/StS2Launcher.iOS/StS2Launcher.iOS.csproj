@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>113</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.113</ApplicationDisplayVersion>
+    <ApplicationVersion>114</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.114</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -109,19 +109,19 @@
 
   <Target Name="ValidateRuntimeAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
-             Text="STEP30 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+             Text="STEP31 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Message Importance="High"
-             Text="STEP30 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" />
+             Text="STEP31 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" />
     <Message Importance="High"
-             Text="STEP30 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
+             Text="STEP31 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
     <Message Importance="High"
-             Text="STEP30 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" />
+             Text="STEP31 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" />
     <Message Importance="High"
-             Text="STEP30 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
+             Text="STEP31 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
     <Message Importance="High"
-             Text="STEP30 HISTORICAL ACCESSTOOLS FRAMEWORK PRESERVATION: DynamicDependency RuntimeInformation/PropertyInfo/Dictionary/ReaderWriterLockSlim measured initializer surface" />
+             Text="STEP31 HISTORICAL ACCESSTOOLS FRAMEWORK PRESERVATION: DynamicDependency RuntimeInformation/PropertyInfo/Dictionary/ReaderWriterLockSlim measured initializer surface" />
     <Message Importance="High"
-             Text="STEP30 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION: bounded DynamicDependency Reflection.Emit/MethodHandle surface from exact Harmony 2.4.2 shared-state/replacement/detour audit" />
+             Text="STEP31 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION: bounded DynamicDependency Reflection.Emit/MethodHandle surface from exact Harmony 2.4.2 shared-state/replacement/detour audit" />
     <Error Condition="'$(MtouchLink)' != 'None'"
            Text="Canonical dynamic-payload host policy requires MtouchLink=None so post-publish StS2/Harmony/mod framework dependencies are not member-trimmed." />
     <Error Condition="'$(TrimMode)' != 'copy'"

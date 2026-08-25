@@ -1,4 +1,4 @@
-# Current Status — Step 30 Selected Harmony Target Semantic Context Audit
+# Current Status — Step 31 PrepareMethod Semantic Context Audit
 
 ## Physically closed boundary
 
@@ -195,25 +195,38 @@ The raw report is preserved at `docs/history/reports/STEP-29.0-PHYSICAL-CLOSURE.
 
 This closes exact target selection only; the report explicitly labels the result audit-only.
 
-## Active candidate — Step 30.0 / 0.0.113 (113)
+## Physical 0.0.113 result — Step 30 CLOSED POSITIVE at 4/4
 
-- Workflow: **`ios-step-30`**
-- IPA: **`artifacts/StS2-Launcher-Step-30.ipa`**
-- TRX: **`artifacts/test-results/step30.trx`**
-- Main device report: `Documents/StS2Launcher/Reports/Step30-SelectedTargetSemanticContextAudit.txt`
-- Closed prerequisites: Step 28 physical 5/5; Step 29 physical 4/4
-- Purpose: bind and inspect the exact selected Harmony call before any real-game rewrite
+The raw report is preserved at `docs/history/reports/STEP-30.0-PHYSICAL-CLOSURE.txt`. Physical Step 30 re-bound the exact Step-29 `ModManager.TryLoadMod(Mod)` selection to the same receipt-backed source, inspected the bounded IL/control-flow/exception context, and passed **A–D / 4/4** without Cecil writes, CLR loading, or resolver fallback.
+
+The selected call remained `IL_0D9D Callvirt -> HarmonyLib.Harmony::PatchAll(System.Reflection.Assembly)` inside `MegaCrit.Sts2.Core.Modding.ModManager::TryLoadMod(Mod)`. Gate C therefore recorded the predeclared disposition:
+
+`DEFER — MOD/HARMONY COMPATIBILITY PATH; NO BASE-GAME REWRITE AUTHORIZED`
+
+Post-audit OfflineReady remained **428/428** and the receipt-backed `sts2.dll` SHA-1/SHA-256/byte count remained unchanged. Step 30 therefore closes the selected Harmony/mod semantic-context boundary positively while authorizing no rewrite of that site.
+
+## Active candidate — Step 31.0 / 0.0.114 (114)
+
+- Workflow: **`ios-step-31`**
+- IPA: **`artifacts/StS2-Launcher-Step-31.ipa`**
+- TRX: **`artifacts/test-results/step31.trx`**
+- Main device report: `Documents/StS2Launcher/Reports/Step31-PrepareMethodSemanticContextAudit.txt`
+- Closed prerequisites: Step 28 physical 5/5; Step 29 physical 4/4; Step 30 physical 4/4
+- Purpose: inspect the first exact non-mod compatibility family from Step 29 before authorizing any real-game rewrite
+- Exact method: `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` token `0x06007D05`
+- Method-body SHA-256: `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`
+- Physically audited `RuntimeHelpers.PrepareMethod` sites: **10** at `IL_003D`, `IL_0052`, `IL_007A`, `IL_00A2`, `IL_00CA`, `IL_00F2`, `IL_0136`, `IL_014C`, `IL_0162`, `IL_0178`
 - Real StS2 writes: **0**
 - Real StS2 CLR load/invocation: **forbidden**
 - Cecil dependency resolution: **forbidden / rejecting resolver**
 
-### Step 30 gates
+### Step 31 gates
 
-- **Gate A — SelectedEvidenceBindingAndOfflineReady:** re-prove OfflineReady; require the exact physical Step-29 source SHA-1/SHA-256/bytes/MVID plus token `0x06007927`, IL `0x0D9D`, `Harmony.PatchAll(Assembly)` target, and body fingerprint.
-- **Gate B — ExactSemanticContextAudit:** report the selected method/body shape, bounded 14-instruction-before/after IL window, branches into the selected instruction, exception regions covering it, nearby strings, and Harmony/dynamic-load call counts; zero resolution/write/CLR execution.
-- **Gate C — DeterministicDisposition:** if the physical fingerprint still resolves structurally to `ModManager.TryLoadMod(Mod) -> Harmony.PatchAll(Assembly)`, record `DEFER — MOD/HARMONY COMPATIBILITY PATH; NO BASE-GAME REWRITE AUTHORIZED`. This is a product-scope disposition, not a runtime-reachability claim.
-- **Gate D — FinalIsolationAudit:** re-hash source, re-prove OfflineReady, require zero CLR-resident `sts2`, zero writes, zero resolver requests, and no game/Godot/native execution.
+- **Gate A — EvidenceBindingAndOfflineReady:** re-prove OfflineReady; require the exact physical source SHA-1/SHA-256/bytes/MVID, `PrewarmJit()` token/body fingerprint, and all ten exact `PrepareMethod` offsets/signatures under deferred Cecil metadata reading with zero resolver requests.
+- **Gate B — ExactPrepareMethodSemanticContextAudit:** record the exact `PrewarmJit()` method/body shape and, for each of the ten `PrepareMethod` calls, a bounded IL window, incoming branches, covering exception regions, call signature/argument count, plus method-wide string and related-call evidence. No resolution/write/CLR execution.
+- **Gate C — DeterministicDisposition:** only if the exact physical method/sites remain structurally intact, record that this non-mod family is **eligible for an explicitly predeclared rewrite design**, while still authorizing **no write** and making no runtime-reachability claim.
+- **Gate D — FinalIsolationAudit:** re-hash source, re-prove OfflineReady, require zero CLR-resident `sts2`, zero Cecil writes, zero resolver requests, and no Harmony/Godot/game/native execution.
 
 ### Acceptance / next authority
 
-Codemagic must pass static validation, the complete host suite, iOS publish and IPA verification before device testing. Physical Step 30 closes only at **A–D / 4/4 PASS**. A pass explicitly authorizes no rewrite of the selected Harmony site. The next evidence frontier is the highest-priority non-mod Step-29 family, currently the `RuntimeHelpers.PrepareMethod` calls in `OneTimeInitialization::PrewarmJit()`, which must receive its own exact semantic audit before any Cecil write.
+Codemagic must pass static validation, the complete host suite, iOS publish and IPA verification before device testing. Physical Step 31 closes only at **A–D / 4/4 PASS**. A pass still does not modify or authorize modification of real game bytes; it provides the semantic evidence required to design a separately gated first real transformation candidate.

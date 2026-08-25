@@ -10,25 +10,27 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 30.0 — SELECTED HARMONY TARGET SEMANTIC CONTEXT AUDIT";
+        "STEP 31.0 — PREPAREMETHOD SEMANTIC CONTEXT AUDIT";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 SELECTED-TARGET SEMANTIC AUDIT";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 PREPAREMETHOD SEMANTIC AUDIT";
 
     public const string Summary =
-        "Physical 0.0.112 closed Step 29 positively at 4/4 on the exact receipt-backed macOS arm64 sts2.dll and selected one fingerprinted audit candidate: MegaCrit.Sts2.Core.Modding.ModManager::TryLoadMod(Mod), token 0x06007927, IL_0D9D Callvirt -> Harmony.PatchAll(Assembly), body SHA-256 50c8c4394082f3c73df414fad8675540cfc00a99ccc4f350b616cec574cdbcbd. Step 30.0 binds that physical evidence back to the same source and records the exact bounded IL/control-flow/exception context before any real-game rewrite can be authorized. Because the selected site is structurally in the mod-loading path, Gate C applies the existing product boundary that Harmony/Workshop compatibility is later and must not block base-game startup. Step 30 is read-only: deferred Cecil inspection with a rejecting resolver, no Cecil write, no sts2 CLR load/invocation, no Harmony/MonoMod runtime patching, no Godot/game startup, and no native game loading.";
+        "Physical 0.0.113 closed Step 30 positively at 4/4 and formally deferred the selected ModManager.TryLoadMod(Mod) -> Harmony.PatchAll(Assembly) site from the base-game frontier. Step 31.0 follows the first recorded non-mod Step-29 family: MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit(), token 0x06007D05, body SHA-256 7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9, with ten exact RuntimeHelpers.PrepareMethod calls. Gate A binds that exact physical evidence to the receipt-backed ARM64 sts2.dll; Gate B records per-site IL/control-flow/exception context; Gate C may mark the family eligible for a separately predeclared rewrite design but authorizes no rewrite; Gate D re-proves source hashes, OfflineReady, and no-CLR-load isolation. The boundary remains read-only with deferred Cecil inspection and a rejecting resolver.";
 
     public const string InitialStatus =
-        "Status: Step 29 is CLOSED POSITIVE by physical 0.0.112 A–D 4/4. Build 0.0.113 is Step 30.0: bind the exact selected ModManager.TryLoadMod -> Harmony.PatchAll site, inspect its surrounding semantics, and deterministically decide whether it belongs on the base-game transformation frontier. No rewrite is authorized by this build. Run Codemagic first; after compile/host/IPA verification, run Step 30 A–D on device and preserve Step30-SelectedTargetSemanticContextAudit.txt.";
+        "Status: Step 30 is CLOSED POSITIVE by physical 0.0.113 A–D 4/4. Build 0.0.114 is Step 31.0: inspect the exact fingerprinted PrewarmJit/PrepareMethod family before any real-game semantic write. Run Codemagic first; after compile/host/IPA verification, force-quit/relaunch, run Step 31 A–D on device, and preserve Step31-PrepareMethodSemanticContextAudit.txt.";
 
-    public const string ExpectedDisplayVersion = "0.0.113";
-    public const string ExpectedBuildVersion = "113";
+    public const string ExpectedDisplayVersion = "0.0.114";
+    public const string ExpectedBuildVersion = "114";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
         "receipt-backed arm64 sts2.dll -> deferred rejecting-resolver Cecil audit -> exact token/IL/target/body fingerprint -> at-most-one audit candidate -> zero writes/zero CLR load -> OfflineReady reproof";
     public const string Step30ImplementationMarker =
         "physical Step29 exact source+token+IL+target+body fingerprint -> deferred rejecting-resolver semantic context audit -> mod-path disposition -> zero writes/zero CLR load -> OfflineReady reproof";
+    public const string Step31ImplementationMarker =
+        "physical Step29 PrewarmJit token+body fingerprint+10 PrepareMethod offsets -> deferred rejecting-resolver per-site semantic context audit -> rewrite-design eligibility only -> zero writes/zero CLR load -> OfflineReady reproof";
 
     // Historical Step-27 crash-report provenance markers remain available as regression/evidence tooling.
     public const string GateSImplementationMarker =

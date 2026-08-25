@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-25T06:26:42Z
+UTC: 2026-08-25T15:14:39Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 30 selected Harmony target semantic context audit static validation
-Root: /mnt/data/work113/StS2Launcher-Step30-0.0.113
+StS2 Launcher — Step 31 PrepareMethod semantic context audit static validation
+Root: /mnt/data/work31/StS2Launcher-Step31-0.0.114
 PASS: all 10 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 220 C# files
+PASS: lexical delimiter scan passes for 228 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 113
-PASS: display version is 0.0.113
-PASS: Info.plist build version is 113
-PASS: Info.plist display version is 0.0.113
+PASS: build version is 114
+PASS: display version is 0.0.114
+PASS: Info.plist build version is 114
+PASS: Info.plist display version is 0.0.114
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 30.0 candidate
-PASS: top launcher banner preserves Step-29 physical closure and identifies the read-only Step-30 semantic-audit boundary
+PASS: top launcher banner identifies active Step 31.0 candidate
+PASS: top launcher banner preserves Step-30 physical closure and identifies the read-only Step-31 PrepareMethod boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 30.0 source pins expected bundle release identity
+PASS: Step 31.0 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -45,8 +45,8 @@ PASS: dynamic-payload host disables managed trimming with copy/no-link policy
 PASS: Step 20 interpreter policy retained
 PASS: build guard rejects broad UseInterpreter=true
 PASS: build guard rejects NativeAOT
-PASS: runtime policy emits Step 30 build telemetry
-PASS: dynamic-payload trimming policy emits exact Step-30 build telemetry
+PASS: runtime policy emits Step 31 build telemetry
+PASS: dynamic-payload trimming policy emits exact Step-31 build telemetry
 PASS: build guards reject drift from copy/no-link host policy
 PASS: all 22 physically proven Step 22 direct host roots remain rooted
 PASS: Step 22 direct root set contains exactly 22 unique roots
@@ -55,9 +55,9 @@ PASS: physically proven Step 24.0.6 System.Collections.Concurrent preservation r
 PASS: historical Step 27.0.22 System.Linq preservation root remains recorded exactly once
 PASS: measured historical root descriptor set remains byte-bounded while copy/no-link supersedes it for preservation
 PASS: physically proven Step 24 preservation root is documented as protected platform policy
-PASS: Step 30 build telemetry retains the physically proven framework preservation root
+PASS: Step 31 build telemetry retains the physically proven framework preservation root
 PASS: build telemetry explicitly marks the System.Linq root as historical under copy/no-link
-PASS: Step 30 build telemetry retains the physically proven Harmony-constructor surface as historical evidence
+PASS: Step 31 build telemetry retains the physically proven Harmony-constructor surface as historical evidence
 PASS: Step 25 does not broaden trimming by rooting System.Private.CoreLib
 PASS: Step 25 bounded Harmony-constructor framework preservation anchor exists
 PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Environment)
@@ -72,7 +72,7 @@ PASS: Step 25 candidate preservation includes measured constructor framework typ
 PASS: Step 25 candidate preservation is bounded to exactly nine measured framework type dependencies
 PASS: Step 25 preservation anchor is metadata-only and executes no probe
 PASS: Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files
-PASS: iOS publish requires exact Step-30 copy/no-link dynamic-payload telemetry
+PASS: iOS publish requires exact Step-31 copy/no-link dynamic-payload telemetry
 PASS: iOS publish retains historical Harmony-constructor preservation telemetry
 PASS: DiskArbitration-only linker framework filter remains present
 PASS: all 97 physically proven Step 22.2 Core source files are retained
@@ -714,6 +714,30 @@ PASS: Step 30 host regression proves exact binding/context/disposition without s
 PASS: iOS UI persists the dedicated Step-30 physical report
 PASS: RootViewController wires Step 30 into the active device surface
 PASS: release presentation pins the Step-30 read-only semantic-audit boundary
+PASS: Step 31 PrepareMethod semantic-audit core exists
+PASS: Step 31 gate enum exists
+PASS: Step 31 summary exists
+PASS: Step 31 host regressions exists
+PASS: Step 31 iOS report surface exists
+PASS: Step 31 exposes exactly four read-only PrepareMethod semantic-audit gates
+PASS: Step 31 summary closes only on four-of-four gate completion
+PASS: Step 31 hard-pins physical PrepareMethod evidence: e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18
+PASS: Step 31 hard-pins physical PrepareMethod evidence: 518e4758-52d7-47c2-b776-471a0e29e49d
+PASS: Step 31 hard-pins physical PrepareMethod evidence: 0x06007D05
+PASS: Step 31 hard-pins physical PrepareMethod evidence: 7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9
+PASS: Step 31 hard-pins physical PrepareMethod evidence: 0x003D
+PASS: Step 31 hard-pins physical PrepareMethod evidence: 0x0178
+PASS: Step 31 hard-pins physical PrepareMethod evidence: RuntimeHelpers::PrepareMethod
+PASS: Step 31 pins all ten physical PrepareMethod offsets
+PASS: Step 31 retains deferred/rejecting-resolver metadata policy
+PASS: Step 31 production source contains no Cecil write path
+PASS: Step 31 production source contains no real-StS2 CLR admission path
+PASS: Step 31 Gate B records bounded per-site IL/control-flow/exception context
+PASS: Step 31 Gate C records rewrite-design eligibility without write authorization or reachability overclaim
+PASS: Step 31 host regression proves exact ten-site audit without source mutation
+PASS: iOS UI persists the dedicated Step-31 physical report
+PASS: RootViewController wires Step 31 into the active device surface
+PASS: release presentation pins the Step-31 read-only PrepareMethod boundary
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -737,6 +761,10 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-29.0-PHYSICAL-
 PASS: authoritative documentation exists: docs/history/reports/STEP-29.0-PHYSICAL-CLOSURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-30-SELECTED-HARMONY-TARGET-SEMANTIC-CONTEXT-AUDIT.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-30-TEST.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-30.0-PHYSICAL-CLOSURE.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-30.0-PHYSICAL-CLOSURE.txt
+PASS: authoritative documentation exists: docs/history/steps/STEP-31-PREPAREMETHOD-SEMANTIC-CONTEXT-AUDIT.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-31-TEST.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md
@@ -865,7 +893,10 @@ PASS: raw Step-28 physical report preserves transformed-only admission, immutabl
 PASS: raw Step-29 physical report preserves decisive 4/4 exact-target evidence
 PASS: regression contracts protect the closed Step-29 target-selection evidence
 PASS: regression contracts define Step 30 as read-only semantic context/product-scope disposition
-PASS: current status preserves prior evidence, closes Step 29 physically, and advances Step 30 read-only semantic audit
+PASS: raw Step-30 physical report preserves decisive 4/4 product-scope disposition evidence
+PASS: raw Step-30 physical report preserves read-only/no-resolution isolation
+PASS: regression contracts define Step 31 as read-only exact PrepareMethod semantic audit
+PASS: current status preserves prior evidence, closes Step 30 physically, and advances Step 31 read-only PrepareMethod semantic audit
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -910,6 +941,7 @@ PASS: readable historical documentation retained for Step 27
 PASS: readable historical documentation retained for Step 28
 PASS: readable historical documentation retained for Step 29
 PASS: readable historical documentation retained for Step 30
+PASS: readable historical documentation retained for Step 31
 PASS: Step 22.4 design/history record is present
 PASS: Step 23 design/test/closure records are present
 PASS: Step 24 design/candidate/closure records are present
@@ -918,12 +950,13 @@ PASS: Step 26 design/closure records are present
 PASS: Step 27 design/candidate/negative-closure record is present
 PASS: Step 28 ahead-of-load design/closure record is present
 PASS: Step 29 target-audit design/test/closure record is present
-PASS: Step 30 semantic-audit design/test record is present
+PASS: Step 30 semantic-audit design/test/closure record is present
+PASS: Step 31 PrepareMethod semantic-audit design/test record is present
 PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes the Step 30 workflow
-PASS: host-test report heading identifies Step 30
-PASS: host-test TRX artifact identifies Step 30
-PASS: Codemagic build-environment report heading identifies Step 30
+PASS: Codemagic exposes the Step 31 workflow
+PASS: host-test report heading identifies Step 31
+PASS: host-test TRX artifact identifies Step 31
+PASS: Codemagic build-environment report heading identifies Step 31
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: Codemagic workflow has no history dependency
@@ -935,9 +968,11 @@ PASS: IPA verifier reads native bridge from canonical project path
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
-PASS: Step 30 candidate boundary hash manifest exists
-PASS: Step 30 implementation, active release wiring, validation, and evidence docs are hash-pinned
+PASS: physically closed Step 30 implementation/evidence hash manifest exists
+PASS: physically closed Step-30 implementation, tests, and closure evidence remain hash-pinned
+PASS: Step 31 candidate boundary hash manifest exists
+PASS: Step 31 implementation, active release wiring, and evidence docs are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 926 checks
+VALIDATION PASS: 961 checks

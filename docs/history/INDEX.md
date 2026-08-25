@@ -137,5 +137,9 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-29.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.112 report: Step 29 A–D 4/4 PASS; exact receipt-backed source preserved; selected `ModManager.TryLoadMod(Mod)` token `0x06007927` @ `IL_0D9D` -> `Harmony.PatchAll(Assembly)`; zero writes/CLR load; OfflineReady 428/428.
 - `steps/STEP-29.0-PHYSICAL-CLOSURE.md` — formal positive closure of exact real-StS2 read-only target selection.
-- `steps/STEP-30-SELECTED-HARMONY-TARGET-SEMANTIC-CONTEXT-AUDIT.md` — active read-only exact selected-method semantic-context/product-scope audit.
+- `steps/STEP-30-SELECTED-HARMONY-TARGET-SEMANTIC-CONTEXT-AUDIT.md` — design for the read-only selected Harmony target semantic-context/product-scope audit.
 - `steps/STEP-30-TEST.md` — physical Step-30 A–D acceptance procedure.
+- `steps/STEP-30.0-PHYSICAL-CLOSURE.md` — physical 0.0.113 4/4 closure; selected Harmony/mod site deferred.
+- `reports/STEP-30.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.113 Step-30 report.
+- `steps/STEP-31-PREPAREMETHOD-SEMANTIC-CONTEXT-AUDIT.md` — active read-only PrewarmJit/PrepareMethod semantic-context audit.
+- `steps/STEP-31-TEST.md` — physical Step-31 A–D acceptance procedure.
