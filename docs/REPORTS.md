@@ -18,6 +18,15 @@ It records ordered Gates A–E: OfflineReady/source-fixture admission, source SH
 
 A current verification overwrites its deterministic latest report. Reports are output-only and are never trusted runtime input.
 
+
+## Preserved Step 28 compile evidence
+
+The 0.0.109 Codemagic host/build output is preserved at:
+
+`docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt`
+
+It records canonical static validation 845/845 PASS, successful construction of all external managed fixtures, and the first blocking Core compiler diagnostic: `AheadOfLoadManagedTransformation.cs(88,23): error CS0246` for missing `CallbackProgress<>`. No MSTest, iOS publish, IPA, or physical runtime result followed from that candidate.
+
 ## Preserved Step 27 architecture-decision evidence
 
 The final physical Step-27 report is preserved in source history at:

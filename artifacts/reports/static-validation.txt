@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-24T21:13:50Z
+UTC: 2026-08-25T03:51:12Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,7 +11,7 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 28 ahead-of-load managed transformation static validation
-Root: /mnt/data/sts2_work/StS2Launcher-Step27-0.0.108
+Root: /mnt/data/sts2_110/StS2Launcher-Step28-0.0.110
 PASS: all 10 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 204 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 109
-PASS: display version is 0.0.109
-PASS: Info.plist build version is 109
-PASS: Info.plist display version is 0.0.109
+PASS: build version is 110
+PASS: display version is 0.0.110
+PASS: Info.plist build version is 110
+PASS: Info.plist display version is 0.0.110
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 28.0 candidate
-PASS: top launcher banner records physical Step-27 negative closure and scopes the Step-28 ahead-of-load pivot
+PASS: top launcher banner identifies active Step 28.0.1 candidate
+PASS: top launcher banner preserves Step-27 negative closure and scopes the unchanged Step-28 ahead-of-load mechanism
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 28.0 source pins expected bundle release identity
+PASS: Step 28.0.1 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -661,6 +661,9 @@ PASS: IPA verifier requires one byte-identical hash-pinned Step-28 data-only fix
 PASS: host runner separately builds and exports the Step-28 fixture root
 PASS: host regressions exercise transformed semantics through both reflection and in-fixture direct-call paths
 PASS: iOS UI persists the dedicated Step-28 physical report
+PASS: Step 28.0.1 declares the callback-backed IProgress adapter required by Gate-A OfflineReady progress
+PASS: Step 28.0.1 callback adapter stores a non-null forwarding callback
+PASS: Step 28.0.1 callback adapter forwards IProgress.Report synchronously
 PASS: Step 28 candidate boundary hash manifest exists
 PASS: Step 28 candidate implementation, release wiring, and architecture docs are hash-pinned
 PASS: authoritative documentation exists: README.md
@@ -675,6 +678,8 @@ PASS: authoritative documentation exists: docs/RELEASE-CHECKLIST.md
 PASS: authoritative documentation exists: docs/history/INDEX.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-28-AHEAD-OF-LOAD-MANAGED-TRANSFORMATION.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-28.0.1-CALLBACK-PROGRESS-COMPILE-FIX.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-22.4.2-STEP19-REGRESSION-CONTRACT-CORRECTION.md
@@ -793,7 +798,7 @@ PASS: physical build 107 proves trimming ambiguity is gone and localizes the nex
 PASS: physical build 107 Gate-T failure is no longer either known trimmed-framework-member failure
 PASS: regression contracts preserve the decisive Step-27 negative physical result and retire runtime patching
 PASS: regression contracts define the five-gate Step-28 transform-before-load capability boundary
-PASS: current status closes Step 27 negatively on physical 0.0.108 and advances to the five-gate Step-28 ahead-of-load architecture proof
+PASS: current status preserves the 0.0.109 compile stop and advances the unchanged five-gate Step-28 mechanism as 0.0.110
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -859,4 +864,4 @@ PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 845 checks
+VALIDATION PASS: 850 checks

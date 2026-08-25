@@ -593,6 +593,13 @@ public sealed class AheadOfLoadManagedTransformation
     private static AheadOfLoadManagedTransformationGateResult Fail(AheadOfLoadManagedTransformationGate gate, Exception ex)
         => new(gate, false, $"Stage failed with {ex.GetType().Name}: {ex.Message}\n{ex}");
 
+    private sealed class CallbackProgress<T> : IProgress<T>
+    {
+        private readonly Action<T> _callback;
+        public CallbackProgress(Action<T> callback) => _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+        public void Report(T value) => _callback(value);
+    }
+
     private sealed class RejectingAssemblyResolver : IAssemblyResolver
     {
         public static RejectingAssemblyResolver Instance { get; } = new();

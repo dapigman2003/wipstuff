@@ -109,3 +109,9 @@ Current Step-28.0 regression contract:
 - after Gate D is reached, a fresh process is required before another Step-28 run because the private context is intentionally non-collectible for physical evidence accounting.
 
 Only after this combined rewrite-before-load + interpreted-execution boundary closes physically may a later Step-28 candidate select a narrowly audited real StS2 compatibility transformation.
+
+### Step 28.0.1 compile-integrity contract
+
+Codemagic 0.0.109 is preserved as compile-only evidence: static validation passed 845/845 and all external fixtures built, but `StS2Launcher.Core` stopped before MSTest with CS0246 because `AheadOfLoadManagedTransformation` referenced an undeclared `CallbackProgress<T>`. It establishes no host, IPA, or physical runtime result.
+
+Step 28.0.1 / 0.0.110 must retain a private callback-backed `IProgress<T>` adapter in `AheadOfLoadManagedTransformation`: the constructor rejects a null callback and `Report(T)` forwards synchronously to that callback. This helper exists only to bridge established OfflineReady progress into the Step-28 progress surface. It must not alter Gate A admission semantics or any Gate B–E transform/execution contract. Static validation pins the declaration and forwarding behavior so this exact compile defect cannot silently recur.

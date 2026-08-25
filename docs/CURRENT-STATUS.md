@@ -149,18 +149,32 @@ This removes the remaining AOT-target ambiguity. Per the Step-27 stop rule, **St
 
 Raw physical evidence: `docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt`. Closure note: `docs/history/steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md`.
 
-## Active candidate — Step 28.0 / 0.0.109 (109)
+## Codemagic 0.0.109 result — compile stop before host tests
+
+Step 28.0 / `0.0.109 (109)` passed canonical static validation **845/845**. Codemagic then acquired the exact hash-pinned Harmony host fixture and successfully built every external managed fixture, including `StS2Launcher.Step28.AheadOfLoadFixture.dll`.
+
+Compilation of `StS2Launcher.Core` stopped before MSTest at `src/StS2Launcher.Core/Compatibility/AheadOfLoadManagedTransformation.cs(88,23)` with:
+
+`error CS0246: The type or namespace name 'CallbackProgress<>' could not be found`
+
+The defect is implementation-local: Gate A already constructs a callback-backed `IProgress<SteamOfflineInstallProgress>` adapter to translate OfflineReady progress into Step-28 progress, but this class omitted the same private `CallbackProgress<T>` helper used by established compatibility/runtime boundaries. The remaining compiler diagnostics were pre-existing nullable/async warnings and were not the blocking Step-28 error.
+
+No host-test verdict exists for 0.0.109. No iOS publish, IPA, or physical-device runtime evidence exists for 0.0.109. The raw Codemagic output is preserved at `docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt`.
+
+## Active candidate — Step 28.0.1 / 0.0.110 (110)
 
 - Workflow: **`ios-step-28`**
 - IPA: **`artifacts/StS2-Launcher-Step-28.ipa`**
 - Main device report: `Documents/StS2Launcher/Reports/Step28-AheadOfLoadManagedTransformation.txt`
 - Closed prerequisite: Steps 01–26 physical closure + Step-27 negative architecture decision + OfflineReady
+- 0.0.109 evidence: **static 845/845 PASS; external fixtures built; Core compile CS0246; no host/iOS/device verdict**
+- 0.0.110 correction: **private callback-backed `IProgress<T>` adapter only; Step-28 gates/fixture/runtime model unchanged**
 - Harmony/MonoMod runtime patching: **not used by Step 28**
-- Real StS2 member reflection/invocation: **forbidden in 28.0**
+- Real StS2 member reflection/invocation: **forbidden in this mechanism-closing candidate**
 
 ### Step 28 architecture
 
-The new canonical compatibility pipeline is:
+The canonical compatibility pipeline remains:
 
 1. verify immutable receipt-backed/source bytes;
 2. clone required managed images into launcher-private storage;
@@ -172,9 +186,15 @@ The new canonical compatibility pipeline is:
 
 The Step-27 copy/no-link host policy remains active. `MtouchLink=None + TrimMode=copy` is still required because the real StS2/mod managed world arrives after publish and ILLink cannot see its complete framework usage. `MtouchInterpreter=-all` also remains unchanged so build-time launcher assemblies stay AOT-targeted while runtime-loaded managed IL can execute.
 
-### 0.0.109 physical question
+### 0.0.110 correction
 
-Step 28.0 deliberately does **not** rewrite a real StS2 method yet. It first proves the new architecture end-to-end with a project-owned fixture built separately from the iOS project and copied into the app only after `dotnet publish`.
+`AheadOfLoadManagedTransformation` now declares the missing private `CallbackProgress<T> : IProgress<T>` adapter. Its constructor stores a non-null `Action<T>` and `Report(T)` forwards the value synchronously to that callback. This restores the already-intended Gate-A OfflineReady progress bridge; it does not change the OfflineReady contract, source admission, rewrite, verification, execution, resolver, isolation, or acceptance semantics.
+
+Static validation adds a regression contract for the helper declaration/constructor/forwarding behavior. Local canonical static validation is expected to reach **850/850 PASS**. The local environment has no .NET SDK, so `scripts/test.sh` cannot provide a host-test verdict here; Codemagic remains the next compile/test authority.
+
+### Unchanged Step-28 physical question
+
+Step 28 deliberately does **not** rewrite a real StS2 method yet. It first proves the new architecture end-to-end with a project-owned fixture built separately from the iOS project and copied into the app only after `dotnet publish`.
 
 The source fixture exposes:
 
@@ -190,9 +210,9 @@ Ordered gates A–E:
 - **Gate D — TransformedExecution:** load **only** the transformed bytes into a dedicated private `AssemblyLoadContext`; require `Adjustment()==1000`, `Target(41)==1041`, and `InvokeTarget(41)==1041`. The latter proves an ordinary in-fixture direct managed IL call observes the transformed image, not merely reflection dispatch.
 - **Gate E — FinalIsolationAudit:** re-hash bundle/source/transformed images, re-prove OfflineReady, and require exactly one Step-28 fixture identity resident in the dedicated private context with no unexpected private dependency fallback.
 
-### Why this is the correct next boundary
+### Why this remains the correct boundary
 
-Step 18 already proved Cecil can write/reopen a real copied `sts2.dll`; Step 20 proved post-publish managed IL can execute through the Mono interpreter. Step 28.0 combines those separately proven capabilities into the exact **rewrite-before-load then execute transformed IL** pipeline that replaces Harmony runtime detouring. Only after this combination is physically closed should a later Step-28 candidate select a narrowly audited real StS2 compatibility transformation.
+Step 18 already proved Cecil can write/reopen a real copied `sts2.dll`; Step 20 proved post-publish managed IL can execute through the Mono interpreter. Step 28 combines those separately proven capabilities into the exact **rewrite-before-load then execute transformed IL** pipeline that replaces Harmony runtime detouring. Only after this combination is physically closed should a later Step-28 candidate select a narrowly audited real StS2 compatibility transformation.
 
 ## Fresh-process rule
 
@@ -200,8 +220,8 @@ Step 28 Gate D loads the fixture identity into a non-collectible private `Assemb
 
 The historical Step-27 UI/report path remains in the source as preserved evidence/regression tooling, but it is no longer the active compatibility architecture.
 
-## Acceptance
+## Acceptance / next authority
 
-Codemagic must pass static validation, the full host regression suite, iOS publish, and IPA verification. The final `.app` must contain exactly one byte-identical `StS2Launcher.Step28.AheadOfLoadFixture.dll` under `Step28AheadOfLoadFixture/`, copied only after publish and accompanied by its SHA-256 manifest.
+Run Codemagic workflow `ios-step-28`. It must first prove Core compilation, then the complete host regression suite, iOS publish, and IPA verification. The final `.app` must contain exactly one byte-identical `StS2Launcher.Step28.AheadOfLoadFixture.dll` under `Step28AheadOfLoadFixture/`, copied only after publish and accompanied by its SHA-256 manifest.
 
-Install `0.0.109 (109)` from a fresh process and run Step 28 A–E. Physical closure requires **5/5 PASS**, followed by the Gate-E OfflineReady re-verification. No real StS2 member is reflected, rewritten, or invoked by this candidate.
+If Codemagic passes, install `0.0.110 (110)` from a fresh process and run Step 28 A–E. Physical closure requires **5/5 PASS**. Gate D must report **1000 / 1041 / 1041**, and Gate E must re-prove OfflineReady. No real StS2 member is reflected, rewritten, or invoked by this candidate.

@@ -5,3 +5,4 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-27.0.4-PHYSICAL-FRESH-PROCESS-GUARD-REPORT.txt` — physical 0.0.88 same-process retry rejected at Gate A because `sts2` remained resident in the dedicated Step-27 context; separate user observation reports abrupt process termination around N–Q with no managed report.
 
 - `STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt` — raw 0.0.89 synchronously flushed breadcrumb localizing the hard crash to Gate S/S1 inside `PatchProcessor.AddPrefix(MethodInfo)` before `Patch()`.
+- `STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt` — raw 0.0.109 Codemagic host/build output: static validation and external fixtures succeeded, then Core compilation stopped on CS0246 for missing `CallbackProgress<>` before MSTest/iOS publish.
