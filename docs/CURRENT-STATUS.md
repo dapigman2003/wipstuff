@@ -1,12 +1,16 @@
-# Current Status — Step 32 First Real StS2 PrepareMethod Rewrite
+# Current Status — Step 32.0.1 Serialized-Fingerprint Verification Fix
 
-## Active candidate — Step 32.0 / 0.0.115 (115)
+## Active candidate — Step 32.0.1 / 0.0.116 (116)
 
 Physical baseline summary: Steps 01–26 closed; Step 27 CLOSED NEGATIVE; Step 28 CLOSED POSITIVE 5/5; Step 29 CLOSED POSITIVE 4/4; Step 30 CLOSED POSITIVE 4/4; Step 31 CLOSED POSITIVE 4/4.
 
 Physical Step 31.0 / 0.0.114 is **CLOSED POSITIVE — 4/4**. The exact receipt-backed `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` method, token `0x06007D05`, body SHA-256 `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`, and all ten `RuntimeHelpers.PrepareMethod` sites were rebound without writes or CLR admission. Gate C retained the family on the base-game frontier as eligible for explicit rewrite design. Preserve `docs/history/reports/STEP-31.0-PHYSICAL-CLOSURE.txt`.
 
 Step 32 is the first real-game semantic write, but only to a launcher-private copy. The predeclared transformation is exactly **6 × one-argument `PrepareMethod(handle)` → `Pop`** and **4 × two-argument `PrepareMethod(handle, instantiation[])` → `Pop + Pop`**. This consumes the same stack arguments as the original void calls while preserving preceding reflection/GetMethod/get_MethodHandle/array construction and surrounding method control flow. The receipt-backed Step-12 install remains immutable and Step 32 performs no real-StS2 CLR load/invocation.
+
+Codemagic 0.0.115 passed static validation **996/996**, compiled, and ran **231** host tests at **230/231 PASS**. The only failure was `ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly` at Gate C after Gate B wrote the transformed private image. The failure was an invalid verifier assumption: the pre-write method-body fingerprint included IL offsets that Cecil finalizes during serialization. Preserve `docs/history/reports/STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt`.
+
+Step 32.0.1 / 0.0.116 keeps the exact 6+4 rewrite unchanged. The pre-write→reopen invariant is the offset-independent semantic fingerprint; the reopened physical body SHA-256 is post-write evidence and must differ from the source, but is no longer predicted before `module.Write`.
 
 Physical close condition: Gates A–D **4/4 PASS**. Preserve `Step32-RealStS2PrepareMethodRewrite.txt`. A pass authorizes only a later separately gated transformed-real-StS2 CLR admission/execution experiment.
 

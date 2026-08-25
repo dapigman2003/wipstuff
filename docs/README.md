@@ -1,6 +1,6 @@
 # Documentation Map
 
-Start here when resuming the project. The active frontier is Step 32.0 / 0.0.115 after physical Step-31 4/4 closure:
+Start here when resuming the project. The active frontier is Step 32.0.1 / 0.0.116 after Codemagic 0.0.115 reached 230/231 host tests and exposed an offset-sensitive pre-write fingerprint verification defect:
 
 1. `MASTER-PLAN.md` — long-lived architecture, safety rules, authority model, and roadmap. Step 32 does not change that architecture.
 2. `CURRENT-STATUS.md` — exact physical baseline/candidate and acceptance state.

@@ -183,3 +183,18 @@ Step 32.0 / 0.0.115 is the first real-game semantic transformation under the phy
 - perform no real-StS2 CLR load/invocation, Harmony/MonoMod runtime patching, Godot/game startup, or native loading;
 - re-prove OfflineReady and all source/transformed hashes at Gate D;
 - a Step-32 PASS authorizes only a separately gated transformed-real-StS2 CLR admission/execution boundary.
+
+## Step 32.0.1 — serialized-fingerprint verification correction
+
+Codemagic 0.0.115 is preserved as host-test evidence: static validation passed **996/996**, compilation succeeded, and the complete host suite reached **230/231 PASS**. The sole failure was `ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly` at Gate C after the private transformed image had already been written. It provides no device evidence and does not invalidate the predeclared 6+4 rewrite.
+
+0.0.115 incorrectly treated the offset-bearing `ComputeMethodBodyFingerprint` result calculated before `ModuleDefinition.Write` as a serialization-stable expected value. Step 32.0.1 / 0.0.116 must instead:
+
+- retain the exact six one-argument + four two-argument Pop rewrite unchanged;
+- retain `ComputeMethodSemanticFingerprint` as the exact pre-write→reopen invariant because it addresses instructions by ordinal and exception-handler boundaries by instruction index rather than physical byte offset;
+- never store or compare an `ExpectedTransformedBodySha256` derived from pre-write `Instruction.Offset` values;
+- compute the transformed method-body SHA-256 only after reopening the serialized image and record it as post-write physical IL evidence;
+- require that reopened transformed body fingerprint to differ from the unchanged source body fingerprint;
+- retain all existing 10/0 PrepareMethod, instruction-count, Pop-count, exception-handler, identity/MVID, rejecting-resolver, trusted-source immutability, and no-CLR-admission checks.
+
+Static validation pins this distinction so a pre-serialization offset-sensitive body hash cannot silently return as a Gate-C acceptance condition.

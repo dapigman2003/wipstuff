@@ -10,7 +10,7 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 32.0 — FIRST REAL STS2 PREPAREMETHOD REWRITE";
+        "STEP 32.0.1 — SERIALIZED-FINGERPRINT VERIFICATION FIX";
 
     public const string MilestoneLine =
         "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 FIRST REAL STS2 REWRITE";
@@ -19,10 +19,10 @@ internal static class CurrentReleasePresentation
         "Physical 0.0.114 closed Step 31 positively at 4/4 and confirmed MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit(), token 0x06007D05, body SHA-256 7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9, with ten exact RuntimeHelpers.PrepareMethod sites as eligible for explicit rewrite design. Step 32.0 is the first real-StS2 semantic transformation: Gate A re-proves OfflineReady and clones the exact receipt-backed sts2.dll into launcher-private storage; Gate B suppresses only those ten PrepareMethod calls with stack-neutral Pop replacements; Gate C reopens source/transformed images and verifies the exact planned semantic fingerprint with zero PrepareMethod references; Gate D re-proves source hashes, OfflineReady, and no-CLR-load isolation. The trusted Step-12 install remains immutable and the transformed image is not CLR-loaded in this build.";
 
     public const string InitialStatus =
-        "Status: Step 31 is CLOSED POSITIVE by physical 0.0.114 A–D 4/4. Build 0.0.115 is Step 32.0: materialize and verify the first narrowly audited real-StS2 semantic rewrite on a launcher-private image only. Run Codemagic first; after compile/host/IPA verification, force-quit/relaunch, run Step 32 A–D on device, and preserve Step32-RealStS2PrepareMethodRewrite.txt.";
+        "Status: Step 31 is CLOSED POSITIVE by physical 0.0.114 A–D 4/4. Codemagic 0.0.115 compiled and ran 231 host tests at 230/231; the sole Step-32 test reached the private rewrite then Gate C rejected an invalid pre-write offset-sensitive body-hash prediction after Cecil serialization. Build 0.0.116 is Step 32.0.1: keep the exact rewrite unchanged and verify the reopened image with the offset-independent semantic fingerprint plus post-write body-hash evidence. Run Codemagic first; after compile/host/IPA verification, force-quit/relaunch, run Step 32 A–D on device, and preserve Step32-RealStS2PrepareMethodRewrite.txt.";
 
-    public const string ExpectedDisplayVersion = "0.0.115";
-    public const string ExpectedBuildVersion = "115";
+    public const string ExpectedDisplayVersion = "0.0.116";
+    public const string ExpectedBuildVersion = "116";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -32,7 +32,7 @@ internal static class CurrentReleasePresentation
     public const string Step31ImplementationMarker =
         "physical Step29 PrewarmJit token+body fingerprint+10 PrepareMethod offsets -> deferred rejecting-resolver per-site semantic context audit -> rewrite-design eligibility only -> zero writes/zero CLR load -> OfflineReady reproof";
     public const string Step32ImplementationMarker =
-        "physical Step31 exact PrewarmJit evidence -> private sts2.dll clone -> 6 one-arg PrepareMethod calls to Pop + 4 two-arg calls to Pop+Pop -> reopen semantic fingerprint verification -> zero CLR load -> OfflineReady reproof";
+        "physical Step31 exact PrewarmJit evidence -> private sts2.dll clone -> 6 one-arg PrepareMethod calls to Pop + 4 two-arg calls to Pop+Pop -> reopen offset-independent semantic fingerprint verification + post-write body fingerprint evidence -> zero CLR load -> OfflineReady reproof";
 
     // Historical Step-27 crash-report provenance markers remain available as regression/evidence tooling.
     public const string GateSImplementationMarker =

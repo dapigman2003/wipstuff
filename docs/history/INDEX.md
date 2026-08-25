@@ -150,3 +150,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-31.0-PHYSICAL-CLOSURE.md` — formal positive closure of the PrepareMethod semantic-context audit.
 - `steps/STEP-32-FIRST-REAL-STS2-PREPAREMETHOD-REWRITE.md` — active first real-game launcher-private transformation design with exact stack-neutral rewrite semantics.
 - `steps/STEP-32-TEST.md` — physical Step-32 A–D acceptance procedure.
+- `reports/STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt` — raw 0.0.115 Codemagic host report: static validation 996/996, compile success, 230/231 host tests; sole Step-32 Gate-C failure was the invalid pre-write offset-sensitive body-fingerprint serialization invariant.
+- `steps/STEP-32.0.1-SERIALIZED-FINGERPRINT-VERIFICATION-FIX.md` — 0.0.116 keeps the exact 6+4 rewrite and corrects only the pre-write→reopen fingerprint model: offset-independent semantic hash is predictive; physical body hash is post-write evidence.
+- `steps/STEP-32.0.1-TEST.md` — physical acceptance procedure for 0.0.116 after the serialized-fingerprint verification correction.
+- `reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt` — raw 0.0.115 static report: 996/996 PASS.

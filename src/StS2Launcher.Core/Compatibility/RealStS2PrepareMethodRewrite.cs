@@ -198,7 +198,6 @@ public sealed class RealStS2PrepareMethodRewrite
             int twoArgumentReplacements;
             int sourcePopCount;
             string expectedTransformedSemanticSha256;
-            string expectedTransformedBodySha256;
             int expectedTransformedInstructionCount;
             using (var resolver = new RejectingAssemblyResolver())
             using (var module = ReadModuleDeferred(source.PrivateSourcePath, resolver))
@@ -250,7 +249,6 @@ public sealed class RealStS2PrepareMethodRewrite
                     throw new InvalidDataException("Step-32 stack-neutral Pop replacement count did not match the predeclared rewrite contract.");
 
                 expectedTransformedSemanticSha256 = ComputeMethodSemanticFingerprint(method);
-                expectedTransformedBodySha256 = RealStS2PrepareMethodSemanticAudit.ComputeMethodBodyFingerprint(method);
                 if (resolver.Requests.Count != 0)
                     throw new InvalidDataException($"Cecil dependency resolution occurred during Step-32 rewrite: {string.Join(", ", resolver.Requests)}");
                 module.Write(transformedPath);
@@ -267,7 +265,7 @@ public sealed class RealStS2PrepareMethodRewrite
 
             _transformation = new TransformationSnapshot(
                 transformedPath, transformedSha256, transformedBytes, oneArgumentReplacements, twoArgumentReplacements,
-                sourcePopCount, expectedTransformedInstructionCount, expectedTransformedSemanticSha256, expectedTransformedBodySha256);
+                sourcePopCount, expectedTransformedInstructionCount, expectedTransformedSemanticSha256);
 
             return Pass(gate,
                 "FIRST REAL-STS2 SEMANTIC CECIL TRANSFORMATION WRITTEN TO A LAUNCHER-PRIVATE IMAGE.\n" +
@@ -279,7 +277,6 @@ public sealed class RealStS2PrepareMethodRewrite
                 "Reflection/GetMethod/get_MethodHandle/array-construction instructions preserved: YES\n" +
                 "Selected-call incoming branch targets: 0\n" +
                 $"Expected transformed PrewarmJit semantic fingerprint SHA-256: {expectedTransformedSemanticSha256}\n" +
-                $"Expected transformed PrewarmJit body fingerprint SHA-256: {expectedTransformedBodySha256}\n" +
                 $"Source SHA-256 preserved: {source.SourceSha256}\n" +
                 $"Transformed SHA-256: {transformedSha256}\n" +
                 $"Transformed bytes: {transformedBytes:N0}\n" +
@@ -353,9 +350,14 @@ public sealed class RealStS2PrepareMethodRewrite
                 throw new InvalidDataException($"PrepareMethod reference verification mismatch: source={sourcePrepareCount}, transformed={transformedPrepareCount}.");
             if (!sourceBodySha256.Equals(_expected.MethodBodySha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-32 source PrewarmJit body fingerprint changed.");
-            if (!transformedBodySha256.Equals(transformation.ExpectedTransformedBodySha256, StringComparison.OrdinalIgnoreCase) ||
-                !transformedSemanticSha256.Equals(transformation.ExpectedTransformedSemanticSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-32 reopened transformed PrewarmJit does not match the exact in-memory predeclared rewrite.");
+            // Instruction offsets are finalized by Cecil during serialization. The physical IL-body fingerprint
+            // is therefore post-write evidence, not something that can be predicted from the pre-write in-memory
+            // instruction offsets. The offset-independent semantic fingerprint is the exact pre-write -> reopen
+            // invariant: it binds opcode/operand order, branch targets by instruction ordinal, and EH boundaries.
+            if (!transformedSemanticSha256.Equals(transformation.ExpectedTransformedSemanticSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-32 reopened transformed PrewarmJit does not match the exact in-memory predeclared semantic rewrite.");
+            if (transformedBodySha256.Equals(sourceBodySha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-32 reopened transformed PrewarmJit body fingerprint unexpectedly matches the source body.");
             if (sourceInstructionCount != _expected.SourceInstructionCount || transformedInstructionCount != transformation.ExpectedTransformedInstructionCount)
                 throw new InvalidDataException("Step-32 source/transformed instruction count drifted.");
             if (sourceHandlerCount != _expected.SourceExceptionHandlerCount || transformedHandlerCount != sourceHandlerCount)
@@ -404,8 +406,8 @@ public sealed class RealStS2PrepareMethodRewrite
                 !ComputeSha256Hex(source.PrivateSourcePath).Equals(source.SourceSha256, StringComparison.OrdinalIgnoreCase) ||
                 !ComputeSha256Hex(transformation.TransformedPath).Equals(transformation.TransformedSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-32 final image hashes do not match the verified snapshots.");
-            if (!verification.TransformedBodySha256.Equals(transformation.ExpectedTransformedBodySha256, StringComparison.OrdinalIgnoreCase) ||
-                !verification.TransformedSemanticSha256.Equals(transformation.ExpectedTransformedSemanticSha256, StringComparison.OrdinalIgnoreCase))
+            if (!verification.TransformedSemanticSha256.Equals(transformation.ExpectedTransformedSemanticSha256, StringComparison.OrdinalIgnoreCase) ||
+                verification.TransformedBodySha256.Equals(_expected.MethodBodySha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-32 transformed-method verification snapshot drifted.");
 
             IProgress<SteamOfflineInstallProgress>? offlineProgress = progress is null
@@ -732,8 +734,7 @@ public sealed class RealStS2PrepareMethodRewrite
         int TwoArgumentReplacements,
         int SourcePopCount,
         int ExpectedTransformedInstructionCount,
-        string ExpectedTransformedSemanticSha256,
-        string ExpectedTransformedBodySha256);
+        string ExpectedTransformedSemanticSha256);
 
     private sealed record VerificationSnapshot(
         string TransformedBodySha256,

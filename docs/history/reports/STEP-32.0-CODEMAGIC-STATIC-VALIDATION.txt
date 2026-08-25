@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-25T17:55:58Z
+UTC: 2026-08-25T17:47:18Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,8 +10,8 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 32.0.1 serialized-fingerprint verification fix static validation
-Root: /mnt/data/work116/StS2Launcher-Step32-0.0.116
+StS2 Launcher — Step 32 first real StS2 PrepareMethod rewrite static validation
+Root: /Users/builder/clone
 PASS: all 10 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 236 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 116
-PASS: display version is 0.0.116
-PASS: Info.plist build version is 116
-PASS: Info.plist display version is 0.0.116
+PASS: build version is 115
+PASS: display version is 0.0.115
+PASS: Info.plist build version is 115
+PASS: Info.plist display version is 0.0.115
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 32.0.1 candidate
+PASS: top launcher banner identifies active Step 32.0 candidate
 PASS: top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 32.0.1 source pins expected bundle release identity
+PASS: Step 32.0 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -761,8 +761,6 @@ PASS: Step 32 retains deferred/rejecting-resolver Cecil policy
 PASS: Step 32 writes only a named launcher-private transformed image
 PASS: Step 32 production source contains no real-StS2 CLR admission path
 PASS: Step 32 reopens and verifies the exact planned transformed method semantics
-PASS: Step 32.0.1 treats physical body fingerprint as post-write evidence and semantic fingerprint as the pre-write/reopen invariant
-PASS: Step 32.0.1 forbids pre-write offset-sensitive transformed body-hash prediction
 PASS: Step 32 host regressions prove private-only rewrite and branch-target refusal
 PASS: iOS UI persists the dedicated Step-32 physical report
 PASS: RootViewController wires Step 32 into the active device surface
@@ -798,10 +796,6 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-31.0-PHYSICAL-
 PASS: authoritative documentation exists: docs/history/reports/STEP-31.0-PHYSICAL-CLOSURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-32-FIRST-REAL-STS2-PREPAREMETHOD-REWRITE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-32-TEST.md
-PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.1-SERIALIZED-FINGERPRINT-VERIFICATION-FIX.md
-PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.1-TEST.md
-PASS: authoritative documentation exists: docs/history/reports/STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt
-PASS: authoritative documentation exists: docs/history/reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md
@@ -933,9 +927,6 @@ PASS: regression contracts define Step 30 as read-only semantic context/product-
 PASS: raw Step-30 physical report preserves decisive 4/4 product-scope disposition evidence
 PASS: raw Step-30 physical report preserves read-only/no-resolution isolation
 PASS: regression contracts protect Step 31 physical PrepareMethod semantic-audit closure
-PASS: raw 0.0.115 host report preserves the single Step-32 Gate-C failure at 230/231
-PASS: raw 0.0.115 static report preserves 996/996 PASS
-PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correction
 PASS: current status preserves physical baselines and advances the first real private StS2 rewrite
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1019,4 +1010,4 @@ PASS: Step 32 implementation, active release wiring, and evidence docs are hash-
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1005 checks
+VALIDATION PASS: 996 checks
