@@ -6,3 +6,4 @@ Selected build/device diagnostic outputs are retained here when they materially 
 
 - `STEP-27.0.5-PHYSICAL-GATE-S-CRASH-CHECKPOINT.txt` — raw 0.0.89 synchronously flushed breadcrumb localizing the hard crash to Gate S/S1 inside `PatchProcessor.AddPrefix(MethodInfo)` before `Patch()`.
 - `STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt` — raw 0.0.109 Codemagic host/build output: static validation and external fixtures succeeded, then Core compilation stopped on CS0246 for missing `CallbackProgress<>` before MSTest/iOS publish.
+- `STEP-28.0.2-PHYSICAL-CLOSURE.txt` — raw physical 0.0.111 Step-28 report: A–E 5/5, transformed execution 1000 / 1041 / 1041, transformed-only identity admission, OfflineReady 428/428 after execution.

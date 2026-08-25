@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-25T04:07:08Z
+UTC: 2026-08-25T04:56:49Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 28 ahead-of-load managed transformation static validation
-Root: /mnt/data/StS2Launcher-Step28-0.0.111
+StS2 Launcher — Step 29 real StS2 compatibility target audit static validation
+Root: /mnt/data/work112/StS2Launcher-Step29-0.0.112
 PASS: all 10 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 204 C# files
+PASS: lexical delimiter scan passes for 212 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 111
-PASS: display version is 0.0.111
-PASS: Info.plist build version is 111
-PASS: Info.plist display version is 0.0.111
+PASS: build version is 112
+PASS: display version is 0.0.112
+PASS: Info.plist build version is 112
+PASS: Info.plist display version is 0.0.112
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 28.0.2 candidate
-PASS: top launcher banner preserves Step-27 negative closure, 0.0.110 host evidence, and the unchanged Step-28 ahead-of-load mechanism
+PASS: top launcher banner identifies active Step 29.0 candidate
+PASS: top launcher banner preserves Step-28 physical closure and identifies the read-only Step-29 target-audit boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 28.0.2 source pins expected bundle release identity
+PASS: Step 29.0 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -45,8 +45,8 @@ PASS: dynamic-payload host disables managed trimming with copy/no-link policy
 PASS: Step 20 interpreter policy retained
 PASS: build guard rejects broad UseInterpreter=true
 PASS: build guard rejects NativeAOT
-PASS: runtime policy emits Step 28 build telemetry
-PASS: dynamic-payload trimming policy emits exact build telemetry
+PASS: runtime policy emits Step 29 build telemetry
+PASS: dynamic-payload trimming policy emits exact Step-29 build telemetry
 PASS: build guards reject drift from copy/no-link host policy
 PASS: all 22 physically proven Step 22 direct host roots remain rooted
 PASS: Step 22 direct root set contains exactly 22 unique roots
@@ -55,9 +55,9 @@ PASS: physically proven Step 24.0.6 System.Collections.Concurrent preservation r
 PASS: historical Step 27.0.22 System.Linq preservation root remains recorded exactly once
 PASS: measured historical root descriptor set remains byte-bounded while copy/no-link supersedes it for preservation
 PASS: physically proven Step 24 preservation root is documented as protected platform policy
-PASS: Step 28 build telemetry retains the physically proven framework preservation root
+PASS: Step 29 build telemetry retains the physically proven framework preservation root
 PASS: build telemetry explicitly marks the System.Linq root as historical under copy/no-link
-PASS: Step 28 build telemetry retains the physically proven Harmony-constructor surface as historical evidence
+PASS: Step 29 build telemetry retains the physically proven Harmony-constructor surface as historical evidence
 PASS: Step 25 does not broaden trimming by rooting System.Private.CoreLib
 PASS: Step 25 bounded Harmony-constructor framework preservation anchor exists
 PASS: Step 25 candidate preservation includes measured constructor framework type: typeof(Environment)
@@ -72,7 +72,7 @@ PASS: Step 25 candidate preservation includes measured constructor framework typ
 PASS: Step 25 candidate preservation is bounded to exactly nine measured framework type dependencies
 PASS: Step 25 preservation anchor is metadata-only and executes no probe
 PASS: Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files
-PASS: iOS publish requires exact copy/no-link dynamic-payload telemetry
+PASS: iOS publish requires exact Step-29 copy/no-link dynamic-payload telemetry
 PASS: iOS publish retains historical Harmony-constructor preservation telemetry
 PASS: DiskArbitration-only linker framework filter remains present
 PASS: all 97 physically proven Step 22.2 Core source files are retained
@@ -668,8 +668,30 @@ PASS: Step 28.0.2 uses deferred Cecil reading for metadata-only fixture admissio
 PASS: Step 28.0.2 retains the fail-closed rejecting Cecil resolver
 PASS: Step 28.0.2 does not reintroduce eager Cecil fixture reads
 PASS: Step 28.0.2 has one canonical deferred fixture reader
-PASS: Step 28 candidate boundary hash manifest exists
-PASS: Step 28 candidate implementation, release wiring, and architecture docs are hash-pinned
+PASS: physically closed Step 28 implementation/evidence hash manifest exists
+PASS: physically closed Step-28 implementation, fixture, tests, and closure evidence remain hash-pinned
+PASS: Step 29 real-StS2 target-audit core exists
+PASS: Step 29 gate enum exists
+PASS: Step 29 summary exists
+PASS: Step 29 host regressions exists
+PASS: Step 29 iOS report surface exists
+PASS: Step 29 exposes exactly the four intended read-only audit gates
+PASS: Step 29 summary closes only on four-of-four gate completion
+PASS: Step 29 binds exactly the receipt-backed ARM64 primary sts2.dll
+PASS: Step 29 uses deferred Cecil metadata with one explicit rejecting resolver
+PASS: Step 29 Cecil dependency resolution remains fail-closed and auditable
+PASS: Step 29 production audit contains no Cecil write path
+PASS: Step 29 production audit contains no real-StS2 CLR admission path
+PASS: Step 29 fingerprints exact method token, IL offset, target, and method-body SHA-256
+PASS: Step 29 candidate categories are explicitly bounded
+PASS: Step 29 counts but excludes the physically closed Step-19 Expression.Compile surface
+PASS: Step 29 permits no-target evidence and never treats selection as write authorization
+PASS: Step 29 selection priority is deterministic and predeclared
+PASS: Step 29 host regression proves deterministic selection without source mutation or CLR load
+PASS: Step 29 host regressions pin candidate ordering and Step-19 exclusion
+PASS: iOS UI persists the dedicated Step-29 physical audit report
+PASS: RootViewController wires the Step-29 audit into the active device surface
+PASS: release presentation pins the Step-29 read-only evidence boundary
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -685,6 +707,10 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-28-AHEAD-OF-LO
 PASS: authoritative documentation exists: docs/history/steps/STEP-28.0.1-CALLBACK-PROGRESS-COMPILE-FIX.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-28.0.1-CODEMAGIC-HOST-TEST-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-28.0.2-DEFERRED-CECIL-METADATA-READ-FIX.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-28.0.2-PHYSICAL-CLOSURE.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-28.0.2-PHYSICAL-CLOSURE.txt
+PASS: authoritative documentation exists: docs/history/steps/STEP-29-REAL-STS2-COMPATIBILITY-TARGET-AUDIT.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-29-TEST.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md
@@ -807,7 +833,11 @@ PASS: regression contracts define the five-gate Step-28 transform-before-load ca
 PASS: Codemagic 0.0.110 evidence preserves the exact 216/217 host result
 PASS: Codemagic 0.0.110 evidence localizes the sole host failure to Gate-A Cecil framework metadata resolution
 PASS: regression contracts pin the deferred metadata-only correction without broadening resolution
-PASS: current status preserves prior evidence and advances the unchanged five-gate Step-28 mechanism as 0.0.111
+PASS: regression contracts protect the positive physical Step-28 closure
+PASS: raw Step-28 physical report preserves the decisive 5/5 transformed-execution values
+PASS: raw Step-28 physical report preserves transformed-only admission, immutable source, and fail-closed isolation
+PASS: regression contracts define Step 29 as read-only exact target selection rather than a semantic rewrite
+PASS: current status preserves prior evidence, closes Step 28 physically, and advances the read-only Step-29 target audit as 0.0.112
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -816,7 +846,7 @@ PASS: master plan contains durable section: Major roadmap
 PASS: master plan contains durable section: Definition of a closed step
 PASS: master plan contains durable section: Resumption rule
 PASS: master plan defines self-contained resumption path
-PASS: master plan preserves the proven managed-runtime chain, records the Step-27 negative decision, and advances the Step-28 ahead-of-load frontier
+PASS: master plan preserves the managed-runtime chain, Step-27 negative decision, Step-28 positive closure, and Step-29 read-only target-audit frontier
 PASS: master plan codifies gate batching for speed without losing discrete proof
 PASS: master plan records both Android StS2 reference implementations as advisory/non-authoritative inputs
 PASS: master plan records both the copy/no-link dynamic-payload correction and the physically justified retirement of runtime Harmony replacement
@@ -849,18 +879,21 @@ PASS: readable historical documentation retained for Step 24
 PASS: readable historical documentation retained for Step 25
 PASS: readable historical documentation retained for Step 26
 PASS: readable historical documentation retained for Step 27
+PASS: readable historical documentation retained for Step 28
+PASS: readable historical documentation retained for Step 29
 PASS: Step 22.4 design/history record is present
 PASS: Step 23 design/test/closure records are present
 PASS: Step 24 design/candidate/closure records are present
 PASS: Step 25 design/candidate/closure records are present
 PASS: Step 26 design/closure records are present
 PASS: Step 27 design/candidate/negative-closure record is present
-PASS: Step 28 ahead-of-load design record is present
+PASS: Step 28 ahead-of-load design/closure record is present
+PASS: Step 29 target-audit design/test record is present
 PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes the Step 28 workflow
-PASS: host-test report heading identifies Step 28
-PASS: host-test TRX artifact identifies Step 28
-PASS: Codemagic build-environment report heading identifies Step 28
+PASS: Codemagic exposes the Step 29 workflow
+PASS: host-test report heading identifies Step 29
+PASS: host-test TRX artifact identifies Step 29
+PASS: Codemagic build-environment report heading identifies Step 29
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: Codemagic workflow has no history dependency
@@ -870,7 +903,9 @@ PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
+PASS: Step 29 candidate boundary hash manifest exists
+PASS: Step 29 implementation, active release wiring, validation, and evidence docs are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 859 checks
+VALIDATION PASS: 894 checks

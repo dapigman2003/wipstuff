@@ -1,54 +1,44 @@
-# Release Checklist — Step 28.0.2
+# Release Checklist — Step 29.0
 
 ## Source / policy
 
-- Steps 01–26 remain closed/protected.
-- Preserve the exact physical Step-27.0.24 / 0.0.108 negative report and closure note.
-- Preserve the 0.0.109 Codemagic Core compile failure as compile-only evidence; do not reinterpret it as a Step-28 runtime failure.
-- Runtime Harmony/MonoMod replacement is retired from the active architecture; Step 28 production code must not invoke Harmony patch APIs.
-- `MtouchLink=None`, `TrimMode=copy`, and `MtouchInterpreter=-all` remain active; broad `UseInterpreter=true` and NativeAOT remain prohibited.
-- The Step-28 source fixture is launcher-owned, IL-only, framework-only, and absent from the iOS/test ProjectReference graph.
-- Build/copy ordering must prove the Step-28 fixture enters the `.app` only after `dotnet publish`.
-- Gate A requires OfflineReady, exact source SHA-256/IL, a private source clone, and no already-loaded Step-28 fixture identity.
-- The Gate-A OfflineReady progress bridge uses the private `CallbackProgress<T> : IProgress<T>` adapter; its constructor/forwarding behavior is statically guarded.
-- Gate B rewrites only the private transformed copy: `Adjustment() 1 -> 1000`.
-- Gate C reopens source/transformed images and verifies source remains 1, transformed is 1000, and direct-call topology is unchanged.
-- Gate D loads only transformed bytes into a dedicated private ALC and requires `Adjustment()==1000`, `Target(41)==1041`, `InvokeTarget(41)==1041`.
-- Gate E re-hashes all images, re-proves OfflineReady, and requires exactly one Step-28 fixture identity in the dedicated context with no unexpected private dependency fallback.
-- Source/live game bytes remain immutable.
-- No real StS2 member reflection/rewrite/invocation; no Godot/game startup; no native game-library loading.
-- `MASTER-PLAN.md` remains unchanged for 0.0.111 because this is a narrow Cecil metadata-read correction only; update it only if architecture, methodology, major roadmap, or end-state assumptions actually change.
+- Step 28.0.2 / 0.0.111 is physically closed positive at **5/5**; preserve its raw report and closure note.
+- Step 27 remains closed negative; do not revive runtime Harmony/MonoMod replacement.
+- `MtouchLink=None`, `TrimMode=copy`, and `MtouchInterpreter=-all` remain active host policy.
+- The receipt-backed Step-12 managed install remains immutable.
+- Step 29 is read-only: zero Cecil writes and zero real-StS2 CLR load/invocation.
+- Cecil source admission/audit uses `ReadingMode.Deferred` plus a rejecting assembly/metadata resolver; zero resolver requests are required.
+- Gate B records exact source method token, IL offset/opcode, target scope/member and method-body SHA-256.
+- Gate C selects at most one audit candidate under a statically pinned priority policy; selection is evidence only.
+- Gate D re-hashes source and re-proves OfflineReady.
+- Godot/game startup and native game loading remain separately gated.
 
 ## Build identity
 
-- step/candidate: **Step 28.0.2**
-- version: `0.0.111 (111)`
-- workflow: `ios-step-28`
-- IPA: `artifacts/StS2-Launcher-Step-28.ipa`
-- TRX: `artifacts/test-results/step28.trx`
-- top launcher banner: **Step 28.0.2**, bundle-derived **Version 0.0.111**, preserved Step-27 negative closure, preserved 0.0.109 compile stop and 0.0.110 host 216/217 Gate-A evidence, and unchanged transformed-only execution architecture.
-
-- 0.0.110 authority is preserved as compile PASS / host **216/217**, with the sole failure at Gate A from Cecil Immediate-mode `System.Runtime` resolution before rewrite/load.
-- Step-28 fixture metadata reads are `ReadingMode.Deferred`; the rejecting Cecil resolver remains present; `ReadingMode.Immediate` is not used by the Step-28 fixture reader.
+- step/candidate: **Step 29.0**
+- version: `0.0.112 (112)`
+- workflow: `ios-step-29`
+- IPA: `artifacts/StS2-Launcher-Step-29.ipa`
+- TRX: `artifacts/test-results/step29.trx`
+- top banner: **STEP 29.0 — REAL STS2 COMPATIBILITY TARGET AUDIT**
 
 ## Pre-device authority
 
-- Canonical static validation: expected **859/859 PASS**.
-- Core/test compilation: PASS.
-- Complete host regression suite: **217/217 PASS**.
-- iOS publish: PASS.
+- canonical static validation: PASS;
+- complete host suite: PASS;
+- iOS publish: PASS;
 - IPA verification: PASS.
-- If any stage fails, preserve the raw artifact, classify the first failing boundary, make the smallest correction, bump candidate identity, and do not change Step-28 semantics unless evidence requires it.
+
+If any stage fails, preserve the raw artifact, classify the first failing boundary, make the smallest correction, bump candidate identity, and do not broaden the Step-29 audit scope unless evidence requires it.
 
 ## Device-run discipline
 
-- Force-quit/relaunch before the run.
-- Gate A must report that the Step-28 fixture identity is not CLR-loaded.
-- Gate B/C must report distinct transformed SHA-256 while source/bundle SHA-256 stay unchanged.
-- Gate D must report 1000 / 1041 / 1041 for Adjustment / Target / InvokeTarget.
-- After Gate D, force-quit before any retry because the Step-28 fixture identity remains process-resident.
-- Preserve `Step28-AheadOfLoadManagedTransformation.txt` after the run.
+- force-quit/relaunch before Step 29;
+- Gate A must report no CLR-resident `sts2` and zero Cecil resolver requests;
+- preserve `Step29-RealStS2CompatibilityTargetAudit.txt`;
+- if Gate C selects a candidate, do not transform it in the same build;
+- if Gate C reports no direct primary target, preserve that outcome instead of choosing a broad fallback manually.
 
 ## Authority
 
-Physical iPhone remains final runtime authority. Step 28 closes only when A–E reach **5/5 PASS** and Gate E re-proves OfflineReady.
+Physical iPhone remains final authority. Step 29 closes only at **A–D / 4/4 PASS**. The resulting exact candidate report is the authority for designing the next semantic transformation candidate.

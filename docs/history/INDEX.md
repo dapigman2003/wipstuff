@@ -125,3 +125,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-28.0.1-CALLBACK-PROGRESS-COMPILE-FIX.md` — 0.0.110 adds only the established callback-backed `IProgress<T>` adapter plus static regression guards; the Step-28 A–E experiment and architecture remain unchanged.
 - `reports/STEP-28.0.1-CODEMAGIC-HOST-TEST-FAILURE.txt` — raw 0.0.110 Codemagic host report: compile succeeded, 216/217 tests passed, and Gate A failed on eager Cecil `System.Runtime` resolution before rewrite/load.
 - `steps/STEP-28.0.2-DEFERRED-CECIL-METADATA-READ-FIX.md` — 0.0.111 switches only Step-28 fixture metadata reads from Immediate to Deferred while retaining the rejecting resolver; experiment semantics remain unchanged.
+
+## Step 28 physical closure / Step 29 frontier
+
+- `reports/STEP-28.0.2-PHYSICAL-CLOSURE.txt` — raw physical 0.0.111 report: Step 28 A–E 5/5 PASS, Gate D 1000 / 1041 / 1041, transformed-only CLR admission, post-execution OfflineReady 428/428.
+- `steps/STEP-28.0.2-PHYSICAL-CLOSURE.md` — formal positive closure of deterministic transform-before-load + post-publish interpreted execution.
+- `steps/STEP-29-REAL-STS2-COMPATIBILITY-TARGET-AUDIT.md` — active read-only exact ARM64 `sts2.dll` target re-audit/selection boundary.
+- `steps/STEP-29-TEST.md` — physical Step-29 A–D acceptance procedure.

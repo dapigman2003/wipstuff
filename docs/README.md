@@ -1,6 +1,6 @@
 # Documentation Map
 
-Start here when resuming the project:
+Start here when resuming the project. The active frontier is Step 29.0 / 0.0.112 after physical Step-28 5/5 closure:
 
 1. `MASTER-PLAN.md` — long-lived architecture, safety rules, authority model, and roadmap.
 2. `CURRENT-STATUS.md` — exact current physical baseline/candidate and acceptance state.

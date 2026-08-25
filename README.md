@@ -1,35 +1,28 @@
-# StS2 Launcher iOS — Step 28 Ahead-of-Load Managed Transformation
+# StS2 Launcher iOS — Step 29 Real StS2 Compatibility Target Audit
 
-Steps 01–26 are physically closed. Step 27 is a **closed negative architecture result**: physical `0.0.108 (108)` proved that the exact public `HarmonyLib.PatchProcessor.Patch()` boundary still throws `System.NotImplementedException` from `PatchFunctions.UpdateWrapper` even when the target is a genuine post-publish interpreted method whose direct in-fixture IL execution was proven immediately beforehand.
+Steps 01–26 are physically closed. Step 27 is a **closed negative architecture result**: physical `0.0.108 (108)` proved runtime Harmony/MonoMod replacement is not viable on this host. Step 28 is now a **closed positive architecture result**: physical `0.0.111 (111)` passed A–E **5/5**, including transformed execution **1000 / 1041 / 1041**, transformed-only CLR admission, stable source/transformed hashes, and post-execution OfflineReady **428/428**.
 
-Per the pre-declared stop rule, the project is no longer iterating Harmony/MonoMod runtime detours.
-
-## Codemagic 0.0.109 result
-
-Step 28.0 / `0.0.109 (109)` passed canonical static validation **845/845** and built every external managed fixture, including `StS2Launcher.Step28.AheadOfLoadFixture.dll`. `StS2Launcher.Core` compilation then stopped before MSTest with `CS0246` because `AheadOfLoadManagedTransformation.cs` referenced `CallbackProgress<T>` without declaring the established callback-backed `IProgress<T>` helper. No host-test verdict, iOS publish, IPA, or physical-device result exists for 0.0.109. The raw Codemagic host/build output is preserved at `docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt`.
+Raw Step-28 closure evidence is preserved at `docs/history/reports/STEP-28.0.2-PHYSICAL-CLOSURE.txt`.
 
 ## Active candidate
 
-**Step 28.0.2 / `0.0.111 (111)` — deferred Cecil metadata admission correction; Step-28 experiment unchanged**
+**Step 29.0 / `0.0.112 (112)` — exact receipt-backed real-StS2 compatibility target audit**
 
-Codemagic 0.0.110 proved the prior compile fix and advanced through the full host runner: **216/217 tests passed**. The only failure was the Step-28 end-to-end regression at Gate A, before rewrite or CLR load. `ReadingMode.Immediate` caused Mono.Cecil to eagerly decode unrelated custom-attribute arguments and request `System.Runtime, Version=9.0.0.0` through the deliberately rejecting metadata resolver.
+The repository does not preserve the old physical Step-17 exact source→target call-site samples. Rather than guess the first semantic patch, Step 29.0 regenerates current evidence from the verified macOS ARM64 `sts2.dll`:
 
-0.0.111 changes only Step-28 fixture module reads to `ReadingMode.Deferred` while retaining `RejectingAssemblyResolver`. The active compatibility pipeline remains:
+1. re-prove OfflineReady and admit only the exact receipt-backed primary assembly as deferred Cecil metadata;
+2. fingerprint concrete compatibility-risk IL call sites without dependency resolution;
+3. deterministically select at most one audit candidate with exact method token, IL offset/opcode, target scope/member and source method-body SHA-256;
+4. re-hash source bytes and re-prove OfflineReady/isolation.
 
-verified receipt-backed source → launcher-private clone → deterministic Cecil transformation before CLR load → reopen/hash verification → transformed-only private `AssemblyLoadContext` execution through the proven interpreter host.
-
-The Step-28 acceptance experiment remains unchanged: the project-owned post-publish fixture begins with `Adjustment() => 1`, the private transformed image changes it to `1000`, Gate D must prove **1000 / 1041 / 1041**, and Gate E must re-prove OfflineReady and isolation. No real StS2 member is changed yet.
-
-`MASTER-PLAN.md` is intentionally unchanged in 0.0.111 because this is a narrow implementation correction, not an architecture/roadmap change.
-
-Expected app version: `0.0.111 (111)`
+Step 29 performs **zero Cecil writes**, never CLR-loads or invokes `sts2.dll`, and does not run Harmony/MonoMod detours, Godot/game startup, or native game loading. A selected candidate is evidence for the next iteration, not authorization to rewrite it in this build.
 
 ## Build
 
-Workflow: `ios-step-28`
+Workflow: `ios-step-29`
 
-Expected app version: `0.0.111 (111)`
+Expected app version: `0.0.112 (112)`
 
-Expected IPA: `artifacts/StS2-Launcher-Step-28.ipa`
+Expected IPA: `artifacts/StS2-Launcher-Step-29.ipa`
 
-Next authority: Codemagic compile -> complete host suite -> iOS publish -> IPA verification. If those pass, physical acceptance remains Step 28 A–E **5/5 PASS**, with Gate D reporting **1000 / 1041 / 1041** and Gate E including the required OfflineReady re-verification.
+Next authority: Codemagic static validation → complete host suite → iOS publish → IPA verification → physical Step 29 A–D **4/4 PASS**. Preserve `Step29-RealStS2CompatibilityTargetAudit.txt` as the authority for the next semantic-transformation design.
