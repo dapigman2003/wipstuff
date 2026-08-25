@@ -115,3 +115,9 @@ Only after this combined rewrite-before-load + interpreted-execution boundary cl
 Codemagic 0.0.109 is preserved as compile-only evidence: static validation passed 845/845 and all external fixtures built, but `StS2Launcher.Core` stopped before MSTest with CS0246 because `AheadOfLoadManagedTransformation` referenced an undeclared `CallbackProgress<T>`. It establishes no host, IPA, or physical runtime result.
 
 Step 28.0.1 / 0.0.110 must retain a private callback-backed `IProgress<T>` adapter in `AheadOfLoadManagedTransformation`: the constructor rejects a null callback and `Report(T)` forwards synchronously to that callback. This helper exists only to bridge established OfflineReady progress into the Step-28 progress surface. It must not alter Gate A admission semantics or any Gate B–E transform/execution contract. Static validation pins the declaration and forwarding behavior so this exact compile defect cannot silently recur.
+
+### Step 28.0.2 metadata-only Cecil admission contract
+
+Codemagic 0.0.110 compiled and ran all 217 host tests; 216 passed. The sole Step-28 failure occurred at Gate A before rewrite/load because `ReadingMode.Immediate` eagerly decoded unrelated custom-attribute arguments and requested `System.Runtime, Version=9.0.0.0` through the deliberately rejecting Cecil resolver. This is preserved as implementation evidence, not transformed-execution evidence.
+
+Step 28.0.2 / 0.0.111 must read the Step-28 fixture with `ReadingMode.Deferred` while retaining the rejecting resolver. The boundary must never broaden Cecil dependency search paths merely to satisfy metadata not required by the experiment. The exact assembly/type/method/body/direct-call/PInvoke checks remain required, and any actual assembly-resolution attempt remains fail-closed. Static validation must reject a return to `ReadingMode.Immediate` in `AheadOfLoadManagedTransformation`.

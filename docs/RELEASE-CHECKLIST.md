@@ -1,4 +1,4 @@
-# Release Checklist — Step 28.0.1
+# Release Checklist — Step 28.0.2
 
 ## Source / policy
 
@@ -17,22 +17,25 @@
 - Gate E re-hashes all images, re-proves OfflineReady, and requires exactly one Step-28 fixture identity in the dedicated context with no unexpected private dependency fallback.
 - Source/live game bytes remain immutable.
 - No real StS2 member reflection/rewrite/invocation; no Godot/game startup; no native game-library loading.
-- `MASTER-PLAN.md` remains unchanged for 0.0.110 because this is a compile correction only; update it only if architecture, methodology, major roadmap, or end-state assumptions actually change.
+- `MASTER-PLAN.md` remains unchanged for 0.0.111 because this is a narrow Cecil metadata-read correction only; update it only if architecture, methodology, major roadmap, or end-state assumptions actually change.
 
 ## Build identity
 
-- step/candidate: **Step 28.0.1**
-- version: `0.0.110 (110)`
+- step/candidate: **Step 28.0.2**
+- version: `0.0.111 (111)`
 - workflow: `ios-step-28`
 - IPA: `artifacts/StS2-Launcher-Step-28.ipa`
 - TRX: `artifacts/test-results/step28.trx`
-- top launcher banner: **Step 28.0.1**, bundle-derived **Version 0.0.110**, preserved Step-27 negative closure, preserved 0.0.109 compile stop, and unchanged transformed-only execution architecture.
+- top launcher banner: **Step 28.0.2**, bundle-derived **Version 0.0.111**, preserved Step-27 negative closure, preserved 0.0.109 compile stop and 0.0.110 host 216/217 Gate-A evidence, and unchanged transformed-only execution architecture.
+
+- 0.0.110 authority is preserved as compile PASS / host **216/217**, with the sole failure at Gate A from Cecil Immediate-mode `System.Runtime` resolution before rewrite/load.
+- Step-28 fixture metadata reads are `ReadingMode.Deferred`; the rejecting Cecil resolver remains present; `ReadingMode.Immediate` is not used by the Step-28 fixture reader.
 
 ## Pre-device authority
 
-- Canonical static validation: expected **850/850 PASS**.
+- Canonical static validation: expected **859/859 PASS**.
 - Core/test compilation: PASS.
-- Complete host regression suite: PASS.
+- Complete host regression suite: **217/217 PASS**.
 - iOS publish: PASS.
 - IPA verification: PASS.
 - If any stage fails, preserve the raw artifact, classify the first failing boundary, make the smallest correction, bump candidate identity, and do not change Step-28 semantics unless evidence requires it.

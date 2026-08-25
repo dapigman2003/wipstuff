@@ -43,3 +43,5 @@ The historical on-device Step-27 report/checkpoint paths remain:
 They remain available as historical regression/evidence tooling but are no longer the active compatibility path.
 
 The physically closed Step 26/25/24/23 reports retain their existing deterministic filenames.
+
+- `docs/history/reports/STEP-28.0.1-CODEMAGIC-HOST-TEST-FAILURE.txt` — preserved raw Codemagic 0.0.110 host output; compile succeeded, 216/217 host tests passed, and Step-28 Gate A failed before rewrite/load on Cecil eager `System.Runtime` resolution.

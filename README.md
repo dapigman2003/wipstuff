@@ -10,31 +10,25 @@ Step 28.0 / `0.0.109 (109)` passed canonical static validation **845/845** and b
 
 ## Active candidate
 
-**Step 28.0.1 / `0.0.110 (110)` — compile correction; Step-28 experiment unchanged**
+**Step 28.0.2 / `0.0.111 (111)` — deferred Cecil metadata admission correction; Step-28 experiment unchanged**
 
-0.0.110 adds only the missing private `CallbackProgress<T> : IProgress<T>` adapter and static validation that pins its declaration and forwarding behavior. The active compatibility pipeline remains:
+Codemagic 0.0.110 proved the prior compile fix and advanced through the full host runner: **216/217 tests passed**. The only failure was the Step-28 end-to-end regression at Gate A, before rewrite or CLR load. `ReadingMode.Immediate` caused Mono.Cecil to eagerly decode unrelated custom-attribute arguments and request `System.Runtime, Version=9.0.0.0` through the deliberately rejecting metadata resolver.
 
-`verified source -> launcher-private clone -> Cecil transform before CLR load -> reopen/hash verify -> load only transformed image -> execute through Mono interpreter`
+0.0.111 changes only Step-28 fixture module reads to `ReadingMode.Deferred` while retaining `RejectingAssemblyResolver`. The active compatibility pipeline remains:
 
-The unchanged Step-28 mechanism is still proven on a project-owned post-publish fixture before touching real StS2 behavior:
+verified receipt-backed source → launcher-private clone → deterministic Cecil transformation before CLR load → reopen/hash verification → transformed-only private `AssemblyLoadContext` execution through the proven interpreter host.
 
-- `StS2Launcher.Step28.AheadOfLoadFixture.dll` is built separately and copied into the `.app` only after `dotnet publish`;
-- the iOS project and host-test project do not reference the fixture project;
-- source IL has `Adjustment() => 1`, `Target(value) => value + Adjustment()`, and `InvokeTarget(value) => Target(value)`;
-- Gate A re-proves OfflineReady, hash/metadata-verifies the source fixture, clones it privately, and requires the fixture identity to be absent from the CLR;
-- Gate B changes only `Adjustment()` from `1` to `1000` in a new private transformed image with Mono.Cecil;
-- Gate C reopens and verifies source/transformed IL and hashes before load;
-- Gate D loads only transformed bytes into a dedicated private `AssemblyLoadContext` and requires `Adjustment()==1000`, `Target(41)==1041`, and the in-fixture direct-call `InvokeTarget(41)==1041`;
-- Gate E re-hashes all images and re-proves OfflineReady/isolation;
-- no Harmony/MonoMod patch API and no real StS2 member reflection/invocation are used by Step 28.
+The Step-28 acceptance experiment remains unchanged: the project-owned post-publish fixture begins with `Adjustment() => 1`, the private transformed image changes it to `1000`, Gate D must prove **1000 / 1041 / 1041**, and Gate E must re-prove OfflineReady and isolation. No real StS2 member is changed yet.
 
-`MASTER-PLAN.md` is intentionally unchanged in 0.0.110 because this candidate does not change architecture, methodology, roadmap, or end-state assumptions.
+`MASTER-PLAN.md` is intentionally unchanged in 0.0.111 because this is a narrow implementation correction, not an architecture/roadmap change.
+
+Expected app version: `0.0.111 (111)`
 
 ## Build
 
 Workflow: `ios-step-28`
 
-Expected app version: `0.0.110 (110)`
+Expected app version: `0.0.111 (111)`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-28.ipa`
 

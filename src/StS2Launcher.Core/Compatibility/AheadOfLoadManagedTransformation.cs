@@ -401,7 +401,7 @@ public sealed class AheadOfLoadManagedTransformation
     private static ModuleDefinition ReadFixtureModule(string path)
         => ModuleDefinition.ReadModule(path, new ReaderParameters
         {
-            ReadingMode = ReadingMode.Immediate,
+            ReadingMode = ReadingMode.Deferred,
             AssemblyResolver = RejectingAssemblyResolver.Instance,
         });
 

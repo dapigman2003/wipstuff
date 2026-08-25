@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>110</ApplicationVersion>" in project_text, "build version is 110")
-require("<ApplicationDisplayVersion>0.0.110</ApplicationDisplayVersion>" in project_text, "display version is 0.0.110")
-require(plist.get("CFBundleVersion") == "110", "Info.plist build version is 110")
-require(plist.get("CFBundleShortVersionString") == "0.0.110", "Info.plist display version is 0.0.110")
+require("<ApplicationVersion>111</ApplicationVersion>" in project_text, "build version is 111")
+require("<ApplicationDisplayVersion>0.0.111</ApplicationDisplayVersion>" in project_text, "display version is 0.0.111")
+require(plist.get("CFBundleVersion") == "111", "Info.plist build version is 111")
+require(plist.get("CFBundleShortVersionString") == "0.0.111", "Info.plist display version is 0.0.111")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 28.0.1 — AHEAD-OF-LOAD MANAGED TRANSFORMATION COMPILE FIX" in release_presentation, "top launcher banner identifies active Step 28.0.1 candidate")
-require("0.0.108" in release_presentation and "NotImplementedException" in release_presentation and "PatchFunctions.UpdateWrapper" in release_presentation and "post-publish interpreted" in release_presentation and "Step 28.0.1" in release_presentation and "Cecil" in release_presentation and "No Harmony patch API" in release_presentation, "top launcher banner preserves Step-27 negative closure and scopes the unchanged Step-28 ahead-of-load mechanism")
+require("STEP 28.0.2 — DEFERRED CECIL METADATA ADMISSION FIX" in release_presentation, "top launcher banner identifies active Step 28.0.2 candidate")
+require("0.0.108" in release_presentation and "216/217" in release_presentation and "System.Runtime" in release_presentation and "ReadingMode.Deferred" in release_presentation and "No Harmony patch API" in release_presentation, "top launcher banner preserves Step-27 negative closure, 0.0.110 host evidence, and the unchanged Step-28 ahead-of-load mechanism")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.110"' in release_presentation and 'ExpectedBuildVersion = "110"' in release_presentation, "Step 28.0.1 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.111"' in release_presentation and 'ExpectedBuildVersion = "111"' in release_presentation, "Step 28.0.2 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
 require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "post-publish interpreted Target+Prefix fixture" in release_presentation and "fresh processor via Harmony.CreateProcessor(MethodBase)" in release_presentation and "exactly one Patch()" in release_presentation, "Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
@@ -343,8 +343,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-28.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.110",
-    "STS2_BUILD_VERSION": "110",
+    "STS2_DISPLAY_VERSION": "0.0.111",
+    "STS2_BUILD_VERSION": "111",
     "STS2_RUNTIME_POLICY_MARKER": "STEP28 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1154,6 +1154,10 @@ require("Step28-AheadOfLoadManagedTransformation.txt" in step28_ui and "AheadOfL
 require("private sealed class CallbackProgress<T> : IProgress<T>" in step28_source, "Step 28.0.1 declares the callback-backed IProgress adapter required by Gate-A OfflineReady progress")
 require("private readonly Action<T> _callback;" in step28_source and "_callback = callback ?? throw new ArgumentNullException(nameof(callback));" in step28_source, "Step 28.0.1 callback adapter stores a non-null forwarding callback")
 require("public void Report(T value) => _callback(value);" in step28_source, "Step 28.0.1 callback adapter forwards IProgress.Report synchronously")
+require("ReadingMode = ReadingMode.Deferred" in step28_source, "Step 28.0.2 uses deferred Cecil reading for metadata-only fixture admission")
+require("AssemblyResolver = RejectingAssemblyResolver.Instance" in step28_source, "Step 28.0.2 retains the fail-closed rejecting Cecil resolver")
+require("ReadingMode = ReadingMode.Immediate" not in step28_source, "Step 28.0.2 does not reintroduce eager Cecil fixture reads")
+require(step28_source.count("ReadingMode = ReadingMode.Deferred") == 1, "Step 28.0.2 has one canonical deferred fixture reader")
 
 step28_manifest = ROOT / "tools/validation/candidate-step28-ahead-of-load-boundary.sha256"
 require(step28_manifest.is_file(), "Step 28 candidate boundary hash manifest exists")
@@ -1177,6 +1181,8 @@ required_docs = [
     "docs/history/steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md",
     "docs/history/steps/STEP-28-AHEAD-OF-LOAD-MANAGED-TRANSFORMATION.md",
     "docs/history/steps/STEP-28.0.1-CALLBACK-PROGRESS-COMPILE-FIX.md",
+    "docs/history/reports/STEP-28.0.1-CODEMAGIC-HOST-TEST-FAILURE.txt",
+    "docs/history/steps/STEP-28.0.2-DEFERRED-CECIL-METADATA-READ-FIX.md",
     "docs/history/reports/STEP-28.0-CODEMAGIC-CORE-COMPILE-FAILURE.txt",
     "docs/history/reports/STEP-27.0.24-PHYSICAL-INTERPRETED-PATCH-FAILURE.txt",
     "docs/history/steps/STEP-22.4-CANONICAL-FOUNDATION.md",
@@ -1325,9 +1331,13 @@ require("System.Linq.Enumerable.Union" not in step27_build107_report[step27_buil
 regression_contracts = read("docs/REGRESSION-CONTRACTS.md")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in regression_contracts and "runtime Harmony/MonoMod method replacement is therefore retired" in regression_contracts, "regression contracts preserve the decisive Step-27 negative physical result and retire runtime patching")
 require("## Step 28 — ahead-of-load managed transformation" in regression_contracts and "Target(41)==1041" in regression_contracts and "loads only the verified transformed bytes" in regression_contracts and "real StS2 member reflection/transformation/invocation" in regression_contracts, "regression contracts define the five-gate Step-28 transform-before-load capability boundary")
+step28_build110_report = read("docs/history/reports/STEP-28.0.1-CODEMAGIC-HOST-TEST-FAILURE.txt")
+require("Test Run Failed." in step28_build110_report and "Total tests: 217" in step28_build110_report and "Passed: 216" in step28_build110_report and "Failed: 1" in step28_build110_report, "Codemagic 0.0.110 evidence preserves the exact 216/217 host result")
+require("VerifiedSourceIsRewrittenBeforeLoadAndOnlyTransformedBehaviorExecutes" in step28_build110_report and "System.Runtime, Version=9.0.0.0" in step28_build110_report and "AssemblyResolutionException" in step28_build110_report and "ReadFixtureModule" in step28_build110_report, "Codemagic 0.0.110 evidence localizes the sole host failure to Gate-A Cecil framework metadata resolution")
+require("Step 28.0.2 metadata-only Cecil admission contract" in regression_contracts and "ReadingMode.Deferred" in regression_contracts and "ReadingMode.Immediate" in regression_contracts and "rejecting resolver" in regression_contracts, "regression contracts pin the deferred metadata-only correction without broadening resolution")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "0.0.107 (107)" in current_status and "Physical 0.0.108 result" in current_status and "0.0.108 (108)" in current_status and "19/26" in current_status and "post-publish interpreted" in current_status and "PatchFunctions.UpdateWrapper" in current_status and "negative" in current_status.lower() and "Codemagic 0.0.109 result" in current_status and "845/845" in current_status and "CS0246" in current_status and "Step 28.0.1 / 0.0.110 (110)" in current_status and "850/850" in current_status and "ahead-of-load" in current_status.lower() and "MtouchLink=None" in current_status and "TrimMode=copy" in current_status and "5/5 PASS" in current_status and "1000 / 1041 / 1041" in current_status and "Step28-AheadOfLoadManagedTransformation.txt" in current_status, "current status preserves the 0.0.109 compile stop and advances the unchanged five-gate Step-28 mechanism as 0.0.110")
+require("Steps 01–26" in current_status and "Physical 0.0.108 result" in current_status and "Codemagic 0.0.109 result" in current_status and "845/845" in current_status and "CS0246" in current_status and "Codemagic 0.0.110 result" in current_status and "850/850" in current_status and "216/217" in current_status and "System.Runtime, Version=9.0.0.0" in current_status and "Step 28.0.2 / 0.0.111 (111)" in current_status and "ReadingMode.Deferred" in current_status and "MtouchLink=None" in current_status and "TrimMode=copy" in current_status and "5/5 PASS" in current_status and "1000 / 1041 / 1041" in current_status and "Step28-AheadOfLoadManagedTransformation.txt" in current_status, "current status preserves prior evidence and advances the unchanged five-gate Step-28 mechanism as 0.0.111")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

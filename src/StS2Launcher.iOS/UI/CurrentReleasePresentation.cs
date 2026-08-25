@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 28.0.1 — AHEAD-OF-LOAD MANAGED TRANSFORMATION COMPILE FIX";
+        "STEP 28.0.2 — DEFERRED CECIL METADATA ADMISSION FIX";
 
     public const string MilestoneLine =
-        "STEPS 01–26 PHYSICALLY CLOSED • STEP 27 CLOSED NEGATIVE ON 0.0.108 • 0.0.109 COMPILE STOP CORRECTED • STEP 28 MECHANISM UNCHANGED";
+        "STEPS 01–26 PHYSICALLY CLOSED • STEP 27 CLOSED NEGATIVE ON 0.0.108 • 0.0.110 COMPILES; HOST 216/217 • STEP 28 GATE-A CECIL READ FIX";
 
     public const string Summary =
-        "Physical 0.0.108 completed the Step-27 stop-rule experiment: a launcher-owned post-publish interpreted target still reached the exact public PatchProcessor.Patch() boundary and failed with System.NotImplementedException from PatchFunctions.UpdateWrapper, so runtime Harmony/MonoMod replacement remains retired. Step 28.0 keeps the replacement pipeline unchanged: admit a separately built post-publish source fixture as Cecil metadata only, clone it to launcher-private storage, rewrite Adjustment() from 1 to 1000 before CLR admission, reopen and hash-verify both images, then load only the transformed bytes and require Adjustment()==1000, Target(41)==1041, and the in-fixture direct-call InvokeTarget(41)==1041. Codemagic 0.0.109 passed static validation and built the external fixtures but StS2Launcher.Core compilation stopped because this production boundary referenced a missing CallbackProgress<T> adapter. Step 28.0.1 adds only that established callback-backed IProgress<T> adapter and a static regression guard. No Harmony patch API, real StS2 member reflection/invocation, Godot/game startup, native game loading, trusted-install mutation, gate semantics, or resolver policy changes.";
+        "Physical 0.0.108 closed runtime Harmony/MonoMod replacement negatively, so Step 28 remains deterministic ahead-of-load Cecil transformation followed by transformed-only interpreted execution. Codemagic 0.0.110 proved the 0.0.109 CallbackProgress<T> compile defect is fixed: Core/tests compiled and 216/217 host tests passed. The sole failure was the Step-28 end-to-end host regression at Gate A, where Mono.Cecil ReadingMode.Immediate eagerly decoded unrelated custom-attribute arguments and asked the deliberately rejecting metadata resolver for System.Runtime, Version=9.0.0.0 before any rewrite or CLR load. Step 28.0.2 changes only fixture metadata reads to ReadingMode.Deferred, matching the established metadata-only audit pattern while retaining the rejecting resolver. No Harmony patch API, real StS2 member reflection/invocation, Godot/game startup, native game loading, trusted-install mutation, gate semantics, or runtime resolver policy changes.";
 
     public const string InitialStatus =
-        "Status: Steps 01–26 are physically closed and Step 27 is closed negative by physical 0.0.108. Codemagic 0.0.109 was compile-only evidence: static validation passed, all external fixtures built, then Core failed CS0246 on missing CallbackProgress<T> before host tests. Build 0.0.110 is the Step 28.0.1 compile-fix candidate; Codemagic compile/full host tests/iOS publish/IPA verification are the next authority before the unchanged physical A–E run.";
+        "Status: Steps 01–26 are physically closed and Step 27 is closed negative by physical 0.0.108. Codemagic 0.0.110 passed static validation, compiled the project, and executed all 217 host tests; 216 passed and the only failure was Gate-A Cecil eager metadata resolution of System.Runtime before transformation. Build 0.0.111 is the Step 28.0.2 deferred-metadata-read correction; Codemagic full host tests/iOS publish/IPA verification are the next authority before the unchanged physical A–E run.";
 
-    public const string ExpectedDisplayVersion = "0.0.110";
-    public const string ExpectedBuildVersion = "110";
+    public const string ExpectedDisplayVersion = "0.0.111";
+    public const string ExpectedBuildVersion = "111";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
 
