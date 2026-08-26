@@ -157,3 +157,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt` — raw physical 0.0.116 report: Gate A PASS; Gate B failed inside Cecil Constant-table serialization on exact `System.Runtime 9.0.0.0` resolution before any CLR admission.
 - `steps/STEP-32.0.2-BOUNDED-CONSTANT-METADATA-WRITE-RESOLVER.md` — 0.0.117 keeps the 6+4 rewrite unchanged and introduces an exact-identity, in-memory write-only constant-metadata surrogate instead of broad resolver fallback.
 - `steps/STEP-32.0.2-TEST.md` — Codemagic + physical A–D acceptance procedure for the bounded write resolver correction.
+
+- `reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt` — raw physical 0.0.117 report: Gate A PASS; Gate B failed closed before write after whole-module Cecil serialization preflight discovered unrelated `Sentry 5.0.0.0` Constant-table scope.
+- `steps/STEP-32.0.3-EXACT-LENGTH-IL-PATCH-AND-CI-FAST-PREFLIGHT.md` — 0.0.118 removes Cecil serialization from the ten-call rewrite, uses exact five-byte private-copy IL patch windows, and splits free-tier Codemagic into fast host preflight + device candidate workflows.
+- `steps/STEP-32.0.3-TEST.md` — same-commit two-workflow CI discipline and physical A–D acceptance procedure.

@@ -1,32 +1,31 @@
-# Testing — Step 32.0.2 Bounded Cecil Write-Metadata Resolver Fix
+# Testing — Step 32.0.3 Exact-Length Private IL Patch
 
-Active candidate: Step 32.0.2 / `0.0.117 (117)`.
+Active candidate: Step 32.0.3 / `0.0.118 (118)`.
 
-## Authority sequence
+## Authority sequence optimized for Codemagic free M2 minutes
 
-1. `scripts/validate.sh` — canonical static policy/provenance validation.
-2. `scripts/test.sh` — complete host regression suite.
-3. `scripts/build-ios.sh` — publish/package the iOS candidate.
-4. `scripts/verify-ipa.sh` — verify release identity, native closure, fixture rules, and IPA structure.
-5. Physical iPhone — final Step-32 A–D authority.
+1. **`step32-fast`** — pinned .NET SDK, `scripts/validate.sh`, then the **complete** `scripts/test.sh` host regression suite. No iOS workload, Godot publish, or IPA.
+2. If fast fails, stop. Preserve artifacts; do not run device CI.
+3. **`ios-step-32` on the exact same commit** — repeats static validation only, installs the pinned iOS workload with `--skip-manifest-update`, builds/publishes, and runs `scripts/verify-ipa.sh`. It intentionally does not repeat the full host suite already proven for that commit.
+4. If device CI fails, stop. Do not install an IPA.
+5. Only when both summaries show PASS for the same commit, install the IPA and run physical Step 32 A–D.
 
-Release identity remains workflow `ios-step-32`, IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, now version `0.0.117 (117)`.
+Both workflows produce `artifacts/reports/phase-timings.txt` and `cache-sizes.txt`. Cached inputs include `$HOME/.nuget/packages`, the pinned Harmony-Fat regression archive, a pristine pinned .NET SDK snapshot, and the existing Godot archive on the device workflow.
 
-### Step 32.0.2 regression focus
+## Step 32.0.3 regression focus
 
-The host end-to-end Step-32 fixture must include an unrelated constant whose declared type is an external enum scoped to exact `System.Runtime 9.0.0.0`. Gate B must reproduce Cecil's Constant-table write-time resolution need and satisfy it only through the production in-memory constant-metadata surrogate. The test must still prove source bytes unchanged, exact 10→0 PrepareMethod rewrite, 6+4 Pop semantics, and reopened verification.
+Production Gate B must contain **no `ModuleDefinition.Write` path**. It must:
 
-Static/runtime guards must require:
+- use deferred Cecil + rejecting resolver only to bind the exact physical source/method/sites;
+- map `PrewarmJit()` RVA to PE file offset and parse tiny/fat IL headers fail-closed;
+- require each selected site to be a direct five-byte `call` (`0x28`) whose raw 4-byte metadata token equals Cecil's bound target token;
+- use only `26 00 00 00 00` for one-argument sites and `26 26 00 00 00` for two-argument sites;
+- preserve exact file length;
+- prove every changed byte is inside the ten non-overlapping approved five-byte windows;
+- perform zero dependency resolution while planning/writing.
 
-- `ReadingMode.Deferred` and rejecting resolvers for source admission and reopened verification;
-- no `DefaultAssemblyResolver`, search directories, framework file probing, `Assembly.Load`, `LoadFromStream`, `LoadFromAssemblyPath`, or `LoadFromAssemblyName` in Step 32;
-- the only Gate-B write-time assembly identity permitted is exact `System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a`;
-- the write resolver synthesizes only constant enum metadata from values already present in the verified source module;
-- zero external framework/game assembly bytes are opened by that resolver;
-- source/transformed Constant-table semantic fingerprints match exactly;
-- the offset-independent transformed method semantic fingerprint remains the pre-write→reopen IL invariant;
-- the physical transformed body hash remains post-write evidence only.
+The host fixture intentionally contains an unrelated **Sentry-scoped external enum constant**, reproducing the class of whole-module metadata dependency that stopped physical 0.0.117. The Step-32 rewrite must succeed without resolving or serializing that metadata.
 
-### Physical acceptance
+Gate C must reopen under the rejecting resolver and verify source/transformed PrepareMethod references **10 / 0**, instruction delta **+40**, Pop/Nop delta **+14 / +36**, exact replacement instructions at original offsets, semantic-fingerprint match, unchanged Constant-table fingerprint, EH count, identity/MVID, and repeated raw byte-diff confinement.
 
-Force-quit before running Step 32. Require A–D **4/4 PASS**. Gate B should report 6/6 + 4/4 replacements plus only exact System.Runtime synthetic write-time resolution; Gate C should report PrepareMethod references **10 / 0** and identical source/transformed constant-metadata fingerprints; Gate D must re-prove OfflineReady and immutable source/no-CLR isolation.
+Physical acceptance remains A–D **4/4 PASS**.

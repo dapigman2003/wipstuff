@@ -1,6 +1,35 @@
 workflows:
+  step32-fast:
+    name: Step 32 - Fast Host Preflight
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+
+    environment:
+      xcode: 26.5
+      vars:
+        DOTNET_SDK_VERSION: "9.0.314"
+        DOTNET_WORKLOAD_SET: "9.0.314.3"
+
+    cache:
+      cache_paths:
+        - $HOME/.nuget/packages
+        - $HOME/.cache/sts2launcher/dotnet-sdk-9.0.314
+        - $HOME/.cache/sts2launcher/harmony-fat-2.4.2
+
+    scripts:
+      - name: Validate and run complete host regression suite
+        script: |
+          set -euo pipefail
+          chmod +x scripts/*.sh
+          bash scripts/codemagic-fast.sh
+
+    artifacts:
+      - artifacts/reports/**
+      - artifacts/test-results/**
+      - artifacts/logs/**
+
   ios-step-32:
-    name: Step 32 - First Real StS2 PrepareMethod Rewrite
+    name: Step 32 - Device Candidate (run fast preflight first)
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -13,14 +42,16 @@ workflows:
     cache:
       cache_paths:
         - $HOME/.nuget/packages
+        - $HOME/.cache/sts2launcher/dotnet-sdk-9.0.314
+        - $HOME/.cache/sts2launcher/harmony-fat-2.4.2
         - $HOME/.cache/sts2launcher/godot-step15
 
     scripts:
-      - name: Validate, test, build, and verify Step 32
+      - name: Build and verify Step 32 device candidate
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
-          bash scripts/codemagic.sh
+          bash scripts/codemagic-device.sh
 
     artifacts:
       - artifacts/StS2-Launcher-Step-32.ipa

@@ -63,9 +63,9 @@ The normal loop is:
 3. modify the project directly;
 4. run local static validation and source-archive audits;
 5. return a Codemagic-ready source ZIP;
-6. build in Codemagic;
-7. install on a physical iPhone;
-8. run gates in order and report the first failure using text files where practical;
+6. run a fast Codemagic preflight containing static validation + the complete host suite; stop if it fails;
+7. only on the exact same commit, run the iOS/device-candidate workflow; install on a physical iPhone only if both CI authorities pass;
+8. run gates in order and report the first failure using text files where practical; where safe, collect the complete diagnostic surface for that failing boundary before returning so one physical run does not reveal only one item from a known set;
 9. after subsystem success, run OfflineReady and Foundation 5/5 regressions before formal closure.
 
 ## Canonical source architecture
@@ -116,7 +116,7 @@ These are architecture, not temporary step hacks:
 - no real StS2 assembly CLR load before the explicit first-load subsystem;
 - no initializer-bearing prepared dependency is admitted automatically outside an explicit controlled-initialization subsystem with a measured target and fail-closed resolver/native policy.
 - runtime Harmony/MonoMod method replacement is **not** an active iOS compatibility mechanism: physical Step 27.0.24 / 0.0.108 failed the exact public `PatchProcessor.Patch()` boundary on a genuine post-publish interpreted target after trimming ambiguity was removed; no further Harmony-internal workaround iteration is planned.
-- compatibility behavior changes are now applied deterministically **ahead of CLR load** to verified launcher-private copies with Mono.Cecil, then the transformed image is reopened/verified and only that image may enter the private runtime context. The receipt-backed Step 12 source remains immutable.
+- compatibility behavior changes are applied deterministically **ahead of CLR load** to verified launcher-private copies. Mono.Cecil is the authoritative metadata/IL binding and reopen-verification tool; when whole-module Cecil serialization would require unrelated dependency resolution, a candidate may use a more narrowly bounded exact-length PE/IL write only after raw opcode/token/offset evidence is pinned and every changed byte is proven confined to the predeclared windows. Only the verified transformed image may later enter the private runtime context. The receipt-backed Step 12 source remains immutable.
 
 ## Data/workspace trust model
 
@@ -157,6 +157,8 @@ Load the prepared real `sts2.dll` into the private execution context with exact 
 This is the active major phase. Steps 24–26 physically proved that the real `0Harmony 2.4.2.0` assembly can be admitted and initialized in the private iOS managed context and that inert `Harmony` / `PatchProcessor` objects can be constructed safely. Step 27 then isolated the first real replacement boundary. Physical 0.0.105 and 0.0.106 exposed two independent publish-time trimming failures (`Enumerable.Union<T>` and `DebuggableAttribute`), which established the architectural need for `MtouchLink=None` + `TrimMode=copy` because receipt-backed StS2/Harmony/mod assemblies arrive after publish and are invisible to ILLink. Physical 0.0.107 removed those trimming failures and reached `PatchProcessor.Patch()`, which threw `NotImplementedException` from `PatchFunctions.UpdateWrapper`. The final Step-27 stop-rule candidate, physical 0.0.108, repeated that failure against a genuine post-publish interpreted target whose direct in-fixture IL execution was proven immediately beforehand. That removed the AOT-target ambiguity and **closed runtime Harmony/MonoMod replacement as a negative architecture result**.
 
 Physical Step 28.0.2 / 0.0.111 closed deterministic ahead-of-load managed transformation positively at 5/5: immutable source bytes were cloned, one exact Cecil semantic change was applied before CLR admission, source/transformed images were reopened and hash-verified, only transformed bytes entered the private context, both reflection and an in-fixture direct managed IL call observed 1000 / 1041 / 1041, and final OfflineReady/isolation passed. Physical Step 29.0 / 0.0.112 then closed exact receipt-backed target selection at 4/4 without writes or CLR admission and selected `ModManager.TryLoadMod(Mod) -> Harmony.PatchAll(Assembly)`. Because that highest-priority site is structurally in the mod-loading path, the active frontier is a read-only semantic-context/product-scope audit before any rewrite; priority rank alone does not override the rule that Workshop/Harmony-mod compatibility is later and must not block base-game startup. After that disposition, the next non-mod compatibility family must receive its own exact semantic audit before one narrowly predeclared real-StS2 transformation is authorized. Runtime Harmony detours are not to be revived. Keep real StS2 transformation, real member invocation, Godot/game startup, native game loading, and broad mod compatibility separately gated.
+
+Physical Step 31.0 / 0.0.114 then closed the exact non-mod `PrewarmJit()`/ten-`PrepareMethod` semantic audit at 4/4 and authorized a separately predeclared rewrite design. Step 32 keeps that 6+4 stack-neutral semantic change on a launcher-private `sts2.dll` copy. Physical 0.0.116 and 0.0.117 showed that whole-module Cecil serialization reaches unrelated external Constant-table metadata (`System.Runtime`, then `Sentry`) even though the selected IL sites need no such dependency. The active Step-32 writer therefore uses Cecil for exact binding/verification but performs only equal-length raw IL replacement inside the ten verified five-byte call windows, with whole-image byte-diff confinement and no metadata serialization/resolver broadening. Transformed-real-StS2 CLR admission remains a later boundary.
 
 ### Phase E — Godot/game integration
 

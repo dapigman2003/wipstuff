@@ -1,17 +1,20 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-25T23:24:26Z
+UTC: 2026-08-26T01:57:32Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
+PASS: shell syntax — scripts/codemagic-device.sh
+PASS: shell syntax — scripts/codemagic-fast.sh
 PASS: shell syntax — scripts/codemagic.sh
+PASS: shell syntax — scripts/lib/codemagic-common.sh
 PASS: shell syntax — scripts/lib/current-release.sh
 PASS: shell syntax — scripts/preflight-godot-link.sh
 PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 32.0.2 bounded Cecil write-metadata resolver fix static validation
-Root: /mnt/data/work117
+StS2 Launcher — Step 32.0.3 exact-length private IL patch static validation
+Root: /mnt/data/work118/StS2Launcher-Step32-0.0.118
 PASS: all 10 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 236 C# files
@@ -21,10 +24,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 117
-PASS: display version is 0.0.117
-PASS: Info.plist build version is 117
-PASS: Info.plist display version is 0.0.117
+PASS: build version is 118
+PASS: display version is 0.0.118
+PASS: Info.plist build version is 118
+PASS: Info.plist display version is 0.0.118
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +35,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 32.0.2 candidate
+PASS: top launcher banner identifies active Step 32.0.3 candidate
 PASS: top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 32.0.2 source pins expected bundle release identity
+PASS: Step 32.0.3 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -88,7 +91,7 @@ PASS: Core root contains no loose implementation .cs files
 PASS: RootViewController remains split into focused partial files
 PASS: no RootViewController partial exceeds 50 KB
 PASS: RootViewController retains sealed partial structure
-PASS: active scripts are exactly seven canonical entry points
+PASS: active scripts are exactly nine canonical entry points
 PASS: active script filenames are not historical-step named
 PASS: canonical shell release configuration exists
 PASS: release config pins STS2_IOS_PROJECT
@@ -127,8 +130,10 @@ PASS: active verify-ipa.sh exists
 PASS: verify-ipa.sh emits a shareable text report
 PASS: active preflight-godot-link.sh exists
 PASS: preflight-godot-link.sh emits a shareable text report
-PASS: active codemagic.sh exists
-PASS: codemagic.sh emits a shareable text report
+PASS: active codemagic-fast.sh exists
+PASS: codemagic-fast.sh emits a shareable text report
+PASS: active codemagic-device.sh exists
+PASS: codemagic-device.sh emits a shareable text report
 PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoad.cs
 PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoadGate.cs
 PASS: Step 23 production boundary source exists: src/StS2Launcher.Core/Runtime/FirstRealGameAssemblyLoadGateResult.cs
@@ -754,24 +759,24 @@ PASS: Step 32 hard-pins physical Step-31 evidence: 0x0178
 PASS: Step 32 hard-pins physical Step-31 evidence: SourceInstructionCount: 117
 PASS: Step 32 hard-pins physical Step-31 evidence: SourceExceptionHandlerCount: 2
 PASS: Step 32 pins all ten physical PrepareMethod offsets
-PASS: Step 32 predeclares exact 6 one-pop + 4 two-pop stack-neutral rewrite
-PASS: Step 32 implementation performs only the predeclared Pop replacements
+PASS: Step 32 predeclares exact 6 one-pop + 4 two-pop equal-length rewrite
+PASS: Step 32 implementation performs only the predeclared equal-length Pop/Nop replacements
 PASS: Step 32 rejects selected sites that become branch targets
 PASS: Step 32 retains deferred/rejecting-resolver policy for read and verification phases
-PASS: Step 32 writes only a named launcher-private transformed image
+PASS: Step 32 writes only the named launcher-private transformed image without Cecil serialization
 PASS: Step 32 production source contains no real-StS2 CLR admission path
 PASS: Step 32 reopens and verifies the exact planned transformed method semantics
-PASS: Step 32.0.1 treats physical body fingerprint as post-write evidence and semantic fingerprint as the pre-write/reopen invariant
+PASS: Step 32 retains offset-independent semantic fingerprint planning while treating reopened body hash as physical evidence
 PASS: Step 32.0.1 forbids pre-write offset-sensitive transformed body-hash prediction
-PASS: Step 32.0.2 pins the exact write-only System.Runtime constant-metadata resolver identity
-PASS: Step 32.0.2 synthesizes constant metadata from verified source values without opening external assembly bytes
-PASS: Step 32.0.2 forbids broad Cecil resolver/search fallback
-PASS: Step 32.0.2 verifies unrelated Constant-table semantics survive serialization unchanged
-PASS: Step 32 host regression reproduces the external-enum Constant-table serialization path
+PASS: Step 32.0.3 binds each raw five-byte call opcode and metadata token before writing
+PASS: Step 32.0.3 confines the private write to ten exact five-byte windows and preserves file length
+PASS: Step 32.0.3 forbids broad Cecil resolver/search fallback and whole-module serialization
+PASS: Step 32.0.3 verifies unrelated Constant-table semantics remain unchanged by the raw IL patch
+PASS: Step 32 host regression carries unrelated external-enum metadata while proving production avoids Cecil serialization
 PASS: Step 32 host regressions prove private-only rewrite and branch-target refusal
 PASS: iOS UI persists the dedicated Step-32 physical report
 PASS: RootViewController wires Step 32 into the active device surface
-PASS: release presentation pins the Step-32 first-real-rewrite boundary
+PASS: release presentation pins the Step-32 exact-length first-real-rewrite boundary
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -807,6 +812,9 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.1-SERIALI
 PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.1-TEST.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.2-BOUNDED-CONSTANT-METADATA-WRITE-RESOLVER.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.2-TEST.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt
+PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.3-EXACT-LENGTH-IL-PATCH-AND-CI-FAST-PREFLIGHT.md
+PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.3-TEST.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt
@@ -946,7 +954,9 @@ PASS: raw 0.0.115 static report preserves 996/996 PASS
 PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correction
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
-PASS: current status preserves physical baselines and advances the bounded Step-32 write correction
+PASS: raw physical 0.0.117 report preserves the unexpected Sentry constant-scope stop before write
+PASS: regression contracts pin exact-length Step-32 writing and same-commit two-workflow CI discipline
+PASS: current status preserves physical baselines and advances the exact-length Step-32 correction
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -1005,13 +1015,18 @@ PASS: Step 30 semantic-audit design/test/closure record is present
 PASS: Step 31 PrepareMethod semantic-audit design/test/closure record is present
 PASS: Step 32 first real StS2 rewrite design/test record is present
 PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes the Step 32 workflow
+PASS: Codemagic exposes separate Step-32 fast and device workflows
 PASS: host-test report heading identifies Step 32
 PASS: host-test TRX artifact identifies Step 32
-PASS: Codemagic build-environment report heading identifies Step 32
-PASS: Codemagic contains one active launcher workflow
-PASS: Codemagic calls the consolidated build entry point
+PASS: Codemagic build-environment reports identify Step 32 fast/device modes
+PASS: Codemagic contains exactly the fast preflight and device-candidate workflows
+PASS: Codemagic calls the split fast/device build entry points
 PASS: Codemagic workflow has no history dependency
+PASS: Codemagic caches NuGet, pinned SDK snapshot, and Harmony regression archive
+PASS: complete host suite runs in fast preflight and is not duplicated in device workflow
+PASS: device workflow skips unnecessary workload manifest updates
+PASS: iOS restore uses the cached user NuGet package root
+PASS: Codemagic emits phase timing and cache-size telemetry
 PASS: iOS build sources canonical release configuration
 PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
@@ -1029,117 +1044,4 @@ PASS: Step 32 implementation, active release wiring, and evidence docs are hash-
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1015 checks
- 104 evidence localizes the genuine failure to Cecil whole-module enum-constant serialization
-PASS: physical build 105 evidence preserves the exact 19/26 Gate-T failure
-PASS: physical build 105 proves raw-body HarmonySharedState normalization completed without source mutation
-PASS: physical build 105 localizes the current blocker to a trimmed LINQ member during Harmony replacement construction
-PASS: physical build 106 evidence preserves the exact 19/26 Gate-T failure
-PASS: physical build 106 proves the LINQ fix advanced Patch() into DynamicMethodDefinition before the next BCL trim failure
-PASS: physical build 106 still does not establish actual MonoMod detour execution
-PASS: physical build 107 evidence preserves the exact 19/26 Gate-T result under copy/no-link
-PASS: physical build 107 proves trimming ambiguity is gone and localizes the next blocker to real Patch() execution
-PASS: physical build 107 Gate-T failure is no longer either known trimmed-framework-member failure
-PASS: regression contracts preserve the decisive Step-27 negative physical result and retire runtime patching
-PASS: regression contracts define the five-gate Step-28 transform-before-load capability boundary
-PASS: Codemagic 0.0.110 evidence preserves the exact 216/217 host result
-PASS: Codemagic 0.0.110 evidence localizes the sole host failure to Gate-A Cecil framework metadata resolution
-PASS: regression contracts pin the deferred metadata-only correction without broadening resolution
-PASS: regression contracts protect the positive physical Step-28 closure
-PASS: raw Step-28 physical report preserves the decisive 5/5 transformed-execution values
-PASS: raw Step-28 physical report preserves transformed-only admission, immutable source, and fail-closed isolation
-PASS: raw Step-29 physical report preserves decisive 4/4 exact-target evidence
-PASS: regression contracts protect the closed Step-29 target-selection evidence
-PASS: regression contracts define Step 30 as read-only semantic context/product-scope disposition
-PASS: raw Step-30 physical report preserves decisive 4/4 product-scope disposition evidence
-PASS: raw Step-30 physical report preserves read-only/no-resolution isolation
-PASS: regression contracts protect Step 31 physical PrepareMethod semantic-audit closure
-PASS: raw 0.0.115 host report preserves the single Step-32 Gate-C failure at 230/231
-PASS: raw 0.0.115 static report preserves 996/996 PASS
-PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correction
-PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
-PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
-PASS: current status preserves physical baselines and advances the bounded Step-32 write correction
-PASS: master plan contains durable section: Product objective
-PASS: master plan contains durable section: Non-negotiable security and content boundaries
-PASS: master plan contains durable section: Authority model
-PASS: master plan contains durable section: Canonical source architecture
-PASS: master plan contains durable section: Major roadmap
-PASS: master plan contains durable section: Definition of a closed step
-PASS: master plan contains durable section: Resumption rule
-PASS: master plan defines self-contained resumption path
-PASS: master plan preserves Step-27 negative, Step-28 positive, Step-29 target-selection closure, and Step-30 semantic-audit frontier
-PASS: master plan codifies gate batching for speed without losing discrete proof
-PASS: master plan records both Android StS2 reference implementations as advisory/non-authoritative inputs
-PASS: master plan records both the copy/no-link dynamic-payload correction and the physically justified retirement of runtime Harmony replacement
-PASS: master plan no longer protects the disproven full-trim dynamic-payload policy
-PASS: top-level docs are durable/current; step records live under docs/history/steps
-PASS: readable historical documentation retained for Step 01
-PASS: readable historical documentation retained for Step 02
-PASS: readable historical documentation retained for Step 03
-PASS: readable historical documentation retained for Step 04
-PASS: readable historical documentation retained for Step 05
-PASS: readable historical documentation retained for Step 06
-PASS: readable historical documentation retained for Step 07
-PASS: readable historical documentation retained for Step 08
-PASS: readable historical documentation retained for Step 09
-PASS: readable historical documentation retained for Step 10
-PASS: readable historical documentation retained for Step 11
-PASS: readable historical documentation retained for Step 12
-PASS: readable historical documentation retained for Step 13
-PASS: readable historical documentation retained for Step 14
-PASS: readable historical documentation retained for Step 15
-PASS: readable historical documentation retained for Step 16
-PASS: readable historical documentation retained for Step 17
-PASS: readable historical documentation retained for Step 18
-PASS: readable historical documentation retained for Step 19
-PASS: readable historical documentation retained for Step 20
-PASS: readable historical documentation retained for Step 21
-PASS: readable historical documentation retained for Step 22
-PASS: readable historical documentation retained for Step 23
-PASS: readable historical documentation retained for Step 24
-PASS: readable historical documentation retained for Step 25
-PASS: readable historical documentation retained for Step 26
-PASS: readable historical documentation retained for Step 27
-PASS: readable historical documentation retained for Step 28
-PASS: readable historical documentation retained for Step 29
-PASS: readable historical documentation retained for Step 30
-PASS: readable historical documentation retained for Step 31
-PASS: readable historical documentation retained for Step 32
-PASS: Step 22.4 design/history record is present
-PASS: Step 23 design/test/closure records are present
-PASS: Step 24 design/candidate/closure records are present
-PASS: Step 25 design/candidate/closure records are present
-PASS: Step 26 design/closure records are present
-PASS: Step 27 design/candidate/negative-closure record is present
-PASS: Step 28 ahead-of-load design/closure record is present
-PASS: Step 29 target-audit design/test/closure record is present
-PASS: Step 30 semantic-audit design/test/closure record is present
-PASS: Step 31 PrepareMethod semantic-audit design/test/closure record is present
-PASS: Step 32 first real StS2 rewrite design/test record is present
-PASS: historical documentation set is comprehensive
-PASS: Codemagic exposes the Step 32 workflow
-PASS: host-test report heading identifies Step 32
-PASS: host-test TRX artifact identifies Step 32
-PASS: Codemagic build-environment report heading identifies Step 32
-PASS: Codemagic contains one active launcher workflow
-PASS: Codemagic calls the consolidated build entry point
-PASS: Codemagic workflow has no history dependency
-PASS: iOS build sources canonical release configuration
-PASS: iOS build uses canonical project variable
-PASS: iOS build uses canonical Godot wrapper
-PASS: IPA verifier enforces release-config version
-PASS: IPA verifier reads native bridge from canonical project path
-PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
-PASS: physically closed Step 29 implementation/evidence hash manifest exists
-PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
-PASS: physically closed Step 30 implementation/evidence hash manifest exists
-PASS: physically closed Step-30 implementation, tests, and closure evidence remain hash-pinned
-PASS: physically closed Step 31 implementation/evidence hash manifest exists
-PASS: physically closed Step-31 implementation, tests, and closure evidence remain hash-pinned
-PASS: Step 32 candidate boundary hash manifest exists
-PASS: Step 32 implementation, active release wiring, and evidence docs are hash-pinned
-PASS: authoritative source tree contains no StS2/proprietary runtime payload
-PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
-
-VALIDATION PASS: 1015 checks
+VALIDATION PASS: 1027 checks

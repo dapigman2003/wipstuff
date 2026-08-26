@@ -27,7 +27,7 @@ PATCH_LOG="artifacts/logs/steamkit-ios-patch.log"
 
 rm -rf artifacts/publish artifacts/Payload
 mkdir -p artifacts/publish artifacts/logs
-export NUGET_PACKAGES="$ROOT/.nuget/packages"
+export NUGET_PACKAGES="${NUGET_PACKAGES:-$HOME/.nuget/packages}"
 rm -rf "$NUGET_PACKAGES/steamkit2/3.4.0"
 mkdir -p "$NUGET_PACKAGES"
 SDK_ROOT="$(xcrun --sdk iphoneos --show-sdk-path)"

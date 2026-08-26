@@ -216,3 +216,14 @@ Step 32.0.2 / 0.0.117 uses a **write-only in-memory** constant-metadata surrogat
 - continue to forbid real-StS2 CLR admission/invocation, Harmony/MonoMod runtime patching, Godot/game startup, native loading, or trusted-install mutation.
 
 A Step-32.0.2 PASS still authorizes only the next separately gated transformed-real-StS2 admission/execution experiment.
+
+
+## Step 32.0.3 — exact-length IL patch; no whole-module Cecil serialization
+
+Physical 0.0.117 is preserved as **1/4 device evidence**: Gate A passed; Gate B stopped before any transformed image because the bounded whole-module Cecil writer discovered unrelated `Sentry 5.0.0.0` Constant-table metadata. The semantic 6+4 rewrite remains untested.
+
+0.0.118 must keep the exact Step-31 method/token/body/site evidence and exact stack-neutral behavior change, but production `RealStS2PrepareMethodRewrite` must not call `ModuleDefinition.Write` or introduce any write-time assembly resolver. It must bind with deferred/rejecting Cecil, verify each selected raw five-byte `call` opcode and metadata token, patch only ten non-overlapping five-byte windows on the private copy, retain exact file length, and fail if any source/transformed byte difference occurs outside those windows. One-argument replacement bytes are `26 00 00 00 00`; two-argument replacement bytes are `26 26 00 00 00`.
+
+Gate C must reopen under the rejecting resolver, prove PrepareMethod 10/0, exact Pop/Nop instructions at original offsets, expected semantic fingerprint, unchanged Constant-table fingerprint, identity/MVID/EH topology, and repeat the raw byte-diff proof. The host fixture includes a Sentry-scoped external enum constant specifically so a future reintroduction of whole-module writer dependency behavior is caught.
+
+Codemagic policy: `step32-fast` contains static validation + complete host suite and must PASS first; `ios-step-32` may omit the repeated host suite only when run on the exact same commit, and must still pass static validation, publish and IPA verification before device installation. Stop at the first failed workflow/gate.
