@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-08-26T02:29:52Z
+UTC: 2026-08-26T02:14:38Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -13,8 +13,8 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 32.0.4 fast-preflight assertion fix static validation
-Root: /mnt/data/StS2Launcher-Step32-0.0.119
+StS2 Launcher — Step 32.0.3 exact-length private IL patch static validation
+Root: /Users/builder/clone
 PASS: all 10 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 236 C# files
@@ -24,10 +24,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 119
-PASS: display version is 0.0.119
-PASS: Info.plist build version is 119
-PASS: Info.plist display version is 0.0.119
+PASS: build version is 118
+PASS: display version is 0.0.118
+PASS: Info.plist build version is 118
+PASS: Info.plist display version is 0.0.118
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -35,10 +35,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 32.0.4 candidate
+PASS: top launcher banner identifies active Step 32.0.3 candidate
 PASS: top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 32.0.4 source pins expected bundle release identity
+PASS: Step 32.0.3 source pins expected bundle release identity
 PASS: Step 27.0.14 source pins the bounded Gate-S implementation marker
 PASS: Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker
 PASS: RootViewController consumes the single current-release presentation source
@@ -774,7 +774,6 @@ PASS: Step 32.0.3 forbids broad Cecil resolver/search fallback and whole-module 
 PASS: Step 32.0.3 verifies unrelated Constant-table semantics remain unchanged by the raw IL patch
 PASS: Step 32 host regression carries unrelated external-enum metadata while proving production avoids Cecil serialization
 PASS: Step 32 host regressions prove private-only rewrite and branch-target refusal
-PASS: Step 32.0.4 host regression pins exact padded five-byte detail strings and removes stale unpadded assertion
 PASS: iOS UI persists the dedicated Step-32 physical report
 PASS: RootViewController wires Step 32 into the active device surface
 PASS: release presentation pins the Step-32 exact-length first-real-rewrite boundary
@@ -816,11 +815,6 @@ PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.2-TEST.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.3-EXACT-LENGTH-IL-PATCH-AND-CI-FAST-PREFLIGHT.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.3-TEST.md
-PASS: authoritative documentation exists: docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt
-PASS: authoritative documentation exists: docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-STATIC-VALIDATION.txt
-PASS: authoritative documentation exists: docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt
-PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.4-FAST-PREFLIGHT-ASSERTION-FIX.md
-PASS: authoritative documentation exists: docs/history/steps/STEP-32.0.4-TEST.md
 PASS: authoritative documentation exists: docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt
@@ -962,12 +956,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.117 report preserves the unexpected Sentry constant-scope stop before write
 PASS: regression contracts pin exact-length Step-32 writing and same-commit two-workflow CI discipline
-PASS: raw 0.0.118 fast host report proves exact-length Gate B succeeded and only stale assertion wording failed at 230/231
-PASS: raw 0.0.118 fast static report preserves 1027/1027 PASS
-PASS: raw 0.0.118 fast timings prove failure stopped before device CI
-PASS: regression contracts pin Step-32.0.4 as a production-unchanged test assertion + failure-telemetry correction
-PASS: fast and device Codemagic workflows preserve cache-size telemetry on both success and failure
-PASS: current status preserves physical baselines and records the fast-preflight test-only Step-32 correction
+PASS: current status preserves physical baselines and advances the exact-length Step-32 correction
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
 PASS: master plan contains durable section: Authority model
@@ -1055,4 +1044,4 @@ PASS: Step 32 implementation, active release wiring, and evidence docs are hash-
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1038 checks
+VALIDATION PASS: 1027 checks

@@ -62,7 +62,8 @@ public sealed class RealStS2PrepareMethodRewriteTests
         StringAssert.Contains(gateA.Detail, "PrepareMethod sites rebound: 10/10");
         StringAssert.Contains(gateB.Detail, "One-argument sites rewritten: 6/6");
         StringAssert.Contains(gateB.Detail, "Two-argument sites rewritten: 4/4");
-        StringAssert.Contains(gateB.Detail, "PrepareMethod(handle, instantiation[]) -> Pop + Pop");
+        StringAssert.Contains(gateB.Detail, "PrepareMethod(handle) 5-byte call -> Pop + Nop + Nop + Nop + Nop");
+        StringAssert.Contains(gateB.Detail, "PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop");
         StringAssert.Contains(gateB.Detail, "Patch windows: 10 x exactly 5 bytes");
         StringAssert.Contains(gateB.Detail, "Cecil serialization performed: NO");
         StringAssert.Contains(gateB.Detail, "All bytes outside the ten approved call windows unchanged: YES");

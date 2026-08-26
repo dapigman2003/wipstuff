@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 32.0.3 exact-length private IL patch static validation")
+print("StS2 Launcher — Step 32.0.4 fast-preflight assertion fix static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>118</ApplicationVersion>" in project_text, "build version is 118")
-require("<ApplicationDisplayVersion>0.0.118</ApplicationDisplayVersion>" in project_text, "display version is 0.0.118")
-require(plist.get("CFBundleVersion") == "118", "Info.plist build version is 118")
-require(plist.get("CFBundleShortVersionString") == "0.0.118", "Info.plist display version is 0.0.118")
+require("<ApplicationVersion>119</ApplicationVersion>" in project_text, "build version is 119")
+require("<ApplicationDisplayVersion>0.0.119</ApplicationDisplayVersion>" in project_text, "display version is 0.0.119")
+require(plist.get("CFBundleVersion") == "119", "Info.plist build version is 119")
+require(plist.get("CFBundleShortVersionString") == "0.0.119", "Info.plist display version is 0.0.119")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 32.0.3 — EXACT-LENGTH PRIVATE IL PATCH" in release_presentation, "top launcher banner identifies active Step 32.0.3 candidate")
+require("STEP 32.0.4 — FAST-PREFLIGHT ASSERTION FIX" in release_presentation, "top launcher banner identifies active Step 32.0.4 candidate")
 require("STEP 31 CLOSED POSITIVE 4/4" in release_presentation and "0x06007D05" in release_presentation and "PrepareMethod" in release_presentation and "private" in release_presentation.lower() and "no real-sts2 clr load" in release_presentation.lower(), "top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.118"' in release_presentation and 'ExpectedBuildVersion = "118"' in release_presentation, "Step 32.0.3 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.119"' in release_presentation and 'ExpectedBuildVersion = "119"' in release_presentation, "Step 32.0.4 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
 require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "post-publish interpreted Target+Prefix fixture" in release_presentation and "fresh processor via Harmony.CreateProcessor(MethodBase)" in release_presentation and "exactly one Patch()" in release_presentation, "Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
@@ -343,8 +343,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-32.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.118",
-    "STS2_BUILD_VERSION": "118",
+    "STS2_DISPLAY_VERSION": "0.0.119",
+    "STS2_BUILD_VERSION": "119",
     "STS2_RUNTIME_POLICY_MARKER": "STEP32 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1308,6 +1308,7 @@ require("DefaultAssemblyResolver" not in step32_source and "AddSearchDirectory" 
 require("ComputeConstantMetadataFingerprint" in step32_source and "source/transformed constant metadata semantics changed" in step32_source and "ExpectedConstantMetadataSha256" in step32_source, "Step 32.0.3 verifies unrelated Constant-table semantics remain unchanged by the raw IL patch")
 require("SyntheticExternalEnum" in step32_tests and "Sentry" in step32_tests and "MultiAssemblyResolver" in step32_tests and "Cecil serialization performed: NO" in step32_tests, "Step 32 host regression carries unrelated external-enum metadata while proving production avoids Cecil serialization")
 require("ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly" in step32_tests and "CollectionAssert.AreEqual(before, after)" in step32_tests and "CountPrepareMethod(transformedMethod)" in step32_tests and "BranchTargetedPrepareMethodSiteIsRejectedBeforeAnyRewrite" in step32_tests, "Step 32 host regressions prove private-only rewrite and branch-target refusal")
+require("PrepareMethod(handle) 5-byte call -> Pop + Nop + Nop + Nop + Nop" in step32_tests and "PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop" in step32_tests and 'StringAssert.Contains(gateB.Detail, "PrepareMethod(handle, instantiation[]) -> Pop + Pop");' not in step32_tests, "Step 32.0.4 host regression pins exact padded five-byte detail strings and removes stale unpadded assertion")
 require("Step32-RealStS2PrepareMethodRewrite.txt" in step32_ui and "REAL STS2 PREPAREMETHOD REWRITE" in step32_ui, "iOS UI persists the dedicated Step-32 physical report")
 require("new RealStS2PrepareMethodRewrite(_launcherDataRoot)" in root_ui_text and "AddRealStS2PrepareMethodRewriteControls(content)" in root_ui_text, "RootViewController wires Step 32 into the active device surface")
 require("Step32ImplementationMarker" in release_presentation and "ten raw 5-byte call opcode+token windows" in release_presentation and "equal-length Pop/Nop byte patch only" in release_presentation and "zero CLR load" in release_presentation, "release presentation pins the Step-32 exact-length first-real-rewrite boundary")
@@ -1346,6 +1347,11 @@ required_docs = [
     "docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt",
     "docs/history/steps/STEP-32.0.3-EXACT-LENGTH-IL-PATCH-AND-CI-FAST-PREFLIGHT.md",
     "docs/history/steps/STEP-32.0.3-TEST.md",
+    "docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt",
+    "docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-STATIC-VALIDATION.txt",
+    "docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt",
+    "docs/history/steps/STEP-32.0.4-FAST-PREFLIGHT-ASSERTION-FIX.md",
+    "docs/history/steps/STEP-32.0.4-TEST.md",
     "docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt",
     "docs/history/reports/STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt",
     "docs/history/reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt",
@@ -1525,9 +1531,17 @@ require("## Step 32.0.2 — bounded Cecil write-time constant-metadata resolver"
 step32_physical_scope_failure = read("docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt")
 require("App version: 0.0.117 (117)" in step32_physical_scope_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_scope_failure and "Gate B — DeterministicStackNeutralRewrite: FAIL" in step32_physical_scope_failure and "Sentry, Version=5.0.0.0" in step32_physical_scope_failure, "raw physical 0.0.117 report preserves the unexpected Sentry constant-scope stop before write")
 require("## Step 32.0.3 — exact-length IL patch; no whole-module Cecil serialization" in regression_contracts and "26 00 00 00 00" in regression_contracts and "26 26 00 00 00" in regression_contracts and "step32-fast" in regression_contracts, "regression contracts pin exact-length Step-32 writing and same-commit two-workflow CI discipline")
+step32_fast_host_failure = read("docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt")
+step32_fast_static = read("docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-STATIC-VALIDATION.txt")
+step32_fast_timings = read("docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt")
+require("Total tests: 231" in step32_fast_host_failure and "Passed: 230" in step32_fast_host_failure and "Failed: 1" in step32_fast_host_failure and "ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly" in step32_fast_host_failure and "PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop" in step32_fast_host_failure and 'expected substring: "PrepareMethod(handle, instantiation[]) -> Pop + Pop"' in step32_fast_host_failure, "raw 0.0.118 fast host report proves exact-length Gate B succeeded and only stale assertion wording failed at 230/231")
+require("VALIDATION PASS: 1027 checks" in step32_fast_static, "raw 0.0.118 fast static report preserves 1027/1027 PASS")
+require("Ensure pinned .NET SDK                13s status=0" in step32_fast_timings and "Canonical static validation            1s status=0" in step32_fast_timings and "Complete host regression suite        13s status=1" in step32_fast_timings, "raw 0.0.118 fast timings prove failure stopped before device CI")
+require("## Step 32.0.4 — fast-preflight assertion correction" in regression_contracts and "production `RealStS2PrepareMethodRewrite.cs` byte-for-byte from 0.0.118" in regression_contracts and "authorize no physical test unless fast passes" in regression_contracts and "EXIT trap" in regression_contracts, "regression contracts pin Step-32.0.4 as a production-unchanged test assertion + failure-telemetry correction")
+require("trap 'sts2_report_cache_sizes' EXIT" in read("scripts/codemagic-fast.sh") and "trap 'sts2_report_cache_sizes' EXIT" in read("scripts/codemagic-device.sh"), "fast and device Codemagic workflows preserve cache-size telemetry on both success and failure")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.3 / 0.0.118 (118)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "Sentry" in current_status and "step32-fast" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines and advances the exact-length Step-32 correction")
+require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.4 / 0.0.119 (119)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "Sentry" in current_status and "step32-fast" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines and records the fast-preflight test-only Step-32 correction")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

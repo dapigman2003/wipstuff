@@ -1,9 +1,9 @@
-# Release Checklist — Step 32.0.3
+# Release Checklist — Step 32.0.4
 
 ## Candidate identity
 
-- step/candidate: **Step 32.0.3**
-- version: `0.0.118 (118)`
+- step/candidate: **Step 32.0.4**
+- version: `0.0.119 (119)`
 - fast workflow: `step32-fast`
 - device workflow: `ios-step-32`
 - IPA: `artifacts/StS2-Launcher-Step-32.ipa`
@@ -11,12 +11,12 @@
 
 ## Required before device install
 
-- [ ] run `step32-fast` and require canonical static validation + complete host suite PASS;
+- [ ] run `step32-fast` and require canonical static validation + complete host suite PASS; preserve phase timings and failure-safe cache-size telemetry;
 - [ ] record its exact `CM_COMMIT` from `fast-preflight-summary.txt`;
 - [ ] only then run `ios-step-32` on the exact same commit;
 - [ ] require device-workflow static validation, iOS publish, and IPA verification PASS;
 - [ ] confirm both workflow summaries show the same commit;
-- [ ] release identity is exactly `0.0.118 (118)`;
+- [ ] release identity is exactly `0.0.119 (119)`;
 - [ ] no proprietary StS2 payload is packaged in source artifacts.
 
 ## Physical Step-32 acceptance

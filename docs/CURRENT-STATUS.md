@@ -1,12 +1,16 @@
-# Current Status — Step 32.0.3 Exact-Length Private IL Patch
+# Current Status — Step 32.0.4 Fast-Preflight Assertion Fix
 
-## Active candidate — Step 32.0.3 / 0.0.118 (118)
+## Active candidate — Step 32.0.4 / 0.0.119 (119)
 
 Physical baseline: Steps 01–26 closed; Step 27 CLOSED NEGATIVE; Step 28 CLOSED POSITIVE 5/5; Steps 29, 30, and 31 CLOSED POSITIVE 4/4. Step 31 authorized explicit rewrite design for the exact receipt-backed `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` token `0x06007D05`, body SHA-256 `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`, and ten `RuntimeHelpers.PrepareMethod` sites.
 
 The Step-32 semantic change remains **6 × one-argument calls consume one value** and **4 × two-argument calls consume two values**. The trusted Step-12 install remains immutable and Step 32 still performs no real-StS2 CLR load/invocation.
 
 Physical 0.0.116 passed Gate A then failed Gate B because whole-module Cecil serialization requested unrelated `System.Runtime` Constant-table enum metadata. 0.0.117 intentionally bounded that request to an in-memory surrogate, but physical 0.0.117 again passed Gate A and then failed closed **before writing** when the pre-scan found another unrelated scope: `Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0`. This shows that continuing to extend a Cecil writer resolver would broaden dependency handling for metadata unrelated to the ten selected call sites. Preserve `docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt`.
+
+Codemagic 0.0.118 then validated the new fast-preflight discipline: pinned SDK setup 13s, static validation 1s at 1027/1027 PASS, and the complete 231-test host suite 13s. The suite finished 230/231 because `ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly` still asserted the old detail substring `PrepareMethod(handle, instantiation[]) -> Pop + Pop`. The actual Gate-B result in that same test already reported the intended 6/6 + 4/4 exact-length patch, `Patch windows: 10 x exactly 5 bytes`, zero Cecil serialization, and byte-diff confinement. This is a test-contract wording defect only. No device workflow or physical test is authorized for 0.0.118. Preserve `docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt`.
+
+Step 32.0.4 / 0.0.119 corrects the stale host assertion to require the exact padded five-byte one-argument and two-argument detail strings. It also makes `cache-sizes.txt` failure-safe via an EXIT trap in both Codemagic scripts, because the 0.0.118 fast failure exited before the previous end-of-script telemetry call. Production Step-32 code, raw-patch semantics, CI authority split, physical A-D boundary, and architecture are unchanged.
 
 Step 32.0.3 removes whole-module serialization from this candidate. Cecil remains the exact binding/reopen-verification authority. Gate B maps the verified method RVA to PE bytes, proves all ten selected instructions are exact five-byte `call` opcode+token windows, and replaces only those windows on the launcher-private copy with equal-length `Pop/Nop` sequences. File length, later IL offsets, branch displacements, EH boundaries, metadata tables and PE layout remain unchanged by construction. A full source/transformed byte comparison rejects any difference outside the fifty approved bytes. Gate C reopens with the rejecting resolver and verifies 10→0 PrepareMethod references, exact padded Pop/Nop semantics, unchanged constant metadata/identity/MVID/EH, and the same byte-diff confinement.
 

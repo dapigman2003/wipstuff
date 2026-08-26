@@ -6,7 +6,7 @@ Current on-device diagnostics write output-only text beneath `Documents/StS2Laun
 
 `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`
 
-For Step 32.0.3 / 0.0.118 it records exact source/evidence binding, private-clone provenance, the ten verified five-byte raw call windows, the 6/6 + 4/4 stack-neutral `Pop/Nop` replacements, whole-image byte-diff confinement, reopened 10→0 `PrepareMethod` verification, source/transformed semantic fingerprints, and final OfflineReady/no-CLR-load isolation. Cecil remains the binding/reopen-verification authority; this candidate performs no Cecil whole-module serialization.
+For Step 32.0.4 / 0.0.119 it records exact source/evidence binding, private-clone provenance, the ten verified five-byte raw call windows, the 6/6 + 4/4 stack-neutral `Pop/Nop` replacements, whole-image byte-diff confinement, reopened 10→0 `PrepareMethod` verification, source/transformed semantic fingerprints, and final OfflineReady/no-CLR-load isolation. Cecil remains the binding/reopen-verification authority; this candidate performs no Cecil whole-module serialization.
 
 ## Codemagic reports
 
@@ -18,6 +18,8 @@ Both `step32-fast` and `ios-step-32` emit `artifacts/reports/phase-timings.txt` 
 - `docs/history/reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt` — preserved 0.0.115 static authority report.
 - `docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt` — physical 0.0.116: Gate A PASS; Gate B stopped when Cecil whole-module serialization requested `System.Runtime 9.0.0.0` Constant-table metadata; no CLR admission.
 - `docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt` — physical 0.0.117: Gate A PASS; Gate B failed closed before writing after the bounded pre-scan discovered unrelated `Sentry 5.0.0.0` constant metadata.
+- `docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt` — 0.0.118 fast preflight: 1027/1027 static PASS; complete host suite 230/231; exact-length Step-32 Gate B succeeded in the fixture and the only failure was a stale test-only detail-string assertion. No device workflow was run.
+- `docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt` — raw 0.0.118 timing proof: SDK 13s, static 1s, complete host suite 13s; failure stopped before iOS work.
 
 ## Earlier physically closed evidence
 

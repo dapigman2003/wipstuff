@@ -10,3 +10,6 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-29.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.112 Step-29 report: A–D 4/4, exact selected `ModManager.TryLoadMod(Mod) -> Harmony.PatchAll(Assembly)` fingerprint, zero source mutation/CLR load, OfflineReady 428/428.
 - `STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt` — raw 0.0.115 Codemagic report: 996/996 static validation, successful compile, 230/231 host tests; Gate C rejected an invalid pre-serialization offset-sensitive body-fingerprint prediction after the private rewrite was written.
 - `STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt` — raw 0.0.115 canonical static-validation report: 996/996 PASS before the host suite exposed the Gate-C serialization-verifier defect.
+- `STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt` — raw 0.0.118 fast-preflight host report: 230/231; exact-length Gate B completed and only a stale test-only detail assertion failed.
+- `STEP-32.0.3-CODEMAGIC-FAST-STATIC-VALIDATION.txt` — raw 0.0.118 fast-preflight static report: 1027/1027 PASS.
+- `STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt` — raw 0.0.118 fast timings: SDK 13s, static 1s, complete host suite 13s; no device CI consumed.

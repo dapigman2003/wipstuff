@@ -1,0 +1,5 @@
+StS2 Launcher Codemagic phase timings
+UTC start: 2026-08-26T02:14:24Z
+Ensure pinned .NET SDK                13s status=0
+Canonical static validation            1s status=0
+Complete host regression suite        13s status=1

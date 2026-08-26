@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 32.0.3 — EXACT-LENGTH PRIVATE IL PATCH";
+        "STEP 32.0.4 — FAST-PREFLIGHT ASSERTION FIX";
 
     public const string MilestoneLine =
         "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 FIRST REAL STS2 REWRITE";
 
     public const string Summary =
-        "Physical 0.0.114 closed Step 31 positively at 4/4 and confirmed the exact OneTimeInitialization::PrewarmJit() token 0x06007D05/body fingerprint and ten RuntimeHelpers.PrepareMethod sites. Physical 0.0.116 and 0.0.117 then proved whole-module Cecil serialization pulls unrelated external Constant-table metadata (System.Runtime, then Sentry) into a ten-call rewrite. Step 32.0.3 keeps the exact 6+4 stack-neutral behavior change but removes Cecil serialization: Gate B binds the exact sites with deferred/rejecting Cecil, verifies each raw 5-byte call opcode+token, and replaces only those ten 5-byte windows on the launcher-private copy with equal-length Pop/Nop sequences. Gate C reopens with Cecil and proves 10->0 PrepareMethod references, exact padded semantics, unchanged metadata, and no byte changes outside the approved windows. No real-StS2 CLR load occurs in this build.";
+        "Physical 0.0.114 closed Step 31 positively at 4/4 and confirmed the exact OneTimeInitialization::PrewarmJit() token 0x06007D05/body fingerprint and ten RuntimeHelpers.PrepareMethod sites. Physical 0.0.116 and 0.0.117 then proved whole-module Cecil serialization pulls unrelated external Constant-table metadata (System.Runtime, then Sentry) into a ten-call rewrite. Step 32.0.3 removed Cecil serialization and its 0.0.118 fast preflight proved the exact-length rewrite executes on the synthetic Sentry-scoped fixture; the only host failure was a stale test-only detail-string assertion. Step 32.0.4 keeps the exact same 6+4 stack-neutral implementation: Gate B binds the exact sites with deferred/rejecting Cecil, verifies each raw 5-byte call opcode+token, and replaces only those ten 5-byte windows on the launcher-private copy with equal-length Pop/Nop sequences. Gate C reopens with Cecil and proves 10->0 PrepareMethod references, exact padded semantics, unchanged metadata, and no byte changes outside the approved windows. No real-StS2 CLR load occurs in this build.";
 
     public const string InitialStatus =
-        "Status: Step 31 remains CLOSED POSITIVE 4/4. Physical 0.0.117 reached Step-32 Gate A PASS then failed closed before writing because the bounded Cecil writer discovered another unrelated external constant scope: Sentry 5.0.0.0. Build 0.0.118 is Step 32.0.3: no ModuleDefinition.Write, no dependency resolver expansion, exact-length raw IL patch only. To conserve Codemagic free M2 minutes, run step32-fast first; only if it passes on the exact commit run ios-step-32, and install the IPA only after that device workflow also passes. Preserve both CI summaries plus Step32-RealStS2PrepareMethodRewrite.txt.";
+        "Status: Step 31 remains CLOSED POSITIVE 4/4. Physical 0.0.117 reached Step-32 Gate A PASS then failed closed before writing because the bounded Cecil writer discovered another unrelated external constant scope: Sentry 5.0.0.0. Build 0.0.119 is Step 32.0.4: the production exact-length raw IL patch is unchanged; only the stale host assertion was corrected to the exact padded five-byte detail contract. The 0.0.118 fast workflow stopped in 27 seconds before any device build. To conserve Codemagic free M2 minutes, run step32-fast first; only if it passes on the exact commit run ios-step-32, and install the IPA only after that device workflow also passes. Preserve both CI summaries plus Step32-RealStS2PrepareMethodRewrite.txt.";
 
-    public const string ExpectedDisplayVersion = "0.0.118";
-    public const string ExpectedBuildVersion = "118";
+    public const string ExpectedDisplayVersion = "0.0.119";
+    public const string ExpectedBuildVersion = "119";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =

@@ -1,6 +1,6 @@
-# Testing — Step 32.0.3 Exact-Length Private IL Patch
+# Testing — Step 32.0.4 Fast-Preflight Assertion Fix
 
-Active candidate: Step 32.0.3 / `0.0.118 (118)`.
+Active candidate: Step 32.0.4 / `0.0.119 (119)`.
 
 ## Authority sequence optimized for Codemagic free M2 minutes
 
@@ -12,7 +12,9 @@ Active candidate: Step 32.0.3 / `0.0.118 (118)`.
 
 Both workflows produce `artifacts/reports/phase-timings.txt` and `cache-sizes.txt`. Cached inputs include `$HOME/.nuget/packages`, the pinned Harmony-Fat regression archive, a pristine pinned .NET SDK snapshot, and the existing Godot archive on the device workflow.
 
-## Step 32.0.3 regression focus
+## Step 32.0.4 regression focus
+
+0.0.118 fast preflight proved the complete host loop can fail in tens of seconds rather than consuming a device-build cycle: 1027/1027 static PASS, then 230/231 host tests with only a stale detail-string assertion. 0.0.119 must require both exact padded report strings: `PrepareMethod(handle) 5-byte call -> Pop + Nop + Nop + Nop + Nop` and `PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop`. Production Step-32 code is unchanged. Both Codemagic scripts must emit `cache-sizes.txt` on success or failure via the shared cache-size reporter registered as an EXIT trap.
 
 Production Gate B must contain **no `ModuleDefinition.Write` path**. It must:
 

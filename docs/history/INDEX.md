@@ -161,3 +161,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt` — raw physical 0.0.117 report: Gate A PASS; Gate B failed closed before write after whole-module Cecil serialization preflight discovered unrelated `Sentry 5.0.0.0` Constant-table scope.
 - `steps/STEP-32.0.3-EXACT-LENGTH-IL-PATCH-AND-CI-FAST-PREFLIGHT.md` — 0.0.118 removes Cecil serialization from the ten-call rewrite, uses exact five-byte private-copy IL patch windows, and splits free-tier Codemagic into fast host preflight + device candidate workflows.
 - `steps/STEP-32.0.3-TEST.md` — same-commit two-workflow CI discipline and physical A–D acceptance procedure.
+
+- `reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt` — raw 0.0.118 fast-preflight report: 1027/1027 static PASS and 230/231 host tests; the exact-length rewrite fixture reached successful Gate B and only a stale test-only detail substring failed.
+- `reports/STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt` — raw 0.0.118 fast-preflight timings proving the stop occurred before device CI (13s SDK, 1s static, 13s full host suite).
+- `steps/STEP-32.0.4-FAST-PREFLIGHT-ASSERTION-FIX.md` — 0.0.119 test-only correction: pin the exact padded five-byte Gate-B detail strings; production Step-32 rewrite and CI/device boundaries unchanged.
+- `steps/STEP-32.0.4-TEST.md` — same-commit fast→device→physical acceptance procedure for 0.0.119.

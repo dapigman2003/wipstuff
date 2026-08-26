@@ -8,6 +8,7 @@ mkdir -p artifacts/reports artifacts/logs artifacts/test-results
 [[ "$(uname -s)" == "Darwin" ]] || { echo "ERROR: iOS device candidate build must run on macOS/Xcode." >&2; exit 2; }
 
 sts2_timing_init
+trap 'sts2_report_cache_sizes' EXIT
 sts2_write_environment_report "DEVICE CANDIDATE"
 sts2_run_timed "Ensure pinned .NET SDK" sts2_ensure_dotnet
 # The complete host suite is deliberately not repeated here. The user must run step32-fast
@@ -38,7 +39,6 @@ install_ios_workload() {
 sts2_run_timed "Install pinned iOS workload" install_ios_workload
 sts2_run_timed "Build iOS app / IPA" bash -c 'set -o pipefail; STS2_SKIP_STATIC_VALIDATION=1 bash scripts/build-ios.sh 2>&1 | tee artifacts/reports/ios-build.txt'
 sts2_run_timed "Verify IPA" bash scripts/verify-ipa.sh "$STS2_IPA_REL"
-sts2_report_cache_sizes
 
 {
   echo "StS2 Launcher iOS — Step 32 DEVICE CANDIDATE PASS"
