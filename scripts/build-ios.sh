@@ -18,8 +18,6 @@ FIXTURE_DLL="$ROOT/fixtures/StS2Launcher.Step16.Fixture/bin/Release/net9.0/StS2L
 STEP20_DYNAMIC_DLL="$ROOT/fixtures/StS2Launcher.Step20.DynamicFixture/bin/Release/net9.0/StS2Launcher.Step20.DynamicFixture.dll"
 STEP20_DEPENDENCY_DLL="$ROOT/fixtures/StS2Launcher.Step20.DependencyFixture/bin/Release/net9.0/StS2Launcher.Step20.DependencyFixture.dll"
 STEP20_ROOT_DLL="$ROOT/fixtures/StS2Launcher.Step20.RootFixture/bin/Release/net9.0/StS2Launcher.Step20.RootFixture.dll"
-STEP27_INTERPRETED_FIXTURE_PROJECT="fixtures/StS2Launcher.Step27.InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.csproj"
-STEP27_INTERPRETED_FIXTURE_DLL="$ROOT/fixtures/StS2Launcher.Step27.InterpretedPatchFixture/bin/Release/net9.0/StS2Launcher.Step27.InterpretedPatchFixture.dll"
 STEP28_AHEAD_OF_LOAD_FIXTURE_PROJECT="fixtures/StS2Launcher.Step28.AheadOfLoadFixture/StS2Launcher.Step28.AheadOfLoadFixture.csproj"
 STEP28_AHEAD_OF_LOAD_FIXTURE_DLL="$ROOT/fixtures/StS2Launcher.Step28.AheadOfLoadFixture/bin/Release/net9.0/StS2Launcher.Step28.AheadOfLoadFixture.dll"
 PUBLISH_LOG="artifacts/logs/ios-publish.log"
@@ -60,13 +58,9 @@ for project in \
   dll="${project%/*.csproj}/bin/Release/net9.0/$(basename "${project%.csproj}").dll"
   [[ -f "$dll" ]] || dotnet build "$project" -c Release --nologo
 done
-# Step 27.0.24 decision fixture is always rebuilt from source before iOS publish, but it is
-# deliberately NOT an iOS project/content reference. Only its finished DLL is copied into
-# the .app after dotnet publish returns, keeping it outside the iOS AOT/publish input graph.
-dotnet build "$STEP27_INTERPRETED_FIXTURE_PROJECT" -c Release --nologo
-# Step 28.0 source fixture is also built separately and remains outside the iOS project/AOT graph.
-dotnet build "$STEP28_AHEAD_OF_LOAD_FIXTURE_PROJECT" -c Release --nologo
-for fixture in "$FIXTURE_DLL" "$STEP20_DYNAMIC_DLL" "$STEP20_DEPENDENCY_DLL" "$STEP20_ROOT_DLL" "$STEP27_INTERPRETED_FIXTURE_DLL" "$STEP28_AHEAD_OF_LOAD_FIXTURE_DLL"; do
+# Step 28.0 source fixture remains outside the iOS project/AOT graph. Host tests normally built it already.
+[[ -f "$STEP28_AHEAD_OF_LOAD_FIXTURE_DLL" ]] || dotnet build "$STEP28_AHEAD_OF_LOAD_FIXTURE_PROJECT" -c Release --nologo
+for fixture in "$FIXTURE_DLL" "$STEP20_DYNAMIC_DLL" "$STEP20_DEPENDENCY_DLL" "$STEP20_ROOT_DLL" "$STEP28_AHEAD_OF_LOAD_FIXTURE_DLL"; do
   [[ -f "$fixture" ]] || { echo "ERROR: required project-owned fixture missing: $fixture" >&2; exit 11; }
 done
 
@@ -84,7 +78,6 @@ set -e
 grep -Fq "$STS2_RUNTIME_POLICY_MARKER MtouchInterpreter=-all" "$PUBLISH_LOG" || { echo "ERROR: runtime-policy telemetry missing." >&2; exit 15; }
 grep -Fq "STEP32 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" "$PUBLISH_LOG" || { echo "ERROR: proven System.Collections.Concurrent preservation telemetry missing." >&2; exit 15; }
 grep -Fq "STEP32 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" "$PUBLISH_LOG" || { echo "ERROR: Step 32 copy/no-link dynamic-payload trimming telemetry missing." >&2; exit 15; }
-grep -Fq "STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" "$PUBLISH_LOG" || { echo "ERROR: historical Harmony-constructor framework-preservation telemetry missing." >&2; exit 15; }
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'UseInterpreter=true'; then echo "ERROR: broad UseInterpreter=true policy resolved." >&2; exit 15; fi
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'PublishAot=true'; then echo "ERROR: NativeAOT unexpectedly enabled." >&2; exit 15; fi
 BEFORE_LINE="$(grep 'STEP05.2 LINKER FRAMEWORKS BEFORE:' "$PUBLISH_LOG" | tail -1 || true)"
@@ -92,9 +85,9 @@ AFTER_LINE="$(grep 'STEP05.2 LINKER FRAMEWORKS AFTER:' "$PUBLISH_LOG" | tail -1 
 [[ "$BEFORE_LINE" == *DiskArbitration* && "$AFTER_LINE" != *DiskArbitration* ]] || { echo "ERROR: DiskArbitration filter regression." >&2; exit 8; }
 [[ -d "$APP" ]] || { echo "ERROR: expected app bundle missing: $APP" >&2; exit 9; }
 
-rm -rf "$APP/Step15GodotSmokeProject" "$APP/Step16Fixtures" "$APP/Step20DynamicFixtures" "$APP/Step27InterpretedPatchFixture" "$APP/Step28AheadOfLoadFixture"
+rm -rf "$APP/Step15GodotSmokeProject" "$APP/Step16Fixtures" "$APP/Step20DynamicFixtures" "$APP/Step28AheadOfLoadFixture"
 cp -R "$ROOT/native/step15/smoke_project" "$APP/Step15GodotSmokeProject"
-mkdir -p "$APP/Step16Fixtures" "$APP/Step20DynamicFixtures" "$APP/Step27InterpretedPatchFixture" "$APP/Step28AheadOfLoadFixture"
+mkdir -p "$APP/Step16Fixtures" "$APP/Step20DynamicFixtures" "$APP/Step28AheadOfLoadFixture"
 cp "$FIXTURE_DLL" "$APP/Step16Fixtures/StS2Launcher.Step16.Fixture.dll"
 cp "$STEP20_DYNAMIC_DLL" "$APP/Step20DynamicFixtures/StS2Launcher.Step20.DynamicFixture.dll"
 cp "$STEP20_DEPENDENCY_DLL" "$APP/Step20DynamicFixtures/StS2Launcher.Step20.DependencyFixture.dll"
@@ -102,11 +95,6 @@ cp "$STEP20_ROOT_DLL" "$APP/Step20DynamicFixtures/StS2Launcher.Step20.RootFixtur
 (
   cd "$APP/Step20DynamicFixtures"
   shasum -a 256 StS2Launcher.Step20.DynamicFixture.dll StS2Launcher.Step20.DependencyFixture.dll StS2Launcher.Step20.RootFixture.dll > step20-fixtures.sha256
-)
-cp "$STEP27_INTERPRETED_FIXTURE_DLL" "$APP/Step27InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.dll"
-(
-  cd "$APP/Step27InterpretedPatchFixture"
-  shasum -a 256 StS2Launcher.Step27.InterpretedPatchFixture.dll > step27-interpreted-patch-fixture.sha256
 )
 cp "$STEP28_AHEAD_OF_LOAD_FIXTURE_DLL" "$APP/Step28AheadOfLoadFixture/StS2Launcher.Step28.AheadOfLoadFixture.dll"
 (

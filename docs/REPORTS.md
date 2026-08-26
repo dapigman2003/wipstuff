@@ -6,10 +6,11 @@ Current on-device diagnostics write output-only text beneath `Documents/StS2Laun
 
 `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`
 
-It records exact source/evidence binding, private-clone provenance, the 6/6 + 4/4 stack-neutral rewrite, the bounded write-only System.Runtime constant-metadata surrogate request count, source/transformed method and Constant-table semantic fingerprints, 10→0 PrepareMethod verification, and final OfflineReady/no-CLR-load isolation.
+0.0.118 leaves this Step-32 runtime report implementation unchanged; the maintenance candidate is intended primarily for CI/build-surface measurement. The latest physical report is the 0.0.117 Gate-A PASS / Gate-B Sentry-scope fail-closed result preserved below.
 
-## Physically closed evidence
+## Physical and closed evidence
 
+- `docs/history/reports/STEP-32.0.2-PHYSICAL-SENTRY-CONSTANT-METADATA-FAILURE.txt` — raw physical 0.0.117 report: Gate A PASS, Gate B rejected exact `Sentry 5.0.0.0` external constant metadata before mutation, no CLR admission.
 - `docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt` — raw physical 0.0.116 Step-32 report: Gate A PASS, Gate B `System.Runtime 9.0.0.0` Cecil Constant-table write-resolution failure, no CLR admission.
 - `docs/history/reports/STEP-31.0-PHYSICAL-CLOSURE.txt` — raw physical 0.0.114 Step-31 4/4 report.
 - `docs/history/steps/STEP-31.0-PHYSICAL-CLOSURE.md` — formal Step-31 closure and rewrite-design authorization boundary.

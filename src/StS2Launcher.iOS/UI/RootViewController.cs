@@ -42,10 +42,6 @@ public sealed partial class RootViewController : UIViewController
     private readonly FirstRealGameAssemblyLoadGateSequence _firstRealGameAssemblyLoadGates = new();
     private readonly ControlledManagedInitialization _controlledManagedInitialization;
     private readonly ControlledManagedInitializationGateSequence _controlledManagedInitializationGates = new();
-    private readonly ControlledHarmonyConstruction _controlledHarmonyConstruction;
-    private readonly ControlledHarmonyConstructionGateSequence _controlledHarmonyConstructionGates = new();
-    private readonly ControlledHarmonyProcessorCreation _controlledHarmonyProcessorCreation;
-    private readonly ControlledHarmonyProcessorCreationGateSequence _controlledHarmonyProcessorCreationGates = new();
     private readonly RealStS2CompatibilityTargetAudit _realStS2CompatibilityTargetAudit;
     private readonly RealStS2CompatibilityTargetAuditGateSequence _realStS2CompatibilityTargetAuditGates = new();
     private readonly RealStS2SelectedTargetSemanticAudit _realStS2SelectedTargetSemanticAudit;
@@ -95,10 +91,6 @@ public sealed partial class RootViewController : UIViewController
     private UILabel? _firstRealGameAssemblyLoadDetailLabel;
     private UILabel? _controlledManagedInitializationResultLabel;
     private UILabel? _controlledManagedInitializationDetailLabel;
-    private UILabel? _controlledHarmonyConstructionResultLabel;
-    private UILabel? _controlledHarmonyConstructionDetailLabel;
-    private UILabel? _controlledHarmonyProcessorCreationResultLabel;
-    private UILabel? _controlledHarmonyProcessorCreationDetailLabel;
     private UILabel? _statusLabel;
     private UILabel? _lifecycleLabel;
     private UITextField? _usernameField;
@@ -129,8 +121,6 @@ public sealed partial class RootViewController : UIViewController
     private UIButton? _runtimeBindingDiagnosticsExportButton;
     private UIButton? _firstRealGameAssemblyLoadButton;
     private UIButton? _controlledManagedInitializationButton;
-    private UIButton? _controlledHarmonyConstructionButton;
-    private UIButton? _controlledHarmonyProcessorCreationButton;
     private UIView? _godotHostContainer;
     private UIButton? _signOutButton;
     private UIButton? _cancelOperationButton;
@@ -170,11 +160,6 @@ public sealed partial class RootViewController : UIViewController
         _hostFrameworkClosureFoundation = new HostFrameworkClosureFoundation(_launcherDataRoot);
         _firstRealGameAssemblyLoad = new FirstRealGameAssemblyLoad(_launcherDataRoot);
         _controlledManagedInitialization = new ControlledManagedInitialization(_launcherDataRoot);
-        _controlledHarmonyConstruction = new ControlledHarmonyConstruction(_launcherDataRoot);
-        _controlledHarmonyProcessorCreation = new ControlledHarmonyProcessorCreation(_launcherDataRoot);
-        _controlledHarmonyPatchExecution = new ControlledHarmonyPatchExecution(
-            _launcherDataRoot,
-            Path.Combine(NSBundle.MainBundle.BundlePath, ControlledHarmonyPatchExecution.InterpretedPatchFixtureDirectoryName));
         _aheadOfLoadManagedTransformation = new AheadOfLoadManagedTransformation(
             _launcherDataRoot,
             Path.Combine(NSBundle.MainBundle.BundlePath, AheadOfLoadManagedTransformation.BundleFixtureDirectoryName));
@@ -694,9 +679,6 @@ public sealed partial class RootViewController : UIViewController
         content.AddArrangedSubview(_firstRealGameAssemblyLoadDetailLabel);
 
         AddControlledManagedInitializationControls(content);
-        AddControlledHarmonyConstructionControls(content);
-        AddControlledHarmonyProcessorCreationControls(content);
-        AddControlledHarmonyPatchExecutionControls(content);
         AddAheadOfLoadManagedTransformationControls(content);
         AddRealStS2CompatibilityTargetAuditControls(content);
         AddRealStS2SelectedTargetSemanticAuditControls(content);

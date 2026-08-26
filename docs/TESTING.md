@@ -1,32 +1,33 @@
-# Testing — Step 32.0.2 Bounded Cecil Write-Metadata Resolver Fix
+# Testing — Step 32.0.3 Retired Harmony Active-Surface Trim
 
-Active candidate: Step 32.0.2 / `0.0.117 (117)`.
+Active candidate: Step 32.0.3 / `0.0.118 (118)`. This is a maintenance-only candidate; the Step-32 rewrite and known Sentry blocker are intentionally unchanged.
 
 ## Authority sequence
 
 1. `scripts/validate.sh` — canonical static policy/provenance validation.
-2. `scripts/test.sh` — complete host regression suite.
-3. `scripts/build-ios.sh` — publish/package the iOS candidate.
-4. `scripts/verify-ipa.sh` — verify release identity, native closure, fixture rules, and IPA structure.
-5. Physical iPhone — final Step-32 A–D authority.
+2. `scripts/test.sh` — active host regression suite, without the retired Step-25–27 Harmony suite or Harmony-Fat network acquisition.
+3. `scripts/build-ios.sh` — publish/package the iOS candidate without the Step-27 interpreted fixture or retired Harmony UI/AOT surface.
+4. `scripts/verify-ipa.sh` — verify release identity, native closure, active fixture rules, and IPA structure.
+5. Compare Codemagic wall-clock/logs against the pre-trim 0.0.117 pipeline.
 
-Release identity remains workflow `ios-step-32`, IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, now version `0.0.117 (117)`.
+Release identity remains workflow `ios-step-32`, IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, now version `0.0.118 (118)`.
 
-### Step 32.0.2 regression focus
+### Maintenance-trim regression focus
 
-The host end-to-end Step-32 fixture must include an unrelated constant whose declared type is an external enum scoped to exact `System.Runtime 9.0.0.0`. Gate B must reproduce Cecil's Constant-table write-time resolution need and satisfy it only through the production in-memory constant-metadata surrogate. The test must still prove source bytes unchanged, exact 10→0 PrepareMethod rewrite, 6+4 Pop semantics, and reopened verification.
+Static/host/package guards must prove:
 
-Static/runtime guards must require:
+- the physically closed Step-25/26/27 runtime-Harmony implementation, dedicated tests, UI, preservation anchors, and Step-27 interpreted fixture are absent from the active source/project/package graph;
+- active scripts contain no Harmony-Fat download, Step-27 fixture build, Step-27 environment variable, or Step-27 IPA payload rule;
+- Step 24 controlled `0Harmony` initialization remains active and protected because it is a separately proven dependency-initialization capability;
+- Step 28 ahead-of-load transformation remains active and its fixture is still built outside the iOS project graph and copied only after publish;
+- `MtouchInterpreter=-all`, `MtouchLink=None`, and `TrimMode=copy` remain unchanged;
+- current Step-29/30/31 physical evidence and Step-32 rewrite implementation remain protected;
+- `RealStS2PrepareMethodRewrite.cs` is unchanged from 0.0.117.
 
-- `ReadingMode.Deferred` and rejecting resolvers for source admission and reopened verification;
-- no `DefaultAssemblyResolver`, search directories, framework file probing, `Assembly.Load`, `LoadFromStream`, `LoadFromAssemblyPath`, or `LoadFromAssemblyName` in Step 32;
-- the only Gate-B write-time assembly identity permitted is exact `System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a`;
-- the write resolver synthesizes only constant enum metadata from values already present in the verified source module;
-- zero external framework/game assembly bytes are opened by that resolver;
-- source/transformed Constant-table semantic fingerprints match exactly;
-- the offset-independent transformed method semantic fingerprint remains the pre-write→reopen IL invariant;
-- the physical transformed body hash remains post-write evidence only.
+### Known physical Step-32 state
 
-### Physical acceptance
+Physical 0.0.117 passed Gate A and failed Gate B before mutation on unexpected external constant-metadata scope `Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0`. This maintenance candidate does not correct that boundary.
 
-Force-quit before running Step 32. Require A–D **4/4 PASS**. Gate B should report 6/6 + 4/4 replacements plus only exact System.Runtime synthetic write-time resolution; Gate C should report PrepareMethod references **10 / 0** and identical source/transformed constant-metadata fingerprints; Gate D must re-prove OfflineReady and immutable source/no-CLR isolation.
+A physical 0.0.118 run is therefore optional and is **not** expected to close Step 32. The next feature candidate should be designed only after static inspection of the exact Sentry constant metadata in the user's receipt-backed game files.
+
+Codemagic `build-summary.txt` records per-stage elapsed seconds for SDK setup, static validation, host tests/fixture builds, iOS workload setup, iOS publish/package preparation, IPA verification, and the total canonical pipeline so the maintenance trim can be measured rather than inferred.

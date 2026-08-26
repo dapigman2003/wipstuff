@@ -1,33 +1,25 @@
-# Step 32.0.3 — Test Procedure
+# Step 32.0.3 — Maintenance Acceptance
 
 Version: `0.0.118 (118)`
 
-## Codemagic — stop at the first failure
+This candidate validates removal of retired runtime-Harmony experiment surface. It is **not** a Sentry resolver correction and is not expected to produce new Step-32 physical closure evidence.
 
-1. Run workflow **`step32-fast`**.
-2. Require canonical static validation PASS and the complete host regression suite PASS. Record the commit SHA from `fast-preflight-summary.txt`.
-3. If fast preflight fails, stop and preserve its artifacts. Do **not** run the device workflow.
-4. If it passes, run **`ios-step-32` on the exact same commit**.
-5. Require static validation, iOS workload/install, publish and IPA verification PASS. Compare the device build commit SHA with the fast-preflight SHA.
-6. If device CI fails, stop and preserve artifacts. Do not install an IPA.
-7. Only after both workflows pass on the same commit, install the produced IPA.
+## Required CI evidence
 
-Use `artifacts/reports/phase-timings.txt` and `cache-sizes.txt` to measure where free M2 minutes are spent.
+- Static validator: PASS with the canonical seven active scripts and no dependency on the inert historical archive.
+- Host tests: PASS without downloading Harmony-Fat 2.4.2 and without compiling the retired Step-25/26/27 suites or Step-27 interpreted fixture.
+- iOS publish: PASS with `MtouchInterpreter=-all`, `MtouchLink=None`, and `TrimMode=copy` unchanged.
+- IPA verification: PASS with no retired Step-27 fixture payload and with release identity `0.0.118 (118)`.
+- Record Codemagic duration and resulting IPA size for comparison with the previous active surface when available.
 
-## Physical Step 32 A–D
+## Regression requirements
 
-Force-quit first. Preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
+- Step 24 controlled initialization remains active.
+- Step 28 ahead-of-load transformation remains active and tested.
+- Step 32 implementation/test sources remain unchanged from 0.0.117 except release-level validation/hash manifests that describe this maintenance candidate.
+- The known physical `Sentry, Version=5.0.0.0` constant-metadata scope remains documented as unresolved.
+- No source, build, test, or runtime path reads or executes material from the inert historical archive.
 
-Expected Gate B evidence now includes:
+## Physical device
 
-- 6/6 one-argument and 4/4 two-argument sites;
-- 10 × exactly five-byte patch windows;
-- raw opcode/token binding at each selected site;
-- exact source/transformed file length equality;
-- every changed byte confined to the ten approved windows;
-- Cecil serialization: **NO**;
-- Cecil dependency-resolution requests during rewrite planning: **0**.
-
-Expected Gate C includes source/transformed PrepareMethod references 10/0, exact padded Pop/Nop shape at the original offsets, semantic-fingerprint match, unchanged Constant-table semantics, and repeated byte-diff confinement.
-
-Pass condition remains `REAL STS2 PREPAREMETHOD REWRITE PASS — 4/4`.
+No physical Step-32 rerun is required merely to accept this maintenance trim. If 0.0.118 is run on-device, the known Sentry Gate-B fail-closed result is expected because the resolver behavior is intentionally unchanged.

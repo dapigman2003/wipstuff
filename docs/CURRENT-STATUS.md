@@ -1,20 +1,22 @@
-# Current Status — Step 32.0.2 Bounded Cecil Write-Metadata Resolver Fix
+# Current Status — Step 32.0.3 Retired Harmony Active-Surface Trim
 
-## Active candidate — Step 32.0.2 / 0.0.117 (117)
+## Active candidate — Step 32.0.3 / 0.0.118 (118)
 
 Physical baseline summary: Steps 01–26 closed; Step 27 CLOSED NEGATIVE; Step 28 CLOSED POSITIVE 5/5; Step 29 CLOSED POSITIVE 4/4; Step 30 CLOSED POSITIVE 4/4; Step 31 CLOSED POSITIVE 4/4.
 
-Physical Step 31.0 / 0.0.114 is **CLOSED POSITIVE — 4/4**. The exact receipt-backed `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` method, token `0x06007D05`, body SHA-256 `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`, and all ten `RuntimeHelpers.PrepareMethod` sites were rebound without writes or CLR admission. Gate C retained the family on the base-game frontier as eligible for explicit rewrite design.
+Physical Step 31.0 / 0.0.114 is **CLOSED POSITIVE — 4/4**. The exact receipt-backed `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` method, token `0x06007D05`, body SHA-256 `7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9`, and all ten `RuntimeHelpers.PrepareMethod` sites were rebound without writes or CLR admission.
 
-Step 32 is the first real-game semantic write, only to a launcher-private copy. The predeclared transformation remains exactly **6 × one-argument `PrepareMethod(handle)` → `Pop`** and **4 × two-argument `PrepareMethod(handle, instantiation[])` → `Pop + Pop`**. This consumes the same stack arguments as the original void calls while preserving preceding reflection/GetMethod/get_MethodHandle/array construction and surrounding control flow.
+The Step-32 semantic transformation remains exactly **6 × one-argument `PrepareMethod(handle)` → `Pop`** and **4 × two-argument `PrepareMethod(handle, instantiation[])` → `Pop + Pop`** on a launcher-private clone. No trusted-install mutation or real-StS2 CLR admission is authorized in Step 32.
 
-Codemagic 0.0.115 passed static validation **996/996**, compiled, and ran **231** host tests at **230/231 PASS**. Its only failure was an invalid Gate-C pre-write offset-sensitive body-hash prediction, corrected in 0.0.116 without changing the rewrite.
+Physical 0.0.116 passed Gate A and exposed the first Cecil write-time constant-metadata need: exact `System.Runtime 9.0.0.0`. Step 32.0.2 / 0.0.117 added only a write-time in-memory surrogate for that exact identity.
 
-Physical 0.0.116 then passed **Gate A** with OfflineReady **428/428**, exact receipt/source SHA/MVID/token/body identity, all ten sites, zero Cecil read-time dependency requests, zero CLR admission, and an unchanged trusted install. **Gate B failed** inside `Mono.Cecil.MetadataBuilder.GetConstantType` during `module.Write`: Cecil attempted to resolve exact `System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a` while rebuilding an unrelated field Constant-table row. No transformed image completed writing and no CLR execution occurred. Preserve `docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt`.
+Physical **0.0.117** then re-proved **Gate A PASS** with OfflineReady **428/428**, source SHA-1 `e424ace9399a82edea4dd7e0fa5761635dfd6c5d`, SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, `PrewarmJit()` token `0x06007D05`, all ten sites, zero Cecil read-time resolution, zero CLR admission, and no trusted-install modification. **Gate B failed closed before mutation** in `ConstantMetadataWriteResolver.Configure` because the verified real module also contains external constant metadata scoped to exact `Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0`. Preserve `docs/history/reports/STEP-32.0.2-PHYSICAL-SENTRY-CONSTANT-METADATA-FAILURE.txt`.
 
-Step 32.0.2 / 0.0.117 keeps the 6+4 rewrite unchanged and keeps all read/verification resolvers rejecting. Gate B now builds a **write-only in-memory constant-metadata surrogate** for the exact System.Runtime identity from constant values already decoded from the verified source metadata. It opens zero framework/game assembly bytes, performs no directory probing/default resolution, and rejects every other assembly request. Gate C additionally proves the source and transformed Constant-table semantic fingerprints are identical.
+Step 32.0.3 / 0.0.118 is **maintenance-only**. `RealStS2PrepareMethodRewrite.cs` and its bounded System.Runtime-only writer policy remain byte-for-byte unchanged from 0.0.117. The active build surface now archives/removes the closed Step 25–27 runtime-Harmony implementation, its dedicated host tests and UI, the Step-27 interpreted fixture, the CI Harmony-Fat download, and the obsolete Harmony DynamicDependency preservation anchors. The copy/no-link/interpreter policy and all current Step 28–32 contracts remain active.
 
-Physical close condition remains Gates A–D **4/4 PASS**. Preserve `Step32-RealStS2PrepareMethodRewrite.txt`. A pass authorizes only a later separately gated transformed-real-StS2 CLR admission/execution experiment.
+For 0.0.118, the immediate acceptance target is canonical static validation + host suite + iOS publish + IPA verification, followed by comparison of Codemagic wall-clock/build logs. **Do not interpret 0.0.118 as a Sentry correction.** A later Step-32 candidate must first use static game-file evidence to understand the exact Sentry constant metadata before changing the writer policy.
+
+Physical close condition for Step 32 remains Gates A–D **4/4 PASS**. Preserve `Step32-RealStS2PrepareMethodRewrite.txt` when a later corrected candidate is physically tested.
 
 ---
 

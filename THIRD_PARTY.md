@@ -1,4 +1,4 @@
-# Third-Party Components — Step 17
+# Third-Party Components — Step 32.0.3
 
 ## Runtime
 
@@ -16,7 +16,7 @@ The pinned Godot Engine `4.5.1-stable` source is built on the Codemagic macOS ru
 
 ### Mono.Cecil 0.11.6
 
-Steps 16–17 intentionally use Mono.Cecil at runtime for managed metadata/IL **file** inspection. Step 16 also proves controlled rewriting only on a project-owned fixture; Step 17 uses Cecil read-only to scan concrete call sites in the receipt-backed macOS arm64 managed payload. The same pinned version remains used by the build-only SteamKit compatibility patcher. No real StS2 assembly is rewritten yet.
+Mono.Cecil is the pinned metadata/IL engine used by the compatibility pipeline. Earlier steps use it for controlled fixture inspection/transformation and read-only real-game audits; Step 32 uses it to rewrite only a launcher-private clone of the exact receipt-backed real `sts2.dll`, followed by independent reopen/hash/semantic verification. The trusted Step-12 installation is never rewritten. The same pinned version is also used by the build-only SteamKit compatibility patcher.
 
 ## Build-only
 
@@ -25,9 +25,9 @@ Steps 16–17 intentionally use Mono.Cecil at runtime for managed metadata/IL **
 The build-only patcher operates on an isolated local NuGet copy of SteamKit2. It verifies SteamKit2 3.4.0 and replaces at most one unsupported `Process.StartTime` call with `DateTime.UtcNow` if that call is still present. It refuses ambiguous matches and the patcher itself is not packaged into the IPA.
 
 
-### Harmony 2.4.2 official fat release fixture
+### Harmony 2.4.2 historical regression material
 
-Step 27 host regression tests download the exact tagged upstream `Harmony-Fat.2.4.2.0.zip` release during CI and extract only its merged `net9.0/0Harmony.dll` as a quarantined structural-surrogate fixture; the selected archive member itself is retained as CI evidence of the target framework. It is used only to exercise the project's Deferred Mono.Cecil normalizer against real upstream Harmony/MonoMod metadata; it is not linked into the launcher, bundled in the IPA, or treated as authority for the receipt-backed StS2 `0Harmony.dll`. Harmony is MIT-licensed.
+The runtime-Harmony Step 25–27 experiment is closed negative and no Harmony release fixture is downloaded, linked, or bundled by the active 0.0.118 build/test pipeline. The complete pre-trim 0.0.117 source candidate, including the old hash-pinned Harmony-Fat host-regression acquisition logic and interpreted fixture, is preserved inertly in the historical archive. Harmony is MIT-licensed.
 
 ### Microsoft.NET.Test.Sdk / MSTest
 
@@ -39,4 +39,4 @@ Installed into a temporary Python virtual environment by Codemagic and used only
 
 ## Repository policy
 
-This repository contains no Slay the Spire 2 game files, Steam credentials, Apple signing secrets, or proprietary FMOD/Spine assets. The Step 16 regression fixture is a tiny project-owned assembly built from source during CI and bundled only as inert test data. Step 17 adds no third-party or game payload.
+This repository contains no Slay the Spire 2 game files, Steam credentials, Apple signing secrets, or proprietary FMOD/Spine assets. The project-owned Step 16/20/28 fixtures are built from source during CI and enter the IPA only as controlled regression/data payloads required by still-active runtime foundations. The IPA contains no real StS2 game payload; real game bytes remain user-owned in the receipt-backed Documents installation.

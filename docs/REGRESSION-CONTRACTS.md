@@ -79,17 +79,16 @@ Before changing one of these contracts:
 5. update static validation to reject the obsolete assertion;
 6. require a new physical regression pass before advancing the project boundary.
 
-## Step 27 — controlled launcher-owned Harmony patch decision
+## Step 27 — retired runtime-Harmony architecture decision
 
-Step 27 is physically closed as a **negative architecture result** by 0.0.108. The current regression contract preserves the evidence needed to prevent the retired runtime-patch path from being accidentally reinterpreted as viable:
+Step 27 is physically closed as a **negative architecture result** by 0.0.108. The active regression contract now protects the **decision and evidence**, not the ability to rerun the retired experiment in every future IPA:
 
-- the copy/no-link host policy (`MtouchLink=None`, `TrimMode=copy`) and `MtouchInterpreter=-all` remain the dynamic-payload execution baseline established after the physical 0.0.105/106 trimming failures;
-- the final Step-27 target/prefix remain the launcher-owned `StS2Launcher.Step27.InterpretedPatchFixture.dll`, absent from iOS/test ProjectReference graphs and copied into the app only after publish;
-- Gate P binds a fresh processor to the exact interpreted `Target` through public `Harmony.CreateProcessor(MethodBase)`; Gate Q proves both Target reflection and the in-fixture direct managed IL call through `InvokeTarget` execute the unpatched post-publish image;
-- physical 0.0.108 must remain preserved as the decisive result: exact public `PatchProcessor.Patch()` fails at Gate T with `System.NotImplementedException: Arg_NotImplementedException` surfaced from `HarmonyLib.PatchFunctions.UpdateWrapper`;
-- the failure is architecture-decisive because it occurs against the representative post-publish interpreted target after the prior trimming ambiguity was removed; identifying the deeper unsupported MonoMod primitive is not a prerequisite for the product architecture;
-- runtime Harmony/MonoMod method replacement is therefore retired from the active compatibility path. No new candidate may modify Harmony internals or force an alternate MonoMod detour backend merely to continue Step 27;
-- the old Step-27 implementation, tests, preservation anchors, fixture, and physical reports remain regression/evidence assets even though active release/version/CI wiring advances.
+- physical 0.0.108 remains the decisive result: exact public `PatchProcessor.Patch()` against the representative post-publish interpreted target fails at Gate T with `System.NotImplementedException: Arg_NotImplementedException` surfaced from `HarmonyLib.PatchFunctions.UpdateWrapper`;
+- runtime Harmony/MonoMod method replacement remains retired from the active compatibility path; no candidate may resume Harmony-internal workaround iteration merely to continue Step 27;
+- the copy/no-link host policy (`MtouchLink=None`, `TrimMode=copy`) and `MtouchInterpreter=-all` remain active because later architecture still depends on post-publish/dynamic managed execution;
+- Step 24 controlled `0Harmony` initialization remains separately protected and active; retiring Steps 25–27 does not erase that proven dependency-initialization capability;
+- from Step 32.0.3 onward, the old Step-25/26/27 implementation, dedicated tests/UI, DynamicDependency anchors, Harmony-Fat host-fixture acquisition, and interpreted patch fixture are historical-only and must be absent from the active compile/package graph;
+- historical step documents, physical reports, and the inert pre-trim source snapshot preserve reconstructability without imposing recurring build/AOT cost.
 
 ## Step 28 — ahead-of-load managed transformation
 
@@ -216,3 +215,19 @@ Step 32.0.2 / 0.0.117 uses a **write-only in-memory** constant-metadata surrogat
 - continue to forbid real-StS2 CLR admission/invocation, Harmony/MonoMod runtime patching, Godot/game startup, native loading, or trusted-install mutation.
 
 A Step-32.0.2 PASS still authorizes only the next separately gated transformed-real-StS2 admission/execution experiment.
+
+## Step 32.0.3 — retired Harmony active-surface maintenance trim
+
+Physical 0.0.117 is preserved as **device evidence at 1/4**: Gate A passed with the exact receipt-backed source and ten sites; Gate B failed closed before mutation because the verified module contains external constant metadata scoped to exact `Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0`.
+
+0.0.118 is maintenance-only and must:
+
+- leave `src/StS2Launcher.Core/Compatibility/RealStS2PrepareMethodRewrite.cs` byte-for-byte unchanged from 0.0.117;
+- make no attempt to admit Sentry or broaden the Step-32 writer resolver;
+- remove the retired Step-25/26/27 runtime-Harmony Core files, dedicated host tests, iOS UI partials, and preservation-anchor sources from the active tree;
+- remove the Step-27 interpreted patch fixture from active fixtures and final IPA packaging;
+- remove the Harmony-Fat network download and all Step-27 fixture environment variables from `scripts/test.sh`;
+- retain Step 24 controlled initialization, Step 28 ahead-of-load transformation, and all current runtime build policies;
+- keep historical evidence reconstructable through `docs/history` and the inert archive, without making active validation/runtime depend on that archive.
+
+Passing 0.0.118 CI/IPA validation proves only that the project can carry its current architecture with a smaller active surface. It does **not** close Step 32 or supersede the Sentry physical finding.

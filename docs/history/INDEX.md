@@ -157,3 +157,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt` — raw physical 0.0.116 report: Gate A PASS; Gate B failed inside Cecil Constant-table serialization on exact `System.Runtime 9.0.0.0` resolution before any CLR admission.
 - `steps/STEP-32.0.2-BOUNDED-CONSTANT-METADATA-WRITE-RESOLVER.md` — 0.0.117 keeps the 6+4 rewrite unchanged and introduces an exact-identity, in-memory write-only constant-metadata surrogate instead of broad resolver fallback.
 - `steps/STEP-32.0.2-TEST.md` — Codemagic + physical A–D acceptance procedure for the bounded write resolver correction.
+- `reports/STEP-32.0.2-PHYSICAL-SENTRY-CONSTANT-METADATA-FAILURE.txt` — raw physical 0.0.117 report: Gate A PASS; Gate B failed closed before mutation because the verified real module also contains external constant metadata scoped to exact `Sentry 5.0.0.0`.
+- `steps/STEP-32.0.3-RETIRED-HARMONY-ACTIVE-SURFACE-TRIM.md` — 0.0.118 maintenance-only trim that moves closed Step-25/26/27 runtime-Harmony executable surface out of the active build while leaving the Step-32 rewrite/resolver behavior unchanged.
+- `steps/STEP-32.0.3-TEST.md` — CI/build acceptance procedure for the maintenance trim; no new Step-32 physical closure is claimed.

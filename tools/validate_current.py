@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 32.0.2 bounded Cecil write-metadata resolver fix static validation")
+print("StS2 Launcher — Step 32.0.3 retired Harmony active-surface trim static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>117</ApplicationVersion>" in project_text, "build version is 117")
-require("<ApplicationDisplayVersion>0.0.117</ApplicationDisplayVersion>" in project_text, "display version is 0.0.117")
-require(plist.get("CFBundleVersion") == "117", "Info.plist build version is 117")
-require(plist.get("CFBundleShortVersionString") == "0.0.117", "Info.plist display version is 0.0.117")
+require("<ApplicationVersion>118</ApplicationVersion>" in project_text, "build version is 118")
+require("<ApplicationDisplayVersion>0.0.118</ApplicationDisplayVersion>" in project_text, "display version is 0.0.118")
+require(plist.get("CFBundleVersion") == "118", "Info.plist build version is 118")
+require(plist.get("CFBundleShortVersionString") == "0.0.118", "Info.plist display version is 0.0.118")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,12 +198,11 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 32.0.2 — BOUNDED CECIL WRITE-METADATA RESOLVER FIX" in release_presentation, "top launcher banner identifies active Step 32.0.2 candidate")
+require("STEP 32.0.3 — RETIRED HARMONY ACTIVE-SURFACE TRIM" in release_presentation, "top launcher banner identifies active Step 32.0.3 maintenance candidate")
 require("STEP 31 CLOSED POSITIVE 4/4" in release_presentation and "0x06007D05" in release_presentation and "PrepareMethod" in release_presentation and "private" in release_presentation and "zero CLR load" in release_presentation, "top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.117"' in release_presentation and 'ExpectedBuildVersion = "117"' in release_presentation, "Step 32.0.2 source pins expected bundle release identity")
-require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
-require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "post-publish interpreted Target+Prefix fixture" in release_presentation and "fresh processor via Harmony.CreateProcessor(MethodBase)" in release_presentation and "exactly one Patch()" in release_presentation, "Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker")
+require('ExpectedDisplayVersion = "0.0.118"' in release_presentation and 'ExpectedBuildVersion = "118"' in release_presentation, "Step 32.0.3 source pins expected bundle release identity")
+require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
 require("STEP 26 — CONTROLLED EMPTY HARMONY PATCHPROCESSOR CREATION" not in root_ui_text and "Version 0.0.83" not in root_ui_text, "stale Step-26 top-banner identity is removed")
@@ -240,23 +239,17 @@ require(set(all_roots) == expected_all_roots and len(all_roots) == len(expected_
 require("Step 24 physically proved this additional post-publish dynamic-IL preservation root" in project_text, "physically proven Step 24 preservation root is documented as protected platform policy")
 require("STEP32 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" in project_text, "Step 32 build telemetry retains the physically proven framework preservation root")
 require("STEP32 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" in project_text, "build telemetry explicitly marks the System.Linq root as historical under copy/no-link")
-require("STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in project_text, "Step 32 build telemetry retains the physically proven Harmony-constructor surface as historical evidence")
 require("System.Private.CoreLib" not in all_roots, "Step 25 does not broaden trimming by rooting System.Private.CoreLib")
-step25_preservation_path = ROOT / "src/StS2Launcher.iOS/Platform/Step25HarmonyConstructorFrameworkPreservation.cs"
-require(step25_preservation_path.is_file(), "Step 25 bounded Harmony-constructor framework preservation anchor exists")
-step25_preservation = step25_preservation_path.read_text() if step25_preservation_path.is_file() else ""
-for preserved_type in [
-    "typeof(Environment)", "typeof(OperatingSystem)", "typeof(Type)", "typeof(Assembly)",
-    "typeof(AssemblyName)", "typeof(MemberInfo)", "typeof(DateTime)", "typeof(Version)",
-    "typeof(DefaultInterpolatedStringHandler)",
-]:
-    require(preserved_type in step25_preservation, f"Step 25 candidate preservation includes measured constructor framework type: {preserved_type}")
-require(step25_preservation.count("[DynamicDependency(") == 9, "Step 25 candidate preservation is bounded to exactly nine measured framework type dependencies")
-require("internal static void Activate()" in step25_preservation and "Intentionally empty" in step25_preservation, "Step 25 preservation anchor is metadata-only and executes no probe")
-require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyConstruction.cs"), "Step 25 candidate UI roots the trimming preservation metadata anchor without modifying protected platform files")
+retired_harmony_platform_files = [
+    ROOT / "src/StS2Launcher.iOS/Platform/Step25HarmonyConstructorFrameworkPreservation.cs",
+    ROOT / "src/StS2Launcher.iOS/Platform/Step27AccessToolsFrameworkPreservation.cs",
+    ROOT / "src/StS2Launcher.iOS/Platform/Step27PatchEngineFrameworkPreservation.cs",
+]
+require(not any(path.exists() for path in retired_harmony_platform_files), "retired Step 25-27 DynamicDependency preservation anchors are absent from the active iOS/AOT graph")
+require("STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION" not in project_text and "STEP32 HISTORICAL ACCESSTOOLS FRAMEWORK PRESERVATION" not in project_text and "STEP32 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION" not in project_text, "active build telemetry no longer roots retired runtime-Harmony preservation anchors")
 build_ios = read("scripts/build-ios.sh")
 require("STEP32 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" in build_ios, "iOS publish requires exact Step-32 copy/no-link dynamic-payload telemetry")
-require("STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" in build_ios, "iOS publish retains historical Harmony-constructor preservation telemetry")
+require("HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION" not in build_ios, "iOS publish no longer requires retired Harmony-constructor preservation telemetry")
 require("DiskArbitration" in project_text and '<_LinkerFrameworks Remove="DiskArbitration" />' in project_text, "DiskArbitration-only linker framework filter remains present")
 
 # ---------------------------------------------------------------------------
@@ -343,8 +336,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-32.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.117",
-    "STS2_BUILD_VERSION": "117",
+    "STS2_DISPLAY_VERSION": "0.0.118",
+    "STS2_BUILD_VERSION": "118",
     "STS2_RUNTIME_POLICY_MARKER": "STEP32 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -384,7 +377,7 @@ required_report_files = {
     "Step14-CompatibilityInventory.txt", "Step15-GodotFoundation.txt", "Step16-ManagedPreparation.txt",
     "Step17-CompatibilityCallSites.txt", "Step18-RealAssemblyRewrite.txt", "Step19-ExpressionInterpreter.txt",
     "Step20-DynamicManagedExecution.txt", "Step21-RuntimeFrameworkBinding.txt", "Step22-HostBindingFrontier.txt",
-    "Step23-FirstRealGameLoad.txt", "Step24-ControlledManagedInitialization.txt", "Step25-ControlledHarmonyConstruction.txt", "Step26-ControlledHarmonyProcessorCreation.txt", "Step27-ControlledHarmonyPatchExecution.txt",
+    "Step23-FirstRealGameLoad.txt", "Step24-ControlledManagedInitialization.txt",
     "Step28-AheadOfLoadManagedTransformation.txt", "Step29-RealStS2CompatibilityTargetAudit.txt",
     "TestSetup-Repair.txt", "TestSetup-Update.txt", "TestSetup-DownloadCacheClear.txt", "TestSetup-FreshDownload.txt",
 }
@@ -654,205 +647,21 @@ if step24_manifest.is_file():
     require(not step24_mismatches, "physically closed Step 24.0.6 controlled-initialization implementation remains hash-pinned", ", ".join(step24_mismatches))
 
 # ---------------------------------------------------------------------------
-# Step 25 controlled Harmony API resolution + instance construction boundary
+# Step 25-27 retired runtime-Harmony active-surface contract
 # ---------------------------------------------------------------------------
-step25_core_files = [
+retired_harmony_paths = [
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyConstruction.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGate.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGateResult.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionProgress.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionSummary.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGateSequence.cs",
-]
-for relative in step25_core_files:
-    require((ROOT / relative).is_file(), f"Step 25 Harmony-construction source exists: {relative}")
-step25_test_path = ROOT / "tests/StS2Launcher.Core.Tests/Runtime/ControlledHarmonyConstructionTests.cs"
-step25_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.HarmonyConstruction.cs"
-require(step25_test_path.is_file(), "Step 25 boundary has host unit tests")
-require(step25_ui_path.is_file(), "Step 25 boundary has isolated iOS UI/report partial")
-step25_source = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyConstruction.cs")
-step25_tests = step25_test_path.read_text() if step25_test_path.is_file() else ""
-step25_ui = step25_ui_path.read_text() if step25_ui_path.is_file() else ""
-step25_gate = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGate.cs")
-step25_sequence = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionGateSequence.cs")
-
-for required in [
-    'TargetSimpleName = "0Harmony"',
-    "TargetVersion = new(2, 4, 2, 0)",
-    'HarmonyTypeFullName = "HarmonyLib.Harmony"',
-    'HarmonyId = "com.community.sts2launcher.step25.probe"',
-    "ReadHarmonyConstructorMetadata",
-    'GetEnvironmentVariable("HARMONY_DEBUG")',
-    'value.Equals("HARMONY_DEBUG", StringComparison.Ordinal)',
-    'field.Name.Equals("DEBUG", StringComparison.Ordinal)',
-    "Code.Brfalse or Code.Brfalse_S",
-    "RunProvenLoadStateReplay",
-    "RunDeferredModuleInitialization",
-    "RunProvenInitializationAuditAsync",
-    "RunHarmonyApiResolution",
-    "RunHarmonyTypeInitialization",
-    "RunHarmonyTypeInitializationAudit",
-    "RunHarmonyInstanceConstruction",
-    "RunPostConstructionAuditAsync",
-    "RuntimeHelpers.RunModuleConstructor(targetAssembly.ManifestModule.ModuleHandle)",
-    "RuntimeHelpers.RunClassConstructor(api.HarmonyType.TypeHandle)",
-    "api.Constructor.Invoke([HarmonyId])",
-    "AssemblyLoadContext.GetLoadContext(instance.GetType().Assembly)",
-    "Post-construction OfflineReady exact-tree verification: YES",
-]:
-    require(required in step25_source, f"Step 25 production boundary contains required invariant: {required}")
-
-for gate_name in [
-    "InitializationPreflight", "ProvenLoadStateReplay", "DeferredModuleInitialization",
-    "ProvenInitializationAudit", "HarmonyApiResolution", "HarmonyTypeInitialization",
-    "HarmonyTypeInitializationAudit", "HarmonyInstanceConstruction", "PostConstructionAudit",
-]:
-    require(gate_name in step25_gate, f"Step 25 gate enum includes {gate_name}")
-require("Expected Step 25 gate {expected}" in step25_sequence and "_results.Count(result => result.Passed)" in step25_sequence, "Step 25 gate sequence enforces strict ordering and reports exact pass count")
-require("CONTROLLED HARMONY CONSTRUCTION BOUNDARY PASS — 9/9" in read("src/StS2Launcher.Core/Runtime/ControlledHarmonyConstructionSummary.cs"), "Step 25 summary requires nine passing gates")
-require("Step25-ControlledHarmonyConstruction.txt" in step25_ui, "Step 25 on-device run emits a Files-visible text report")
-require("Run Step 25 A–I" in step25_ui and "GATE I RUNNING" in step25_ui, "Step 25 UI exposes the ordered nine-gate run")
-require("No real game/Harmony assembly was loaded by Step 25 Gate A: YES" in step25_source, "Step 25 Gate A remains metadata-only before the real-load replay")
-require("Step25MetadataOnlyResolver" in step25_source and "AssemblyResolver = resolver" in step25_source and "MetadataResolver = resolver" in step25_source, "Step 25 constructor/initializer preflight uses rejecting Cecil resolvers")
-require("var typeInitializer = harmonyType.TypeInitializer" in step25_source and "exact HarmonyLib.Harmony type initializer measured by Gate A" in step25_source, "Step 25 runtime API gate requires the exact measured Harmony type initializer")
-require("publicConstructors.Length != 1" in step25_source and "parameters.Length == 1 && parameters[0].ParameterType == typeof(string)" in step25_source, "Step 25 runtime reflection requires exactly one public string constructor")
-require('GetProperty("Id"' in step25_source and 'GetField("DEBUG"' in step25_source, "Step 25 runtime reflection is limited to exact observation members")
-require("Harmony.DEBUG value read: NO — Gate F owns the type-initialization boundary" in step25_source and "Harmony object constructed: NO" in step25_source, "Step 25 Gate E proves targeted API resolution separately from type initialization and construction")
-require(step25_source.count("api.Constructor.Invoke([HarmonyId])") == 1, "Step 25 has exactly one intentional reflection invocation site: exact Harmony(string) constructor")
-require("Activator.CreateInstance" not in step25_source and "Activator." not in step25_source, "Step 25 does not use broad Activator construction")
-require("GetMethods(" not in step25_source and "GetMethod(" not in step25_source, "Step 25 does not perform broad method-name reflection")
-require("PatchAll(" not in step25_source and ".Patch(" not in step25_source and "CreateProcessor(" not in step25_source, "Step 25 production code does not invoke Harmony patch/processor APIs")
-require("Game type/member reflected or invoked: NO" in step25_source and "Godot/game startup requested: NO" in step25_source, "Step 25 reports preservation of later game/Godot boundaries")
-require("LoadUnmanagedDll(string unmanagedDllName)" in step25_source and "throw new DllNotFoundException" in step25_source, "Step 25 strict private context still refuses native resolution")
-require("context.RejectedManagedRequests.Count != 0" in step25_source, "Step 25 fails on unplanned managed resolution")
-require(step25_source.count("_offlineInspection.RunAsync(") == 3, "Step 25 re-proves OfflineReady at preflight, post-initialization, and post-construction boundaries")
-for forbidden_write in ["File.Copy(", "File.Move(", "File.Write", "File.Create("]:
-    require(forbidden_write not in step25_source, f"Step 25 runtime boundary never mutates prepared/live bytes: {forbidden_write}")
-
-require("OrderedHarmonyConstructionGatesReachNineOfNinePass" in step25_tests and "HarmonyConstructionGatesStopAfterFirstFailure" in step25_tests, "Step 25 host tests enforce ordered fail-fast nine-gate behavior")
-require("SyntheticStep24ReplayThenExactHarmonyConstructionPasses" in step25_tests, "Step 25 host tests cover synthetic closed-Step24 replay plus exact inert Harmony construction")
-require("Harmony type initializer executed by Step 25: NO" in step25_tests and "RuntimeHelpers.RunClassConstructor(HarmonyLib.Harmony.TypeHandle) = PASS" in step25_tests and "Harmony object construction: YES — exact string constructor only" in step25_tests, "Step 25 host tests separate API resolution, type initialization, and construction")
-for safety_test in [
-    "GateARejectsReachablePInvokeBeforeAnyStep25ClrLoad",
-    "GateARejectsFunctionPointerIndirectionBeforeAnyStep25ClrLoad",
-    "GateARejectsImplicitTypeInitializerPInvokeBeforeAnyStep25ClrLoad",
-    "GateAMetadataAuditDoesNotResolveExternalBaseForNominallyLocalMemberRef",
-    "GateAConditionallyAcceptsExactPhysicalMonoModLoggerFingerprintOnlyWhenInert",
-    "GateAConditionalMonoModPolicyRejectsAnyFingerprintDrift",
-    "GateAConditionalMonoModPolicyRejectsNonInertLoggingState",
-    "GateAConditionalMonoModPolicyRequiresExactMeasuredAutomaticInitializerShape",
-    "GateCReportsThrowingModuleInitializerAndDoesNotAdvance",
-]:
-    require(safety_test in step25_tests, f"Step 25 retains host safety regression: {safety_test}")
-require("AddSyntheticHarmonyType" in step25_tests and '"HARMONY_DEBUG"' in step25_tests and '"DEBUG"' in step25_tests and '"Id"' in step25_tests, "Step 25 synthetic target includes the exact Harmony API/constructor preflight surface")
-require("scopeName.Equals(module.Assembly.Name.Name, StringComparison.OrdinalIgnoreCase)" in step25_source, "Step 25 constructor audit classifies same-assembly calls from the audited module identity")
-require("Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH" in step25_tests and "Exact Step 25.0.4 MonoMod logger dispatch fingerprint: MATCH" not in step25_tests, "Step 25 logger regression names the physically measured Step 24.0.4 fingerprint")
-require("collectibleLoadContext: true" in step25_tests and "Guid.NewGuid()" in step25_tests, "Step 25 host tests isolate synthetic runtime identities in collectible contexts")
-
-step25_manifest = ROOT / "tools/validation/protected-step25.0.2-harmony-construction-boundary.sha256"
-require(step25_manifest.is_file(), "physically closed Step 25.0.2 protected boundary hash manifest exists")
-if step25_manifest.is_file():
-    step25_mismatches: list[str] = []
-    for line in step25_manifest.read_text().splitlines():
-        if not line.strip():
-            continue
-        digest, relative = line.split("  ", 1)
-        path = ROOT / relative
-        if not path.is_file() or sha256(path) != digest:
-            step25_mismatches.append(relative)
-    require(not step25_mismatches, "physically closed Step 25.0.2 Harmony-construction implementation is byte-for-byte protected", ", ".join(step25_mismatches))
-
-
-# ---------------------------------------------------------------------------
-# Step 26 controlled empty Harmony PatchProcessor creation boundary
-# ---------------------------------------------------------------------------
-step26_core_files = [
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreation.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationGate.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationGateResult.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationProgress.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationSummary.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationGateSequence.cs",
-    "src/StS2Launcher.Core/Runtime/HarmonyProcessorProbe.cs",
-]
-for relative in step26_core_files:
-    require((ROOT / relative).is_file(), f"Step 26 processor-creation source exists: {relative}")
-step26_test_path = ROOT / "tests/StS2Launcher.Core.Tests/Runtime/ControlledHarmonyProcessorCreationTests.cs"
-step26_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.HarmonyProcessorCreation.cs"
-require(step26_test_path.is_file(), "Step 26 boundary has host unit tests")
-require(step26_ui_path.is_file(), "Step 26 boundary has isolated iOS UI/report partial")
-step26_source = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreation.cs")
-step26_tests = step26_test_path.read_text() if step26_test_path.is_file() else ""
-step26_ui = step26_ui_path.read_text() if step26_ui_path.is_file() else ""
-step26_gate = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationGate.cs")
-step26_sequence = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationGateSequence.cs")
-for gate_name in [
-    "InitializationPreflight", "ProvenLoadStateReplay", "DeferredModuleInitialization", "ProvenInitializationAudit",
-    "HarmonyApiResolution", "HarmonyTypeInitialization", "HarmonyTypeInitializationAudit", "HarmonyInstanceConstruction",
-    "PostConstructionAudit", "HarmonyProcessorApiResolution", "PatchProcessorTypeInitialization", "LauncherProbeResolution",
-    "HarmonyProcessorCreation", "PostProcessorAudit",
-]:
-    require(gate_name in step26_gate, f"Step 26 gate enum includes {gate_name}")
-require("Expected Step 26 gate {expected}" in step26_sequence, "Step 26 gate sequence enforces strict ordered fail-fast execution")
-require("CONTROLLED HARMONY PROCESSOR CREATION BOUNDARY PASS — 14/14" in read("src/StS2Launcher.Core/Runtime/ControlledHarmonyProcessorCreationSummary.cs"), "Step 26 summary requires fourteen passing gates")
-require("Step26-ControlledHarmonyProcessorCreation.txt" in step26_ui, "Step 26 on-device run emits a Files-visible text report")
-require("Run Step 26 A–N" in step26_ui and "GATE N RUNNING" in step26_ui, "Step 26 UI exposes the ordered fourteen-gate run")
-require("Step 26 prerequisite: physical Step 25.0.2 / 0.0.82 is closed" in step26_ui, "Step 26 UI records the physically closed Step 25 prerequisite")
-require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in step26_ui, "Step 26 retains the physically proven Step 25 constructor framework-preservation anchor")
-for required in [
-    'PatchProcessorTypeFullName = "HarmonyLib.PatchProcessor"',
-    'HarmonyId = "com.community.sts2launcher.step25.probe"',
-    "ReadHarmonyProcessorMetadata(preflight.Target.PreparedPath)",
-    'Name.Equals("CreateProcessor", StringComparison.Ordinal)',
-    'PatchProcessorTypeFullName',
-    'field.Name.Equals("instance", StringComparison.Ordinal)',
-    'field.Name.Equals("original", StringComparison.Ordinal)',
-    'lockerField.Name.Equals("locker", StringComparison.Ordinal)',
-    "RuntimeHelpers.RunClassConstructor(api.PatchProcessorType.TypeHandle)",
-    "typeof(HarmonyProcessorProbe).GetMethod",
-    "processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [probe.Method])",
-    "processorApi.InstanceField.GetValue(processor)",
-    "processorApi.OriginalField.GetValue(processor)",
-    "Post-processor OfflineReady exact-tree verification: YES",
-]:
-    require(required in step26_source, f"Step 26 production boundary contains required invariant: {required}")
-require(step26_source.count("api.Constructor.Invoke([HarmonyId])") == 1, "Step 26 replays exactly one inert Harmony(string) constructor invocation")
-require(step26_source.count("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [probe.Method])") == 1, "Step 26 has exactly one intentional CreateProcessor(MethodBase) invocation")
-require(step26_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2, "Step 26 has exactly two explicit class-constructor invocation sites: Harmony and PatchProcessor")
-require("Activator.CreateInstance" not in step26_source and "Activator." not in step26_source, "Step 26 does not use broad Activator construction")
-require(".Patch(" not in step26_source and "PatchAll(" not in step26_source, "Step 26 production code never invokes Patch()/PatchAll")
-require("HarmonyMethod" not in step26_source, "Step 26 does not construct patch descriptions/HarmonyMethod objects")
-require("public static int Target(int value)" in read("src/StS2Launcher.Core/Runtime/HarmonyProcessorProbe.cs") and "=> value + 1" in read("src/StS2Launcher.Core/Runtime/HarmonyProcessorProbe.cs"), "Step 26 launcher-owned inert processor target is explicit and tiny")
-require("Method invoked: NO" in step26_source and "StS2 assembly/type/member reflection: NO" in step26_source, "Step 26 launcher-probe gate preserves the StS2 reflection boundary")
-require("PatchProcessor.Patch invoked: NO" in step26_source and "Launcher probe method invoked: NO" in step26_source, "Step 26 processor-creation gate reports that neither patching nor target invocation occurred")
-require("LoadUnmanagedDll(string unmanagedDllName)" in step26_source and "throw new DllNotFoundException" in step26_source, "Step 26 strict private context still refuses native resolution")
-require("context.RejectedManagedRequests.Count != 0" in step26_source, "Step 26 fails on unplanned managed resolution")
-require(step26_source.count("_offlineInspection.RunAsync(") == 4, "Step 26 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, and post-processor boundaries")
-for forbidden_write in ["File.WriteAllBytes", "File.WriteAllText", "File.Move", "File.Delete"]:
-    require(forbidden_write not in step26_source, f"Step 26 runtime boundary never mutates prepared/live bytes: {forbidden_write}")
-require("OrderedHarmonyProcessorCreationGatesReachFourteenOfFourteenPass" in step26_tests and "HarmonyProcessorCreationGatesStopAfterFirstFailure" in step26_tests, "Step 26 host tests enforce ordered fail-fast fourteen-gate behavior")
-require("SyntheticStep24ReplayThenExactHarmonyProcessorCreationPasses" in step26_tests and "RunPostProcessorAuditAsync" in step26_tests, "Step 26 host tests cover synthetic full A–N empty processor creation")
-require("AddSyntheticHarmonyType" in step26_tests and '"PatchProcessor"' in step26_tests and '"CreateProcessor"' in step26_tests and '"locker"' in step26_tests, "Step 26 synthetic target includes exact PatchProcessor/CreateProcessor metadata surface")
-require("PatchProcessor.Patch invoked: NO" in step26_tests and "PatchProcessor.Patch/Harmony.Patch/PatchAll: NOT INVOKED" in step26_tests, "Step 26 host tests assert patch execution remains absent")
-require("collectibleLoadContext: true" in step26_tests and "Guid.NewGuid()" in step26_tests, "Step 26 host tests retain synthetic identity isolation")
-
-step26_manifest = ROOT / "tools/validation/protected-step26.0-harmony-processor-boundary.sha256"
-require(step26_manifest.is_file(), "physically closed Step 26.0 protected boundary hash manifest exists")
-if step26_manifest.is_file():
-    step26_mismatches: list[str] = []
-    for line in step26_manifest.read_text().splitlines():
-        if not line.strip():
-            continue
-        digest, relative = line.split("  ", 1)
-        path = ROOT / relative
-        if not path.is_file() or sha256(path) != digest:
-            step26_mismatches.append(relative)
-    require(not step26_mismatches, "physically closed Step 26.0 processor-creation behavior is byte-for-byte protected", ", ".join(step26_mismatches))
-
-# ---------------------------------------------------------------------------
-# Step 27 controlled launcher-owned Harmony patch/unpatch boundary
-# ---------------------------------------------------------------------------
-step27_core_files = [
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecution.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGate.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateResult.cs",
@@ -860,258 +669,34 @@ step27_core_files = [
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionSummary.cs",
     "src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateSequence.cs",
     "src/StS2Launcher.Core/Runtime/HarmonyPatchProbe.cs",
+    "src/StS2Launcher.Core/Runtime/HarmonyProcessorProbe.cs",
+    "tests/StS2Launcher.Core.Tests/Runtime/ControlledHarmonyConstructionTests.cs",
+    "tests/StS2Launcher.Core.Tests/Runtime/ControlledHarmonyProcessorCreationTests.cs",
+    "tests/StS2Launcher.Core.Tests/Runtime/ControlledHarmonyPatchExecutionTests.cs",
+    "src/StS2Launcher.iOS/UI/RootViewController.HarmonyConstruction.cs",
+    "src/StS2Launcher.iOS/UI/RootViewController.HarmonyProcessorCreation.cs",
+    "src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs",
+    "fixtures/StS2Launcher.Step27.InterpretedPatchFixture",
 ]
-for relative in step27_core_files:
-    require((ROOT / relative).is_file(), f"Step 27 patch-execution source exists: {relative}")
-step27_test_path = ROOT / "tests/StS2Launcher.Core.Tests/Runtime/ControlledHarmonyPatchExecutionTests.cs"
-step27_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs"
-require(step27_test_path.is_file(), "Step 27 boundary has host unit tests")
-require(step27_ui_path.is_file(), "Step 27 boundary has isolated iOS UI/report partial")
-step27_source = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecution.cs")
-step27_tests = step27_test_path.read_text() if step27_test_path.is_file() else ""
-step27_ui = step27_ui_path.read_text() if step27_ui_path.is_file() else ""
-step27_gate = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGate.cs")
-step27_sequence = read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionGateSequence.cs")
-step27_probe = read("src/StS2Launcher.Core/Runtime/HarmonyPatchProbe.cs")
-for gate_name in [
-    "InitializationPreflight", "ProvenLoadStateReplay", "DeferredModuleInitialization", "ProvenInitializationAudit",
-    "HarmonyApiResolution", "HarmonyTypeInitialization", "HarmonyTypeInitializationAudit", "HarmonyInstanceConstruction",
-    "PostConstructionAudit", "HarmonyProcessorApiResolution", "PatchProcessorTypeInitialization", "LauncherProbeResolution",
-    "HarmonyProcessorCreation", "PostProcessorAudit", "HarmonyPatchApiResolution", "LauncherPatchProbeResolution",
-    "BaselineProbeInvocation", "AccessToolsTypeInitialization", "PrefixRegistration", "PatchEngineExecution", "PostPatchAudit", "PatchedProbeInvocation",
-    "ExactPrefixUnpatch", "PostUnpatchAudit", "RestoredProbeInvocation", "FinalIsolationAudit",
-]:
-    require(gate_name in step27_gate, f"Step 27 gate enum includes {gate_name}")
-require("FinalIsolationAudit = 26" in step27_gate, "Step 27 gate enum ends exactly at Gate Z / 26")
-require("Expected Step 27 gate {expected}" in step27_sequence, "Step 27 gate sequence enforces strict ordered fail-fast execution")
-require("CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY PASS — 26/26" in read("src/StS2Launcher.Core/Runtime/ControlledHarmonyPatchExecutionSummary.cs"), "Step 27 summary requires twenty-six passing gates")
-require("Step27-ControlledHarmonyPatchExecution.txt" in step27_ui, "Step 27 on-device run emits a Files-visible text report")
-require("Run Step 27 A–Z" in step27_ui and "GATE Z RUNNING" in step27_ui, "Step 27 UI exposes the ordered twenty-six-gate run")
-require("Step 27 prerequisite: physical Step 26.0 / 0.0.83 is closed" in step27_ui, "Step 27 UI records the physically closed Step 26 prerequisite")
-require("Step25HarmonyConstructorFrameworkPreservation.Activate();" in step27_ui, "Step 27 retains the physically proven Step 25 constructor framework-preservation anchor")
-require("Gates A–N replay the physically closed Step 26 boundary" in step27_ui, "Step 27 UI explicitly distinguishes the closed A-N replay from new patch gates")
-require('Step27-CrashCheckpoint.txt' in step27_ui and 'stream.Flush(flushToDisk: true)' in step27_ui, "Step 27 writes a synchronously flushed durable crash checkpoint")
-require(step27_ui.count('WriteStep27CrashCheckpoint("START"') == 26, "Step 27 crash checkpoint marks all twenty-six gate starts")
-require('WriteStep27CrashCheckpoint(result.Passed ? "PASS" : "FAIL"' in step27_ui and 'WriteStep27CrashCheckpoint("RUN_START"' in step27_ui and 'WriteStep27CrashCheckpoint("RUN_COMPLETE"' in step27_ui, "Step 27 crash checkpoint records run and gate outcomes")
-require('InlineProgress<ControlledHarmonyPatchExecutionProgress>' in step27_ui and 'WriteStep27CrashCheckpoint("PROGRESS"' in step27_ui, "Step 27 progress is synchronously checkpointed before UI marshaling")
-require('once Gate B has started' in step27_ui and 'force-quit before any retry' in step27_ui, "Step 27 UI states the correct fresh-process retry rule after Gate B")
-for required in [
-    'ReadHarmonyPatchMetadata(preflight.Target.PreparedPath)',
-    'ReadAccessToolsMetadata(preflight.Target.PreparedPath)',
-    'ReadHarmonyPatchEngineMetadata(preflight.Target.PreparedPath)',
-    'RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)',
-    'RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)',
-    'ValidatePatchEngineHostFrameworkPreservationSurface();',
-    'GetType(HarmonySharedStateTypeFullName, throwOnError: false, ignoreCase: false)',
-    'GetField("all", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)',
-    'GetField("allDeclared", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)',
-    'Name.Equals("AddPrefix", StringComparison.Ordinal)',
-    'Name.Equals("Patch", StringComparison.Ordinal)',
-    'Name.Equals("Unpatch", StringComparison.Ordinal)',
-    'GetType("HarmonyLib.HarmonyMethod", throwOnError: false, ignoreCase: false)',
-    'GetField("prefix", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)',
-    'GetField("method", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)',
-    'InterpretedPatchFixtureDirectoryName = "Step27InterpretedPatchFixture"',
-    'InterpretedPatchFixtureFileName = "StS2Launcher.Step27.InterpretedPatchFixture.dll"',
-    'LoadVerifiedInterpretedFixture(',
-    'GetMethod("InvokeTarget"',
-    'processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])',
-    'processorApi.OriginalField.GetValue(interpretedProcessor), target',
-    'InvokePatchProbeInt32(probe.Target, 41',
-    'InvokePatchProbeInt32(probe.InvokeTarget, 41',
-    'patchApi.HarmonyMethodDefaultConstructor.Invoke([])',
-    'patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)',
-    'patchApi.PrefixField.SetValue(processor, descriptor)',
-    'patchApi.PatchMethod.Invoke(processor, null)',
-    'patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])',
-]:
-    require(required in step27_source, f"Step 27 production boundary contains required invariant: {required}")
-require(step27_source.count("api.Constructor.Invoke([HarmonyId])") == 1, "Step 27 replays exactly one inert Harmony(string) constructor invocation")
-require(step27_source.count("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [probe.Method])") == 1, "Step 27 replays exactly one empty CreateProcessor(MethodBase) invocation")
-require(step27_source.count("patchApi.AddPrefixMethod.Invoke(processor, [probe.Prefix])") == 0, "Step 27 does not invoke the physically crashing AddPrefix(MethodInfo) wrapper")
-require(step27_source.count("patchApi.HarmonyMethodDefaultConstructor.Invoke([])") == 1, "Step 27 has exactly one bounded HarmonyMethod() descriptor construction")
-require(step27_source.count("patchApi.HarmonyMethodMethodField.SetValue(descriptor, probe.Prefix)") == 1 and step27_source.count("patchApi.PrefixField.SetValue(processor, descriptor)") == 1, "Step 27 bounded descriptor path performs exactly one method assignment and one processor-prefix assignment")
-require(step27_source.count("patchApi.PatchMethod.Invoke(processor, null)") == 1, "Step 27 has exactly one intentional PatchProcessor.Patch() invocation")
-require(step27_source.count("patchApi.UnpatchMethod.Invoke(processor, [probe.Prefix])") == 1, "Step 27 has exactly one intentional exact-prefix Unpatch(MethodInfo) invocation")
-require(step27_source.count("InvokePatchProbeInt32(probe.Target, 41") == 3, "Step 27 invokes the post-publish interpreted Target exactly at baseline, patched, and restored gates")
-require(step27_source.count("InvokePatchProbeInt32(probe.InvokeTarget, 41") == 3, "Step 27 exercises the in-fixture interpreted direct-call route exactly at baseline, patched, and restored gates")
-require("HarmonyPatchProbe" not in step27_source, "Step 27 production boundary no longer depends on the build-time AOT HarmonyPatchProbe target")
-require(step27_source.count("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])") == 1, "Step 27 creates exactly one fresh processor for the admitted post-publish interpreted target")
-require(step27_source.count("RuntimeHelpers.RunClassConstructor(api.") == 2 and step27_source.count("RuntimeHelpers.RunClassConstructor(patchApi.AccessToolsType.TypeHandle)") == 1 and step27_source.count("RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)") == 1, "Step 27 replays the proven Harmony/PatchProcessor/AccessTools class-constructor barriers and adds exactly one explicit HarmonySharedState barrier")
-require(step27_source.count("CreateIosNormalizedHarmonyRuntimeImage(target.PreparedPath)") == 1, "Step 27.0.14 creates exactly one bounded normalized Harmony runtime image during Gate A")
-require(step27_source.count("CreateSyntheticPassthroughRuntimeImage(target.PreparedPath)") == 1, "Step 27.0.14 retains exactly one internal synthetic passthrough path alongside canonical normalization")
-require("_targetSimpleName.Equals(TargetSimpleName, StringComparison.OrdinalIgnoreCase)" in step27_source and "_targetVersion == TargetVersion" in step27_source and "requiresIosHarmonyNormalization" in step27_source, "Step 27.0.14 scopes production normalization to exact canonical target identity/version")
-require("requiresIosHarmonyNormalization &&" in step27_source and "produce a byte-distinct runtime image" in step27_source and "!requiresIosHarmonyNormalization &&" in step27_source and "internal synthetic-target replay must remain byte-identical" in step27_source, "Step 27.0.14 requires canonical normalization to be byte-distinct and synthetic replay to be byte-identical")
-require("var sha1 = Convert.ToHexString(SHA1.HashData(bytes)).ToLowerInvariant();" in step27_source and step27_source.count("            sha1,\n            sha1,\n            bytes,") == 1, "Step 27.0.13 synthetic passthrough hashes exactly the unchanged prepared bytes")
-require("TargetSimpleName,\n            TargetVersion," in step27_source, "Step 27 public constructor remains pinned to canonical 0Harmony 2.4.2 target")
-require("HarmonySharedState iOS runtime-image normalization: NOT APPLICABLE — internal synthetic target replay" in step27_tests and "production normalization policy not bypassed" in step27_tests, "Step 27 host tests explicitly prove synthetic replay bypass is test-scoped and byte-preserving")
-require("ReadHarmonyPatchEngineMetadata(path)" in step27_source and "refuses to normalize HarmonySharedState because the source 0Harmony patch-engine fingerprint" in step27_source, "Step 27.0.14 admits normalization only after the exact original patch-engine fingerprint passes")
-require("module.Write(output)" not in step27_source and "ModuleDefinition.Write" not in step27_source, "Step 27.0.21 removes Cecil whole-module serialization from the production normalizer")
-require("using BinaryPrimitives = System.Buffers.Binary.BinaryPrimitives;" in step27_source and "using PEReader = System.Reflection.PortableExecutable.PEReader;" in step27_source, "Step 27.0.21 uses bounded PE/header primitives without adding a metadata writer")
-require("GetContainingSectionIndex(cctor.RVA)" in step27_source and "section.PointerToRawData + (cctor.RVA - section.VirtualAddress)" in step27_source, "Step 27.0.21 maps the exact cctor RVA into its existing PE section/file slot")
-require("must use a fat ECMA-335 method header" in step27_source and "CorIlMethodMoreSects" in step27_source and "ExceptionHandlers.Count != 0" in step27_source, "Step 27.0.21 fail-closes on unexpected cctor body/header/extra-section shape")
-require("ModuleAttributes.StrongNameSigned" in step27_source and "would invalidate its strong-name signature" in step27_source and "ModuleAttributes.ILOnly" in step27_source and "requires an IL-only source module" in step27_source, "Step 27.0.21 admits only unsigned IL-only Harmony images for raw-body substitution")
-require("cctorEndRva" in step27_source and "overlappingMethod" in step27_source and "method-body slot overlaps another managed method RVA" in step27_source, "Step 27.0.21 proves no other managed-method RVA overlaps the admitted cctor storage span")
-require("ModuleAttributes.StrongNameSigned" in step27_source and "would invalidate its strong-name signature" in step27_source and "ModuleAttributes.ILOnly" in step27_source and "requires an IL-only source module" in step27_source, "Step 27.0.21 admits only unsigned IL-only Harmony images for raw-body substitution")
-require("cctorEndRva" in step27_source and "overlappingMethod" in step27_source and "method-body slot overlaps another managed method RVA" in step27_source, "Step 27.0.21 proves no other managed-method RVA overlaps the admitted cctor storage span")
-require("RequireExistingParameterlessConstructorToken" in step27_source and "Expected an existing MemberRef constructor token" in step27_source and "RequireFieldToken" in step27_source and "Expected a FieldDef token" in step27_source, "Step 27.0.21 reuses only pre-existing constructor and field metadata tokens")
-require("var replacementIl = new byte[47];" in step27_source and "replacementFatFlagsAndSize = 0x3003" in step27_source and "WriteUInt16LittleEndian(runtimeBytes.AsSpan(methodFileOffset + 2, 2), 1)" in step27_source and "WriteInt32LittleEndian(runtimeBytes.AsSpan(methodFileOffset + 4, 4), replacementIl.Length)" in step27_source and "WriteInt32LittleEndian(runtimeBytes.AsSpan(methodFileOffset + 8, 4), 0)" in step27_source, "Step 27.0.21 pins the exact 12-byte fat header and 47-byte replacement body contract")
-require(step27_source.count("EmitTokenInstruction(0x73,") == 3 and step27_source.count("EmitTokenInstruction(0x80,") == 5 and "replacementIl[ilOffset++] = 0x14;" in step27_source and "replacementIl[ilOffset++] = 0x20;" in step27_source and "replacementIl[ilOffset++] = 0x2A;" in step27_source, "Step 27.0.21 encodes the exact eleven direct-state IL operations without Cecil instruction generation")
-require("Array.Clear(runtimeBytes, methodFileOffset, originalBodyStorageLength)" in step27_source and "index >= methodFileOffset && index < methodFileOffset + originalBodyStorageLength" in step27_source and "changed bytes outside the admitted .cctor method-body slot" in step27_source, "Step 27.0.21 changes only the original cctor method-body slot in the cloned runtime image")
-require("new MemoryStream(runtimeBytes, writable: false)" in step27_source and "instructions.Count != 11" in step27_source, "Step 27.0.21 reopens the raw-patched image read-only and pins the exact 11-instruction cctor")
-require(step27_source.count("ReadingMode = ReadingMode.Deferred") >= 8 and "ReadingMode = ReadingMode.Immediate" not in step27_source, "Step 27.0.21 keeps all Step-27 Cecil reads deferred and forbids the physical 0.0.97 Immediate-reader regression")
-require("Cecil 0.11.6 must resolve enum-typed" in step27_source and "whole-module round-trip incompatible" in step27_source, "Step 27.0.21 documents why Cecil serialization was removed rather than framework enums whitelisted")
-require("GetOrCreateSharedStateType" in step27_source and "FieldRefAccess" in step27_source and "ReflectionHelper::Load" in step27_source and "Normalized HarmonySharedState::.cctor failed its exact 11-instruction iOS-safe fingerprint audit." in step27_source, "Step 27.0.14 normalized cctor audit forbids the original dynamic-singleton/FieldRefAccess load calls")
-require("HarmonySharedStateInternalVersion = 102" in step27_source and 'RequireField("state"' in step27_source and 'RequireField("originals"' in step27_source and 'RequireField("originalsMono"' in step27_source and 'GetField("methodAddressRef"' in step27_source, "Step 27.0.14 normalization is pinned to the exact HarmonySharedState direct-state field surface")
-require("SourcePreparedSha1" in step27_source and "RuntimeImageSha1" in step27_source and "RuntimeImageBytes" in step27_source and "produce a byte-distinct runtime image" in step27_source, "Step 27.0.14 records source/runtime hashes and requires a byte-distinct compatibility image")
-require("new MemoryStream(_harmonyRuntimeImage.RuntimeImageBytes, writable: false)" in step27_source and "prepared.Plan.AssemblyFullName.Equals(_normalizedHarmonyAssemblyFullName" in step27_source, "Step 27.0.14 private load context uses retained memory bytes only for the exact admitted target identity")
-require('"T5a — bounded iOS-normalized HarmonySharedState cctor image reverified in memory' in step27_source and '"T5b — entering RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle) against the normalized direct-state initializer' in step27_source, "Step 27.0.14 brackets the normalized HarmonySharedState cctor with durable T5a/T5b progress")
-require("generatedBeforeSharedInitialization.Length != 0" in step27_source and "unexpected pre-existing generated patch-engine assembly" in step27_source and "sharedGeneratedAssemblies.Length != 0" in step27_source, "Step 27.0.14 rejects generated HarmonySharedState/proxy state before and after normalized T5/T6")
-require("harmonySharedStateStateField.GetValue(null) is null" in step27_source and "harmonySharedStateOriginalsField.GetValue(null) is null" in step27_source and "harmonySharedStateOriginalsMonoField.GetValue(null) is null" in step27_source and "harmonySharedStateMethodAddressRefField.GetValue(null) is not null" in step27_source, "Step 27.0.14 T6 validates three initialized dictionaries and null methodAddressRef")
-require(step27_source.count("_offlineInspection.RunAsync(") == 6, "Step 27 re-proves OfflineReady at preflight, post-initialization, post-Harmony-construction, post-processor, post-patch, and final boundaries")
-require('stage = "OfflineReady post-patch pre-invocation check"' in step27_source and 'stage = "OfflineReady final postcondition"' in step27_source and step27_source.count('\"OfflineReady exact-tree verification: YES\\n\" +') == 2, "Step 27 has distinct post-patch and final OfflineReady proof stages")
-require("Harmony.Patch(" not in step27_source and "PatchAll(" not in step27_source and "PatchCategory(" not in step27_source and "PatchClassProcessor" not in step27_source, "Step 27 never invokes broad Harmony patch/discovery APIs")
-require("Activator.CreateInstance" not in step27_source and "Activator." not in step27_source, "Step 27 does not use broad Activator construction")
-step27_ui = read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs")
-require("BundleIdentityMatchesExpected" in step27_ui and "IDENTITY_FAIL" in step27_ui and "No Step-27 gate was run" in step27_ui, "Step 27.0.14 fails closed before Gate A on bundle/source identity mismatch")
-require("App version:" in step27_ui and "Expected source version:" in step27_ui and "Candidate:" in step27_ui and "Gate S implementation:" in step27_ui and "Gate T implementation:" in step27_ui, "Step 27.0.14 crash checkpoint self-identifies release/candidate/Gate-S/Gate-T provenance")
-require("LoadUnmanagedDll(string unmanagedDllName)" in step27_source and "throw new DllNotFoundException" in step27_source, "Step 27 strict private context still refuses native resolution")
-require("context.RejectedManagedRequests.Count != 0" in step27_source, "Step 27 fails on unplanned managed resolution")
-require('GetType("StS' not in step27_source and 'GetType("STS' not in step27_source and 'GetType("MegaCrit' not in step27_source, "Step 27 introduces no named StS2 type reflection")
-for forbidden_write in ["File.WriteAllBytes", "File.WriteAllText", "File.Move", "File.Delete"]:
-    require(forbidden_write not in step27_source, f"Step 27 runtime boundary never mutates prepared/live bytes: {forbidden_write}")
-require("[MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]" in step27_probe, "Step 27 launcher target/prefix are protected from build-time inlining/optimization")
-require("public static int Target(int value)" in step27_probe and "return value + 1;" in step27_probe, "Step 27 launcher target has deterministic original value+1 behavior")
-require("public static bool Prefix(int value, ref int __result)" in step27_probe and "__result = value + 1000;" in step27_probe and "return false;" in step27_probe, "Step 27 launcher prefix deterministically replaces the result and skips the original body")
-require("Interlocked.Increment(ref _targetCalls)" in step27_probe and "Interlocked.Increment(ref _prefixCalls)" in step27_probe, "Step 27 launcher probe records target/prefix execution separately")
-require("OrderedHarmonyPatchExecutionGatesReachTwentySixOfTwentySixPass" in step27_tests and "HarmonyPatchExecutionGatesStopAfterFirstFailure" in step27_tests, "Step 27 host tests enforce ordered fail-fast twenty-six-gate behavior")
-require("SyntheticStep26ReplayThroughEmptyProcessorStillPassesBeforePatchBoundary" in step27_tests and "RunPostProcessorAuditAsync" in step27_tests, "Step 27 host tests preserve a synthetic A-N replay of the closed empty-processor boundary")
-require("LauncherPatchProbeHasDeterministicOriginalAndPrefixBehavior" in step27_tests and "LauncherPatchProbeReflectionSurfaceIsExactAndLauncherOwned" in step27_tests, "Step 27 host tests cover exact launcher patch-probe behavior and signature metadata")
-require("LauncherPatchPrefixCarriesNoHarmonyAnnotationsSoBoundedDescriptorPathIsEquivalent" in step27_tests, "Step 27 host tests require zero Harmony annotations for the bounded descriptor substitution")
-require("AccessToolsMetadataAuditAcceptsOnlyExactMeasuredRuntimeDetectionCacheInitializer" in step27_tests and "WriteAccessToolsFixture" in step27_tests, "Step 27 host tests pin the exact physically measured AccessTools runtime-detection/cache initializer metadata shape")
-require("HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing" in step27_tests and "ReadHarmonyPatchEngineMetadata" in step27_tests, "Step 27 host tests exercise fail-closed patch-engine metadata admission")
-step27_test_project = read("tests/StS2Launcher.Core.Tests/StS2Launcher.Core.Tests.csproj")
-step27_test_script = read("scripts/test.sh")
-require('PackageDownload Include="Lib.Harmony"' not in step27_test_project and 'PackageReference Include="Lib.Harmony"' not in step27_test_project and "CopyStep27RealHarmonyNormalizerFixture" not in step27_test_project and "NuGetPackageRoot" not in step27_test_project, "Step 27.0.20 keeps Harmony package assets and brittle NuGet/MSBuild fixture-path assumptions out of the test project")
-require('STEP27_HARMONY_RELEASE_URL="https://github.com/pardeike/Harmony/releases/download/v2.4.2.0/Harmony-Fat.2.4.2.0.zip"' in step27_test_script and 'STEP27_HARMONY_ARCHIVE_RELATIVE="net9.0/0Harmony.dll"' in step27_test_script, "Step 27.0.20 pins the exact official Harmony-Fat 2.4.2 release URL and strict net9.0 implementation member")
-require('STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED="a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774"' in step27_test_script and 'STEP27_HARMONY_FIXTURE_SHA256_EXPECTED="a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab"' in step27_test_script, "Step 27.0.20 content-addresses the exact official archive and selected net9 DLL observed by Codemagic 0.0.103")
-require("host-only structural surrogate" in step27_test_script and "production normalizer remains pinned" in step27_test_script and "EditorBrowsable metadata" in step27_test_script, "Step 27.0.20 explicitly scopes the official net9.0 binary to CI structural regression only")
-require("curl --fail --location --silent --show-error" in step27_test_script and "--retry 3" in step27_test_script and "--proto '=https' --tlsv1.2" in step27_test_script and 'STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL=' in step27_test_script and 'archive hash drift' in step27_test_script and 'fixture hash drift' in step27_test_script and '(PIN MATCH)' in step27_test_script, "Step 27.0.20 verifies exact archive/DLL hashes before the real-Harmony regression")
-require('unzip -Z1 "$STEP27_HARMONY_ARCHIVE" > "$STEP27_HARMONY_MEMBER_LIST"' in step27_test_script and 'STEP27_HARMONY_MEMBER_COUNT=' in step27_test_script and "awk 'END { print NR + 0 }'" in step27_test_script and r'gsub(/\\/, "/", normalized)' in step27_test_script and "normalized == target" in step27_test_script and 'wrapped="/" target' in step27_test_script and "Discovered 0Harmony.dll archive members:" in step27_test_script, "Step 27.0.20 retains exact root-or-wrapped member selection and drift diagnostics")
-require('artifacts/host-step27-fixtures' in step27_test_script and 'export STS2_STEP27_REAL_HARMONY_FIXTURE="$ROOT/$STEP27_HARMONY_FIXTURE"' in step27_test_script and 'export STS2_STEP27_REAL_HARMONY_ARCHIVE_MEMBER="$STEP27_HARMONY_ARCHIVE_MEMBER"' in step27_test_script, "Step 27.0.20 quarantines the official Harmony fixture and exports only its path/member evidence")
-require('Environment.GetEnvironmentVariable("STS2_STEP27_REAL_HARMONY_FIXTURE")' in step27_tests and 'Environment.GetEnvironmentVariable("STS2_STEP27_REAL_HARMONY_ARCHIVE_MEMBER")' in step27_tests and "Path.GetFullPath(fixturePath!)" in step27_tests, "Step 27.0.20 real-Harmony regression consumes only the canonical host-script fixture path and selected archive-member evidence")
-require("OfficialHarmony242Net9FatNormalizerPatchesOnlySharedStateMethodBodyAndPreservesSourceBytes" in step27_tests and "HasEditorBrowsableAttributeSurface" in step27_tests and "CreateIosNormalizedHarmonyRuntimeImage" in step27_tests and "SourcePreparedSha1" in step27_tests and "RuntimeImageSha1" in step27_tests and "instructions=11" in step27_tests, "Step 27.0.21 host test executes the official merged Harmony 2.4.2 net9 surrogate through the raw-body production normalizer and preserves source bytes")
-require("sourceBytesBefore.Length, runtimeBytes.Length" in step27_tests and "Raw-body normalization must preserve the exact PE image length" in step27_tests and "sourceBytesBefore.AsSpan().SequenceEqual(runtimeBytes)" in step27_tests, "Step 27.0.21 real-Harmony regression proves no PE relayout and requires a byte-distinct runtime image")
-real_harmony_test_start = step27_tests.index("OfficialHarmony242Net9FatNormalizerPatchesOnlySharedStateMethodBodyAndPreservesSourceBytes")
-real_harmony_test_end = step27_tests.index("HarmonyPatchEngineMetadataAuditFailsClosedWhenSharedStateReplacementOrDetourChainIsMissing")
-real_harmony_test = step27_tests[real_harmony_test_start:real_harmony_test_end]
-require("ConstructorArguments" not in real_harmony_test, "Step 27.0.20 real-Harmony regression detects the EditorBrowsable surface without resolving attribute argument values")
-require('expectedFixtureSha256 = "a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab"' in real_harmony_test and "SHA256.HashData(sourceBytesBefore)" in real_harmony_test, "Step 27.0.20 C# regression independently pins and re-hashes the exact official net9 DLL")
-require('normalizedArchiveMember.Equals("net9.0/0Harmony.dll"' in real_harmony_test and 'EndsWith("/net9.0/0Harmony.dll"' in real_harmony_test, "Step 27.0.20 keeps exact selected-member proof without AssemblyRef inference")
-require('SingleOrDefault(reference => reference.Name == "System.Runtime")' not in real_harmony_test and 'reference.Name == "System.Runtime"' not in real_harmony_test and 'reference.Name == "netstandard"' not in real_harmony_test and "merged AssemblyRef rows" in real_harmony_test, "Step 27.0.20 forbids target-framework/provenance inference from merged System.Runtime/netstandard AssemblyRef topology")
-require("using CecilCustomAttributeProvider = Mono.Cecil.ICustomAttributeProvider;" in step27_tests and "HasAttribute(CecilCustomAttributeProvider provider, string fullName)" in step27_tests, "Step 27.0.15 real-Harmony test explicitly aliases the Cecil custom-attribute provider")
-require("HasAttribute(ICustomAttributeProvider provider, string fullName)" not in step27_tests, "Step 27.0.15 forbids the ambiguous bare ICustomAttributeProvider helper declaration")
-require("wrongThrowOnError" in step27_tests and "expected false then false" in step27_tests and "wrongThrowOnError ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0" in step27_tests, "Step 27 host tests reject drift in the physical RuntimeInformation Type.GetType operands")
-require("wrongLockRecursion" in step27_tests and "expected SupportsRecursion (1)" in step27_tests and "wrongLockRecursion ? OpCodes.Ldc_I4_0 : OpCodes.Ldc_I4_1" in step27_tests, "Step 27 host tests reject drift in the physical ReaderWriterLockSlim SupportsRecursion operand")
-require("Exact Step 24.0.4 MonoMod logger dispatch fingerprint: MATCH" in step27_tests, "Step 27 retains the physically measured Step 24.0.4 logger fingerprint regression")
-step27_preservation = read("src/StS2Launcher.iOS/Platform/Step27AccessToolsFrameworkPreservation.cs")
-require("typeof(RuntimeInformation)" in step27_preservation and "typeof(PropertyInfo)" in step27_preservation and "typeof(Dictionary<,>)" in step27_preservation and "typeof(ReaderWriterLockSlim)" in step27_preservation, "Step 27 preserves only the bounded framework surface measured in AccessTools::.cctor")
-require("Step27AccessToolsFrameworkPreservation.Activate();" in read("src/StS2Launcher.iOS/UI/RootViewController.HarmonyPatchExecution.cs"), "Step 27 roots the AccessTools DynamicDependency preservation anchor from candidate-owned UI")
-step27_patch_engine_preservation = read("src/StS2Launcher.iOS/Platform/Step27PatchEngineFrameworkPreservation.cs")
-require(all(marker in step27_patch_engine_preservation for marker in ["typeof(DynamicMethod)", "typeof(ILGenerator)", "typeof(RuntimeMethodHandle)", "typeof(AssemblyBuilder)", "typeof(ModuleBuilder)", "typeof(TypeBuilder)", "typeof(MethodBuilder)"]), "Step 27.0.8 retains only the bounded patch-engine Reflection.Emit/MethodHandle framework surface")
-require("TrimmerRootAssembly Include=\"System.Reflection.Emit" not in project_text, "Step 27.0.8 does not broaden preservation to a Reflection.Emit assembly root")
-require("Step27PatchEngineFrameworkPreservation.Activate();" in step27_ui, "Step 27 roots the bounded patch-engine DynamicDependency preservation anchor from candidate-owned UI")
-require("STEP32 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION" in project_text, "build telemetry records the retired Step-27 patch-engine preservation anchor as historical evidence")
-require("cctor.Body.Instructions.Count != 57" in step27_source and "[Code.Ldc_I4_1] = 1" in step27_source and "Exact Step 27.0.2 physical AccessTools initializer fingerprint: MATCH" in step27_source and "RuntimeInformation.FrameworkDescription" in step27_source, "Step 27 Gate O pins the exact physical 57-instruction AccessTools fingerprint and framework preflight")
-require("expected false then false" in step27_source and "typedGetTypeCalls[0].Previous" in step27_source and "typedGetTypeCalls[1].Previous" in step27_source and "LockRecursionPolicy.SupportsRecursion" in step27_source and "ReaderWriterLockSlim recursion-policy operand changed" in step27_source, "Step 27 Gate O pins the physical RuntimeInformation Type.GetType operands and ReaderWriterLockSlim SupportsRecursion operand semantically")
-require("HarmonySharedState internalVersion: 102 — MATCH" in step27_source and "GetOrCreateSharedStateType" in step27_source and "MethodCreatorConfig.Prepare" in step27_source and "DetourFactory.Current.CreateDetour" in step27_source and "MethodHandle.GetFunctionPointer" in step27_source, "Step 27 Gate O pins the exact shared-state/replacement/detour/update patch-engine chain")
-gate_o_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunHarmonyPatchApiResolution(")
-gate_o_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunLauncherPatchProbeResolution()", gate_o_start)
-gate_o_body = step27_source[gate_o_start:gate_o_end]
-require("frameworkDescriptionProperty.GetValue(null)" not in gate_o_body and "FrameworkDescription" in gate_o_body, "Step 27 Gate O resolves FrameworkDescription metadata without invoking the reflected getter")
-require("GetType(HarmonySharedStateTypeFullName" not in gate_o_body and "ValidatePatchEngineHostFrameworkPreservationSurface" not in gate_o_body, "Step 27.0.8 restores Gate-O runtime reflection to the physically passing 0.0.90 PatchProcessor/HarmonyMethod/AccessTools surface")
-require("ReadHarmonyPatchEngineMetadata(preflight.Target.PreparedPath)" in gate_o_body and "HarmonySharedState" in gate_o_body, "Step 27 Gate O retains HarmonySharedState/replacement/detour admission as metadata-only audit")
-require(all(marker in gate_o_body for marker in ["O1 —", "O2 —", "O3 —", "O4 —", "O5 —", "O6 —", "O7 —", "O8 —", "O9 —", "O10 —", "O11 —"]) and "O12 —" not in gate_o_body, "Step 27.0.8 Gate O exposes eleven durable crash-localization substages on the restored runtime surface")
-gate_r_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunAccessToolsTypeInitialization(")
-gate_r_end = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPrefixRegistration(", gate_r_start)
-gate_r_body = step27_source[gate_r_start:gate_r_end]
-require("patchApi.RuntimeFrameworkDescriptionProperty.GetValue(null)" in gate_r_body and all(marker in gate_r_body for marker in ["R1 —", "R2 —", "R3 —"]), "Step 27 Gate R owns reflected FrameworkDescription execution and explicit AccessTools initialization with substages")
-require(all(marker in step27_source for marker in ["S1 —", "S2 —", "S3 —", "S4 —", "S5 —", "T1 —", "T2 —", "T3 —", "T4 —", "T5a —", "T5b —", "T6 —", "T6a —", "T6b —", "T7 —", "T8 —", "T9 —"]), "Step 27 bounded prefix registration and decomposed patch-engine runtime boundary have durable crash substages including LINQ closure T6a/T6b")
-gate_t_start = step27_source.index("public ControlledHarmonyPatchExecutionGateResult RunPatchEngineExecution(")
-gate_t_end = step27_source.index("public async Task<ControlledHarmonyPatchExecutionGateResult> RunPostPatchAuditAsync(", gate_t_start)
-gate_t_body = step27_source[gate_t_start:gate_t_end]
-require("ValidatePatchEngineHostFrameworkPreservationSurface();" in gate_t_body and "GetType(HarmonySharedStateTypeFullName" in gate_t_body and "sharedResolutionManagedDelta" in gate_t_body and "sharedResolutionMembershipAfter.SequenceEqual" in gate_t_body, "Step 27.0.8 Gate T measures the new host/shared-state runtime reflection instead of weakening Gate-O purity")
-require("Static field values were NOT read and the cctor was NOT run" in gate_t_body and "RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)" in gate_t_body and "ValidatePatchEngineLinqFrameworkPreservationSurface()" in gate_t_body and "patchApi.PatchMethod.Invoke(processor, null)" in gate_t_body, "Step 27 Gate T orders reflection -> normalized shared-state initialization -> LINQ preservation preflight -> one public Patch() acceptance call")
-linq_preflight_index = gate_t_body.index("ValidatePatchEngineLinqFrameworkPreservationSurface()")
-shared_state_cctor_index = gate_t_body.index("RuntimeHelpers.RunClassConstructor(harmonySharedStateType.TypeHandle)")
-patch_invoke_index = gate_t_body.index("patchApi.PatchMethod.Invoke(processor, null)")
-require(shared_state_cctor_index < linq_preflight_index < patch_invoke_index, "Step 27.0.23 retains T6a/T6b LINQ closure strictly after shared-state cctor completion and before Patch()")
-require("IsExactTwoSequenceUnion" in step27_source and "IsExactNonIndexedSelect" in step27_source and "IsExactThreeSelectorToDictionary" in step27_source and "SingleOrDefault(IsExactTwoSequenceUnion)" in step27_source and "SingleOrDefault(IsExactNonIndexedSelect)" in step27_source and "SingleOrDefault(IsExactThreeSelectorToDictionary)" in step27_source, "Step 27.0.23 retains the exact LINQ preflight overload shapes as a regression contract")
-require("defaultCtorIl.Count == 6" in step27_source and "Code.Ldc_I4_M1" in step27_source and "HarmonyMethod() no longer matches exact priority=-1" in step27_source, "Step 27 Gate O pins the exact parameterless HarmonyMethod descriptor constructor shape")
-require("harmonyAnnotations.Length != 0" in step27_source and "HarmonyMethod(MethodInfo)/ImportMethod invoked: NO" in step27_source and "PatchProcessor.AddPrefix invoked: NO" in step27_source, "Step 27 bounded descriptor path is admitted only for an annotation-free prefix and records the skipped crashing path")
-require("collectibleLoadContext: true" in step27_tests and "Guid.NewGuid()" in step27_tests, "Step 27 host tests retain synthetic runtime identity isolation")
+retired_harmony_present = [relative for relative in retired_harmony_paths if (ROOT / relative).exists()]
+require(not retired_harmony_present, "closed Step 25-27 runtime-Harmony implementation/tests/UI/fixture are absent from the active build surface", ", ".join(retired_harmony_present))
+require("ControlledHarmonyConstruction" not in root_ui_text and "ControlledHarmonyProcessorCreation" not in root_ui_text and "ControlledHarmonyPatchExecution" not in root_ui_text and "AddControlledHarmony" not in root_ui_text, "RootViewController no longer wires retired runtime-Harmony experiments")
 
-# Step 27.0.24 — single post-publish interpreted target/prefix decision experiment.
-step27_interpreted_project = ROOT / "fixtures/StS2Launcher.Step27.InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.csproj"
-step27_interpreted_source_path = ROOT / "fixtures/StS2Launcher.Step27.InterpretedPatchFixture/InterpretedPatchProbe.cs"
-require(step27_interpreted_project.is_file() and step27_interpreted_source_path.is_file(), "Step 27.0.24 dedicated interpreted patch fixture project/source exist")
-step27_interpreted_source = step27_interpreted_source_path.read_text() if step27_interpreted_source_path.is_file() else ""
-require(all(marker in step27_interpreted_source for marker in ["public static int TargetCalls", "public static int PrefixCalls", "public static void ResetCounters()", "public static int Target(int value)", "public static int InvokeTarget(int value) => Target(value);", "public static bool Prefix(int value, ref int __result)", "__result = value + 1000", "return false"]), "Step 27.0.24 fixture pins deterministic Target/InvokeTarget/Prefix/counter behavior")
-require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text, "Step 27.0.24 interpreted fixture is absent from the iOS MSBuild/AOT project graph")
 test_project_text = read("tests/StS2Launcher.Core.Tests/StS2Launcher.Core.Tests.csproj")
-require('ProjectReference Include="../../fixtures/StS2Launcher.Step27.InterpretedPatchFixture' not in test_project_text, "Step 27.0.24 interpreted fixture is not a host-test ProjectReference")
-require("PostPublishInterpretedPatchFixtureHasExactPatchSurfaceWithoutProjectReference" in step27_tests and "STS2_STEP27_INTERPRETED_PATCH_FIXTURE" in step27_tests and "InvokeTarget must retain a direct managed IL call to Target" in step27_tests, "host suite validates the separately supplied interpreted fixture without a project reference")
-require("InterpretedPatchFixtureDirectoryName" in root_ui_text and "NSBundle.MainBundle.BundlePath" in root_ui_text and "new ControlledHarmonyPatchExecution(" in root_ui_text, "iOS UI passes the explicit bundled post-publish fixture directory into Step 27")
-
 build_ios_text = read("scripts/build-ios.sh")
-require("STEP27_INTERPRETED_FIXTURE_PROJECT" in build_ios_text and 'dotnet build "$STEP27_INTERPRETED_FIXTURE_PROJECT"' in build_ios_text, "iOS build explicitly builds the Step 27 interpreted fixture outside the iOS project graph")
-require('dotnet publish "$PROJECT"' in build_ios_text and 'cp "$STEP27_INTERPRETED_FIXTURE_DLL" "$APP/Step27InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.dll"' in build_ios_text, "iOS build explicitly copies the interpreted fixture into the app")
-require(build_ios_text.index('dotnet publish "$PROJECT"') < build_ios_text.index('cp "$STEP27_INTERPRETED_FIXTURE_DLL" "$APP/Step27InterpretedPatchFixture/StS2Launcher.Step27.InterpretedPatchFixture.dll"'), "Step 27 interpreted fixture copy occurs strictly after dotnet publish returns")
 verify_ipa_text = read("scripts/verify-ipa.sh")
-require("Step27InterpretedPatchFixture" in verify_ipa_text and "STEP27_BUNDLED_COUNT" in verify_ipa_text and '[[ "$STEP27_BUNDLED_COUNT" == "1" ]]' in verify_ipa_text and 'cmp -s "$STEP27_FIXTURE_SOURCE" "$STEP27_FIXTURE"' in verify_ipa_text and "step27-interpreted-patch-fixture.sha256" in verify_ipa_text, "IPA verifier requires exactly one byte-identical hash-verified interpreted fixture in its data-only directory")
 test_script_text = read("scripts/test.sh")
-require("STEP27_INTERPRETED_PROJECT" in test_script_text and "STS2_STEP27_INTERPRETED_PATCH_FIXTURE" in test_script_text and 'dotnet build "$STEP27_INTERPRETED_PROJECT"' in test_script_text, "host runner builds the interpreted fixture separately and exports only its path to MSTest")
-require("processorApi.CreateProcessorMethod.Invoke(harmonyInstance, [target])" in step27_source and "processorApi.OriginalField.GetValue(interpretedProcessor), target" in step27_source, "Gate P creates a fresh public processor bound to the exact interpreted target without private original-field mutation")
-require("processorApi.OriginalField.SetValue" not in step27_source and "patchApi.OriginalField.SetValue" not in step27_source, "Step 27.0.24 never mutates PatchProcessor.original directly")
-require("ResetPatchProbeCounters(probe);" in step27_source and "RequirePatchProbeCounters(2, 0" in step27_source and "RequirePatchProbeCounters(2, 2" not in step27_source, "interpreted fixture baseline counters are reset and physically re-established before patching")
-require(step27_source.count("InvokePatchProbeInt32(probe.Target, 41") == 3 and step27_source.count("InvokePatchProbeInt32(probe.InvokeTarget, 41") == 3, "baseline/patched/restored gates each exercise direct target reflection plus in-fixture interpreted call route")
-require("finalCounters.TargetCalls != 2 || finalCounters.PrefixCalls != 2" in step27_source and "counters.TargetCalls != 4 || counters.PrefixCalls != 2" in step27_source, "Step 27.0.24 pins skip-original patched counters and exact restored counters")
-require("MONOMOD_DMD_TYPE" not in step27_source + build_ios_text + test_script_text + project_text, "Step 27.0.24 does not force a MonoMod DMD backend override")
-require("STEP-27.0.23-PHYSICAL-NOTIMPLEMENTED-PATCHENGINE.txt" in read("docs/CURRENT-STATUS.md") and "STEP-27.0.24-POST-PUBLISH-INTERPRETED-PATCH-EXPERIMENT.md" in read("docs/history/INDEX.md"), "active status/history index preserve the physical 0.0.107 evidence and final interpreted decision experiment")
-master_after_step27 = read("docs/MASTER-PLAN.md")
-require("physical Step 27.0.24 / 0.0.108" in master_after_step27 and "closed runtime Harmony/MonoMod replacement as a negative architecture result" in master_after_step27 and "deterministic ahead-of-load managed transformation" in master_after_step27, "master plan records the physical Step-27 negative architecture decision and Step-28 ahead-of-load pivot")
-
-step27_manifest = ROOT / "tools/validation/candidate-step27-harmony-patch-boundary.sha256"
-require(step27_manifest.is_file(), "Step 27 candidate boundary hash manifest exists")
-if step27_manifest.is_file():
-    # Step 27 is now a physically closed negative architecture experiment. Keep its implementation,
-    # tests, framework-preservation evidence, UI/report surface, and fixture byte-pinned, but permit the
-    # active release/version/build wiring to advance to Step 28.
-    superseded_step27_release_wiring = {
-        "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs",
-        "src/StS2Launcher.iOS/UI/RootViewController.cs",
-        "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
-        "src/StS2Launcher.iOS/Info.plist",
-        "scripts/build-ios.sh",
-        "scripts/lib/current-release.sh",
-        "scripts/test.sh",
-        "scripts/codemagic.sh",
-        "scripts/verify-ipa.sh",
-        "codemagic.yaml",
-    }
-    step27_mismatches: list[str] = []
-    for line in step27_manifest.read_text().splitlines():
-        if not line.strip():
-            continue
-        digest, relative = line.split("  ", 1)
-        if relative in superseded_step27_release_wiring:
-            continue
-        path = ROOT / relative
-        if not path.is_file() or sha256(path) != digest:
-            step27_mismatches.append(relative)
-    require(not step27_mismatches, "physically closed Step-27 implementation/evidence remains hash-pinned while active release wiring advances to Step 28", ", ".join(step27_mismatches))
+for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
+    require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
+require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
+require("Step 32.0.3 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the maintenance candidate rather than retired Step 27")
+require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
+require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
+require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
+require("Step25-ControlledHarmonyConstruction.txt" not in ui_text and "Step26-ControlledHarmonyProcessorCreation.txt" not in ui_text and "Step27-ControlledHarmonyPatchExecution.txt" not in ui_text, "retired Step 25-27 report controls are absent from active UI")
 
 # Step 28.0 — deterministic ahead-of-load Cecil transformation before CLR admission.
+
 step28_source_path = ROOT / "src/StS2Launcher.Core/Compatibility/AheadOfLoadManagedTransformation.cs"
 step28_gate_path = ROOT / "src/StS2Launcher.Core/Compatibility/AheadOfLoadManagedTransformationGate.cs"
 step28_summary_path = ROOT / "src/StS2Launcher.Core/Compatibility/AheadOfLoadManagedTransformationSummary.cs"
@@ -1491,7 +1076,7 @@ require("App version: 0.0.107 (107)" in step27_build107_report and "CONTROLLED L
 require("System.NotImplementedException: Arg_NotImplementedException" in step27_build107_report and "at HarmonyLib.PatchFunctions.UpdateWrapper" in step27_build107_report and "at HarmonyLib.PatchProcessor.Patch" in step27_build107_report, "physical build 107 proves trimming ambiguity is gone and localizes the next blocker to real Patch() execution")
 require("System.Linq.Enumerable.Union" not in step27_build107_report[step27_build107_report.index("Gate T — PatchEngineExecution: FAIL"): ] and "System.Diagnostics.DebuggableAttribute" not in step27_build107_report[step27_build107_report.index("Gate T — PatchEngineExecution: FAIL"): ], "physical build 107 Gate-T failure is no longer either known trimmed-framework-member failure")
 regression_contracts = read("docs/REGRESSION-CONTRACTS.md")
-require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in regression_contracts and "runtime Harmony/MonoMod method replacement is therefore retired" in regression_contracts, "regression contracts preserve the decisive Step-27 negative physical result and retire runtime patching")
+require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in regression_contracts and "runtime Harmony/MonoMod method replacement remains retired" in regression_contracts, "regression contracts preserve the decisive Step-27 negative physical result and retire runtime patching")
 require("## Step 28 — ahead-of-load managed transformation" in regression_contracts and "Target(41)==1041" in regression_contracts and "loads only the verified transformed bytes" in regression_contracts and "real StS2 member reflection/transformation/invocation" in regression_contracts, "regression contracts define the five-gate Step-28 transform-before-load capability boundary")
 step28_build110_report = read("docs/history/reports/STEP-28.0.1-CODEMAGIC-HOST-TEST-FAILURE.txt")
 require("Test Run Failed." in step28_build110_report and "Total tests: 217" in step28_build110_report and "Passed: 216" in step28_build110_report and "Failed: 1" in step28_build110_report, "Codemagic 0.0.110 evidence preserves the exact 216/217 host result")
@@ -1520,7 +1105,7 @@ require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 1/4" in step32_physical_write_
 require("## Step 32.0.2 — bounded Cecil write-time constant-metadata resolver" in regression_contracts and "write-only in-memory" in regression_contracts and "open zero external framework/game assembly bytes" in regression_contracts and "Constant-table" in regression_contracts, "regression contracts pin the Step-32.0.2 bounded serialization resolver correction")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.2 / 0.0.117 (117)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "System.Runtime" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines and advances the bounded Step-32 write correction")
+require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.3 / 0.0.118 (118)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "System.Runtime" in current_status and "Sentry, Version=5.0.0.0" in current_status and "maintenance-only" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines, the 0.0.117 Sentry finding, and the maintenance-only Step-32 trim")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
@@ -1564,6 +1149,7 @@ require("Step 32 PrepareMethod Semantic Context Audit build environment" in read
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
+require(all(marker in read("scripts/codemagic.sh") for marker in ["SDK_SECONDS", "VALIDATE_SECONDS", "HOST_TEST_SECONDS", "WORKLOAD_SECONDS", "IOS_BUILD_SECONDS", "IPA_VERIFY_SECONDS", "TOTAL_SECONDS"]), "maintenance Codemagic summary records per-stage and total elapsed time")
 require("history" not in codemagic.lower(), "Codemagic workflow has no history dependency")
 
 build_ios = read("scripts/build-ios.sh")

@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>117</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.117</ApplicationDisplayVersion>
+    <ApplicationVersion>118</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.118</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -107,6 +107,7 @@
     <TrimmerRootAssembly Include="System.Linq" />
   </ItemGroup>
 
+  <!-- Step 32.0.3 maintenance trim: closed Step 25-27 runtime-Harmony experiment implementations and their DynamicDependency anchors are preserved in the inert historical archive and are intentionally absent from the active iOS/AOT graph. The physically proven copy/no-link/interpreter policy remains unchanged. -->
   <Target Name="ValidateRuntimeAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
              Text="STEP32 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
@@ -116,12 +117,6 @@
              Text="STEP32 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
     <Message Importance="High"
              Text="STEP32 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" />
-    <Message Importance="High"
-             Text="STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION: DynamicDependency exact measured constructor surface" />
-    <Message Importance="High"
-             Text="STEP32 HISTORICAL ACCESSTOOLS FRAMEWORK PRESERVATION: DynamicDependency RuntimeInformation/PropertyInfo/Dictionary/ReaderWriterLockSlim measured initializer surface" />
-    <Message Importance="High"
-             Text="STEP32 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION: bounded DynamicDependency Reflection.Emit/MethodHandle surface from exact Harmony 2.4.2 shared-state/replacement/detour audit" />
     <Error Condition="'$(MtouchLink)' != 'None'"
            Text="Canonical dynamic-payload host policy requires MtouchLink=None so post-publish StS2/Harmony/mod framework dependencies are not member-trimmed." />
     <Error Condition="'$(TrimMode)' != 'copy'"

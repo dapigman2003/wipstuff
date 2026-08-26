@@ -1,6 +1,6 @@
 # Documentation Map
 
-Start here when resuming the project. The active frontier is Step 32.0.2 / 0.0.117 after physical 0.0.116 passed Gate A and exposed a bounded Cecil serialization dependency: `module.Write` needed exact `System.Runtime 9.0.0.0` enum metadata to encode unrelated Constant-table rows.
+Start here when resuming the project. The active candidate is Step 32.0.3 / 0.0.118, a maintenance-only trim after physical 0.0.117 re-proved Gate A and then failed closed at Gate B on exact external constant-metadata scope `Sentry, Version=5.0.0.0`. The Step-32 rewrite logic is intentionally unchanged while the retired Step 25–27 runtime-Harmony experiment is removed from the active build/test/package surface and preserved inertly in history.
 
 1. `MASTER-PLAN.md` — long-lived architecture, safety rules, authority model, and roadmap. Step 32 does not change that architecture.
 2. `CURRENT-STATUS.md` — exact physical baseline/candidate and acceptance state.
