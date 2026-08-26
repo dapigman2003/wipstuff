@@ -62,11 +62,9 @@ public sealed class RealStS2PrepareMethodRewriteTests
         StringAssert.Contains(gateA.Detail, "PrepareMethod sites rebound: 10/10");
         StringAssert.Contains(gateB.Detail, "One-argument sites rewritten: 6/6");
         StringAssert.Contains(gateB.Detail, "Two-argument sites rewritten: 4/4");
-        StringAssert.Contains(gateB.Detail, "PrepareMethod(handle) 5-byte call -> Pop + Nop + Nop + Nop + Nop");
-        StringAssert.Contains(gateB.Detail, "PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop");
-        StringAssert.Contains(gateB.Detail, "Patch windows: 10 x exactly 5 bytes");
-        StringAssert.Contains(gateB.Detail, "Cecil serialization performed: NO");
-        StringAssert.Contains(gateB.Detail, "All bytes outside the ten approved call windows unchanged: YES");
+        StringAssert.Contains(gateB.Detail, "PrepareMethod(handle, instantiation[]) -> Pop + Pop");
+        StringAssert.Contains(gateB.Detail, "Synthetic constant-metadata resolver types: 1");
+        StringAssert.Contains(gateB.Detail, "exact System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a only");
         StringAssert.Contains(gateC.Detail, "PrepareMethod references source/transformed: 10 / 0");
         StringAssert.Contains(gateD.Detail, "Trusted Step 12 managed install unchanged: YES");
         StringAssert.Contains(gateD.Detail, "Real StS2 assembly/type/member CLR load or invocation by Step 32: NO");
@@ -80,14 +78,10 @@ public sealed class RealStS2PrepareMethodRewriteTests
         var transformedMethod = FindPrewarmJit(transformedModule);
         Assert.AreEqual(10, CountPrepareMethod(sourceMethod));
         Assert.AreEqual(0, CountPrepareMethod(transformedMethod));
-        Assert.AreEqual(sourceMethod.Body.Instructions.Count + 40, transformedMethod.Body.Instructions.Count);
+        Assert.AreEqual(sourceMethod.Body.Instructions.Count + 4, transformedMethod.Body.Instructions.Count);
         Assert.AreEqual(
             sourceMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Pop) + 14,
             transformedMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Pop));
-        Assert.AreEqual(
-            sourceMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Nop) + 36,
-            transformedMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Nop));
-        Assert.AreEqual(new FileInfo(primaryPath).Length, new FileInfo(transformedPath!).Length);
         Assert.AreNotEqual(
             RealStS2PrepareMethodRewrite.ComputeMethodSemanticFingerprint(sourceMethod),
             RealStS2PrepareMethodRewrite.ComputeMethodSemanticFingerprint(transformedMethod));
@@ -173,8 +167,7 @@ public sealed class RealStS2PrepareMethodRewriteTests
     private static void WriteSyntheticPrimaryAssembly(string path, bool branchToFirstPrepareMethod)
     {
         using var syntheticRuntime = CreateSyntheticSystemRuntime();
-        using var syntheticSentry = CreateSyntheticSentry();
-        using var sourceWriteResolver = new MultiAssemblyResolver(syntheticRuntime, syntheticSentry);
+        using var sourceWriteResolver = new SingleAssemblyResolver(syntheticRuntime);
         using var assembly = AssemblyDefinition.CreateAssembly(
             new AssemblyNameDefinition("sts2", new Version(0, 1, 0, 0)),
             "sts2",
@@ -185,11 +178,6 @@ public sealed class RealStS2PrepareMethodRewriteTests
             PublicKeyToken = Convert.FromHexString("b03f5f7f11d50a3a"),
         };
         module.AssemblyReferences.Add(runtimeAssembly);
-        var sentryAssembly = new AssemblyNameReference("Sentry", new Version(5, 0, 0, 0))
-        {
-            PublicKeyToken = Convert.FromHexString("fba2ec45388e2af0"),
-        };
-        module.AssemblyReferences.Add(sentryAssembly);
         var type = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "OneTimeInitialization", TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Sealed, module.TypeSystem.Object);
         module.Types.Add(type);
         var runtimeHelpers = new TypeReference("System.Runtime.CompilerServices", "RuntimeHelpers", module, runtimeAssembly);
@@ -203,7 +191,7 @@ public sealed class RealStS2PrepareMethodRewriteTests
         prepareTwo.Parameters.Add(new ParameterDefinition(runtimeTypeHandleArray));
 
         var constantHolder = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "SyntheticConstantHolder", TypeAttributes.NotPublic | TypeAttributes.Abstract | TypeAttributes.Sealed, module.TypeSystem.Object);
-        var externalEnum = new TypeReference("Sentry", "SyntheticExternalEnum", module, sentryAssembly, true);
+        var externalEnum = new TypeReference("System", "SyntheticExternalEnum", module, runtimeAssembly, true);
         constantHolder.Fields.Add(new FieldDefinition(
             "ExternalEnumDefault",
             FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.Literal | FieldAttributes.HasDefault,
@@ -268,35 +256,10 @@ public sealed class RealStS2PrepareMethodRewriteTests
         return assembly;
     }
 
-    private static AssemblyDefinition CreateSyntheticSentry()
+    private sealed class SingleAssemblyResolver(AssemblyDefinition assembly) : IAssemblyResolver
     {
-        var name = new AssemblyNameDefinition("Sentry", new Version(5, 0, 0, 0))
-        {
-            PublicKeyToken = Convert.FromHexString("fba2ec45388e2af0"),
-        };
-        var assembly = AssemblyDefinition.CreateAssembly(name, "Sentry.dll", ModuleKind.Dll);
-        var enumType = new TypeDefinition(
-            "Sentry",
-            "SyntheticExternalEnum",
-            TypeAttributes.Public | TypeAttributes.Sealed,
-            assembly.MainModule.ImportReference(typeof(Enum)));
-        enumType.Fields.Add(new FieldDefinition(
-            "value__",
-            FieldAttributes.Public | FieldAttributes.SpecialName | FieldAttributes.RTSpecialName,
-            assembly.MainModule.ImportReference(typeof(int))));
-        assembly.MainModule.Types.Add(enumType);
-        return assembly;
-    }
-
-    private sealed class MultiAssemblyResolver : IAssemblyResolver
-    {
-        private readonly AssemblyDefinition[] _assemblies;
-
-        public MultiAssemblyResolver(params AssemblyDefinition[] assemblies)
-            => _assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
-
         public AssemblyDefinition Resolve(AssemblyNameReference name)
-            => _assemblies.SingleOrDefault(value => value.Name.FullName == name.FullName) ?? throw new AssemblyResolutionException(name);
+            => name.FullName == assembly.Name.FullName ? assembly : throw new AssemblyResolutionException(name);
 
         public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
             => Resolve(name);

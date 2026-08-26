@@ -1,32 +1,21 @@
-# StS2 Launcher iOS — Step 32.0.4 Fast-Preflight Assertion Fix
+# StS2 Launcher iOS — Step 32.0.2 Bounded Cecil Write-Metadata Resolver Fix
 
-Steps 01–26 are physically closed. Step 27 is closed negative for runtime Harmony/MonoMod replacement. Step 28 is closed positive at **5/5** for ahead-of-load transformation + transformed-only interpreted execution. Steps 29–31 are each closed positive at **4/4**, ending with the exact `OneTimeInitialization::PrewarmJit()` / ten-`RuntimeHelpers.PrepareMethod` family authorized for explicit rewrite design.
+Steps 01–26 are physically closed. Step 27 is closed negative for runtime Harmony/MonoMod replacement. Step 28 is closed positive at **5/5** for deterministic transform-before-load + transformed-only interpreted execution. Step 29 is closed positive at **4/4** for exact real-StS2 target auditing. Step 30 is closed positive at **4/4** and deferred the Harmony/mod-loading site. Step 31 is closed positive at **4/4** and confirmed the exact `OneTimeInitialization::PrewarmJit()` / ten-`PrepareMethod` family as eligible for an explicitly predeclared rewrite design.
 
 ## Active candidate
 
-**Step 32.0.4 / `0.0.119 (119)` — test-only correction after fast preflight validated the exact-length rewrite path**
+**Step 32.0.2 / `0.0.117 (117)` — bounded Cecil write-time constant-metadata resolution for the first real StS2 PrepareMethod rewrite**
 
-The semantic change remains exactly the Step-31-approved family: six one-argument `PrepareMethod(handle)` calls consume one stack value; four two-argument `PrepareMethod(handle, instantiation[])` calls consume two. Physical 0.0.116 and 0.0.117 proved that whole-module Cecil serialization drags unrelated Constant-table dependencies (`System.Runtime`, then `Sentry`) into this otherwise tiny rewrite.
+Step 32 still performs the first semantic write to a real `sts2.dll`, only on a launcher-private clone. The semantic transformation is unchanged: six one-argument `RuntimeHelpers.PrepareMethod` calls become one `Pop`; four two-argument calls become `Pop + Pop`. The exact physical Step-31 source SHA/MVID/method token/body fingerprint and ten offsets remain hard-pinned.
 
-0.0.118 introduced the exact-length private-copy patch. Its first `step32-fast` run completed static validation at 1027/1027 and executed all 231 host tests in about 27 seconds total. The Step-32 end-to-end fixture itself reached Gate B successfully and reported 6/6 + 4/4 rewrites, ten exact five-byte windows, no Cecil serialization, and byte-diff confinement. The sole 230/231 failure was a stale test-only substring assertion that still expected the old unpadded `Pop + Pop` wording.
+Physical 0.0.116 passed Gate A with OfflineReady **428/428**, exact source identity, all ten sites, zero Cecil read-time resolution, and no CLR admission. Gate B then failed during `module.Write` because Mono.Cecil needed the declared type of an unrelated external enum constant to encode the Constant table and requested exact `System.Runtime, Version=9.0.0.0, PublicKeyToken=b03f5f7f11d50a3a` through the all-rejecting resolver. Preserve `docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt`.
 
-0.0.119 corrects that assertion to the exact five-byte padded detail contract and makes Codemagic cache-size telemetry failure-safe with an EXIT trap. The production transformation is byte-for-byte unchanged from 0.0.118 and uses Cecil only to bind and verify the exact receipt-backed assembly/method/sites. Gate B maps the verified method RVA to PE bytes, confirms each selected instruction is the exact five-byte `call` plus expected metadata token, and changes only those ten five-byte windows on the launcher-private clone:
+0.0.117 keeps read/audit resolvers rejecting. Only the serialization phase gets an in-memory constant-metadata surrogate for that exact `System.Runtime` identity. The surrogate is synthesized from constant values already present in the verified source metadata, opens no external framework/game assembly bytes, has no directory probing/fallback, and rejects every other assembly request. Gate C additionally requires source/transformed Constant-table semantic fingerprints to match exactly.
 
-- 6 × `call` → `Pop + Nop + Nop + Nop + Nop`;
-- 4 × `call` → `Pop + Pop + Nop + Nop + Nop`.
+The receipt-backed Step-12 install remains immutable. Step 32 performs **zero real-StS2 CLR admission/invocation**, no Harmony/MonoMod runtime patching, no Godot/game startup, and no native loading.
 
-Equal-length replacement preserves every later IL offset, branch displacement, EH boundary, metadata table, RVA, section layout, and file length. Gate B rejects any byte difference outside the fifty approved bytes. Gate C reopens the transformed image with the rejecting Cecil resolver and verifies the exact padded semantic plan, 10→0 PrepareMethod references, unchanged constant metadata, identity/MVID/EH topology, and the same byte-diff confinement. **No Cecil serialization occurs.**
-
-The trusted Step-12 install remains immutable. Step 32 still performs zero real-StS2 CLR admission/invocation, no Harmony/MonoMod runtime patching, no Godot/game startup, and no native loading.
-
-## Codemagic free-minute workflow
-
-Run **`step32-fast` first**. It performs static validation + the complete host suite only. If it fails, stop and send its artifacts.
-
-Only after fast preflight passes, run **`ios-step-32` on the exact same commit**. That workflow does not repeat the complete host suite; it performs static validation, iOS workload/publish, and IPA verification. Install the IPA only if both workflows passed for the same commit.
-
-Both workflows emit `phase-timings.txt` and `cache-sizes.txt`. NuGet, the pinned Harmony regression archive, and a pristine pinned .NET SDK snapshot are cached to reduce free M2 minutes.
+Workflow: `ios-step-32`
 
 Expected IPA: `artifacts/StS2-Launcher-Step-32.ipa`
 
-Physical close remains Step 32 A–D **4/4 PASS**. Preserve `Step32-RealStS2PrepareMethodRewrite.txt`.
+Next authority: Codemagic static validation → complete host suite → iOS publish → IPA verification → physical Step 32 A–D **4/4 PASS**. Preserve `Step32-RealStS2PrepareMethodRewrite.txt`.

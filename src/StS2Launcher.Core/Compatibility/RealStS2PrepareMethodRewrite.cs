@@ -1,6 +1,4 @@
-using System.Buffers.Binary;
 using System.Globalization;
-using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -25,6 +23,7 @@ public sealed class RealStS2PrepareMethodRewrite
     public const string SourceRootName = "source";
     public const string TransformedRootName = "transformed";
     public const string PrimaryFileName = "sts2.dll";
+    private const string CecilWriteSystemRuntimeIdentity = "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
 
     internal static readonly RewriteEvidence PhysicalStep31Evidence = new(
         SourceSha1: "e424ace9399a82edea4dd7e0fa5761635dfd6c5d",
@@ -196,111 +195,76 @@ public sealed class RealStS2PrepareMethodRewrite
             Directory.CreateDirectory(transformedRoot);
             var transformedPath = Path.Combine(transformedRoot, PrimaryFileName);
 
-            var sourceImage = File.ReadAllBytes(source.PrivateSourcePath);
-            var transformedImage = sourceImage.ToArray();
             int oneArgumentReplacements;
             int twoArgumentReplacements;
             int sourcePopCount;
-            int sourceNopCount;
             string expectedTransformedSemanticSha256;
             string expectedConstantMetadataSha256;
             int expectedTransformedInstructionCount;
-            MethodBodyFileLocation methodLocation;
-            List<RawPatchWindow> patchWindows = [];
-
-            using (var resolver = new RejectingAssemblyResolver())
+            int writeResolutionRequestCount;
+            int syntheticConstantTypeCount;
+            using (var resolver = new ConstantMetadataWriteResolver())
             using (var module = ReadModuleDeferred(source.PrivateSourcePath, resolver))
             {
                 var method = ValidateModuleAndMethod(module, requireExactOffsets: true);
+                var constantPlan = resolver.Configure(module);
                 expectedConstantMetadataSha256 = ComputeConstantMetadataFingerprint(module);
+                syntheticConstantTypeCount = constantPlan.SyntheticTypeCount;
                 sourcePopCount = method.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Pop);
-                sourceNopCount = method.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Nop);
-                methodLocation = LocateMethodBodyCode(sourceImage, method.RVA);
-                if (methodLocation.CodeSize != method.Body.CodeSize)
-                    throw new InvalidDataException($"Step-32 PE/Cecil method code-size mismatch: PE={methodLocation.CodeSize}, Cecil={method.Body.CodeSize}.");
-
+                var il = method.Body.GetILProcessor();
                 oneArgumentReplacements = 0;
                 twoArgumentReplacements = 0;
-                foreach (var site in _expected.Sites.OrderBy(site => site.IlOffset))
+
+                foreach (var site in _expected.Sites.OrderByDescending(site => site.IlOffset))
                 {
                     var instruction = method.Body.Instructions.SingleOrDefault(value => value.Offset == site.IlOffset)
                         ?? throw new InvalidDataException($"Step-32 expected PrepareMethod instruction IL_{site.IlOffset:X4} is missing.");
-                    if (!TryGetPrepareMethod(instruction, out var target) || instruction.OpCode.Code != Code.Call ||
-                        target.Parameters.Count != site.ArgumentCount || target.FullName != site.TargetMember)
-                        throw new InvalidDataException($"Step-32 expected direct PrepareMethod site IL_{site.IlOffset:X4} drifted before rewrite.");
+                    if (!TryGetPrepareMethod(instruction, out var target) || target.Parameters.Count != site.ArgumentCount || target.FullName != site.TargetMember)
+                        throw new InvalidDataException($"Step-32 expected PrepareMethod site IL_{site.IlOffset:X4} drifted before rewrite.");
                     if (FindIncomingBranchSources(method, instruction).Count != 0)
                         throw new InvalidDataException($"Step-32 refuses to rewrite branch-targeted PrepareMethod site IL_{site.IlOffset:X4}.");
 
-                    var fileOffset = checked(methodLocation.CodeFileOffset + site.IlOffset);
-                    if (site.IlOffset < 0 || site.IlOffset + 5 > methodLocation.CodeSize || fileOffset < 0 || fileOffset + 5 > sourceImage.LongLength)
-                        throw new InvalidDataException($"Step-32 patch window IL_{site.IlOffset:X4} falls outside the exact PrewarmJit method body.");
-                    var fileIndex = checked((int)fileOffset);
-                    if (sourceImage[fileIndex] != 0x28)
-                        throw new InvalidDataException($"Step-32 raw IL site IL_{site.IlOffset:X4} is not the expected 5-byte call opcode (0x28).");
-                    var rawToken = BinaryPrimitives.ReadUInt32LittleEndian(sourceImage.AsSpan(fileIndex + 1, 4));
-                    var expectedToken = target.MetadataToken.ToUInt32();
-                    if (expectedToken == 0 || rawToken != expectedToken)
-                        throw new InvalidDataException($"Step-32 raw IL token mismatch at IL_{site.IlOffset:X4}: PE=0x{rawToken:X8}, Cecil=0x{expectedToken:X8}.");
-
-                    var replacement = site.ArgumentCount switch
+                    if (site.ArgumentCount == 1)
                     {
-                        1 => new byte[] { 0x26, 0x00, 0x00, 0x00, 0x00 },
-                        2 => new byte[] { 0x26, 0x26, 0x00, 0x00, 0x00 },
-                        _ => throw new InvalidDataException($"Unexpected PrepareMethod argument count {site.ArgumentCount} at IL_{site.IlOffset:X4}."),
-                    };
-                    patchWindows.Add(new RawPatchWindow(site.IlOffset, site.ArgumentCount, expectedToken, fileOffset, sourceImage.AsSpan(fileIndex, 5).ToArray(), replacement));
-                    if (site.ArgumentCount == 1) oneArgumentReplacements++; else twoArgumentReplacements++;
-                }
-
-                if (oneArgumentReplacements != 6 || twoArgumentReplacements != 4 || patchWindows.Count != 10)
-                    throw new InvalidDataException($"Step-32 rewrite count mismatch: one-arg={oneArgumentReplacements}, two-arg={twoArgumentReplacements}, windows={patchWindows.Count}.");
-
-                // Build the exact expected post-patch semantic shape in memory only. This never serializes the module.
-                // Each original 5-byte call window remains exactly 5 bytes on disk, so padding Nops intentionally
-                // preserve all later IL offsets, branch displacements, EH boundaries, metadata tables, and PE layout.
-                var il = method.Body.GetILProcessor();
-                foreach (var site in _expected.Sites.OrderByDescending(site => site.IlOffset))
-                {
-                    var instruction = method.Body.Instructions.Single(value => value.Offset == site.IlOffset);
-                    instruction.OpCode = OpCodes.Pop;
-                    instruction.Operand = null;
-                    var cursor = instruction;
-                    if (site.ArgumentCount == 2)
-                    {
-                        var secondPop = il.Create(OpCodes.Pop);
-                        il.InsertAfter(cursor, secondPop);
-                        cursor = secondPop;
+                        instruction.OpCode = OpCodes.Pop;
+                        instruction.Operand = null;
+                        oneArgumentReplacements++;
                     }
-                    var nopCount = site.ArgumentCount == 1 ? 4 : 3;
-                    for (var i = 0; i < nopCount; i++)
+                    else if (site.ArgumentCount == 2)
                     {
-                        var nop = il.Create(OpCodes.Nop);
-                        il.InsertAfter(cursor, nop);
-                        cursor = nop;
+                        // Original stack immediately before call: [..., RuntimeMethodHandle, RuntimeTypeHandle[]].
+                        // Inserted Pop consumes the array; rewritten call-as-Pop consumes the method handle.
+                        il.InsertBefore(instruction, il.Create(OpCodes.Pop));
+                        instruction.OpCode = OpCodes.Pop;
+                        instruction.Operand = null;
+                        twoArgumentReplacements++;
+                    }
+                    else
+                    {
+                        throw new InvalidDataException($"Unexpected PrepareMethod argument count {site.ArgumentCount} at IL_{site.IlOffset:X4}.");
                     }
                 }
+
+                if (oneArgumentReplacements != 6 || twoArgumentReplacements != 4)
+                    throw new InvalidDataException($"Step-32 rewrite count mismatch: one-arg={oneArgumentReplacements}, two-arg={twoArgumentReplacements}.");
                 if (CountPrepareMethodReferences(method) != 0)
                     throw new InvalidDataException("Step-32 transformed in-memory PrewarmJit still contains RuntimeHelpers.PrepareMethod references.");
                 expectedTransformedInstructionCount = method.Body.Instructions.Count;
-                if (expectedTransformedInstructionCount != _expected.SourceInstructionCount + 40)
-                    throw new InvalidDataException($"Step-32 exact-length transformed instruction count mismatch: {expectedTransformedInstructionCount}.");
-                if (method.Body.Instructions.Count(value => value.OpCode.Code == Code.Pop) != sourcePopCount + 14 ||
-                    method.Body.Instructions.Count(value => value.OpCode.Code == Code.Nop) != sourceNopCount + 36)
-                    throw new InvalidDataException("Step-32 exact-length Pop/Nop replacement shape did not match the predeclared 50-byte patch contract.");
+                if (expectedTransformedInstructionCount != _expected.SourceInstructionCount + twoArgumentReplacements)
+                    throw new InvalidDataException($"Step-32 transformed instruction count mismatch: {expectedTransformedInstructionCount}.");
+                if (method.Body.Instructions.Count(value => value.OpCode.Code == Code.Pop) != sourcePopCount + oneArgumentReplacements + (twoArgumentReplacements * 2))
+                    throw new InvalidDataException("Step-32 stack-neutral Pop replacement count did not match the predeclared rewrite contract.");
+
                 expectedTransformedSemanticSha256 = ComputeMethodSemanticFingerprint(method);
                 if (resolver.Requests.Count != 0)
-                    throw new InvalidDataException($"Cecil dependency resolution occurred while planning the Step-32 raw IL patch: {string.Join(", ", resolver.Requests)}");
+                    throw new InvalidDataException($"Cecil dependency resolution occurred before Step-32 serialization: {string.Join(", ", resolver.Requests)}");
+                module.Write(transformedPath, new WriterParameters { WriteSymbols = false });
+                resolver.ValidateWriteRequests();
+                writeResolutionRequestCount = resolver.Requests.Count;
             }
-
-            foreach (var window in patchWindows)
-                window.Replacement.AsSpan().CopyTo(transformedImage.AsSpan(checked((int)window.FileOffset), 5));
-            var changedByteCount = ValidateOnlyApprovedPatchWindowsChanged(sourceImage, transformedImage, patchWindows);
-            File.WriteAllBytes(transformedPath, transformedImage);
 
             var transformedSha256 = ComputeSha256Hex(transformedPath);
             var transformedBytes = new FileInfo(transformedPath).Length;
-            if (transformedBytes != source.SourceBytes)
-                throw new InvalidDataException($"Step-32 exact-length transformation changed file length: source={source.SourceBytes}, transformed={transformedBytes}.");
             if (!ComputeSha256Hex(source.PrimaryPath).Equals(source.SourceSha256, StringComparison.OrdinalIgnoreCase) ||
                 !ComputeSha256Hex(source.PrivateSourcePath).Equals(source.SourceSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-32 source/trusted image changed while writing the transformed copy.");
@@ -310,28 +274,26 @@ public sealed class RealStS2PrepareMethodRewrite
 
             _transformation = new TransformationSnapshot(
                 transformedPath, transformedSha256, transformedBytes, oneArgumentReplacements, twoArgumentReplacements,
-                sourcePopCount, sourceNopCount, expectedTransformedInstructionCount, expectedTransformedSemanticSha256,
-                expectedConstantMetadataSha256, methodLocation, patchWindows, changedByteCount);
+                sourcePopCount, expectedTransformedInstructionCount, expectedTransformedSemanticSha256,
+                expectedConstantMetadataSha256, writeResolutionRequestCount, syntheticConstantTypeCount);
 
             return Pass(gate,
-                "FIRST REAL-STS2 EXACT-LENGTH IL TRANSFORMATION WRITTEN TO A LAUNCHER-PRIVATE IMAGE.\n" +
+                "FIRST REAL-STS2 SEMANTIC CECIL TRANSFORMATION WRITTEN TO A LAUNCHER-PRIVATE IMAGE.\n" +
                 "Predeclared behavior change: suppress RuntimeHelpers.PrepareMethod eager-compilation requests inside the exact fingerprinted PrewarmJit() method only.\n" +
-                "Stack contract — PrepareMethod(handle) 5-byte call -> Pop + Nop + Nop + Nop + Nop.\n" +
-                "Stack contract — PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop.\n" +
+                "Stack contract — PrepareMethod(handle) -> Pop: consumes exactly 1 argument, returns void-equivalent empty stack.\n" +
+                "Stack contract — PrepareMethod(handle, instantiation[]) -> Pop + Pop: consumes exactly 2 arguments, returns void-equivalent empty stack.\n" +
                 $"One-argument sites rewritten: {oneArgumentReplacements}/6\n" +
                 $"Two-argument sites rewritten: {twoArgumentReplacements}/4\n" +
-                "Patch windows: 10 x exactly 5 bytes\n" +
-                $"Changed bytes inside approved windows: {changedByteCount:N0}\n" +
-                $"PrewarmJit RVA/code file offset/code size: 0x{methodLocation.MethodRva:X8} / 0x{methodLocation.CodeFileOffset:X} / {methodLocation.CodeSize:N0}\n" +
-                "All bytes outside the ten approved call windows unchanged: YES\n" +
-                "All later IL offsets / PE layout / metadata tables preserved by equal-length replacement: YES\n" +
-                "Cecil serialization performed: NO\n" +
-                "Cecil dependency resolution requests during rewrite planning: 0\n" +
+                "Reflection/GetMethod/get_MethodHandle/array-construction instructions preserved: YES\n" +
+                "Selected-call incoming branch targets: 0\n" +
                 $"Expected transformed PrewarmJit semantic fingerprint SHA-256: {expectedTransformedSemanticSha256}\n" +
                 $"Constant metadata semantic fingerprint preserved for reopen verification: {expectedConstantMetadataSha256}\n" +
+                $"Synthetic constant-metadata resolver types: {syntheticConstantTypeCount:N0}\n" +
+                $"Cecil write-time resolution requests: {writeResolutionRequestCount:N0} — exact {CecilWriteSystemRuntimeIdentity} only\n" +
+                "External framework/game assembly bytes opened by the write resolver: 0\n" +
                 $"Source SHA-256 preserved: {source.SourceSha256}\n" +
                 $"Transformed SHA-256: {transformedSha256}\n" +
-                $"Transformed bytes: {transformedBytes:N0} (exactly source length)\n" +
+                $"Transformed bytes: {transformedBytes:N0}\n" +
                 $"Output: {WorkRootName}/{TransformedRootName}/{PrimaryFileName}\n" +
                 "Trusted/source bytes mutated: NO\n" +
                 "Assembly.Load/LoadFromStream during transformation: NO\n" +
@@ -364,8 +326,6 @@ public sealed class RealStS2PrepareMethodRewrite
             int transformedHandlerCount;
             int sourcePopCount;
             int transformedPopCount;
-            int sourceNopCount;
-            int transformedNopCount;
             string sourceBodySha256;
             string transformedBodySha256;
             string transformedSemanticSha256;
@@ -380,7 +340,6 @@ public sealed class RealStS2PrepareMethodRewrite
                 sourceInstructionCount = sourceMethod.Body.Instructions.Count;
                 sourceHandlerCount = sourceMethod.Body.ExceptionHandlers.Count;
                 sourcePopCount = sourceMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Pop);
-                sourceNopCount = sourceMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Nop);
                 sourceBodySha256 = RealStS2PrepareMethodSemanticAudit.ComputeMethodBodyFingerprint(sourceMethod);
                 sourceConstantMetadataSha256 = ComputeConstantMetadataFingerprint(sourceModule);
                 if (sourceResolver.Requests.Count != 0)
@@ -398,8 +357,6 @@ public sealed class RealStS2PrepareMethodRewrite
                 transformedInstructionCount = transformedMethod.Body.Instructions.Count;
                 transformedHandlerCount = transformedMethod.Body.ExceptionHandlers.Count;
                 transformedPopCount = transformedMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Pop);
-                transformedNopCount = transformedMethod.Body.Instructions.Count(value => value.OpCode.Code == Code.Nop);
-                ValidateReplacementInstructionShape(transformedMethod);
                 transformedBodySha256 = RealStS2PrepareMethodSemanticAudit.ComputeMethodBodyFingerprint(transformedMethod);
                 transformedSemanticSha256 = ComputeMethodSemanticFingerprint(transformedMethod);
                 transformedConstantMetadataSha256 = ComputeConstantMetadataFingerprint(transformedModule);
@@ -411,13 +368,15 @@ public sealed class RealStS2PrepareMethodRewrite
                 throw new InvalidDataException($"PrepareMethod reference verification mismatch: source={sourcePrepareCount}, transformed={transformedPrepareCount}.");
             if (!sourceBodySha256.Equals(_expected.MethodBodySha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-32 source PrewarmJit body fingerprint changed.");
-            // Gate B planned the exact padded semantic shape in memory but never serialized it. Gate C now
-            // reopens the raw-patched image and requires the same offset-independent semantic fingerprint.
+            // Instruction offsets are finalized by Cecil during serialization. The physical IL-body fingerprint
+            // is therefore post-write evidence, not something that can be predicted from the pre-write in-memory
+            // instruction offsets. The offset-independent semantic fingerprint is the exact pre-write -> reopen
+            // invariant: it binds opcode/operand order, branch targets by instruction ordinal, and EH boundaries.
             if (!transformedSemanticSha256.Equals(transformation.ExpectedTransformedSemanticSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-32 reopened transformed PrewarmJit does not match the exact in-memory predeclared semantic rewrite.");
             if (!sourceConstantMetadataSha256.Equals(transformation.ExpectedConstantMetadataSha256, StringComparison.OrdinalIgnoreCase) ||
                 !transformedConstantMetadataSha256.Equals(sourceConstantMetadataSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-32 source/transformed constant metadata semantics changed even though the raw patch is confined to method IL bytes.");
+                throw new InvalidDataException("Step-32 source/transformed constant metadata semantics changed during Cecil serialization.");
             if (transformedBodySha256.Equals(sourceBodySha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-32 reopened transformed PrewarmJit body fingerprint unexpectedly matches the source body.");
             if (sourceInstructionCount != _expected.SourceInstructionCount || transformedInstructionCount != transformation.ExpectedTransformedInstructionCount)
@@ -425,14 +384,8 @@ public sealed class RealStS2PrepareMethodRewrite
             if (sourceHandlerCount != _expected.SourceExceptionHandlerCount || transformedHandlerCount != sourceHandlerCount)
                 throw new InvalidDataException("Step-32 exception-handler topology count changed.");
             var expectedPopDelta = transformation.OneArgumentReplacements + (transformation.TwoArgumentReplacements * 2);
-            const int expectedNopDelta = 36;
-            if (transformedPopCount != sourcePopCount + expectedPopDelta || transformedNopCount != sourceNopCount + expectedNopDelta)
-                throw new InvalidDataException("Step-32 reopened transformed image did not preserve the exact Pop/Nop replacement count.");
-            var sourceImage = File.ReadAllBytes(source.PrivateSourcePath);
-            var transformedImage = File.ReadAllBytes(transformation.TransformedPath);
-            var changedByteCount = ValidateOnlyApprovedPatchWindowsChanged(sourceImage, transformedImage, transformation.PatchWindows);
-            if (changedByteCount != transformation.ChangedByteCount || transformedImage.LongLength != sourceImage.LongLength)
-                throw new InvalidDataException("Step-32 raw patch byte-diff evidence changed between Gate B and Gate C.");
+            if (transformedPopCount != sourcePopCount + expectedPopDelta)
+                throw new InvalidDataException("Step-32 reopened transformed image did not preserve the exact Pop replacement count.");
             EnsureStS2NotLoaded("Gate C exit");
 
             _verification = new VerificationSnapshot(transformedBodySha256, transformedSemanticSha256, sourcePrepareCount, transformedPrepareCount);
@@ -445,12 +398,9 @@ public sealed class RealStS2PrepareMethodRewrite
                 $"PrepareMethod references source/transformed: {sourcePrepareCount} / {transformedPrepareCount}\n" +
                 $"Instruction count source/transformed: {sourceInstructionCount} / {transformedInstructionCount}\n" +
                 $"Exception-handler count source/transformed: {sourceHandlerCount} / {transformedHandlerCount}\n" +
-                $"Pop/Nop delta: +{expectedPopDelta} / +{expectedNopDelta}\n" +
-                $"Changed bytes confined to ten approved 5-byte windows: YES ({changedByteCount:N0} differing bytes)\n" +
-                "PE layout and all bytes outside the selected method-call windows unchanged: YES\n" +
+                $"Pop delta: +{expectedPopDelta} (6 one-arg + 4 two-arg stack-neutral replacements)\n" +
                 "Assembly identity/MVID preserved: YES\n" +
-                "Reopened transformed semantics match exact pre-write padded plan: YES\n" +
-                "Cecil serialization performed by Step 32: NO\n" +
+                "Reopened transformed semantics match exact pre-write plan: YES\n" +
                 "Original receipt-backed/private-source image CLR-loaded: NO\n" +
                 "Harmony/MonoMod runtime replacement/detour used: NO");
         }
@@ -506,9 +456,8 @@ public sealed class RealStS2PrepareMethodRewrite
                 "Trusted Step 12 managed install unchanged: YES\n" +
                 "Exactly one semantic family changed: PrewarmJit RuntimeHelpers.PrepareMethod calls only\n" +
                 "Real StS2 assembly/type/member CLR load or invocation by Step 32: NO\n" +
-                "Cecil read/verification dependency resolution requests: 0; Cecil serialization: NONE\n" +
-                $"Exact-length raw patch windows retained: {transformation.PatchWindows.Count}/10; changed bytes: {transformation.ChangedByteCount:N0}\n" +
-                "External framework/game assembly bytes opened for transformation: 0\n" +
+                $"Cecil read/verification dependency resolution requests: 0; write-time synthetic constant-metadata resolutions: {transformation.WriteResolutionRequestCount:N0} ({CecilWriteSystemRuntimeIdentity} only)\n" +
+                "External framework/game assembly bytes opened by Cecil write resolver: 0\n" +
                 "Harmony/MonoMod runtime patching invoked by Step 32: NO\n" +
                 "Godot/game startup or native game loading attempted by Step 32: NO\n" +
                 "Authorization after Step-32 PASS: transformed-image mechanism may advance to a separately gated real-StS2 CLR admission/execution boundary; this build itself does not load or execute the transformed game image.");
@@ -664,116 +613,112 @@ public sealed class RealStS2PrepareMethodRewrite
         }
     }
 
-    private void ValidateReplacementInstructionShape(MethodDefinition method)
+    private static Dictionary<ExternalConstantTypeKey, TypeCode> CollectExternalConstantTypeRequirements(ModuleDefinition module)
     {
-        foreach (var site in _expected.Sites)
+        var requirements = new Dictionary<ExternalConstantTypeKey, TypeCode>();
+
+        void Add(TypeReference declaredType, object? constant, string provider)
         {
-            var expectedCodes = site.ArgumentCount == 1
-                ? new[] { Code.Pop, Code.Nop, Code.Nop, Code.Nop, Code.Nop }
-                : new[] { Code.Pop, Code.Pop, Code.Nop, Code.Nop, Code.Nop };
-            for (var i = 0; i < expectedCodes.Length; i++)
+            if (constant is null)
+                return;
+            var leaf = GetConstantResolutionLeaf(declaredType);
+            if (leaf is null)
+                return;
+            if (leaf.Scope is ModuleDefinition)
+                return;
+            if (leaf.Scope is not AssemblyNameReference assemblyReference)
+                throw new InvalidDataException($"Step-32 constant provider '{provider}' has unsupported metadata scope '{leaf.Scope?.MetadataScopeType}'.");
+
+            var typeCode = Type.GetTypeCode(constant.GetType());
+            if (!IsSupportedConstantTypeCode(typeCode))
+                throw new InvalidDataException($"Step-32 constant provider '{provider}' has unsupported constant storage type {constant.GetType().FullName}.");
+            var key = new ExternalConstantTypeKey(assemblyReference.FullName, leaf.FullName, leaf.IsNested);
+            if (requirements.TryGetValue(key, out var prior) && prior != typeCode)
+                throw new InvalidDataException($"Step-32 external constant type '{leaf.FullName}' has inconsistent storage types {prior} and {typeCode}.");
+            requirements[key] = typeCode;
+        }
+
+        foreach (var type in EnumerateTypes(module.Types))
+        {
+            foreach (var field in type.Fields)
+                if (field.HasConstant)
+                    Add(field.FieldType, field.Constant, $"field {field.FullName}");
+            foreach (var property in type.Properties)
+                if (property.HasConstant)
+                    Add(property.PropertyType, property.Constant, $"property {property.FullName}");
+            foreach (var method in type.Methods)
             {
-                var instruction = method.Body.Instructions.SingleOrDefault(value => value.Offset == site.IlOffset + i)
-                    ?? throw new InvalidDataException($"Step-32 transformed replacement instruction IL_{site.IlOffset + i:X4} is missing.");
-                if (instruction.OpCode.Code != expectedCodes[i] || instruction.Operand is not null)
-                    throw new InvalidDataException($"Step-32 transformed replacement shape drifted at IL_{site.IlOffset + i:X4}: expected {expectedCodes[i]}, observed {instruction.OpCode.Code}.");
+                if (method.MethodReturnType.HasConstant)
+                    Add(method.MethodReturnType.ReturnType, method.MethodReturnType.Constant, $"return {method.FullName}");
+                foreach (var parameter in method.Parameters)
+                    if (parameter.HasConstant)
+                        Add(parameter.ParameterType, parameter.Constant, $"parameter {method.FullName}::{parameter.Name}");
             }
         }
+
+        return requirements;
     }
 
-    private static int ValidateOnlyApprovedPatchWindowsChanged(byte[] source, byte[] transformed, IReadOnlyList<RawPatchWindow> windows)
+    private static TypeReference? GetConstantResolutionLeaf(TypeReference type)
     {
-        if (source.Length != transformed.Length)
-            throw new InvalidDataException($"Step-32 exact-length patch changed image size: source={source.Length}, transformed={transformed.Length}.");
-        var approved = new HashSet<int>();
-        foreach (var window in windows)
+        while (true)
         {
-            var start = checked((int)window.FileOffset);
-            if (start < 0 || start + 5 > source.Length)
-                throw new InvalidDataException($"Step-32 approved patch window IL_{window.IlOffset:X4} is outside the image.");
-            if (!source.AsSpan(start, 5).SequenceEqual(window.Original))
-                throw new InvalidDataException($"Step-32 source bytes changed inside approved patch window IL_{window.IlOffset:X4}.");
-            if (!transformed.AsSpan(start, 5).SequenceEqual(window.Replacement))
-                throw new InvalidDataException($"Step-32 transformed bytes do not match the exact replacement at IL_{window.IlOffset:X4}.");
-            for (var i = 0; i < 5; i++)
-                if (!approved.Add(start + i))
-                    throw new InvalidDataException($"Step-32 approved patch windows overlap at file offset 0x{start + i:X}.");
-        }
-        if (windows.Count != 10 || approved.Count != 50)
-            throw new InvalidDataException($"Step-32 patch-window cardinality drifted: windows={windows.Count}, approved-bytes={approved.Count}.");
+            switch (type)
+            {
+                case GenericInstanceType genericInstance:
+                    if (genericInstance.ElementType.FullName == "System.Nullable`1" && genericInstance.GenericArguments.Count == 1)
+                    {
+                        type = genericInstance.GenericArguments[0];
+                        continue;
+                    }
+                    type = genericInstance.ElementType;
+                    continue;
+                case OptionalModifierType optionalModifier:
+                    type = optionalModifier.ElementType;
+                    continue;
+                case RequiredModifierType requiredModifier:
+                    type = requiredModifier.ElementType;
+                    continue;
+                case ByReferenceType byReference:
+                    type = byReference.ElementType;
+                    continue;
+                case SentinelType sentinel:
+                    type = sentinel.ElementType;
+                    continue;
+                case ArrayType:
+                case GenericParameter:
+                    return null;
+            }
 
-        var changed = 0;
-        for (var i = 0; i < source.Length; i++)
-        {
-            if (source[i] == transformed[i]) continue;
-            changed++;
-            if (!approved.Contains(i))
-                throw new InvalidDataException($"Step-32 transformed an unapproved byte at file offset 0x{i:X}.");
+            if (type.MetadataType is MetadataType.Boolean or MetadataType.Char or MetadataType.SByte or MetadataType.Byte or
+                MetadataType.Int16 or MetadataType.UInt16 or MetadataType.Int32 or MetadataType.UInt32 or MetadataType.Int64 or
+                MetadataType.UInt64 or MetadataType.Single or MetadataType.Double or MetadataType.String or MetadataType.Object)
+                return null;
+            return type;
         }
-        if (changed == 0)
-            throw new InvalidDataException("Step-32 exact-length transformation changed zero bytes.");
-        return changed;
     }
 
-    private static MethodBodyFileLocation LocateMethodBodyCode(byte[] image, int methodRva)
-    {
-        if (methodRva <= 0)
-            throw new InvalidDataException("Step-32 selected method has an invalid RVA.");
+    private static bool IsSupportedConstantTypeCode(TypeCode typeCode)
+        => typeCode is TypeCode.Boolean or TypeCode.Char or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or TypeCode.UInt16 or
+            TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or TypeCode.UInt64 or TypeCode.Single or TypeCode.Double;
 
-        using var peStream = new MemoryStream(image, writable: false);
-        using var peReader = new PEReader(peStream);
-        if (!peReader.HasMetadata)
-            throw new InvalidDataException("Step-32 source image has no CLR metadata.");
-
-        int sectionIndex;
-        try
+    private static TypeReference GetPrimitiveConstantType(ModuleDefinition sourceModule, TypeCode typeCode)
+        => typeCode switch
         {
-            sectionIndex = peReader.PEHeaders.GetContainingSectionIndex(methodRva);
-        }
-        catch (Exception ex) when (ex is ArgumentOutOfRangeException or BadImageFormatException)
-        {
-            throw new InvalidDataException($"Step-32 could not map selected method RVA 0x{methodRva:X8} to a PE section.", ex);
-        }
-        if (sectionIndex < 0 || sectionIndex >= peReader.PEHeaders.SectionHeaders.Length)
-            throw new InvalidDataException($"Step-32 selected method RVA 0x{methodRva:X8} does not map to a PE section.");
-
-        var section = peReader.PEHeaders.SectionHeaders[sectionIndex];
-        var delta = checked(methodRva - section.VirtualAddress);
-        if (delta < 0 || delta >= section.SizeOfRawData)
-            throw new InvalidDataException("Step-32 selected method RVA maps outside PE raw section data.");
-        var methodHeaderOffset = checked((long)section.PointerToRawData + delta);
-        if (methodHeaderOffset < 0 || methodHeaderOffset >= image.LongLength)
-            throw new InvalidDataException("Step-32 selected method header maps outside the PE image.");
-
-        var headerIndex = checked((int)methodHeaderOffset);
-        var first = image[headerIndex];
-        int headerSize;
-        int codeSize;
-        if ((first & 0x3) == 0x2)
-        {
-            headerSize = 1;
-            codeSize = first >> 2;
-        }
-        else if ((first & 0x3) == 0x3)
-        {
-            if (headerIndex + 12 > image.Length)
-                throw new InvalidDataException("Step-32 selected method has a truncated fat IL header.");
-            var flagsAndSize = BinaryPrimitives.ReadUInt16LittleEndian(image.AsSpan(headerIndex, 2));
-            headerSize = ((flagsAndSize >> 12) & 0x0F) * 4;
-            if (headerSize < 12 || headerIndex + headerSize > image.Length)
-                throw new InvalidDataException($"Step-32 selected method has invalid fat IL header size {headerSize}.");
-            codeSize = checked((int)BinaryPrimitives.ReadUInt32LittleEndian(image.AsSpan(headerIndex + 4, 4)));
-        }
-        else
-        {
-            throw new InvalidDataException($"Step-32 selected method uses unsupported IL header format byte 0x{first:X2}.");
-        }
-
-        var codeOffset = checked(methodHeaderOffset + headerSize);
-        if (codeSize <= 0 || codeOffset < 0 || codeOffset + codeSize > image.LongLength)
-            throw new InvalidDataException("Step-32 selected method IL code range is outside the PE image.");
-        return new MethodBodyFileLocation(methodRva, methodHeaderOffset, codeOffset, codeSize, headerSize);
-    }
+            TypeCode.Boolean => sourceModule.TypeSystem.Boolean,
+            TypeCode.Char => sourceModule.TypeSystem.Char,
+            TypeCode.SByte => sourceModule.TypeSystem.SByte,
+            TypeCode.Byte => sourceModule.TypeSystem.Byte,
+            TypeCode.Int16 => sourceModule.TypeSystem.Int16,
+            TypeCode.UInt16 => sourceModule.TypeSystem.UInt16,
+            TypeCode.Int32 => sourceModule.TypeSystem.Int32,
+            TypeCode.UInt32 => sourceModule.TypeSystem.UInt32,
+            TypeCode.Int64 => sourceModule.TypeSystem.Int64,
+            TypeCode.UInt64 => sourceModule.TypeSystem.UInt64,
+            TypeCode.Single => sourceModule.TypeSystem.Single,
+            TypeCode.Double => sourceModule.TypeSystem.Double,
+            _ => throw new InvalidDataException($"Unsupported Step-32 constant storage type {typeCode}."),
+        };
 
     internal static string ComputeConstantMetadataFingerprint(ModuleDefinition module)
     {
@@ -926,6 +871,102 @@ public sealed class RealStS2PrepareMethodRewrite
         public void Report(T value) => _callback(value);
     }
 
+    private sealed class ConstantMetadataWriteResolver : IAssemblyResolver
+    {
+        private readonly List<string> _requests = [];
+        private AssemblyDefinition? _systemRuntimeSurrogate;
+        private int _syntheticTypeCount;
+        private bool _configured;
+
+        public IReadOnlyList<string> Requests => _requests;
+
+        public ConstantMetadataResolutionPlan Configure(ModuleDefinition sourceModule)
+        {
+            if (_configured)
+                throw new InvalidOperationException("The Step-32 constant-metadata write resolver was already configured.");
+            _configured = true;
+
+            var requirements = CollectExternalConstantTypeRequirements(sourceModule);
+            if (requirements.Count == 0)
+                return new ConstantMetadataResolutionPlan(0);
+
+            var unexpectedScopes = requirements.Keys
+                .Where(key => !key.AssemblyFullName.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal))
+                .Select(key => key.AssemblyFullName)
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            if (unexpectedScopes.Length != 0)
+                throw new InvalidDataException(
+                    "Step-32 Cecil serialization requires unexpected external constant-metadata scope(s): " +
+                    string.Join(" | ", unexpectedScopes));
+
+            var systemRuntimeReference = sourceModule.AssemblyReferences
+                .SingleOrDefault(reference => reference.FullName.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal))
+                ?? throw new InvalidDataException($"Step-32 source has no exact {CecilWriteSystemRuntimeIdentity} AssemblyRef for the physical write-time metadata request.");
+
+            var surrogateName = new AssemblyNameDefinition(systemRuntimeReference.Name, systemRuntimeReference.Version)
+            {
+                Culture = systemRuntimeReference.Culture,
+                PublicKeyToken = systemRuntimeReference.PublicKeyToken is null ? [] : systemRuntimeReference.PublicKeyToken.ToArray(),
+            };
+            _systemRuntimeSurrogate = AssemblyDefinition.CreateAssembly(surrogateName, "Step32.System.Runtime.ConstantMetadataSurrogate.dll", ModuleKind.Dll);
+
+            foreach (var requirement in requirements.OrderBy(pair => pair.Key.TypeFullName, StringComparer.Ordinal))
+            {
+                if (requirement.Key.IsNested)
+                    throw new InvalidDataException($"Step-32 does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
+                var separator = requirement.Key.TypeFullName.LastIndexOf('.');
+                var typeNamespace = separator < 0 ? string.Empty : requirement.Key.TypeFullName[..separator];
+                var typeName = separator < 0 ? requirement.Key.TypeFullName : requirement.Key.TypeFullName[(separator + 1)..];
+                var enumBase = new TypeReference("System", "Enum", _systemRuntimeSurrogate.MainModule, surrogateName);
+                var syntheticEnum = new TypeDefinition(
+                    typeNamespace,
+                    typeName,
+                    TypeAttributes.Public | TypeAttributes.Sealed,
+                    enumBase);
+                syntheticEnum.Fields.Add(new FieldDefinition(
+                    "value__",
+                    FieldAttributes.Public | FieldAttributes.SpecialName | FieldAttributes.RTSpecialName,
+                    GetPrimitiveConstantType(sourceModule, requirement.Value)));
+                _systemRuntimeSurrogate.MainModule.Types.Add(syntheticEnum);
+                _syntheticTypeCount++;
+            }
+
+            return new ConstantMetadataResolutionPlan(_syntheticTypeCount);
+        }
+
+        public AssemblyDefinition Resolve(AssemblyNameReference name)
+            => ResolveCore(name);
+
+        public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
+            => ResolveCore(name);
+
+        private AssemblyDefinition ResolveCore(AssemblyNameReference name)
+        {
+            _requests.Add(name.FullName);
+            if (!_configured || _systemRuntimeSurrogate is null ||
+                !name.FullName.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal))
+                throw new AssemblyResolutionException(name);
+            return _systemRuntimeSurrogate;
+        }
+
+        public void ValidateWriteRequests()
+        {
+            if (_requests.Count == 0)
+                throw new InvalidDataException("Step-32 expected Cecil serialization to use the bounded System.Runtime constant-metadata surrogate, but no write-time resolution request occurred.");
+            var unexpected = _requests.Where(value => !value.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal)).Distinct(StringComparer.Ordinal).ToArray();
+            if (unexpected.Length != 0)
+                throw new InvalidDataException("Step-32 Cecil serialization attempted an unapproved assembly resolution: " + string.Join(" | ", unexpected));
+        }
+
+        public void Dispose()
+        {
+            _systemRuntimeSurrogate?.Dispose();
+            _systemRuntimeSurrogate = null;
+        }
+    }
+
     private sealed class RejectingAssemblyResolver : IAssemblyResolver
     {
         private readonly List<string> _requests = [];
@@ -935,8 +976,8 @@ public sealed class RealStS2PrepareMethodRewrite
         public void Dispose() { }
     }
 
-    private sealed record RawPatchWindow(int IlOffset, int ArgumentCount, uint TargetToken, long FileOffset, byte[] Original, byte[] Replacement);
-    private readonly record struct MethodBodyFileLocation(int MethodRva, long HeaderFileOffset, long CodeFileOffset, int CodeSize, int HeaderSize);
+    private sealed record ConstantMetadataResolutionPlan(int SyntheticTypeCount);
+    private readonly record struct ExternalConstantTypeKey(string AssemblyFullName, string TypeFullName, bool IsNested);
 
     internal sealed record RewriteCallSiteEvidence(int IlOffset, int ArgumentCount, string TargetMember);
     internal sealed record RewriteEvidence(
@@ -970,13 +1011,11 @@ public sealed class RealStS2PrepareMethodRewrite
         int OneArgumentReplacements,
         int TwoArgumentReplacements,
         int SourcePopCount,
-        int SourceNopCount,
         int ExpectedTransformedInstructionCount,
         string ExpectedTransformedSemanticSha256,
         string ExpectedConstantMetadataSha256,
-        MethodBodyFileLocation MethodLocation,
-        IReadOnlyList<RawPatchWindow> PatchWindows,
-        int ChangedByteCount);
+        int WriteResolutionRequestCount,
+        int SyntheticConstantTypeCount);
 
     private sealed record VerificationSnapshot(
         string TransformedBodySha256,

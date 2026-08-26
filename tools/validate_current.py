@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 32.0.4 fast-preflight assertion fix static validation")
+print("StS2 Launcher — Step 32.0.2 bounded Cecil write-metadata resolver fix static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>119</ApplicationVersion>" in project_text, "build version is 119")
-require("<ApplicationDisplayVersion>0.0.119</ApplicationDisplayVersion>" in project_text, "display version is 0.0.119")
-require(plist.get("CFBundleVersion") == "119", "Info.plist build version is 119")
-require(plist.get("CFBundleShortVersionString") == "0.0.119", "Info.plist display version is 0.0.119")
+require("<ApplicationVersion>117</ApplicationVersion>" in project_text, "build version is 117")
+require("<ApplicationDisplayVersion>0.0.117</ApplicationDisplayVersion>" in project_text, "display version is 0.0.117")
+require(plist.get("CFBundleVersion") == "117", "Info.plist build version is 117")
+require(plist.get("CFBundleShortVersionString") == "0.0.117", "Info.plist display version is 0.0.117")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 32.0.4 — FAST-PREFLIGHT ASSERTION FIX" in release_presentation, "top launcher banner identifies active Step 32.0.4 candidate")
-require("STEP 31 CLOSED POSITIVE 4/4" in release_presentation and "0x06007D05" in release_presentation and "PrepareMethod" in release_presentation and "private" in release_presentation.lower() and "no real-sts2 clr load" in release_presentation.lower(), "top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary")
+require("STEP 32.0.2 — BOUNDED CECIL WRITE-METADATA RESOLVER FIX" in release_presentation, "top launcher banner identifies active Step 32.0.2 candidate")
+require("STEP 31 CLOSED POSITIVE 4/4" in release_presentation and "0x06007D05" in release_presentation and "PrepareMethod" in release_presentation and "private" in release_presentation and "zero CLR load" in release_presentation, "top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.119"' in release_presentation and 'ExpectedBuildVersion = "119"' in release_presentation, "Step 32.0.4 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.117"' in release_presentation and 'ExpectedBuildVersion = "117"' in release_presentation, "Step 32.0.2 source pins expected bundle release identity")
 require("GateSImplementationMarker" in release_presentation and "AddPrefix(MethodInfo) runtime invocation forbidden" in release_presentation, "Step 27.0.14 source pins the bounded Gate-S implementation marker")
 require("GateTImplementationMarker" in release_presentation and "raw PE method-body normalized HarmonySharedState cctor" in release_presentation and "post-publish interpreted Target+Prefix fixture" in release_presentation and "fresh processor via Harmony.CreateProcessor(MethodBase)" in release_presentation and "exactly one Patch()" in release_presentation, "Step 27.0.24 source pins the interpreted-fixture Gate-T decision marker")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
@@ -333,8 +333,8 @@ require(not large_ui, "no RootViewController partial exceeds 50 KB", ", ".join(f
 require("public sealed partial class RootViewController" in read("src/StS2Launcher.iOS/UI/RootViewController.cs"), "RootViewController retains sealed partial structure")
 
 active_scripts = {p.name for p in (ROOT / "scripts").glob("*.sh")}
-expected_scripts = {"build-godot.sh", "preflight-godot-link.sh", "build-ios.sh", "test.sh", "validate.sh", "verify-ipa.sh", "codemagic.sh", "codemagic-fast.sh", "codemagic-device.sh"}
-require(active_scripts == expected_scripts, "active scripts are exactly nine canonical entry points", f"found={sorted(active_scripts)}")
+expected_scripts = {"build-godot.sh", "preflight-godot-link.sh", "build-ios.sh", "test.sh", "validate.sh", "verify-ipa.sh", "codemagic.sh"}
+require(active_scripts == expected_scripts, "active scripts are exactly seven canonical entry points", f"found={sorted(active_scripts)}")
 require(not any("step15" in name.lower() for name in active_scripts), "active script filenames are not historical-step named")
 release_config_path = ROOT / "scripts/lib/current-release.sh"
 require(release_config_path.is_file(), "canonical shell release configuration exists")
@@ -343,8 +343,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-32.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.119",
-    "STS2_BUILD_VERSION": "119",
+    "STS2_DISPLAY_VERSION": "0.0.117",
+    "STS2_BUILD_VERSION": "117",
     "STS2_RUNTIME_POLICY_MARKER": "STEP32 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -419,8 +419,7 @@ for script_name, report_marker in [
     ("validate.sh", "artifacts/reports/static-validation.txt"),
     ("verify-ipa.sh", "artifacts/reports/ipa-verification.txt"),
     ("preflight-godot-link.sh", "artifacts/reports/godot-native-preflight.txt"),
-    ("codemagic-fast.sh", "artifacts/reports/fast-preflight-summary.txt"),
-    ("codemagic-device.sh", "artifacts/reports/build-summary.txt"),
+    ("codemagic.sh", "artifacts/reports/build-summary.txt"),
 ]:
     path = ROOT / "scripts" / script_name
     require(path.is_file(), f"active {script_name} exists")
@@ -1293,25 +1292,24 @@ require("4/4" in step32_summary and "Gates.Count(g => g.Passed)}/4" in step32_su
 for marker in ["e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18", "518e4758-52d7-47c2-b776-471a0e29e49d", "0x06007D05", "7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9", "0x003D", "0x0178", "SourceInstructionCount: 117", "SourceExceptionHandlerCount: 2"]:
     require(marker in step32_source, f"Step 32 hard-pins physical Step-31 evidence: {marker}")
 require(step32_source.count("new(0x") >= 10 and all(offset in step32_source for offset in ["0x003D","0x0052","0x007A","0x00A2","0x00CA","0x00F2","0x0136","0x014C","0x0162","0x0178"]), "Step 32 pins all ten physical PrepareMethod offsets")
-require("oneArgumentReplacements != 6 || twoArgumentReplacements != 4" in step32_source and "PrepareMethod(handle) 5-byte call -> Pop" in step32_source and "PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop" in step32_source, "Step 32 predeclares exact 6 one-pop + 4 two-pop equal-length rewrite")
-require("new byte[] { 0x26, 0x00, 0x00, 0x00, 0x00 }" in step32_source and "new byte[] { 0x26, 0x26, 0x00, 0x00, 0x00 }" in step32_source and "ValidateOnlyApprovedPatchWindowsChanged" in step32_source, "Step 32 implementation performs only the predeclared equal-length Pop/Nop replacements")
+require("oneArgumentReplacements != 6 || twoArgumentReplacements != 4" in step32_source and "PrepareMethod(handle) -> Pop" in step32_source and "PrepareMethod(handle, instantiation[]) -> Pop + Pop" in step32_source, "Step 32 predeclares exact 6 one-pop + 4 two-pop stack-neutral rewrite")
+require("il.InsertBefore(instruction, il.Create(OpCodes.Pop))" in step32_source and "instruction.OpCode = OpCodes.Pop" in step32_source and "instruction.Operand = null" in step32_source, "Step 32 implementation performs only the predeclared Pop replacements")
 require("FindIncomingBranchSources" in step32_source and "refuses to rewrite branch-targeted PrepareMethod site" in step32_source, "Step 32 rejects selected sites that become branch targets")
 require("ReadingMode = ReadingMode.Deferred" in step32_source and "class RejectingAssemblyResolver" in step32_source and "throw new AssemblyResolutionException(name)" in step32_source, "Step 32 retains deferred/rejecting-resolver policy for read and verification phases")
-require("File.WriteAllBytes(transformedPath, transformedImage)" in step32_source and "Step32-RealStS2PrepareMethodRewrite" in step32_source and "module.Write(" not in step32_source, "Step 32 writes only the named launcher-private transformed image without Cecil serialization")
+require("module.Write(transformedPath, new WriterParameters { WriteSymbols = false })" in step32_source and "Step32-RealStS2PrepareMethodRewrite" in step32_source, "Step 32 writes only a named launcher-private transformed image")
 require("Assembly.Load(" not in step32_source and "LoadFromStream(" not in step32_source and "LoadFromAssemblyPath(" not in step32_source and "LoadFromAssemblyName(" not in step32_source, "Step 32 production source contains no real-StS2 CLR admission path")
 require("ComputeMethodSemanticFingerprint" in step32_source and "ExpectedTransformedSemanticSha256" in step32_source and "PrepareMethod references source/transformed" in step32_source, "Step 32 reopens and verifies the exact planned transformed method semantics")
-require("exact expected post-patch semantic shape in memory only" in step32_source and "ExpectedTransformedSemanticSha256" in step32_source and "transformedBodySha256.Equals(sourceBodySha256" in step32_source, "Step 32 retains offset-independent semantic fingerprint planning while treating reopened body hash as physical evidence")
+require("Instruction offsets are finalized by Cecil during serialization" in step32_source and "offset-independent semantic fingerprint" in step32_source and "transformedBodySha256.Equals(sourceBodySha256" in step32_source, "Step 32.0.1 treats physical body fingerprint as post-write evidence and semantic fingerprint as the pre-write/reopen invariant")
 require("ExpectedTransformedBodySha256" not in step32_source and "expectedTransformedBodySha256" not in step32_source, "Step 32.0.1 forbids pre-write offset-sensitive transformed body-hash prediction")
-require("LocateMethodBodyCode" in step32_source and "raw IL token mismatch" in step32_source and "sourceImage[fileIndex] != 0x28" in step32_source and "BinaryPrimitives.ReadUInt32LittleEndian" in step32_source, "Step 32.0.3 binds each raw five-byte call opcode and metadata token before writing")
-require("Patch windows: 10 x exactly 5 bytes" in step32_source and "All bytes outside the ten approved call windows unchanged: YES" in step32_source and "transformedBytes != source.SourceBytes" in step32_source, "Step 32.0.3 confines the private write to ten exact five-byte windows and preserves file length")
-require("DefaultAssemblyResolver" not in step32_source and "AddSearchDirectory" not in step32_source and "ModuleDefinition.Write" not in step32_source, "Step 32.0.3 forbids broad Cecil resolver/search fallback and whole-module serialization")
-require("ComputeConstantMetadataFingerprint" in step32_source and "source/transformed constant metadata semantics changed" in step32_source and "ExpectedConstantMetadataSha256" in step32_source, "Step 32.0.3 verifies unrelated Constant-table semantics remain unchanged by the raw IL patch")
-require("SyntheticExternalEnum" in step32_tests and "Sentry" in step32_tests and "MultiAssemblyResolver" in step32_tests and "Cecil serialization performed: NO" in step32_tests, "Step 32 host regression carries unrelated external-enum metadata while proving production avoids Cecil serialization")
+require("ConstantMetadataWriteResolver" in step32_source and "CecilWriteSystemRuntimeIdentity" in step32_source and "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" in step32_source, "Step 32.0.2 pins the exact write-only System.Runtime constant-metadata resolver identity")
+require("CollectExternalConstantTypeRequirements" in step32_source and "GetPrimitiveConstantType" in step32_source and "External framework/game assembly bytes opened by the write resolver: 0" in step32_source, "Step 32.0.2 synthesizes constant metadata from verified source values without opening external assembly bytes")
+require("DefaultAssemblyResolver" not in step32_source and "AddSearchDirectory" not in step32_source, "Step 32.0.2 forbids broad Cecil resolver/search fallback")
+require("ComputeConstantMetadataFingerprint" in step32_source and "source/transformed constant metadata semantics changed" in step32_source and "ExpectedConstantMetadataSha256" in step32_source, "Step 32.0.2 verifies unrelated Constant-table semantics survive serialization unchanged")
+require("SyntheticExternalEnum" in step32_tests and "SingleAssemblyResolver" in step32_tests and "Synthetic constant-metadata resolver types: 1" in step32_tests, "Step 32 host regression reproduces the external-enum Constant-table serialization path")
 require("ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly" in step32_tests and "CollectionAssert.AreEqual(before, after)" in step32_tests and "CountPrepareMethod(transformedMethod)" in step32_tests and "BranchTargetedPrepareMethodSiteIsRejectedBeforeAnyRewrite" in step32_tests, "Step 32 host regressions prove private-only rewrite and branch-target refusal")
-require("PrepareMethod(handle) 5-byte call -> Pop + Nop + Nop + Nop + Nop" in step32_tests and "PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop" in step32_tests and 'StringAssert.Contains(gateB.Detail, "PrepareMethod(handle, instantiation[]) -> Pop + Pop");' not in step32_tests, "Step 32.0.4 host regression pins exact padded five-byte detail strings and removes stale unpadded assertion")
 require("Step32-RealStS2PrepareMethodRewrite.txt" in step32_ui and "REAL STS2 PREPAREMETHOD REWRITE" in step32_ui, "iOS UI persists the dedicated Step-32 physical report")
 require("new RealStS2PrepareMethodRewrite(_launcherDataRoot)" in root_ui_text and "AddRealStS2PrepareMethodRewriteControls(content)" in root_ui_text, "RootViewController wires Step 32 into the active device surface")
-require("Step32ImplementationMarker" in release_presentation and "ten raw 5-byte call opcode+token windows" in release_presentation and "equal-length Pop/Nop byte patch only" in release_presentation and "zero CLR load" in release_presentation, "release presentation pins the Step-32 exact-length first-real-rewrite boundary")
+require("Step32ImplementationMarker" in release_presentation and "6 one-arg PrepareMethod calls to Pop" in release_presentation and "4 two-arg calls to Pop+Pop" in release_presentation and "zero CLR load" in release_presentation, "release presentation pins the Step-32 first-real-rewrite boundary")
 
 # ---------------------------------------------------------------------------
 # Documentation model
@@ -1344,14 +1342,6 @@ required_docs = [
     "docs/history/steps/STEP-32.0.1-TEST.md",
     "docs/history/steps/STEP-32.0.2-BOUNDED-CONSTANT-METADATA-WRITE-RESOLVER.md",
     "docs/history/steps/STEP-32.0.2-TEST.md",
-    "docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt",
-    "docs/history/steps/STEP-32.0.3-EXACT-LENGTH-IL-PATCH-AND-CI-FAST-PREFLIGHT.md",
-    "docs/history/steps/STEP-32.0.3-TEST.md",
-    "docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt",
-    "docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-STATIC-VALIDATION.txt",
-    "docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt",
-    "docs/history/steps/STEP-32.0.4-FAST-PREFLIGHT-ASSERTION-FIX.md",
-    "docs/history/steps/STEP-32.0.4-TEST.md",
     "docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt",
     "docs/history/reports/STEP-32.0-CODEMAGIC-HOST-TEST-FAILURE.txt",
     "docs/history/reports/STEP-32.0-CODEMAGIC-STATIC-VALIDATION.txt",
@@ -1528,20 +1518,9 @@ require("## Step 32.0.1 — serialized-fingerprint verification correction" in r
 step32_physical_write_failure = read("docs/history/reports/STEP-32.0.1-PHYSICAL-CECIL-WRITE-RESOLUTION-FAILURE.txt")
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 1/4" in step32_physical_write_failure and "App version: 0.0.116 (116)" in step32_physical_write_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_write_failure and "Gate B — DeterministicStackNeutralRewrite: FAIL" in step32_physical_write_failure and "MetadataBuilder.GetConstantType" in step32_physical_write_failure and "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" in step32_physical_write_failure, "raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary")
 require("## Step 32.0.2 — bounded Cecil write-time constant-metadata resolver" in regression_contracts and "write-only in-memory" in regression_contracts and "open zero external framework/game assembly bytes" in regression_contracts and "Constant-table" in regression_contracts, "regression contracts pin the Step-32.0.2 bounded serialization resolver correction")
-step32_physical_scope_failure = read("docs/history/reports/STEP-32.0.2-PHYSICAL-UNEXPECTED-CONSTANT-SCOPE-FAILURE.txt")
-require("App version: 0.0.117 (117)" in step32_physical_scope_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_scope_failure and "Gate B — DeterministicStackNeutralRewrite: FAIL" in step32_physical_scope_failure and "Sentry, Version=5.0.0.0" in step32_physical_scope_failure, "raw physical 0.0.117 report preserves the unexpected Sentry constant-scope stop before write")
-require("## Step 32.0.3 — exact-length IL patch; no whole-module Cecil serialization" in regression_contracts and "26 00 00 00 00" in regression_contracts and "26 26 00 00 00" in regression_contracts and "step32-fast" in regression_contracts, "regression contracts pin exact-length Step-32 writing and same-commit two-workflow CI discipline")
-step32_fast_host_failure = read("docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-HOST-TEST-FAILURE.txt")
-step32_fast_static = read("docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-STATIC-VALIDATION.txt")
-step32_fast_timings = read("docs/history/reports/STEP-32.0.3-CODEMAGIC-FAST-PHASE-TIMINGS.txt")
-require("Total tests: 231" in step32_fast_host_failure and "Passed: 230" in step32_fast_host_failure and "Failed: 1" in step32_fast_host_failure and "ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly" in step32_fast_host_failure and "PrepareMethod(handle, instantiation[]) 5-byte call -> Pop + Pop + Nop + Nop + Nop" in step32_fast_host_failure and 'expected substring: "PrepareMethod(handle, instantiation[]) -> Pop + Pop"' in step32_fast_host_failure, "raw 0.0.118 fast host report proves exact-length Gate B succeeded and only stale assertion wording failed at 230/231")
-require("VALIDATION PASS: 1027 checks" in step32_fast_static, "raw 0.0.118 fast static report preserves 1027/1027 PASS")
-require("Ensure pinned .NET SDK                13s status=0" in step32_fast_timings and "Canonical static validation            1s status=0" in step32_fast_timings and "Complete host regression suite        13s status=1" in step32_fast_timings, "raw 0.0.118 fast timings prove failure stopped before device CI")
-require("## Step 32.0.4 — fast-preflight assertion correction" in regression_contracts and "production `RealStS2PrepareMethodRewrite.cs` byte-for-byte from 0.0.118" in regression_contracts and "authorize no physical test unless fast passes" in regression_contracts and "EXIT trap" in regression_contracts, "regression contracts pin Step-32.0.4 as a production-unchanged test assertion + failure-telemetry correction")
-require("trap 'sts2_report_cache_sizes' EXIT" in read("scripts/codemagic-fast.sh") and "trap 'sts2_report_cache_sizes' EXIT" in read("scripts/codemagic-device.sh"), "fast and device Codemagic workflows preserve cache-size telemetry on both success and failure")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.4 / 0.0.119 (119)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "Sentry" in current_status and "step32-fast" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines and records the fast-preflight test-only Step-32 correction")
+require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.2 / 0.0.117 (117)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "System.Runtime" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines and advances the bounded Step-32 write correction")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
@@ -1578,19 +1557,14 @@ require(len(history_steps) >= 60, "historical documentation set is comprehensive
 # Codemagic/current build wiring
 # ---------------------------------------------------------------------------
 codemagic = read("codemagic.yaml")
-require("step32-fast:" in codemagic and "ios-step-32:" in codemagic, "Codemagic exposes separate Step-32 fast and device workflows")
+require("ios-step-32:" in codemagic, "Codemagic exposes the Step 32 workflow")
 require("Step 32 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 32")
 require("LogFileName=step32.trx" in read("scripts/test.sh") and "artifacts/test-results/step32.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 32")
-require("Step 32" in read("scripts/lib/codemagic-common.sh") and "FAST HOST PREFLIGHT" in read("scripts/codemagic-fast.sh") and "DEVICE CANDIDATE" in read("scripts/codemagic-device.sh"), "Codemagic build-environment reports identify Step 32 fast/device modes")
-workflow_count = len(re.findall(r'^  (?:step32-fast|ios-step-32):', codemagic, re.M))
-require(workflow_count == 2, "Codemagic contains exactly the fast preflight and device-candidate workflows")
-require("scripts/codemagic-fast.sh" in codemagic and "scripts/codemagic-device.sh" in codemagic, "Codemagic calls the split fast/device build entry points")
+require("Step 32 PrepareMethod Semantic Context Audit build environment" in read("scripts/codemagic.sh") or "Step 32" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 32")
+workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
+require(workflow_count == 1, "Codemagic contains one active launcher workflow")
+require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
 require("history" not in codemagic.lower(), "Codemagic workflow has no history dependency")
-require("$HOME/.nuget/packages" in codemagic and "dotnet-sdk-9.0.314" in codemagic and "harmony-fat-2.4.2" in codemagic, "Codemagic caches NuGet, pinned SDK snapshot, and Harmony regression archive")
-require("bash scripts/test.sh" in read("scripts/codemagic-fast.sh") and "bash scripts/test.sh" not in read("scripts/codemagic-device.sh"), "complete host suite runs in fast preflight and is not duplicated in device workflow")
-require("--skip-manifest-update" in read("scripts/codemagic-device.sh"), "device workflow skips unnecessary workload manifest updates")
-require('NUGET_PACKAGES="${NUGET_PACKAGES:-$HOME/.nuget/packages}"' in read("scripts/build-ios.sh"), "iOS restore uses the cached user NuGet package root")
-require("phase-timings.txt" in read("scripts/lib/codemagic-common.sh") and "cache-sizes.txt" in read("scripts/lib/codemagic-common.sh"), "Codemagic emits phase timing and cache-size telemetry")
 
 build_ios = read("scripts/build-ios.sh")
 verify_ipa = read("scripts/verify-ipa.sh")

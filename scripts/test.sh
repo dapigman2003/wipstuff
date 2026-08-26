@@ -19,8 +19,6 @@ STEP28_AHEAD_OF_LOAD_DIR="artifacts/host-step28-ahead-of-load-fixture"
 STEP27_FIXTURE_DIR="artifacts/host-step27-fixtures"
 STEP27_HARMONY_RELEASE_URL="https://github.com/pardeike/Harmony/releases/download/v2.4.2.0/Harmony-Fat.2.4.2.0.zip"
 STEP27_HARMONY_ARCHIVE="$STEP27_FIXTURE_DIR/Harmony-Fat.2.4.2.0.zip"
-STEP27_HARMONY_CACHE_DIR="${STS2_HARMONY_CACHE_DIR:-$HOME/.cache/sts2launcher/harmony-fat-2.4.2}"
-STEP27_HARMONY_CACHE_ARCHIVE="$STEP27_HARMONY_CACHE_DIR/Harmony-Fat.2.4.2.0.zip"
 STEP27_HARMONY_ARCHIVE_RELATIVE="net9.0/0Harmony.dll"
 STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED="a5fc5f9d9640b927d786a0527faa18bf7aa776788235140c59e9b73de87a7774"
 STEP27_HARMONY_FIXTURE_SHA256_EXPECTED="a849b726e1f9248d71aabbed8114deaf79beb7acc25e8344ff92a27ad8ac87ab"
@@ -38,28 +36,12 @@ echo ".NET: $(dotnet --version)"
 
 echo "Acquiring exact official Harmony-Fat 2.4.2 host regression fixture..."
 rm -rf "$STEP27_FIXTURE_DIR"
-mkdir -p "$STEP27_FIXTURE_DIR" "$STEP27_HARMONY_CACHE_DIR"
-cache_hash="$(shasum -a 256 "$STEP27_HARMONY_CACHE_ARCHIVE" 2>/dev/null | awk '{print $1}' || true)"
-if [[ "$cache_hash" != "$STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED" ]]; then
-  echo "Harmony regression cache miss; downloading pinned archive..."
-  temp_archive="$STEP27_HARMONY_CACHE_ARCHIVE.tmp.$$"
-  rm -f "$temp_archive"
-  curl --fail --location --silent --show-error \
-    --retry 3 --retry-delay 2 --retry-all-errors \
-    --proto '=https' --tlsv1.2 \
-    "$STEP27_HARMONY_RELEASE_URL" \
-    --output "$temp_archive"
-  temp_hash="$(shasum -a 256 "$temp_archive" | awk '{print $1}')"
-  [[ "$temp_hash" == "$STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED" ]] || {
-    echo "ERROR: downloaded Harmony archive hash drift: expected $STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED, observed $temp_hash." >&2
-    rm -f "$temp_archive"
-    exit 3
-  }
-  mv "$temp_archive" "$STEP27_HARMONY_CACHE_ARCHIVE"
-else
-  echo "Harmony regression cache hit."
-fi
-cp "$STEP27_HARMONY_CACHE_ARCHIVE" "$STEP27_HARMONY_ARCHIVE"
+mkdir -p "$STEP27_FIXTURE_DIR"
+curl --fail --location --silent --show-error \
+  --retry 3 --retry-delay 2 --retry-all-errors \
+  --proto '=https' --tlsv1.2 \
+  "$STEP27_HARMONY_RELEASE_URL" \
+  --output "$STEP27_HARMONY_ARCHIVE"
 STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL="$(shasum -a 256 "$STEP27_HARMONY_ARCHIVE" | awk '{print $1}')"
 if [[ "$STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL" != "$STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED" ]]; then
   echo "ERROR: official Harmony-Fat 2.4.2 archive hash drift: expected $STEP27_HARMONY_ARCHIVE_SHA256_EXPECTED, observed $STEP27_HARMONY_ARCHIVE_SHA256_ACTUAL."
