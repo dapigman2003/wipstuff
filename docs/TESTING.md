@@ -30,6 +30,8 @@ Host coverage must prove:
 
 Latest physical evidence remains 0.0.117: Gate A PASS, Gate B fail-closed before mutation on exact Sentry 5.0.0.0. The static audit then proved the exact three non-null requirement set. User-confirmed Codemagic 0.0.118 established the lean build baseline.
 
+The first Codemagic attempt passed 669/669 static checks and compiled, but the three Step-32 rewrite tests failed during synthetic exact-System.Runtime fixture construction (`TypeSystem.Int32` on an image-less core-library module). The fixture-only correction imports primitive storage references and does not change production Step-32 code or release identity. Rerun the full canonical pipeline; do not use the failed attempt as publish/device authority.
+
 0.0.119 is intended to cross that known metadata-serialization boundary without broad resolution. After Codemagic succeeds, run a fresh-process physical Step 32 A–D and preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
 
 Expected Gate-B report evidence includes:

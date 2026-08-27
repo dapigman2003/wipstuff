@@ -1,0 +1,54 @@
+StS2 Launcher — Step 32.0.4 / 0.0.119 Codemagic Host-Fixture Failure
+Generated from Codemagic artifact bundle received 27 August 2026
+
+Authority
+---------
+This is host/CI evidence only. It is not physical iPhone evidence and does not close any Step-32 gate.
+
+Environment
+-----------
+Codemagic build timestamp: Thu Aug 27 15:29:12 UTC 2026
+macOS: 26.5 (25F71)
+Xcode: 26.5 (17F42)
+.NET SDK reported by host-test script: 9.0.314
+
+Observed result
+---------------
+Canonical static validation: PASS — 669/669 checks.
+External managed fixture builds: PASS.
+Core/test compilation: PASS (warnings only).
+Host tests: FAIL — 186 total, 183 passed, 3 failed.
+The run stopped at the host-test boundary; no iOS publish/IPA verification or physical-device authority is claimed from this run.
+
+Failed tests
+------------
+1. ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly
+2. UnauditedExternalConstantRequirementFailsClosedBeforeRewrite
+3. BranchTargetedPrepareMethodSiteIsRejectedBeforeAnyRewrite
+
+All three failures had the same pre-test-fixture exception:
+
+System.NullReferenceException
+  at Mono.Cecil.TypeSystem.CoreTypeSystem.LookupTypeDefinition(...)
+  at Mono.Cecil.TypeSystem.get_Int32()
+  at StS2Launcher.Core.Tests.RealStS2PrepareMethodRewriteTests.CreateSyntheticSystemRuntime()
+     RealStS2PrepareMethodRewriteTests.cs:line 349
+
+Interpretation
+--------------
+The new host fixture constructs an in-memory synthetic assembly named exact System.Runtime 9.0.0.0 so the Step-32 writer can exercise the audited BindingFlags enum requirement without using host/disk dependency resolution. Mono.Cecil treats a module named System.Runtime as a core-library module. Calling that image-less synthetic module's TypeSystem.Int32 attempts a core-type lookup through PE-backed module metadata and throws before the fixture assembly is written.
+
+Therefore this Codemagic result does NOT exercise or disprove the Step-32.0.4 production ConstantMetadataWriteResolver correction. The failure is confined to host-test fixture construction and occurs before the three intended rewrite/fail-closed test paths begin.
+
+Authorized correction
+---------------------
+Keep version 0.0.119 and all production Step-32 semantics/resolver code unchanged. Correct only the synthetic host fixtures so enum value__ primitive storage types are created through Cecil reflection import (typeof(int)/typeof(short)) rather than the synthetic assembly's TypeSystem primitive properties. This preserves Int32/Int16 metadata identity without asking an image-less synthetic System.Runtime module to perform a core-library metadata lookup.
+
+After correction
+----------------
+Rerun Codemagic. Require:
+- canonical static validation PASS;
+- all host tests PASS;
+- iOS publish PASS;
+- IPA verification PASS.
+Only then install 0.0.119 and run Step 32 A-D on a fresh physical process.

@@ -346,7 +346,11 @@ public sealed class RealStS2PrepareMethodRewriteTests
             PublicKeyToken = Convert.FromHexString("b03f5f7f11d50a3a"),
         };
         var assembly = AssemblyDefinition.CreateAssembly(name, "System.Runtime.dll", ModuleKind.Dll);
-        AddSyntheticEnum(assembly.MainModule, "System.Reflection", "BindingFlags", assembly.MainModule.TypeSystem.Int32);
+        // An in-memory assembly named System.Runtime is treated by Cecil as a core-library module.
+        // Asking its TypeSystem for Int32 attempts an image-backed core-type lookup, but this
+        // synthetic fixture has no PE image. Import the CLR primitive explicitly instead; this
+        // changes only the host fixture and still gives Cecil an Int32 metadata type for value__.
+        AddSyntheticEnum(assembly.MainModule, "System.Reflection", "BindingFlags", assembly.MainModule.ImportReference(typeof(int)));
         return assembly;
     }
 
@@ -357,8 +361,8 @@ public sealed class RealStS2PrepareMethodRewriteTests
             PublicKeyToken = Convert.FromHexString("fba2ec45388e2af0"),
         };
         var assembly = AssemblyDefinition.CreateAssembly(name, "Sentry.dll", ModuleKind.Dll);
-        AddSyntheticEnum(assembly.MainModule, "Sentry", "BreadcrumbLevel", assembly.MainModule.TypeSystem.Int32);
-        AddSyntheticEnum(assembly.MainModule, "Sentry", "SentryLevel", assembly.MainModule.TypeSystem.Int16);
+        AddSyntheticEnum(assembly.MainModule, "Sentry", "BreadcrumbLevel", assembly.MainModule.ImportReference(typeof(int)));
+        AddSyntheticEnum(assembly.MainModule, "Sentry", "SentryLevel", assembly.MainModule.ImportReference(typeof(short)));
         return assembly;
     }
 
@@ -368,7 +372,7 @@ public sealed class RealStS2PrepareMethodRewriteTests
             new AssemblyNameDefinition("Unexpected.Dependency", new Version(1, 0, 0, 0)),
             "Unexpected.Dependency.dll",
             ModuleKind.Dll);
-        AddSyntheticEnum(assembly.MainModule, "Unexpected", "AuditEscape", assembly.MainModule.TypeSystem.Int32);
+        AddSyntheticEnum(assembly.MainModule, "Unexpected", "AuditEscape", assembly.MainModule.ImportReference(typeof(int)));
         return assembly;
     }
 

@@ -163,3 +163,4 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-32.0.3-TEST.md` — CI/build acceptance procedure for the maintenance trim; no new Step-32 physical closure is claimed.
 - `steps/STEP-32.0.4-AUDITED-MULTI-SCOPE-CONSTANT-METADATA-WRITE-RESOLVER.md` — 0.0.119 evidence-bounded resolver correction: exact audited System.Runtime + Sentry enum/storage requirements only, per-exact-assembly in-memory surrogates, all other requirements/resolution identities fail closed; 6+4 rewrite unchanged.
 - `steps/STEP-32.0.4-TEST.md` — Codemagic + physical A–D acceptance procedure for 0.0.119.
+- `reports/STEP-32.0.4-CODEMAGIC-HOST-FIXTURE-FAILURE.txt` — first 0.0.119 CI attempt: static 669/669 and compile passed; 183/186 host tests because the synthetic exact-System.Runtime fixture used an image-backed `TypeSystem.Int32` lookup before the intended Step-32 test paths ran; corrected fixture keeps production code/version unchanged.

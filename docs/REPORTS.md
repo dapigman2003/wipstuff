@@ -8,6 +8,10 @@ Current on-device diagnostics write output-only text beneath `Documents/StS2Laun
 
 0.0.119 keeps the Step-32 runtime report path and 6+4 rewrite semantics unchanged while changing only the bounded Cecil write-time constant-metadata resolver. The latest physical report remains the 0.0.117 Gate-A PASS / Gate-B Sentry-scope fail-closed result preserved below; 0.0.119 requires new physical A–D evidence after Codemagic passes.
 
+## Current Codemagic evidence
+
+- `docs/history/reports/STEP-32.0.4-CODEMAGIC-HOST-FIXTURE-FAILURE.txt` — first 0.0.119 Codemagic attempt: static validation 669/669 and compile succeeded; host suite reached 183/186, with all three failures caused by the image-less synthetic `System.Runtime` fixture asking Cecil for `TypeSystem.Int32` before the intended Step-32 tests ran. Production resolver/rewrite semantics were not changed; rerun the same 0.0.119 candidate after the fixture-only correction.
+
 ## Static Step 32 metadata evidence
 
 - `docs/history/reports/STEP-32-STATIC-STS2-CONSTANT-METADATA-AUDIT.txt` — static-only audit of the exact Step-32 receipt-backed `sts2.dll`: raw Constant-table coverage, exact non-null external type/storage requirements, Sentry provider identities, and the null-only GodotSharp/System.Collections distinction. The DLL was not executed, CLR-loaded, or modified.

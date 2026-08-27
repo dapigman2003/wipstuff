@@ -16,6 +16,8 @@ Step 32.0.3 / **0.0.118** was maintenance-only and removed retired Step-25–27 
 
 Step 32.0.4 / **0.0.119** is the next semantic candidate. `ConstantMetadataWriteResolver.Configure` now requires the observed distinct non-null external requirement set to equal the three audited entries exactly before mutation, creates per-exact-assembly in-memory surrogates for exact System.Runtime and exact Sentry, synthesizes only those three enum shapes with their audited primitive storage types, and rejects every other requirement or resolution identity. No DefaultAssemblyResolver, search path, external dependency byte read, CLR load, or runtime Sentry admission is authorized.
 
+The first 0.0.119 Codemagic attempt passed canonical static validation **669/669** and compiled the active host suite, but stopped at **183/186 host tests**. All three failures were the same `NullReferenceException` in the newly added synthetic `System.Runtime` test fixture while evaluating `assembly.MainModule.TypeSystem.Int32`; production Step-32 resolver/rewrite code had not yet been exercised by those tests. This is a **host-fixture-only correction**: 0.0.119 remains the candidate/version, production code and 6+4 semantics are unchanged, and the fixture now imports primitive `Int32`/`Int16` references instead of asking an image-less synthetic core-library module for `TypeSystem` primitives. Preserve `docs/history/reports/STEP-32.0.4-CODEMAGIC-HOST-FIXTURE-FAILURE.txt`.
+
 Physical close condition for Step 32 remains Gates A–D **4/4 PASS**. First require Codemagic static validation, complete host tests, iOS publish and IPA verification for 0.0.119. Then perform one fresh-process physical run and preserve `Step32-RealStS2PrepareMethodRewrite.txt`.
 
 ---
