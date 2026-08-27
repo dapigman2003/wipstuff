@@ -1,6 +1,6 @@
 # Documentation Map
 
-Start here when resuming the project. The active candidate is Step 32.0.3 / 0.0.118, a maintenance-only trim after physical 0.0.117 re-proved Gate A and then failed closed at Gate B on exact external constant-metadata scope `Sentry, Version=5.0.0.0`. The Step-32 rewrite logic is intentionally unchanged while the retired Step 25–27 runtime-Harmony experiment is removed from the active build/test/package surface and preserved inertly in history.
+Start here when resuming the project. The active candidate is **Step 32.0.4 / 0.0.119**. Physical 0.0.117 failed closed before mutation on exact Sentry constant metadata; the exact DLL was then audited statically, proving exactly three non-null external type/storage requirements. User-confirmed Codemagic 0.0.118 established the lean baseline. 0.0.119 keeps the 6+4 rewrite unchanged and expands only the write-time Cecil metadata surrogate policy to those exact audited System.Runtime/Sentry requirements, while every unplanned requirement or resolution identity remains fail-closed.
 
 1. `MASTER-PLAN.md` — long-lived architecture, safety rules, authority model, and roadmap. Step 32 does not change that architecture.
 2. `CURRENT-STATUS.md` — exact physical baseline/candidate and acceptance state.

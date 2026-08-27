@@ -1,38 +1,39 @@
-# Release Checklist — Step 32.0.3 Maintenance Trim
+# Release Checklist — Step 32.0.4 Audited Constant-Metadata Resolver
 
 ## Candidate identity
 
-- step/candidate: **Step 32.0.3**
-- version: `0.0.118 (118)`
+- step/candidate: **Step 32.0.4**
+- version: `0.0.119 (119)`
 - workflow: `ios-step-32`
-- IPA: `artifacts/StS2-Launcher-Step-32.ipa`
-- known physical Step-32 blocker: exact external constant-metadata scope `Sentry 5.0.0.0`
+- expected IPA: `artifacts/StS2-Launcher-Step-32.ipa`
+- latest physical Step-32 evidence: 0.0.117 Gate A PASS / Gate B Sentry fail-closed before mutation
+- static correction evidence: `docs/history/reports/STEP-32-STATIC-STS2-CONSTANT-METADATA-AUDIT.txt`
+- lean baseline: user-confirmed Codemagic 0.0.118
 
-## Required for the maintenance candidate
+## Required before device testing
 
+- [ ] release identity is exactly `0.0.119 (119)`;
 - [ ] canonical static validation passes;
-- [ ] complete **active** host suite passes;
-- [ ] no Harmony-Fat network acquisition occurs;
-- [ ] retired Step-25–27 runtime-Harmony Core/UI/tests/preservation anchors are absent from active compilation;
-- [ ] Step-27 interpreted fixture is not built or bundled;
-- [ ] Step-28 fixture remains hash-verified and post-publish only;
-- [ ] iOS publish succeeds;
-- [ ] IPA verification succeeds;
-- [ ] release identity is exactly `0.0.118 (118)`;
-- [ ] no proprietary StS2 payload is packaged in source artifacts;
-- [ ] `RealStS2PrepareMethodRewrite.cs` remains identical to 0.0.117;
-- [ ] record Codemagic build duration/logs for comparison with the pre-trim pipeline.
+- [ ] complete active host suite passes;
+- [ ] host tests cover the exact three audited external constant type/storage requirements;
+- [ ] host tests prove an unaudited external constant requirement fails closed before transformation output;
+- [ ] iOS publish/package succeeds with `MtouchInterpreter=-all`, `MtouchLink=None`, `TrimMode=copy`;
+- [ ] IPA verification passes;
+- [ ] no proprietary `sts2.dll`, app bundle, credentials, or signing secrets are present in the source archive;
+- [ ] the static audit remains present under `docs/history/reports` and hash-pinned.
 
-## Step-32 physical acceptance remains unchanged
+## Physical acceptance
 
-A future feature candidate still requires:
+- [ ] install the verified IPA;
+- [ ] force-quit before the Step-32 run;
+- [ ] legitimate Step-12 install is OfflineReady;
+- [ ] Gate A re-proves exact receipt/source identity and 10/10 PrepareMethod sites;
+- [ ] Gate B reports exactly 3/3 audited constant requirements across 2/2 exact scopes and writes the transformed private image;
+- [ ] Gate B opens zero external dependency bytes and accepts no unplanned resolution identity;
+- [ ] Gate C proves 10 → 0 PrepareMethod references and unchanged constant-metadata semantic fingerprint;
+- [ ] Gate D re-proves trusted-install isolation, OfflineReady, and zero real-StS2 CLR admission/invocation;
+- [ ] final result is `REAL STS2 PREPAREMETHOD REWRITE PASS — 4/4`.
 
-- [ ] Gate A PASS — exact source/private clone, OfflineReady, no CLR admission;
-- [ ] Gate B PASS — exact 6 + 4 rewrite with only explicitly justified bounded constant-metadata handling;
-- [ ] Gate C PASS — 10 / 0 PrepareMethod references, exact semantic fingerprint, identical Constant-table semantics, source unchanged;
-- [ ] Gate D PASS — hashes stable, OfflineReady re-proved, trusted install unchanged, no `sts2` CLR load/invocation;
-- [ ] overall `REAL STS2 PREPAREMETHOD REWRITE PASS — 4/4`.
+## Failure discipline
 
-0.0.118 is not a Sentry correction. Do not broaden resolver search/fallback merely to make the physical run advance.
-
-Codemagic `build-summary.txt` records per-stage elapsed seconds for SDK setup, static validation, host tests/fixture builds, iOS workload setup, iOS publish/package preparation, IPA verification, and the total canonical pipeline so the maintenance trim can be measured rather than inferred.
+Do not broaden authority to make the run advance. A request for GodotSharp, System.Collections, another Sentry identity/type, another storage type, or another external assembly is new evidence and must fail closed. Do not enable Cecil default resolution, search paths, trimming/linking, runtime Harmony patching, real-game CLR admission, Godot/game startup, or native loading as part of Step 32.0.4.

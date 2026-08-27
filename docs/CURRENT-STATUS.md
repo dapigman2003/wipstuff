@@ -1,6 +1,6 @@
-# Current Status — Step 32.0.3 Retired Harmony Active-Surface Trim
+# Current Status — Step 32.0.4 Audited Constant-Metadata Resolver
 
-## Active candidate — Step 32.0.3 / 0.0.118 (118)
+## Active candidate — Step 32.0.4 / 0.0.119 (119)
 
 Physical baseline summary: Steps 01–26 closed; Step 27 CLOSED NEGATIVE; Step 28 CLOSED POSITIVE 5/5; Step 29 CLOSED POSITIVE 4/4; Step 30 CLOSED POSITIVE 4/4; Step 31 CLOSED POSITIVE 4/4.
 
@@ -8,15 +8,15 @@ Physical Step 31.0 / 0.0.114 is **CLOSED POSITIVE — 4/4**. The exact receipt-b
 
 The Step-32 semantic transformation remains exactly **6 × one-argument `PrepareMethod(handle)` → `Pop`** and **4 × two-argument `PrepareMethod(handle, instantiation[])` → `Pop + Pop`** on a launcher-private clone. No trusted-install mutation or real-StS2 CLR admission is authorized in Step 32.
 
-Physical 0.0.116 passed Gate A and exposed the first Cecil write-time constant-metadata need: exact `System.Runtime 9.0.0.0`. Step 32.0.2 / 0.0.117 added only a write-time in-memory surrogate for that exact identity.
+Physical 0.0.116 passed Gate A and exposed exact `System.Runtime 9.0.0.0` Cecil Constant-table write resolution. Step 32.0.2 / 0.0.117 added only an in-memory surrogate for that exact identity. Physical **0.0.117** then re-proved **Gate A PASS** with OfflineReady **428/428**, source SHA-1 `e424ace9399a82edea4dd7e0fa5761635dfd6c5d`, SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, token `0x06007D05`, all ten sites, zero Cecil read-time resolution, zero CLR admission, and no trusted-install modification. **Gate B failed closed before mutation** because the verified module also contains exact `Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0` non-null external constant metadata. Preserve `docs/history/reports/STEP-32.0.2-PHYSICAL-SENTRY-CONSTANT-METADATA-FAILURE.txt`.
 
-Physical **0.0.117** then re-proved **Gate A PASS** with OfflineReady **428/428**, source SHA-1 `e424ace9399a82edea4dd7e0fa5761635dfd6c5d`, SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, `PrewarmJit()` token `0x06007D05`, all ten sites, zero Cecil read-time resolution, zero CLR admission, and no trusted-install modification. **Gate B failed closed before mutation** in `ConstantMetadataWriteResolver.Configure` because the verified real module also contains external constant metadata scoped to exact `Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0`. Preserve `docs/history/reports/STEP-32.0.2-PHYSICAL-SENTRY-CONSTANT-METADATA-FAILURE.txt`.
+The static-only audit of that exact DLL is preserved at `docs/history/reports/STEP-32-STATIC-STS2-CONSTANT-METADATA-AUDIT.txt`. It proves 3,059 Constant-table rows and exactly three non-null external type/storage requirements under the active scanner rule: exact System.Runtime 9.0.0.0 / `System.Reflection.BindingFlags` / `Int32`; exact Sentry 5.0.0.0 / `Sentry.BreadcrumbLevel` / `Int32`; exact Sentry 5.0.0.0 / `Sentry.SentryLevel` / `Int16`. The Sentry constants are default parameters on `SentryService`, not `PrewarmJit`. Null-only external Constant rows also reference GodotSharp 4.5.1.0 and System.Collections 9.0.0.0; they remain unauthorized unless a future write actually requests them.
 
-Step 32.0.3 / 0.0.118 is **maintenance-only**. `RealStS2PrepareMethodRewrite.cs` and its bounded System.Runtime-only writer policy remain byte-for-byte unchanged from 0.0.117. The active build surface now archives/removes the closed Step 25–27 runtime-Harmony implementation, its dedicated host tests and UI, the Step-27 interpreted fixture, the CI Harmony-Fat download, and the obsolete Harmony DynamicDependency preservation anchors. The copy/no-link/interpreter policy and all current Step 28–32 contracts remain active.
+Step 32.0.3 / **0.0.118** was maintenance-only and removed retired Step-25–27 Harmony implementation/test/UI/fixture weight without changing the Step-32 writer behavior. The user has confirmed 0.0.118 works in Codemagic, so it is the proven lean active-source baseline.
 
-For 0.0.118, the immediate acceptance target is canonical static validation + host suite + iOS publish + IPA verification, followed by comparison of Codemagic wall-clock/build logs. **Do not interpret 0.0.118 as a Sentry correction.** A later Step-32 candidate must first use static game-file evidence to understand the exact Sentry constant metadata before changing the writer policy.
+Step 32.0.4 / **0.0.119** is the next semantic candidate. `ConstantMetadataWriteResolver.Configure` now requires the observed distinct non-null external requirement set to equal the three audited entries exactly before mutation, creates per-exact-assembly in-memory surrogates for exact System.Runtime and exact Sentry, synthesizes only those three enum shapes with their audited primitive storage types, and rejects every other requirement or resolution identity. No DefaultAssemblyResolver, search path, external dependency byte read, CLR load, or runtime Sentry admission is authorized.
 
-Physical close condition for Step 32 remains Gates A–D **4/4 PASS**. Preserve `Step32-RealStS2PrepareMethodRewrite.txt` when a later corrected candidate is physically tested.
+Physical close condition for Step 32 remains Gates A–D **4/4 PASS**. First require Codemagic static validation, complete host tests, iOS publish and IPA verification for 0.0.119. Then perform one fresh-process physical run and preserve `Step32-RealStS2PrepareMethodRewrite.txt`.
 
 ---
 

@@ -158,5 +158,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-32.0.2-BOUNDED-CONSTANT-METADATA-WRITE-RESOLVER.md` — 0.0.117 keeps the 6+4 rewrite unchanged and introduces an exact-identity, in-memory write-only constant-metadata surrogate instead of broad resolver fallback.
 - `steps/STEP-32.0.2-TEST.md` — Codemagic + physical A–D acceptance procedure for the bounded write resolver correction.
 - `reports/STEP-32.0.2-PHYSICAL-SENTRY-CONSTANT-METADATA-FAILURE.txt` — raw physical 0.0.117 report: Gate A PASS; Gate B failed closed before mutation because the verified real module also contains external constant metadata scoped to exact `Sentry 5.0.0.0`.
+- `reports/STEP-32-STATIC-STS2-CONSTANT-METADATA-AUDIT.txt` — static-only audit of the exact receipt-backed Step-32 DLL; resolves the Sentry constant providers/types/storage and distinguishes non-null resolver requirements from null-only external Constant rows.
 - `steps/STEP-32.0.3-RETIRED-HARMONY-ACTIVE-SURFACE-TRIM.md` — 0.0.118 maintenance-only trim that moves closed Step-25/26/27 runtime-Harmony executable surface out of the active build while leaving the Step-32 rewrite/resolver behavior unchanged.
 - `steps/STEP-32.0.3-TEST.md` — CI/build acceptance procedure for the maintenance trim; no new Step-32 physical closure is claimed.
+- `steps/STEP-32.0.4-AUDITED-MULTI-SCOPE-CONSTANT-METADATA-WRITE-RESOLVER.md` — 0.0.119 evidence-bounded resolver correction: exact audited System.Runtime + Sentry enum/storage requirements only, per-exact-assembly in-memory surrogates, all other requirements/resolution identities fail closed; 6+4 rewrite unchanged.
+- `steps/STEP-32.0.4-TEST.md` — Codemagic + physical A–D acceptance procedure for 0.0.119.

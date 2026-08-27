@@ -24,6 +24,14 @@ public sealed class RealStS2PrepareMethodRewrite
     public const string TransformedRootName = "transformed";
     public const string PrimaryFileName = "sts2.dll";
     private const string CecilWriteSystemRuntimeIdentity = "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+    private const string CecilWriteSentryIdentity = "Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0";
+    private static readonly IReadOnlyDictionary<ExternalConstantTypeKey, TypeCode> AuditedExternalConstantTypeRequirements =
+        new Dictionary<ExternalConstantTypeKey, TypeCode>
+        {
+            [new(CecilWriteSystemRuntimeIdentity, "System.Reflection.BindingFlags", false)] = TypeCode.Int32,
+            [new(CecilWriteSentryIdentity, "Sentry.BreadcrumbLevel", false)] = TypeCode.Int32,
+            [new(CecilWriteSentryIdentity, "Sentry.SentryLevel", false)] = TypeCode.Int16,
+        };
 
     internal static readonly RewriteEvidence PhysicalStep31Evidence = new(
         SourceSha1: "e424ace9399a82edea4dd7e0fa5761635dfd6c5d",
@@ -203,6 +211,9 @@ public sealed class RealStS2PrepareMethodRewrite
             int expectedTransformedInstructionCount;
             int writeResolutionRequestCount;
             int syntheticConstantTypeCount;
+            int approvedConstantScopeCount;
+            int approvedConstantRequirementCount;
+            string writeResolutionIdentities;
             using (var resolver = new ConstantMetadataWriteResolver())
             using (var module = ReadModuleDeferred(source.PrivateSourcePath, resolver))
             {
@@ -210,6 +221,8 @@ public sealed class RealStS2PrepareMethodRewrite
                 var constantPlan = resolver.Configure(module);
                 expectedConstantMetadataSha256 = ComputeConstantMetadataFingerprint(module);
                 syntheticConstantTypeCount = constantPlan.SyntheticTypeCount;
+                approvedConstantScopeCount = constantPlan.ApprovedScopeCount;
+                approvedConstantRequirementCount = constantPlan.ApprovedRequirementCount;
                 sourcePopCount = method.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Pop);
                 var il = method.Body.GetILProcessor();
                 oneArgumentReplacements = 0;
@@ -261,6 +274,7 @@ public sealed class RealStS2PrepareMethodRewrite
                 module.Write(transformedPath, new WriterParameters { WriteSymbols = false });
                 resolver.ValidateWriteRequests();
                 writeResolutionRequestCount = resolver.Requests.Count;
+                writeResolutionIdentities = string.Join(" | ", resolver.Requests.Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal));
             }
 
             var transformedSha256 = ComputeSha256Hex(transformedPath);
@@ -289,7 +303,9 @@ public sealed class RealStS2PrepareMethodRewrite
                 $"Expected transformed PrewarmJit semantic fingerprint SHA-256: {expectedTransformedSemanticSha256}\n" +
                 $"Constant metadata semantic fingerprint preserved for reopen verification: {expectedConstantMetadataSha256}\n" +
                 $"Synthetic constant-metadata resolver types: {syntheticConstantTypeCount:N0}\n" +
-                $"Cecil write-time resolution requests: {writeResolutionRequestCount:N0} — exact {CecilWriteSystemRuntimeIdentity} only\n" +
+                $"Audited external constant type/storage requirements approved: {approvedConstantRequirementCount:N0}/3 across {approvedConstantScopeCount:N0}/2 exact assembly scopes\n" +
+                $"Approved exact constant-metadata scopes: {CecilWriteSystemRuntimeIdentity} | {CecilWriteSentryIdentity}\n" +
+                $"Cecil write-time resolution requests: {writeResolutionRequestCount:N0} — approved exact audited scope(s) only: {writeResolutionIdentities}\n" +
                 "External framework/game assembly bytes opened by the write resolver: 0\n" +
                 $"Source SHA-256 preserved: {source.SourceSha256}\n" +
                 $"Transformed SHA-256: {transformedSha256}\n" +
@@ -874,8 +890,7 @@ public sealed class RealStS2PrepareMethodRewrite
     private sealed class ConstantMetadataWriteResolver : IAssemblyResolver
     {
         private readonly List<string> _requests = [];
-        private AssemblyDefinition? _systemRuntimeSurrogate;
-        private int _syntheticTypeCount;
+        private readonly Dictionary<string, AssemblyDefinition> _surrogates = new(StringComparer.Ordinal);
         private bool _configured;
 
         public IReadOnlyList<string> Requests => _requests;
@@ -887,54 +902,98 @@ public sealed class RealStS2PrepareMethodRewrite
             _configured = true;
 
             var requirements = CollectExternalConstantTypeRequirements(sourceModule);
-            if (requirements.Count == 0)
-                return new ConstantMetadataResolutionPlan(0);
+            ValidateAuditedRequirementSet(requirements);
 
-            var unexpectedScopes = requirements.Keys
-                .Where(key => !key.AssemblyFullName.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal))
-                .Select(key => key.AssemblyFullName)
-                .Distinct(StringComparer.Ordinal)
-                .OrderBy(value => value, StringComparer.Ordinal)
-                .ToArray();
-            if (unexpectedScopes.Length != 0)
-                throw new InvalidDataException(
-                    "Step-32 Cecil serialization requires unexpected external constant-metadata scope(s): " +
-                    string.Join(" | ", unexpectedScopes));
-
-            var systemRuntimeReference = sourceModule.AssemblyReferences
-                .SingleOrDefault(reference => reference.FullName.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal))
-                ?? throw new InvalidDataException($"Step-32 source has no exact {CecilWriteSystemRuntimeIdentity} AssemblyRef for the physical write-time metadata request.");
-
-            var surrogateName = new AssemblyNameDefinition(systemRuntimeReference.Name, systemRuntimeReference.Version)
+            var assemblyReferences = new Dictionary<string, AssemblyNameReference>(StringComparer.Ordinal);
+            foreach (var identity in requirements.Keys.Select(key => key.AssemblyFullName).Distinct(StringComparer.Ordinal))
             {
-                Culture = systemRuntimeReference.Culture,
-                PublicKeyToken = systemRuntimeReference.PublicKeyToken is null ? [] : systemRuntimeReference.PublicKeyToken.ToArray(),
-            };
-            _systemRuntimeSurrogate = AssemblyDefinition.CreateAssembly(surrogateName, "Step32.System.Runtime.ConstantMetadataSurrogate.dll", ModuleKind.Dll);
-
-            foreach (var requirement in requirements.OrderBy(pair => pair.Key.TypeFullName, StringComparer.Ordinal))
-            {
-                if (requirement.Key.IsNested)
-                    throw new InvalidDataException($"Step-32 does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
-                var separator = requirement.Key.TypeFullName.LastIndexOf('.');
-                var typeNamespace = separator < 0 ? string.Empty : requirement.Key.TypeFullName[..separator];
-                var typeName = separator < 0 ? requirement.Key.TypeFullName : requirement.Key.TypeFullName[(separator + 1)..];
-                var enumBase = new TypeReference("System", "Enum", _systemRuntimeSurrogate.MainModule, surrogateName);
-                var syntheticEnum = new TypeDefinition(
-                    typeNamespace,
-                    typeName,
-                    TypeAttributes.Public | TypeAttributes.Sealed,
-                    enumBase);
-                syntheticEnum.Fields.Add(new FieldDefinition(
-                    "value__",
-                    FieldAttributes.Public | FieldAttributes.SpecialName | FieldAttributes.RTSpecialName,
-                    GetPrimitiveConstantType(sourceModule, requirement.Value)));
-                _systemRuntimeSurrogate.MainModule.Types.Add(syntheticEnum);
-                _syntheticTypeCount++;
+                var matches = sourceModule.AssemblyReferences
+                    .Where(reference => reference.FullName.Equals(identity, StringComparison.Ordinal))
+                    .ToArray();
+                if (matches.Length != 1)
+                    throw new InvalidDataException($"Step-32 source must contain exactly one AssemblyRef for audited constant-metadata scope {identity}; found {matches.Length}.");
+                assemblyReferences.Add(identity, matches[0]);
             }
 
-            return new ConstantMetadataResolutionPlan(_syntheticTypeCount);
+            var syntheticTypeCount = 0;
+            foreach (var scopeGroup in requirements
+                         .GroupBy(pair => pair.Key.AssemblyFullName, StringComparer.Ordinal)
+                         .OrderBy(group => group.Key, StringComparer.Ordinal))
+            {
+                var sourceReference = assemblyReferences[scopeGroup.Key];
+                var surrogateName = new AssemblyNameDefinition(sourceReference.Name, sourceReference.Version)
+                {
+                    Culture = sourceReference.Culture,
+                    PublicKeyToken = sourceReference.PublicKeyToken is null ? [] : sourceReference.PublicKeyToken.ToArray(),
+                };
+                var safeName = sourceReference.Name.Replace('.', '-');
+                var surrogate = AssemblyDefinition.CreateAssembly(
+                    surrogateName,
+                    $"Step32.{safeName}.ConstantMetadataSurrogate.dll",
+                    ModuleKind.Dll);
+                _surrogates.Add(scopeGroup.Key, surrogate);
+
+                foreach (var requirement in scopeGroup.OrderBy(pair => pair.Key.TypeFullName, StringComparer.Ordinal))
+                {
+                    if (requirement.Key.IsNested)
+                        throw new InvalidDataException($"Step-32 does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
+                    var separator = requirement.Key.TypeFullName.LastIndexOf('.');
+                    var typeNamespace = separator < 0 ? string.Empty : requirement.Key.TypeFullName[..separator];
+                    var typeName = separator < 0 ? requirement.Key.TypeFullName : requirement.Key.TypeFullName[(separator + 1)..];
+
+                    // The surrogate is never written or loaded. Cecil only needs a TypeDefinition whose
+                    // BaseType identifies System.Enum and whose value__ field exposes the audited primitive
+                    // storage type. Keeping the synthetic System.Enum scope inside the same surrogate avoids
+                    // introducing any secondary resolver path while satisfying that bounded metadata query.
+                    var enumBase = new TypeReference("System", "Enum", surrogate.MainModule, surrogateName);
+                    var syntheticEnum = new TypeDefinition(
+                        typeNamespace,
+                        typeName,
+                        TypeAttributes.Public | TypeAttributes.Sealed,
+                        enumBase);
+                    syntheticEnum.Fields.Add(new FieldDefinition(
+                        "value__",
+                        FieldAttributes.Public | FieldAttributes.SpecialName | FieldAttributes.RTSpecialName,
+                        GetPrimitiveConstantType(sourceModule, requirement.Value)));
+                    surrogate.MainModule.Types.Add(syntheticEnum);
+                    syntheticTypeCount++;
+                }
+            }
+
+            return new ConstantMetadataResolutionPlan(
+                syntheticTypeCount,
+                _surrogates.Count,
+                requirements.Count);
         }
+
+        private static void ValidateAuditedRequirementSet(IReadOnlyDictionary<ExternalConstantTypeKey, TypeCode> actual)
+        {
+            var missing = AuditedExternalConstantTypeRequirements
+                .Where(pair => !actual.TryGetValue(pair.Key, out var observed) || observed != pair.Value)
+                .Select(pair => FormatRequirement(pair.Key, pair.Value))
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            var unexpected = actual
+                .Where(pair => !AuditedExternalConstantTypeRequirements.TryGetValue(pair.Key, out var expected) || expected != pair.Value)
+                .Select(pair => FormatRequirement(pair.Key, pair.Value))
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+
+            if (missing.Length == 0 && unexpected.Length == 0)
+                return;
+
+            var detail = new List<string>();
+            if (missing.Length != 0)
+                detail.Add("missing/changed audited requirement(s): " + string.Join(" | ", missing));
+            if (unexpected.Length != 0)
+                detail.Add("unexpected requirement(s): " + string.Join(" | ", unexpected));
+            throw new InvalidDataException(
+                "Step-32 external constant-metadata requirement set drifted from the static audit of the exact receipt-backed sts2.dll; " +
+                string.Join("; ", detail));
+        }
+
+        private static string FormatRequirement(ExternalConstantTypeKey key, TypeCode typeCode)
+            => $"{key.AssemblyFullName} / {key.TypeFullName} / {typeCode} / nested={key.IsNested}";
 
         public AssemblyDefinition Resolve(AssemblyNameReference name)
             => ResolveCore(name);
@@ -945,25 +1004,29 @@ public sealed class RealStS2PrepareMethodRewrite
         private AssemblyDefinition ResolveCore(AssemblyNameReference name)
         {
             _requests.Add(name.FullName);
-            if (!_configured || _systemRuntimeSurrogate is null ||
-                !name.FullName.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal))
+            if (!_configured || !_surrogates.TryGetValue(name.FullName, out var surrogate))
                 throw new AssemblyResolutionException(name);
-            return _systemRuntimeSurrogate;
+            return surrogate;
         }
 
         public void ValidateWriteRequests()
         {
             if (_requests.Count == 0)
-                throw new InvalidDataException("Step-32 expected Cecil serialization to use the bounded System.Runtime constant-metadata surrogate, but no write-time resolution request occurred.");
-            var unexpected = _requests.Where(value => !value.Equals(CecilWriteSystemRuntimeIdentity, StringComparison.Ordinal)).Distinct(StringComparer.Ordinal).ToArray();
+                throw new InvalidDataException("Step-32 expected Cecil serialization to use at least one bounded constant-metadata surrogate, but no write-time resolution request occurred.");
+            var unexpected = _requests
+                .Where(value => !_surrogates.ContainsKey(value))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
             if (unexpected.Length != 0)
                 throw new InvalidDataException("Step-32 Cecil serialization attempted an unapproved assembly resolution: " + string.Join(" | ", unexpected));
         }
 
         public void Dispose()
         {
-            _systemRuntimeSurrogate?.Dispose();
-            _systemRuntimeSurrogate = null;
+            foreach (var surrogate in _surrogates.Values)
+                surrogate.Dispose();
+            _surrogates.Clear();
         }
     }
 
@@ -976,7 +1039,10 @@ public sealed class RealStS2PrepareMethodRewrite
         public void Dispose() { }
     }
 
-    private sealed record ConstantMetadataResolutionPlan(int SyntheticTypeCount);
+    private sealed record ConstantMetadataResolutionPlan(
+        int SyntheticTypeCount,
+        int ApprovedScopeCount,
+        int ApprovedRequirementCount);
     private readonly record struct ExternalConstantTypeKey(string AssemblyFullName, string TypeFullName, bool IsNested);
 
     internal sealed record RewriteCallSiteEvidence(int IlOffset, int ArgumentCount, string TargetMember);

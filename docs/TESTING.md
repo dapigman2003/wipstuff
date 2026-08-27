@@ -1,33 +1,45 @@
-# Testing — Step 32.0.3 Retired Harmony Active-Surface Trim
+# Testing — Step 32.0.4 Audited Constant-Metadata Resolver
 
-Active candidate: Step 32.0.3 / `0.0.118 (118)`. This is a maintenance-only candidate; the Step-32 rewrite and known Sentry blocker are intentionally unchanged.
+Active candidate: Step 32.0.4 / `0.0.119 (119)`.
 
-## Authority sequence
+## Canonical authority chain
 
-1. `scripts/validate.sh` — canonical static policy/provenance validation.
-2. `scripts/test.sh` — active host regression suite, without the retired Step-25–27 Harmony suite or Harmony-Fat network acquisition.
-3. `scripts/build-ios.sh` — publish/package the iOS candidate without the Step-27 interpreted fixture or retired Harmony UI/AOT surface.
-4. `scripts/verify-ipa.sh` — verify release identity, native closure, active fixture rules, and IPA structure.
-5. Compare Codemagic wall-clock/logs against the pre-trim 0.0.117 pipeline.
+1. `python3 tools/validate_current.py`
+2. complete host suite through `scripts/test.sh`
+3. iOS publish/package through `scripts/build-ios.sh`
+4. `scripts/verify-ipa.sh`
+5. physical iPhone Step-32 A–D run from a fresh process
 
-Release identity remains workflow `ios-step-32`, IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, now version `0.0.118 (118)`.
+Codemagic workflow: `ios-step-32`
 
-### Maintenance-trim regression focus
+Release identity: IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, version `0.0.119 (119)`.
 
-Static/host/package guards must prove:
+## What 0.0.119 changes
 
-- the physically closed Step-25/26/27 runtime-Harmony implementation, dedicated tests, UI, preservation anchors, and Step-27 interpreted fixture are absent from the active source/project/package graph;
-- active scripts contain no Harmony-Fat download, Step-27 fixture build, Step-27 environment variable, or Step-27 IPA payload rule;
-- Step 24 controlled `0Harmony` initialization remains active and protected because it is a separately proven dependency-initialization capability;
-- Step 28 ahead-of-load transformation remains active and its fixture is still built outside the iOS project graph and copied only after publish;
-- `MtouchInterpreter=-all`, `MtouchLink=None`, and `TrimMode=copy` remain unchanged;
-- current Step-29/30/31 physical evidence and Step-32 rewrite implementation remain protected;
-- `RealStS2PrepareMethodRewrite.cs` is unchanged from 0.0.117.
+The semantic rewrite is unchanged: 6 one-argument PrepareMethod calls become one Pop each, and 4 two-argument calls become Pop + Pop. The only changed runtime boundary is the write-time Constant-table resolver.
 
-### Known physical Step-32 state
+Host coverage must prove:
 
-Physical 0.0.117 passed Gate A and failed Gate B before mutation on unexpected external constant-metadata scope `Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0`. This maintenance candidate does not correct that boundary.
+- the representative source fixture contains the three audited requirements: System.Runtime/BindingFlags/Int32, Sentry/BreadcrumbLevel/Int32, Sentry/SentryLevel/Int16;
+- Gate B can serialize that fixture using in-memory exact-identity surrogates only;
+- an additional unaudited non-null external constant requirement is rejected before rewrite/output;
+- Gate C independently reopens and proves the full constant-metadata semantic fingerprint unchanged;
+- existing Step-32 source/rewrite/isolation contracts still pass.
 
-A physical 0.0.118 run is therefore optional and is **not** expected to close Step 32. The next feature candidate should be designed only after static inspection of the exact Sentry constant metadata in the user's receipt-backed game files.
+## Physical Step-32 state
 
-Codemagic `build-summary.txt` records per-stage elapsed seconds for SDK setup, static validation, host tests/fixture builds, iOS workload setup, iOS publish/package preparation, IPA verification, and the total canonical pipeline so the maintenance trim can be measured rather than inferred.
+Latest physical evidence remains 0.0.117: Gate A PASS, Gate B fail-closed before mutation on exact Sentry 5.0.0.0. The static audit then proved the exact three non-null requirement set. User-confirmed Codemagic 0.0.118 established the lean build baseline.
+
+0.0.119 is intended to cross that known metadata-serialization boundary without broad resolution. After Codemagic succeeds, run a fresh-process physical Step 32 A–D and preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
+
+Expected Gate-B report evidence includes:
+
+- `Synthetic constant-metadata resolver types: 3`;
+- `Audited external constant type/storage requirements approved: 3/3 across 2/2 exact assembly scopes`;
+- all Cecil write-time resolution requests limited to the configured exact audited System.Runtime/Sentry identities;
+- zero external framework/game assembly bytes opened by the write resolver;
+- exact 6/6 + 4/4 rewrite counts.
+
+Any request for GodotSharp, System.Collections, another Sentry identity/type, or another assembly remains a failure. Do not add default resolver fallback or search directories in response to a failure.
+
+Codemagic `build-summary.txt` remains the timing record for the optimized active build surface.

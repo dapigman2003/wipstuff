@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 32.0.3 retired Harmony active-surface trim static validation")
+print("StS2 Launcher — Step 32.0.4 audited multi-scope constant-metadata resolver static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>118</ApplicationVersion>" in project_text, "build version is 118")
-require("<ApplicationDisplayVersion>0.0.118</ApplicationDisplayVersion>" in project_text, "display version is 0.0.118")
-require(plist.get("CFBundleVersion") == "118", "Info.plist build version is 118")
-require(plist.get("CFBundleShortVersionString") == "0.0.118", "Info.plist display version is 0.0.118")
+require("<ApplicationVersion>119</ApplicationVersion>" in project_text, "build version is 119")
+require("<ApplicationDisplayVersion>0.0.119</ApplicationDisplayVersion>" in project_text, "display version is 0.0.119")
+require(plist.get("CFBundleVersion") == "119", "Info.plist build version is 119")
+require(plist.get("CFBundleShortVersionString") == "0.0.119", "Info.plist display version is 0.0.119")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 32.0.3 — RETIRED HARMONY ACTIVE-SURFACE TRIM" in release_presentation, "top launcher banner identifies active Step 32.0.3 maintenance candidate")
+require("STEP 32.0.4 — AUDITED MULTI-SCOPE CONSTANT-METADATA RESOLVER" in release_presentation, "top launcher banner identifies active Step 32.0.4 metadata-resolver candidate")
 require("STEP 31 CLOSED POSITIVE 4/4" in release_presentation and "0x06007D05" in release_presentation and "PrepareMethod" in release_presentation and "private" in release_presentation and "zero CLR load" in release_presentation, "top launcher banner preserves Step-31 physical closure and identifies the private Step-32 rewrite boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.118"' in release_presentation and 'ExpectedBuildVersion = "118"' in release_presentation, "Step 32.0.3 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.119"' in release_presentation and 'ExpectedBuildVersion = "119"' in release_presentation, "Step 32.0.4 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -336,8 +336,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-32.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.118",
-    "STS2_BUILD_VERSION": "118",
+    "STS2_DISPLAY_VERSION": "0.0.119",
+    "STS2_BUILD_VERSION": "119",
     "STS2_RUNTIME_POLICY_MARKER": "STEP32 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -689,7 +689,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Step 32.0.3 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the maintenance candidate rather than retired Step 27")
+require("Step 32.0.4 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-32.0.4 candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -886,12 +886,13 @@ require("Assembly.Load(" not in step32_source and "LoadFromStream(" not in step3
 require("ComputeMethodSemanticFingerprint" in step32_source and "ExpectedTransformedSemanticSha256" in step32_source and "PrepareMethod references source/transformed" in step32_source, "Step 32 reopens and verifies the exact planned transformed method semantics")
 require("Instruction offsets are finalized by Cecil during serialization" in step32_source and "offset-independent semantic fingerprint" in step32_source and "transformedBodySha256.Equals(sourceBodySha256" in step32_source, "Step 32.0.1 treats physical body fingerprint as post-write evidence and semantic fingerprint as the pre-write/reopen invariant")
 require("ExpectedTransformedBodySha256" not in step32_source and "expectedTransformedBodySha256" not in step32_source, "Step 32.0.1 forbids pre-write offset-sensitive transformed body-hash prediction")
-require("ConstantMetadataWriteResolver" in step32_source and "CecilWriteSystemRuntimeIdentity" in step32_source and "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" in step32_source, "Step 32.0.2 pins the exact write-only System.Runtime constant-metadata resolver identity")
-require("CollectExternalConstantTypeRequirements" in step32_source and "GetPrimitiveConstantType" in step32_source and "External framework/game assembly bytes opened by the write resolver: 0" in step32_source, "Step 32.0.2 synthesizes constant metadata from verified source values without opening external assembly bytes")
+require("ConstantMetadataWriteResolver" in step32_source and "CecilWriteSystemRuntimeIdentity" in step32_source and "CecilWriteSentryIdentity" in step32_source and "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" in step32_source and "Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0" in step32_source, "Step 32.0.4 pins the exact audited System.Runtime and Sentry write-only metadata resolver identities")
+require("AuditedExternalConstantTypeRequirements" in step32_source and "System.Reflection.BindingFlags" in step32_source and "Sentry.BreadcrumbLevel" in step32_source and "Sentry.SentryLevel" in step32_source and "TypeCode.Int16" in step32_source and "ValidateAuditedRequirementSet" in step32_source, "Step 32.0.4 pins the exact three audited external constant type/storage requirements and rejects requirement drift before mutation")
+require("CollectExternalConstantTypeRequirements" in step32_source and "GetPrimitiveConstantType" in step32_source and "Dictionary<string, AssemblyDefinition> _surrogates" in step32_source and "External framework/game assembly bytes opened by the write resolver: 0" in step32_source, "Step 32.0.4 uses per-exact-assembly in-memory surrogates synthesized from verified source constant values without opening external assembly bytes")
 require("DefaultAssemblyResolver" not in step32_source and "AddSearchDirectory" not in step32_source, "Step 32.0.2 forbids broad Cecil resolver/search fallback")
 require("ComputeConstantMetadataFingerprint" in step32_source and "source/transformed constant metadata semantics changed" in step32_source and "ExpectedConstantMetadataSha256" in step32_source, "Step 32.0.2 verifies unrelated Constant-table semantics survive serialization unchanged")
-require("SyntheticExternalEnum" in step32_tests and "SingleAssemblyResolver" in step32_tests and "Synthetic constant-metadata resolver types: 1" in step32_tests, "Step 32 host regression reproduces the external-enum Constant-table serialization path")
-require("ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly" in step32_tests and "CollectionAssert.AreEqual(before, after)" in step32_tests and "CountPrepareMethod(transformedMethod)" in step32_tests and "BranchTargetedPrepareMethodSiteIsRejectedBeforeAnyRewrite" in step32_tests, "Step 32 host regressions prove private-only rewrite and branch-target refusal")
+require("CreateSyntheticSentry" in step32_tests and "MultiAssemblyResolver" in step32_tests and "Synthetic constant-metadata resolver types: 3" in step32_tests and "\"Sentry\", \"BreadcrumbLevel\"" in step32_tests and "\"Sentry\", \"SentryLevel\"" in step32_tests, "Step 32.0.4 host regression reproduces all three audited external-enum Constant-table serialization requirements")
+require("ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly" in step32_tests and "CollectionAssert.AreEqual(before, after)" in step32_tests and "CountPrepareMethod(transformedMethod)" in step32_tests and "BranchTargetedPrepareMethodSiteIsRejectedBeforeAnyRewrite" in step32_tests and "UnauditedExternalConstantRequirementFailsClosedBeforeRewrite" in step32_tests and "Unexpected.Dependency" in step32_tests, "Step 32 host regressions prove private-only rewrite, branch-target refusal, and unaudited constant-requirement fail-closed behavior")
 require("Step32-RealStS2PrepareMethodRewrite.txt" in step32_ui and "REAL STS2 PREPAREMETHOD REWRITE" in step32_ui, "iOS UI persists the dedicated Step-32 physical report")
 require("new RealStS2PrepareMethodRewrite(_launcherDataRoot)" in root_ui_text and "AddRealStS2PrepareMethodRewriteControls(content)" in root_ui_text, "RootViewController wires Step 32 into the active device surface")
 require("Step32ImplementationMarker" in release_presentation and "6 one-arg PrepareMethod calls to Pop" in release_presentation and "4 two-arg calls to Pop+Pop" in release_presentation and "zero CLR load" in release_presentation, "release presentation pins the Step-32 first-real-rewrite boundary")
@@ -1105,7 +1106,7 @@ require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 1/4" in step32_physical_write_
 require("## Step 32.0.2 — bounded Cecil write-time constant-metadata resolver" in regression_contracts and "write-only in-memory" in regression_contracts and "open zero external framework/game assembly bytes" in regression_contracts and "Constant-table" in regression_contracts, "regression contracts pin the Step-32.0.2 bounded serialization resolver correction")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.3 / 0.0.118 (118)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "System.Runtime" in current_status and "Sentry, Version=5.0.0.0" in current_status and "maintenance-only" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines, the 0.0.117 Sentry finding, and the maintenance-only Step-32 trim")
+require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "Step 28" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 31" in current_status and "CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 32.0.4 / 0.0.119 (119)" in current_status and "0x06007D05" in current_status and "6 ×" in current_status and "4 ×" in current_status and "System.Reflection.BindingFlags" in current_status and "Sentry.BreadcrumbLevel" in current_status and "Sentry.SentryLevel" in current_status and "user has confirmed 0.0.118 works in Codemagic" in current_status and "Step32-RealStS2PrepareMethodRewrite.txt" in current_status, "current status preserves physical baselines, the exact static audit, proven 0.0.118 lean baseline, and active 0.0.119 bounded resolver correction")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:

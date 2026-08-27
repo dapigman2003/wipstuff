@@ -63,8 +63,10 @@ public sealed class RealStS2PrepareMethodRewriteTests
         StringAssert.Contains(gateB.Detail, "One-argument sites rewritten: 6/6");
         StringAssert.Contains(gateB.Detail, "Two-argument sites rewritten: 4/4");
         StringAssert.Contains(gateB.Detail, "PrepareMethod(handle, instantiation[]) -> Pop + Pop");
-        StringAssert.Contains(gateB.Detail, "Synthetic constant-metadata resolver types: 1");
-        StringAssert.Contains(gateB.Detail, "exact System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a only");
+        StringAssert.Contains(gateB.Detail, "Synthetic constant-metadata resolver types: 3");
+        StringAssert.Contains(gateB.Detail, "Audited external constant type/storage requirements approved: 3/3 across 2/2 exact assembly scopes");
+        StringAssert.Contains(gateB.Detail, "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
+        StringAssert.Contains(gateB.Detail, "Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0");
         StringAssert.Contains(gateC.Detail, "PrepareMethod references source/transformed: 10 / 0");
         StringAssert.Contains(gateD.Detail, "Trusted Step 12 managed install unchanged: YES");
         StringAssert.Contains(gateD.Detail, "Real StS2 assembly/type/member CLR load or invocation by Step 32: NO");
@@ -104,6 +106,36 @@ public sealed class RealStS2PrepareMethodRewriteTests
         Assert.IsFalse(gateA.Passed);
         StringAssert.Contains(gateA.Detail, "became a branch target");
         Assert.IsFalse(Directory.Exists(Path.Combine(temp.Path, RealStS2PrepareMethodRewrite.WorkRootName)));
+    }
+
+    [TestMethod]
+    public async Task UnauditedExternalConstantRequirementFailsClosedBeforeRewrite()
+    {
+        using var temp = new TempTestDirectory("sts2-step32-unaudited-constant");
+        var managedPath = Path.Combine(temp.Path, SteamOfflineInstallInspection.ManagedRootRelativePath, "Depot-2868842");
+        const string primaryRelative = "SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/sts2.dll";
+        var primaryPath = Path.Combine(managedPath, primaryRelative.Replace('/', Path.DirectorySeparatorChar));
+        Directory.CreateDirectory(Path.GetDirectoryName(primaryPath)!);
+        WriteSyntheticPrimaryAssembly(primaryPath, branchToFirstPrepareMethod: false, includeUnauditedExternalConstant: true);
+        var evidence = BuildEvidence(primaryPath);
+        await WriteReceiptAsync(managedPath, primaryRelative, primaryPath);
+
+        var before = await File.ReadAllBytesAsync(primaryPath);
+        var rewrite = new RealStS2PrepareMethodRewrite(temp.Path, evidence);
+        var gateA = await rewrite.RunSourceAdmissionAndPrivateCloneAsync();
+        var gateB = rewrite.RunDeterministicStackNeutralRewrite();
+        var after = await File.ReadAllBytesAsync(primaryPath);
+
+        Assert.IsTrue(gateA.Passed, gateA.Detail);
+        Assert.IsFalse(gateB.Passed);
+        StringAssert.Contains(gateB.Detail, "external constant-metadata requirement set drifted from the static audit");
+        StringAssert.Contains(gateB.Detail, "Unexpected.Dependency, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+        CollectionAssert.AreEqual(before, after);
+        Assert.IsFalse(File.Exists(Path.Combine(
+            temp.Path,
+            RealStS2PrepareMethodRewrite.WorkRootName,
+            RealStS2PrepareMethodRewrite.TransformedRootName,
+            RealStS2PrepareMethodRewrite.PrimaryFileName)));
     }
 
     private static async Task WriteReceiptAsync(string managedPath, string primaryRelative, string primaryPath)
@@ -164,21 +196,34 @@ public sealed class RealStS2PrepareMethodRewriteTests
         foreach (var nested in root.NestedTypes.SelectMany(EnumerateTypes)) yield return nested;
     }
 
-    private static void WriteSyntheticPrimaryAssembly(string path, bool branchToFirstPrepareMethod)
+    private static void WriteSyntheticPrimaryAssembly(
+        string path,
+        bool branchToFirstPrepareMethod,
+        bool includeUnauditedExternalConstant = false)
     {
         using var syntheticRuntime = CreateSyntheticSystemRuntime();
-        using var sourceWriteResolver = new SingleAssemblyResolver(syntheticRuntime);
+        using var syntheticSentry = CreateSyntheticSentry();
+        using var syntheticUnexpected = includeUnauditedExternalConstant ? CreateSyntheticUnexpectedDependency() : null;
+        var resolverAssemblies = syntheticUnexpected is null
+            ? new[] { syntheticRuntime, syntheticSentry }
+            : new[] { syntheticRuntime, syntheticSentry, syntheticUnexpected };
+        using var sourceWriteResolver = new MultiAssemblyResolver(resolverAssemblies);
         using var assembly = AssemblyDefinition.CreateAssembly(
             new AssemblyNameDefinition("sts2", new Version(0, 1, 0, 0)),
             "sts2",
             new ModuleParameters { Kind = ModuleKind.Dll, AssemblyResolver = sourceWriteResolver });
         var module = assembly.MainModule;
-        var runtimeAssembly = new AssemblyNameReference("System.Runtime", new Version(9, 0, 0, 0))
-        {
-            PublicKeyToken = Convert.FromHexString("b03f5f7f11d50a3a"),
-        };
+
+        var runtimeAssembly = CloneReference(syntheticRuntime.Name);
+        var sentryAssembly = CloneReference(syntheticSentry.Name);
         module.AssemblyReferences.Add(runtimeAssembly);
-        var type = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "OneTimeInitialization", TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Sealed, module.TypeSystem.Object);
+        module.AssemblyReferences.Add(sentryAssembly);
+
+        var type = new TypeDefinition(
+            "MegaCrit.Sts2.Core.Helpers",
+            "OneTimeInitialization",
+            TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Sealed,
+            module.TypeSystem.Object);
         module.Types.Add(type);
         var runtimeHelpers = new TypeReference("System.Runtime.CompilerServices", "RuntimeHelpers", module, runtimeAssembly);
         var runtimeMethodHandle = new TypeReference("System", "RuntimeMethodHandle", module, runtimeAssembly, true);
@@ -190,16 +235,74 @@ public sealed class RealStS2PrepareMethodRewriteTests
         prepareTwo.Parameters.Add(new ParameterDefinition(runtimeMethodHandle));
         prepareTwo.Parameters.Add(new ParameterDefinition(runtimeTypeHandleArray));
 
-        var constantHolder = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "SyntheticConstantHolder", TypeAttributes.NotPublic | TypeAttributes.Abstract | TypeAttributes.Sealed, module.TypeSystem.Object);
-        var externalEnum = new TypeReference("System", "SyntheticExternalEnum", module, runtimeAssembly, true);
+        var constantHolder = new TypeDefinition(
+            "MegaCrit.Sts2.Core.Helpers",
+            "SyntheticConstantHolder",
+            TypeAttributes.NotPublic | TypeAttributes.Abstract | TypeAttributes.Sealed,
+            module.TypeSystem.Object);
+        var bindingFlags = new TypeReference("System.Reflection", "BindingFlags", module, runtimeAssembly, true);
         constantHolder.Fields.Add(new FieldDefinition(
-            "ExternalEnumDefault",
+            "InstanceMemberBindingFlags",
             FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.Literal | FieldAttributes.HasDefault,
-            externalEnum)
+            bindingFlags)
         {
-            Constant = 2,
+            Constant = 52,
         });
         module.Types.Add(constantHolder);
+
+        var sentryService = new TypeDefinition(
+            "MegaCrit.Sts2.Core.Debug",
+            "SentryService",
+            TypeAttributes.NotPublic | TypeAttributes.Abstract | TypeAttributes.Sealed,
+            module.TypeSystem.Object);
+        module.Types.Add(sentryService);
+        var breadcrumbLevel = new TypeReference("Sentry", "BreadcrumbLevel", module, sentryAssembly, true);
+        var sentryLevel = new TypeReference("Sentry", "SentryLevel", module, sentryAssembly, true);
+
+        var addBreadcrumb = new MethodDefinition(
+            "AddBreadcrumb",
+            MethodAttributes.Public | MethodAttributes.Static,
+            module.TypeSystem.Void);
+        addBreadcrumb.Parameters.Add(new ParameterDefinition("category", ParameterAttributes.None, module.TypeSystem.String));
+        addBreadcrumb.Parameters.Add(new ParameterDefinition("message", ParameterAttributes.None, module.TypeSystem.String));
+        addBreadcrumb.Parameters.Add(new ParameterDefinition(
+            "level",
+            ParameterAttributes.Optional | ParameterAttributes.HasDefault,
+            breadcrumbLevel)
+        {
+            Constant = 0,
+        });
+        addBreadcrumb.Body.GetILProcessor().Append(addBreadcrumb.Body.GetILProcessor().Create(OpCodes.Ret));
+        sentryService.Methods.Add(addBreadcrumb);
+
+        var captureMessage = new MethodDefinition(
+            "CaptureMessage",
+            MethodAttributes.Public | MethodAttributes.Static,
+            module.TypeSystem.Void);
+        captureMessage.Parameters.Add(new ParameterDefinition("message", ParameterAttributes.None, module.TypeSystem.String));
+        captureMessage.Parameters.Add(new ParameterDefinition(
+            "level",
+            ParameterAttributes.Optional | ParameterAttributes.HasDefault,
+            sentryLevel)
+        {
+            Constant = (short)1,
+        });
+        captureMessage.Body.GetILProcessor().Append(captureMessage.Body.GetILProcessor().Create(OpCodes.Ret));
+        sentryService.Methods.Add(captureMessage);
+
+        if (syntheticUnexpected is not null)
+        {
+            var unexpectedAssembly = CloneReference(syntheticUnexpected.Name);
+            module.AssemblyReferences.Add(unexpectedAssembly);
+            var unexpectedEnum = new TypeReference("Unexpected", "AuditEscape", module, unexpectedAssembly, true);
+            constantHolder.Fields.Add(new FieldDefinition(
+                "UnauditedExternalDefault",
+                FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.Literal | FieldAttributes.HasDefault,
+                unexpectedEnum)
+            {
+                Constant = 7,
+            });
+        }
 
         var method = new MethodDefinition("PrewarmJit", MethodAttributes.Public | MethodAttributes.Static, module.TypeSystem.Void);
         type.Methods.Add(method);
@@ -235,6 +338,7 @@ public sealed class RealStS2PrepareMethodRewriteTests
             optionalBranch.Operand = firstPrepare!;
         assembly.Write(path);
     }
+
     private static AssemblyDefinition CreateSyntheticSystemRuntime()
     {
         var name = new AssemblyNameDefinition("System.Runtime", new Version(9, 0, 0, 0))
@@ -242,24 +346,62 @@ public sealed class RealStS2PrepareMethodRewriteTests
             PublicKeyToken = Convert.FromHexString("b03f5f7f11d50a3a"),
         };
         var assembly = AssemblyDefinition.CreateAssembly(name, "System.Runtime.dll", ModuleKind.Dll);
-        var module = assembly.MainModule;
+        AddSyntheticEnum(assembly.MainModule, "System.Reflection", "BindingFlags", assembly.MainModule.TypeSystem.Int32);
+        return assembly;
+    }
+
+    private static AssemblyDefinition CreateSyntheticSentry()
+    {
+        var name = new AssemblyNameDefinition("Sentry", new Version(5, 0, 0, 0))
+        {
+            PublicKeyToken = Convert.FromHexString("fba2ec45388e2af0"),
+        };
+        var assembly = AssemblyDefinition.CreateAssembly(name, "Sentry.dll", ModuleKind.Dll);
+        AddSyntheticEnum(assembly.MainModule, "Sentry", "BreadcrumbLevel", assembly.MainModule.TypeSystem.Int32);
+        AddSyntheticEnum(assembly.MainModule, "Sentry", "SentryLevel", assembly.MainModule.TypeSystem.Int16);
+        return assembly;
+    }
+
+    private static AssemblyDefinition CreateSyntheticUnexpectedDependency()
+    {
+        var assembly = AssemblyDefinition.CreateAssembly(
+            new AssemblyNameDefinition("Unexpected.Dependency", new Version(1, 0, 0, 0)),
+            "Unexpected.Dependency.dll",
+            ModuleKind.Dll);
+        AddSyntheticEnum(assembly.MainModule, "Unexpected", "AuditEscape", assembly.MainModule.TypeSystem.Int32);
+        return assembly;
+    }
+
+    private static void AddSyntheticEnum(ModuleDefinition module, string typeNamespace, string typeName, TypeReference storageType)
+    {
         var enumType = new TypeDefinition(
-            "System",
-            "SyntheticExternalEnum",
+            typeNamespace,
+            typeName,
             TypeAttributes.Public | TypeAttributes.Sealed,
             module.ImportReference(typeof(Enum)));
         enumType.Fields.Add(new FieldDefinition(
             "value__",
             FieldAttributes.Public | FieldAttributes.SpecialName | FieldAttributes.RTSpecialName,
-            module.ImportReference(typeof(int))));
+            storageType));
         module.Types.Add(enumType);
-        return assembly;
     }
 
-    private sealed class SingleAssemblyResolver(AssemblyDefinition assembly) : IAssemblyResolver
+    private static AssemblyNameReference CloneReference(AssemblyNameDefinition name)
+        => new(name.Name, name.Version)
+        {
+            Culture = name.Culture,
+            PublicKeyToken = name.PublicKeyToken is null ? [] : name.PublicKeyToken.ToArray(),
+        };
+
+    private sealed class MultiAssemblyResolver(IEnumerable<AssemblyDefinition> assemblies) : IAssemblyResolver
     {
+        private readonly Dictionary<string, AssemblyDefinition> _assemblies =
+            assemblies.ToDictionary(assembly => assembly.Name.FullName, StringComparer.Ordinal);
+
         public AssemblyDefinition Resolve(AssemblyNameReference name)
-            => name.FullName == assembly.Name.FullName ? assembly : throw new AssemblyResolutionException(name);
+            => _assemblies.TryGetValue(name.FullName, out var assembly)
+                ? assembly
+                : throw new AssemblyResolutionException(name);
 
         public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
             => Resolve(name);

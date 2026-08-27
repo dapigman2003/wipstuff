@@ -1,0 +1,90 @@
+StS2 Step 32 — Static sts2.dll Constant-Metadata Audit
+Generated 2026-08-26
+
+Safety
+------
+Static PE/CLI metadata parsing only. The assembly was not executed or loaded into a CLR and was not modified.
+
+Identity
+--------
+File size: 9,363,456 bytes
+SHA-1: e424ace9399a82edea4dd7e0fa5761635dfd6c5d
+SHA-256: e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18
+Assembly: sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Module MVID: 518e4758-52d7-47c2-b776-471a0e29e49d
+
+Constant-table coverage
+-----------------------
+Raw ECMA-335 Constant rows: 3,059
+Field parents: 2,556
+Parameter parents: 503
+Property parents: 0
+Return-parameter parents (Param.Sequence=0): 0
+
+This means the active Step-32 enumeration categories (fields, properties, method returns, parameters) cover every Constant-table parent shape actually present in this DLL. ECMA-335 HasConstant permits Field, Param, and Property parents; no hidden provider category exists in this file.
+
+Non-null externally scoped Constant providers
+---------------------------------------------
+Total providers: 9
+Distinct external scopes: 2
+Distinct external type/storage requirements: 3
+
+1) Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0
+
+  Type: Sentry.BreadcrumbLevel
+  Provider kind: Parameter
+  Provider token: 0x080058F4
+  Provider: MegaCrit.Sts2.Core.Debug.SentryService::AddBreadcrumb, parameter sequence 3, name=level
+  Storage: Int32
+  Constant value: 0
+
+  Type: Sentry.SentryLevel
+  Provider kind: Parameter
+  Provider token: 0x080058F9
+  Provider: MegaCrit.Sts2.Core.Debug.SentryService::CaptureMessage, parameter sequence 2, name=level
+  Storage: Int16
+  Constant value: 1
+
+2) System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+
+  Type: System.Reflection.BindingFlags
+  Storage: Int32
+  Constant value: 52
+  Providers: 7 fields
+
+  0x04000049 MegaCrit.Sts2.GameInfo.GameInfoUploaderSerializerContext::InstanceMemberBindingFlags
+  0x0400021E MegaCrit.Sts2.Core.Saves.MegaCritSerializerContext::InstanceMemberBindingFlags
+  0x04000464 MegaCrit.Sts2.Core.Runs.Metrics.MetricsSerializerContext::InstanceMemberBindingFlags
+  0x040028C3 MegaCrit.Sts2.Core.Localization.LocManagerSerializerContext::InstanceMemberBindingFlags
+  0x040028E2 MegaCrit.Sts2.Core.Localization.SerializableDynamicVarDictionarySerializerContext::InstanceMemberBindingFlags
+  0x0400298A MegaCrit.Sts2.Core.Helpers.ReflectionHelper::allAccessLevels
+  0x04002DB0 MegaCrit.Sts2.Core.Debug.ReleaseInfoJsonSerializerContext::InstanceMemberBindingFlags
+
+Conclusion for current ConstantMetadataWriteResolver requirement scan
+--------------------------------------------------------------------
+The current Step-32 scanner ignores constants whose value is null. Under that exact rule, System.Runtime 9.0.0.0 and Sentry 5.0.0.0 are the complete set of external assembly scopes in this exact DLL. There are no additional non-null external Constant providers.
+
+Literal whole-Constant-table external-scope inventory
+-----------------------------------------------------
+There are 98 Constant rows whose declared type resolves to an external AssemblyRef when null-valued defaults are included:
+
+  System.Runtime 9.0.0.0: 79 total (7 non-null, 72 null)
+  Sentry 5.0.0.0: 2 total (2 non-null, 0 null)
+  GodotSharp 4.5.1.0: 11 total (0 non-null, 11 null)
+  System.Collections 9.0.0.0: 6 total (0 non-null, 6 null)
+
+Therefore, the statement "System.Runtime and Sentry are the only external Constant-table scopes" is true only for the current Step-32 non-null requirement model. It is false if interpreted literally across all Constant rows. The other scopes occur only on null-valued constants and should remain outside resolver authority unless Cecil actually requests them; any such request should continue to fail closed.
+
+Sentry interpretation
+---------------------
+The two Sentry constants are default parameter metadata on MegaCrit.Sts2.Core.Debug.SentryService methods. They are not in OneTimeInitialization::PrewarmJit and do not indicate a PrewarmJit dependency on Sentry.
+
+Evidence-supported next resolver contract
+-----------------------------------------
+A next Step-32 candidate can remain bounded by approving exactly these three non-null external type/storage requirements:
+
+  System.Runtime 9.0.0.0 / System.Reflection.BindingFlags / Int32 / non-nested
+  Sentry 5.0.0.0 / Sentry.BreadcrumbLevel / Int32 / non-nested
+  Sentry 5.0.0.0 / Sentry.SentryLevel / Int16 / non-nested
+
+Use per-exact-assembly synthetic surrogates, reject every other resolution identity, log every write-time request, and let any request for GodotSharp, System.Collections, another Sentry identity/type, or any unplanned assembly fail closed. Gate C should independently re-open the result and prove the full constant-metadata fingerprint is unchanged.

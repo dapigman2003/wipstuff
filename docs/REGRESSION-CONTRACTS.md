@@ -231,3 +231,23 @@ Physical 0.0.117 is preserved as **device evidence at 1/4**: Gate A passed with 
 - keep historical evidence reconstructable through `docs/history` and the inert archive, without making active validation/runtime depend on that archive.
 
 Passing 0.0.118 CI/IPA validation proves only that the project can carry its current architecture with a smaller active surface. It does **not** close Step 32 or supersede the Sentry physical finding.
+
+## Step 32.0.4 — audited multi-scope constant-metadata resolver
+
+The exact Step-32 `sts2.dll` static audit is preserved in `docs/history/reports/STEP-32-STATIC-STS2-CONSTANT-METADATA-AUDIT.txt`. Under the active non-null requirement scan, the source has exactly three external type/storage requirements: exact System.Runtime 9.0.0.0 / `System.Reflection.BindingFlags` / `Int32`; exact Sentry 5.0.0.0 / `Sentry.BreadcrumbLevel` / `Int32`; exact Sentry 5.0.0.0 / `Sentry.SentryLevel` / `Int16`. User-confirmed Codemagic success for 0.0.118 establishes the lean baseline before this correction.
+
+0.0.119 must:
+
+- keep the exact 6 + 4 PrepareMethod→Pop rewrite unchanged;
+- require the observed distinct non-null external constant requirement set to equal those three audited entries exactly before the rewrite loop;
+- reject any missing, changed-storage, nested, or additional external constant requirement before producing transformed output;
+- require exactly one matching source AssemblyRef for each approved exact identity;
+- synthesize only the three audited enum definitions, using per-exact-assembly in-memory surrogates for System.Runtime and Sentry;
+- satisfy only write-time assembly-resolution requests whose full identity is one of those configured exact audited surrogate identities;
+- record every write-time resolver request and reject all other identities;
+- keep GodotSharp 4.5.1.0 and System.Collections 9.0.0.0 unauthorized despite their null-only Constant rows in the whole-table audit;
+- open zero external framework/game assembly bytes from the write resolver and continue to forbid DefaultAssemblyResolver/search-directory fallback;
+- retain the full source/transformed constant-metadata fingerprint equality check in Gate C;
+- retain all Step-32 exact source/hash/MVID/token/site, branch-target, semantic fingerprint, Pop/instruction/EH, trusted-install immutability, no-CLR-admission, and OfflineReady invariants.
+
+Host regression coverage must include both a representative exact three-requirement fixture and an unaudited-external-requirement fail-closed fixture. Physical Step-32 closure still requires A–D **4/4 PASS**; a pass does not itself authorize transformed-real-StS2 CLR admission/execution.
