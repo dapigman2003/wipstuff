@@ -1,7 +1,0 @@
-StS2 Launcher — Step 27 crash checkpoint
-Output-only diagnostic; never consumed as trusted runtime input.
-Generated UTC: 2026-08-22T08:52:37.0968130+00:00
-Process ID: 90705
-Phase: PROGRESS
-Gate: S — PrefixRegistration
-Detail: Gate S progress: S1 — entering exact PatchProcessor.AddPrefix(MethodInfo) reflection invocation.
