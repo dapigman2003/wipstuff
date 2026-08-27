@@ -1,0 +1,13 @@
+StS2 Launcher — Step 27 crash checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Generated UTC: 2026-08-22T23:18:34.8548080+00:00
+Process ID: 96761
+App version: 0.0.94 (94)
+Expected source version: 0.0.94 (94)
+Candidate: STEP 27.0.10 — HARMONYSHAREDSTATE CCTOR IN-FLIGHT OBSERVABILITY
+Gate S implementation: bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden
+Gate T implementation: T1-T4 physically crossed; unchanged HarmonySharedState RunClassConstructor with bounded cctor resolver/AssemblyLoad observers; PatchProcessor.Patch() remains after T6
+Phase: PROGRESS
+Gate: T — PatchEngineExecution
+Detail:
+Gate T progress: T5 observer — dedicated ALC: host load completed: netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 => netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 PatchProcessor.Patch() and launcher target remain uninvoked.

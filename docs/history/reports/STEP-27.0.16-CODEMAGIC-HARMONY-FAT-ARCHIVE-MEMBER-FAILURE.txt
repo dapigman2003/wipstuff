@@ -1,0 +1,5 @@
+StS2 Launcher — Step 27 canonical host regression tests
+UTC: 2026-08-23T20:00:05Z
+.NET: 9.0.314
+Acquiring exact official Harmony-Fat 2.4.2 host regression fixture...
+ERROR: official Harmony-Fat 2.4.2 archive must contain exactly one netstandard2.0/0Harmony.dll; found 0.

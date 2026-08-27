@@ -1,0 +1,12 @@
+StS2 Launcher — Step 27 crash checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Generated UTC: 2026-08-22T20:55:39.9166930+00:00
+Process ID: 95261
+App version: 0.0.93 (93)
+Expected source version: 0.0.93 (93)
+Candidate: STEP 27.0.9 — CRASH-CHECKPOINT RELEASE PROVENANCE HARDENING
+Gate S implementation: bounded HarmonyMethod() descriptor; PatchProcessor.AddPrefix(MethodInfo) runtime invocation forbidden
+Phase: PROGRESS
+Gate: T — PatchEngineExecution
+Detail:
+Gate T progress: T5 — entering explicit RuntimeHelpers.RunClassConstructor(HarmonySharedState.TypeHandle); PatchProcessor.Patch() and launcher target remain uninvoked.

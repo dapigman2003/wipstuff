@@ -1,0 +1,40 @@
+StS2 Launcher — Step 27.0.20 / 0.0.104 Codemagic real-Harmony normalizer failure
+Generated from wipstuff_24_artifacts.zip evidence supplied after candidate 0.0.104.
+
+RESULT
+Codemagic compiled production and tests and executed all 212 host tests.
+211 passed / 1 failed.
+
+FAILED TEST
+OfficialHarmony242Net9FatNormalizerUsesDeferredMetadataAndPreservesSourceBytes
+
+FIRST REAL FAILURE
+Real Harmony 2.4.2 normalization failed:
+System.InvalidOperationException: Step 27 Gate A metadata-only audit attempted forbidden type resolution while reading
+'artifacts/host-step27-fixtures/0Harmony.dll': System.Reflection.BindingFlags
+
+The stack crosses:
+Mono.Cecil.MetadataBuilder.GetConstantType
+Mono.Cecil.MetadataBuilder.AddConstant
+Mono.Cecil.MetadataBuilder.BuildMetadata
+Mono.Cecil.ModuleWriter.Write
+Mono.Cecil.ModuleDefinition.Write
+ControlledHarmonyPatchExecution.CreateIosNormalizedHarmonyRuntimeImage
+
+INTERPRETATION
+This is the first Codemagic run where the exact official, hash-pinned Harmony-Fat 2.4.2 net9.0 surrogate
+actually entered the production normalizer. The Deferred Cecil read succeeded. The failure is in Cecil's
+whole-module writer, which rebuilds metadata and attempts to resolve enum-typed constants even when
+unrelated custom-attribute constructor arguments remain deferred.
+
+The rejecting Step27MetadataOnlyResolver is behaving as designed. Whitelisting BindingFlags would only
+move the failure to another enum constant and would weaken the metadata-only boundary.
+
+DECISION
+Step 27.0.21 removes Mono.Cecil.ModuleDefinition.Write from the normalization path. Cecil remains read-only
+for exact admission and token discovery. The normalized runtime image is produced by replacing only the
+existing HarmonySharedState::.cctor PE method-body slot in a cloned byte array using existing metadata tokens.
+No metadata table, heap/blob, assembly reference, custom attribute, constant, resource, signature, or unrelated
+method is rebuilt or moved.
+
+No StS2 member was reflected, patched, or invoked in this Codemagic run.

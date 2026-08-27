@@ -1,0 +1,192 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-ios</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    <RootNamespace>StS2Launcher.iOS</RootNamespace>
+    <AssemblyName>StS2Launcher.iOS</AssemblyName>
+
+    <SupportedOSPlatformVersion>18.0</SupportedOSPlatformVersion>
+
+    <ApplicationId>com.community.sts2launcher</ApplicationId>
+    <ApplicationTitle>StS2 Launcher</ApplicationTitle>
+    <ApplicationVersion>118</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.118</ApplicationDisplayVersion>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!--
+      Step 28.0 retains the physically proven Step 27.0.23 dynamic-payload compatibility policy while runtime Harmony detours are retired from the active architecture. Physical 0.0.105 and 0.0.106 proved that
+      full trimming can remove ordinary BCL members/types referenced only by assemblies that arrive
+      after publish (first System.Linq.Enumerable.Union<T>, then System.Diagnostics.DebuggableAttribute
+      while MonoMod.Utils.DynamicMethodDefinition initializes). This launcher intentionally loads the
+      receipt-backed StS2/Harmony/mod managed world after publish, so ILLink cannot statically see its
+      complete framework usage. Disable managed IL trimming for the iOS host instead of chasing one
+      framework member at a time. The macios SDK supports this explicit copy/no-link policy. AOT remains
+      enabled for build-time assemblies; MtouchInterpreter=-all remains the dynamic managed-code policy.
+    -->
+    <TrimMode>copy</TrimMode>
+    <MtouchLink>None</MtouchLink>
+
+    <!--
+      Step 21 retains the physically proven Step 20 Dynamic Managed Execution Foundation interpreter policy: keep every build-time launcher assembly on
+      the already-proven AOT path while linking the Mono interpreter into the Release host for
+      runtime/dynamic managed code. Microsoft documents MtouchInterpreter=-all as "AOT compile
+      all assemblies, while still allowing the interpreter to perform dynamic code generation".
+      The Step 20 fixture DLLs are copied only after dotnet publish and are never project/content
+      references, so physical Gate B is the authority for whether post-publish IL can execute.
+      PublishAot/NativeAOT remains disabled.
+    -->
+    <MtouchInterpreter>-all</MtouchInterpreter>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../StS2Launcher.Core/StS2Launcher.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="SteamKit2" />
+    <TrimmerRootAssembly Include="protobuf-net" />
+    <TrimmerRootAssembly Include="protobuf-net.Core" />
+  </ItemGroup>
+
+  <!--
+    Step 22 Host Framework Closure Foundation. These 22 names remain the physically measured
+    direct host-binding frontier and are retained as historical/protection descriptors. Under the
+    retained Step 27.0.23/Step 28 copy/no-link host policy they are no longer relied upon to prevent member trimming;
+    the host framework assemblies are preserved wholesale. The larger 44-name observed frontier is
+    still verified on-device before the Step 21 binding plan is recomputed. No downloaded System.*
+    implementation is added here.
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="netstandard" />
+    <TrimmerRootAssembly Include="System.Data.Common" />
+    <TrimmerRootAssembly Include="System.Diagnostics.Contracts" />
+    <TrimmerRootAssembly Include="System.Diagnostics.StackTrace" />
+    <TrimmerRootAssembly Include="System.Diagnostics.TraceSource" />
+    <TrimmerRootAssembly Include="System.Diagnostics.Tracing" />
+    <TrimmerRootAssembly Include="System.IO.FileSystem.DriveInfo" />
+    <TrimmerRootAssembly Include="System.IO.MemoryMappedFiles" />
+    <TrimmerRootAssembly Include="System.Net.Ping" />
+    <TrimmerRootAssembly Include="System.Net.Quic" />
+    <TrimmerRootAssembly Include="System.Numerics.Vectors" />
+    <TrimmerRootAssembly Include="System.Reflection.Metadata" />
+    <TrimmerRootAssembly Include="System.Runtime.CompilerServices.Unsafe" />
+    <TrimmerRootAssembly Include="System.Runtime.Loader" />
+    <TrimmerRootAssembly Include="System.Runtime.Serialization.Json" />
+    <TrimmerRootAssembly Include="System.Runtime.Serialization.Primitives" />
+    <TrimmerRootAssembly Include="System.Runtime.Serialization.Xml" />
+    <TrimmerRootAssembly Include="System.Threading.Tasks.Parallel" />
+    <TrimmerRootAssembly Include="System.Threading.ThreadPool" />
+    <TrimmerRootAssembly Include="System.Xml.XDocument" />
+    <TrimmerRootAssembly Include="System.Xml.XmlSerializer" />
+    <TrimmerRootAssembly Include="System.Xml.XPath" />
+  </ItemGroup>
+
+  <!--
+    Step 24 physically proved this additional post-publish dynamic-IL preservation root. Build 78
+    reached MonoMod.Logs.DebugLog::.cctor and exposed a trimmed ConcurrentBag<T> constructor;
+    Step 24.0.6 / 0.0.79 then passed all four physical gates plus OfflineReady and Foundation 5/5
+    with System.Collections.Concurrent rooted. Keep that measured root as historical/protection
+    evidence, while the active Step 28 host preserves all managed publish assemblies with
+    MtouchLink=None + TrimMode=copy. MtouchInterpreter=-all remains unchanged.
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="System.Collections.Concurrent" />
+  </ItemGroup>
+
+  <!--
+    Step 27.0.22 measured System.Linq as the first whole-assembly dynamic-payload preservation root.
+    Physical 0.0.106 proved that this fixed the LINQ blocker but immediately exposed the same class
+    of failure in System.Runtime/System.Private.CoreLib: DynamicMethodDefinition could not resolve
+    System.Diagnostics.DebuggableAttribute. Keep the System.Linq root as historical evidence only;
+    Step 28 retains the Step 27.0.23 copy/no-link correction and does not rely on isolated roots because managed trimming is disabled globally.
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="System.Linq" />
+  </ItemGroup>
+
+  <!-- Step 32.0.3 maintenance trim: closed Step 25-27 runtime-Harmony experiment implementations and their DynamicDependency anchors are preserved in the inert historical archive and are intentionally absent from the active iOS/AOT graph. The physically proven copy/no-link/interpreter policy remains unchanged. -->
+  <Target Name="ValidateRuntimeAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
+    <Message Importance="High"
+             Text="STEP32 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+    <Message Importance="High"
+             Text="STEP32 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" />
+    <Message Importance="High"
+             Text="STEP32 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
+    <Message Importance="High"
+             Text="STEP32 HISTORICAL POST-PUBLISH LINQ PRESERVATION ROOT: System.Linq (superseded by copy/no-link host policy)" />
+    <Error Condition="'$(MtouchLink)' != 'None'"
+           Text="Canonical dynamic-payload host policy requires MtouchLink=None so post-publish StS2/Harmony/mod framework dependencies are not member-trimmed." />
+    <Error Condition="'$(TrimMode)' != 'copy'"
+           Text="Canonical dynamic-payload host policy requires TrimMode=copy together with MtouchLink=None." />
+    <Error Condition="'$(MtouchInterpreter)' != '-all'"
+           Text="Canonical foundation preserves the Step 20/21 requirement MtouchInterpreter=-all so build-time assemblies remain AOT-targeted while the interpreter stays available for runtime/dynamic managed code." />
+    <Error Condition="'$(UseInterpreter)' == 'true'"
+           Text="Canonical foundation preserves the Step 20/21 prohibition on UseInterpreter=true because it is the broader interpret-all build-time policy." />
+    <Error Condition="'$(PublishAot)' == 'true'"
+           Text="Canonical foundation requires the Mono runtime; NativeAOT is incompatible with the Mono interpreter proof." />
+  </Target>
+
+  <!--
+    Step 15 Godot Foundation: Codemagic builds a pinned Godot 4.5.1-stable
+    arm64 iOS static archive into NativeBuild before dotnet publish. The
+    archive contains only upstream Godot + the project-owned Step 15 bridge;
+    no StS2 game files or proprietary FMOD/Spine binaries are bundled.
+  -->
+  <ItemGroup Condition="Exists('NativeBuild/libgodot-step15.a')">
+    <NativeReference Include="NativeBuild/libgodot-step15.a">
+      <Kind>Static</Kind>
+      <!-- Do not force-load the combined Godot archive. Godot contains mutually exclusive/width-specific third-party object members (for example PCRE2 16/32-bit helpers) that are safe under normal static-archive selection but collide if every member is pulled into the final link. The explicit bridge references plus -ObjC are the intended roots. -->
+      <ForceLoad>false</ForceLoad>
+      <SmartLink>false</SmartLink>
+      <IsCxx>true</IsCxx>
+      <!-- Godot includes AudioUnit headers while compiling iOS audio code, but Xcode 26.5 does not expose AudioUnit as a standalone linkable iPhoneOS framework. The C Audio Unit symbols are supplied by AudioToolbox; do not add AudioUnit here. -->
+      <Frameworks>Accelerate AudioToolbox AVFoundation CFNetwork CoreAudio CoreFoundation CoreGraphics CoreHaptics CoreLocation CoreMedia CoreMotion CoreText CoreVideo Foundation GameController ImageIO MediaPlayer Metal MetalFX MetalKit OpenGLES QuartzCore Security SystemConfiguration UIKit UniformTypeIdentifiers VideoToolbox WebKit</Frameworks>
+      <LinkerFlags>-ObjC -lz</LinkerFlags>
+    </NativeReference>
+  </ItemGroup>
+
+  <!--
+    .NET 9 iOS build item designed to root native static symbols without force-loading
+    the entire combined Godot archive. Keep this list exactly aligned with the
+    managed DllImport("__Internal") Step 15 entry points.
+  -->
+  <ItemGroup Condition="Exists('NativeBuild/libgodot-step15.a')">
+    <ReferenceNativeSymbol Include="sts2_step15_background_count" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_focus_in_count" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_focus_out_count" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_foreground_count" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_get_engine_version" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_is_engine_started" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_is_metal_layer_ready" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_is_rendering_active" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_is_setup_finished" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_last_error" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_render_marker_ready" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_requires_process_restart" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_start" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_start_rendering" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_stop_rendering" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_touch_marker_ready" SymbolType="Function" />
+  </ItemGroup>
+
+  <!--
+    SteamKit carries macOS-only machine-information P/Invokes that cause the
+    .NET iOS linker to infer DiskArbitration.framework. iPhoneOS does not ship
+    that framework, so remove only this generated framework item after linker
+    output is loaded and before native link inputs are computed.
+  -->
+  <Target Name="Step052RemoveMacOnlyDiskArbitrationFramework"
+          AfterTargets="_LoadLinkerOutput"
+          BeforeTargets="_ComputeLinkNativeExecutableInputs">
+    <Message Importance="High"
+             Text="STEP05.2 LINKER FRAMEWORKS BEFORE: @(_LinkerFrameworks, ',')" />
+    <ItemGroup>
+      <_LinkerFrameworks Remove="DiskArbitration" />
+    </ItemGroup>
+    <Message Importance="High"
+             Text="STEP05.2 LINKER FRAMEWORKS AFTER: @(_LinkerFrameworks, ',')" />
+  </Target>
+</Project>

@@ -1,0 +1,89 @@
+StS2 Launcher — Step 27 Controlled Launcher-Owned Harmony Patch + Unpatch Boundary
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-08-23T06:07:37.1695430+00:00
+
+RESULT
+CONTROLLED LAUNCHER-OWNED HARMONY PATCH EXECUTION BOUNDARY FAIL — 0/26, first failure: InitializationPreflight
+
+METADATA
+App version: 0.0.97 (97)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Gate A — InitializationPreflight: FAIL
+Stage: HarmonySharedState iOS runtime-image normalization
+System.InvalidOperationException: Step 24 Gate A metadata-only audit attempted forbidden type resolution while reading '/var/mobile/Containers/Data/Application/1F8A988F-561A-43A6-9BC5-BA34A4169949/Documents/StS2Launcher/Step21-PreparedRuntimeBinding/prepared/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/0Harmony.dll': System.ComponentModel.EditorBrowsableState
+   at StS2Launcher.Core.ControlledHarmonyPatchExecution.Step27MetadataOnlyResolver.Mono.Cecil.IMetadataResolver.Resolve(TypeReference )
+   at Mono.Cecil.ModuleDefinition.Resolve(TypeReference )
+   at Mono.Cecil.TypeReference.Resolve()
+   at Mono.Cecil.Mixin.CheckedResolve(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeEnum(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeElementValue(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeElement(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeFixedArgument(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeConstructorArguments(CustomAttribute , Collection`1 )
+   at Mono.Cecil.MetadataReader.ReadCustomAttributeSignature(CustomAttribute )
+   at Mono.Cecil.CustomAttribute.<Resolve>b__35_0(CustomAttribute attribute, MetadataReader reader)
+   at Mono.Cecil.ModuleDefinition.Read[CustomAttribute](CustomAttribute , Action`2 )
+   at Mono.Cecil.CustomAttribute.Resolve()
+   at Mono.Cecil.CustomAttribute.get_ConstructorArguments()
+   at Mono.Cecil.ImmediateModuleReader.ReadCustomAttributes(ICustomAttributeProvider )
+   at Mono.Cecil.ImmediateModuleReader.ReadType(TypeDefinition )
+   at Mono.Cecil.ImmediateModuleReader.ReadTypes(Collection`1 )
+   at Mono.Cecil.ImmediateModuleReader.ReadModule(ModuleDefinition , Boolean )
+   at Mono.Cecil.ImmediateModuleReader.<ReadModule>b__2_0(ModuleDefinition module, MetadataReader reader)
+   at Mono.Cecil.ModuleDefinition.Read[ModuleDefinition](ModuleDefinition , Action`2 )
+   at Mono.Cecil.ImmediateModuleReader.ReadModule()
+   at Mono.Cecil.ModuleReader.CreateModule(Image , ReaderParameters )
+   at Mono.Cecil.ModuleDefinition.ReadModule(String , ReaderParameters )
+   at StS2Launcher.Core.ControlledHarmonyPatchExecution.CreateIosNormalizedHarmonyRuntimeImage(String )
+   at StS2Launcher.Core.ControlledHarmonyPatchExecution.RunInitializationPreflightAsync(IProgress`1 , CancellationToken )
+
+Step 27 prerequisite: physical Step 26.0 / 0.0.83 is closed — Gates A–N PASS, OfflineReady PASS, Foundation 5/5 PASS.
+Gates A–N replay the closed Step 26 chain in the exact Step 27 private context, preserving the proven System.Collections.Concurrent root and Step-25 constructor framework-preservation anchor with TrimMode=full and MtouchInterpreter=-all.
+Gate O metadata-audits exact PatchProcessor.AddPrefix(MethodInfo), Patch(), Unpatch(MethodInfo), both HarmonyMethod constructors/fields, the physically traversed AccessTools initializer, and the exact HarmonySharedState/GetOrCreateSharedStateType -> MethodCreatorConfig.Prepare -> PatchFunctions.UpdateWrapper -> PatchTools.DetourMethod -> UpdatePatchInfo chain. Its runtime reflection is deliberately restored to the physically passing 0.0.90 PatchProcessor/HarmonyMethod/AccessTools surface; bounded Reflection.Emit/RuntimeMethodHandle preflight and HarmonySharedState runtime reflection are deferred to Gate T so their loader effects are measured.
+Gate P resolves only launcher-owned HarmonyPatchProbe.Target(int) + Prefix(int, ref int __result), including exact parameter names required by Harmony. No StS2 member is reflected.
+Gate Q invokes the launcher target through direct + reflection routes before patching and requires original value+1 behavior with prefix count zero.
+Gate R first invokes the exact preserved RuntimeInformation.FrameworkDescription getter through PropertyInfo.GetValue, then explicitly completes only the Gate-O-measured HarmonyLib.AccessTools runtime-detection/cache type initializer with RunClassConstructor and verifies the exact measured state. It still constructs no HarmonyMethod and applies no patch.
+Gate S uses the exact parameterless HarmonyMethod() constructor, verifies priority=-1 and method=null, assigns only the exact launcher Prefix MethodInfo to HarmonyMethod.method, then assigns only that descriptor to PatchProcessor.prefix. This is admitted only because the launcher prefix carries zero Harmony annotations and the exact six-instruction AddPrefix wrapper is still metadata-audited. AddPrefix(MethodInfo), HarmonyMethod(MethodInfo), ImportMethod, and Patch() are not invoked.
+Gate T decomposes the patch-engine runtime boundary: T1/T2 measure the bounded Reflection.Emit/RuntimeMethodHandle host preflight with private membership unchanged; T3/T4 resolve the exact HarmonySharedState runtime Type/.cctor/version/state fields from the normalized runtime image without initialization; T5a re-verifies that in-memory image and requires zero pre-existing generated patch-engine assemblies; T5b enters RunClassConstructor against the direct-state cctor; T6 requires three initialized dictionaries, null methodAddressRef, actualVersion=102, zero generated shared-state assemblies, and unchanged prepared bytes; T7/T8 invoke exactly one public PatchProcessor.Patch(); T9 validates replacement/isolation. The launcher target is not invoked until Gate V.
+Gate U re-hashes plan/prepared/live bytes, re-proves OfflineReady, and audits context/native/resolver state before patched execution.
+Gate V invokes the patched launcher target through reflection and direct calls; both must return 1041, increment the prefix, and skip the original target body.
+Gate W removes exactly the launcher prefix via PatchProcessor.Unpatch(MethodInfo). Gate X audits before restored invocation. Gate Y invokes the launcher target through both routes and requires restored value+1 behavior with no additional prefix calls. Gate Z performs the final full byte/OfflineReady/context/native audit.
+Still forbidden: Harmony.Patch/PatchAll/PatchCategory/PatchClassProcessor; postfix/transpiler/finalizer/inner patch registration; StS2 entry-point/type/member reflection, patching, or invocation; broad Activator/CreateInstance; Godot/game startup; native game-library loading; mutation of trusted live/prepared bytes.
+Fresh-process rule: once Gate B has started, the Step 27 sts2/Harmony load context is process-resident for safety accounting; force-quit before any retry, even if the run fails before patching. If Gate T or later runs, additionally assume launcher probe patch state may remain process-resident until force-quit.
+Crash telemetry: Documents/StS2Launcher/Reports/Step27-CrashCheckpoint.txt is synchronously overwritten at RUN_START, every gate START/PASS/FAIL, normal progress, and sensitive O/R/S/T substages. If iOS terminates the process without a managed exception/report, preserve that checkpoint before the next Step 27 attempt.
+Stage: HarmonySharedState iOS runtime-image normalization
+System.InvalidOperationException: Step 24 Gate A metadata-only audit attempted forbidden type resolution while reading '/var/mobile/Containers/Data/Application/1F8A988F-561A-43A6-9BC5-BA34A4169949/Documents/StS2Launcher/Step21-PreparedRuntimeBinding/prepared/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64/0Harmony.dll': System.ComponentModel.EditorBrowsableState
+   at StS2Launcher.Core.ControlledHarmonyPatchExecution.Step27MetadataOnlyResolver.Mono.Cecil.IMetadataResolver.Resolve(TypeReference )
+   at Mono.Cecil.ModuleDefinition.Resolve(TypeReference )
+   at Mono.Cecil.TypeReference.Resolve()
+   at Mono.Cecil.Mixin.CheckedResolve(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeEnum(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeElementValue(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeElement(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeFixedArgument(TypeReference )
+   at Mono.Cecil.SignatureReader.ReadCustomAttributeConstructorArguments(CustomAttribute , Collection`1 )
+   at Mono.Cecil.MetadataReader.ReadCustomAttributeSignature(CustomAttribute )
+   at Mono.Cecil.CustomAttribute.<Resolve>b__35_0(CustomAttribute attribute, MetadataReader reader)
+   at Mono.Cecil.ModuleDefinition.Read[CustomAttribute](CustomAttribute , Action`2 )
+   at Mono.Cecil.CustomAttribute.Resolve()
+   at Mono.Cecil.CustomAttribute.get_ConstructorArguments()
+   at Mono.Cecil.ImmediateModuleReader.ReadCustomAttributes(ICustomAttributeProvider )
+   at Mono.Cecil.ImmediateModuleReader.ReadType(TypeDefinition )
+   at Mono.Cecil.ImmediateModuleReader.ReadTypes(Collection`1 )
+   at Mono.Cecil.ImmediateModuleReader.ReadModule(ModuleDefinition , Boolean )
+   at Mono.Cecil.ImmediateModuleReader.<ReadModule>b__2_0(ModuleDefinition module, MetadataReader reader)
+   at Mono.Cecil.ModuleDefinition.Read[ModuleDefinition](ModuleDefinition , Action`2 )
+   at Mono.Cecil.ImmediateModuleReader.ReadModule()
+   at Mono.Cecil.ModuleReader.CreateModule(Image , ReaderParameters )
+   at Mono.Cecil.ModuleDefinition.ReadModule(String , ReaderParameters )
+   at StS2Launcher.Core.ControlledHarmonyPatchExecution.CreateIosNormalizedHarmonyRuntimeImage(String )
+   at StS2Launcher.Core.ControlledHarmonyPatchExecution.RunInitializationPreflightAsync(IProgress`1 , CancellationToken )
