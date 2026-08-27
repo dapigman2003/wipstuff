@@ -1,0 +1,21 @@
+StS2 Launcher — Step 33.0 / 0.0.121 Codemagic cold-cache host compile failure
+Generated from uploaded Codemagic artifact bundle on 2026-08-27.
+
+RESULT
+Static validation completed successfully, but the host test project failed to compile before Godot build, iOS workload/publish, IPA verification, or any physical Step-33 execution.
+
+CACHE STATE BEFORE BUILD
+Home NuGet: COLD/MISSING
+Isolated iOS NuGet: COLD/MISSING
+Godot Step 15: COLD/MISSING
+iOS arm64 obj: COLD/MISSING
+AOT output files before build: 0
+
+HOST FAILURE
+tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2AssemblyAdmissionTests.cs(100,20): error CS0117: 'Assert' does not contain a definition for 'ThrowsException'
+
+INTERPRETATION
+This is a host-test API compatibility failure, not Step-33 runtime evidence. The build never reached iOS publish, so this run did not exercise or seed the new iOS AOT obj cache. The production Step-33 admission implementation was not exercised on-device.
+
+CORRECTION
+Replace the obsolete MSTest assertion with Assert.ThrowsExactly<FileLoadException>. Add a canonical static-validation guard rejecting Assert.ThrowsException/ThrowsExceptionAsync in active tests. Keep release identity at 0.0.121 because no iOS candidate was produced.

@@ -15,6 +15,8 @@ Current on-device diagnostics write output-only text beneath `Documents/StS2Laun
 
 ## Current Codemagic evidence
 
+The first cache-tuned 0.0.121 attempt did not reach iOS publish: all configured caches were cold and host-test compilation stopped on removed MSTest `Assert.ThrowsException`. The corrected 0.0.121 rerun must seed the iOS arm64 obj/AOT cache before cache reuse can be measured. See `docs/history/reports/STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt`.
+
 0.0.120 passed Codemagic before the successful physical 4/4 run. Step 33.0 / 0.0.121 must separately pass canonical static validation, the full host suite, iOS publish, and IPA verification before physical execution.
 
 ## Static Step 32 metadata evidence

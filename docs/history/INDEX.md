@@ -170,3 +170,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.120 Step-32 closure: A–D 4/4, exact transformed hash/semantic verification, trusted source unchanged, zero real-game CLR admission.
 - `steps/STEP-33.0-VERIFIED-TRANSFORMED-CLR-ADMISSION.md` — Step 33.0 / 0.0.121 admission-only design: requalify exact Step-32 transformed image, LoadFromStream only transformed primary, reject private/native expansion, re-prove isolation.
 - `steps/STEP-33.0-TEST.md` — Codemagic/IPA/physical acceptance procedure for the Step-33 transformed-primary admission boundary.
+
+- `reports/STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt` — cold-cache 0.0.121 host compile failure before iOS publish/AOT; corrected by moving the new Step-33 test to MSTest v4 `Assert.ThrowsExactly`.

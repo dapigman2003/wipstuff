@@ -97,7 +97,7 @@ public sealed class TransformedRealStS2AssemblyAdmissionTests
             Assert.AreEqual(1, context.Assemblies.Count());
             Assert.AreEqual(0, context.ManagedResolverRequests.Count);
 
-            Assert.ThrowsException<FileLoadException>(() =>
+            Assert.ThrowsExactly<FileLoadException>(() =>
                 context.LoadFromAssemblyName(new AssemblyName(dependencyPlan.AssemblyFullName)));
             Assert.AreEqual(1, context.PrivateDependencyRequests.Count);
             Assert.AreEqual(0, context.NativeLoadAttempts.Count);
