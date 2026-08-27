@@ -1,6 +1,6 @@
 # Documentation Map
 
-Start here when resuming the project. The active candidate is **Step 32.0.4 / 0.0.119**. Physical 0.0.117 failed closed before mutation on exact Sentry constant metadata; the exact DLL was then audited statically, proving exactly three non-null external type/storage requirements. User-confirmed Codemagic 0.0.118 established the lean baseline. 0.0.119 keeps the 6+4 rewrite unchanged and expands only the write-time Cecil metadata surrogate policy to those exact audited System.Runtime/Sentry requirements, while every unplanned requirement or resolution identity remains fail-closed.
+Start here when resuming the project. The active candidate is **Step 32.0.5 / 0.0.120**. Physical 0.0.119 advanced Step 32 to 2/4: Gate A re-proved the exact source and Gate B successfully wrote the bounded 6+4 private rewrite using only the three audited System.Runtime/Sentry metadata requirements. Gate C then failed before semantic verification because it reused the source MethodDef token as a post-Cecil-write locator. 0.0.120 changes only that transformed-image locator to exact declaring type + full signature; all semantic, metadata, resolver, isolation, and no-CLR-load contracts remain unchanged.
 
 1. `MASTER-PLAN.md` — long-lived architecture, safety rules, authority model, and roadmap. Step 32 does not change that architecture.
 2. `CURRENT-STATUS.md` — exact physical baseline/candidate and acceptance state.

@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 32.0.4 — AUDITED MULTI-SCOPE CONSTANT-METADATA RESOLVER";
+        "STEP 32.0.5 — STABLE TRANSFORMED METHOD VERIFICATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 FIRST REAL STS2 REWRITE";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 PHYSICAL FRONTIER 2/4";
 
     public const string Summary =
-        "Physical 0.0.114 closed Step 31 positively at 4/4 and confirmed MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit(), token 0x06007D05, body SHA-256 7f25b7bd955c407fc69306cf26af2162223353f5606560458066aed085e72ab9, with ten exact RuntimeHelpers.PrepareMethod sites as eligible for explicit rewrite design. Step 32 is the first real-StS2 semantic transformation: Gate A re-proves OfflineReady and clones the exact receipt-backed sts2.dll into launcher-private storage; Gate B suppresses only those ten PrepareMethod calls with stack-neutral Pop replacements; Gate C reopens source/transformed images and verifies the exact planned semantic fingerprint with zero PrepareMethod references and unchanged constant metadata; Gate D re-proves source hashes, OfflineReady, and no-CLR-load isolation. The trusted Step-12 install remains immutable and the transformed image is not CLR-loaded in this build.";
+        "Physical 0.0.119 advanced Step 32 to 2/4: Gate A re-proved the exact receipt-backed sts2.dll and ten PrepareMethod sites, and Gate B successfully wrote the first launcher-private real-StS2 semantic transformation with the exact audited System.Runtime/Sentry metadata resolver. Gate C then stopped before semantic verification because it reused the physical Step-31 source MethodDef token as a post-Cecil-write locator. Build 0.0.120 keeps source token 0x06007D05 as an exact Gate-A/Gate-B admission locator, but Gate C reopens the serialized image by the exact declaring type plus full method signature and then proves the already-predeclared offset-independent semantic fingerprint, zero PrepareMethod references, unchanged constant metadata, instruction/EH shape, and Pop delta. The transformed token is reported diagnostically instead of being treated as semantic identity.";
 
     public const string InitialStatus =
-        "Status: Physical 0.0.117 re-proved Step-32 Gate A, then Gate B failed closed before mutation on exact Sentry 5.0.0.0 constant metadata. The exact receipt-backed DLL was then audited statically and proved exactly three non-null external type/storage requirements: System.Reflection.BindingFlags/Int32 under exact System.Runtime 9.0.0.0, plus Sentry.BreadcrumbLevel/Int32 and Sentry.SentryLevel/Int16 under exact Sentry 5.0.0.0. User-confirmed Codemagic 0.0.118 established the lean maintenance baseline. Build 0.0.119 changes only the bounded Cecil write-time metadata resolver: it synthesizes those three audited enum shapes in per-exact-assembly in-memory surrogates and rejects every other requirement or resolution identity. The 6+4 rewrite semantics and no-execution boundary remain unchanged.";
+        "Status: Step 32 remains OPEN at physical 2/4. 0.0.119 proved the bounded 6+4 rewrite can serialize the exact real sts2.dll with 9 write-time resolver requests confined to the three audited requirements across exact System.Runtime 9.0.0.0 and Sentry 5.0.0.0; no external dependency bytes were opened and the trusted install was not mutated. Gate C failed at the old token-based transformed-method locator before the reopened semantic fingerprint or constant-metadata checks ran. 0.0.120 changes only that post-write verification locator and adds token-drift diagnostics; rewrite semantics, resolver authority, no-CLR-load boundary, and Gate-D isolation requirements are unchanged.";
 
-    public const string ExpectedDisplayVersion = "0.0.119";
-    public const string ExpectedBuildVersion = "119";
+    public const string ExpectedDisplayVersion = "0.0.120";
+    public const string ExpectedBuildVersion = "120";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -32,7 +32,8 @@ internal static class CurrentReleasePresentation
     public const string Step31ImplementationMarker =
         "physical Step29 PrewarmJit token+body fingerprint+10 PrepareMethod offsets -> deferred rejecting-resolver per-site semantic context audit -> rewrite-design eligibility only -> zero writes/zero CLR load -> OfflineReady reproof";
     public const string Step32ImplementationMarker =
-        "physical Step31 exact PrewarmJit evidence -> private sts2.dll clone -> 6 one-arg PrepareMethod calls to Pop + 4 two-arg calls to Pop+Pop -> exact audited System.Runtime+Sentry in-memory constant-metadata surrogates for Cecil write only -> reopen semantic + constant-metadata verification -> zero CLR load -> OfflineReady reproof";
+        "physical Step31 exact source token/body/10-site evidence -> private sts2.dll clone -> 6 one-arg PrepareMethod calls to Pop + 4 two-arg calls to Pop+Pop -> exact audited System.Runtime+Sentry in-memory constant-metadata surrogates for Cecil write only -> transformed reopen by stable exact type+signature -> semantic + constant-metadata verification -> zero CLR load -> OfflineReady reproof";
+
 
 
     public static string DisplayVersion =>

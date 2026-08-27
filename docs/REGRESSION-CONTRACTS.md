@@ -251,3 +251,19 @@ The exact Step-32 `sts2.dll` static audit is preserved in `docs/history/reports/
 - retain all Step-32 exact source/hash/MVID/token/site, branch-target, semantic fingerprint, Pop/instruction/EH, trusted-install immutability, no-CLR-admission, and OfflineReady invariants.
 
 Host regression coverage must include both a representative exact three-requirement fixture and an unaudited-external-requirement fail-closed fixture. Physical Step-32 closure still requires A–D **4/4 PASS**; a pass does not itself authorize transformed-real-StS2 CLR admission/execution.
+
+## Step 32.0.5 — stable transformed-method verification
+
+Physical 0.0.119 proved Gate A and Gate B, advancing Step 32 to **2/4**. The private real-StS2 rewrite serialized successfully with the exact audited resolver contract, but Gate C failed before semantic verification at the transformed method identity/body check. The 0.0.119 verifier had reused source MethodDef token `0x06007D05` as a post-Cecil-write transformed locator.
+
+0.0.120 must:
+
+- keep source token `0x06007D05` authoritative for Gate-A/Gate-B source binding only;
+- reopen the transformed method by exactly one matching declaring type `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization` plus full signature `System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()`;
+- fail closed if that stable identity is missing, duplicated, or lacks a body;
+- treat transformed MethodDef token preservation as diagnostic rather than semantic authority;
+- report the transformed token, whether the original source token survived serialization, and the old-token occupant;
+- retain the exact expected transformed semantic fingerprint check, zero PrepareMethod requirement, constant-metadata fingerprint equality, instruction/EH shape, exact Pop delta, assembly identity/MVID, source/transformed hashes, zero reopen resolution, and zero CLR admission;
+- make no change to the 6 + 4 rewrite or the exact audited System.Runtime/Sentry resolver authority.
+
+Host coverage must explicitly protect the stable-identity lookup against historical-token assumptions. Physical closure remains A–D **4/4 PASS**; 2/4 is progress, not closure.

@@ -347,6 +347,9 @@ public sealed class RealStS2PrepareMethodRewrite
             string transformedSemanticSha256;
             string sourceConstantMetadataSha256;
             string transformedConstantMetadataSha256;
+            uint transformedMethodToken;
+            bool sourceTokenPreservedAfterSerialization;
+            string sourceTokenOccupantAfterSerialization;
 
             using (var sourceResolver = new RejectingAssemblyResolver())
             using (var sourceModule = ReadModuleDeferred(source.PrivateSourcePath, sourceResolver))
@@ -366,9 +369,22 @@ public sealed class RealStS2PrepareMethodRewrite
             using (var transformedModule = ReadModuleDeferred(transformation.TransformedPath, transformedResolver))
             {
                 ValidateAssemblyIdentity(transformedModule);
-                var transformedMethod = FindMethodByToken(transformedModule, _expected.MethodToken);
-                if (transformedMethod.FullName != _expected.SourceMethod || !transformedMethod.HasBody)
-                    throw new InvalidDataException("Step-32 transformed PrewarmJit method identity/body drifted.");
+                // The physical Step-31 metadata token is an exact source-admission locator, not a
+                // post-serialization identity contract. A whole-module Cecil write may assign a
+                // different MethodDef RID while preserving the exact declaring type/signature and
+                // body semantics. Reopen the transformed image by stable semantic identity, then
+                // independently report whether the original source token happened to survive.
+                var transformedMethod = FindMethodByStableIdentity(transformedModule, _expected.SourceType, _expected.SourceMethod);
+                if (!transformedMethod.HasBody)
+                    throw new InvalidDataException("Step-32 transformed PrewarmJit stable identity was found but has no method body.");
+                transformedMethodToken = transformedMethod.MetadataToken.ToUInt32();
+                var sourceTokenOccupant = TryFindMethodByToken(transformedModule, _expected.MethodToken);
+                sourceTokenPreservedAfterSerialization = sourceTokenOccupant is not null &&
+                    sourceTokenOccupant.DeclaringType.FullName == _expected.SourceType &&
+                    sourceTokenOccupant.FullName == _expected.SourceMethod;
+                sourceTokenOccupantAfterSerialization = sourceTokenOccupant is null
+                    ? "<no MethodDef at original source token>"
+                    : $"{sourceTokenOccupant.FullName} [0x{sourceTokenOccupant.MetadataToken.ToUInt32():X8}]";
                 transformedPrepareCount = CountPrepareMethodReferences(transformedMethod);
                 transformedInstructionCount = transformedMethod.Body.Instructions.Count;
                 transformedHandlerCount = transformedMethod.Body.ExceptionHandlers.Count;
@@ -410,6 +426,9 @@ public sealed class RealStS2PrepareMethodRewrite
                 $"Source PrewarmJit body fingerprint unchanged: {sourceBodySha256}\n" +
                 $"Transformed PrewarmJit body fingerprint: {transformedBodySha256}\n" +
                 $"Transformed semantic fingerprint: {transformedSemanticSha256}\n" +
+                $"Transformed PrewarmJit metadata token: 0x{transformedMethodToken:X8}\n" +
+                $"Original source token 0x{_expected.MethodToken:X8} preserved after Cecil serialization: {(sourceTokenPreservedAfterSerialization ? "YES" : "NO — informational only; stable identity + semantic fingerprint are authoritative after write")}\n" +
+                $"Original source-token occupant after serialization: {sourceTokenOccupantAfterSerialization}\n" +
                 $"Constant metadata semantic fingerprint source/transformed: {sourceConstantMetadataSha256} / {transformedConstantMetadataSha256}\n" +
                 $"PrepareMethod references source/transformed: {sourcePrepareCount} / {transformedPrepareCount}\n" +
                 $"Instruction count source/transformed: {sourceInstructionCount} / {transformedInstructionCount}\n" +
@@ -616,9 +635,27 @@ public sealed class RealStS2PrepareMethodRewrite
         => instruction is null ? -1 : index[instruction];
 
     private static MethodDefinition FindMethodByToken(ModuleDefinition module, uint token)
-        => EnumerateTypes(module.Types).SelectMany(type => type.Methods)
-            .SingleOrDefault(method => method.MetadataToken.ToUInt32() == token)
+        => TryFindMethodByToken(module, token)
             ?? throw new MissingMethodException($"No method with metadata token 0x{token:X8} exists in sts2.dll.");
+
+    private static MethodDefinition? TryFindMethodByToken(ModuleDefinition module, uint token)
+        => EnumerateTypes(module.Types).SelectMany(type => type.Methods)
+            .SingleOrDefault(method => method.MetadataToken.ToUInt32() == token);
+
+    internal static MethodDefinition FindMethodByStableIdentity(
+        ModuleDefinition module,
+        string declaringTypeFullName,
+        string methodFullName)
+    {
+        var matches = EnumerateTypes(module.Types)
+            .SelectMany(type => type.Methods)
+            .Where(method => method.DeclaringType.FullName == declaringTypeFullName && method.FullName == methodFullName)
+            .ToArray();
+        if (matches.Length != 1)
+            throw new InvalidDataException(
+                $"Step-32 expected exactly one transformed method matching stable identity '{methodFullName}' on '{declaringTypeFullName}', found {matches.Length}.");
+        return matches[0];
+    }
 
     private static IEnumerable<TypeDefinition> EnumerateTypes(IEnumerable<TypeDefinition> roots)
     {

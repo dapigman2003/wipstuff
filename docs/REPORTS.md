@@ -6,7 +6,11 @@ Current on-device diagnostics write output-only text beneath `Documents/StS2Laun
 
 `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`
 
-0.0.119 keeps the Step-32 runtime report path and 6+4 rewrite semantics unchanged while changing only the bounded Cecil write-time constant-metadata resolver. The latest physical report remains the 0.0.117 Gate-A PASS / Gate-B Sentry-scope fail-closed result preserved below; 0.0.119 requires new physical A–D evidence after Codemagic passes.
+0.0.120 keeps the Step-32 runtime report path, 6+4 rewrite semantics, and exact audited System.Runtime/Sentry resolver authority unchanged. Physical 0.0.119 advanced Step 32 to 2/4: Gate A and Gate B passed, then Gate C failed before semantic verification because the transformed verifier reused the source MethodDef token as a post-Cecil-write locator. 0.0.120 changes only that Gate-C locator to exact declaring type + full signature and adds token-drift diagnostics.
+
+## Current physical frontier
+
+- `docs/history/reports/STEP-32.0.4-PHYSICAL-GATE-C-TRANSFORMED-METHOD-IDENTITY-FAILURE.txt` — raw physical 0.0.119 report: Gate A PASS, Gate B PASS with the first real-StS2 private 6+4 serialization, Gate C failed at the old source-token-based transformed method identity/body check before semantic or Constant-table reopen verification.
 
 ## Current Codemagic evidence
 

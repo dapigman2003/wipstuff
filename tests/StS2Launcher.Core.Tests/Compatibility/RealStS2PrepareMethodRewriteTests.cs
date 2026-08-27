@@ -35,6 +35,46 @@ public sealed class RealStS2PrepareMethodRewriteTests
     }
 
     [TestMethod]
+    public void StableTransformedMethodLookupDoesNotDependOnHistoricalSourceToken()
+    {
+        using var temp = new TempTestDirectory("sts2-step32-stable-method-identity");
+        var path = Path.Combine(temp.Path, "token-drift-fixture.dll");
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("sts2", new Version(0, 1, 0, 0)),
+                   "sts2",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var type = new TypeDefinition(
+                "MegaCrit.Sts2.Core.Helpers",
+                "OneTimeInitialization",
+                TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Sealed,
+                module.TypeSystem.Object);
+            module.Types.Add(type);
+
+            var decoy = new MethodDefinition("EarlierMethod", MethodAttributes.Public | MethodAttributes.Static, module.TypeSystem.Void);
+            decoy.Body.GetILProcessor().Append(decoy.Body.GetILProcessor().Create(OpCodes.Ret));
+            type.Methods.Add(decoy);
+
+            var target = new MethodDefinition("PrewarmJit", MethodAttributes.Public | MethodAttributes.Static, module.TypeSystem.Void);
+            target.Body.GetILProcessor().Append(target.Body.GetILProcessor().Create(OpCodes.Ret));
+            type.Methods.Add(target);
+            assembly.Write(path);
+        }
+
+        using var reopened = ModuleDefinition.ReadModule(path, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var decoyAfterWrite = reopened.Types.SelectMany(EnumerateTypes).SelectMany(type => type.Methods).Single(method => method.Name == "EarlierMethod");
+        var targetAfterWrite = RealStS2PrepareMethodRewrite.FindMethodByStableIdentity(
+            reopened,
+            "MegaCrit.Sts2.Core.Helpers.OneTimeInitialization",
+            "System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()");
+
+        Assert.AreNotEqual(decoyAfterWrite.MetadataToken.ToUInt32(), targetAfterWrite.MetadataToken.ToUInt32());
+        Assert.AreEqual("PrewarmJit", targetAfterWrite.Name);
+        Assert.IsTrue(targetAfterWrite.HasBody);
+    }
+
+    [TestMethod]
     public async Task ExactPrewarmJitPrepareMethodFamilyIsRewrittenOnPrivateCopyOnly()
     {
         using var temp = new TempTestDirectory("sts2-step32");
@@ -68,6 +108,8 @@ public sealed class RealStS2PrepareMethodRewriteTests
         StringAssert.Contains(gateB.Detail, "System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
         StringAssert.Contains(gateB.Detail, "Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0");
         StringAssert.Contains(gateC.Detail, "PrepareMethod references source/transformed: 10 / 0");
+        StringAssert.Contains(gateC.Detail, "Transformed PrewarmJit metadata token:");
+        StringAssert.Contains(gateC.Detail, "Original source token");
         StringAssert.Contains(gateD.Detail, "Trusted Step 12 managed install unchanged: YES");
         StringAssert.Contains(gateD.Detail, "Real StS2 assembly/type/member CLR load or invocation by Step 32: NO");
 

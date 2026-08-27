@@ -1,6 +1,6 @@
-# Testing — Step 32.0.4 Audited Constant-Metadata Resolver
+# Testing — Step 32.0.5 Stable Transformed Method Verification
 
-Active candidate: Step 32.0.4 / `0.0.119 (119)`.
+Active candidate: Step 32.0.5 / `0.0.120 (120)`.
 
 ## Canonical authority chain
 
@@ -12,36 +12,41 @@ Active candidate: Step 32.0.4 / `0.0.119 (119)`.
 
 Codemagic workflow: `ios-step-32`
 
-Release identity: IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, version `0.0.119 (119)`.
+Release identity: IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, version `0.0.120 (120)`.
 
-## What 0.0.119 changes
+## What 0.0.120 changes
 
-The semantic rewrite is unchanged: 6 one-argument PrepareMethod calls become one Pop each, and 4 two-argument calls become Pop + Pop. The only changed runtime boundary is the write-time Constant-table resolver.
+The semantic rewrite is unchanged: 6 one-argument PrepareMethod calls become one Pop each, and 4 two-argument calls become Pop + Pop. The exact audited System.Runtime/Sentry Constant-table resolver is also unchanged.
+
+The only production correction is Gate C transformed-image method binding. Source admission and Gate B still require physical Step-31 token `0x06007D05`. After Cecil serialization, Gate C now locates exactly one `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` by declaring type + full method signature rather than assuming the source MethodDef token is preserved. It then applies the existing semantic fingerprint, PrepareMethod count, instruction/EH shape, Pop delta, Constant-table fingerprint, hash, and zero-resolution/zero-CLR-load checks.
 
 Host coverage must prove:
 
-- the representative source fixture contains the three audited requirements: System.Runtime/BindingFlags/Int32, Sentry/BreadcrumbLevel/Int32, Sentry/SentryLevel/Int16;
+- the representative source fixture still contains the three audited requirements: System.Runtime/BindingFlags/Int32, Sentry/BreadcrumbLevel/Int32, Sentry/SentryLevel/Int16;
 - Gate B can serialize that fixture using in-memory exact-identity surrogates only;
 - an additional unaudited non-null external constant requirement is rejected before rewrite/output;
-- Gate C independently reopens and proves the full constant-metadata semantic fingerprint unchanged;
+- stable transformed-method identity lookup is independent of a historical source token;
+- Gate C independently reopens and proves the full constant-metadata and transformed semantic fingerprints unchanged;
 - existing Step-32 source/rewrite/isolation contracts still pass.
 
 ## Physical Step-32 state
 
-Latest physical evidence remains 0.0.117: Gate A PASS, Gate B fail-closed before mutation on exact Sentry 5.0.0.0. The static audit then proved the exact three non-null requirement set. User-confirmed Codemagic 0.0.118 established the lean build baseline.
+Physical 0.0.119 is **2/4**. Gate A passed and Gate B successfully serialized the first real-StS2 private 6+4 rewrite with exactly three audited metadata types, nine approved write-time resolver requests across exact System.Runtime/Sentry, zero external dependency-byte reads, no source/trusted mutation, and no CLR load. Gate C then failed at the old token-based transformed-method identity/body check before the deeper semantic/metadata verification ran.
 
-The first Codemagic attempt passed 669/669 static checks and compiled, but the three Step-32 rewrite tests failed during synthetic exact-System.Runtime fixture construction (`TypeSystem.Int32` on an image-less core-library module). The fixture-only correction imports primitive storage references and does not change production Step-32 code or release identity. Rerun the full canonical pipeline; do not use the failed attempt as publish/device authority.
+The raw physical report is preserved at `docs/history/reports/STEP-32.0.4-PHYSICAL-GATE-C-TRANSFORMED-METHOD-IDENTITY-FAILURE.txt`.
 
-0.0.119 is intended to cross that known metadata-serialization boundary without broad resolution. After Codemagic succeeds, run a fresh-process physical Step 32 A–D and preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
+After Codemagic succeeds for 0.0.120, run a fresh-process physical Step 32 A–D and preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
 
-Expected Gate-B report evidence includes:
+Expected Gate-C report evidence now includes:
 
-- `Synthetic constant-metadata resolver types: 3`;
-- `Audited external constant type/storage requirements approved: 3/3 across 2/2 exact assembly scopes`;
-- all Cecil write-time resolution requests limited to the configured exact audited System.Runtime/Sentry identities;
-- zero external framework/game assembly bytes opened by the write resolver;
-- exact 6/6 + 4/4 rewrite counts.
+- exact stable-identity `PrewarmJit()` reopen;
+- transformed MethodDef token;
+- whether source token `0x06007D05` survived serialization and the old-token occupant, diagnostic only;
+- zero transformed `PrepareMethod` references;
+- transformed semantic fingerprint equal to the Gate-B pre-write plan;
+- source/transformed Constant-table semantic fingerprint equality;
+- expected instruction/EH and Pop-count invariants.
 
-Any request for GodotSharp, System.Collections, another Sentry identity/type, or another assembly remains a failure. Do not add default resolver fallback or search directories in response to a failure.
+Any resolver request for GodotSharp, System.Collections, another Sentry identity/type, or another assembly remains a failure. Do not add default resolver fallback or search directories in response to a failure.
 
 Codemagic `build-summary.txt` remains the timing record for the optimized active build surface.

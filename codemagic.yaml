@@ -1,6 +1,6 @@
 workflows:
   ios-step-32:
-    name: Step 32.0.4 - Audited Constant Metadata Resolver
+    name: Step 32.0.5 - Stable Transformed Method Verification
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -16,7 +16,7 @@ workflows:
         - $HOME/.cache/sts2launcher/godot-step15
 
     scripts:
-      - name: Validate, test, build, and verify Step 32.0.4
+      - name: Validate, test, build, and verify Step 32.0.5
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
