@@ -1,6 +1,6 @@
 workflows:
-  ios-step-32:
-    name: Step 32.0.5 - Stable Transformed Method Verification
+  ios-canonical:
+    name: Step 33.0 - Verified Transformed Real-StS2 CLR Admission
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -10,20 +10,29 @@ workflows:
         DOTNET_SDK_VERSION: "9.0.314"
         DOTNET_WORKLOAD_SET: "9.0.314.3"
 
+    # Keep this workflow key stable across Step 33+ candidates. Codemagic caches are
+    # workflow-scoped, so changing the key for every numbered step would force cold caches.
     cache:
       cache_paths:
+        # Existing dependency caches.
         - $HOME/.nuget/packages
+        - $CM_BUILD_DIR/.nuget/packages
         - $HOME/.cache/sts2launcher/godot-step15
 
+        # Dominant Step-32 timing sink: .NET iOS publish/AOT intermediates.
+        # Cache only the canonical Release/net9.0-ios/ios-arm64 intermediate tree;
+        # MSBuild remains responsible for invalidating inputs that actually changed.
+        - $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
+
     scripts:
-      - name: Validate, test, build, and verify Step 32.0.5
+      - name: Validate, test, build, and verify Step 33.0
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-32.ipa
+      - artifacts/StS2-Launcher-Step-33.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**

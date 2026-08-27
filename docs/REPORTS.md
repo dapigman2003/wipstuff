@@ -2,19 +2,20 @@
 
 Current on-device diagnostics write output-only text beneath `Documents/StS2Launcher/Reports/*.txt`. Reports are never trusted runtime input and intentionally exclude Steam passwords/tokens/Guard material and Apple signing secrets.
 
-## Active Step 32 report
+## Active Step 33 report
 
-`Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`
+`Documents/StS2Launcher/Reports/Step33-TransformedRealStS2AssemblyAdmission.txt`
 
-0.0.120 keeps the Step-32 runtime report path, 6+4 rewrite semantics, and exact audited System.Runtime/Sentry resolver authority unchanged. Physical 0.0.119 advanced Step 32 to 2/4: Gate A and Gate B passed, then Gate C failed before semantic verification because the transformed verifier reused the source MethodDef token as a post-Cecil-write locator. 0.0.120 changes only that Gate-C locator to exact declaring type + full signature and adds token-drift diagnostics.
+0.0.121 is an admission-only boundary. Gate A re-runs the physically closed Step-32 A–D contract, requires the exact closed transformed image/hash/semantic fingerprint, and requalifies the existing Step-21/22 zero-blocker runtime plan without CLR-loading StS2. Gate B loads only the exact transformed primary bytes into a dedicated private AssemblyLoadContext. Gate C requires transformed `sts2` to be the only private assembly and rejects private dependency/native/unplanned managed expansion. Gate D re-proves OfflineReady, original/transformed/plan hashes, and transformed-context residency.
 
-## Current physical frontier
+## Latest physical closure
 
-- `docs/history/reports/STEP-32.0.4-PHYSICAL-GATE-C-TRANSFORMED-METHOD-IDENTITY-FAILURE.txt` — raw physical 0.0.119 report: Gate A PASS, Gate B PASS with the first real-StS2 private 6+4 serialization, Gate C failed at the old source-token-based transformed method identity/body check before semantic or Constant-table reopen verification.
+- `docs/history/reports/STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.120 Step-32 report: A–D 4/4 PASS; exact 6+4 private rewrite; transformed SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`; zero PrepareMethod references after reopen; source/trusted install unchanged; zero real-StS2 CLR admission.
+- `docs/history/reports/STEP-32.0.4-PHYSICAL-GATE-C-TRANSFORMED-METHOD-IDENTITY-FAILURE.txt` — prior physical 0.0.119 2/4 evidence that motivated stable post-write method identity.
 
 ## Current Codemagic evidence
 
-- `docs/history/reports/STEP-32.0.4-CODEMAGIC-HOST-FIXTURE-FAILURE.txt` — first 0.0.119 Codemagic attempt: static validation 669/669 and compile succeeded; host suite reached 183/186, with all three failures caused by the image-less synthetic `System.Runtime` fixture asking Cecil for `TypeSystem.Int32` before the intended Step-32 tests ran. Production resolver/rewrite semantics were not changed; rerun the same 0.0.119 candidate after the fixture-only correction.
+0.0.120 passed Codemagic before the successful physical 4/4 run. Step 33.0 / 0.0.121 must separately pass canonical static validation, the full host suite, iOS publish, and IPA verification before physical execution.
 
 ## Static Step 32 metadata evidence
 

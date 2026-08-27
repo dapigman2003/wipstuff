@@ -10,6 +10,34 @@ DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
 export DOTNET_ROOT PATH="$DOTNET_ROOT:$PATH" DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 NUGET_XMLDOC_MODE=skip
 [[ "$(uname -s)" == "Darwin" ]] || { echo "ERROR: Codemagic iOS build must run on macOS." >&2; exit 2; }
 
+# Cache telemetry is evidence only. It never changes build inputs or bypasses validation.
+IOS_CACHE_ROOT="$ROOT/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64"
+AOT_CACHE_DIR="$IOS_CACHE_ROOT/nativelibraries/aot-output"
+CACHE_REPORT="artifacts/reports/cache-state.txt"
+cache_path_line() {
+  local label="$1" path="$2"
+  if [[ -e "$path" ]]; then
+    local size
+    size="$(du -sh "$path" 2>/dev/null | awk '{print $1}' || true)"
+    echo "$label: RESTORED/PRESENT size=${size:-unknown} path=$path"
+  else
+    echo "$label: COLD/MISSING path=$path"
+  fi
+}
+{
+  echo "StS2 Launcher — Codemagic cache state before Step 33 build"
+  echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  cache_path_line "Home NuGet" "$HOME/.nuget/packages"
+  cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
+  cache_path_line "Godot Step 15" "$HOME/.cache/sts2launcher/godot-step15"
+  cache_path_line "iOS arm64 obj" "$IOS_CACHE_ROOT"
+  if [[ -d "$AOT_CACHE_DIR" ]]; then
+    echo "AOT output files before build: $(find "$AOT_CACHE_DIR" -type f | wc -l | tr -d ' ')"
+  else
+    echo "AOT output files before build: 0"
+  fi
+} | tee "$CACHE_REPORT"
+
 BUILD_START_EPOCH="$(date +%s)"
 elapsed_seconds() {
   local start="$1"
@@ -17,7 +45,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 32.0.5 Stable Transformed Method Verification build environment"
+  echo "StS2 Launcher — Step 33.0 Verified Transformed Real-StS2 CLR Admission build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -64,6 +92,17 @@ WORKLOAD_SECONDS="$(elapsed_seconds "$WORKLOAD_START_EPOCH")"
 IOS_BUILD_START_EPOCH="$(date +%s)"
 STS2_SKIP_STATIC_VALIDATION=1 bash scripts/build-ios.sh 2>&1 | tee artifacts/reports/ios-build.txt
 IOS_BUILD_SECONDS="$(elapsed_seconds "$IOS_BUILD_START_EPOCH")"
+{
+  echo
+  echo "Cache state after iOS publish"
+  cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
+  cache_path_line "iOS arm64 obj" "$IOS_CACHE_ROOT"
+  if [[ -d "$AOT_CACHE_DIR" ]]; then
+    echo "AOT output files after build: $(find "$AOT_CACHE_DIR" -type f | wc -l | tr -d ' ')"
+  else
+    echo "AOT output files after build: 0"
+  fi
+} | tee -a "$CACHE_REPORT"
 
 IPA_VERIFY_START_EPOCH="$(date +%s)"
 bash scripts/verify-ipa.sh "$STS2_IPA_REL"
@@ -71,7 +110,7 @@ IPA_VERIFY_SECONDS="$(elapsed_seconds "$IPA_VERIFY_START_EPOCH")"
 TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
 
 {
-  echo "StS2 Launcher iOS — Step 32.0.5 Stable Transformed Method Verification"
+  echo "StS2 Launcher iOS — Step 33.0 Verified Transformed Real-StS2 CLR Admission"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"

@@ -47,6 +47,7 @@ public sealed partial class RootViewController : UIViewController
     private readonly RealStS2SelectedTargetSemanticAudit _realStS2SelectedTargetSemanticAudit;
     private readonly RealStS2PrepareMethodSemanticAudit _realStS2PrepareMethodSemanticAudit;
     private readonly RealStS2PrepareMethodRewrite _realStS2PrepareMethodRewrite;
+    private readonly TransformedRealStS2AssemblyAdmission _transformedRealStS2AssemblyAdmission;
     private UILabel? _foundationResultLabel;
     private UILabel? _foundationDetailLabel;
     private UILabel? _authResultLabel;
@@ -167,6 +168,7 @@ public sealed partial class RootViewController : UIViewController
         _realStS2SelectedTargetSemanticAudit = new RealStS2SelectedTargetSemanticAudit(_launcherDataRoot);
         _realStS2PrepareMethodSemanticAudit = new RealStS2PrepareMethodSemanticAudit(_launcherDataRoot);
         _realStS2PrepareMethodRewrite = new RealStS2PrepareMethodRewrite(_launcherDataRoot);
+        _transformedRealStS2AssemblyAdmission = new TransformedRealStS2AssemblyAdmission(_launcherDataRoot);
     }
     public override void ViewDidLoad()
     {
@@ -684,6 +686,7 @@ public sealed partial class RootViewController : UIViewController
         AddRealStS2SelectedTargetSemanticAuditControls(content);
         AddRealStS2PrepareMethodSemanticAuditControls(content);
         AddRealStS2PrepareMethodRewriteControls(content);
+        AddTransformedRealStS2AssemblyAdmissionControls(content);
 
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();

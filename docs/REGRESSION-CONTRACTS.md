@@ -267,3 +267,36 @@ Physical 0.0.119 proved Gate A and Gate B, advancing Step 32 to **2/4**. The pri
 - make no change to the 6 + 4 rewrite or the exact audited System.Runtime/Sentry resolver authority.
 
 Host coverage must explicitly protect the stable-identity lookup against historical-token assumptions. Physical closure remains A–D **4/4 PASS**; 2/4 is progress, not closure.
+
+## Step 32.0.5 physical closure
+
+Physical 0.0.120 is **CLOSED POSITIVE — 4/4**. Preserve these exact closure facts:
+
+- source SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, 9,363,456 bytes, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`;
+- transformed SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`, 9,304,576 bytes;
+- transformed PrewarmJit semantic fingerprint `47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a` and zero PrepareMethod references;
+- transformed MethodDef token `0x0600AFEA` is diagnostic only; the source token `0x06007D05` is not a post-write identity contract;
+- source/transformed constant-metadata semantic fingerprints are identical at `945f87ca177cabe587a3c8d6eef3b0ef419cbe4327349c0ffc7c541a4652ad37`;
+- write-time Cecil resolution remains exactly bounded to the audited System.Runtime/Sentry requirements; no external dependency assembly bytes are opened;
+- trusted install/private source remain unchanged and no real-StS2 CLR admission/invocation occurs in Step 32.
+
+The authoritative report is `docs/history/reports/STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt`.
+
+## Step 33.0 — verified transformed real-StS2 CLR admission
+
+0.0.121 must:
+
+- start from a fresh process with no `sts2` already CLR-resident and no active Godot process-global state;
+- re-run Step 32 A–D and require the exact physically closed transformed hash, length, assembly identity, MVID, transformed semantic fingerprint, and zero PrepareMethod references before CLR admission;
+- re-run the physically proven Step-23 prepared-runtime preflight so the persisted Step-21/22 zero-blocker plan and prepared/live bytes are current;
+- immediately re-hash the transformed image before `LoadFromStream`;
+- load only that transformed primary into a dedicated `StS2Launcher-Step33-TransformedGame` AssemblyLoadContext;
+- verify loaded assembly identity/MVID/context ownership and require it to be the unique resident `sts2` assembly;
+- permit only exact preplanned host-framework bindings from `AssemblyLoadContext.Default` if demanded by primary admission;
+- reject private prepared dependency requests in Step 33 rather than broadening the admission-only boundary;
+- reject unplanned managed requests and all unmanaged-library resolution;
+- require the private Step-33 context to contain transformed `sts2` only;
+- re-prove OfflineReady and original/transformed/runtime-plan hashes after admission;
+- perform no game type/member reflection or invocation, no `PrewarmJit`, no entry point, no Godot/game startup, no native game load, and no Harmony/MonoMod runtime patching.
+
+Host coverage must protect four-gate ordering and prove the Step-33 admission context can load a primary while refusing a private dependency request. Physical closure requires one exact 0.0.121 A–D **4/4 PASS** report.

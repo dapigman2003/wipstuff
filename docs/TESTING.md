@@ -1,6 +1,6 @@
-# Testing — Step 32.0.5 Stable Transformed Method Verification
+# Testing — Step 33.0 Verified Transformed Real-StS2 CLR Admission
 
-Active candidate: Step 32.0.5 / `0.0.120 (120)`.
+Active candidate: Step 33.0 / `0.0.121 (121)`.
 
 ## Canonical authority chain
 
@@ -8,45 +8,39 @@ Active candidate: Step 32.0.5 / `0.0.120 (120)`.
 2. complete host suite through `scripts/test.sh`
 3. iOS publish/package through `scripts/build-ios.sh`
 4. `scripts/verify-ipa.sh`
-5. physical iPhone Step-32 A–D run from a fresh process
+5. physical iPhone Step-33 A–D run from a fresh process
 
-Codemagic workflow: `ios-step-32`
+Codemagic workflow: `ios-canonical`
 
-Release identity: IPA `StS2-Launcher-Step-32.ipa`, TRX `step32.trx`, version `0.0.120 (120)`.
+CI cache policy: keep the workflow ID `ios-canonical` stable across future numbered steps so Codemagic can reuse its workflow-scoped cache. The canonical cache preserves the home NuGet cache, the isolated iOS NuGet cache, the validated Godot Step-15 cache, and `src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64` as the AOT intermediate cache. Cache reuse is an optimization only: all static validation, host tests, publish checks, and IPA verification still run on every build. `artifacts/reports/cache-state.txt` records whether these paths were restored and their sizes before/after publish.
 
-## What 0.0.120 changes
 
-The semantic rewrite is unchanged: 6 one-argument PrepareMethod calls become one Pop each, and 4 two-argument calls become Pop + Pop. The exact audited System.Runtime/Sentry Constant-table resolver is also unchanged.
+Release identity: IPA `StS2-Launcher-Step-33.ipa`, TRX `step33.trx`, version `0.0.121 (121)`.
 
-The only production correction is Gate C transformed-image method binding. Source admission and Gate B still require physical Step-31 token `0x06007D05`. After Cecil serialization, Gate C now locates exactly one `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` by declaring type + full method signature rather than assuming the source MethodDef token is preserved. It then applies the existing semantic fingerprint, PrepareMethod count, instruction/EH shape, Pop delta, Constant-table fingerprint, hash, and zero-resolution/zero-CLR-load checks.
+## Closed prerequisite
+
+Physical 0.0.120 closed Step 32 at **4/4**. Preserve `docs/history/reports/STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt`. Step 33 must require the exact closed transformed image SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`, 9,304,576 bytes, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, transformed PrewarmJit semantic fingerprint `47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a`, and zero PrepareMethod references before CLR admission.
+
+## Host coverage
 
 Host coverage must prove:
 
-- the representative source fixture still contains the three audited requirements: System.Runtime/BindingFlags/Int32, Sentry/BreadcrumbLevel/Int32, Sentry/SentryLevel/Int16;
-- Gate B can serialize that fixture using in-memory exact-identity surrogates only;
-- an additional unaudited non-null external constant requirement is rejected before rewrite/output;
-- stable transformed-method identity lookup is independent of a historical source token;
-- Gate C independently reopens and proves the full constant-metadata and transformed semantic fingerprints unchanged;
-- existing Step-32 source/rewrite/isolation contracts still pass.
+- the four Step-33 gates are ordered and stop after the first failure;
+- the admission-only load context can `LoadFromStream` a primary into its dedicated context;
+- a private prepared dependency request is refused and does not enter the Step-33 context;
+- existing Step-32 transform/reopen/isolation regressions remain green;
+- the existing Step-23 prepared-runtime preflight remains green.
 
-## Physical Step-32 state
+## Physical Step-33 run
 
-Physical 0.0.119 is **2/4**. Gate A passed and Gate B successfully serialized the first real-StS2 private 6+4 rewrite with exactly three audited metadata types, nine approved write-time resolver requests across exact System.Runtime/Sentry, zero external dependency-byte reads, no source/trusted mutation, and no CLR load. Gate C then failed at the old token-based transformed-method identity/body check before the deeper semantic/metadata verification ran.
+Start from a fresh app process. Do not start Godot and do not run any earlier real-game CLR-load boundary first.
 
-The raw physical report is preserved at `docs/history/reports/STEP-32.0.4-PHYSICAL-GATE-C-TRANSFORMED-METHOD-IDENTITY-FAILURE.txt`.
+Gate A must re-run Step 32 A–D successfully, require the exact closed transformed artifact, and requalify the persisted zero-blocker Step-21/22 runtime plan without CLR-loading StS2.
 
-After Codemagic succeeds for 0.0.120, run a fresh-process physical Step 32 A–D and preserve `Documents/StS2Launcher/Reports/Step32-RealStS2PrepareMethodRewrite.txt`.
+Gate B must immediately re-hash and `LoadFromStream` only the exact transformed `sts2.dll` into `StS2Launcher-Step33-TransformedGame`, then verify exact assembly identity, MVID, context ownership, and unique `sts2` residency. No game member invocation is permitted.
 
-Expected Gate-C report evidence now includes:
+Gate C must require the Step-33 private context to contain transformed `sts2` only. Private dependency requests are a fail-closed boundary. Unplanned managed requests and all native requests are failures. Exact planned host-framework bindings may be serviced from `AssemblyLoadContext.Default` only if requested by the CLR during primary admission.
 
-- exact stable-identity `PrewarmJit()` reopen;
-- transformed MethodDef token;
-- whether source token `0x06007D05` survived serialization and the old-token occupant, diagnostic only;
-- zero transformed `PrepareMethod` references;
-- transformed semantic fingerprint equal to the Gate-B pre-write plan;
-- source/transformed Constant-table semantic fingerprint equality;
-- expected instruction/EH and Pop-count invariants.
+Gate D must re-prove OfflineReady, the receipt-backed original SHA-256, transformed SHA-256, runtime-plan SHA-256, unique transformed-context residency, and zero private/native/game-execution expansion.
 
-Any resolver request for GodotSharp, System.Collections, another Sentry identity/type, or another assembly remains a failure. Do not add default resolver fallback or search directories in response to a failure.
-
-Codemagic `build-summary.txt` remains the timing record for the optimized active build surface.
+Preserve `Documents/StS2Launcher/Reports/Step33-TransformedRealStS2AssemblyAdmission.txt` whether PASS or FAIL. A valid closure is `TRANSFORMED REAL STS2 CLR ADMISSION PASS — 4/4`.

@@ -39,10 +39,10 @@ EXEC_NAME="$($PLISTBUDDY -c 'Print :CFBundleExecutable' "$PLIST")"
 EXECUTABLE="$APP/$EXEC_NAME"
 
 [[ "$BUNDLE_ID" == "com.community.sts2launcher" ]] || { echo "ERROR: wrong bundle ID: $BUNDLE_ID" >&2; exit 4; }
-[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 32 version: $VERSION" >&2; exit 4; }
-[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 32 build version: $BUILD_VERSION" >&2; exit 4; }
-[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 32 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
-[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 32 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
+[[ "$VERSION" == "$STS2_DISPLAY_VERSION" ]] || { echo "ERROR: wrong Step 33 version: $VERSION" >&2; exit 4; }
+[[ "$BUILD_VERSION" == "$STS2_BUILD_VERSION" ]] || { echo "ERROR: wrong Step 33 build version: $BUILD_VERSION" >&2; exit 4; }
+[[ "$FILE_SHARING" == "true" ]] || { echo "ERROR: Step 33 final IPA does not enable UIFileSharingEnabled: $FILE_SHARING" >&2; exit 4; }
+[[ "$OPEN_IN_PLACE" == "true" ]] || { echo "ERROR: Step 33 final IPA does not enable LSSupportsOpeningDocumentsInPlace: $OPEN_IN_PLACE" >&2; exit 4; }
 [[ -f "$EXECUTABLE" ]] || { echo "ERROR: executable missing: $EXECUTABLE" >&2; exit 4; }
 grep -qi 'arm64' <<<"$(file "$EXECUTABLE")" || { echo "ERROR: executable is not arm64." >&2; exit 4; }
 
@@ -231,7 +231,7 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
 }
 
 {
-  echo "Step 32.0.5 IPA verification passed."
+  echo "Step 33.0 IPA verification passed."
   echo "  Bundle ID: $BUNDLE_ID"
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
@@ -245,5 +245,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 32.0.5 — STABLE TRANSFORMED METHOD VERIFICATION"
-} | tee artifacts/logs/step32-ipa-verification-summary.log
+  echo "  Expected device UI: STEP 33.0 — VERIFIED TRANSFORMED REAL-STS2 CLR ADMISSION"
+} | tee artifacts/logs/step33-ipa-verification-summary.log

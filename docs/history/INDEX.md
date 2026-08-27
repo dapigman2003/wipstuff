@@ -167,3 +167,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-32.0.4-PHYSICAL-GATE-C-TRANSFORMED-METHOD-IDENTITY-FAILURE.txt` — physical 0.0.119 advanced Step 32 to 2/4: Gate A and Gate B passed; Gate C failed before semantic reopen checks because the verifier reused source MethodDef token 0x06007D05 as a post-Cecil-write locator.
 - `steps/STEP-32.0.5-STABLE-TRANSFORMED-METHOD-VERIFICATION.md` — 0.0.120 correction: retain exact source-token admission, but bind the reopened transformed PrewarmJit by exact declaring type + full signature and treat transformed token preservation as diagnostic only.
 - `steps/STEP-32.0.5-TEST.md` — CI/IPA/physical acceptance procedure for the 0.0.120 Gate-C verification correction.
+- `reports/STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.120 Step-32 closure: A–D 4/4, exact transformed hash/semantic verification, trusted source unchanged, zero real-game CLR admission.
+- `steps/STEP-33.0-VERIFIED-TRANSFORMED-CLR-ADMISSION.md` — Step 33.0 / 0.0.121 admission-only design: requalify exact Step-32 transformed image, LoadFromStream only transformed primary, reject private/native expansion, re-prove isolation.
+- `steps/STEP-33.0-TEST.md` — Codemagic/IPA/physical acceptance procedure for the Step-33 transformed-primary admission boundary.
