@@ -275,42 +275,63 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         "IL2026",
         Justification = "Step 35 admits only the exact hash-pinned transformed primary image; member reflection/invocation is deferred to Gate C.")]
     public TransformedRealStS2VeryEarlyInitializationGateResult RunExecutionCapableClrAdmission()
+        => RunExecutionCapableClrAdmission(crashCheckpoint: null);
+
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026",
+        Justification = "Step 35.0.1 preserves the exact Step-35 transformed-primary LoadFromStream admission path; the added callback is output-only crash telemetry.")]
+    public TransformedRealStS2VeryEarlyInitializationGateResult RunExecutionCapableClrAdmission(Action<string>? crashCheckpoint)
     {
         const TransformedRealStS2VeryEarlyInitializationGate gate = TransformedRealStS2VeryEarlyInitializationGate.ExecutionCapableClrAdmission;
         var stage = "initialization";
         try
         {
+            Checkpoint(crashCheckpoint, "B_ENTRY — entered Gate B execution-capable CLR admission.");
             ThrowIfDisposed();
             var preflight = RequirePreflight();
             EnsureNoStS2Loaded("Gate B entry");
+            Checkpoint(crashCheckpoint, "B_FRESH_PROCESS_PASS — no sts2 assembly is CLR-resident at Gate B entry.");
             if (_loadContext is not null)
                 throw new InvalidOperationException("Step 35 Gate B requires a fresh dedicated load context.");
 
             stage = "immediate transformed hash recheck";
+            Checkpoint(crashCheckpoint, "B_HASH_START — rechecking exact transformed primary length/SHA-256 before CLR admission.");
             VerifyFileLength(preflight.TransformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "transformed primary");
             var immediateSha256 = ComputeSha256Hex(preflight.TransformedPath);
             if (!immediateSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35 transformed image changed between Gate A verification and Gate B CLR admission.");
+            Checkpoint(crashCheckpoint, $"B_HASH_PASS — transformed primary recheck matched {immediateSha256}.");
 
             stage = "execution-capable strict AssemblyLoadContext construction";
+            Checkpoint(crashCheckpoint, "B_ALC_CONSTRUCT_START — constructing strict Step-35 execution AssemblyLoadContext.");
             var context = new Step35ExecutionLoadContext(
                 LoadContextName,
                 preflight.Plan,
                 preflight.PreparedAssemblies,
-                _collectibleLoadContext);
+                _collectibleLoadContext,
+                crashCheckpoint);
             _loadContext = context;
+            Checkpoint(crashCheckpoint, "B_ALC_CONSTRUCT_PASS — strict Step-35 execution AssemblyLoadContext constructed.");
 
             stage = "exact transformed sts2.dll LoadFromStream";
+            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_START — entering exact transformed primary LoadPrimary/LoadFromStream path.");
             var assembly = context.LoadPrimary(preflight.TransformedPath, immediateSha256);
+            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_PASS — exact transformed primary returned from LoadPrimary/LoadFromStream.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(assembly), context))
                 throw new InvalidDataException("The transformed sts2.dll did not load into the dedicated Step-35 AssemblyLoadContext.");
+            Checkpoint(crashCheckpoint, "B_CONTEXT_OWNERSHIP_PASS — transformed primary belongs to the dedicated Step-35 AssemblyLoadContext.");
 
+            Checkpoint(crashCheckpoint, "B_GETNAME_START — reading loaded transformed assembly identity.");
             var actualIdentity = assembly.GetName().FullName ?? assembly.GetName().Name ?? string.Empty;
             if (!actualIdentity.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity, StringComparison.Ordinal))
                 throw new InvalidDataException($"Loaded transformed identity mismatch. Expected '{TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity}', actual '{actualIdentity}'.");
+            Checkpoint(crashCheckpoint, $"B_GETNAME_PASS — loaded transformed identity matched: {actualIdentity}.");
+            Checkpoint(crashCheckpoint, "B_MVID_START — reading loaded transformed module MVID.");
             var actualMvid = assembly.ManifestModule.ModuleVersionId;
             if (actualMvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
                 throw new InvalidDataException($"Loaded transformed module MVID mismatch. Expected {TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid}, actual {actualMvid}.");
+            Checkpoint(crashCheckpoint, $"B_MVID_PASS — loaded transformed MVID matched: {actualMvid}.");
 
             if (context.ManagedResolverRequests.Count != 0 || context.PrivateLoads.Count != 0 ||
                 context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
@@ -319,15 +340,19 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     "Step-35 transformed primary admission no longer matches the physically closed Step-33 zero-resolution admission behavior. " +
                     context.FormatResolverState());
             }
+            Checkpoint(crashCheckpoint, "B_ZERO_RESOLUTION_PASS — primary admission produced zero managed/private/initializer/rejected/native resolution activity.");
 
             var matches = FindLoadedStS2Assemblies();
             if (matches.Length != 1 || !ReferenceEquals(matches[0], assembly))
                 throw new InvalidDataException($"Expected exactly one transformed sts2 assembly after Step-35 Gate B, found {matches.Length}.");
+            Checkpoint(crashCheckpoint, "B_GLOBAL_RESIDENCY_PASS — exactly one sts2 assembly is resident and it is the transformed primary.");
             var contextAssemblies = context.Assemblies.ToArray();
             if (contextAssemblies.Length != 1 || !ReferenceEquals(contextAssemblies[0], assembly))
                 throw new InvalidDataException($"Step-35 context contains {contextAssemblies.Length} private assemblies immediately after admission instead of exactly transformed sts2.");
+            Checkpoint(crashCheckpoint, "B_PRIVATE_CONTEXT_ENUM_PASS — private context contains exactly the transformed primary after admission.");
 
             _admission = new PrimaryAdmissionSnapshot(assembly, actualIdentity, actualMvid, immediateSha256);
+            Checkpoint(crashCheckpoint, "B_PASS_RETURN — Gate B completed successfully and is returning its PASS result.");
 
             return Pass(gate,
                 "PHYSICALLY CLOSED STEP-33 TRANSFORMED-PRIMARY ADMISSION BEHAVIOR RE-ESTABLISHED IN THE STEP-35 VERY-EARLY EXECUTION CONTEXT; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
@@ -347,6 +372,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         }
         catch (Exception ex)
         {
+            Checkpoint(crashCheckpoint, $"B_MANAGED_FAIL — stage={stage}; {ex.GetType().FullName}: {ex.Message}");
             if (_collectibleLoadContext)
                 ReleaseLoadContext();
             _admission = null;
@@ -358,13 +384,23 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         "Trimming",
         "IL2026",
         Justification = "Step 35 deliberately reflects and invokes one exact async initialization method on the exact transformed real-StS2 image. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
+    public Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunExactExecuteVeryEarlyInvocationAsync(
+        CancellationToken cancellationToken = default)
+        => RunExactExecuteVeryEarlyInvocationAsync(crashCheckpoint: null, cancellationToken: cancellationToken);
+
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026",
+        Justification = "Step 35.0.1 preserves the exact Step-35 reflected ExecuteVeryEarly invocation; the added callback is output-only crash telemetry.")]
     public async Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunExactExecuteVeryEarlyInvocationAsync(
+        Action<string>? crashCheckpoint,
         CancellationToken cancellationToken = default)
     {
         const TransformedRealStS2VeryEarlyInitializationGate gate = TransformedRealStS2VeryEarlyInitializationGate.ExactExecuteVeryEarlyInvocation;
         var stage = "initialization";
         try
         {
+            Checkpoint(crashCheckpoint, "C_ENTRY — entered Gate C exact ExecuteVeryEarly binding/invocation/await boundary.");
             ThrowIfDisposed();
             var preflight = RequirePreflight();
             var admission = RequireAdmission();
@@ -376,6 +412,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             {
                 throw new InvalidDataException("Step-35 resolver state changed before Gate C invocation. " + context.FormatResolverState());
             }
+            Checkpoint(crashCheckpoint, "C_RESOLVER_PRECHECK_PASS — resolver/native state is still zero immediately before target binding.");
 
             var resolverRequestsBefore = context.ManagedResolverRequests.Count;
             var hostLoadsBefore = context.HostLoads.Count;
@@ -383,11 +420,14 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var nativeAttemptsBefore = context.NativeLoadAttempts.Count;
 
             stage = "exact transformed very-early type/member binding";
+            Checkpoint(crashCheckpoint, "C_BIND_TYPE_START — calling Assembly.GetType for exact OneTimeInitialization target.");
             var targetType = admission.Assembly.GetType(TargetTypeFullName, throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException(TargetTypeFullName);
             if (!ReferenceEquals(targetType.Assembly, admission.Assembly))
                 throw new InvalidDataException("Step-35 target type did not bind from the transformed sts2 assembly.");
+            Checkpoint(crashCheckpoint, "C_BIND_TYPE_PASS — exact OneTimeInitialization target type bound from transformed sts2.");
 
+            Checkpoint(crashCheckpoint, "C_BIND_METHOD_START — calling Type.GetMethod for exact static parameterless ExecuteVeryEarly.");
             var method = targetType.GetMethod(
                 TargetMethodName,
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
@@ -395,21 +435,28 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 types: Type.EmptyTypes,
                 modifiers: null)
                 ?? throw new MissingMethodException(TargetTypeFullName, TargetMethodName);
+            Checkpoint(crashCheckpoint, "C_BIND_METHOD_PASS — ExecuteVeryEarly MethodInfo binding returned.");
 
             if (!ReferenceEquals(method.DeclaringType, targetType) || !method.IsStatic || method.ReturnType != typeof(Task) || method.GetParameters().Length != 0)
                 throw new InvalidDataException("Step-35 reflected ExecuteVeryEarly identity/signature drifted from the exact static parameterless System.Threading.Tasks.Task target.");
+            Checkpoint(crashCheckpoint, "C_SIGNATURE_PASS — reflected method is exact static parameterless Task-returning target.");
             if (method.MetadataToken != unchecked((int)preflight.TransformedMethodToken))
                 throw new InvalidDataException($"Step-35 reflected ExecuteVeryEarly token drifted: 0x{method.MetadataToken:X8} != preflight 0x{preflight.TransformedMethodToken:X8}.");
+            Checkpoint(crashCheckpoint, $"C_TOKEN_PASS — reflected ExecuteVeryEarly token matched 0x{method.MetadataToken:X8}.");
             if (method.Module.ModuleVersionId != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
                 throw new InvalidDataException("Step-35 reflected ExecuteVeryEarly module MVID drifted from the closed transformed image.");
+            Checkpoint(crashCheckpoint, $"C_MVID_PASS — reflected ExecuteVeryEarly module MVID matched {method.Module.ModuleVersionId}.");
 
             stage = "single exact transformed ExecuteVeryEarly invocation";
             Task task;
             try
             {
+                Checkpoint(crashCheckpoint, "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for transformed ExecuteVeryEarly.");
                 var result = method.Invoke(null, null);
+                Checkpoint(crashCheckpoint, "C_INVOKE_RETURNED — MethodInfo.Invoke returned to the launcher.");
                 task = result as Task
                     ?? throw new InvalidDataException("Step-35 ExecuteVeryEarly returned null or a non-Task object despite its exact Task return contract.");
+                Checkpoint(crashCheckpoint, $"C_TASK_CONFIRMED — invocation returned a non-null Task; initial status={task.Status}.");
             }
             catch (TargetInvocationException ex)
             {
@@ -422,7 +469,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             stage = "await exact ExecuteVeryEarly Task completion";
             try
             {
+                Checkpoint(crashCheckpoint, "C_WAIT_START — awaiting the exact returned ExecuteVeryEarly Task with the predeclared 60-second boundary.");
                 await task.WaitAsync(TimeSpan.FromSeconds(60), cancellationToken).ConfigureAwait(false);
+                Checkpoint(crashCheckpoint, $"C_WAIT_COMPLETED — ExecuteVeryEarly Task await returned; status={task.Status}.");
             }
             catch (TimeoutException ex)
             {
@@ -449,6 +498,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 throw new InvalidDataException("Step-35 ExecuteVeryEarly triggered an unplanned managed resolver request: " + string.Join(" | ", context.RejectedManagedRequests));
             if (context.NativeLoadAttempts.Count != 0)
                 throw new InvalidDataException("Step-35 ExecuteVeryEarly attempted native library resolution: " + string.Join(" | ", context.NativeLoadAttempts));
+            Checkpoint(crashCheckpoint, $"C_POST_RESOLVER_PASS — post-await confinement passed; {context.FormatResolverState()}.");
 
             var privateAssemblies = context.Assemblies.ToArray();
             foreach (var loaded in privateAssemblies.Where(item => !ReferenceEquals(item, admission.Assembly)))
@@ -462,6 +512,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     throw new InvalidDataException("Step-35 private context admitted an initializer-bearing dependency: " + prepared.Plan.AssemblyFullName);
             }
 
+            Checkpoint(crashCheckpoint, $"C_PRIVATE_CONTEXT_ENUM_PASS — private context enumeration completed with {privateAssemblies.Length} resident assembly/assemblies.");
             _execution = new ExecutionSnapshot(
                 method.MetadataToken,
                 context.ManagedResolverRequests.Skip(resolverRequestsBefore).ToArray(),
@@ -469,6 +520,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 context.PrivateLoads.Skip(privateLoadsBefore).ToArray(),
                 context.NativeLoadAttempts.Skip(nativeAttemptsBefore).ToArray(),
                 privateAssemblies.Select(item => item.GetName().FullName ?? item.GetName().Name ?? "<unknown>").ToArray());
+            Checkpoint(crashCheckpoint, "C_PASS_RETURN — Gate C completed successfully and is returning its PASS result.");
 
             return Pass(gate,
                 "FIRST CONTROLLED INVOCATION/AWAIT OF THE EXACT TRANSFORMED REAL-STS2 EXECUTEVERYEARLY INITIALIZATION SITE COMPLETED NORMALLY.\n" +
@@ -495,10 +547,12 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         }
         catch (OperationCanceledException)
         {
+            Checkpoint(crashCheckpoint, $"C_CANCELLED_INCONCLUSIVE — stage={stage}; invocation may already have occurred; fresh process required before retry.");
             throw;
         }
         catch (Exception ex)
         {
+            Checkpoint(crashCheckpoint, $"C_MANAGED_FAIL — stage={stage}; {ex.GetType().FullName}: {ex.Message}");
             _execution = null;
             return Fail(gate, stage, ex);
         }
@@ -609,6 +663,20 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         _preparedPreflight.Dispose();
         _disposed = true;
         GC.SuppressFinalize(this);
+    }
+
+    private static void Checkpoint(Action<string>? crashCheckpoint, string detail)
+    {
+        if (crashCheckpoint is null)
+            return;
+        try
+        {
+            crashCheckpoint(detail);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Step-35 crash-checkpoint callback failed: {ex.GetType().Name}: {ex.Message}");
+        }
     }
 
     private static string DescribeException(Exception ex)
@@ -870,14 +938,17 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     {
         private readonly IReadOnlyDictionary<string, PreparedExecutionEntry> _privateBySimpleName;
         private readonly RuntimeBindingHostFramework[] _hostBindings;
+        private readonly Action<string>? _crashCheckpoint;
 
         internal Step35ExecutionLoadContext(
             string name,
             RuntimeFrameworkBindingPlanDocument plan,
             IReadOnlyList<PreparedExecutionEntry> preparedAssemblies,
-            bool isCollectible)
+            bool isCollectible,
+            Action<string>? crashCheckpoint = null)
             : base(name, isCollectible)
         {
+            _crashCheckpoint = crashCheckpoint;
             var privateBySimpleName = new Dictionary<string, PreparedExecutionEntry>(StringComparer.OrdinalIgnoreCase);
             foreach (var item in preparedAssemblies.Where(item => !item.Plan.IsPrimary))
             {
@@ -904,11 +975,16 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Justification = "Step 35 loads only the exact hash-pinned transformed primary image and exact hash-pinned prepared private dependencies selected by the persisted runtime plan.")]
         internal Assembly LoadPrimary(string transformedPath, string expectedSha256)
         {
+            Checkpoint("B_LOADPRIMARY_REHASH_START — LoadPrimary is re-hashing transformed bytes immediately before LoadFromStream.");
             var actualSha256 = ComputeSha256Hex(transformedPath);
             if (!actualSha256.Equals(expectedSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35 transformed primary hash changed immediately before LoadFromStream.");
+            Checkpoint($"B_LOADPRIMARY_REHASH_PASS — immediate LoadPrimary SHA-256 matched {actualSha256}.");
             using var stream = new FileStream(transformedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return LoadFromStream(stream);
+            Checkpoint("B_LOADFROMSTREAM_START — entering AssemblyLoadContext.LoadFromStream for exact transformed primary.");
+            var assembly = LoadFromStream(stream);
+            Checkpoint("B_LOADFROMSTREAM_PASS — AssemblyLoadContext.LoadFromStream returned transformed primary.");
+            return assembly;
         }
 
         [UnconditionalSuppressMessage(
@@ -918,6 +994,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         protected override Assembly? Load(AssemblyName assemblyName)
         {
             var requestedFullName = assemblyName.FullName ?? assemblyName.Name ?? "<unknown>";
+            Checkpoint($"RESOLVE_MANAGED_START — {requestedFullName}");
             ManagedResolverRequests.Add(requestedFullName);
             if (assemblyName.Name is null)
                 return Reject(requestedFullName, "assembly request has no simple name");
@@ -928,6 +1005,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 {
                     var detail = $"{requestedFullName} => {privateAssembly.Plan.AssemblyFullName}; moduleInitializers={privateAssembly.ModuleInitializerCount}";
                     InitializerBearingRequests.Add(detail);
+                    Checkpoint($"RESOLVE_INITIALIZER_BEARING_REJECT — {detail}");
                     throw new FileLoadException(
                         "Step 35 refuses initializer-bearing private dependencies during the ExecuteVeryEarly boundary: " + detail);
                 }
@@ -943,17 +1021,22 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 if (alreadyLoaded is not null)
                     return alreadyLoaded;
 
+                Checkpoint($"RESOLVE_PRIVATE_HASH_START — {requestedFullName} => {privateAssembly.Plan.RelativePath}");
                 VerifyFileLength(privateAssembly.PreparedPath, privateAssembly.Plan.Length, "prepared private dependency");
                 var hash = ComputeSha1Hex(privateAssembly.PreparedPath);
                 if (!hash.Equals(privateAssembly.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
                     throw new InvalidDataException("Step-35 prepared private dependency SHA-1 changed immediately before load: " + privateAssembly.Plan.RelativePath);
+                Checkpoint($"RESOLVE_PRIVATE_HASH_PASS — {requestedFullName}; sha1={hash}");
 
                 using var stream = new FileStream(privateAssembly.PreparedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                Checkpoint($"RESOLVE_PRIVATE_LOADFROMSTREAM_START — {requestedFullName}");
                 var loaded = LoadFromStream(stream);
+                Checkpoint($"RESOLVE_PRIVATE_LOADFROMSTREAM_PASS — {requestedFullName}");
                 var actualFullName = loaded.GetName().FullName ?? loaded.GetName().Name ?? string.Empty;
                 if (!actualFullName.Equals(privateAssembly.Plan.AssemblyFullName, StringComparison.Ordinal))
                     throw new FileLoadException($"Step-35 private dependency loaded identity drifted. Planned '{privateAssembly.Plan.AssemblyFullName}', actual '{actualFullName}'.");
                 PrivateLoads.Add($"{requestedFullName} => {actualFullName}");
+                Checkpoint($"RESOLVE_PRIVATE_PASS — {requestedFullName} => {actualFullName}");
                 return loaded;
             }
 
@@ -963,6 +1046,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (hostMatches.Length == 0)
                 return Reject(requestedFullName, "request is neither an exact planned host-framework binding nor an identified prepared private dependency");
 
+            Checkpoint($"RESOLVE_HOST_START — {requestedFullName}");
             var allowedActual = hostMatches
                 .Select(binding => binding.ActualFullName)
                 .Distinct(StringComparer.Ordinal)
@@ -973,11 +1057,13 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 throw new FileLoadException(
                     $"Step-35 host binding drift for '{requestedFullName}'. Planned actual identity: {string.Join(" | ", allowedActual)}; runtime actual: {hostFullName}.");
             HostLoads.Add($"{requestedFullName} => {hostFullName}");
+            Checkpoint($"RESOLVE_HOST_PASS — {requestedFullName} => {hostFullName}");
             return hostAssembly;
         }
 
         protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
         {
+            Checkpoint($"RESOLVE_NATIVE_REJECT — {unmanagedDllName}");
             NativeLoadAttempts.Add(unmanagedDllName);
             throw new DllNotFoundException(
                 $"Step 35 controlled ExecuteVeryEarly boundary refuses native library resolution for '{unmanagedDllName}'.");
@@ -997,8 +1083,12 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         {
             var detail = $"{requestedFullName} — {reason}";
             RejectedManagedRequests.Add(detail);
+            Checkpoint($"RESOLVE_MANAGED_REJECT — {detail}");
             throw new FileLoadException("Step-35 strict managed resolver rejected an unplanned request: " + detail);
         }
+
+        private void Checkpoint(string detail)
+            => TransformedRealStS2VeryEarlyInitialization.Checkpoint(_crashCheckpoint, detail);
     }
 
     private sealed class RejectingAssemblyResolver : IAssemblyResolver

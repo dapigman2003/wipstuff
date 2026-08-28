@@ -81,11 +81,13 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             new TransformedRealStS2VeryEarlyInitialization.PreparedExecutionEntry(harmonyPlan, harmonyPath, harmonyIdentity, 1),
         };
 
+        var crashCheckpoints = new List<string>();
         var context = new TransformedRealStS2VeryEarlyInitialization.Step35ExecutionLoadContext(
             "Step35-Test",
             plan,
             entries,
-            isCollectible: true);
+            isCollectible: true,
+            crashCheckpoint: crashCheckpoints.Add);
         try
         {
             var loadedPrimary = context.LoadPrimary(primaryPath, primarySha256);
@@ -104,6 +106,10 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             Assert.AreEqual(1, context.InitializerBearingRequests.Count);
             Assert.AreEqual(0, context.NativeLoadAttempts.Count);
             Assert.AreEqual(2, context.Assemblies.Count());
+            Assert.IsTrue(crashCheckpoints.Any(item => item.StartsWith("B_LOADFROMSTREAM_START", StringComparison.Ordinal)));
+            Assert.IsTrue(crashCheckpoints.Any(item => item.StartsWith("B_LOADFROMSTREAM_PASS", StringComparison.Ordinal)));
+            Assert.IsTrue(crashCheckpoints.Any(item => item.StartsWith("RESOLVE_PRIVATE_PASS", StringComparison.Ordinal)));
+            Assert.IsTrue(crashCheckpoints.Any(item => item.StartsWith("RESOLVE_INITIALIZER_BEARING_REJECT", StringComparison.Ordinal)));
         }
         finally
         {

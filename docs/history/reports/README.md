@@ -21,3 +21,4 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-34.0-CODEMAGIC-IOS-UI-COMPILE-FAILURE.txt` — first 0.0.122 CI attempt: 735/735 static and 194/194 host PASS, stable iOS cache restored, then iOS C# compilation stopped on a Step-34 `SystemButton` argument-type mistake before AOT/publish completion; no IPA/device evidence.
 
 - `STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.122 Step-34 closure: exact transformed PrewarmJit invoked once and returned normally; 8 managed requests = 6 exact host + 2 initializer-free private loads; zero initializer-bearing/unplanned/native escape; 4/4 PASS.
+- `STEP-35.0-PHYSICAL-HARD-TERMINATION-SUMMARY.txt` — sanitized physical 0.0.123 hard-termination evidence summary; raw device `.ips` is intentionally excluded from source because it can contain device identifiers.

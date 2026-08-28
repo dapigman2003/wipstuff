@@ -1,0 +1,29 @@
+StS2 Launcher — Step 35.0 physical hard-termination evidence summary
+Sanitized summary only; raw iOS .ips intentionally excluded from source archive because it can contain device-specific identifiers.
+
+Candidate: Step 35.0 / 0.0.123 (123)
+Physical observation date: 2026-08-28
+Observed UI state: app opened and advanced to the visible Gate-B region before abrupt termination.
+Managed Step-35 report survived: NO
+
+Matching iOS crash-report facts:
+- process/application: StS2Launcher.iOS
+- app version/build: 0.0.123 (123)
+- exception: EXC_BAD_ACCESS
+- signal: SIGKILL
+- termination namespace/code text: CODESIGNING / Invalid Page
+- faulting thread: main thread
+- faulting program counter: 0x0000000000000000
+- visible .NET thread-pool worker threads in the report were waiting/parked at capture time
+
+Interpretation boundary:
+- This report proves a hard native/runtime/kernel termination that bypassed managed catch/finally; it explains why no normal Step-35 report was written.
+- The CODESIGNING/Invalid Page text does not by itself prove the transformed managed DLL modified a signed executable page. PC=0x0 is also consistent with a null native function-pointer call/jump.
+- The visible Gate-B label is not a trustworthy code frontier. Gate B is awaited from Task.Run; after it returns, the continuation resumes on the main thread and Gate C performs synchronous reflection/invocation work before its first incomplete await and before UIKit is guaranteed to repaint.
+- Therefore the exact crash frontier remains B→C until durable in-process checkpoints prove otherwise.
+
+Related fresh-process observation:
+Running Step 34 and then Step 35 in the same app process causes a normal Step-35 Gate-A rejection because sts2 is already resident. This is expected and confirms the fresh-process guard; it is not the hard-crash defect.
+
+Next candidate:
+Step 35.0.1 / 0.0.124 freezes execution authority and adds synchronously flushed, provenance/thread-aware checkpoints around Gate B, the B→C handoff, ExecuteVeryEarly binding/invocation/Task await, and resolver callbacks.

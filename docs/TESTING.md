@@ -1,6 +1,6 @@
-# Testing — Step 35.0 Controlled Transformed Real-StS2 Very-Early Initialization
+# Testing — Step 35.0.1 Very-Early B→C Hard-Termination Crash Localization
 
-Active candidate: Step 35.0 / `0.0.123 (123)`.
+Active candidate: Step 35.0.1 / `0.0.124 (124)`.
 
 ## Canonical authority chain
 
@@ -10,11 +10,23 @@ Active candidate: Step 35.0 / `0.0.123 (123)`.
 4. `scripts/verify-ipa.sh`
 5. physical iPhone Step-35 A–D run from a **fresh process**
 
-Release identity: IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, version `0.0.123 (123)`. The Codemagic workflow key remains `ios-canonical` so NuGet/Godot/iOS arm64 `obj`/AOT caches survive numbered-step changes.
+Release identity: IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, version `0.0.124 (124)`. The Codemagic workflow key remains `ios-canonical` so NuGet/Godot/iOS arm64 `obj`/AOT caches survive numbered-step changes.
+
+## Physical evidence entering this candidate
+
+Physical 0.0.123 opened normally, reached the visible Gate-B region, then hard-terminated without producing `Step35-TransformedRealStS2VeryEarlyInitialization.txt`. The matching iOS crash report identifies 0.0.123 (123) and records `EXC_BAD_ACCESS / SIGKILL`, faulting main thread, PC=`0x0`, with `CODESIGNING / Invalid Page` termination text. This does not by itself prove signed-page mutation; PC=`0x0` is consistent with a call/jump through a null native function pointer. Because Gate B executes on `Task.Run` while Gate C begins synchronously on the main thread before its first incomplete await, the visible “Gate B” UI state is not sufficient to localize the crash.
+
+Running Step 34 and then Step 35 in the same process is expected to fail Gate A normally: Step 34 leaves `sts2` resident in a non-collectible private load context, and Step 35 intentionally requires a fresh process.
 
 ## Host/static expectations
 
-Static validation must protect the physically closed Step-32/33/34 manifests and the active Step-35 candidate manifest. Step-35 host tests must protect ordered 4-gate completion, first-failure stopping, exact source target constants (`ExecuteVeryEarly` token `0x06007D02`, `<ExecuteVeryEarly>d__7::MoveNext` token `0x0600BC71`), initializer-free prepared dependency admission, and initializer-bearing dependency refusal. Active tests must use MSTest v4 `Assert.ThrowsExactly` APIs rather than removed `Assert.ThrowsException` APIs.
+Static validation must protect the physically closed Step-32/33/34 manifests and the active Step-35.0.1 candidate manifest. Step-35 host tests must protect ordered 4-gate completion, first-failure stopping, exact source target constants (`ExecuteVeryEarly` token `0x06007D02`, `<ExecuteVeryEarly>d__7::MoveNext` token `0x0600BC71`), initializer-free prepared dependency admission, initializer-bearing dependency refusal, and crash-checkpoint callback coverage for primary/private load boundaries. Active tests must use MSTest v4 `Assert.ThrowsExactly` APIs rather than removed `Assert.ThrowsException` APIs.
+
+## Crash checkpoint contract
+
+`Documents/StS2Launcher/Reports/Step35-CrashCheckpoint.txt` is output-only diagnostic telemetry and is never consumed as trusted runtime input. It is synchronously flushed after each checkpoint and carries release provenance plus managed thread ID. A telemetry write failure is logged to stderr and must not change resolver or compatibility decisions.
+
+The most important frontier records are `B_LOADFROMSTREAM_START/PASS`, `B_PASS_RETURN`, `B_TASK_AWAIT_RESUMED`, `C_UI_SELECTED`, `C_BIND_TYPE_START/PASS`, `C_BIND_METHOD_START/PASS`, `C_INVOKE_START`, `C_INVOKE_RETURNED`, `C_TASK_CONFIRMED`, and `C_WAIT_START/COMPLETED`, plus `RESOLVE_*` events. After a hard termination, the last durable line is the primary localization evidence.
 
 ## Physical Gate A — VerifiedExecutionPreflight
 
@@ -22,14 +34,16 @@ Require a fresh process with no resident `sts2`. Re-run the physically closed St
 
 ## Physical Gate B — ExecutionCapableClrAdmission
 
-Immediately re-hash and `LoadFromStream` only the exact transformed primary into `StS2Launcher-Step35-VeryEarly`. Require exact identity/MVID/context ownership, exactly one resident `sts2`, and zero managed resolver requests/private loads/initializer-bearing requests/rejected requests/native attempts during primary admission.
+Immediately re-hash and `LoadFromStream` only the exact transformed primary into `StS2Launcher-Step35-VeryEarly`. Require exact identity/MVID/context ownership, exactly one resident `sts2`, and zero managed resolver requests/private loads/initializer-bearing requests/rejected requests/native attempts during primary admission. Step 35.0.1 checkpoints each substage without changing the admission policy.
 
 ## Physical Gate C — ExactExecuteVeryEarlyInvocation
 
-Reflect only `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()` from the transformed assembly. Require static, parameterless, exact `System.Threading.Tasks.Task` return, Gate-A-discovered transformed MethodDef token, and exact MVID. Invoke exactly once and require a non-null `Task`; await it for at most **60 seconds**. The strict resolver may service only exact persisted host-framework bindings and exact hash-pinned initializer-free prepared private dependencies. Any initializer-bearing dependency request, unplanned managed request, native request, synchronous target exception, Task fault, cancellation, or timeout is a Gate-C failure and becomes the next evidence boundary.
+Reflect only `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()` from the transformed assembly. Require static, parameterless, exact `System.Threading.Tasks.Task` return, Gate-A-discovered transformed MethodDef token, and exact MVID. Invoke exactly once and require a non-null `Task`; await it for at most **60 seconds**. The strict resolver may service only exact persisted host-framework bindings and exact hash-pinned initializer-free prepared private dependencies. Any initializer-bearing dependency request, unplanned managed request, native request, synchronous target exception, Task fault, or timeout is a Gate-C failure and becomes the next evidence boundary.
+
+Operator cancellation is **INCONCLUSIVE**, not PASS or FAIL. If Gate B has started, force-quit before retry. If `C_INVOKE_START` has occurred, cancellation cannot prove that target execution was undone.
 
 ## Physical Gate D — FinalIsolationAudit
 
 Re-prove OfflineReady 428/428, receipt-backed source SHA-256, transformed SHA-256, runtime-plan SHA-256, every resident private dependency hash, unique transformed-primary residency/context ownership, zero initializer-bearing/unplanned/native escape, and exactly one Step-35 `ExecuteVeryEarly` invocation. The launcher must not intentionally invoke `ExecuteEssential`, `ExecuteDeferred`, `PrewarmJit`, the entry point, Harmony APIs, or Godot/game startup.
 
-Preserve `Documents/StS2Launcher/Reports/Step35-TransformedRealStS2VeryEarlyInitialization.txt` whether PASS or FAIL. Accept only ordered A–D **4/4 PASS**. Do not rerun Step 35 in the same process after Gate B.
+Preserve both `Documents/StS2Launcher/Reports/Step35-CrashCheckpoint.txt` and `Step35-TransformedRealStS2VeryEarlyInitialization.txt` when present. Accept physical closure only on ordered A–D **4/4 PASS**. Do not rerun Step 35 in the same process after Gate B.

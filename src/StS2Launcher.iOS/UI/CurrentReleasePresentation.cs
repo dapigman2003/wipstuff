@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 35.0 — CONTROLLED TRANSFORMED REAL-STS2 VERY-EARLY INITIALIZATION";
+        "STEP 35.0.1 — VERY-EARLY B→C HARD-TERMINATION CRASH LOCALIZATION";
 
     public const string MilestoneLine =
         "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 CLOSED POSITIVE 4/4 • STEP 34 CLOSED POSITIVE 4/4 • STEP 35 OPEN";
 
     public const string Summary =
-        "Physical 0.0.122 CLOSED Step 34 positively at 4/4 on exact transformed SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef: exact transformed OneTimeInitialization::PrewarmJit() token 0x0600AFEA was invoked once and returned normally under the strict prepared resolver, producing 8 managed requests, 6 exact host-framework loads, 2 initializer-free prepared private loads, and zero initializer-bearing/unplanned/native escape. Step 35.0 begins the natural managed startup sequence at exact static parameterless Task-returning OneTimeInitialization::ExecuteVeryEarly(), source token 0x06007D02. The candidate re-manufactures/reverifies the closed transform, proves the ExecuteVeryEarly async wrapper/state-machine semantics are unchanged, admits only the exact transformed primary, invokes ExecuteVeryEarly once and awaits its Task for at most 60 seconds under the same strict resolver.";
+        "Physical 0.0.122 CLOSED Step 34 positively at 4/4. Physical Step 35.0 / 0.0.123 then hard-terminated around the visible Gate-B region; the matching iOS .ips reports EXC_BAD_ACCESS/SIGKILL with faulting main-thread PC=0x0, while no managed Step-35 report survived. Because the display can remain on Gate B while synchronous Gate-C reflection/invocation has already begun, Step 35.0.1 / 0.0.124 preserves the exact 0.0.123 execution policy and adds synchronously flushed, provenance/thread-aware checkpoints across Gate B, the B→C transition, ExecuteVeryEarly binding/invocation/Task await, and resolver callbacks. No broader startup authority is added.";
 
     public const string InitialStatus =
-        "Status: Steps 32–34 are CLOSED POSITIVE at 4/4. Step 35 is OPEN. Candidate 0.0.123 preserves the exact Step-32 transformed image and the Step-33/34 resolver policy, audits exact ExecuteVeryEarly source token 0x06007D02 plus <ExecuteVeryEarly>d__7::MoveNext token 0x0600BC71, then invokes/awaits only ExecuteVeryEarly. ExecuteEssential, ExecuteDeferred, the receipt-backed original, initializer-bearing 0Harmony 2.4.2.0, unplanned managed/native loading, the game entry point, Harmony patching and Godot/game startup remain forbidden.";
+        "Status: Steps 32–34 are CLOSED POSITIVE at 4/4. Step 35 remains OPEN after physical 0.0.123 hard-terminated with main-thread PC=0x0 around the B→C frontier. Candidate 0.0.124 is diagnostic-only: exact source/transformed target, strict resolver, one ExecuteVeryEarly invocation, and <=60s Task await remain unchanged; durable Step35-CrashCheckpoint.txt telemetry is added. Cancellation is INCONCLUSIVE, not a compatibility FAIL. ExecuteEssential, ExecuteDeferred, the receipt-backed original, initializer-bearing 0Harmony 2.4.2.0, unplanned managed/native loading, the game entry point, Harmony patching and Godot/game startup remain forbidden.";
 
-    public const string ExpectedDisplayVersion = "0.0.123";
-    public const string ExpectedBuildVersion = "123";
+    public const string ExpectedDisplayVersion = "0.0.124";
+    public const string ExpectedBuildVersion = "124";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -38,7 +38,7 @@ internal static class CurrentReleasePresentation
     public const string Step34ImplementationMarker =
         "physical Step33 transformed-primary-only admission -> fresh exact transformed requalification -> strict execution-capable private ALC -> exact transformed PrewarmJit type/signature/token 0x0600AFEA binding -> one MethodInfo.Invoke -> only exact host bindings + hash-pinned initializer-free prepared dependencies -> zero initializer-bearing/native/unplanned escape -> OfflineReady/source/transformed/plan isolation reproof";
     public const string Step35ImplementationMarker =
-        "physical Step34 exact PrewarmJit execution closure -> exact source ExecuteVeryEarly token 0x06007D02 + async MoveNext token 0x0600BC71 -> source/transformed semantic-equivalence audit -> strict transformed-primary private ALC -> one ExecuteVeryEarly MethodInfo.Invoke + exact Task await <=60s -> exact host + initializer-free prepared dependency resolver only -> isolation reproof";
+        "physical Step34 exact PrewarmJit closure -> physical 0.0.123 main-thread PC=0x0 hard termination near visible B/C frontier -> unchanged exact source ExecuteVeryEarly token 0x06007D02 + async MoveNext token 0x0600BC71 -> unchanged semantic audit/strict transformed-primary ALC/one MethodInfo.Invoke/Task await <=60s/exact resolver -> synchronous provenance+thread crash checkpoints around Gate B, B-to-C transition, binding, invoke, await and resolver callbacks -> isolation reproof";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

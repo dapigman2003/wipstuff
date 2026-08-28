@@ -182,3 +182,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.122 closure: exact transformed PrewarmJit invoked once and returned normally; Step 34 CLOSED POSITIVE 4/4.
 - `steps/STEP-35.0-CONTROLLED-VERY-EARLY-INITIALIZATION.md` — active 0.0.123 design for exact transformed `OneTimeInitialization::ExecuteVeryEarly()` invocation + bounded Task await.
 - `steps/STEP-35.0-TEST.md` — Step-35 host/static/device acceptance contract.
+
+## Step 35 physical hard-termination / Step 35.0.1 diagnostic frontier
+
+- `reports/STEP-35.0-PHYSICAL-HARD-TERMINATION-SUMMARY.txt` — sanitized physical 0.0.123 evidence: app terminated around visible B→C region; matching iOS crash report shows EXC_BAD_ACCESS/SIGKILL, main-thread PC=0x0, and no managed Step-35 report.
+- `steps/STEP-35.0.1-B-C-HARD-TERMINATION-CRASH-LOCALIZATION.md` — 0.0.124 diagnostic-only revision: freezes Step-35 compatibility authority and adds durable provenance/thread-aware checkpoints around Gate B, the B→C handoff, ExecuteVeryEarly binding/invocation/await, and resolver callbacks; cancellation is INCONCLUSIVE.

@@ -327,21 +327,26 @@ Host coverage must protect four-gate ordering, successful initializer-free priva
 
 Physical 0.0.122 CLOSED Step 34 positively at **4/4 PASS**. Preserve `docs/history/reports/STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` as authoritative evidence. The exact transformed `OneTimeInitialization::PrewarmJit()` MethodDef token `0x0600AFEA` must remain invocable once and return normally under the strict prepared resolver. The closed physical resolver result is 8 managed requests = 6 exact planned host-framework loads + 2 hash-pinned initializer-free prepared private loads, with 0 initializer-bearing requests, 0 unplanned managed requests and 0 native attempts. The receipt-backed/prepared original remains outside the CLR; no game entry point, Harmony/MonoMod patching or Godot/game startup is authorized by this closure.
 
-## Step 35.0 — controlled transformed very-early initialization
+## Step 35.0 / 35.0.1 — controlled transformed very-early initialization and crash localization
 
-0.0.123 must:
+Physical 0.0.123 attempted the Step-35 boundary and hard-terminated around the visible Gate-B/B→C region. A matching iOS `.ips` identifies 0.0.123 (123) and reports `EXC_BAD_ACCESS / SIGKILL`, faulting main thread, PC=`0x0`, with no surviving managed Step-35 report. This is **not** a Step-35 closure and does not revoke Steps 32–34. The exact Gate-B-vs-Gate-C frontier remains unproven until durable checkpoint evidence localizes it.
+
+0.0.124 must preserve every 0.0.123 compatibility contract and add observability only:
 
 - preserve all physically closed Step-32, Step-33 and Step-34 contracts;
 - hard-pin exact source `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()` MethodDef `0x06007D02`, static parameterless `System.Threading.Tasks.Task`, plus `<ExecuteVeryEarly>d__7::MoveNext` source token `0x0600BC71`;
-- re-manufacture/reverify the exact Step-32 transformed image before any Step-35 CLR admission;
+- re-run the exact closed Step-32 A–D transform and require the exact closed source/transformed hashes/MVID;
 - independently prove source/transformed semantic fingerprint equality for the `ExecuteVeryEarly` wrapper and its async MoveNext with zero Cecil dependency resolution;
 - require zero direct MoveNext calls to later `ExecuteEssential`, `ExecuteDeferred` or `PrewarmJit` and zero direct Harmony method references;
 - requalify the zero-blocker prepared runtime plan and keep exact `0Harmony 2.4.2.0` as the sole initializer-bearing private dependency and forbidden;
 - preserve Step-33 zero-resolution primary admission when exact transformed primary enters `StS2Launcher-Step35-VeryEarly`;
 - reflect only exact transformed `ExecuteVeryEarly()`, invoke it once, require a non-null exact `Task`, and await it for at most 60 seconds;
 - service only exact persisted host-framework bindings and exact hash-pinned initializer-free private dependencies;
-- fail closed on initializer-bearing, unplanned managed, or native requests, synchronous target exception, Task fault, timeout, or cancellation;
-- re-prove OfflineReady, trusted source/transformed/runtime-plan hashes, loaded-private hashes and exact context residency after execution;
-- intentionally invoke no `ExecuteEssential`, `ExecuteDeferred`, `PrewarmJit`, game entry point, Harmony/MonoMod API or Godot/game startup.
+- fail closed on initializer-bearing, unplanned managed, or native requests, synchronous target exception, Task fault, or timeout;
+- treat operator cancellation as **INCONCLUSIVE**, not PASS/compatibility FAIL; if Gate B/C began, require force-quit before retry;
+- re-prove OfflineReady, trusted source/transformed/runtime-plan hashes, loaded-private hashes and exact context residency after successful execution;
+- intentionally invoke no `ExecuteEssential`, `ExecuteDeferred`, `PrewarmJit`, game entry point, Harmony/MonoMod API or Godot/game startup;
+- synchronously write output-only `Step35-CrashCheckpoint.txt` provenance/thread/frontier records around Gate B, B→C transition, Gate-C binding/invocation/await, and resolver callbacks;
+- never consume crash-checkpoint telemetry as trusted runtime input, and never change compatibility/resolver decisions because checkpoint writing failed.
 
-Host coverage must protect four-gate ordering, first-failure stopping, exact source target constants and initializer-bearing refusal. Physical closure requires one exact 0.0.123 A–D **4/4 PASS** report named `Step35-TransformedRealStS2VeryEarlyInitialization.txt`.
+Host coverage must protect four-gate ordering, first-failure stopping, exact source target constants, initializer-bearing refusal, and checkpoint callback coverage around primary/private load events. Physical closure still requires one exact A–D **4/4 PASS** report. A hard termination instead requires preservation of `Step35-CrashCheckpoint.txt` and the matching OS crash report before any rerun; the last durable checkpoint is the next evidence boundary.
