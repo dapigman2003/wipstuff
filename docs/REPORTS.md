@@ -16,6 +16,8 @@ Current on-device diagnostics write output-only text beneath `Documents/StS2Laun
 
 ## Current Codemagic evidence
 
+The first Step-34 / 0.0.122 Codemagic attempt passed **735/735 static** and **194/194 host** checks and restored the persistent iOS cache (2.8G arm64 `obj`, 1,092 AOT outputs), then stopped before publish completion on a Step-34 UI CS1503: `SystemButton` was passed `UIButtonType.System` where its second parameter is `nfloat fontSize`. No IPA/device evidence exists from that attempt. The corrected 0.0.122 source changes only that UI argument to `17` and adds a static guard. See `docs/history/reports/STEP-34.0-CODEMAGIC-IOS-UI-COMPILE-FAILURE.txt`.
+
 The first cache-tuned 0.0.121 attempt did not reach iOS publish: all configured caches were cold and host-test compilation stopped on removed MSTest `Assert.ThrowsException`. See `docs/history/reports/STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt`. The corrected 0.0.121 candidate subsequently built and physically closed Step 33 at 4/4. The active 0.0.122 candidate keeps the stable `ios-canonical` workflow and the same NuGet/Godot/iOS-arm64 `obj` cache paths so AOT cache reuse can continue without changing runtime policy.
 
 ## Static Step 32 metadata evidence

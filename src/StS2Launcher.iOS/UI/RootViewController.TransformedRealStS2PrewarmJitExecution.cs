@@ -18,7 +18,7 @@ public sealed partial class RootViewController
 
         _transformedRealStS2PrewarmJitExecutionButton = SystemButton(
             "Run Step 34 A–D — Reverify Transform → Admit Exact Transformed sts2.dll → Invoke Exact PrewarmJit Once → Audit Isolation",
-            UIButtonType.System);
+            17);
         _transformedRealStS2PrewarmJitExecutionButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2PrewarmJitExecutionAsync();
         content.AddArrangedSubview(_transformedRealStS2PrewarmJitExecutionButton);
 

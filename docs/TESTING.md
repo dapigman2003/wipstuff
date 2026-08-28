@@ -46,3 +46,6 @@ Gate C must bind only `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::Prewarm
 Gate D must re-prove OfflineReady, the receipt-backed original SHA-256, transformed SHA-256, runtime-plan SHA-256, hashes for any admitted private dependencies, unique transformed-context residency, clean resolver/native counters, and exactly one successful PrewarmJit invocation. Game entry-point execution, broader managed startup, Harmony/MonoMod patching, and Godot/game startup remain forbidden.
 
 Preserve `Documents/StS2Launcher/Reports/Step34-TransformedRealStS2PrewarmJitExecution.txt` whether PASS or FAIL. Accept only ordered A–D **4/4 PASS**. If Gate C fails, preserve the exact exception and resolver/native state. Do not retry Step 34 in the same process after Gate B because transformed StS2 and any initializer-free dependencies may remain resident.
+## Codemagic build-only correction
+
+The first 0.0.122 CI attempt passed 735/735 static validation and 194/194 host tests but stopped during iOS C# compilation because the new Step-34 UI called `SystemButton(..., UIButtonType.System)` while the helper expects a numeric `nfloat` font size. The corrected source uses `17`. No IPA or physical Step-34 gate result came from the failed attempt; rerun the complete canonical pipeline before installation.

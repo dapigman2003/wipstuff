@@ -959,6 +959,7 @@ require("AssemblyLoadContext.Default.LoadFromAssemblyName" in step34_source and 
 require("ComputeSha1Hex" in step34_source and "ComputeSha256Hex" in step34_source and "OfflineReady" in step34_source, "Step 34 re-proves source/transformed integrity and OfflineReady isolation")
 require("OrderedExecutionGatesReachFourOfFourPass" in step34_tests and "ExecutionStopsAfterFirstFailure" in step34_tests and "ExecutionContextLoadsInitializerFreePrivateDependencyAndRejectsInitializerBearingDependency" in step34_tests and "Step34PinsThePhysicallyClosedTransformedTarget" in step34_tests, "Step 34 host regressions protect gate order, exact target, and initializer-bearing refusal")
 require("Step34-TransformedRealStS2PrewarmJitExecution.txt" in step34_ui and "TRANSFORMED REAL STS2 PREWARMJIT EXECUTION" in step34_ui, "iOS UI persists the dedicated Step-34 physical report")
+require("UIButtonType.System" not in step34_ui, "Step 34 iOS SystemButton helper receives a numeric font size rather than UIButtonType")
 require("new TransformedRealStS2PrewarmJitExecution(_launcherDataRoot)" in root_ui_text and "AddTransformedRealStS2PrewarmJitExecutionControls(content)" in root_ui_text, "RootViewController wires Step 34 into the active device surface")
 require("Step34ImplementationMarker" in release_presentation and "0x0600AFEA" in release_presentation and "PrewarmJit" in release_presentation, "release presentation pins the Step-34 exact transformed-site execution boundary")
 

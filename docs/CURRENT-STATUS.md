@@ -12,6 +12,8 @@ Step 34.0 / **0.0.122** is the first separately gated transformed-real-game exec
 
 Step 34 does **not** authorize CLR admission of the receipt-backed/prepared original `sts2.dll`, intentional invocation of any other game method, the game entry point, broad managed startup, `0Harmony` initialization, Harmony/MonoMod patching, Godot/game startup, native game loading, or arbitrary resolver fallback. Physical close condition is Gates A–D **4/4 PASS** on 0.0.122 after Codemagic static validation, full host suite, iOS publish, and IPA verification. Preserve `Step34-TransformedRealStS2PrewarmJitExecution.txt` from the physical run.
 
+Codemagic correction note: the first 0.0.122 attempt passed 735/735 static and 194/194 host checks and restored the persistent iOS cache, then failed iOS C# compilation on a UI-only `SystemButton` argument mismatch before AOT/publish completion. The corrected candidate remains 0.0.122 and changes only that UI font-size argument; no Step-34 runtime evidence was produced by the failed build.
+
 ---
 
 ## Physically closed boundary

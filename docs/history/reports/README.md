@@ -18,3 +18,4 @@ Selected build/device diagnostic outputs are retained here when they materially 
 
 - `STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt` — first cache-tuned 0.0.121 Codemagic attempt: all configured caches were cold; host-test compilation stopped on removed MSTest `Assert.ThrowsException` before iOS publish/AOT, so the new AOT cache was not exercised or seeded.
 - `STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.121 Step-33 report: A–D 4/4, exact transformed-primary CLR admission, zero managed/private/native admission-time expansion, original primary excluded, no game-member invocation.
+- `STEP-34.0-CODEMAGIC-IOS-UI-COMPILE-FAILURE.txt` — first 0.0.122 CI attempt: 735/735 static and 194/194 host PASS, stable iOS cache restored, then iOS C# compilation stopped on a Step-34 `SystemButton` argument-type mistake before AOT/publish completion; no IPA/device evidence.

@@ -176,3 +176,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.121 Step-33 CLOSED POSITIVE 4/4; exact transformed primary admitted with zero resolver/private/native expansion and no game-member invocation.
 - `steps/STEP-34.0-CONTROLLED-TRANSFORMED-PREWARMJIT-EXECUTION.md` — active 0.0.122 design for the first exact transformed real-StS2 `PrewarmJit()` invocation.
 - `steps/STEP-34.0-TEST.md` — Step-34 host/static/physical acceptance contract.
+- `reports/STEP-34.0-CODEMAGIC-IOS-UI-COMPILE-FAILURE.txt` — first Step-34 0.0.122 CI attempt: static 735/735 + host 194/194 PASS, persistent iOS cache restored, then UI CS1503 before publish completion; no IPA/device evidence.
+- `steps/STEP-34.0.1-IOS-SYSTEMBUTTON-COMPILE-FIX.md` — build-only correction: Step-34 UI passes numeric font size 17 to the established `SystemButton` helper; runtime semantics/version unchanged.
