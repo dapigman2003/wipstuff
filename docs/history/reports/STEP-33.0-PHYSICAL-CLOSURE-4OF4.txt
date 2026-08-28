@@ -1,0 +1,89 @@
+StS2 Launcher — Step 33 Transformed Real StS2 CLR Admission
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-08-28T05:55:14.1627260+00:00
+
+RESULT
+TRANSFORMED REAL STS2 CLR ADMISSION PASS — 4/4
+
+METADATA
+App version: 0.0.121 (121)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Gate A — VerifiedTransformedImagePreflight: PASS
+EXACT STEP-32 TRANSFORMED REAL-STS2 IMAGE RE-MANUFACTURED, REVERIFIED, AND QUALIFIED FOR CLR ADMISSION; NO CLR LOAD OCCURRED.
+Physical Step-32 closure re-run inside Gate A: 4/4 PASS
+Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef
+Transformed bytes: 9,304,576
+Assembly identity: sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Module MVID: 518e4758-52d7-47c2-b776-471a0e29e49d
+Transformed PrewarmJit semantic fingerprint: 47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a
+Transformed PrepareMethod references: 0
+Prepared runtime-binding plan SHA-256: 613babc63caa4f1df310cd038593f239fd33b9d2bc113e7db7724318d11898b0
+Prepared private/game assemblies requalified by Step-23 preflight: 7
+Host framework binding entries available to the admission-only resolver: 67
+Original receipt-backed/prepared sts2.dll admitted to CLR: NO
+Game type/member reflection or invocation: NO
+Native game loading: NO
+
+Gate B — TransformedPrimaryClrAdmission: PASS
+FIRST CLR ADMISSION OF THE VERIFIED TRANSFORMED REAL-STS2 IMAGE SUCCEEDED. THE BOUNDARY STOPS AFTER IMAGE/CONTEXT IDENTITY VERIFICATION.
+Loaded identity: sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Loaded MVID: 518e4758-52d7-47c2-b776-471a0e29e49d
+AssemblyLoadContext: StS2Launcher-Step33-TransformedGame
+Exact transformed SHA-256 immediately before LoadFromStream: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef
+Managed resolver requests during transformed primary admission: 0
+Host framework bindings serviced during admission: 0
+Private dependency requests during admission: 0
+Rejected managed requests during admission: 0
+Native load attempts during admission: 0
+Original receipt-backed/prepared sts2.dll used as CLR load input: NO
+Game entry point invoked: NO
+Game type/member reflection performed: NO
+Game method/delegate invoked: NO
+Godot/game initialization requested: NO
+
+Gate C — AdmissionOnlyResolverAudit: PASS
+ADMISSION-ONLY RESOLVER/CONTEXT AUDIT PASSED. ONLY THE TRANSFORMED PRIMARY ENTERED THE PRIVATE CLR CONTEXT.
+Private context assemblies: 1 (transformed sts2 only)
+Managed resolver requests: 0
+Exact planned host-framework bindings serviced: 0
+Private game dependency loads: 0
+Private game dependency requests: 0
+Unplanned managed resolver requests: 0
+Native resolution attempts: 0
+Receipt-backed/prepared original sts2.dll CLR admission: NO
+Game member reflection/invocation: NO
+
+Gate D — FinalIsolationAudit: PASS
+STEP 33 FINAL TRANSFORMED-REAL-STS2 CLR-ADMISSION ISOLATION AUDIT PASSED.
+Post-admission OfflineReady: PASS (428/428 files)
+Receipt-backed original SHA-256 unchanged: e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18
+Verified transformed SHA-256 unchanged: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef
+Runtime-binding plan SHA-256 unchanged: 613babc63caa4f1df310cd038593f239fd33b9d2bc113e7db7724318d11898b0
+Unique resident sts2 assembly identity: sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Resident sts2 AssemblyLoadContext: StS2Launcher-Step33-TransformedGame
+Resident sts2 load input: exact Step-32 transformed image
+Receipt-backed/prepared original sts2.dll CLR-loaded by Step 33: NO
+Private game dependencies CLR-loaded by Step 33: NO
+Unplanned managed resolution: NO
+Native game resolution/loading: NO
+Game entry point/type/member invocation: NO
+Godot/game startup: NO
+Authorization after Step-33 PASS: a later separately gated boundary may prepare for and invoke the exact transformed compatibility site; Step 33 itself remains admission-only.
+
+Step 32 physical baseline: CLOSED POSITIVE — 0.0.120 passed 4/4. Exact transformed SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef; transformed semantic fingerprint 47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a; zero PrepareMethod references; trusted install unchanged.
+Step 33 scope: re-manufacture/reverify that exact transformed image, then CLR-admit only those transformed primary bytes into a dedicated private AssemblyLoadContext.
+Resolver boundary: exact Step-21/22 host-framework bindings may be serviced from AssemblyLoadContext.Default if the CLR requests them during primary admission; private prepared dependency admission is refused and any such request fails closed for a later boundary.
+Forbidden in Step 33: CLR admission of the receipt-backed/prepared original sts2.dll, private game dependency loading, game type/member reflection or invocation, entry-point execution, Godot/game startup, native game loading, Harmony/MonoMod runtime patching, and arbitrary resolver fallback.
+After Gate B, transformed sts2 remains CLR-resident until force-quit on the physical non-collectible context. Do not rerun pre-load boundaries in the same process.
+All four Step 33 gates passed. Preserve this report. A pass proves the independently verified transformed real-StS2 image—not the receipt-backed/prepared original—can enter the dedicated iOS CLR context without game member invocation, private dependency admission, native loading, or Godot/game startup. A later separately gated boundary may prepare for controlled transformed-site execution.
+
+END OF REPORT

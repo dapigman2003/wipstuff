@@ -211,3 +211,7 @@ A step/subsystem is closed only when:
 ## Resumption rule
 
 If conversation state is lost, do **not** infer the current boundary from version numbers or old scripts. Read `CURRENT-STATUS.md`, then `REGRESSION-CONTRACTS.md`, then use the latest physical text reports/artifacts. The current source and physical-device evidence override historical plans.
+
+### Current post-transform progression
+
+Physical 0.0.120 closed the first exact real-StS2 ahead-of-load semantic rewrite at Step 32. Physical 0.0.121 then closed Step 33 transformed-primary CLR admission at 4/4 with only the exact transformed primary resident and zero admission-time resolver/native expansion. The active next boundary is Step 34: invoke only the exact transformed `OneTimeInitialization::PrewarmJit()` site once under the strict prepared resolver, preserving initializer-bearing `0Harmony`, unplanned managed resolution, native loading, game entry-point execution and Godot/game startup as later separately gated boundaries.

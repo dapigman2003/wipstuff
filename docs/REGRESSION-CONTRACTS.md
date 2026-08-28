@@ -300,3 +300,24 @@ The authoritative report is `docs/history/reports/STEP-32.0.5-PHYSICAL-CLOSURE-4
 - perform no game type/member reflection or invocation, no `PrewarmJit`, no entry point, no Godot/game startup, no native game load, and no Harmony/MonoMod runtime patching.
 
 Host coverage must protect four-gate ordering and prove the Step-33 admission context can load a primary while refusing a private dependency request. Physical closure requires one exact 0.0.121 A–D **4/4 PASS** report.
+
+## Step 33.0 physical closure — verified transformed real-StS2 CLR admission
+
+Physical 0.0.121 CLOSED Step 33 positively at **4/4 PASS**. Preserve `docs/history/reports/STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt` as authoritative evidence. The closed contract requires the exact Step-32 transformed SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, and transformed semantic fingerprint `47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a`; only transformed primary bytes may be the CLR load input; primary admission itself must cause zero managed/private/native resolution; the private context must initially contain transformed `sts2` only; the receipt-backed/prepared original must remain outside the CLR; and no game member may be reflected or invoked by Step 33.
+
+## Step 34.0 — controlled transformed PrewarmJit execution
+
+0.0.122 must:
+
+- preserve the physically closed Step-32 transformed artifact exactly and re-run Step-32 A–D before any Step-34 CLR admission;
+- preserve the Step-33 physical admission invariant that loading the transformed primary itself produces zero managed resolver requests, zero private loads, zero rejected requests and zero native attempts;
+- hard-pin transformed `PrewarmJit()` to exact declaring type/signature, MVID, semantic fingerprint and MethodDef token `0x0600AFEA`;
+- invoke exact transformed `PrewarmJit()` exactly once and no other game method intentionally;
+- service only exact persisted Step-21/22 host-framework bindings and exact hash-pinned prepared private dependencies whose module initializer count is zero;
+- keep the sole measured initializer-bearing private dependency exact `0Harmony 2.4.2.0` outside the Step-34 CLR context and fail closed if it or any other initializer-bearing dependency is requested;
+- fail closed on any unplanned managed request or native resolution request;
+- preserve the full target exception/inner-exception and resolver state if invocation fails rather than widening authority;
+- re-prove OfflineReady, receipt-backed source hash, transformed hash, runtime-plan hash, loaded-private hashes and exact context residency after invocation;
+- keep receipt-backed/prepared original `sts2.dll`, game entry point, Harmony/MonoMod patching, Godot/game startup and native game loading unauthorized.
+
+Host coverage must protect four-gate ordering, successful initializer-free private dependency loading, initializer-bearing dependency refusal, and the closed transformed target constants. Physical closure requires one exact 0.0.122 A–D **4/4 PASS** report named `Step34-TransformedRealStS2PrewarmJitExecution.txt`.

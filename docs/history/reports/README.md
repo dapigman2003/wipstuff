@@ -17,3 +17,4 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.120 Step-32 4/4 closure report; exact transformed SHA-256 and semantic verification, no trusted-source mutation or CLR admission.
 
 - `STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt` — first cache-tuned 0.0.121 Codemagic attempt: all configured caches were cold; host-test compilation stopped on removed MSTest `Assert.ThrowsException` before iOS publish/AOT, so the new AOT cache was not exercised or seeded.
+- `STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.121 Step-33 report: A–D 4/4, exact transformed-primary CLR admission, zero managed/private/native admission-time expansion, original primary excluded, no game-member invocation.

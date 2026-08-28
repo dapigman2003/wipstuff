@@ -172,3 +172,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-33.0-TEST.md` — Codemagic/IPA/physical acceptance procedure for the Step-33 transformed-primary admission boundary.
 
 - `reports/STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt` — cold-cache 0.0.121 host compile failure before iOS publish/AOT; corrected by moving the new Step-33 test to MSTest v4 `Assert.ThrowsExactly`.
+
+- `reports/STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.121 Step-33 CLOSED POSITIVE 4/4; exact transformed primary admitted with zero resolver/private/native expansion and no game-member invocation.
+- `steps/STEP-34.0-CONTROLLED-TRANSFORMED-PREWARMJIT-EXECUTION.md` — active 0.0.122 design for the first exact transformed real-StS2 `PrewarmJit()` invocation.
+- `steps/STEP-34.0-TEST.md` — Step-34 host/static/physical acceptance contract.

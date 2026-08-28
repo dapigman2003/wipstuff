@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 33.0 — VERIFIED TRANSFORMED REAL-STS2 CLR ADMISSION";
+        "STEP 34.0 — CONTROLLED TRANSFORMED REAL-STS2 PREWARMJIT EXECUTION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 OPEN";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 CLOSED POSITIVE 4/4 • STEP 34 OPEN";
 
     public const string Summary =
-        "Physical 0.0.120 CLOSED Step 32 positively at 4/4. The exact receipt-backed sts2.dll was cloned privately; only the ten audited RuntimeHelpers.PrepareMethod calls in OneTimeInitialization::PrewarmJit() were replaced stack-neutrally (6 × Pop, 4 × Pop+Pop); the result serialized through the exact audited System.Runtime/Sentry metadata boundary; reopen verification proved zero PrepareMethod references, unchanged constant metadata, the exact transformed semantic fingerprint, and final source isolation. The closed transformed image is SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef. Step 33.0 now re-manufactures/reverifies that exact image and tests only its CLR admission into a dedicated private AssemblyLoadContext. No game member invocation, private dependency admission, native loading, or Godot/game startup is authorized.";
+        "Physical 0.0.120 CLOSED Step 32 positively at 4/4 and fixed the exact transformed real-StS2 artifact: SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef, MVID 518e4758-52d7-47c2-b776-471a0e29e49d, transformed PrewarmJit token 0x0600AFEA, semantic fingerprint 47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a, and zero PrepareMethod references. Physical 0.0.121 then CLOSED Step 33 positively at 4/4: only those exact transformed primary bytes entered StS2Launcher-Step33-TransformedGame, with zero resolver requests, zero private dependency/native admission and no game-member invocation. Step 34.0 is the first controlled execution boundary: re-establish the exact transformed-primary state in a strict execution-capable private AssemblyLoadContext, bind only OneTimeInitialization::PrewarmJit(), invoke it exactly once, and preserve fail-closed resolver/native isolation.";
 
     public const string InitialStatus =
-        "Status: Step 32 CLOSED POSITIVE — physical 0.0.120 passed 4/4. Step 33 is OPEN. Candidate 0.0.121 re-runs the closed Step-32 transform contract, requires the exact closed transformed hash/identity/semantic fingerprint, requalifies the existing zero-blocker runtime plan, and then LoadFromStream-admits only the transformed primary into a dedicated private CLR context. The receipt-backed/prepared original sts2.dll must never be the CLR load input; private dependency requests and native requests fail closed. Execution remains a later boundary.";
+        "Status: Steps 32 and 33 are CLOSED POSITIVE at 4/4. Step 34 is OPEN. Candidate 0.0.122 re-manufactures/reverifies the exact closed transformed image, requalifies the zero-blocker prepared runtime plan, re-establishes the Step-33 zero-resolution transformed-primary CLR admission state, and then reflects/invokes only exact transformed OneTimeInitialization::PrewarmJit() once. Exact persisted host-framework bindings and hash-pinned initializer-free prepared dependencies may resolve on demand. Initializer-bearing 0Harmony 2.4.2.0, unplanned managed requests, native loading, the game entry point, Harmony patching and Godot/game startup remain forbidden.";
 
-    public const string ExpectedDisplayVersion = "0.0.121";
-    public const string ExpectedBuildVersion = "121";
+    public const string ExpectedDisplayVersion = "0.0.122";
+    public const string ExpectedBuildVersion = "122";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -35,6 +35,8 @@ internal static class CurrentReleasePresentation
         "physical Step31 exact source token/body/10-site evidence -> private sts2.dll clone -> 6 one-arg PrepareMethod calls to Pop + 4 two-arg calls to Pop+Pop -> exact audited System.Runtime+Sentry in-memory constant-metadata surrogates for Cecil write only -> transformed reopen by stable exact type+signature -> semantic + constant-metadata verification -> zero CLR load -> OfflineReady reproof";
     public const string Step33ImplementationMarker =
         "physical Step32 exact transformed hash+semantic fingerprint -> fresh Step32 requalification -> zero-blocker prepared-plan requalification -> exact transformed bytes LoadFromStream into dedicated private ALC -> transformed-primary-only context audit -> original/source isolation reproof -> zero game-member invocation/native load";
+    public const string Step34ImplementationMarker =
+        "physical Step33 transformed-primary-only admission -> fresh exact transformed requalification -> strict execution-capable private ALC -> exact transformed PrewarmJit type/signature/token binding -> one MethodInfo.Invoke -> only exact host bindings + hash-pinned initializer-free prepared dependencies -> zero initializer-bearing/native/unplanned escape -> OfflineReady/source/transformed/plan isolation reproof";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

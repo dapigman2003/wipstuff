@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>121</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.121</ApplicationDisplayVersion>
+    <ApplicationVersion>122</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.122</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -110,9 +110,9 @@
   <!-- Step 32.0.3 maintenance trim: closed Step 25-27 runtime-Harmony experiment implementations and their DynamicDependency anchors are preserved in the inert historical archive and are intentionally absent from the active iOS/AOT graph. The physically proven copy/no-link/interpreter policy remains unchanged. -->
   <Target Name="ValidateRuntimeAndFrameworkRootPolicy" BeforeTargets="PrepareForBuild">
     <Message Importance="High"
-             Text="STEP33 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
+             Text="STEP34 RUNTIME POLICY: MtouchInterpreter=$(MtouchInterpreter); UseInterpreter=$(UseInterpreter); PublishAot=$(PublishAot)" />
     <Message Importance="High"
-             Text="STEP33 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" />
+             Text="STEP34 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" />
     <Message Importance="High"
              Text="STEP32 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" />
     <Message Importance="High"

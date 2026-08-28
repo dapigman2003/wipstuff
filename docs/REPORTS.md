@@ -2,22 +2,21 @@
 
 Current on-device diagnostics write output-only text beneath `Documents/StS2Launcher/Reports/*.txt`. Reports are never trusted runtime input and intentionally exclude Steam passwords/tokens/Guard material and Apple signing secrets.
 
-## Active Step 33 report
+## Active Step 34 report
 
-`Documents/StS2Launcher/Reports/Step33-TransformedRealStS2AssemblyAdmission.txt`
+`Documents/StS2Launcher/Reports/Step34-TransformedRealStS2PrewarmJitExecution.txt`
 
-0.0.121 is an admission-only boundary. Gate A re-runs the physically closed Step-32 A–D contract, requires the exact closed transformed image/hash/semantic fingerprint, and requalifies the existing Step-21/22 zero-blocker runtime plan without CLR-loading StS2. Gate B loads only the exact transformed primary bytes into a dedicated private AssemblyLoadContext. Gate C requires transformed `sts2` to be the only private assembly and rejects private dependency/native/unplanned managed expansion. Gate D re-proves OfflineReady, original/transformed/plan hashes, and transformed-context residency.
+0.0.122 is the first controlled transformed-real-game execution boundary. Gate A re-runs and re-verifies the closed Step-32 transform and prepared runtime plan. Gate B re-establishes transformed-primary-only CLR admission in `StS2Launcher-Step34-PrewarmJit`. Gate C binds only exact transformed `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::PrewarmJit()` and invokes it once under the strict resolver. Gate D re-proves source/transformed/plan/dependency/context isolation. Preserve any first failure exactly; especially preserve Gate-C target exception and resolver/native state.
 
-## Latest physical closure
+## Latest physical closures
 
+- `docs/history/reports/STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.121 Step-33 report: A–D 4/4 PASS; exact transformed-primary-only CLR admission; zero managed/private/native admission-time expansion; receipt-backed/prepared original excluded; no game-member invocation.
 - `docs/history/reports/STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt` — authoritative physical 0.0.120 Step-32 report: A–D 4/4 PASS; exact 6+4 private rewrite; transformed SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`; zero PrepareMethod references after reopen; source/trusted install unchanged; zero real-StS2 CLR admission.
 - `docs/history/reports/STEP-32.0.4-PHYSICAL-GATE-C-TRANSFORMED-METHOD-IDENTITY-FAILURE.txt` — prior physical 0.0.119 2/4 evidence that motivated stable post-write method identity.
 
 ## Current Codemagic evidence
 
-The first cache-tuned 0.0.121 attempt did not reach iOS publish: all configured caches were cold and host-test compilation stopped on removed MSTest `Assert.ThrowsException`. The corrected 0.0.121 rerun must seed the iOS arm64 obj/AOT cache before cache reuse can be measured. See `docs/history/reports/STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt`.
-
-0.0.120 passed Codemagic before the successful physical 4/4 run. Step 33.0 / 0.0.121 must separately pass canonical static validation, the full host suite, iOS publish, and IPA verification before physical execution.
+The first cache-tuned 0.0.121 attempt did not reach iOS publish: all configured caches were cold and host-test compilation stopped on removed MSTest `Assert.ThrowsException`. See `docs/history/reports/STEP-33.0-CODEMAGIC-COLD-CACHE-HOST-COMPILE-FAILURE.txt`. The corrected 0.0.121 candidate subsequently built and physically closed Step 33 at 4/4. The active 0.0.122 candidate keeps the stable `ios-canonical` workflow and the same NuGet/Godot/iOS-arm64 `obj` cache paths so AOT cache reuse can continue without changing runtime policy.
 
 ## Static Step 32 metadata evidence
 
