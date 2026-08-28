@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 34.0 controlled transformed real-StS2 PrewarmJit execution static validation")
+print("StS2 Launcher — Step 35.0 controlled transformed real-StS2 very-early initialization static validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>122</ApplicationVersion>" in project_text, "build version is 122")
-require("<ApplicationDisplayVersion>0.0.122</ApplicationDisplayVersion>" in project_text, "display version is 0.0.122")
-require(plist.get("CFBundleVersion") == "122", "Info.plist build version is 122")
-require(plist.get("CFBundleShortVersionString") == "0.0.122", "Info.plist display version is 0.0.122")
+require("<ApplicationVersion>123</ApplicationVersion>" in project_text, "build version is 123")
+require("<ApplicationDisplayVersion>0.0.123</ApplicationDisplayVersion>" in project_text, "display version is 0.0.123")
+require(plist.get("CFBundleVersion") == "123", "Info.plist build version is 123")
+require(plist.get("CFBundleShortVersionString") == "0.0.123", "Info.plist display version is 0.0.123")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 34.0 — CONTROLLED TRANSFORMED REAL-STS2 PREWARMJIT EXECUTION" in release_presentation, "top launcher banner identifies active Step 34 controlled-execution candidate")
-require("STEP 32 CLOSED POSITIVE 4/4" in release_presentation and "STEP 33 CLOSED POSITIVE 4/4" in release_presentation and "39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in release_presentation and "PrewarmJit" in release_presentation and "AssemblyLoadContext" in release_presentation, "top launcher banner preserves Step-32/33 physical closures and identifies Step-34 exact transformed-site execution")
+require("STEP 35.0 — CONTROLLED TRANSFORMED REAL-STS2 VERY-EARLY INITIALIZATION" in release_presentation, "top launcher banner identifies active Step 35 very-early initialization candidate")
+require("STEP 32 CLOSED POSITIVE 4/4" in release_presentation and "STEP 33 CLOSED POSITIVE 4/4" in release_presentation and "STEP 34 CLOSED POSITIVE 4/4" in release_presentation and "39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in release_presentation and "ExecuteVeryEarly" in release_presentation and "0x06007D02" in release_presentation, "top launcher banner preserves Step-32/33/34 physical closures and identifies Step-35 exact very-early boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.122"' in release_presentation and 'ExpectedBuildVersion = "122"' in release_presentation, "Step 34 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.123"' in release_presentation and 'ExpectedBuildVersion = "123"' in release_presentation, "Step 35 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -215,8 +215,8 @@ require("<TrimMode>copy</TrimMode>" in project_text and "<MtouchLink>None</Mtouc
 require("<MtouchInterpreter>-all</MtouchInterpreter>" in project_text, "Step 20 interpreter policy retained")
 require("'$(UseInterpreter)' == 'true'" in project_text, "build guard rejects broad UseInterpreter=true")
 require("'$(PublishAot)' == 'true'" in project_text, "build guard rejects NativeAOT")
-require("STEP34 RUNTIME POLICY" in project_text, "runtime policy emits Step 34 build telemetry")
-require("STEP34 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" in project_text, "dynamic-payload trimming policy emits exact Step-34 build telemetry")
+require("STEP35 RUNTIME POLICY" in project_text, "runtime policy emits Step 35 build telemetry")
+require("STEP35 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=$(MtouchLink); TrimMode=$(TrimMode)" in project_text, "dynamic-payload trimming policy emits exact Step-35 build telemetry")
 require("'$(MtouchLink)' != 'None'" in project_text and "'$(TrimMode)' != 'copy'" in project_text, "build guards reject drift from copy/no-link host policy")
 
 all_roots = re.findall(r'<TrimmerRootAssembly Include="([^"]+)"\s*/>', project_text)
@@ -248,7 +248,7 @@ retired_harmony_platform_files = [
 require(not any(path.exists() for path in retired_harmony_platform_files), "retired Step 25-27 DynamicDependency preservation anchors are absent from the active iOS/AOT graph")
 require("STEP32 HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION" not in project_text and "STEP32 HISTORICAL ACCESSTOOLS FRAMEWORK PRESERVATION" not in project_text and "STEP32 RETIRED PATCH-ENGINE FRAMEWORK PRESERVATION" not in project_text, "active build telemetry no longer roots retired runtime-Harmony preservation anchors")
 build_ios = read("scripts/build-ios.sh")
-require("STEP34 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" in build_ios, "iOS publish requires exact Step-34 copy/no-link dynamic-payload telemetry")
+require("STEP35 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" in build_ios, "iOS publish requires exact Step-35 copy/no-link dynamic-payload telemetry")
 require("HISTORICAL HARMONY CONSTRUCTOR FRAMEWORK PRESERVATION" not in build_ios, "iOS publish no longer requires retired Harmony-constructor preservation telemetry")
 require("DiskArbitration" in project_text and '<_LinkerFrameworks Remove="DiskArbitration" />' in project_text, "DiskArbitration-only linker framework filter remains present")
 
@@ -335,10 +335,10 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-34.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.122",
-    "STS2_BUILD_VERSION": "122",
-    "STS2_RUNTIME_POLICY_MARKER": "STEP34 RUNTIME POLICY:",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-35.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.123",
+    "STS2_BUILD_VERSION": "123",
+    "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
 
@@ -690,7 +690,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Step 34.0 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-34 candidate rather than retired Step 27")
+require("Step 35.0 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-35 candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -930,7 +930,7 @@ require("Game entry point invoked: NO" in step33_source and "Game type/member re
 require("OrderedAdmissionGatesReachFourOfFourPass" in step33_tests and "AdmissionStopsAfterFirstFailure" in step33_tests and "AdmissionOnlyContextLoadsPrimaryButRefusesPrivateDependencyAdmission" in step33_tests, "Step 33 host regressions protect gate order and admission-only private-dependency refusal")
 require("Step33-TransformedRealStS2AssemblyAdmission.txt" in step33_ui and "TRANSFORMED REAL STS2 CLR ADMISSION" in step33_ui, "iOS UI persists the dedicated Step-33 physical report")
 require("new TransformedRealStS2AssemblyAdmission(_launcherDataRoot)" in root_ui_text and "AddTransformedRealStS2AssemblyAdmissionControls(content)" in root_ui_text, "RootViewController wires Step 33 into the active device surface")
-require("Step33ImplementationMarker" in release_presentation and "Step34ImplementationMarker" in release_presentation and "39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in release_presentation and "PrewarmJit" in release_presentation, "release presentation pins Step-32/33 closures and the Step-34 controlled-execution boundary")
+require("Step33ImplementationMarker" in release_presentation and "Step34ImplementationMarker" in release_presentation and "Step35ImplementationMarker" in release_presentation and "0x06007D02" in release_presentation and "0x0600BC71" in release_presentation, "release presentation pins Step-33/34 closures and the Step-35 very-early initialization boundary")
 
 # ---------------------------------------------------------------------------
 # Step 34.0 — controlled transformed real-StS2 PrewarmJit execution.
@@ -961,7 +961,38 @@ require("OrderedExecutionGatesReachFourOfFourPass" in step34_tests and "Executio
 require("Step34-TransformedRealStS2PrewarmJitExecution.txt" in step34_ui and "TRANSFORMED REAL STS2 PREWARMJIT EXECUTION" in step34_ui, "iOS UI persists the dedicated Step-34 physical report")
 require("UIButtonType.System" not in step34_ui, "Step 34 iOS SystemButton helper receives a numeric font size rather than UIButtonType")
 require("new TransformedRealStS2PrewarmJitExecution(_launcherDataRoot)" in root_ui_text and "AddTransformedRealStS2PrewarmJitExecutionControls(content)" in root_ui_text, "RootViewController wires Step 34 into the active device surface")
-require("Step34ImplementationMarker" in release_presentation and "0x0600AFEA" in release_presentation and "PrewarmJit" in release_presentation, "release presentation pins the Step-34 exact transformed-site execution boundary")
+require("Step34ImplementationMarker" in release_presentation and "0x0600AFEA" in release_presentation and "PrewarmJit" in release_presentation and "Step35ImplementationMarker" in release_presentation, "release presentation preserves the closed Step-34 exact transformed-site execution boundary while advancing Step 35")
+
+# ---------------------------------------------------------------------------
+# Step 35.0 — controlled transformed real-StS2 very-early initialization.
+# ---------------------------------------------------------------------------
+step35_source_path = ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitialization.cs"
+step35_gate_path = ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitializationGate.cs"
+step35_summary_path = ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitializationSummary.cs"
+step35_tests_path = ROOT / "tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2VeryEarlyInitializationTests.cs"
+step35_ui_path = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2VeryEarlyInitialization.cs"
+for path, label in [(step35_source_path,"Step 35 very-early core"),(step35_gate_path,"Step 35 gate enum"),(step35_summary_path,"Step 35 summary"),(step35_tests_path,"Step 35 host regressions"),(step35_ui_path,"Step 35 iOS report surface")]:
+    require(path.is_file(), f"{label} exists")
+step35_source = step35_source_path.read_text() if step35_source_path.is_file() else ""
+step35_gate = step35_gate_path.read_text() if step35_gate_path.is_file() else ""
+step35_summary = step35_summary_path.read_text() if step35_summary_path.is_file() else ""
+step35_tests = step35_tests_path.read_text() if step35_tests_path.is_file() else ""
+step35_ui = step35_ui_path.read_text() if step35_ui_path.is_file() else ""
+require(all(marker in step35_gate for marker in ["VerifiedExecutionPreflight = 1", "ExecutionCapableClrAdmission = 2", "ExactExecuteVeryEarlyInvocation = 3", "FinalIsolationAudit = 4"]), "Step 35 exposes exactly four ordered very-early initialization gates")
+require("TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION PASS — 4/4" in step35_summary and "Gates.Count(g => g.Passed)}/4" in step35_summary, "Step 35 summary closes only on four-of-four gate completion")
+for marker35 in ["SourceTargetMethodToken = 0x06007D02", "SourceStateMachineMoveNextToken = 0x0600BC71", "<ExecuteVeryEarly>d__7", "System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()", "StS2Launcher-Step35-VeryEarly"]:
+    require(marker35 in step35_source, f"Step 35 hard-pins exact very-early target/context evidence: {marker35}")
+require("RunSourceAdmissionAndPrivateCloneAsync" in step35_source and "RunDeterministicStackNeutralRewrite" in step35_source and "RunTransformedImageVerification" in step35_source and "RunFinalIsolationAuditAsync" in step35_source, "Step 35 Gate A re-runs the closed Step-32 A-D transform contract")
+require("FindMethodByToken" in step35_source and "FindVeryEarlyMoveNext" in step35_source and "ComputeMethodSemanticFingerprint" in step35_source and "CountLaterOneTimeInitializationCalls" in step35_source and "CountHarmonyMethodReferences" in step35_source, "Step 35 Gate A independently audits exact wrapper/async-state-machine semantics and later-boundary purity")
+require("sourceResolver.Requests.Count != 0" in step35_source and "transformedResolver.Requests.Count != 0" in step35_source, "Step 35 static target audit remains dependency-resolution rejecting")
+require("RunPreparedLoadPreflightAsync" in step35_source and "ControlledManagedInitialization.TargetSimpleName" in step35_source and "ControlledManagedInitialization.TargetVersion" in step35_source, "Step 35 requalifies the prepared plan and exact initializer-bearing 0Harmony boundary")
+require("method.ReturnType != typeof(Task)" in step35_source and "method.Invoke(null, null)" in step35_source and "task.WaitAsync(TimeSpan.FromSeconds(60), cancellationToken)" in step35_source, "Step 35 invokes only exact Task-returning ExecuteVeryEarly once and uses the predeclared 60-second await boundary")
+require("AssemblyLoadContext.Default.LoadFromAssemblyName" in step35_source and "InitializerBearingRequests" in step35_source and "RejectedManagedRequests" in step35_source and "LoadUnmanagedDll" in step35_source, "Step 35 resolver stays exact-plan/fail-closed for initializer-bearing, unplanned and native requests")
+require("OrderedVeryEarlyInitializationGatesReachFourOfFourPass" in step35_tests and "VeryEarlyInitializationStopsAfterFirstFailure" in step35_tests and "VeryEarlyContextLoadsInitializerFreePrivateDependencyAndRejectsInitializerBearingDependency" in step35_tests and "Step35PinsTheExactVeryEarlyManagedInitializationTarget" in step35_tests, "Step 35 host regressions protect gate order, exact target and initializer-bearing refusal")
+require("Assert.ThrowsException" not in step35_tests and "ThrowsExceptionAsync" not in step35_tests and "Assert.ThrowsExactly" in step35_tests, "Step 35 host regressions use supported MSTest v4 exception assertions")
+require("Step35-TransformedRealStS2VeryEarlyInitialization.txt" in step35_ui and "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION" in step35_ui and "UIButtonType.System" not in step35_ui, "Step 35 iOS UI persists the dedicated report and uses the numeric SystemButton font-size contract")
+require("new TransformedRealStS2VeryEarlyInitialization(_launcherDataRoot)" in root_ui_text and "AddTransformedRealStS2VeryEarlyInitializationControls(content)" in root_ui_text, "RootViewController wires Step 35 into the active device surface")
+require("Step35ImplementationMarker" in release_presentation and "0x06007D02" in release_presentation and "0x0600BC71" in release_presentation and "ExecuteVeryEarly" in release_presentation, "release presentation pins the Step-35 exact very-early initialization boundary")
 
 # ---------------------------------------------------------------------------
 # Documentation model
@@ -991,6 +1022,9 @@ required_docs = [
     "docs/history/reports/STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt",
     "docs/history/steps/STEP-34.0-CONTROLLED-TRANSFORMED-PREWARMJIT-EXECUTION.md",
     "docs/history/steps/STEP-34.0-TEST.md",
+    "docs/history/reports/STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt",
+    "docs/history/steps/STEP-35.0-CONTROLLED-VERY-EARLY-INITIALIZATION.md",
+    "docs/history/steps/STEP-35.0-TEST.md",
     "docs/history/steps/STEP-32-FIRST-REAL-STS2-PREPAREMETHOD-REWRITE.md",
     "docs/history/steps/STEP-32-TEST.md",
     "docs/history/steps/STEP-32.0.1-SERIALIZED-FINGERPRINT-VERIFICATION-FIX.md",
@@ -1178,7 +1212,7 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 32 CLOSED POSITIVE 4/4" in current_status and "Step 33 CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 34.0 / 0.0.122 (122)" in current_status and "39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in current_status and "47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a" in current_status and "Step34-TransformedRealStS2PrewarmJitExecution.txt" in current_status, "current status preserves Step-32/33 4/4 closures and the active Step-34 controlled-execution boundary")
+require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 32 CLOSED POSITIVE 4/4" in current_status and "Step 33 CLOSED POSITIVE 4/4" in current_status and "Step 34 CLOSED POSITIVE 4/4" in current_status and "Active candidate — Step 35.0 / 0.0.123 (123)" in current_status and "0x06007D02" in current_status and "0x0600BC71" in current_status and "Step35-TransformedRealStS2VeryEarlyInitialization.txt" in current_status, "current status preserves Step-32/33/34 4/4 closures and the active Step-35 very-early boundary")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
@@ -1195,7 +1229,7 @@ require(not top_level_step_docs, "top-level docs are durable/current; step recor
 
 history_steps = list((ROOT / "docs/history/steps").glob("*.md"))
 history_names = [p.name for p in history_steps]
-for major in range(1, 35):
+for major in range(1, 36):
     prefix = f"STEP-{major:02d}"
     require(any(name.startswith(prefix) for name in history_names), f"readable historical documentation retained for Step {major:02d}")
 require(any(name.startswith("STEP-22.4") for name in history_names), "Step 22.4 design/history record is present")
@@ -1210,7 +1244,8 @@ require(any(name.startswith("STEP-30") for name in history_names), "Step 30 sema
 require(any(name.startswith("STEP-31") for name in history_names), "Step 31 PrepareMethod semantic-audit design/test/closure record is present")
 require(any(name.startswith("STEP-32") for name in history_names), "Step 32 first real StS2 rewrite design/test/closure record is present")
 require(any(name.startswith("STEP-33") for name in history_names), "Step 33 transformed-admission design/test/closure record is present")
-require(any(name.startswith("STEP-34") for name in history_names), "Step 34 controlled-execution design/test record is present")
+require(any(name.startswith("STEP-34") for name in history_names), "Step 34 controlled-execution design/test/closure record is present")
+require(any(name.startswith("STEP-35") for name in history_names), "Step 35 very-early initialization design/test record is present")
 require(len(history_steps) >= 60, "historical documentation set is comprehensive", f"count={len(history_steps)}")
 
 # ---------------------------------------------------------------------------
@@ -1226,9 +1261,9 @@ for cache_path in [
     "$CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64",
 ]:
     require(cache_path in codemagic, f"Codemagic preserves canonical cache path: {cache_path}")
-require("Step 34 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 34")
-require("LogFileName=step34.trx" in read("scripts/test.sh") and "artifacts/test-results/step34.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 34")
-require("Step 34.0 Controlled Transformed Real-StS2 PrewarmJit Execution build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 34")
+require("Step 35 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 35")
+require("LogFileName=step35.trx" in read("scripts/test.sh") and "artifacts/test-results/step35.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 35")
+require("Step 35.0 Controlled Transformed Real-StS2 Very-Early Initialization build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 35")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1243,7 +1278,7 @@ require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical pr
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEP 34.0 — CONTROLLED TRANSFORMED REAL-STS2 PREWARMJIT EXECUTION" in verify_ipa and "step34-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step 34 device boundary")
+require("Expected device UI: STEP 35.0 — CONTROLLED TRANSFORMED REAL-STS2 VERY-EARLY INITIALIZATION" in verify_ipa and "step35-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step 35 device boundary")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
@@ -1299,15 +1334,25 @@ if step33_manifest.is_file():
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
     require(not mismatches, "physically closed Step-33 implementation, tests, and closure evidence remain hash-pinned", ", ".join(mismatches))
 
-step34_manifest = ROOT / "tools/validation/candidate-step34-transformed-real-sts2-prewarmjit-execution.sha256"
-require(step34_manifest.is_file(), "Step 34 candidate boundary hash manifest exists")
+step34_manifest = ROOT / "tools/validation/protected-step34.0-transformed-real-sts2-prewarmjit-execution.sha256"
+require(step34_manifest.is_file(), "physically closed Step 34 implementation/evidence hash manifest exists")
 if step34_manifest.is_file():
     mismatches=[]
     for line in step34_manifest.read_text().splitlines():
         if not line.strip(): continue
         digest, relative = line.split("  ",1); path=ROOT/relative
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
-    require(not mismatches, "Step 34 implementation, active release wiring, and design/evidence docs are hash-pinned", ", ".join(mismatches))
+    require(not mismatches, "physically closed Step-34 implementation, tests, and closure evidence remain hash-pinned", ", ".join(mismatches))
+
+step35_manifest = ROOT / "tools/validation/candidate-step35-transformed-real-sts2-very-early-initialization.sha256"
+require(step35_manifest.is_file(), "Step 35 candidate boundary hash manifest exists")
+if step35_manifest.is_file():
+    mismatches=[]
+    for line in step35_manifest.read_text().splitlines():
+        if not line.strip(): continue
+        digest, relative = line.split("  ",1); path=ROOT/relative
+        if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
+    require(not mismatches, "Step 35 implementation, active release wiring, and design/evidence docs are hash-pinned", ", ".join(mismatches))
 
 # ---------------------------------------------------------------------------
 # Source archive cleanliness/security

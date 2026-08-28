@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 34.0 — CONTROLLED TRANSFORMED REAL-STS2 PREWARMJIT EXECUTION";
+        "STEP 35.0 — CONTROLLED TRANSFORMED REAL-STS2 VERY-EARLY INITIALIZATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 CLOSED POSITIVE 4/4 • STEP 34 OPEN";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 CLOSED POSITIVE 4/4 • STEP 34 CLOSED POSITIVE 4/4 • STEP 35 OPEN";
 
     public const string Summary =
-        "Physical 0.0.120 CLOSED Step 32 positively at 4/4 and fixed the exact transformed real-StS2 artifact: SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef, MVID 518e4758-52d7-47c2-b776-471a0e29e49d, transformed PrewarmJit token 0x0600AFEA, semantic fingerprint 47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a, and zero PrepareMethod references. Physical 0.0.121 then CLOSED Step 33 positively at 4/4: only those exact transformed primary bytes entered StS2Launcher-Step33-TransformedGame, with zero resolver requests, zero private dependency/native admission and no game-member invocation. Step 34.0 is the first controlled execution boundary: re-establish the exact transformed-primary state in a strict execution-capable private AssemblyLoadContext, bind only OneTimeInitialization::PrewarmJit(), invoke it exactly once, and preserve fail-closed resolver/native isolation.";
+        "Physical 0.0.122 CLOSED Step 34 positively at 4/4 on exact transformed SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef: exact transformed OneTimeInitialization::PrewarmJit() token 0x0600AFEA was invoked once and returned normally under the strict prepared resolver, producing 8 managed requests, 6 exact host-framework loads, 2 initializer-free prepared private loads, and zero initializer-bearing/unplanned/native escape. Step 35.0 begins the natural managed startup sequence at exact static parameterless Task-returning OneTimeInitialization::ExecuteVeryEarly(), source token 0x06007D02. The candidate re-manufactures/reverifies the closed transform, proves the ExecuteVeryEarly async wrapper/state-machine semantics are unchanged, admits only the exact transformed primary, invokes ExecuteVeryEarly once and awaits its Task for at most 60 seconds under the same strict resolver.";
 
     public const string InitialStatus =
-        "Status: Steps 32 and 33 are CLOSED POSITIVE at 4/4. Step 34 is OPEN. Candidate 0.0.122 re-manufactures/reverifies the exact closed transformed image, requalifies the zero-blocker prepared runtime plan, re-establishes the Step-33 zero-resolution transformed-primary CLR admission state, and then reflects/invokes only exact transformed OneTimeInitialization::PrewarmJit() once. Exact persisted host-framework bindings and hash-pinned initializer-free prepared dependencies may resolve on demand. Initializer-bearing 0Harmony 2.4.2.0, unplanned managed requests, native loading, the game entry point, Harmony patching and Godot/game startup remain forbidden.";
+        "Status: Steps 32–34 are CLOSED POSITIVE at 4/4. Step 35 is OPEN. Candidate 0.0.123 preserves the exact Step-32 transformed image and the Step-33/34 resolver policy, audits exact ExecuteVeryEarly source token 0x06007D02 plus <ExecuteVeryEarly>d__7::MoveNext token 0x0600BC71, then invokes/awaits only ExecuteVeryEarly. ExecuteEssential, ExecuteDeferred, the receipt-backed original, initializer-bearing 0Harmony 2.4.2.0, unplanned managed/native loading, the game entry point, Harmony patching and Godot/game startup remain forbidden.";
 
-    public const string ExpectedDisplayVersion = "0.0.122";
-    public const string ExpectedBuildVersion = "122";
+    public const string ExpectedDisplayVersion = "0.0.123";
+    public const string ExpectedBuildVersion = "123";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -36,7 +36,9 @@ internal static class CurrentReleasePresentation
     public const string Step33ImplementationMarker =
         "physical Step32 exact transformed hash+semantic fingerprint -> fresh Step32 requalification -> zero-blocker prepared-plan requalification -> exact transformed bytes LoadFromStream into dedicated private ALC -> transformed-primary-only context audit -> original/source isolation reproof -> zero game-member invocation/native load";
     public const string Step34ImplementationMarker =
-        "physical Step33 transformed-primary-only admission -> fresh exact transformed requalification -> strict execution-capable private ALC -> exact transformed PrewarmJit type/signature/token binding -> one MethodInfo.Invoke -> only exact host bindings + hash-pinned initializer-free prepared dependencies -> zero initializer-bearing/native/unplanned escape -> OfflineReady/source/transformed/plan isolation reproof";
+        "physical Step33 transformed-primary-only admission -> fresh exact transformed requalification -> strict execution-capable private ALC -> exact transformed PrewarmJit type/signature/token 0x0600AFEA binding -> one MethodInfo.Invoke -> only exact host bindings + hash-pinned initializer-free prepared dependencies -> zero initializer-bearing/native/unplanned escape -> OfflineReady/source/transformed/plan isolation reproof";
+    public const string Step35ImplementationMarker =
+        "physical Step34 exact PrewarmJit execution closure -> exact source ExecuteVeryEarly token 0x06007D02 + async MoveNext token 0x0600BC71 -> source/transformed semantic-equivalence audit -> strict transformed-primary private ALC -> one ExecuteVeryEarly MethodInfo.Invoke + exact Task await <=60s -> exact host + initializer-free prepared dependency resolver only -> isolation reproof";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

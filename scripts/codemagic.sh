@@ -25,7 +25,7 @@ cache_path_line() {
   fi
 }
 {
-  echo "StS2 Launcher — Codemagic cache state before Step 34 build"
+  echo "StS2 Launcher — Codemagic cache state before Step 35 build"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   cache_path_line "Home NuGet" "$HOME/.nuget/packages"
   cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
@@ -45,7 +45,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 34.0 Controlled Transformed Real-StS2 PrewarmJit Execution build environment"
+  echo "StS2 Launcher — Step 35.0 Controlled Transformed Real-StS2 Very-Early Initialization build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -110,7 +110,7 @@ IPA_VERIFY_SECONDS="$(elapsed_seconds "$IPA_VERIFY_START_EPOCH")"
 TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
 
 {
-  echo "StS2 Launcher iOS — Step 34.0 Controlled Transformed Real-StS2 PrewarmJit Execution"
+  echo "StS2 Launcher iOS — Step 35.0 Controlled Transformed Real-StS2 Very-Early Initialization"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"

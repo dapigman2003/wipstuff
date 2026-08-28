@@ -321,3 +321,27 @@ Physical 0.0.121 CLOSED Step 33 positively at **4/4 PASS**. Preserve `docs/histo
 - keep receipt-backed/prepared original `sts2.dll`, game entry point, Harmony/MonoMod patching, Godot/game startup and native game loading unauthorized.
 
 Host coverage must protect four-gate ordering, successful initializer-free private dependency loading, initializer-bearing dependency refusal, and the closed transformed target constants. Physical closure requires one exact 0.0.122 A–D **4/4 PASS** report named `Step34-TransformedRealStS2PrewarmJitExecution.txt`.
+
+
+## Step 34.0 physical closure — controlled transformed PrewarmJit execution
+
+Physical 0.0.122 CLOSED Step 34 positively at **4/4 PASS**. Preserve `docs/history/reports/STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` as authoritative evidence. The exact transformed `OneTimeInitialization::PrewarmJit()` MethodDef token `0x0600AFEA` must remain invocable once and return normally under the strict prepared resolver. The closed physical resolver result is 8 managed requests = 6 exact planned host-framework loads + 2 hash-pinned initializer-free prepared private loads, with 0 initializer-bearing requests, 0 unplanned managed requests and 0 native attempts. The receipt-backed/prepared original remains outside the CLR; no game entry point, Harmony/MonoMod patching or Godot/game startup is authorized by this closure.
+
+## Step 35.0 — controlled transformed very-early initialization
+
+0.0.123 must:
+
+- preserve all physically closed Step-32, Step-33 and Step-34 contracts;
+- hard-pin exact source `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()` MethodDef `0x06007D02`, static parameterless `System.Threading.Tasks.Task`, plus `<ExecuteVeryEarly>d__7::MoveNext` source token `0x0600BC71`;
+- re-manufacture/reverify the exact Step-32 transformed image before any Step-35 CLR admission;
+- independently prove source/transformed semantic fingerprint equality for the `ExecuteVeryEarly` wrapper and its async MoveNext with zero Cecil dependency resolution;
+- require zero direct MoveNext calls to later `ExecuteEssential`, `ExecuteDeferred` or `PrewarmJit` and zero direct Harmony method references;
+- requalify the zero-blocker prepared runtime plan and keep exact `0Harmony 2.4.2.0` as the sole initializer-bearing private dependency and forbidden;
+- preserve Step-33 zero-resolution primary admission when exact transformed primary enters `StS2Launcher-Step35-VeryEarly`;
+- reflect only exact transformed `ExecuteVeryEarly()`, invoke it once, require a non-null exact `Task`, and await it for at most 60 seconds;
+- service only exact persisted host-framework bindings and exact hash-pinned initializer-free private dependencies;
+- fail closed on initializer-bearing, unplanned managed, or native requests, synchronous target exception, Task fault, timeout, or cancellation;
+- re-prove OfflineReady, trusted source/transformed/runtime-plan hashes, loaded-private hashes and exact context residency after execution;
+- intentionally invoke no `ExecuteEssential`, `ExecuteDeferred`, `PrewarmJit`, game entry point, Harmony/MonoMod API or Godot/game startup.
+
+Host coverage must protect four-gate ordering, first-failure stopping, exact source target constants and initializer-bearing refusal. Physical closure requires one exact 0.0.123 A–D **4/4 PASS** report named `Step35-TransformedRealStS2VeryEarlyInitialization.txt`.

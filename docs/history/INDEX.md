@@ -178,3 +178,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-34.0-TEST.md` — Step-34 host/static/physical acceptance contract.
 - `reports/STEP-34.0-CODEMAGIC-IOS-UI-COMPILE-FAILURE.txt` — first Step-34 0.0.122 CI attempt: static 735/735 + host 194/194 PASS, persistent iOS cache restored, then UI CS1503 before publish completion; no IPA/device evidence.
 - `steps/STEP-34.0.1-IOS-SYSTEMBUTTON-COMPILE-FIX.md` — build-only correction: Step-34 UI passes numeric font size 17 to the established `SystemButton` helper; runtime semantics/version unchanged.
+
+- `reports/STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.122 closure: exact transformed PrewarmJit invoked once and returned normally; Step 34 CLOSED POSITIVE 4/4.
+- `steps/STEP-35.0-CONTROLLED-VERY-EARLY-INITIALIZATION.md` — active 0.0.123 design for exact transformed `OneTimeInitialization::ExecuteVeryEarly()` invocation + bounded Task await.
+- `steps/STEP-35.0-TEST.md` — Step-35 host/static/device acceptance contract.

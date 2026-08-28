@@ -1,40 +1,26 @@
-# Release Checklist — Step 34.0 Controlled Transformed Real-StS2 PrewarmJit Execution
+# Release Checklist — Step 35.0 Controlled Transformed Real-StS2 Very-Early Initialization
 
 ## Candidate identity
 
-- step/candidate: **Step 34.0**
-- version: `0.0.122 (122)`
+- step/candidate: **Step 35.0**
+- version: `0.0.123 (123)`
 - workflow: `ios-canonical`
-- expected IPA: `artifacts/StS2-Launcher-Step-34.ipa`
-- expected device report: `Documents/StS2Launcher/Reports/Step34-TransformedRealStS2PrewarmJitExecution.txt`
+- expected IPA: `artifacts/StS2-Launcher-Step-35.ipa`
+- expected host TRX: `artifacts/test-results/step35.trx`
+- expected device report: `Documents/StS2Launcher/Reports/Step35-TransformedRealStS2VeryEarlyInitialization.txt`
 
 ## Required before device testing
 
-- [ ] release identity is exactly `0.0.122 (122)`;
 - [ ] canonical static validation passes;
-- [ ] complete active host suite passes, including Step-34 gate ordering / strict execution-resolver tests;
-- [ ] iOS publish succeeds with `MtouchInterpreter=-all`, `MtouchLink=None`, `TrimMode=copy`;
-- [ ] IPA verification succeeds;
-- [ ] `ios-canonical` remains the stable Codemagic workflow key and configured NuGet/Godot/iOS-arm64 `obj` caches remain enabled;
-- [ ] source archive contains no proprietary `sts2.dll` or game payload;
-- [ ] physical Step-32 0.0.120 and Step-33 0.0.121 4/4 closure reports are preserved in history;
-- [ ] exact closed transformed SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`, MVID, semantic fingerprint, and transformed token `0x0600AFEA` remain pinned;
-- [ ] no Step-34 code authorizes the receipt-backed original, game entry point, `0Harmony`, Harmony/MonoMod patching, native loading, or Godot/game startup.
+- [ ] full host suite passes;
+- [ ] release identity is exactly `0.0.123 (123)`;
+- [ ] iOS publish/package succeeds under `MtouchLink=None`, `TrimMode=copy`, `MtouchInterpreter=-all`;
+- [ ] IPA verification succeeds and advertises Step 35.0;
+- [ ] stable `ios-canonical` cache key and existing NuGet/Godot/iOS-arm64 obj cache paths remain intact;
+- [ ] no proprietary `sts2.dll`, app bundle, native game library, credentials, or signing secrets are present in the source ZIP.
 
-## Physical run
+## Device run
 
-Use a fresh app process. Do not run Step 23/24/33 or other real-game CLR-load buttons first and do not start Godot.
+Force-quit/relaunch first. Gate A must re-run Step-32 A–D, require the exact physically closed source/transformed evidence, validate source token `0x06007D02`, exact static parameterless Task signature, source `<ExecuteVeryEarly>d__7::MoveNext` token `0x0600BC71`, source/transformed semantic equality, zero direct later OneTimeInitialization calls, zero direct Harmony refs, and exact prepared resolver plan. Gate B must admit only exact transformed primary into `StS2Launcher-Step35-VeryEarly` with zero primary-admission resolution. Gate C must invoke exact transformed `ExecuteVeryEarly()` once and await its returned Task for at most 60 seconds; exact host bindings and hash-pinned initializer-free private dependencies only. Gate D must re-prove source/transformed/plan/dependency/context isolation.
 
-Gate A must re-run the exact closed Step-32 transformation, re-prove the transformed target, requalify the zero-blocker runtime plan, re-hash all prepared assemblies, and confirm exact `0Harmony 2.4.2.0` is still the sole initializer-bearing private dependency. No CLR admission yet.
-
-Gate B must `LoadFromStream` only the exact transformed primary into `StS2Launcher-Step34-PrewarmJit` and re-prove the Step-33 zero-resolution primary-admission behavior.
-
-Gate C must bind only exact transformed `OneTimeInitialization::PrewarmJit()` and invoke it exactly once. Only exact planned host bindings and hash-pinned initializer-free private dependencies may resolve. Initializer-bearing/unplanned/native requests fail closed.
-
-Gate D must re-prove OfflineReady, original/transformed/plan/dependency hashes, unique transformed-context residency, clean resolver/native isolation, and one exact PrewarmJit invocation.
-
-## Failure discipline
-
-Do not broaden authority to make the run advance. A transformed identity/hash/semantic mismatch, changed initializer classification, target binding failure, managed/native resolver rejection, dependency drift, or exception from exact PrewarmJit is new evidence and must fail closed.
-
-A Step-34 4/4 PASS authorizes only design of a later separately gated progressive managed-initialization boundary. It does not authorize broad game startup or Godot integration by itself.
+Accept only **4/4 PASS**. Any first failure is authoritative. Do not broaden resolver/native/Harmony/Godot authority in the same candidate and do not rerun after Gate B in the same process.

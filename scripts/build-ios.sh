@@ -66,7 +66,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Step 34 Controlled Transformed Real-StS2 PrewarmJit Execution Boundary..."
+echo "Publishing Step 35 Controlled Transformed Real-StS2 Very-Early Initialization Boundary..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \
@@ -77,7 +77,7 @@ set -e
 
 grep -Fq "$STS2_RUNTIME_POLICY_MARKER MtouchInterpreter=-all" "$PUBLISH_LOG" || { echo "ERROR: runtime-policy telemetry missing." >&2; exit 15; }
 grep -Fq "STEP32 PROVEN DYNAMIC IL PRESERVATION ROOT: System.Collections.Concurrent" "$PUBLISH_LOG" || { echo "ERROR: proven System.Collections.Concurrent preservation telemetry missing." >&2; exit 15; }
-grep -Fq "STEP34 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" "$PUBLISH_LOG" || { echo "ERROR: Step 34 copy/no-link dynamic-payload trimming telemetry missing." >&2; exit 15; }
+grep -Fq "STEP35 DYNAMIC PAYLOAD TRIMMING POLICY: MtouchLink=None; TrimMode=copy" "$PUBLISH_LOG" || { echo "ERROR: Step 35 copy/no-link dynamic-payload trimming telemetry missing." >&2; exit 15; }
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'UseInterpreter=true'; then echo "ERROR: broad UseInterpreter=true policy resolved." >&2; exit 15; fi
 if grep -F "$STS2_RUNTIME_POLICY_MARKER" "$PUBLISH_LOG" | grep -Fq 'PublishAot=true'; then echo "ERROR: NativeAOT unexpectedly enabled." >&2; exit 15; fi
 BEFORE_LINE="$(grep 'STEP05.2 LINKER FRAMEWORKS BEFORE:' "$PUBLISH_LOG" | tail -1 || true)"

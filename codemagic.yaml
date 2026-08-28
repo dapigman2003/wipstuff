@@ -1,6 +1,6 @@
 workflows:
   ios-canonical:
-    name: Step 34.0 - Controlled Transformed Real-StS2 PrewarmJit Execution
+    name: Step 35.0 - Controlled Transformed Real-StS2 Very-Early Initialization
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -25,14 +25,14 @@ workflows:
         - $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 
     scripts:
-      - name: Validate, test, build, and verify Step 34.0
+      - name: Validate, test, build, and verify Step 35.0
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-34.ipa
+      - artifacts/StS2-Launcher-Step-35.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**
