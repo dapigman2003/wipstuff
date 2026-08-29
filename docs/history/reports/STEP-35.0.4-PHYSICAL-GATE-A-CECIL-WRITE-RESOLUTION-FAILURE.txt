@@ -1,0 +1,24 @@
+StS2 Launcher — Step 35.0.4 Physical Gate-A Cecil Write Resolution Failure
+
+Candidate: 0.0.127 (127)
+Physical result: DIAGNOSTIC LOCALIZATION FAIL — 0/4
+
+The fresh-process physical run ended normally; there was no native crash and no game-method invocation.
+Gate A failed closed during Step-35.0.4 diagnostic-clone instrumentation before the same-run static map, Gate B CLR admission, or Gate C ExecuteVeryEarly invocation.
+
+Observed managed failure:
+AssemblyResolutionException: Failed to resolve assembly: 'System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+
+Durable sequence:
+- RUN_TELEMETRY_READY
+- RUN_START
+- A_RESULT — passed=False; gate=VerifiedExecutionPreflight
+- RUN_FINALLY_ENTER
+- RUN_NORMAL_REPORT_RETURNED
+- RUN_END
+
+Interpretation:
+The diagnostic clone writer used a rejecting Cecil resolver. Serializing the real sts2 image requires Cecil to inspect external enum/constant metadata and internally resolve exact framework metadata. This is the same writer-only Constant-table resolution family previously observed and corrected during Step 32.0.1–32.0.4. The result does not advance or regress the physical ExecuteVeryEarly runtime frontier established by 0.0.126 because no sts2 assembly was CLR-admitted or invoked.
+
+Required correction:
+Reuse the already-audited Step-32 exact-identity in-memory constant-metadata surrogate resolver for diagnostic-clone serialization only; keep exact source hashing, post-write constant-metadata verification, rejecting-resolver reopen, runtime fail-closed resolver policy, diagnostic-only authority, and all later-boundary prohibitions unchanged.

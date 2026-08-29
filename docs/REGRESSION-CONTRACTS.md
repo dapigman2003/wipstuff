@@ -352,14 +352,14 @@ Physical 0.0.123 attempted the Step-35 boundary and hard-terminated while the UI
 Host coverage continues to protect four-gate ordering, first-failure stopping, exact target constants, initializer-bearing refusal, checkpoint callback coverage, and static-map callsite/await tagging. Static validation additionally protects the run-correlated telemetry filenames, Run ID/PID propagation, fail-visible initialization, and 0.0.126 release identity. Physical closure still requires one exact A–D **4/4 PASS** report.
 
 
-## Step 35.0.4 / 0.0.127 diagnostic-clone contract
-0.0.127 must preserve the exact Step-32 transformed source SHA-256 and never overwrite or CLR-load that file. After re-verification it may create one separate diagnostic clone that must preserve assembly identity/MVID and the exact `ExecuteVeryEarly` signature. The clone may add only the Step-35 diagnostic bridge and `INMETHOD_*` entry markers for the current pre-first-await localization set. The prepared resolver, initializer-bearing refusal, native refusal, one-Invoke rule, <=60-second await, cancellation semantics, and later-boundary prohibitions remain unchanged.
+## Step 35.0.5 / 0.0.128 diagnostic-clone contract
+0.0.128 must preserve the exact Step-32 transformed source SHA-256 and never overwrite or CLR-load that file. After re-verification it may create one separate diagnostic clone that must preserve assembly identity/MVID and the exact `ExecuteVeryEarly` signature. The clone may add only the Step-35 diagnostic bridge and `INMETHOD_*` entry markers for the current pre-first-await localization set. The prepared resolver, initializer-bearing refusal, native refusal, one-Invoke rule, <=60-second await, cancellation semantics, and later-boundary prohibitions remain unchanged.
 
-Additional 0.0.127 evidence-semantics contract:
+Additional 0.0.128 evidence-semantics contract:
 
 - Gate C is `DiagnosticExecuteVeryEarlyInvocation`, not exact transformed execution;
 - the exact closed transformed source is re-hashed unchanged immediately after diagnostic-clone emission and before Gate-B admission;
 - Gate B/C CLR-load/execute only the separately hash-pinned diagnostic clone;
 - active UI/report summaries must label diagnostic A–D 4/4 as **NOT STEP 35 CLOSURE**;
-- no 0.0.127 derivative result may close Step 35, even if all diagnostic gates complete;
+- no 0.0.128 derivative result may close Step 35, even if all diagnostic gates complete;
 - after localization, compatibility work must return to a separately defined authoritative transformed artifact before physical closure can be claimed.

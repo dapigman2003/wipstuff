@@ -201,3 +201,5 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.3-PHYSICAL-SAME-RUN-CORRELATION-AND-INVOKE-FRONTIER.txt` — physical 0.0.126 proves same-run telemetry and repeats the no-C_INVOKE_RETURNED synchronous frontier.
 - `steps/STEP-35.0.4-IN-METHOD-PRE-FIRST-AWAIT-LOCALIZATION.md` — 0.0.127 diagnostic-clone design with durable in-method entry markers.
+- `reports/STEP-35.0.4-PHYSICAL-GATE-A-CECIL-WRITE-RESOLUTION-FAILURE.txt` — physical 0.0.127 ended normally at Gate A: diagnostic-clone Cecil serialization failed closed on exact System.Runtime 9.0.0.0 metadata resolution before CLR admission or game invocation.
+- `steps/STEP-35.0.5-BOUNDED-CECIL-WRITER-RESOLUTION-FIX.md` — 0.0.128 reuses the physically proven Step-32 audited in-memory constant-metadata surrogate resolver for diagnostic-clone serialization only, then requires rejecting-resolver reopen plus constant-metadata fingerprint preservation.
