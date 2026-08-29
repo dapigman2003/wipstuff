@@ -1,6 +1,6 @@
-# Current Status — Step 35.0.2 ExecuteVeryEarly Invoke-Crash Static IL/Callsite Localization
+# Current Status — Step 35.0.3 Run-Correlated Durable Telemetry
 
-## Active candidate — Step 35.0.2 / 0.0.125 (125)
+## Active candidate — Step 35.0.3 / 0.0.126 (126)
 
 Physical baseline summary: Steps 01–26 closed; Step 27 CLOSED NEGATIVE; Step 28 CLOSED POSITIVE 5/5; Step 29 CLOSED POSITIVE 4/4; Step 30 CLOSED POSITIVE 4/4; Step 31 CLOSED POSITIVE 4/4; **Step 32 CLOSED POSITIVE 4/4**; **Step 33 CLOSED POSITIVE 4/4**; **Step 34 CLOSED POSITIVE 4/4**. Step 35 remains **OPEN**.
 
@@ -12,37 +12,29 @@ Physical Step 34.0 / **0.0.122** closed exact transformed `OneTimeInitialization
 
 ## Step 35 physical evidence
 
-Physical Step 35.0 / **0.0.123 (123)** hard-terminated while the UI still appeared near Gate B. Its matching iOS `.ips` reported `EXC_BAD_ACCESS / SIGKILL`, faulting main thread, program counter **0x0**, and no managed Step-35 report survived. That run alone could not prove whether the crash was Gate B or early synchronous Gate C.
+Physical Step 35.0 / **0.0.123 (123)** hard-terminated near the visible B→C boundary. Its matching iOS `.ips` reported `EXC_BAD_ACCESS / SIGKILL`, faulting main thread, program counter **0x0**, and no managed Step-35 report.
 
-Physical Step 35.0.1 / **0.0.124 (124)** resolved that ambiguity with durable checkpoints:
+Physical Step 35.0.1 / **0.0.124 (124)** resolved that ambiguity. Gate B passed fully. Gate C bound exact transformed `ExecuteVeryEarly()`, wrote `C_INVOKE_START`, successfully serviced planned `GodotSharp 4.5.1.0`, `Steamworks.NET 1.0.0.0`, and host-framework resolutions, and then hard-terminated before `C_INVOKE_RETURNED`. Its `.ips` repeated the main-thread PC=`0x0` failure family. This remains the authoritative runtime frontier: **inside synchronous execution initiated by exact transformed `ExecuteVeryEarly()` MethodInfo.Invoke, after planned resolution and before Invoke returns the Task**.
 
-- Gate A passed.
-- Gate B passed fully: fresh-process check, transformed hash rechecks, strict ALC construction, `LoadFromStream`, context ownership, identity, MVID, zero primary-admission resolver activity, global unique `sts2` residency, and private-context enumeration.
-- Gate C entered on the main thread and bound exact transformed `ExecuteVeryEarly()`.
-- reflected transformed token matched `0x0600AFE7`; MVID matched the closed transformed MVID.
-- `C_INVOKE_START` was written for the first/only `MethodInfo.Invoke(null, null)`.
-- during that invocation, planned resolution successfully loaded initializer-free `GodotSharp 4.5.1.0` and `Steamworks.NET 1.0.0.0` plus exact host framework bindings including `System.Runtime`, `System.Collections`, `System.Collections.Concurrent`, and `System.Text.Json`.
-- the final durable event was a successful `System.Collections.Concurrent` host binding; `C_INVOKE_RETURNED` never occurred.
-- the matching `.ips` again faults the main thread at PC=`0x0` and shows essentially the same runtime-heavy application stack shape as 0.0.123.
+Physical Step 35.0.2 / **0.0.125 (125)** reproduced the same `EXC_BAD_ACCESS / SIGKILL`, `KERN_PROTECTION_FAILURE at 0x0`, `CODESIGNING / Invalid Page`, faulting-main-thread, PC=`0x0` family. The available 0.0.125 static map, however, was generated at 01:31:19 -0500 while the attached crash-report process launched at 01:37:50 -0500. Those artifacts were from different runs. No fixed-name `Step35-CrashCheckpoint.txt` from the crash-report process was available. Therefore 0.0.125 confirms repeatability of the native failure family but does not safely advance callsite localization.
 
-Therefore the current hard-termination frontier is **inside synchronous execution initiated by exact transformed `ExecuteVeryEarly()` MethodInfo.Invoke, after multiple planned resolver operations and before Invoke returns the Task**. Gate B is no longer suspect.
+Running Step 34 and then Step 35 in the same process remains invalid because Step 34 leaves `sts2` resident in a non-collectible ALC. A fresh process is mandatory.
 
-Running Step 34 and then Step 35 in the same process is expected to fail Step-35 Gate A normally because Step 34 leaves `sts2` resident in a non-collectible ALC. A fresh process is mandatory.
+## Step 35.0.3 / 0.0.126 diagnostic candidate
 
-## Step 35.0.2 / 0.0.125 diagnostic candidate
+Step 35.0.3 preserves the exact 0.0.125 compatibility experiment: same transformed bytes, exact source `ExecuteVeryEarly` token `0x06007D02`, source async `<ExecuteVeryEarly>d__7::MoveNext` token `0x0600BC71`, same strict private ALC/resolver policy, one exact reflected invocation, <=60-second Task await, and the same forbidden boundaries.
 
-Step 35.0.2 preserves the exact 0.0.123/0.0.124 compatibility experiment. It does not change transformed bytes, target method, resolver authority, invocation count, Task timeout, or forbidden boundaries.
+The change is diagnostic provenance. Before Gate A, 0.0.126 creates one immutable Run ID containing UTC/PID/GUID and durably establishes:
 
-Gate A still re-runs Step-32 A–D, pins source/transformed hashes/MVID, binds source `ExecuteVeryEarly` token `0x06007D02` and source async `<ExecuteVeryEarly>d__7::MoveNext` token `0x0600BC71`, proves source/transformed semantic equality, requires zero direct calls to `ExecuteEssential`/`ExecuteDeferred`/`PrewarmJit`, zero direct Harmony method references, and requalifies the prepared runtime plan.
+- `Documents/StS2Launcher/Reports/Step35-CurrentRun.txt` — manifest naming the exact same-run artifact files;
+- `Documents/StS2Launcher/Reports/Step35-LastCheckpoint.txt` — independently flushed overwrite-on-each-event convenience record;
+- `Documents/StS2Launcher/Reports/Step35-CrashCheckpoint-<RunId>.txt` — run-specific append journal;
+- `Documents/StS2Launcher/Reports/Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt` — same-run static wrapper/MoveNext IL map written after Gate-A verification and before Gate B.
 
-New in 0.0.125: after those checks, Gate A builds an output-only static map from the exact verified transformed wrapper and MoveNext and writes `Documents/StS2Launcher/Reports/Step35-ExecuteVeryEarly-StaticMap.txt` before any CLR admission. The map contains each IL instruction/operand, metadata scope, numbered call/callvirt/newobj callsites, and `AWAIT-CANDIDATE` markers. It must not call Cecil `Resolve`, and it is never runtime input.
+If the initial run journal cannot be created/flushed, the UI reports `TELEMETRY FAIL / NOT RUN` and Gate A is not entered. If Gate A passes but the same-run static map cannot be durably written, execution stops before Gate B. These are diagnostic stops, not compatibility failures.
 
-Gate B remains the exact physically proven 0.0.124 admission path. Gate C remains one exact reflected `ExecuteVeryEarly()` invocation and <=60-second await of the returned non-null Task. `Step35-CrashCheckpoint.txt` remains synchronously flushed runtime telemetry.
-
-Cancellation is **CANCELLED = INCONCLUSIVE**, not PASS or compatibility FAIL. Once Gate B starts the process is spent; once Gate C invocation starts, cancellation cannot undo code already executed.
-
-Step 35 still forbids intentional `ExecuteEssential`, `ExecuteDeferred`, launcher-driven `PrewarmJit`, the entry point, Harmony/MonoMod patching, Godot/game startup, initializer-bearing `0Harmony 2.4.2.0`, unplanned managed loading, and native loading.
+Cancellation remains **CANCELLED = INCONCLUSIVE**. `ExecuteEssential`, `ExecuteDeferred`, launcher-driven `PrewarmJit`, game entry-point execution, Harmony/MonoMod patching, initializer-bearing `0Harmony 2.4.2.0`, unplanned managed/native loading, and Godot/game startup remain forbidden.
 
 ## Immediate next evidence
 
-Run exact 0.0.125 once from a fresh process. Preserve `Step35-ExecuteVeryEarly-StaticMap.txt`, `Step35-CrashCheckpoint.txt`, and the matching `.ips` after any hard termination. Correlate the runtime resolver frontier with the static callsite map, then design the smallest method/type/callsite discriminator rather than broadening execution authority.
+Run exact 0.0.126 once from a fresh process. After a hard termination, preserve `Step35-CurrentRun.txt`, `Step35-LastCheckpoint.txt`, the exact run-specific crash journal and static map named by the manifest, and the matching `.ips` before any rerun. Only same-Run-ID evidence should be used to choose the next pre-first-await callsite discriminator.

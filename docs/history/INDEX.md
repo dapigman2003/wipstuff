@@ -192,3 +192,9 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.1-PHYSICAL-EXECUTEVERYEARLY-INVOKE-CRASH-LOCALIZATION.txt` — sanitized physical 0.0.124 evidence: Gate B passed fully; Gate C entered exact ExecuteVeryEarly `MethodInfo.Invoke`, serviced planned GodotSharp/Steamworks.NET/framework resolutions, then hard-terminated before `C_INVOKE_RETURNED`; matching `.ips` repeats main-thread PC=0x0 and the same runtime-heavy stack shape as 0.0.123.
 - `steps/STEP-35.0.2-EXECUTEVERYEARLY-INVOKE-CRASH-STATIC-ILCALLSITE-LOCALIZATION.md` — 0.0.125 diagnostic-only revision: execution/resolver authority unchanged; emit a resolution-free static IL/callsite map of the exact verified transformed ExecuteVeryEarly wrapper + async MoveNext before CLR admission, while retaining durable runtime checkpoints.
+
+
+## Step 35.0.2 physical repeat / Step 35.0.3 run-correlated telemetry
+
+- `reports/STEP-35.0.2-PHYSICAL-REPEATED-HARD-TERMINATION-AND-TELEMETRY-CORRELATION.txt` — sanitized physical 0.0.125 evidence: same main-thread PC=0x0 / CODESIGNING Invalid Page family, but the available static map predates the matching crash-report process and no fixed-name checkpoint from that process was available.
+- `steps/STEP-35.0.3-RUN-CORRELATED-DURABLE-TELEMETRY.md` — 0.0.126 diagnostic-only correction: immutable Run ID/PID, unique same-run journal/map, current-run manifest, independently flushed last checkpoint, fail-visible telemetry prerequisite, execution/resolver authority otherwise unchanged.

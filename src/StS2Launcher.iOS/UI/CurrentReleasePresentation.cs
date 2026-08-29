@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 35.0.2 — EXECUTEVERYEARLY INVOKE-CRASH STATIC ILCALLSITE LOCALIZATION";
+        "STEP 35.0.3 — RUN-CORRELATED DURABLE TELEMETRY";
 
     public const string MilestoneLine =
         "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 CLOSED POSITIVE 4/4 • STEP 34 CLOSED POSITIVE 4/4 • STEP 35 OPEN";
 
     public const string Summary =
-        "Physical 0.0.124 localized the Step-35 hard termination beyond ambiguity: Gate B passed completely; Gate C bound exact transformed ExecuteVeryEarly, entered the first/only MethodInfo.Invoke, loaded GodotSharp and Steamworks.NET plus exact host frameworks, then died before C_INVOKE_RETURNED with the same main-thread PC=0x0 native signature and essentially the same runtime stack shape as 0.0.123. Step 35.0.2 / 0.0.125 preserves the exact execution/resolver authority and existing durable checkpoints, and adds a pre-CLR output-only static IL/callsite map of the verified transformed ExecuteVeryEarly wrapper + async MoveNext so the invoke-time crash can be correlated to exact callsites before designing a smaller execution discriminator.";
+        "Physical 0.0.125 reproduced the 0.0.124 main-thread PC=0x0 / CODESIGNING Invalid Page hard-kill family. The available 0.0.125 static map and matching crash report were from different process runs, while the expected fixed-name crash checkpoint was absent, exposing a telemetry-correlation gap rather than a new compatibility result. Step 35.0.3 / 0.0.126 keeps the exact execution/resolver authority frozen and makes durable per-run telemetry a pre-execution prerequisite: one immutable Run ID/PID correlates a unique crash journal and unique static IL map, Step35-CurrentRun.txt names the pair, and Step35-LastCheckpoint.txt is independently flushed after every checkpoint.";
 
     public const string InitialStatus =
-        "Status: Steps 32–34 are CLOSED POSITIVE at 4/4. Step 35 remains OPEN after physical 0.0.124 proved Gate B PASS and localized the hard kill inside the synchronous execution initiated by exact ExecuteVeryEarly MethodInfo.Invoke, after planned GodotSharp/Steamworks.NET/framework resolutions but before Invoke returned. Candidate 0.0.125 is diagnostic-only: execution authority remains unchanged; Step35-ExecuteVeryEarly-StaticMap.txt is generated before CLR admission alongside the existing Step35-CrashCheckpoint.txt. Cancellation remains INCONCLUSIVE. ExecuteEssential, ExecuteDeferred, the receipt-backed original, initializer-bearing 0Harmony 2.4.2.0, unplanned managed/native loading, the game entry point, Harmony patching and Godot/game startup remain forbidden.";
+        "Status: Steps 32–34 are CLOSED POSITIVE at 4/4. Step 35 remains OPEN. Physical 0.0.124 localized the hard kill inside synchronous execution initiated by exact ExecuteVeryEarly MethodInfo.Invoke; physical 0.0.125 repeated the same iOS native failure family but did not yield a same-run fixed checkpoint/static-map pair. Candidate 0.0.126 is diagnostic-only: it refuses Gate A if a run-specific durable journal cannot be established, refuses Gate B if the same-run static map cannot be durably written, and otherwise preserves the 0.0.125 execution target/resolver/timeout and all later-boundary prohibitions. Cancellation remains INCONCLUSIVE.";
 
-    public const string ExpectedDisplayVersion = "0.0.125";
-    public const string ExpectedBuildVersion = "125";
+    public const string ExpectedDisplayVersion = "0.0.126";
+    public const string ExpectedBuildVersion = "126";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -38,7 +38,7 @@ internal static class CurrentReleasePresentation
     public const string Step34ImplementationMarker =
         "physical Step33 transformed-primary-only admission -> fresh exact transformed requalification -> strict execution-capable private ALC -> exact transformed PrewarmJit type/signature/token 0x0600AFEA binding -> one MethodInfo.Invoke -> only exact host bindings + hash-pinned initializer-free prepared dependencies -> zero initializer-bearing/native/unplanned escape -> OfflineReady/source/transformed/plan isolation reproof";
     public const string Step35ImplementationMarker =
-        "physical Step34 exact PrewarmJit closure -> 0.0.123/0.0.124 repeated main-thread PC=0x0 hard termination -> 0.0.124 proves Gate B PASS and exact ExecuteVeryEarly MethodInfo.Invoke entered, GodotSharp+Steamworks.NET+framework resolutions serviced, no C_INVOKE_RETURNED -> unchanged exact source ExecuteVeryEarly token 0x06007D02 + async MoveNext token 0x0600BC71 -> verified transformed wrapper/MoveNext static IL+callsite map emitted before CLR admission -> unchanged strict transformed-primary ALC/one MethodInfo.Invoke/Task await <=60s/exact resolver -> durable invoke/resolver checkpoints -> isolation reproof";
+        "physical Step34 exact PrewarmJit closure -> 0.0.123/0.0.124/0.0.125 repeated main-thread PC=0x0 hard termination family -> 0.0.124 proves Gate B PASS and exact ExecuteVeryEarly MethodInfo.Invoke entered with planned GodotSharp+Steamworks.NET+framework resolutions and no C_INVOKE_RETURNED -> 0.0.125 static wrapper/MoveNext IL map plus mismatched-run/no-fixed-checkpoint evidence -> unchanged exact source ExecuteVeryEarly token 0x06007D02 + async MoveNext token 0x0600BC71 -> fail-visible run-specific journal + current-run manifest + independently flushed last-checkpoint + same-run static map before CLR admission -> unchanged strict transformed-primary ALC/one MethodInfo.Invoke/Task await <=60s/exact resolver -> isolation reproof";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

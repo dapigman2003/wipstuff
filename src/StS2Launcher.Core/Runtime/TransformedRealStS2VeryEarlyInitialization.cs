@@ -401,7 +401,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.2 preserves the exact Step-35 reflected ExecuteVeryEarly invocation; added diagnostics are output-only telemetry.")]
+        Justification = "Step 35.0.3 preserves the exact Step-35 reflected ExecuteVeryEarly invocation; added run-correlation diagnostics are output-only telemetry.")]
     public async Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunExactExecuteVeryEarlyInvocationAsync(
         Action<string>? crashCheckpoint,
         CancellationToken cancellationToken = default)

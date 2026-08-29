@@ -1,0 +1,28 @@
+StS2 Launcher — Step 35.0.2 physical repeated hard termination / telemetry correlation summary
+Candidate: 0.0.125 (125)
+
+Observed physical crash report:
+- app version/build: 0.0.125 (125)
+- process launch: 2026-08-29 01:37:50.1013 -0500
+- crash capture: 2026-08-29 01:38:00.3025 -0500
+- faulting thread: main thread
+- exception: EXC_BAD_ACCESS / SIGKILL
+- subtype: KERN_PROTECTION_FAILURE at 0x0
+- termination namespace/indicator: CODESIGNING / Invalid Page
+- ARM64 PC/FAR: 0x0 / 0x0
+- application stack shape remained materially consistent with the 0.0.124 failure family, modulo build-layout offset shifts.
+
+Artifact-correlation finding:
+The available Step35-ExecuteVeryEarly-StaticMap output identified 0.0.125, but its generation timestamp was 2026-08-29T06:31:19.7963860+00:00 (01:31:19 -0500), more than six minutes before the above process launched. Therefore that static map did not belong to the crash-report process. No fixed-name Step35-CrashCheckpoint.txt from the crash-report process was available.
+
+Interpretation:
+This does not move the established compatibility frontier. Physical 0.0.124 remains the authoritative runtime localization proving Gate B PASS, exact ExecuteVeryEarly MethodInfo.Invoke entry, planned GodotSharp/Steamworks.NET/framework resolution, and no C_INVOKE_RETURNED before the same PC=0x0 hard-kill family. Physical 0.0.125 independently confirms repeatability of that native failure family, but its diagnostic artifacts cannot be safely correlated across runs.
+
+Required next diagnostic correction:
+- assign one immutable Run ID/PID before Gate A;
+- write a unique run-specific crash journal and unique run-specific static map sharing that identity;
+- publish Step35-CurrentRun.txt naming the exact pair;
+- publish an independently flushed overwrite-on-each-event Step35-LastCheckpoint.txt;
+- refuse Gate A if the initial journal cannot be durably created/flushed;
+- refuse Gate B if the same-run static map cannot be durably created/flushed;
+- preserve the exact 0.0.125 execution/resolver authority otherwise.

@@ -22,3 +22,6 @@ Selected build/device diagnostic outputs are retained here when they materially 
 
 - `STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.122 Step-34 closure: exact transformed PrewarmJit invoked once and returned normally; 8 managed requests = 6 exact host + 2 initializer-free private loads; zero initializer-bearing/unplanned/native escape; 4/4 PASS.
 - `STEP-35.0-PHYSICAL-HARD-TERMINATION-SUMMARY.txt` — sanitized physical 0.0.123 hard-termination evidence summary; raw device `.ips` is intentionally excluded from source because it can contain device identifiers.
+
+- `STEP-35.0.1-PHYSICAL-EXECUTEVERYEARLY-INVOKE-CRASH-LOCALIZATION.txt` — sanitized physical 0.0.124 evidence proving Gate B PASS and the exact ExecuteVeryEarly invoke-time crash frontier.
+- `STEP-35.0.2-PHYSICAL-REPEATED-HARD-TERMINATION-AND-TELEMETRY-CORRELATION.txt` — sanitized physical 0.0.125 repeated PC=0x0 / CODESIGNING Invalid Page failure plus the cross-run static-map/checkpoint correlation gap that motivated 0.0.126.
