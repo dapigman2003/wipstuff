@@ -187,3 +187,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0-PHYSICAL-HARD-TERMINATION-SUMMARY.txt` — sanitized physical 0.0.123 evidence: app terminated around visible B→C region; matching iOS crash report shows EXC_BAD_ACCESS/SIGKILL, main-thread PC=0x0, and no managed Step-35 report.
 - `steps/STEP-35.0.1-B-C-HARD-TERMINATION-CRASH-LOCALIZATION.md` — 0.0.124 diagnostic-only revision: freezes Step-35 compatibility authority and adds durable provenance/thread-aware checkpoints around Gate B, the B→C handoff, ExecuteVeryEarly binding/invocation/await, and resolver callbacks; cancellation is INCONCLUSIVE.
+
+## Step 35.0.1 physical invoke-crash localization / Step 35.0.2 static IL-callsite diagnostic
+
+- `reports/STEP-35.0.1-PHYSICAL-EXECUTEVERYEARLY-INVOKE-CRASH-LOCALIZATION.txt` — sanitized physical 0.0.124 evidence: Gate B passed fully; Gate C entered exact ExecuteVeryEarly `MethodInfo.Invoke`, serviced planned GodotSharp/Steamworks.NET/framework resolutions, then hard-terminated before `C_INVOKE_RETURNED`; matching `.ips` repeats main-thread PC=0x0 and the same runtime-heavy stack shape as 0.0.123.
+- `steps/STEP-35.0.2-EXECUTEVERYEARLY-INVOKE-CRASH-STATIC-ILCALLSITE-LOCALIZATION.md` — 0.0.125 diagnostic-only revision: execution/resolver authority unchanged; emit a resolution-free static IL/callsite map of the exact verified transformed ExecuteVeryEarly wrapper + async MoveNext before CLR admission, while retaining durable runtime checkpoints.

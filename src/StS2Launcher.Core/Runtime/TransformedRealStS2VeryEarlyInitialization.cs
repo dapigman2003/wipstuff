@@ -4,6 +4,7 @@ using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace StS2Launcher.Core;
 
@@ -121,6 +122,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             uint transformedMoveNextToken;
             string targetSemanticSha256;
             string moveNextSemanticSha256;
+            string veryEarlyStaticInstructionMap;
             using (var sourceResolver = new RejectingAssemblyResolver())
             using (var transformedResolver = new RejectingAssemblyResolver())
             using (var sourceModule = ModuleDefinition.ReadModule(sourcePath, new ReaderParameters
@@ -172,6 +174,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 if (CountHarmonyMethodReferences(sourceMoveNext) != 0 || CountHarmonyMethodReferences(transformedMoveNext) != 0)
                     throw new InvalidDataException("Step-35 ExecuteVeryEarly unexpectedly contains a direct Harmony method reference.");
 
+                veryEarlyStaticInstructionMap = BuildStaticInstructionMap(transformedMethod, transformedMoveNext);
                 transformedMethodToken = transformedMethod.MetadataToken.ToUInt32();
                 transformedMoveNextToken = transformedMoveNext.MetadataToken.ToUInt32();
                 if (sourceResolver.Requests.Count != 0 || transformedResolver.Requests.Count != 0)
@@ -225,6 +228,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 transformedMoveNextToken,
                 targetSemanticSha256,
                 moveNextSemanticSha256,
+                veryEarlyStaticInstructionMap,
                 plan,
                 planSha256,
                 prepared,
@@ -268,6 +272,12 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             _preflight = null;
             return Fail(gate, stage, ex);
         }
+    }
+
+    public string GetVerifiedVeryEarlyStaticInstructionMap()
+    {
+        ThrowIfDisposed();
+        return RequirePreflight().VeryEarlyStaticInstructionMap;
     }
 
     [UnconditionalSuppressMessage(
@@ -391,7 +401,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.1 preserves the exact Step-35 reflected ExecuteVeryEarly invocation; the added callback is output-only crash telemetry.")]
+        Justification = "Step 35.0.2 preserves the exact Step-35 reflected ExecuteVeryEarly invocation; added diagnostics are output-only telemetry.")]
     public async Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunExactExecuteVeryEarlyInvocationAsync(
         Action<string>? crashCheckpoint,
         CancellationToken cancellationToken = default)
@@ -721,6 +731,79 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             .SingleOrDefault(method => method.MetadataToken.ToUInt32() == token)
             ?? throw new MissingMethodException($"Step-35 source method token 0x{token:X8} is absent.");
 
+    internal static string BuildStaticInstructionMap(MethodDefinition wrapper, MethodDefinition moveNext)
+    {
+        if (!wrapper.HasBody || !moveNext.HasBody)
+            throw new InvalidDataException("Step-35 static instruction map requires managed IL for wrapper and MoveNext.");
+
+        var lines = new List<string>
+        {
+            "StS2 Launcher — Step 35 ExecuteVeryEarly static IL/callsite map",
+            "Diagnostic-only output derived from the exact transformed image before CLR admission; never consumed as trusted runtime input.",
+            $"Wrapper: token=0x{wrapper.MetadataToken.ToUInt32():X8}; {wrapper.FullName}",
+            $"Wrapper instructions={wrapper.Body.Instructions.Count}; handlers={wrapper.Body.ExceptionHandlers.Count}; locals={wrapper.Body.Variables.Count}",
+            $"MoveNext: token=0x{moveNext.MetadataToken.ToUInt32():X8}; {moveNext.FullName}",
+            $"MoveNext instructions={moveNext.Body.Instructions.Count}; handlers={moveNext.Body.ExceptionHandlers.Count}; locals={moveNext.Body.Variables.Count}",
+            "Legend: CALLSITE marks call/callvirt/newobj; AWAIT-CANDIDATE marks Async*MethodBuilder await registration; scope is metadata scope only (no Cecil Resolve).",
+            string.Empty,
+            "[WRAPPER IL]",
+        };
+        AppendInstructionMap(lines, wrapper);
+        lines.Add(string.Empty);
+        lines.Add("[MOVENEXT IL]");
+        AppendInstructionMap(lines, moveNext);
+        return string.Join("\n", lines);
+    }
+
+    private static void AppendInstructionMap(List<string> lines, MethodDefinition method)
+    {
+        var callIndex = 0;
+        foreach (var instruction in method.Body.Instructions)
+        {
+            var tags = new List<string>();
+            if (instruction.OpCode.Code is Code.Call or Code.Callvirt or Code.Newobj)
+            {
+                callIndex++;
+                tags.Add($"CALLSITE#{callIndex:D3}");
+            }
+
+            if (instruction.Operand is MethodReference methodReference &&
+                (methodReference.Name.Contains("AwaitUnsafeOnCompleted", StringComparison.Ordinal) ||
+                 methodReference.Name.Contains("AwaitOnCompleted", StringComparison.Ordinal)))
+            {
+                tags.Add("AWAIT-CANDIDATE");
+            }
+
+            var tagText = tags.Count == 0 ? string.Empty : " [" + string.Join(",", tags) + "]";
+            lines.Add($"IL_{instruction.Offset:X4}: {instruction.OpCode.Name}{tagText}{DescribeInstructionOperand(instruction.Operand)}");
+        }
+    }
+
+    private static string DescribeInstructionOperand(object? operand)
+        => operand switch
+        {
+            null => string.Empty,
+            MethodReference method => $" | method={method.FullName} | token=0x{method.MetadataToken.ToUInt32():X8} | scope={DescribeMetadataScope(method.DeclaringType.Scope)}",
+            FieldReference field => $" | field={field.FullName} | token=0x{field.MetadataToken.ToUInt32():X8} | scope={DescribeMetadataScope(field.DeclaringType.Scope)}",
+            TypeReference type => $" | type={type.FullName} | token=0x{type.MetadataToken.ToUInt32():X8} | scope={DescribeMetadataScope(type.Scope)}",
+            Instruction target => $" | target=IL_{target.Offset:X4}",
+            Instruction[] targets => " | targets=" + string.Join(",", targets.Select(target => $"IL_{target.Offset:X4}")),
+            VariableDefinition variable => $" | local=V_{variable.Index}:{variable.VariableType.FullName}",
+            ParameterDefinition parameter => $" | parameter={parameter.Index}:{parameter.ParameterType.FullName}",
+            string text => $" | string={JsonSerializer.Serialize(text)}",
+            _ => $" | operand={operand}",
+        };
+
+    private static string DescribeMetadataScope(IMetadataScope? scope)
+        => scope switch
+        {
+            AssemblyNameReference assembly => assembly.FullName,
+            ModuleDefinition module => module.Assembly?.Name.FullName ?? module.Name,
+            ModuleReference module => module.Name,
+            null => "<none>",
+            _ => scope.ToString() ?? "<unknown>",
+        };
+
     private static int CountLaterOneTimeInitializationCalls(MethodDefinition moveNext)
     {
         var later = new HashSet<string>(StringComparer.Ordinal) { "ExecuteEssential", "ExecuteDeferred", "PrewarmJit" };
@@ -908,6 +991,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         uint TransformedMoveNextToken,
         string TargetSemanticSha256,
         string MoveNextSemanticSha256,
+        string VeryEarlyStaticInstructionMap,
         RuntimeFrameworkBindingPlanDocument Plan,
         string PlanSha256,
         PreparedExecutionEntry[] PreparedAssemblies,

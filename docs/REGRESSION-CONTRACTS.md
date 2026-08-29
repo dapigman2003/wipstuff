@@ -327,11 +327,11 @@ Host coverage must protect four-gate ordering, successful initializer-free priva
 
 Physical 0.0.122 CLOSED Step 34 positively at **4/4 PASS**. Preserve `docs/history/reports/STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` as authoritative evidence. The exact transformed `OneTimeInitialization::PrewarmJit()` MethodDef token `0x0600AFEA` must remain invocable once and return normally under the strict prepared resolver. The closed physical resolver result is 8 managed requests = 6 exact planned host-framework loads + 2 hash-pinned initializer-free prepared private loads, with 0 initializer-bearing requests, 0 unplanned managed requests and 0 native attempts. The receipt-backed/prepared original remains outside the CLR; no game entry point, Harmony/MonoMod patching or Godot/game startup is authorized by this closure.
 
-## Step 35.0 / 35.0.1 — controlled transformed very-early initialization and crash localization
+## Step 35.0 / 35.0.1 / 35.0.2 — controlled transformed very-early initialization and invoke-crash localization
 
-Physical 0.0.123 attempted the Step-35 boundary and hard-terminated around the visible Gate-B/B→C region. A matching iOS `.ips` identifies 0.0.123 (123) and reports `EXC_BAD_ACCESS / SIGKILL`, faulting main thread, PC=`0x0`, with no surviving managed Step-35 report. This is **not** a Step-35 closure and does not revoke Steps 32–34. The exact Gate-B-vs-Gate-C frontier remains unproven until durable checkpoint evidence localizes it.
+Physical 0.0.123 attempted the Step-35 boundary and hard-terminated while the UI still appeared near Gate B. Physical 0.0.124 then proved Gate B PASS and localized the same main-thread PC=`0x0` hard kill after `C_INVOKE_START`, after successful planned `GodotSharp`/`Steamworks.NET`/host-framework resolution, and before `C_INVOKE_RETURNED`. This is **not** a Step-35 closure and does not revoke Steps 32–34.
 
-0.0.124 must preserve every 0.0.123 compatibility contract and add observability only:
+0.0.125 must preserve every 0.0.123/0.0.124 compatibility contract and add diagnostic static-map observability only:
 
 - preserve all physically closed Step-32, Step-33 and Step-34 contracts;
 - hard-pin exact source `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()` MethodDef `0x06007D02`, static parameterless `System.Threading.Tasks.Task`, plus `<ExecuteVeryEarly>d__7::MoveNext` source token `0x0600BC71`;
@@ -347,6 +347,7 @@ Physical 0.0.123 attempted the Step-35 boundary and hard-terminated around the v
 - re-prove OfflineReady, trusted source/transformed/runtime-plan hashes, loaded-private hashes and exact context residency after successful execution;
 - intentionally invoke no `ExecuteEssential`, `ExecuteDeferred`, `PrewarmJit`, game entry point, Harmony/MonoMod API or Godot/game startup;
 - synchronously write output-only `Step35-CrashCheckpoint.txt` provenance/thread/frontier records around Gate B, B→C transition, Gate-C binding/invocation/await, and resolver callbacks;
-- never consume crash-checkpoint telemetry as trusted runtime input, and never change compatibility/resolver decisions because checkpoint writing failed.
+- after Gate-A semantic verification and before CLR admission, write output-only `Step35-ExecuteVeryEarly-StaticMap.txt` from the exact transformed wrapper + MoveNext, including every IL instruction/operand, metadata scope, numbered call/callvirt/newobj callsites, and await-registration candidates without Cecil `Resolve`;
+- never consume crash-checkpoint or static-map telemetry as trusted runtime input, and never change compatibility/resolver decisions because diagnostic writing failed.
 
-Host coverage must protect four-gate ordering, first-failure stopping, exact source target constants, initializer-bearing refusal, and checkpoint callback coverage around primary/private load events. Physical closure still requires one exact A–D **4/4 PASS** report. A hard termination instead requires preservation of `Step35-CrashCheckpoint.txt` and the matching OS crash report before any rerun; the last durable checkpoint is the next evidence boundary.
+Host coverage must protect four-gate ordering, first-failure stopping, exact source target constants, initializer-bearing refusal, checkpoint callback coverage around primary/private load events, and static-map callsite/await tagging. Physical closure still requires one exact A–D **4/4 PASS** report. A hard termination instead requires preservation of `Step35-CrashCheckpoint.txt` and the matching OS crash report before any rerun; the last durable checkpoint is the next evidence boundary.

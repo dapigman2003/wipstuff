@@ -118,6 +118,40 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
     }
 
     [TestMethod]
+    public void StaticInstructionMapCapturesCallsitesAndAwaitCandidatesWithoutResolution()
+    {
+        using var assembly = AssemblyDefinition.CreateAssembly(
+            new AssemblyNameDefinition("StaticMapFixture", new Version(1, 0, 0, 0)),
+            "StaticMapFixture",
+            ModuleKind.Dll);
+        var module = assembly.MainModule;
+        var type = new TypeDefinition("Fixture", "StateMachine", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+        module.Types.Add(type);
+
+        var wrapper = new MethodDefinition("ExecuteVeryEarly", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+        wrapper.Body.GetILProcessor().Append(wrapper.Body.GetILProcessor().Create(OpCodes.Ret));
+        type.Methods.Add(wrapper);
+
+        var moveNext = new MethodDefinition("MoveNext", Mono.Cecil.MethodAttributes.Public, module.TypeSystem.Void);
+        type.Methods.Add(moveNext);
+        var systemRuntime = new AssemblyNameReference("System.Runtime", new Version(9, 0, 0, 0));
+        module.AssemblyReferences.Add(systemRuntime);
+        var builderType = new TypeReference("System.Runtime.CompilerServices", "AsyncTaskMethodBuilder", module, systemRuntime);
+        var awaitCall = new MethodReference("AwaitUnsafeOnCompleted", module.TypeSystem.Void, builderType);
+        var il = moveNext.Body.GetILProcessor();
+        il.Append(il.Create(OpCodes.Call, awaitCall));
+        il.Append(il.Create(OpCodes.Ret));
+
+        var map = TransformedRealStS2VeryEarlyInitialization.BuildStaticInstructionMap(wrapper, moveNext);
+
+        StringAssert.Contains(map, "[MOVENEXT IL]");
+        StringAssert.Contains(map, "CALLSITE#001");
+        StringAssert.Contains(map, "AWAIT-CANDIDATE");
+        StringAssert.Contains(map, "System.Runtime, Version=9.0.0.0");
+        StringAssert.Contains(map, "AwaitUnsafeOnCompleted");
+    }
+
+    [TestMethod]
     public void Step35PinsTheExactVeryEarlyManagedInitializationTarget()
     {
         Assert.AreEqual("MegaCrit.Sts2.Core.Helpers.OneTimeInitialization", TransformedRealStS2VeryEarlyInitialization.TargetTypeFullName);

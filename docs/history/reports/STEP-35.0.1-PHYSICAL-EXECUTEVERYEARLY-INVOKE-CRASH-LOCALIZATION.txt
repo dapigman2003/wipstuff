@@ -1,0 +1,32 @@
+StS2 Launcher — Step 35.0.1 Physical ExecuteVeryEarly Invoke-Crash Localization
+Candidate: 0.0.124 (124)
+Status: PHYSICAL HARD TERMINATION; STEP 35 REMAINS OPEN
+
+Sanitized evidence only. Raw device crash reports and device-specific identifiers are not stored in the source archive.
+
+Physical checkpoint evidence:
+- Gate A PASS.
+- Gate B PASS end-to-end: fresh-process guard, exact transformed SHA-256, strict ALC construction, transformed primary LoadFromStream, context ownership, identity, MVID, zero primary-admission resolution, unique global residency and private-context enumeration all passed.
+- UI continuation resumed on managed thread 1 and recorded Gate B PASS.
+- Gate C entered on managed thread 1.
+- Assembly.GetType bound exact OneTimeInitialization after exact System.Runtime host resolution.
+- Type.GetMethod bound exact static parameterless Task-returning ExecuteVeryEarly.
+- reflected transformed token matched 0x0600AFE7 and MVID matched 518e4758-52d7-47c2-b776-471a0e29e49d.
+- C_INVOKE_START was durably written for the first and only MethodInfo.Invoke(null, null).
+- during that invocation, exact planned resolution successfully loaded initializer-free GodotSharp 4.5.1.0 and Steamworks.NET 1.0.0.0 from hash-pinned prepared bytes.
+- exact host framework resolution also serviced System.Runtime, System.Collections, System.Collections.Concurrent and System.Text.Json requests.
+- last durable checkpoint was RESOLVE_HOST_PASS for System.Collections.Concurrent 8.0.0.0 -> host System.Collections.Concurrent 9.0.0.0.
+- C_INVOKE_RETURNED was never written.
+- managed finally/report did not run.
+
+Matching iOS crash report summary:
+- exact candidate 0.0.124 (124), same process id as checkpoint.
+- foreground main thread fault.
+- EXC_BAD_ACCESS / SIGKILL, KERN_PROTECTION_FAILURE at 0x0, PC=0x0.
+- CODESIGNING / Invalid Page termination label.
+- native/runtime application-frame stack shape is effectively the same as physical 0.0.123. Comparing the 40 application-image frames in order, 34 shift by exactly +38,672 bytes in 0.0.124; the remaining six are small build-layout variants. This is strong evidence that the diagnostic instrumentation changed binary layout while preserving the same crash path.
+
+Conclusion:
+The 0.0.123 visible Gate-B observation is retrospectively localized: Gate B is not the hard-termination frontier. Physical 0.0.124 proves exact transformed CLR admission succeeds and the hard kill occurs inside synchronous execution initiated by the exact transformed ExecuteVeryEarly MethodInfo.Invoke, after several planned dependency/framework resolutions and before Invoke returns a Task.
+
+This does NOT yet identify which ExecuteVeryEarly/MoveNext IL callsite or type initialization triggers the native PC=0x0 termination. Do not broaden resolver/native/Harmony/Godot authority based on assembly names alone. The smallest next discriminator is to persist a resolution-free static IL/callsite map for the exact verified transformed ExecuteVeryEarly wrapper + async MoveNext before re-running the unchanged invocation.

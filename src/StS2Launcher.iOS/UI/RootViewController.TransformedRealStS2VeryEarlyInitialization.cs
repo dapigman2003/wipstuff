@@ -11,16 +11,17 @@ public sealed partial class RootViewController
     private UIButton? _transformedRealStS2VeryEarlyInitializationButton;
     private readonly object _step35CrashCheckpointSync = new();
     private const string Step35CrashCheckpointFileName = "Step35-CrashCheckpoint.txt";
+    private const string Step35StaticMapFileName = "Step35-ExecuteVeryEarly-StaticMap.txt";
 
     private void AddTransformedRealStS2VeryEarlyInitializationControls(UIStackView content)
     {
         content.AddArrangedSubview(Label(
-            "Step 35.0.1 — Controlled Very-Early Initialization Crash Localization (ordered gates A–D; behavior unchanged)",
+            "Step 35.0.2 — ExecuteVeryEarly Invoke-Crash Static IL/Callsite Localization (ordered gates A–D; behavior unchanged)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
         _transformedRealStS2VeryEarlyInitializationButton = SystemButton(
-            "Run Step 35.0.1 A–D — Reverify → Admit → Invoke/Await ExecuteVeryEarly Once → Audit + Durable B→C Crash Checkpoints",
+            "Run Step 35.0.2 A–D — Reverify + Static IL Map → Admit → Invoke/Await ExecuteVeryEarly Once → Audit",
             17);
         _transformedRealStS2VeryEarlyInitializationButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync();
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationButton);
@@ -32,7 +33,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationResultLabel);
 
         _transformedRealStS2VeryEarlyInitializationDetailLabel = Label(
-            "Physical 0.0.123 reached the Step-35 B→C region and then hard-terminated with an iOS EXC_BAD_ACCESS/SIGKILL report showing faulting main thread PC=0x0; no managed Step-35 report survived. Because Gate B is functionally the physically proven Step-34 admission path and the screen can still display Gate B while synchronous Gate-C work has already begun, 0.0.124 keeps the exact same Step-35 execution policy and adds synchronously flushed crash checkpoints across Gate B, the B→C transition, exact type/method binding, MethodInfo.Invoke, Task await, and resolver callbacks. Preserve Step35-CrashCheckpoint.txt after any abrupt termination. ExecuteEssential, ExecuteDeferred, the game entry point, Harmony, native loading and Godot/game startup remain separate later boundaries.",
+            "Physical 0.0.124 localized the hard termination: Gate B passed completely; Gate C bound exact transformed ExecuteVeryEarly and entered the first/only MethodInfo.Invoke. The process then survived multiple exact resolver operations, including GodotSharp and Steamworks.NET private loads plus host framework loads, but died before C_INVOKE_RETURNED with the same main-thread PC=0x0 native signature as 0.0.123. Step 35.0.2 / 0.0.125 keeps execution authority unchanged and additionally writes Step35-ExecuteVeryEarly-StaticMap.txt before CLR admission, containing the exact transformed ExecuteVeryEarly wrapper + async MoveNext IL/callsite map without Cecil dependency resolution. Preserve both diagnostic files after an abrupt termination. ExecuteEssential, ExecuteDeferred, the game entry point, Harmony, native loading and Godot/game startup remain separate later boundaries.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationDetailLabel);
@@ -75,7 +76,7 @@ public sealed partial class RootViewController
         try
         {
             ResetStep35CrashCheckpoint();
-            WriteStep35CrashCheckpoint("RUN_START — fresh-process Step 35.0.1 diagnostic run started; execution authority is unchanged from 0.0.123.");
+            WriteStep35CrashCheckpoint("RUN_START — fresh-process Step 35.0.2 diagnostic run started; execution authority is unchanged from 0.0.123/0.0.124.");
             var token = _operationCts?.Token ?? CancellationToken.None;
             var progress = new Progress<TransformedRealStS2VeryEarlyInitializationProgress>(value =>
             {
@@ -88,7 +89,9 @@ public sealed partial class RootViewController
             var gateA = await _transformedRealStS2VeryEarlyInitialization.RunVerifiedExecutionPreflightAsync(progress, token);
             WriteStep35CrashCheckpoint($"A_RESULT — passed={gateA.Passed}; gate={gateA.Gate}.");
             if (!RecordTransformedRealStS2VeryEarlyInitializationGate(gateA)) return;
-            WriteStep35CrashCheckpoint("A_PASS — Gate A completed; about to select/schedule Gate B.");
+            WriteStep35CrashCheckpoint("A_PASS — Gate A completed; writing verified static ExecuteVeryEarly IL/callsite map before any CLR admission.");
+            WriteStep35StaticMap();
+            WriteStep35CrashCheckpoint("A_STATIC_MAP_WRITE_RETURNED — diagnostic static-map writer returned; about to select/schedule Gate B.");
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE B RUNNING…";
             _statusLabel.Text = "STEP 35 GATE B — CLR-admit only the exact transformed sts2.dll into the strict execution context and re-prove Step-33 zero-resolution admission behavior.";
@@ -198,8 +201,9 @@ public sealed partial class RootViewController
         lines.Add("Step 32 physical baseline: CLOSED POSITIVE — 0.0.120 passed 4/4. Exact transformed SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef; transformed PrewarmJit token 0x0600AFEA; semantic fingerprint 47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a; zero PrepareMethod references; trusted install unchanged.");
         lines.Add("Step 33 physical baseline: CLOSED POSITIVE — 0.0.121 passed 4/4. Only the exact transformed primary entered StS2Launcher-Step33-TransformedGame; admission caused zero managed resolver requests, zero private dependency loads and zero native attempts; no game member was reflected or invoked.");
         lines.Add("Step 34 physical baseline: CLOSED POSITIVE — 0.0.122 passed 4/4. Exact transformed PrewarmJit was invoked once and returned normally; 8 managed requests produced 6 exact host loads + 2 initializer-free private loads, with zero initializer-bearing/unplanned/native escape and no entry point/Godot startup.");
-        lines.Add("Step 35.0 physical 0.0.123 observation: app hard-terminated around the visible Gate-B region; matching iOS .ips reported EXC_BAD_ACCESS/SIGKILL with faulting main-thread PC=0x0 and no managed Step-35 report. That observation is not yet localized to Gate B versus the synchronous prefix of Gate C.");
-        lines.Add("Step 35.0.1 diagnostic scope: preserve the exact 0.0.123 execution authority while synchronously flushing provenance/thread-aware checkpoints across Gate B, the B→C transition, exact ExecuteVeryEarly binding/invocation/Task await, and managed/native resolver callbacks. Preserve Step35-CrashCheckpoint.txt after any abrupt exit.");
+        lines.Add("Step 35.0 physical 0.0.123 observation: app hard-terminated while the UI still appeared near Gate B; the matching iOS .ips reported EXC_BAD_ACCESS/SIGKILL with faulting main-thread PC=0x0 and no managed Step-35 report.");
+        lines.Add("Step 35.0.1 physical 0.0.124 localization: Gate A passed; Gate B passed fully through LoadFromStream/identity/MVID/zero-resolution/residency checks; Gate C bound exact transformed ExecuteVeryEarly, entered MethodInfo.Invoke, loaded GodotSharp and Steamworks.NET plus exact host frameworks, then hard-terminated before C_INVOKE_RETURNED. The matching .ips repeats the main-thread PC=0x0 native signature and essentially the same runtime stack shape as 0.0.123.");
+        lines.Add("Step 35.0.2 diagnostic scope: preserve the exact 0.0.123/0.0.124 execution authority and existing crash checkpoints, while adding output-only Step35-ExecuteVeryEarly-StaticMap.txt generated from the exact transformed wrapper/MoveNext before CLR admission. Use it to correlate the invoke-time resolver frontier with exact IL callsites; do not treat the diagnostic map as compatibility proof or trusted input.");
         lines.Add("Step 35 scope: begin the natural managed startup sequence at exact static parameterless Task-returning MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly(), source token 0x06007D02. Re-prove its unchanged async state machine, admit only the exact transformed primary, invoke once and await the returned Task for at most 60 seconds.");
         lines.Add("Resolver boundary: exact persisted host-framework bindings and hash-pinned initializer-free prepared private dependencies may be serviced on demand. The known initializer-bearing 0Harmony 2.4.2.0 dependency remains forbidden; any changed/additional initializer-bearing dependency, unplanned managed request, or native request fails closed.");
         lines.Add("Forbidden in Step 35: receipt-backed/prepared original sts2.dll CLR admission, intentional ExecuteEssential/ExecuteDeferred/PrewarmJit invocation by the launcher, game entry-point execution, Harmony/MonoMod API invocation or runtime patching, Godot/game startup, native game loading, arbitrary resolver fallback, or broad startup sequencing.");
@@ -218,14 +222,14 @@ public sealed partial class RootViewController
                 var path = Path.Combine(_deviceTestReportWriter.ReportsRoot, Step35CrashCheckpointFileName);
                 using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.None);
                 using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), 1024, leaveOpen: true);
-                writer.WriteLine("StS2 Launcher — Step 35.0.1 crash checkpoint");
+                writer.WriteLine("StS2 Launcher — Step 35.0.2 crash checkpoint");
                 writer.WriteLine("Output-only diagnostic; never consumed as trusted runtime input.");
                 writer.WriteLine($"Initialized UTC: {DateTimeOffset.UtcNow:O}");
                 writer.WriteLine($"Process ID: {Environment.ProcessId}");
                 writer.WriteLine($"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})");
                 writer.WriteLine($"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})");
-                writer.WriteLine("Candidate: STEP 35.0.1 — B→C HARD-TERMINATION CRASH LOCALIZATION");
-                writer.WriteLine("Execution policy: unchanged from Step 35.0 / 0.0.123; diagnostic checkpoints only.");
+                writer.WriteLine("Candidate: STEP 35.0.2 — EXECUTEVERYEARLY INVOKE-CRASH STATIC ILCALLSITE LOCALIZATION");
+                writer.WriteLine("Execution policy: unchanged from Step 35.0 / 0.0.123 and Step 35.0.1 / 0.0.124; diagnostics only.");
                 writer.WriteLine($"Implementation: {CurrentReleasePresentation.Step35ImplementationMarker}");
                 writer.WriteLine();
                 writer.Flush();
@@ -235,6 +239,32 @@ public sealed partial class RootViewController
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Step-35 crash-checkpoint reset failed: {ex.GetType().Name}: {ex.Message}");
+        }
+    }
+
+    private void WriteStep35StaticMap()
+    {
+        try
+        {
+            Directory.CreateDirectory(_deviceTestReportWriter.ReportsRoot);
+            var path = Path.Combine(_deviceTestReportWriter.ReportsRoot, Step35StaticMapFileName);
+            var body = _transformedRealStS2VeryEarlyInitialization.GetVerifiedVeryEarlyStaticInstructionMap();
+            using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.None);
+            using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), 1024, leaveOpen: true);
+            writer.WriteLine($"Generated UTC: {DateTimeOffset.UtcNow:O}");
+            writer.WriteLine($"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})");
+            writer.WriteLine($"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})");
+            writer.WriteLine("Candidate: STEP 35.0.2 — output-only static ExecuteVeryEarly IL/callsite localization");
+            writer.WriteLine("This file is generated from the already-verified exact transformed image before CLR admission and is never consumed as runtime input.");
+            writer.WriteLine();
+            writer.Write(body);
+            writer.WriteLine();
+            writer.Flush();
+            stream.Flush(flushToDisk: true);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Step-35 static-map write failed: {ex.GetType().Name}: {ex.Message}");
         }
     }
 
