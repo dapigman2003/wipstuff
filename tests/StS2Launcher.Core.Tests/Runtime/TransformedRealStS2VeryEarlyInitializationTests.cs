@@ -11,18 +11,18 @@ namespace StS2Launcher.Core.Tests;
 public sealed class TransformedRealStS2VeryEarlyInitializationTests
 {
     [TestMethod]
-    public void OrderedVeryEarlyInitializationGatesReachFourOfFourPass()
+    public void OrderedDiagnosticLocalizationGatesReachFourOfFourWithoutClaimingClosure()
     {
         var gates = new TransformedRealStS2VeryEarlyInitializationGateSequence();
         gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.VerifiedExecutionPreflight, true, "preflight"));
         gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.ExecutionCapableClrAdmission, true, "admission"));
-        gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.ExactExecuteVeryEarlyInvocation, true, "invoke"));
+        gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.DiagnosticExecuteVeryEarlyInvocation, true, "invoke"));
         gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.FinalIsolationAudit, true, "isolation"));
 
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION PASS — 4/4", summary.Summary);
+        Assert.AreEqual("STEP 35.0.4 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -31,11 +31,11 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var gates = new TransformedRealStS2VeryEarlyInitializationGateSequence();
         gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.VerifiedExecutionPreflight, true, "preflight"));
         gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.ExecutionCapableClrAdmission, true, "admission"));
-        gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.ExactExecuteVeryEarlyInvocation, false, "failed"));
+        gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.DiagnosticExecuteVeryEarlyInvocation, false, "failed"));
 
         Assert.ThrowsExactly<InvalidOperationException>(() =>
             gates.Record(new(TransformedRealStS2VeryEarlyInitializationGate.FinalIsolationAudit, true, "must not advance")));
-        Assert.AreEqual(TransformedRealStS2VeryEarlyInitializationGate.ExactExecuteVeryEarlyInvocation, gates.Snapshot().FirstFailingGate);
+        Assert.AreEqual(TransformedRealStS2VeryEarlyInitializationGate.DiagnosticExecuteVeryEarlyInvocation, gates.Snapshot().FirstFailingGate);
     }
 
     [TestMethod]

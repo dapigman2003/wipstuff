@@ -10,8 +10,9 @@ namespace StS2Launcher.Core;
 
 /// <summary>
 /// Step 35 boundary. Re-manufactures/reverifies the physically closed Step-32 transformed image,
-/// re-establishes the Step-33 transformed-primary admission contract in a fresh execution-capable
-/// private AssemblyLoadContext, then reflects and invokes exactly transformed
+/// emits a diagnostic-only clone that preserves identity/MVID while adding entry checkpoints to the
+/// pre-first-await call chain, admits only that clone into a fresh execution-capable private
+/// AssemblyLoadContext, then reflects and invokes the instrumented
 /// MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly() once and awaits its exact Task to completion. Resolver authority remains
 /// limited to the persisted Step-21/22 host bindings and hash-pinned initializer-free prepared private
 /// dependencies. Initializer-bearing private dependencies (including 0Harmony), unplanned managed
@@ -28,6 +29,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     public const long ClosedSourceBytes = 9_363_456;
     public const string TargetStateMachineTypeName = "<ExecuteVeryEarly>d__7";
     public const uint SourceStateMachineMoveNextToken = 0x0600BC71;
+    public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
+    public const string DiagnosticBridgeCallbackFieldName = "Callback";
+    private const string DiagnosticCloneFileName = "sts2.step35.0.4.instrumented.dll";
 
     private readonly string _launcherDataRoot;
     private readonly string _preparedWorkRoot;
@@ -86,16 +90,16 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             cancellationToken.ThrowIfCancellationRequested();
 
             stage = "closed Step-32 transformation requalification";
-            progress?.Report(new(gate, 0, 7, null,
+            progress?.Report(new(gate, 0, 8, null,
                 "Re-running the physically closed Step-32 A-D transform contract. No StS2 CLR admission or game invocation occurs in Gate A."));
             RequireRewritePass("Step 32 Gate A", await _rewrite.RunSourceAdmissionAndPrivateCloneAsync(cancellationToken: cancellationToken).ConfigureAwait(false));
-            progress?.Report(new(gate, 1, 7, null, "Step-32 Gate A requalified."));
+            progress?.Report(new(gate, 1, 8, null, "Step-32 Gate A requalified."));
             RequireRewritePass("Step 32 Gate B", _rewrite.RunDeterministicStackNeutralRewrite());
-            progress?.Report(new(gate, 2, 7, null, "Step-32 Gate B requalified; exact transformed bytes manufactured privately."));
+            progress?.Report(new(gate, 2, 8, null, "Step-32 Gate B requalified; exact transformed bytes manufactured privately."));
             RequireRewritePass("Step 32 Gate C", _rewrite.RunTransformedImageVerification());
-            progress?.Report(new(gate, 3, 7, null, "Step-32 Gate C requalified; transformed semantics independently reopened and verified."));
+            progress?.Report(new(gate, 3, 8, null, "Step-32 Gate C requalified; transformed semantics independently reopened and verified."));
             RequireRewritePass("Step 32 Gate D", await _rewrite.RunFinalIsolationAuditAsync(cancellationToken: cancellationToken).ConfigureAwait(false));
-            progress?.Report(new(gate, 4, 7, null, "Step-32 Gate D requalified; trusted source remains isolated."));
+            progress?.Report(new(gate, 4, 8, null, "Step-32 Gate D requalified; trusted source remains isolated."));
 
             stage = "physical Step-32 transformed artifact and very-early startup target identity";
             var sourcePath = Path.Combine(
@@ -180,8 +184,20 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 if (sourceResolver.Requests.Count != 0 || transformedResolver.Requests.Count != 0)
                     throw new InvalidDataException("Step-35 source/transformed very-early metadata inspection unexpectedly resolved a dependency through Cecil.");
             }
-            progress?.Report(new(gate, 5, 7, transformedPath,
+            progress?.Report(new(gate, 5, 8, transformedPath,
                 "Exact source/transformed ExecuteVeryEarly wrapper + async MoveNext semantics requalified; no direct ExecuteEssential/ExecuteDeferred/PrewarmJit or Harmony call crosses this boundary."));
+
+            stage = "Step-35.0.4 diagnostic-clone instrumentation";
+            var diagnosticRoot = Path.Combine(_launcherDataRoot, "Step35-ExecuteVeryEarlyDiagnostic");
+            Directory.CreateDirectory(diagnosticRoot);
+            var diagnosticPath = Path.Combine(diagnosticRoot, DiagnosticCloneFileName);
+            var diagnostic = CreateInstrumentedDiagnosticClone(transformedPath, diagnosticPath);
+            VerifyFileLength(transformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "exact transformed primary after diagnostic-clone emission");
+            var transformedSha256AfterDiagnosticEmission = ComputeSha256Hex(transformedPath);
+            if (!transformedSha256AfterDiagnosticEmission.Equals(transformedSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-35.0.4 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
+            progress?.Report(new(gate, 6, 8, diagnosticPath,
+                $"Exact transformed image requalified, then a Step-35.0.4 diagnostic-only clone was emitted with {diagnostic.MarkerCount:N0} in-method entry markers; the exact transformed source was immediately re-hashed unchanged and is never overwritten or CLR-loaded by this candidate."));
 
             stage = "Step-21/22 prepared execution-plan preflight";
             var preparedResult = await _preparedPreflight.RunPreparedLoadPreflightAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -219,11 +235,17 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     (initializerBearing.Length == 0 ? "<none>" : string.Join(" | ", initializerBearing.Select(item => item.Plan.AssemblyFullName))));
             }
 
-            progress?.Report(new(gate, 6, 7, _planPath, "Prepared runtime-binding plan and exact initializer-bearing boundary requalified; no prepared assembly has been CLR-loaded."));
+            progress?.Report(new(gate, 7, 8, _planPath, "Prepared runtime-binding plan and exact initializer-bearing boundary requalified; no prepared assembly has been CLR-loaded."));
 
             _preflight = new ExecutionPreflightSnapshot(
                 transformedPath,
                 transformedSha256,
+                diagnostic.Path,
+                diagnostic.Sha256,
+                diagnostic.Length,
+                diagnostic.MethodToken,
+                diagnostic.MoveNextToken,
+                diagnostic.MarkerCount,
                 transformedMethodToken,
                 transformedMoveNextToken,
                 targetSemanticSha256,
@@ -236,7 +258,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 initializerBearing[0]);
 
             EnsureNoStS2Loaded("Gate A exit");
-            progress?.Report(new(gate, 7, 7, _planPath, "Execution preflight complete; transformed primary and all prepared dependencies remain outside the CLR."));
+            progress?.Report(new(gate, 8, 8, _planPath, "Execution preflight complete; exact transformed source, instrumented diagnostic clone, and all prepared dependencies remain outside the CLR."));
 
             return Pass(gate,
                 "EXACT CLOSED TRANSFORMED IMAGE, VERY-EARLY ASYNC STARTUP TARGET, AND EXECUTION RESOLVER PLAN REQUALIFIED; NO STS2 CLR LOAD OR GAME INVOCATION OCCURRED.\n" +
@@ -244,6 +266,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 $"Source SHA-256: {sourceSha256}\n" +
                 $"Transformed SHA-256: {transformedSha256}\n" +
                 $"Transformed bytes: {TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes:N0}\n" +
+                $"Step-35.0.4 diagnostic clone SHA-256: {diagnostic.Sha256}\n" +
+                $"Step-35.0.4 diagnostic clone bytes: {diagnostic.Length:N0}\n" +
+                $"Injected durable checkpoint markers: {diagnostic.MarkerCount:N0}\n" +
                 $"Assembly identity: {TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity}\n" +
                 $"Module MVID: {TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid}\n" +
                 $"Source ExecuteVeryEarly MethodDef token: 0x{SourceTargetMethodToken:X8}\n" +
@@ -283,14 +308,14 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35 admits only the exact hash-pinned transformed primary image; member reflection/invocation is deferred to Gate C.")]
+        Justification = "Step 35.0.4 CLR-admits only the separately hash-pinned diagnostic clone after re-verifying the exact transformed source; member reflection/invocation remains deferred to Gate C.")]
     public TransformedRealStS2VeryEarlyInitializationGateResult RunExecutionCapableClrAdmission()
         => RunExecutionCapableClrAdmission(crashCheckpoint: null);
 
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.1 preserves the exact Step-35 transformed-primary LoadFromStream admission path; the added callback is output-only crash telemetry.")]
+        Justification = "Step 35.0.4 re-verifies the exact closed transformed source but CLR-admits only the separately hash-pinned diagnostic clone; the callback remains output-only crash telemetry.")]
     public TransformedRealStS2VeryEarlyInitializationGateResult RunExecutionCapableClrAdmission(Action<string>? crashCheckpoint)
     {
         const TransformedRealStS2VeryEarlyInitializationGate gate = TransformedRealStS2VeryEarlyInitializationGate.ExecutionCapableClrAdmission;
@@ -305,13 +330,17 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (_loadContext is not null)
                 throw new InvalidOperationException("Step 35 Gate B requires a fresh dedicated load context.");
 
-            stage = "immediate transformed hash recheck";
-            Checkpoint(crashCheckpoint, "B_HASH_START — rechecking exact transformed primary length/SHA-256 before CLR admission.");
-            VerifyFileLength(preflight.TransformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "transformed primary");
-            var immediateSha256 = ComputeSha256Hex(preflight.TransformedPath);
-            if (!immediateSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35 transformed image changed between Gate A verification and Gate B CLR admission.");
-            Checkpoint(crashCheckpoint, $"B_HASH_PASS — transformed primary recheck matched {immediateSha256}.");
+            stage = "immediate exact-transformed and diagnostic-clone hash recheck";
+            Checkpoint(crashCheckpoint, "B_HASH_START — rechecking the exact closed transformed primary and the Step-35.0.4 instrumented diagnostic clone before CLR admission.");
+            VerifyFileLength(preflight.TransformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "exact transformed primary");
+            var exactImmediateSha256 = ComputeSha256Hex(preflight.TransformedPath);
+            if (!exactImmediateSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-35 exact transformed image changed between Gate A verification and Gate B CLR admission.");
+            VerifyFileLength(preflight.DiagnosticPath, preflight.DiagnosticLength, "Step-35.0.4 instrumented diagnostic clone");
+            var immediateSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
+            if (!immediateSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-35.0.4 diagnostic clone changed between Gate A instrumentation and Gate B CLR admission.");
+            Checkpoint(crashCheckpoint, $"B_HASH_PASS — exact transformed source still matched {exactImmediateSha256}; instrumented diagnostic clone matched {immediateSha256}.");
 
             stage = "execution-capable strict AssemblyLoadContext construction";
             Checkpoint(crashCheckpoint, "B_ALC_CONSTRUCT_START — constructing strict Step-35 execution AssemblyLoadContext.");
@@ -324,52 +353,51 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             _loadContext = context;
             Checkpoint(crashCheckpoint, "B_ALC_CONSTRUCT_PASS — strict Step-35 execution AssemblyLoadContext constructed.");
 
-            stage = "exact transformed sts2.dll LoadFromStream";
-            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_START — entering exact transformed primary LoadPrimary/LoadFromStream path.");
-            var assembly = context.LoadPrimary(preflight.TransformedPath, immediateSha256);
-            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_PASS — exact transformed primary returned from LoadPrimary/LoadFromStream.");
+            stage = "instrumented diagnostic sts2.dll LoadFromStream";
+            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_START — entering Step-35.0.4 instrumented diagnostic-clone LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched on disk.");
+            var assembly = context.LoadPrimary(preflight.DiagnosticPath, immediateSha256);
+            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_PASS — instrumented diagnostic clone returned from LoadPrimary/LoadFromStream.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(assembly), context))
-                throw new InvalidDataException("The transformed sts2.dll did not load into the dedicated Step-35 AssemblyLoadContext.");
-            Checkpoint(crashCheckpoint, "B_CONTEXT_OWNERSHIP_PASS — transformed primary belongs to the dedicated Step-35 AssemblyLoadContext.");
+                throw new InvalidDataException("The Step-35.0.4 diagnostic sts2.dll clone did not load into the dedicated Step-35 AssemblyLoadContext.");
+            Checkpoint(crashCheckpoint, "B_CONTEXT_OWNERSHIP_PASS — instrumented diagnostic clone belongs to the dedicated Step-35 AssemblyLoadContext.");
 
-            Checkpoint(crashCheckpoint, "B_GETNAME_START — reading loaded transformed assembly identity.");
+            Checkpoint(crashCheckpoint, "B_GETNAME_START — reading loaded diagnostic-clone assembly identity.");
             var actualIdentity = assembly.GetName().FullName ?? assembly.GetName().Name ?? string.Empty;
             if (!actualIdentity.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity, StringComparison.Ordinal))
-                throw new InvalidDataException($"Loaded transformed identity mismatch. Expected '{TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity}', actual '{actualIdentity}'.");
-            Checkpoint(crashCheckpoint, $"B_GETNAME_PASS — loaded transformed identity matched: {actualIdentity}.");
-            Checkpoint(crashCheckpoint, "B_MVID_START — reading loaded transformed module MVID.");
+                throw new InvalidDataException($"Loaded diagnostic-clone identity mismatch. Expected '{TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity}', actual '{actualIdentity}'.");
+            Checkpoint(crashCheckpoint, $"B_GETNAME_PASS — loaded diagnostic-clone identity matched: {actualIdentity}.");
+            Checkpoint(crashCheckpoint, "B_MVID_START — reading loaded diagnostic-clone module MVID.");
             var actualMvid = assembly.ManifestModule.ModuleVersionId;
             if (actualMvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
-                throw new InvalidDataException($"Loaded transformed module MVID mismatch. Expected {TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid}, actual {actualMvid}.");
-            Checkpoint(crashCheckpoint, $"B_MVID_PASS — loaded transformed MVID matched: {actualMvid}.");
-
+                throw new InvalidDataException($"Loaded diagnostic-clone module MVID mismatch. Expected {TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid}, actual {actualMvid}.");
+            Checkpoint(crashCheckpoint, $"B_MVID_PASS — loaded diagnostic-clone MVID matched the exact transformed source: {actualMvid}.");
             if (context.ManagedResolverRequests.Count != 0 || context.PrivateLoads.Count != 0 ||
                 context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
             {
                 throw new InvalidDataException(
-                    "Step-35 transformed primary admission no longer matches the physically closed Step-33 zero-resolution admission behavior. " +
+                    "Step-35.0.4 diagnostic-clone admission no longer matches the physically closed Step-33 zero-resolution admission behavior. " +
                     context.FormatResolverState());
             }
             Checkpoint(crashCheckpoint, "B_ZERO_RESOLUTION_PASS — primary admission produced zero managed/private/initializer/rejected/native resolution activity.");
 
             var matches = FindLoadedStS2Assemblies();
             if (matches.Length != 1 || !ReferenceEquals(matches[0], assembly))
-                throw new InvalidDataException($"Expected exactly one transformed sts2 assembly after Step-35 Gate B, found {matches.Length}.");
-            Checkpoint(crashCheckpoint, "B_GLOBAL_RESIDENCY_PASS — exactly one sts2 assembly is resident and it is the transformed primary.");
+                throw new InvalidDataException($"Expected exactly one diagnostic sts2 assembly after Step-35 Gate B, found {matches.Length}.");
+            Checkpoint(crashCheckpoint, "B_GLOBAL_RESIDENCY_PASS — exactly one sts2 assembly is resident and it is the instrumented diagnostic clone.");
             var contextAssemblies = context.Assemblies.ToArray();
             if (contextAssemblies.Length != 1 || !ReferenceEquals(contextAssemblies[0], assembly))
-                throw new InvalidDataException($"Step-35 context contains {contextAssemblies.Length} private assemblies immediately after admission instead of exactly transformed sts2.");
-            Checkpoint(crashCheckpoint, "B_PRIVATE_CONTEXT_ENUM_PASS — private context contains exactly the transformed primary after admission.");
+                throw new InvalidDataException($"Step-35 context contains {contextAssemblies.Length} private assemblies immediately after admission instead of exactly the instrumented diagnostic sts2 clone.");
+            Checkpoint(crashCheckpoint, "B_PRIVATE_CONTEXT_ENUM_PASS — private context contains exactly the instrumented diagnostic clone after admission.");
 
             _admission = new PrimaryAdmissionSnapshot(assembly, actualIdentity, actualMvid, immediateSha256);
             Checkpoint(crashCheckpoint, "B_PASS_RETURN — Gate B completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "PHYSICALLY CLOSED STEP-33 TRANSFORMED-PRIMARY ADMISSION BEHAVIOR RE-ESTABLISHED IN THE STEP-35 VERY-EARLY EXECUTION CONTEXT; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
+                "STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35.0.4 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
                 $"Loaded identity: {actualIdentity}\n" +
                 $"Loaded MVID: {actualMvid}\n" +
                 $"AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
-                $"Exact transformed SHA-256 immediately before LoadFromStream: {immediateSha256}\n" +
+                $"Instrumented diagnostic-clone SHA-256 immediately before LoadFromStream: {immediateSha256}\n" +
                 "Managed resolver requests during primary admission: 0\n" +
                 "Private dependency loads during primary admission: 0\n" +
                 "Initializer-bearing dependency requests during primary admission: 0\n" +
@@ -393,24 +421,22 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35 deliberately reflects and invokes one exact async initialization method on the exact transformed real-StS2 image. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
-    public Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunExactExecuteVeryEarlyInvocationAsync(
-        CancellationToken cancellationToken = default)
-        => RunExactExecuteVeryEarlyInvocationAsync(crashCheckpoint: null, cancellationToken: cancellationToken);
-
+        Justification = "Step 35.0.4 deliberately reflects and invokes one instrumented diagnostic clone of the exact async initialization method after re-verifying the exact transformed source. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.3 preserves the exact Step-35 reflected ExecuteVeryEarly invocation; added run-correlation diagnostics are output-only telemetry.")]
-    public async Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunExactExecuteVeryEarlyInvocationAsync(
+        Justification = "Step 35.0.4 reflects and invokes only the separately verified diagnostic clone of ExecuteVeryEarly; this derivative is localization evidence and is never exact Step-35 closure evidence.")]
+    public async Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunDiagnosticExecuteVeryEarlyInvocationAsync(
         Action<string>? crashCheckpoint,
         CancellationToken cancellationToken = default)
     {
-        const TransformedRealStS2VeryEarlyInitializationGate gate = TransformedRealStS2VeryEarlyInitializationGate.ExactExecuteVeryEarlyInvocation;
+        const TransformedRealStS2VeryEarlyInitializationGate gate = TransformedRealStS2VeryEarlyInitializationGate.DiagnosticExecuteVeryEarlyInvocation;
         var stage = "initialization";
         try
         {
-            Checkpoint(crashCheckpoint, "C_ENTRY — entered Gate C exact ExecuteVeryEarly binding/invocation/await boundary.");
+            if (crashCheckpoint is null)
+                throw new InvalidOperationException("Step-35.0.4 diagnostic Gate C requires a durable launcher-owned checkpoint callback; refusing to execute an instrumented clone without in-method telemetry.");
+            Checkpoint(crashCheckpoint, "C_ENTRY — entered Gate C diagnostic-clone ExecuteVeryEarly binding/invocation/await boundary; exact transformed source remains outside the CLR.");
             ThrowIfDisposed();
             var preflight = RequirePreflight();
             var admission = RequireAdmission();
@@ -429,15 +455,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var privateLoadsBefore = context.PrivateLoads.Count;
             var nativeAttemptsBefore = context.NativeLoadAttempts.Count;
 
-            stage = "exact transformed very-early type/member binding";
+            stage = "instrumented diagnostic very-early type/member binding";
             Checkpoint(crashCheckpoint, "C_BIND_TYPE_START — calling Assembly.GetType for exact OneTimeInitialization target.");
             var targetType = admission.Assembly.GetType(TargetTypeFullName, throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException(TargetTypeFullName);
             if (!ReferenceEquals(targetType.Assembly, admission.Assembly))
-                throw new InvalidDataException("Step-35 target type did not bind from the transformed sts2 assembly.");
-            Checkpoint(crashCheckpoint, "C_BIND_TYPE_PASS — exact OneTimeInitialization target type bound from transformed sts2.");
+                throw new InvalidDataException("Step-35.0.4 target type did not bind from the admitted diagnostic sts2 clone.");
+            Checkpoint(crashCheckpoint, "C_BIND_TYPE_PASS — OneTimeInitialization target type bound from the separately verified diagnostic sts2 clone.");
 
-            Checkpoint(crashCheckpoint, "C_BIND_METHOD_START — calling Type.GetMethod for exact static parameterless ExecuteVeryEarly.");
+            Checkpoint(crashCheckpoint, "C_BIND_METHOD_START — calling Type.GetMethod for the diagnostic clone's static parameterless ExecuteVeryEarly.");
             var method = targetType.GetMethod(
                 TargetMethodName,
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
@@ -445,23 +471,33 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 types: Type.EmptyTypes,
                 modifiers: null)
                 ?? throw new MissingMethodException(TargetTypeFullName, TargetMethodName);
-            Checkpoint(crashCheckpoint, "C_BIND_METHOD_PASS — ExecuteVeryEarly MethodInfo binding returned.");
+            Checkpoint(crashCheckpoint, "C_BIND_METHOD_PASS — diagnostic-clone ExecuteVeryEarly MethodInfo binding returned.");
 
             if (!ReferenceEquals(method.DeclaringType, targetType) || !method.IsStatic || method.ReturnType != typeof(Task) || method.GetParameters().Length != 0)
-                throw new InvalidDataException("Step-35 reflected ExecuteVeryEarly identity/signature drifted from the exact static parameterless System.Threading.Tasks.Task target.");
-            Checkpoint(crashCheckpoint, "C_SIGNATURE_PASS — reflected method is exact static parameterless Task-returning target.");
-            if (method.MetadataToken != unchecked((int)preflight.TransformedMethodToken))
-                throw new InvalidDataException($"Step-35 reflected ExecuteVeryEarly token drifted: 0x{method.MetadataToken:X8} != preflight 0x{preflight.TransformedMethodToken:X8}.");
+                throw new InvalidDataException("Step-35.0.4 reflected diagnostic ExecuteVeryEarly identity/signature drifted from the exact static parameterless System.Threading.Tasks.Task target.");
+            Checkpoint(crashCheckpoint, "C_SIGNATURE_PASS — reflected instrumented method retains the exact static parameterless Task-returning target contract.");
+            if (method.MetadataToken != unchecked((int)preflight.DiagnosticMethodToken))
+                throw new InvalidDataException($"Step-35.0.4 reflected instrumented ExecuteVeryEarly token drifted: 0x{method.MetadataToken:X8} != preflight diagnostic 0x{preflight.DiagnosticMethodToken:X8}.");
             Checkpoint(crashCheckpoint, $"C_TOKEN_PASS — reflected ExecuteVeryEarly token matched 0x{method.MetadataToken:X8}.");
             if (method.Module.ModuleVersionId != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
                 throw new InvalidDataException("Step-35 reflected ExecuteVeryEarly module MVID drifted from the closed transformed image.");
-            Checkpoint(crashCheckpoint, $"C_MVID_PASS — reflected ExecuteVeryEarly module MVID matched {method.Module.ModuleVersionId}.");
+            Checkpoint(crashCheckpoint, $"C_MVID_PASS — reflected diagnostic-clone ExecuteVeryEarly module MVID matched {method.Module.ModuleVersionId}.");
 
-            stage = "single exact transformed ExecuteVeryEarly invocation";
+            stage = "Step-35.0.4 in-method checkpoint bridge arm";
+            var bridgeType = admission.Assembly.GetType(DiagnosticBridgeTypeFullName, throwOnError: true, ignoreCase: false)
+                ?? throw new MissingMemberException(DiagnosticBridgeTypeFullName);
+            var bridgeField = bridgeType.GetField(DiagnosticBridgeCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
+                ?? throw new MissingFieldException(DiagnosticBridgeTypeFullName, DiagnosticBridgeCallbackFieldName);
+            if (bridgeField.FieldType != typeof(Action<string>))
+                throw new InvalidDataException($"Step-35.0.4 diagnostic bridge field type drifted: {bridgeField.FieldType.FullName}.");
+            bridgeField.SetValue(null, crashCheckpoint);
+            Checkpoint(crashCheckpoint, $"C_DIAGNOSTIC_BRIDGE_ARMED — instrumented diagnostic clone callback armed; markerCount={preflight.DiagnosticMarkerCount}. The next durable INMETHOD_* record is emitted from inside the executing sts2.dll method body.");
+
+            stage = "single instrumented diagnostic ExecuteVeryEarly invocation";
             Task task;
             try
             {
-                Checkpoint(crashCheckpoint, "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for transformed ExecuteVeryEarly.");
+                Checkpoint(crashCheckpoint, "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for the Step-35.0.4 instrumented ExecuteVeryEarly diagnostic clone.");
                 var result = method.Invoke(null, null);
                 Checkpoint(crashCheckpoint, "C_INVOKE_RETURNED — MethodInfo.Invoke returned to the launcher.");
                 task = result as Task
@@ -472,14 +508,14 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             {
                 var target = ex.InnerException ?? ex;
                 throw new InvalidOperationException(
-                    "Step-35 transformed ExecuteVeryEarly threw synchronously during the first controlled invocation. " +
+                    "Step-35.0.4 instrumented ExecuteVeryEarly threw synchronously during the first controlled invocation. " +
                     DescribeException(target) + "\nResolver state at failure: " + context.FormatResolverState(), target);
             }
 
-            stage = "await exact ExecuteVeryEarly Task completion";
+            stage = "await diagnostic-clone ExecuteVeryEarly Task completion";
             try
             {
-                Checkpoint(crashCheckpoint, "C_WAIT_START — awaiting the exact returned ExecuteVeryEarly Task with the predeclared 60-second boundary.");
+                Checkpoint(crashCheckpoint, "C_WAIT_START — awaiting the diagnostic clone's returned ExecuteVeryEarly Task with the unchanged predeclared 60-second boundary.");
                 await task.WaitAsync(TimeSpan.FromSeconds(60), cancellationToken).ConfigureAwait(false);
                 Checkpoint(crashCheckpoint, $"C_WAIT_COMPLETED — ExecuteVeryEarly Task await returned; status={task.Status}.");
             }
@@ -495,7 +531,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    "Step-35 transformed ExecuteVeryEarly Task faulted during the first controlled await. " +
+                    "Step-35.0.4 diagnostic-clone ExecuteVeryEarly Task faulted during the controlled await. " +
                     DescribeException(ex) + "\nResolver state at failure: " + context.FormatResolverState(), ex);
             }
 
@@ -533,11 +569,11 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "C_PASS_RETURN — Gate C completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "FIRST CONTROLLED INVOCATION/AWAIT OF THE EXACT TRANSFORMED REAL-STS2 EXECUTEVERYEARLY INITIALIZATION SITE COMPLETED NORMALLY.\n" +
+                "STEP-35.0.4 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE.\n" +
                 $"Target type: {TargetTypeFullName}\n" +
                 $"Target method: {TargetMethodFullName}\n" +
-                $"Reflected transformed MethodDef token: 0x{method.MetadataToken:X8}\n" +
-                $"Preflight transformed async MoveNext token: 0x{preflight.TransformedMoveNextToken:X8}\n" +
+                $"Reflected diagnostic-clone MethodDef token: 0x{method.MetadataToken:X8}\n" +
+                $"Preflight diagnostic-clone async MoveNext token: 0x{preflight.DiagnosticMoveNextToken:X8}\n" +
                 $"Target module MVID: {method.Module.ModuleVersionId}\n" +
                 "Launcher invocation count: 1\n" +
                 "Return contract: exact System.Threading.Tasks.Task; awaited to completion: YES\n" +
@@ -584,7 +620,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             cancellationToken.ThrowIfCancellationRequested();
 
             stage = "post-execution OfflineReady and source reproof";
-            progress?.Report(new(gate, 0, 3, null, "Re-proving the receipt-backed install after exact transformed ExecuteVeryEarly initialization."));
+            progress?.Report(new(gate, 0, 4, null, "Re-proving the receipt-backed install after instrumented diagnostic ExecuteVeryEarly initialization."));
             var offline = await _offlineInspection.RunAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
             if (offline.Outcome == SteamOfflineInstallOutcome.Cancelled)
                 throw new OperationCanceledException("Step 35 final OfflineReady audit was cancelled.", cancellationToken);
@@ -596,12 +632,16 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var trustedSha256 = ComputeSha256Hex(trustedPrimaryPath);
             if (!trustedSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32SourceSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException($"Receipt-backed original sts2.dll changed after Step-35 execution: {trustedSha256}.");
-            progress?.Report(new(gate, 1, 3, trustedPrimaryPath, "Trusted receipt-backed primary remains byte-identical."));
+            progress?.Report(new(gate, 1, 4, trustedPrimaryPath, "Trusted receipt-backed primary remains byte-identical."));
 
             stage = "transformed image / plan / dependency hash reproof";
             var transformedSha256 = ComputeSha256Hex(preflight.TransformedPath);
             if (!transformedSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Verified transformed sts2.dll changed after ExecuteVeryEarly initialization.");
+                throw new InvalidDataException("Verified exact transformed sts2.dll changed after ExecuteVeryEarly diagnostic execution.");
+            var diagnosticSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
+            if (!diagnosticSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-35.0.4 instrumented diagnostic clone changed during ExecuteVeryEarly execution.");
+            progress?.Report(new(gate, 2, 4, preflight.DiagnosticPath, "Exact transformed source and instrumented diagnostic clone remain byte-identical to their Gate-A hashes."));
             var planSha256 = ComputeSha256Hex(_planPath);
             if (!planSha256.Equals(preflight.PlanSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Prepared runtime-binding plan changed during Step-35 execution.");
@@ -626,21 +666,22 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 throw new InvalidDataException("Step-35 final resolver/native isolation counters are not clean. " + context.FormatResolverState());
             var matches = FindLoadedStS2Assemblies();
             if (matches.Length != 1 || !ReferenceEquals(matches[0], admission.Assembly) || !ReferenceEquals(AssemblyLoadContext.GetLoadContext(admission.Assembly), context))
-                throw new InvalidDataException("Step-35 transformed-primary CLR residency/context ownership drifted during final audit.");
-            if (execution.MethodToken != unchecked((int)preflight.TransformedMethodToken))
-                throw new InvalidDataException("Step-35 execution snapshot ExecuteVeryEarly token drifted during final audit.");
+                throw new InvalidDataException("Step-35.0.4 diagnostic-clone CLR residency/context ownership drifted during final audit.");
+            if (execution.MethodToken != unchecked((int)preflight.DiagnosticMethodToken))
+                throw new InvalidDataException("Step-35.0.4 execution snapshot diagnostic ExecuteVeryEarly token drifted during final audit.");
 
-            progress?.Report(new(gate, 3, 3, preflight.TransformedPath, "Final source/transformed/plan/dependency/context isolation checks passed."));
+            progress?.Report(new(gate, 4, 4, preflight.DiagnosticPath, "Final source/diagnostic-clone/plan/dependency/context isolation checks passed."));
 
             return Pass(gate,
-                "STEP 35 FINAL CONTROLLED VERY-EARLY INITIALIZATION ISOLATION AUDIT PASSED.\n" +
+                "STEP-35.0.4 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n" +
                 $"Post-execution OfflineReady: PASS ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
-                $"Verified transformed SHA-256 unchanged: {transformedSha256}\n" +
+                $"Verified exact transformed SHA-256 unchanged: {transformedSha256}\n" +
+                $"Instrumented diagnostic clone SHA-256 unchanged: {diagnosticSha256}\n" +
                 $"Runtime-binding plan SHA-256 unchanged: {planSha256}\n" +
                 $"Unique resident sts2 identity: {admission.AssemblyFullName}\n" +
                 $"Resident sts2 AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
-                "Resident sts2 load input: exact physically closed Step-32 transformed image\n" +
+                "Resident sts2 load input: Step-35.0.4 instrumented diagnostic clone derived from the reverified exact Step-32 transformed image\n" +
                 $"Initializer-free prepared private dependencies resident and re-hashed: {verifiedPrivate:N0}\n" +
                 $"Managed resolver requests total: {context.ManagedResolverRequests.Count:N0}\n" +
                 $"Exact planned host-framework loads total: {context.HostLoads.Count:N0}\n" +
@@ -648,12 +689,12 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 "Initializer-bearing private dependency requests: 0\n" +
                 "Unplanned managed resolution: NO\n" +
                 "Native game resolution/loading: NO\n" +
-                "Exact transformed ExecuteVeryEarly invocation count: 1\n" +
+                "Instrumented diagnostic ExecuteVeryEarly invocation count: 1\n" +
                 "Receipt-backed/prepared original sts2.dll CLR-loaded: NO\n" +
                 "Game entry point / ExecuteEssential / ExecuteDeferred intentionally invoked by launcher: NO\n" +
                 "Harmony/MonoMod runtime patching intentionally invoked by launcher: NO\n" +
                 "Godot/game startup intentionally requested by launcher: NO\n" +
-                "Authorization after Step-35 PASS: a later separately gated boundary may advance into the next measured managed-initialization site; Step 35 authorizes no broader startup by itself.");
+                "After a 0.0.127 diagnostic 4/4 result, Step 35 remains OPEN. Use the localization evidence to design a separately defined compatibility candidate, then return to an explicitly authoritative transformed artifact for physical closure testing.");
         }
         catch (OperationCanceledException)
         {
@@ -803,6 +844,220 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             null => "<none>",
             _ => scope.ToString() ?? "<unknown>",
         };
+
+    private static (string TypeName, string MethodFullName, string Marker)[] GetDiagnosticMarkerTargets() =>
+    [
+        (TargetTypeFullName + "/" + TargetStateMachineTypeName, "System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization/<ExecuteVeryEarly>d__7::MoveNext()", "INMETHOD_001 — ExecuteVeryEarly.MoveNext entered"),
+        ("MegaCrit.Sts2.Core.TestSupport.TestMode", "System.Boolean MegaCrit.Sts2.Core.TestSupport.TestMode::get_IsOn()", "INMETHOD_010 — TestMode.get_IsOn entered"),
+        ("MegaCrit.Sts2.Core.Saves.SaveManager", "MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()", "INMETHOD_020 — SaveManager.get_Instance entered"),
+        ("MegaCrit.Sts2.Core.Saves.SaveManager", "MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SettingsSave> MegaCrit.Sts2.Core.Saves.SaveManager::InitSettingsDataForTest()", "INMETHOD_030 — SaveManager.InitSettingsDataForTest entered"),
+        ("MegaCrit.Sts2.Core.Saves.SaveManager", "MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SettingsSave> MegaCrit.Sts2.Core.Saves.SaveManager::InitSettingsData()", "INMETHOD_031 — SaveManager.InitSettingsData entered"),
+        (TargetTypeFullName, "System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::set_SettingsReadResult(MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SettingsSave>)", "INMETHOD_040 — OneTimeInitialization.set_SettingsReadResult entered"),
+        ("MegaCrit.Sts2.Core.Modding.ModManagerFileIo", "System.Void MegaCrit.Sts2.Core.Modding.ModManagerFileIo::.ctor()", "INMETHOD_050 — ModManagerFileIo..ctor entered"),
+        ("MegaCrit.Sts2.Core.Saves.SaveManager", "MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()", "INMETHOD_060 — SaveManager.get_SettingsSave entered"),
+        ("MegaCrit.Sts2.Core.Saves.SettingsSave", "MegaCrit.Sts2.Core.Modding.ModSettings MegaCrit.Sts2.Core.Saves.SettingsSave::get_ModSettings()", "INMETHOD_070 — SettingsSave.get_ModSettings entered"),
+        ("MegaCrit.Sts2.Core.Debug.ReleaseInfoManager", "MegaCrit.Sts2.Core.Debug.ReleaseInfoManager MegaCrit.Sts2.Core.Debug.ReleaseInfoManager::get_Instance()", "INMETHOD_080 — ReleaseInfoManager.get_Instance entered"),
+        ("MegaCrit.Sts2.Core.Debug.ReleaseInfoManager", "MegaCrit.Sts2.Core.Debug.SemanticVersion MegaCrit.Sts2.Core.Debug.ReleaseInfoManager::get_SemVer()", "INMETHOD_090 — ReleaseInfoManager.get_SemVer entered"),
+        ("MegaCrit.Sts2.Core.Modding.ModManager", "System.Threading.Tasks.Task MegaCrit.Sts2.Core.Modding.ModManager::Initialize(MegaCrit.Sts2.Core.Modding.IModManagerFileIo,MegaCrit.Sts2.Core.Modding.ModSettings,MegaCrit.Sts2.Core.Debug.SemanticVersion)", "INMETHOD_100 — ModManager.Initialize entered"),
+    ];
+
+    private static DiagnosticCloneSnapshot CreateInstrumentedDiagnosticClone(string exactTransformedPath, string diagnosticPath)
+    {
+        if (File.Exists(diagnosticPath))
+            File.Delete(diagnosticPath);
+
+        using var resolver = new RejectingAssemblyResolver();
+        using (var module = ModuleDefinition.ReadModule(exactTransformedPath, new ReaderParameters
+               {
+                   ReadSymbols = false,
+                   ReadingMode = ReadingMode.Immediate,
+                   InMemory = true,
+                   AssemblyResolver = resolver,
+               }))
+        {
+            if (resolver.Requests.Count != 0)
+                throw new InvalidDataException("Step-35.0.4 diagnostic instrumentation unexpectedly resolved a dependency while opening the exact transformed image.");
+
+            if (EnumerateTypes(module.Types).Any(type => type.FullName == DiagnosticBridgeTypeFullName))
+                throw new InvalidDataException("Step-35.0.4 diagnostic bridge type already exists in the exact transformed image.");
+
+            var bridge = new TypeDefinition(
+                "StS2Launcher.Step35Diagnostics",
+                "ExecuteVeryEarlyCheckpointBridge",
+                Mono.Cecil.TypeAttributes.Class | Mono.Cecil.TypeAttributes.Abstract | Mono.Cecil.TypeAttributes.Sealed |
+                Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.BeforeFieldInit,
+                module.TypeSystem.Object);
+            module.Types.Add(bridge);
+
+            var systemRuntime = module.AssemblyReferences
+                .Where(reference => reference.Name == "System.Runtime")
+                .OrderByDescending(reference => reference.Version)
+                .FirstOrDefault()
+                ?? throw new InvalidDataException("Step-35.0.4 diagnostic clone requires the existing System.Runtime metadata scope.");
+            var actionOpen = new TypeReference("System", "Action`1", module, systemRuntime, false);
+            var actionStringType = new GenericInstanceType(actionOpen);
+            actionStringType.GenericArguments.Add(module.TypeSystem.String);
+            var callbackField = new FieldDefinition(
+                DiagnosticBridgeCallbackFieldName,
+                Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static,
+                actionStringType);
+            bridge.Fields.Add(callbackField);
+
+            var emit = new MethodDefinition(
+                "Emit",
+                Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+                module.TypeSystem.Void);
+            emit.Parameters.Add(new ParameterDefinition("marker", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
+            bridge.Methods.Add(emit);
+            var invoke = new MethodReference("Invoke", module.TypeSystem.Void, actionStringType)
+            {
+                HasThis = true,
+                ExplicitThis = false,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+            invoke.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+            var emitIl = emit.Body.GetILProcessor();
+            var haveCallback = Instruction.Create(OpCodes.Nop);
+            emitIl.Append(Instruction.Create(OpCodes.Ldsfld, callbackField));
+            emitIl.Append(Instruction.Create(OpCodes.Dup));
+            emitIl.Append(Instruction.Create(OpCodes.Brtrue_S, haveCallback));
+            emitIl.Append(Instruction.Create(OpCodes.Pop));
+            emitIl.Append(Instruction.Create(OpCodes.Ret));
+            emitIl.Append(haveCallback);
+            emitIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+            emitIl.Append(Instruction.Create(OpCodes.Callvirt, invoke));
+            emitIl.Append(Instruction.Create(OpCodes.Ret));
+
+            var emitReference = module.ImportReference(emit);
+            var markers = GetDiagnosticMarkerTargets();
+
+            var markerCount = 0;
+            foreach (var item in markers)
+            {
+                var type = EnumerateTypes(module.Types).SingleOrDefault(candidate => candidate.FullName == item.TypeName)
+                    ?? throw new MissingMemberException($"Step-35.0.4 diagnostic marker target type missing: {item.TypeName}.");
+                var methods = type.Methods.Where(method => method.FullName == item.MethodFullName && method.HasBody).ToArray();
+                if (methods.Length != 1)
+                    throw new MissingMethodException($"Step-35.0.4 expected exactly one managed-IL marker target {item.MethodFullName}, found {methods.Length}.");
+                InsertEntryMarker(methods[0], emitReference, item.Marker);
+                markerCount++;
+
+                var cctor = type.Methods.SingleOrDefault(method => method.Name == ".cctor" && method.IsStatic && method.HasBody);
+                if (cctor is not null)
+                {
+                    var cctorMarker = $"INMETHOD_CCTOR — {item.TypeName}..cctor entered";
+                    if (!HasInjectedEntryMarker(cctor, cctorMarker))
+                    {
+                        InsertEntryMarker(cctor, emitReference, cctorMarker);
+                        markerCount++;
+                    }
+                }
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(diagnosticPath) ?? throw new InvalidOperationException("Diagnostic clone path has no parent."));
+            module.Write(diagnosticPath, new WriterParameters { WriteSymbols = false });
+        }
+
+        var length = new FileInfo(diagnosticPath).Length;
+        var sha256 = ComputeSha256Hex(diagnosticPath);
+        using var verifyResolver = new RejectingAssemblyResolver();
+        using var verifyModule = ModuleDefinition.ReadModule(diagnosticPath, new ReaderParameters
+        {
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = verifyResolver,
+        });
+        if (verifyResolver.Requests.Count != 0)
+            throw new InvalidDataException("Step-35.0.4 diagnostic clone verification unexpectedly resolved a dependency.");
+        if (verifyModule.Assembly?.Name.FullName != TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity ||
+            verifyModule.Mvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
+            throw new InvalidDataException("Step-35.0.4 diagnostic clone changed assembly identity or MVID.");
+        var target = RealStS2PrepareMethodRewrite.FindMethodByStableIdentity(verifyModule, TargetTypeFullName, TargetMethodFullName);
+        RequireVeryEarlySignature(target, "diagnostic clone");
+        var moveNext = FindVeryEarlyMoveNext(verifyModule);
+        var bridgeType = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == DiagnosticBridgeTypeFullName)
+            ?? throw new MissingMemberException(DiagnosticBridgeTypeFullName);
+        var bridgeFields = bridgeType.Fields.Where(field => field.Name == DiagnosticBridgeCallbackFieldName).ToArray();
+        var bridgeEmitMethods = bridgeType.Methods.Where(method => method.Name == "Emit").ToArray();
+        if (bridgeFields.Length != 1 || bridgeFields[0].FieldType.FullName != "System.Action`1<System.String>" ||
+            bridgeEmitMethods.Length != 1 || !bridgeEmitMethods[0].IsStatic || bridgeEmitMethods[0].ReturnType.FullName != "System.Void" ||
+            bridgeEmitMethods[0].Parameters.Count != 1 || bridgeEmitMethods[0].Parameters[0].ParameterType.FullName != "System.String")
+        {
+            throw new InvalidDataException("Step-35.0.4 diagnostic bridge field/method signature drifted after serialization.");
+        }
+
+        var expectedMarkerCount = 0;
+        var verifiedCctorTypes = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var item in GetDiagnosticMarkerTargets())
+        {
+            var type = EnumerateTypes(verifyModule.Types).SingleOrDefault(candidate => candidate.FullName == item.TypeName)
+                ?? throw new MissingMemberException($"Step-35.0.4 diagnostic verification target type missing: {item.TypeName}.");
+            var method = type.Methods.SingleOrDefault(candidate => candidate.FullName == item.MethodFullName && candidate.HasBody)
+                ?? throw new MissingMethodException($"Step-35.0.4 diagnostic verification target method missing: {item.MethodFullName}.");
+            if (!HasInjectedEntryMarkerAtStart(method, item.Marker))
+                throw new InvalidDataException($"Step-35.0.4 marker is not the first stack-neutral checkpoint in {item.MethodFullName}: {item.Marker}.");
+            expectedMarkerCount++;
+
+            var cctor = type.Methods.SingleOrDefault(candidate => candidate.Name == ".cctor" && candidate.IsStatic && candidate.HasBody);
+            if (cctor is not null && verifiedCctorTypes.Add(item.TypeName))
+            {
+                var cctorMarker = $"INMETHOD_CCTOR — {item.TypeName}..cctor entered";
+                if (!HasInjectedEntryMarkerAtStart(cctor, cctorMarker))
+                    throw new InvalidDataException($"Step-35.0.4 cctor marker is not the first stack-neutral checkpoint in {item.TypeName}..cctor.");
+                expectedMarkerCount++;
+            }
+        }
+
+        var markerCountVerified = EnumerateTypes(verifyModule.Types)
+            .SelectMany(type => type.Methods)
+            .Where(method => method.HasBody)
+            .SelectMany(method => method.Body.Instructions)
+            .Count(instruction => instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string text && text.StartsWith("INMETHOD_", StringComparison.Ordinal));
+        if (markerCountVerified != expectedMarkerCount)
+            throw new InvalidDataException($"Step-35.0.4 diagnostic clone marker count drifted after serialization: expected {expectedMarkerCount}, observed {markerCountVerified}.");
+
+        return new DiagnosticCloneSnapshot(
+            diagnosticPath,
+            sha256,
+            length,
+            target.MetadataToken.ToUInt32(),
+            moveNext.MetadataToken.ToUInt32(),
+            markerCountVerified);
+    }
+
+    private static void InsertEntryMarker(MethodDefinition method, MethodReference emitReference, string marker)
+    {
+        if (!method.HasBody || method.Body.Instructions.Count == 0)
+            throw new InvalidDataException($"Cannot instrument method without IL: {method.FullName}.");
+        if (HasInjectedEntryMarker(method, marker))
+            return;
+        var first = method.Body.Instructions[0];
+        var il = method.Body.GetILProcessor();
+        il.InsertBefore(first, Instruction.Create(OpCodes.Ldstr, marker));
+        il.InsertBefore(first, Instruction.Create(OpCodes.Call, emitReference));
+    }
+
+    private static bool HasInjectedEntryMarker(MethodDefinition method, string marker)
+        => method.HasBody && method.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, marker));
+
+    private static bool HasInjectedEntryMarkerAtStart(MethodDefinition method, string marker)
+    {
+        if (!method.HasBody || method.Body.Instructions.Count < 2)
+            return false;
+        var markerInstruction = method.Body.Instructions[0];
+        var callInstruction = method.Body.Instructions[1];
+        return markerInstruction.OpCode.Code == Code.Ldstr && Equals(markerInstruction.Operand, marker) &&
+               callInstruction.OpCode.Code == Code.Call && callInstruction.Operand is MethodReference call &&
+               call.Name == "Emit" && call.DeclaringType.FullName == DiagnosticBridgeTypeFullName;
+    }
+
+    private sealed record DiagnosticCloneSnapshot(
+        string Path,
+        string Sha256,
+        long Length,
+        uint MethodToken,
+        uint MoveNextToken,
+        int MarkerCount);
 
     private static int CountLaterOneTimeInitializationCalls(MethodDefinition moveNext)
     {
@@ -987,6 +1242,12 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     private sealed record ExecutionPreflightSnapshot(
         string TransformedPath,
         string TransformedSha256,
+        string DiagnosticPath,
+        string DiagnosticSha256,
+        long DiagnosticLength,
+        uint DiagnosticMethodToken,
+        uint DiagnosticMoveNextToken,
+        int DiagnosticMarkerCount,
         uint TransformedMethodToken,
         uint TransformedMoveNextToken,
         string TargetSemanticSha256,
@@ -1056,18 +1317,18 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         [UnconditionalSuppressMessage(
             "Trimming",
             "IL2026",
-            Justification = "Step 35 loads only the exact hash-pinned transformed primary image and exact hash-pinned prepared private dependencies selected by the persisted runtime plan.")]
+            Justification = "Step 35.0.4 LoadPrimary accepts only the already hash-pinned selected execution image; Gate B supplies the separately verified diagnostic clone and the exact transformed source stays outside the CLR.")]
         internal Assembly LoadPrimary(string transformedPath, string expectedSha256)
         {
-            Checkpoint("B_LOADPRIMARY_REHASH_START — LoadPrimary is re-hashing transformed bytes immediately before LoadFromStream.");
+            Checkpoint("B_LOADPRIMARY_REHASH_START — LoadPrimary is re-hashing the selected Step-35 execution image immediately before LoadFromStream.");
             var actualSha256 = ComputeSha256Hex(transformedPath);
             if (!actualSha256.Equals(expectedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35 transformed primary hash changed immediately before LoadFromStream.");
-            Checkpoint($"B_LOADPRIMARY_REHASH_PASS — immediate LoadPrimary SHA-256 matched {actualSha256}.");
+                throw new InvalidDataException("Step-35 selected execution image hash changed immediately before LoadFromStream.");
+            Checkpoint($"B_LOADPRIMARY_REHASH_PASS — immediate selected execution-image SHA-256 matched {actualSha256}.");
             using var stream = new FileStream(transformedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            Checkpoint("B_LOADFROMSTREAM_START — entering AssemblyLoadContext.LoadFromStream for exact transformed primary.");
+            Checkpoint("B_LOADFROMSTREAM_START — entering AssemblyLoadContext.LoadFromStream for the selected Step-35 execution image.");
             var assembly = LoadFromStream(stream);
-            Checkpoint("B_LOADFROMSTREAM_PASS — AssemblyLoadContext.LoadFromStream returned transformed primary.");
+            Checkpoint("B_LOADFROMSTREAM_PASS — AssemblyLoadContext.LoadFromStream returned the selected Step-35 execution image.");
             return assembly;
         }
 

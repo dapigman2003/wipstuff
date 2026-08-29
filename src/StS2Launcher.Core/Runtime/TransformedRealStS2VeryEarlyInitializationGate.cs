@@ -4,6 +4,6 @@ public enum TransformedRealStS2VeryEarlyInitializationGate
 {
     VerifiedExecutionPreflight = 1,
     ExecutionCapableClrAdmission = 2,
-    ExactExecuteVeryEarlyInvocation = 3,
+    DiagnosticExecuteVeryEarlyInvocation = 3,
     FinalIsolationAudit = 4,
 }

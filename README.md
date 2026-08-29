@@ -1,15 +1,11 @@
-# StS2 Launcher iOS — Step 35.0.3 Run-Correlated Durable Telemetry
+# StS2 Launcher iOS — Step 35.0.4 In-Method Pre-First-Await Localization
 
-Steps 01–26 are physically closed. Step 27 is CLOSED NEGATIVE for runtime Harmony/MonoMod replacement. Steps 28–34 are CLOSED POSITIVE. Physical `0.0.122` closed Step 34 at 4/4 by invoking exact transformed `OneTimeInitialization::PrewarmJit()` once under the strict prepared resolver.
+Active candidate: **Step 35.0.4 / `0.0.127 (127)`**.
 
-## Active candidate
+Physical 0.0.126 proved the run-correlated telemetry fix: the journal, static map, current-run manifest, and last-checkpoint all carried one Run ID/PID. The run again entered exact transformed `ExecuteVeryEarly` and ended after the planned `System.Collections.Concurrent` 8→9 host-resolution marker with no `C_INVOKE_RETURNED`.
 
-**Step 35.0.3 / `0.0.126 (126)` — unchanged Step-35 ExecuteVeryEarly experiment with fail-visible same-run diagnostics**
+0.0.127 preserves and re-verifies the exact closed Step-32 transformed source and the Step-35 resolver/later-boundary policy, but creates a **separate diagnostic clone**. The clone preserves assembly identity/MVID and receives output-only `INMETHOD_*` entry markers in `ExecuteVeryEarly.MoveNext`, the top-level pre-first-await game methods, and relevant managed-IL type initializers. Gate C arms a launcher-owned `Action<string>` callback immediately before the one reflected diagnostic invocation. The exact transformed source is immediately re-hashed after clone emission, is never overwritten, and is never CLR-loaded by this candidate.
 
-Physical `0.0.124 (124)` proved Gate B PASS and localized the Step-35 hard termination inside synchronous execution initiated by exact transformed `ExecuteVeryEarly()` `MethodInfo.Invoke`, after planned `GodotSharp`, `Steamworks.NET`, and host-framework resolution but before `C_INVOKE_RETURNED`. Physical `0.0.125 (125)` reproduced the same main-thread PC=`0x0`, `CODESIGNING / Invalid Page` failure family. However, the available 0.0.125 static map was generated before the matching crash-report process launched, and no fixed-name crash checkpoint from that process was available.
+After a physical hard termination, collect `Step35-CurrentRun.txt`, `Step35-LastCheckpoint.txt`, the run-specific crash journal/static map named by the manifest, and the matching `.ips`. The final durable `INMETHOD_*` line is the primary localization result.
 
-Step 35 therefore remains **OPEN**. `0.0.126` does not broaden compatibility authority. It assigns one immutable Run ID/PID before Gate A and durably creates `Step35-CurrentRun.txt`, `Step35-LastCheckpoint.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, and later `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`. Gate A is refused if the run journal cannot be established; Gate B is refused if the same-run static map cannot be durably written. Those are diagnostic stops, not compatibility failures.
-
-The exact transformed bytes, target tokens, strict resolver, one `ExecuteVeryEarly()` invocation, <=60-second returned-Task await, initializer-bearing `0Harmony` refusal, unplanned managed/native refusal, and later-startup prohibitions remain unchanged.
-
-The stable Codemagic workflow remains `ios-canonical`; `MtouchLink=None`, `TrimMode=copy`, and `MtouchInterpreter=-all` remain unchanged.
+**Authority:** a 0.0.127 A–D 4/4 result is diagnostic completion only. It cannot close exact Step 35 because Gate B/C execute an instrumented derivative rather than the exact closed transformed bytes. Step 35 remains OPEN until a separately defined authoritative transformed artifact passes its physical closure contract.

@@ -1,0 +1,17 @@
+StS2 Launcher — Step 35.0.3 physical same-run correlation result
+App version: 0.0.126 (126)
+Run ID: 20260829T1704412398760Z-pid12579-64e2395729ab45c381bc8b2131ee2c70
+Process ID: 12579
+
+Evidence:
+- run journal, static map, current-run manifest, and last-checkpoint all carry the same Run ID/PID;
+- Gate A passed and the same-run static map was durably written;
+- Gate B passed completely with zero resolver activity during primary admission;
+- Gate C bound exact ExecuteVeryEarly token 0x0600AFE7 and entered the first/only MethodInfo.Invoke;
+- planned GodotSharp and Steamworks.NET private loads succeeded;
+- host framework resolution proceeded through System.Text.Json and then System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0;
+- the final durable event is that System.Collections.Concurrent host-resolution PASS;
+- no C_INVOKE_RETURNED exists.
+
+Conclusion:
+0.0.126 closes the telemetry-correlation defect, not Step 35 compatibility. Resolver traffic alone still cannot distinguish which pre-first-await game method/type initializer is the synchronous hard-kill frontier. Advance diagnostics to in-method localization while preserving later-boundary prohibitions.

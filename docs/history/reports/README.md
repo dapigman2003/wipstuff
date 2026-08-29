@@ -25,3 +25,5 @@ Selected build/device diagnostic outputs are retained here when they materially 
 
 - `STEP-35.0.1-PHYSICAL-EXECUTEVERYEARLY-INVOKE-CRASH-LOCALIZATION.txt` — sanitized physical 0.0.124 evidence proving Gate B PASS and the exact ExecuteVeryEarly invoke-time crash frontier.
 - `STEP-35.0.2-PHYSICAL-REPEATED-HARD-TERMINATION-AND-TELEMETRY-CORRELATION.txt` — sanitized physical 0.0.125 repeated PC=0x0 / CODESIGNING Invalid Page failure plus the cross-run static-map/checkpoint correlation gap that motivated 0.0.126.
+
+- `STEP-35.0.3-PHYSICAL-SAME-RUN-CORRELATION-AND-INVOKE-FRONTIER.txt` — sanitized physical 0.0.126 same-run telemetry result and final resolver marker.

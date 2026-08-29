@@ -1,40 +1,25 @@
-# Current Status — Step 35.0.3 Run-Correlated Durable Telemetry
+# Current Status — Step 35.0.4 In-Method Pre-First-Await Localization
 
-## Active candidate — Step 35.0.3 / 0.0.126 (126)
+## Active candidate — Step 35.0.4 / 0.0.127 (127)
 
-Physical baseline summary: Steps 01–26 closed; Step 27 CLOSED NEGATIVE; Step 28 CLOSED POSITIVE 5/5; Step 29 CLOSED POSITIVE 4/4; Step 30 CLOSED POSITIVE 4/4; Step 31 CLOSED POSITIVE 4/4; **Step 32 CLOSED POSITIVE 4/4**; **Step 33 CLOSED POSITIVE 4/4**; **Step 34 CLOSED POSITIVE 4/4**. Step 35 remains **OPEN**.
+Steps 01–26 are closed; Step 27 is CLOSED NEGATIVE; Step 28 is CLOSED POSITIVE 5/5; Steps 29–34 are CLOSED POSITIVE 4/4. Step 35 remains OPEN.
 
-Physical Step 32.0.5 / **0.0.120** closed the first real-StS2 semantic rewrite at 4/4. Exact transformed SHA-256 is `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`, MVID `518e4758-52d7-47c2-b776-471a0e29e49d`, transformed `PrewarmJit` token `0x0600AFEA`, semantic fingerprint `47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a`, with zero remaining `RuntimeHelpers.PrepareMethod` references.
+Milestones: **Step 32 CLOSED POSITIVE 4/4 • Step 33 CLOSED POSITIVE 4/4 • Step 34 CLOSED POSITIVE 4/4 • Step 35 OPEN**.
 
-Physical Step 33.0 / **0.0.121** closed exact transformed-primary CLR admission at 4/4 with zero primary-admission managed/private/native resolution and no game-member invocation.
+Physical 0.0.124 proved Gate B PASS and localized the hard termination inside synchronous execution started by exact transformed `OneTimeInitialization.ExecuteVeryEarly()` `MethodInfo.Invoke`, after planned `GodotSharp`, `Steamworks.NET`, and framework resolutions but before `C_INVOKE_RETURNED`. The matching iOS family faults the main thread at program counter **0x0** with `CODESIGNING / Invalid Page`. Physical 0.0.125 reproduced that family but exposed cross-run telemetry correlation.
 
-Physical Step 34.0 / **0.0.122** closed exact transformed `OneTimeInitialization::PrewarmJit()` execution at 4/4. It returned normally after 8 managed resolver requests: 6 exact host-framework resolutions and 2 hash-pinned initializer-free private dependency loads, with zero initializer-bearing, unplanned managed, or native escape.
+Physical **0.0.126** fixed correlation: `Step35-CurrentRun.txt`, `Step35-LastCheckpoint.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, and `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt` all shared the same Run ID/PID. The exact run reached Gate B PASS, entered Gate C, and the last durable event was the planned `System.Collections.Concurrent, Version=8.0.0.0` → host 9.0.0.0 resolution; there was still no `C_INVOKE_RETURNED`.
 
-## Step 35 physical evidence
+The verified static map keeps the exact source `ExecuteVeryEarly` token `0x06007D02` and source async `<ExecuteVeryEarly>d__7::MoveNext` token `0x0600BC71`. Its normal pre-first-await path is `TestMode.get_IsOn` → `SaveManager.InitSettingsData` → `ModManagerFileIo`/settings/version getters → `ModManager.Initialize` → first await. Resolver traffic cannot identify which of those game methods is the hard-kill frontier.
 
-Physical Step 35.0 / **0.0.123 (123)** hard-terminated near the visible B→C boundary. Its matching iOS `.ips` reported `EXC_BAD_ACCESS / SIGKILL`, faulting main thread, program counter **0x0**, and no managed Step-35 report.
+## 0.0.127 diagnostic change
 
-Physical Step 35.0.1 / **0.0.124 (124)** resolved that ambiguity. Gate B passed fully. Gate C bound exact transformed `ExecuteVeryEarly()`, wrote `C_INVOKE_START`, successfully serviced planned `GodotSharp 4.5.1.0`, `Steamworks.NET 1.0.0.0`, and host-framework resolutions, and then hard-terminated before `C_INVOKE_RETURNED`. Its `.ips` repeated the main-thread PC=`0x0` failure family. This remains the authoritative runtime frontier: **inside synchronous execution initiated by exact transformed `ExecuteVeryEarly()` MethodInfo.Invoke, after planned resolution and before Invoke returns the Task**.
+Gate A re-runs the closed Step-32 transform and exact semantic checks, then emits a separate diagnostic clone. The exact transformed source remains byte-identical and is never overwritten. The clone preserves assembly identity/MVID and injects a tiny bridge plus durable `INMETHOD_*` entry markers into `ExecuteVeryEarly.MoveNext`, the top-level pre-first-await callees, and relevant type initializers. Gate B admits only that diagnostic clone. Gate C reflects the same static parameterless Task-returning `ExecuteVeryEarly`, arms the bridge callback, and performs one invocation/await under the same strict prepared resolver and 60-second boundary.
 
-Physical Step 35.0.2 / **0.0.125 (125)** reproduced the same `EXC_BAD_ACCESS / SIGKILL`, `KERN_PROTECTION_FAILURE at 0x0`, `CODESIGNING / Invalid Page`, faulting-main-thread, PC=`0x0` family. The available 0.0.125 static map, however, was generated at 01:31:19 -0500 while the attached crash-report process launched at 01:37:50 -0500. Those artifacts were from different runs. No fixed-name `Step35-CrashCheckpoint.txt` from the crash-report process was available. Therefore 0.0.125 confirms repeatability of the native failure family but does not safely advance callsite localization.
+`ExecuteEssential`, `ExecuteDeferred`, the game entry point, Harmony/MonoMod runtime patching, native game loading, and Godot/game startup remain forbidden. Cancellation remains INCONCLUSIVE and requires a fresh process.
 
-Running Step 34 and then Step 35 in the same process remains invalid because Step 34 leaves `sts2` resident in a non-collectible ALC. A fresh process is mandatory.
+On the next physical hard termination, the final durable `INMETHOD_*` checkpoint is the primary evidence for the next localization step.
 
-## Step 35.0.3 / 0.0.126 diagnostic candidate
+## 0.0.127 evidence semantics
 
-Step 35.0.3 preserves the exact 0.0.125 compatibility experiment: same transformed bytes, exact source `ExecuteVeryEarly` token `0x06007D02`, source async `<ExecuteVeryEarly>d__7::MoveNext` token `0x0600BC71`, same strict private ALC/resolver policy, one exact reflected invocation, <=60-second Task await, and the same forbidden boundaries.
-
-The change is diagnostic provenance. Before Gate A, 0.0.126 creates one immutable Run ID containing UTC/PID/GUID and durably establishes:
-
-- `Documents/StS2Launcher/Reports/Step35-CurrentRun.txt` — manifest naming the exact same-run artifact files;
-- `Documents/StS2Launcher/Reports/Step35-LastCheckpoint.txt` — independently flushed overwrite-on-each-event convenience record;
-- `Documents/StS2Launcher/Reports/Step35-CrashCheckpoint-<RunId>.txt` — run-specific append journal;
-- `Documents/StS2Launcher/Reports/Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt` — same-run static wrapper/MoveNext IL map written after Gate-A verification and before Gate B.
-
-If the initial run journal cannot be created/flushed, the UI reports `TELEMETRY FAIL / NOT RUN` and Gate A is not entered. If Gate A passes but the same-run static map cannot be durably written, execution stops before Gate B. These are diagnostic stops, not compatibility failures.
-
-Cancellation remains **CANCELLED = INCONCLUSIVE**. `ExecuteEssential`, `ExecuteDeferred`, launcher-driven `PrewarmJit`, game entry-point execution, Harmony/MonoMod patching, initializer-bearing `0Harmony 2.4.2.0`, unplanned managed/native loading, and Godot/game startup remain forbidden.
-
-## Immediate next evidence
-
-Run exact 0.0.126 once from a fresh process. After a hard termination, preserve `Step35-CurrentRun.txt`, `Step35-LastCheckpoint.txt`, the exact run-specific crash journal and static map named by the manifest, and the matching `.ips` before any rerun. Only same-Run-ID evidence should be used to choose the next pre-first-await callsite discriminator.
+A successful 0.0.127 A–D run must be reported as **Step 35.0.4 diagnostic localization complete 4/4 — NOT Step 35 closure**. The instrumented clone may identify the active pre-first-await method/type-initializer frontier, but it is not byte-identical to the closed Step-32 transformed SHA-256. After localization, any compatibility correction must return to an explicitly defined authoritative transformed artifact and re-establish a physical closure contract.

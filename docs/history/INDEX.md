@@ -198,3 +198,6 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.2-PHYSICAL-REPEATED-HARD-TERMINATION-AND-TELEMETRY-CORRELATION.txt` — sanitized physical 0.0.125 evidence: same main-thread PC=0x0 / CODESIGNING Invalid Page family, but the available static map predates the matching crash-report process and no fixed-name checkpoint from that process was available.
 - `steps/STEP-35.0.3-RUN-CORRELATED-DURABLE-TELEMETRY.md` — 0.0.126 diagnostic-only correction: immutable Run ID/PID, unique same-run journal/map, current-run manifest, independently flushed last checkpoint, fail-visible telemetry prerequisite, execution/resolver authority otherwise unchanged.
+
+- `reports/STEP-35.0.3-PHYSICAL-SAME-RUN-CORRELATION-AND-INVOKE-FRONTIER.txt` — physical 0.0.126 proves same-run telemetry and repeats the no-C_INVOKE_RETURNED synchronous frontier.
+- `steps/STEP-35.0.4-IN-METHOD-PRE-FIRST-AWAIT-LOCALIZATION.md` — 0.0.127 diagnostic-clone design with durable in-method entry markers.
