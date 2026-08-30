@@ -231,7 +231,7 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
 }
 
 {
-  echo "Step 35.0.7 IPA verification passed."
+  echo "Step 35.0.8 IPA verification passed."
   echo "  Bundle ID: $BUNDLE_ID"
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
@@ -245,5 +245,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 35.0.7 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION"
+  echo "  Expected device UI: STEP 35.0.8 — SAVE/PLATFORM/GODOT NATIVE-BOUNDARY LOCALIZATION"
 } | tee artifacts/logs/step35-ipa-verification-summary.log

@@ -1,0 +1,37 @@
+StS2 Launcher — Step 35.0.7 / 0.0.130 physical localization summary
+
+Run ID: 20260830T1534599351240Z-pid1600-14d8ad5a1dfe44359180c8fc25d7fcc6
+App version/build: 0.0.130 (130)
+Candidate: Step 35.0.7 diagnostic clone
+Matching .ips: NOT AVAILABLE
+
+Evidence summary
+- Gate A PASS.
+- Gate B PASS.
+- Exact closed transformed source re-hash remained 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef.
+- Diagnostic clone admission preserved identity/MVID/context ownership and zero primary-admission resolution activity.
+- Gate C bound the diagnostic clone target, armed the Action<string> bridge, and entered the one reflected ExecuteVeryEarly invocation.
+- The 0.0.129 MemberRef bug is physically closed for this diagnostic path: durable INMETHOD markers were emitted.
+
+Durable in-game frontier
+1. INMETHOD_001 — ExecuteVeryEarly.MoveNext entered
+2. INMETHOD_010 — TestMode.get_IsOn entered
+3. INMETHOD_CCTOR — MegaCrit.Sts2.Core.Saves.SaveManager..cctor entered
+4. INMETHOD_020 — SaveManager.get_Instance entered
+5. System.Collections.Concurrent 9.0.0.0 host resolution
+6. INMETHOD_010 — TestMode.get_IsOn entered (nested call reached under SaveManager construction)
+7. System.Text.Json 9.0.0.0 host resolution
+8. System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0
+9. hard termination / no further durable marker
+
+Neither SaveManager.InitSettingsDataForTest nor SaveManager.InitSettingsData was entered.
+
+Interpretation
+The physical frontier is inside work reached from SaveManager.get_Instance / default construction before settings initialization. The final System.Collections.Concurrent resolver event is context/frontier evidence only and is not attributed as the cause.
+
+Static follow-up against the exact supplied sts2.dll identified the normal branch:
+SaveManager.ConstructDefault -> UserDataPathProvider.GetAccountScopedBasePath -> PlatformUtil.get_PrimaryPlatform / PlatformUtil..cctor -> NullPlatformUtilStrategy..ctor -> GodotFileIo..ctor -> GodotFileIo.CreateDirectory.
+GodotFileIo.CreateDirectory contains one DirAccess.DirExistsAbsolute call and one conditional MakeDirRecursiveAbsolute call.
+
+Authority
+This is diagnostic-derivative evidence. Physical 0.0.126 remains the authoritative exact transformed-byte Step-35 compatibility frontier. Step 35 remains OPEN.

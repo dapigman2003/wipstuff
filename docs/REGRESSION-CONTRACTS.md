@@ -371,3 +371,21 @@ All Step-35.0.5 derivative/evidence restrictions remain in force. In addition, t
 ## Step 35.0.7 / 0.0.130 generic delegate MemberRef contract
 
 All Step-35.0.6 derivative/evidence restrictions remain in force. The diagnostic bridge must model open `System.Action<T>` with one type generic parameter, construct the callback field as `System.Action<string>`, and encode its `Invoke` MemberRef parameter as the declaring-type generic variable `!0`, not concrete `System.String`. After serialization, rejecting-resolver verification must find exactly one bridge `callvirt` whose declaring type is `Action<string>` and whose sole parameter is a type `GenericParameter` at position 0. The physically disproven synthetic `invoke.Parameters.Add(new ParameterDefinition(module.TypeSystem.String))` form is forbidden.
+
+## Step 35.0.8 / 0.0.131 Save/Platform/Godot localization contract
+
+Physical 0.0.130 proved the generic-delegate MemberRef correction and localized the hard termination beneath `SaveManager.get_Instance`, before either settings-init method. The active 0.0.131 derivative must preserve all exact Step-35 authority constraints and may add only output-only instrumentation needed to distinguish the statically verified Save/Platform/Godot path.
+
+Required invariants:
+
+- exact closed Step-32 transformed source hash/identity/MVID remains unchanged and outside the CLR;
+- diagnostic source open remains file-backed `ReadingMode.Deferred`, with zero resolver requests before bounded writer-resolver configuration;
+- the diagnostic bridge is produced by the same helper covered by a synthetic serialize/reopen regression and must remain `Action<string>::Invoke(!0)`, never `Invoke(string)`;
+- marker targets include exact managed methods `SaveManager.ConstructDefault`, `UserDataPathProvider.GetAccountScopedBasePath`, `PlatformUtil.get_PrimaryPlatform`, `NullPlatformUtilStrategy..ctor`, `GodotFileIo..ctor`, and `GodotFileIo.CreateDirectory`;
+- production clone verification requires exactly one `Godot.DirAccess.DirExistsAbsolute(System.String)` and one `Godot.DirAccess.MakeDirRecursiveAbsolute(System.String)` callsite inside `GodotFileIo.CreateDirectory`;
+- each selected Godot callsite is wrapped by one pre and one post `INMETHOD_*` marker and the serialized adjacency is reverified after write;
+- the helper refuses a selected callsite that is already a branch target before instrumentation;
+- a synthetic serialize/reopen host regression protects callsite-marker adjacency;
+- no Godot bootstrap/startup, native game loading, later OneTimeInitialization phase, game entry point, initializer-bearing dependency admission, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
+- `System.Collections.Concurrent` or other resolver traffic may be recorded as frontier context but must not be promoted to root cause without callsite/native evidence;
+- a 0.0.131 4/4 result is diagnostic completion only and **NOT Step-35 closure**.

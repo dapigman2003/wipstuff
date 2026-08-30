@@ -2,53 +2,57 @@
 
 Current on-device diagnostics write output-only text beneath `Documents/StS2Launcher/Reports/*.txt`. Reports are never trusted runtime input and intentionally exclude Steam passwords/tokens/Guard material and Apple signing secrets.
 
-## Active Step 35.0.7 reports
+## Active Step 35.0.8 reports
 
 `Documents/StS2Launcher/Reports/Step35-CurrentRun.txt`
 
-Small current-run manifest written before Gate A. It records Run ID, initialization UTC, PID, app version/build, and the exact run-specific crash-journal/static-map filenames. Use this file first when collecting evidence after a termination.
+Current-run manifest written before Gate A. It records Run ID, initialization UTC, PID, app version/build, and the exact run-specific crash-journal/static-map filenames.
 
 `Documents/StS2Launcher/Reports/Step35-LastCheckpoint.txt`
 
-Overwrite-on-each-event convenience file. It is independently flushed after the run-specific journal append and records the same Run ID plus the latest durable checkpoint line. It is not a substitute for the full run-specific journal.
+Overwrite-on-each-event convenience file, independently flushed after the run-specific journal append. It must carry the same Run ID as the journal/static map.
 
 `Documents/StS2Launcher/Reports/Step35-CrashCheckpoint-<RunId>.txt`
 
-Run-specific synchronously flushed crash-localization journal. Each event records UTC, Run ID, process ID, managed thread ID, and the A/B/C/resolver/in-method frontier marker. For 0.0.130 the decisive new events remain `C_DIAGNOSTIC_BRIDGE_ARMED` and `INMETHOD_*`; 0.0.129 armed the bridge but failed on its malformed generic Invoke MemberRef before any `INMETHOD_*`. The filename is never reused within a run.
+Run-specific synchronously flushed journal. For 0.0.131 the decisive markers include the existing `C_DIAGNOSTIC_BRIDGE_ARMED` / `INMETHOD_*` sequence plus:
+
+- `INMETHOD_021` — `SaveManager.ConstructDefault`;
+- `INMETHOD_022` — `UserDataPathProvider.GetAccountScopedBasePath`;
+- `INMETHOD_023` — `PlatformUtil.get_PrimaryPlatform`;
+- managed `PlatformUtil..cctor` entry when triggered;
+- `INMETHOD_024` — `NullPlatformUtilStrategy..ctor`;
+- `INMETHOD_025` — `GodotFileIo..ctor`;
+- `INMETHOD_026` — `GodotFileIo.CreateDirectory`;
+- `INMETHOD_180/181` — before/after `Godot.DirAccess.DirExistsAbsolute`;
+- `INMETHOD_182/183` — before/after `Godot.DirAccess.MakeDirRecursiveAbsolute`.
 
 `Documents/StS2Launcher/Reports/Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`
 
-Run-specific static map generated from the **exact closed transformed source** after source/transformed semantic checks and before CLR admission. It contains the exact transformed `ExecuteVeryEarly` wrapper and async `MoveNext` IL/callsite map, metadata scopes, numbered callsites, and await-registration candidates. It carries the same Run ID/PID as the journal and is never runtime input. The map describes the exact source artifact; Gate B/C of 0.0.130 execute a separately identified diagnostic clone.
+Run-specific static map generated from the **exact closed transformed source** after source/transformed semantic checks and before CLR admission. It describes the exact wrapper/async `MoveNext` artifact; Gate B/C execute a separately identified diagnostic clone.
 
 `Documents/StS2Launcher/Reports/Step35-TransformedRealStS2VeryEarlyInitialization.txt`
 
-Normal deterministic managed report. It is produced only when managed control reaches the UI `finally`; it may be absent after a native/runtime/kernel hard termination. Any 0.0.130 4/4 result must be labeled diagnostic completion and **not Step-35 closure**.
+Normal managed report written only if managed control returns to the UI `finally`. It may be absent after a hard termination. Any 0.0.131 4/4 result is diagnostic completion only, **not Step-35 closure**.
 
-## How to interpret 0.0.130
+## How to interpret 0.0.131
 
-After a hard termination, first use `Step35-CurrentRun.txt` to identify the same-run journal/static map. Confirm Run ID/PID match. Then inspect `Step35-LastCheckpoint.txt` and the journal tail. If `C_DIAGNOSTIC_BRIDGE_ARMED` is present, the final durable `INMETHOD_*` marker identifies the last selected instrumented game method/type initializer entered before termination. If the bridge is armed but no `INMETHOD_*` marker is durable, the bridge/first-entry boundary becomes the immediate diagnostic frontier.
+After a hard termination, use `Step35-CurrentRun.txt` first and confirm Run ID/PID match across artifacts. The last durable marker is the physical localization result.
 
-The diagnostic clone preserves assembly identity/MVID but is not byte-identical to the exact closed Step-32 transformed artifact. Therefore its reports may localize a failure but cannot close exact Step 35.
+- final `INMETHOD_180` without `181`: failure while entering/executing `DirExistsAbsolute`;
+- `181` then final `182` without `183`: failure while entering/executing `MakeDirRecursiveAbsolute`;
+- both post markers present: do not blame those two calls; continue from the subsequent marker;
+- resolver events remain context/frontier evidence and are not root-cause attribution by themselves.
+
+A matching `.ips` is useful independent evidence when available but is not required for this marker experiment.
 
 ## Preserved Step-35 physical evidence
 
-- `docs/history/reports/STEP-35.0.4-PHYSICAL-GATE-A-CECIL-WRITE-RESOLUTION-FAILURE.txt` — sanitized 0.0.127 normal Gate-A `System.Runtime 9.0.0.0` failure before CLR admission.
-- `docs/history/reports/STEP-35.0.5-PHYSICAL-GATE-A-DEFERRED-OPEN-FAILURE.txt` — sanitized 0.0.128 evidence confirming a second normal Gate-A `System.Runtime 9.0.0.0` failure before CLR admission, later localized to Immediate reading before resolver configuration.
-
-- `docs/history/reports/STEP-35.0-PHYSICAL-HARD-TERMINATION-SUMMARY.txt` — sanitized 0.0.123 main-thread PC=0x0 hard termination.
-- `docs/history/reports/STEP-35.0.1-PHYSICAL-EXECUTEVERYEARLY-INVOKE-CRASH-LOCALIZATION.txt` — sanitized 0.0.124 evidence proving Gate B PASS and hard termination inside synchronous exact `ExecuteVeryEarly` invocation after planned resolver activity.
-- `docs/history/reports/STEP-35.0.2-PHYSICAL-REPEATED-HARD-TERMINATION-AND-TELEMETRY-CORRELATION.txt` — sanitized 0.0.125 repeated hard-kill evidence and proof that the available static map/crash report came from different runs.
-- `docs/history/reports/STEP-35.0.3-PHYSICAL-SAME-RUN-CORRELATION-AND-INVOKE-FRONTIER.txt` — sanitized 0.0.126 same-run evidence proving Gate B PASS, exact invocation entry, planned resolver activity, and the final durable `System.Collections.Concurrent 8 -> 9` host-resolution event with no `C_INVOKE_RETURNED`.
+- `docs/history/reports/STEP-35.0-PHYSICAL-HARD-TERMINATION-SUMMARY.txt` — 0.0.123 hard termination.
+- `docs/history/reports/STEP-35.0.1-PHYSICAL-EXECUTEVERYEARLY-INVOKE-CRASH-LOCALIZATION.txt` — 0.0.124 exact invocation localization.
+- `docs/history/reports/STEP-35.0.2-PHYSICAL-REPEATED-HARD-TERMINATION-AND-TELEMETRY-CORRELATION.txt` — 0.0.125 repeated failure/correlation gap.
+- `docs/history/reports/STEP-35.0.3-PHYSICAL-SAME-RUN-CORRELATION-AND-INVOKE-FRONTIER.txt` — 0.0.126 same-run exact frontier.
+- `docs/history/reports/STEP-35.0.4-PHYSICAL-GATE-A-CECIL-WRITE-RESOLUTION-FAILURE.txt` — 0.0.127 Gate-A writer failure.
+- `docs/history/reports/STEP-35.0.5-PHYSICAL-GATE-A-DEFERRED-OPEN-FAILURE.txt` — 0.0.128 Immediate-read ordering failure.
+- `docs/history/reports/STEP-35.0.7-PHYSICAL-SAVEMANAGER-LOCALIZATION-0.0.130.txt` — 0.0.130 working bridge and SaveManager-path physical frontier.
 
 Raw `.ips` files are intentionally not stored in source because they can contain device-specific identifiers.
-
-## Latest physical closures
-
-- `docs/history/reports/STEP-34.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.122 Step 34 4/4 exact transformed `PrewarmJit()` execution.
-- `docs/history/reports/STEP-33.0-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.121 Step 33 4/4 transformed-primary-only CLR admission.
-- `docs/history/reports/STEP-32.0.5-PHYSICAL-CLOSURE-4OF4.txt` — physical 0.0.120 Step 32 4/4 exact private real-StS2 semantic rewrite.
-
-
-## Physical 0.0.129 interpretation
-
-0.0.129 is a managed diagnostic-instrumentation failure, not a new exact-game compatibility verdict. Gate A/B passed and Gate C reached `C_DIAGNOSTIC_BRIDGE_ARMED` plus `C_INVOKE_START`; the first bridge callback then threw `MissingMethodException` for synthetic `Action<string>.Invoke(string)`. No `INMETHOD_*` marker was emitted. The exact 0.0.126 pre-first-await hard-kill frontier therefore remains authoritative.

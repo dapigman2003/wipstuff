@@ -1,7 +1,7 @@
-# Documentation — Step 35.0.7 / 0.0.130
+# Documentation — Step 35.0.8 / 0.0.131
 
-Physical 0.0.129 proved the deferred-open/configure/write correction and advanced the diagnostic clone through Gate A, Gate B and into Gate C. It then returned a managed `MissingMethodException` for the bridge's synthetic `System.Action<string>.Invoke(string)` MemberRef before any `INMETHOD_*` marker.
+Physical 0.0.130 proved the corrected `Action<string>::Invoke(!0)` bridge and emitted durable in-game markers through `SaveManager.get_Instance`, with a nested second `TestMode.get_IsOn` before the process hard-terminated. That run did not reach either settings-initialization method and has no matching `.ips`.
 
-0.0.130 changes only that generic delegate MemberRef encoding. The bridge models open `Action<T>` explicitly, constructs the field as `Action<string>`, encodes `Invoke(!0)`, and requires rejecting-resolver post-write verification of that exact generic-variable signature. The strict resolver, exact-source protection, timeout, later-boundary prohibitions and diagnostic-only evidence semantics remain unchanged.
+0.0.131 keeps the exact Step-35 source/resolver authority unchanged and adds only narrow entry/callsite localization along the statically verified Save/Platform/Godot path. It instruments `SaveManager.ConstructDefault`, `UserDataPathProvider.GetAccountScopedBasePath`, `PlatformUtil.get_PrimaryPlatform` plus its managed `.cctor`, `NullPlatformUtilStrategy..ctor`, `GodotFileIo..ctor`, and `GodotFileIo.CreateDirectory`, then places pre/post markers around `Godot.DirAccess.DirExistsAbsolute` and `MakeDirRecursiveAbsolute`.
 
-See `CURRENT-STATUS.md` for the active frontier and `history/INDEX.md` for the physical records and Step 35.0.7 design record.
+See `CURRENT-STATUS.md` for the active frontier, `TESTING.md` for the physical acceptance contract, and `history/INDEX.md` for preserved step/physical records.

@@ -229,3 +229,9 @@ Physical 0.0.128 did not reach Gate B or game execution. It repeated the Gate-A 
 ## Step 35.0.7 generic delegate MemberRef correction
 
 Physical 0.0.129 reached the diagnostic invocation but failed normally before `INMETHOD_001` with `MissingMethodException: Method not found: void System.Action`1.Invoke(string)`. Gate A/B passing means the deferred Cecil writer defect is closed for this diagnostic path. The next bounded correction is metadata-only within the diagnostic bridge: encode the generic member as `Action<string>::Invoke(!0)` rather than a concrete-parameter MemberRef, verify that serialized shape under rejecting resolution, and rerun the unchanged in-method localization experiment. This remains derivative evidence only and cannot close exact Step 35.
+
+## Step 35.0.8 Save/Platform/Godot native-boundary localization
+
+Physical 0.0.130 closes the diagnostic bridge metadata question: `Action<string>::Invoke(!0)` executes and durable in-game markers reach `SaveManager.get_Instance`. The next bounded experiment is not a compatibility transform and not a Godot bootstrap. 0.0.131 instruments only the statically verified path under that getter and the two Godot directory callsites inside `GodotFileIo.CreateDirectory`.
+
+Acceptance is evidence-only: identify the last durable entry/callsite marker. If a pre-call marker is durable and its post-call partner is absent, record that exact call as the physical boundary. Do not infer that framework assembly resolution immediately preceding a hard stop is itself causal. Do not authorize Godot startup, native game loading, later `OneTimeInitialization` phases, Harmony/MonoMod runtime patching, or broader resolver fallback from this diagnostic result.

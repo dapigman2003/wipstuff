@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.7 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.8 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -161,6 +161,111 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         Assert.AreEqual("<ExecuteVeryEarly>d__7", TransformedRealStS2VeryEarlyInitialization.TargetStateMachineTypeName);
         Assert.AreEqual(0x0600BC71u, TransformedRealStS2VeryEarlyInitialization.SourceStateMachineMoveNextToken);
         Assert.AreEqual("39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef", TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256);
+    }
+
+    [TestMethod]
+    public void DiagnosticActionStringInvokeMemberRefRoundTripsAsDeclaringTypeVarZero()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-action-memberref");
+        var assemblyPath = Path.Combine(temp.Path, "ActionMemberRefFixture.dll");
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("ActionMemberRefFixture", new Version(1, 0, 0, 0)),
+                   "ActionMemberRefFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var systemRuntime = new AssemblyNameReference("System.Runtime", new Version(9, 0, 0, 0));
+            module.AssemblyReferences.Add(systemRuntime);
+            var (_, invoke) = TransformedRealStS2VeryEarlyInitialization.CreateDiagnosticActionStringInvokeReference(module, systemRuntime);
+
+            var type = new TypeDefinition("Fixture", "Probe", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(type);
+            var method = new MethodDefinition("Run", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            type.Methods.Add(method);
+            var il = method.Body.GetILProcessor();
+            il.Append(il.Create(OpCodes.Ldnull));
+            il.Append(il.Create(OpCodes.Ldstr, "marker"));
+            il.Append(il.Create(OpCodes.Callvirt, invoke));
+            il.Append(il.Create(OpCodes.Ret));
+            assembly.Write(assemblyPath);
+        }
+
+        using var reopened = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var serializedMethod = reopened.MainModule.Types.Single(type => type.FullName == "Fixture.Probe").Methods.Single(method => method.Name == "Run");
+        var call = serializedMethod.Body.Instructions.Single(instruction => instruction.OpCode == OpCodes.Callvirt);
+        Assert.IsInstanceOfType(call.Operand, typeof(MethodReference));
+        var serializedInvoke = (MethodReference)call.Operand;
+        Assert.AreEqual("Invoke", serializedInvoke.Name);
+        Assert.IsInstanceOfType(serializedInvoke.DeclaringType, typeof(GenericInstanceType));
+        var declaringType = (GenericInstanceType)serializedInvoke.DeclaringType;
+        Assert.AreEqual("System.Action`1", declaringType.ElementType.FullName);
+        Assert.AreEqual(1, declaringType.GenericArguments.Count);
+        Assert.AreEqual("System.String", declaringType.GenericArguments[0].FullName);
+        Assert.AreEqual(1, serializedInvoke.Parameters.Count);
+        Assert.IsInstanceOfType(serializedInvoke.Parameters[0].ParameterType, typeof(GenericParameter));
+        var parameter = (GenericParameter)serializedInvoke.Parameters[0].ParameterType;
+        Assert.AreEqual(GenericParameterType.Type, parameter.Type);
+        Assert.AreEqual(0, parameter.Position);
+    }
+
+    [TestMethod]
+    public void DiagnosticGodotCallsiteMarkersRoundTripImmediatelyBeforeAndAfterTargetCall()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-godot-callsite");
+        var assemblyPath = Path.Combine(temp.Path, "GodotCallsiteFixture.dll");
+        const string beforeMarker = "INMETHOD_180 — before Godot.DirAccess.DirExistsAbsolute";
+        const string afterMarker = "INMETHOD_181 — after Godot.DirAccess.DirExistsAbsolute";
+
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("GodotCallsiteFixture", new Version(1, 0, 0, 0)),
+                   "GodotCallsiteFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var godotSharp = new AssemblyNameReference("GodotSharp", new Version(4, 5, 1, 0));
+            module.AssemblyReferences.Add(godotSharp);
+            var dirAccess = new TypeReference("Godot", "DirAccess", module, godotSharp, false);
+            var dirExists = new MethodReference("DirExistsAbsolute", module.TypeSystem.Boolean, dirAccess)
+            {
+                HasThis = false,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+            dirExists.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+
+            var bridge = new TypeDefinition("StS2Launcher.Step35Diagnostics", "ExecuteVeryEarlyCheckpointBridge", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(bridge);
+            var emit = new MethodDefinition("Emit", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            emit.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+            emit.Body.GetILProcessor().Append(emit.Body.GetILProcessor().Create(OpCodes.Ret));
+            bridge.Methods.Add(emit);
+
+            var fixture = new TypeDefinition("Fixture", "GodotFileIo", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(fixture);
+            var method = new MethodDefinition("CreateDirectory", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            method.Parameters.Add(new ParameterDefinition("path", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
+            fixture.Methods.Add(method);
+            var il = method.Body.GetILProcessor();
+            il.Append(il.Create(OpCodes.Ldarg_0));
+            il.Append(il.Create(OpCodes.Call, dirExists));
+            il.Append(il.Create(OpCodes.Pop));
+            il.Append(il.Create(OpCodes.Ret));
+
+            TransformedRealStS2VeryEarlyInitialization.InsertCallsiteMarkers(method, emit, dirExists.FullName, beforeMarker, afterMarker);
+            assembly.Write(assemblyPath);
+        }
+
+        using var reopened = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var serializedMethod = reopened.MainModule.Types.Single(type => type.FullName == "Fixture.GodotFileIo").Methods.Single(method => method.Name == "CreateDirectory");
+        var targetCall = serializedMethod.Body.Instructions.Single(instruction =>
+            instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference method && method.Name == "DirExistsAbsolute");
+        Assert.AreEqual(OpCodes.Call, targetCall.Previous!.OpCode);
+        Assert.AreEqual("Emit", ((MethodReference)targetCall.Previous.Operand).Name);
+        Assert.AreEqual(OpCodes.Ldstr, targetCall.Previous.Previous!.OpCode);
+        Assert.AreEqual(beforeMarker, targetCall.Previous.Previous.Operand);
+        Assert.AreEqual(OpCodes.Ldstr, targetCall.Next!.OpCode);
+        Assert.AreEqual(afterMarker, targetCall.Next.Operand);
+        Assert.AreEqual(OpCodes.Call, targetCall.Next.Next!.OpCode);
+        Assert.AreEqual("Emit", ((MethodReference)targetCall.Next.Next.Operand).Name);
     }
 
     private static RuntimeBindingPreparedAssembly CreatePlanEntry(string relative, AssemblyName identity, byte[] bytes, bool isPrimary)
