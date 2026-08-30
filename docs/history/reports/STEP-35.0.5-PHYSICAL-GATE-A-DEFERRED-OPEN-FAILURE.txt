@@ -1,0 +1,25 @@
+StS2 Launcher — Step 35.0.5 / 0.0.128 physical Gate-A failure
+Sanitized physical evidence record. Raw device-specific crash artifacts are not committed.
+
+Candidate: 0.0.128 (128) — STEP 35.0.5 IN-METHOD PRE-FIRST-AWAIT LOCALIZATION
+Run ID: 20260829T2333192043840Z-pid16280-939cafb963bf4510ab46abd7968a5139
+PID: 16280
+
+Outcome:
+- no crash;
+- Gate A (`VerifiedExecutionPreflight`) returned FAIL;
+- failure stage: `Step-35.0.5 diagnostic-clone instrumentation`;
+- exception: `AssemblyResolutionException` for `System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a`;
+- durable sequence: RUN_TELEMETRY_READY -> RUN_START -> A_RESULT passed=False -> RUN_FINALLY_ENTER -> RUN_NORMAL_REPORT_RETURNED -> RUN_END;
+- no same-run static map was written because Gate A did not complete;
+- no Gate B CLR admission, Gate C invocation, or `INMETHOD_*` checkpoint occurred.
+
+Interpretation:
+This run did not test the game compatibility frontier and does not supersede physical 0.0.126. Post-run source analysis found that the 0.0.128 diagnostic clone path opened the exact transformed image using Cecil `ReadingMode.Immediate` before calling `DiagnosticConstantMetadataWriteResolver.Configure(module)`. The resolver intentionally rejects requests while unconfigured, so any constant/enum metadata materialized during the immediate read fails on `System.Runtime` before the physically proven bounded writer surrogates can be installed.
+
+Game-input correlation used for the analysis:
+- supplied `sts2.dll` SHA-256: e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18 (exact closed trusted source identity);
+- supplied GodotSharp SHA-1: 6594b7f2f3e0e503009996c243fc83ac23dc0e86 (matches physical Step-35 planned dependency evidence);
+- supplied Steamworks.NET SHA-1: a84d864856652dc07f634d815d8bdac1a0d7b5bd (matches physical Step-35 planned dependency evidence).
+
+No proprietary game binary is included in the source repository/history.

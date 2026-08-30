@@ -363,3 +363,6 @@ Additional 0.0.128 evidence-semantics contract:
 - active UI/report summaries must label diagnostic A–D 4/4 as **NOT STEP 35 CLOSURE**;
 - no 0.0.128 derivative result may close Step 35, even if all diagnostic gates complete;
 - after localization, compatibility work must return to a separately defined authoritative transformed artifact before physical closure can be claimed.
+
+## Step 35.0.6 / 0.0.129 deferred-open diagnostic-clone contract
+All Step-35.0.5 derivative/evidence restrictions remain in force. In addition, the diagnostic clone source open must use Cecil `ReadingMode.Deferred`; `ReadingMode.Immediate` is forbidden in `CreateInstrumentedDiagnosticClone`. The bounded writer resolver must observe zero requests before `Configure(module)`. The audited external constant requirement set must be validated before `module.Write`, and every write-time request must be serviced only by the configured in-memory `System.Runtime`/`Sentry` surrogates. Post-write verification must continue to use a rejecting resolver. Physical 0.0.127/0.0.128 Gate-A failures are diagnostic tooling failures and do not advance the 0.0.126 runtime frontier.

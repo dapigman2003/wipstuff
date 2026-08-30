@@ -219,3 +219,8 @@ Physical 0.0.120 closed the first exact real-StS2 ahead-of-load semantic rewrite
 
 ## Step 35.0.5 diagnostic localization
 Physical 0.0.126 validated same-run durable telemetry and reproduced the no-`C_INVOKE_RETURNED` synchronous frontier. 0.0.128 does not advance to a later initialization boundary. It re-verifies the exact closed transformed source, emits a separate identity/MVID-preserving diagnostic clone, instruments only entry checkpoints in the current pre-first-await call chain/type initializers, and executes that clone once under the existing strict Step-35 resolver and timeout. The exact transformed source remains immutable.
+
+## Step 35.0.6 diagnostic-writer ordering correction
+Physical 0.0.128 did not reach Gate B or game execution. It repeated the Gate-A `System.Runtime 9.0.0.0` `AssemblyResolutionException`. The exact trusted `sts2.dll` supplied for analysis matches the closed source SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`. Source review identified the immediate cause: Step 35.0.5 opened the diagnostic source module with Cecil `ReadingMode.Immediate` before configuring its bounded surrogate resolver, unlike physically closed Step 32.
+
+0.0.129 changes only that sequence to `ReadingMode.Deferred -> zero pre-configure resolver requests -> audited requirement collection/configuration -> marker injection/write -> bounded request validation -> rejecting reopen/semantic verification`. No external dependency bytes become writer inputs. If Gate A now passes, the existing Step-35.0.4 in-method diagnostic experiment proceeds unchanged.

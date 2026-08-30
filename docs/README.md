@@ -1,5 +1,5 @@
-# Documentation — Step 35.0.5 / 0.0.128
+# Documentation — Step 35.0.6 / 0.0.129
 
-Start with `CURRENT-STATUS.md`. Steps 32–34 remain closed positive. Step 35 remains open. Physical 0.0.126 validated same-run durable telemetry and reproduced the synchronous `ExecuteVeryEarly` hard-kill frontier. 0.0.128 advances diagnostics only by executing a separately instrumented clone of the reverified exact transformed source.
+Start with `CURRENT-STATUS.md`. Steps 32–34 remain closed positive and Step 35 remains open. Physical 0.0.126 is still the runtime authority. Physical 0.0.127 and 0.0.128 stopped in Gate A before CLR admission; post-run analysis of the exact trusted game assembly localized 0.0.128 to Cecil `ReadingMode.Immediate` occurring before bounded writer-resolver configuration.
 
-The diagnostic clone adds durable entry markers to the pre-first-await call chain; the original transformed image, resolver authority, timeout, and later-boundary prohibitions remain preserved. See `history/INDEX.md` for the 0.0.126 physical report and the Step 35.0.5 design record.
+0.0.129 corrects only that diagnostic writer ordering by matching the physically proven Step-32 deferred-open/configure/write pattern. The diagnostic clone, strict runtime resolver, timeout, exact-source protection, later-boundary prohibitions, and diagnostic-only evidence semantics remain unchanged. See `history/INDEX.md` for the physical records and Step 35.0.6 design record.
