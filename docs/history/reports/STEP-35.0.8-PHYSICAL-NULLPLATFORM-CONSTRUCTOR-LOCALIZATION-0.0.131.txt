@@ -1,0 +1,28 @@
+StS2 Launcher — Step 35.0.8 physical result — 0.0.131 (131)
+Run ID: 20260830T1920262569650Z-pid4122-2714d6840a8c49ef91a759bd03de1834
+Candidate: SAVE/PLATFORM/GODOT NATIVE-BOUNDARY LOCALIZATION
+
+RESULT
+Gate A PASS. Gate B PASS. Gate C armed the diagnostic bridge and entered the one instrumented ExecuteVeryEarly invocation. The process then hard-terminated before managed control returned.
+
+DURABLE FRONTIER
+The run physically emitted, in order, the previously expected ExecuteVeryEarly/TestMode/SaveManager markers and then advanced through:
+- INMETHOD_021 — SaveManager.ConstructDefault entered
+- nested INMETHOD_010 — TestMode.get_IsOn entered
+- INMETHOD_022 — UserDataPathProvider.GetAccountScopedBasePath entered
+- INMETHOD_CCTOR — MegaCrit.Sts2.Core.Platform.PlatformUtil..cctor entered
+- System.Text.Json 9.0.0.0 host resolution PASS
+- INMETHOD_024 — NullPlatformUtilStrategy..ctor entered
+- System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0 resolution PASS
+
+No INMETHOD_025 — GodotFileIo..ctor marker was emitted. No INMETHOD_026, 180/181, or 182/183 marker was emitted.
+
+CONCLUSION
+The Step-35 diagnostic frontier is physically inside work executed by NullPlatformUtilStrategy..ctor after its entry marker and before GodotFileIo..ctor begins. The last System.Collections.Concurrent resolver event is a frontier/context marker and is not root-cause attribution.
+
+The prior hypothesis that the first failure might be at Godot.DirAccess.DirExistsAbsolute is not supported by this run because execution never reached GodotFileIo.CreateDirectory or its selected DirAccess callsites.
+
+AUTHORITY
+This is diagnostic-derivative evidence only. It does not replace the authoritative exact transformed-byte Step-35 frontier from physical 0.0.126 and does not close Step 35.
+
+No matching .ips is available.

@@ -1,45 +1,37 @@
-# Release Checklist — Step 35.0.8 Save/Platform/Godot Native-Boundary Localization
+# Release Checklist — Step 35.0.9 Null-Platform Constructor Callsite Localization
 
-## Candidate identity
+## Identity
 
-- step/candidate: **Step 35.0.8**
-- version: `0.0.131 (131)`
-- workflow: `ios-canonical`
-- expected IPA: `artifacts/StS2-Launcher-Step-35.ipa`
-- expected host TRX: `artifacts/test-results/step35.trx`
-- expected current-run manifest: `Documents/StS2Launcher/Reports/Step35-CurrentRun.txt`
-- expected last checkpoint: `Documents/StS2Launcher/Reports/Step35-LastCheckpoint.txt`
-- expected run-specific checkpoint: `Documents/StS2Launcher/Reports/Step35-CrashCheckpoint-<RunId>.txt`
-- expected run-specific static map: `Documents/StS2Launcher/Reports/Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`
+- step/candidate: **Step 35.0.9**
+- version: `0.0.132 (132)`
+- IPA: `StS2-Launcher-Step-35.ipa`
+- TRX: `step35.trx`
 
-## Required before device testing
+## Before packaging
 
-- [ ] canonical static validation passes;
-- [ ] full host suite passes when a .NET SDK is available;
-- [ ] release identity is exactly `0.0.131 (131)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
-- [ ] iOS publish/package succeeds under `MtouchLink=None`, `TrimMode=copy`, `MtouchInterpreter=-all`;
-- [ ] IPA verification succeeds and advertises Step 35.0.8 Save/Platform/Godot localization;
-- [ ] exact closed Step-32 transformed SHA-256 remains `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`;
-- [ ] Gate-A clone source open uses Cecil `ReadingMode.Deferred`, sees zero requests before `Configure`, and uses only the audited writer-only metadata surrogates before `module.Write`;
-- [ ] Gate A creates `sts2.step35.0.8.instrumented.dll`, preserves identity/MVID, verifies all entry/callsite markers after serialization, and immediately re-hashes the exact transformed source unchanged;
-- [ ] synthetic host regression round-trips `Action<string>::Invoke(!0)` and rejects regression to concrete `Invoke(string)`;
-- [ ] synthetic host regression round-trips pre/post callsite markers immediately around a target `Godot.DirAccess` call;
-- [ ] production clone verification requires exactly one `DirExistsAbsolute` and one `MakeDirRecursiveAbsolute` target callsite in `GodotFileIo.CreateDirectory`;
-- [ ] Gate B CLR-loads only the diagnostic clone, never the exact transformed source or receipt-backed/prepared original;
-- [ ] Gate C arms the launcher-owned durable callback before the one diagnostic `ExecuteVeryEarly()` invocation;
-- [ ] active summary/UI/report text states that diagnostic 4/4 is **NOT STEP 35 CLOSURE**;
-- [ ] no proprietary game DLL/app bundle/native game library/raw user payload, credentials, device identifiers, signing secrets, or user game data are present in the source ZIP.
+- [ ] closed Step-32/33/34 manifests verify unchanged;
+- [ ] active Step-35.0.9 candidate manifest verifies;
+- [ ] canonical static validator passes completely;
+- [ ] host tests pass, including generic MemberRef round-trip, selected Godot callsite round-trip and NullPlatform constructor callsite-sweep round-trip;
+- [ ] release identity is exactly `0.0.132 (132)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] no supplied proprietary game DLLs/deps files are packaged into the launcher source archive;
+- [ ] IPA verification succeeds and advertises `STEP 35.0.9 — NULL-PLATFORM CONSTRUCTOR CALLSITE LOCALIZATION`;
+- [ ] Gate A creates `sts2.step35.0.9.instrumented.dll`, preserves identity/MVID, verifies prior markers plus every NullPlatform sweep pair after serialization, and immediately re-hashes the exact transformed source unchanged;
+- [ ] same-run static map contains `[NULL PLATFORM CTOR IL]` and constructor CALLSITE ordinals;
+- [ ] direct base constructor is intentionally not wrapped by the NP sweep;
+- [ ] no Godot bootstrap/startup or resolver broadening is present.
 
-## Device run
+## Physical run
 
-Force-quit/relaunch first. Run Step 35.0.8 once. A telemetry-initialization failure must stop before Gate A. Once Gate B begins, the process is spent.
+Force-quit/relaunch first. Run Step 35.0.9 once. A telemetry-initialization failure must stop before Gate A. Once Gate B begins, the process is spent.
 
-The desired sequence is the existing Step-35 markers followed by the newly added Save/Platform/Godot markers. After a hard termination, preserve the current-run manifest, last-checkpoint file, exact run-specific journal/static map, and a matching `.ips` if one exists. Do not combine artifacts from different Run IDs/PIDs.
+After a hard termination preserve at minimum:
 
-The decisive interpretation is:
+- `Step35-CurrentRun.txt` if present;
+- matching `Step35-CrashCheckpoint-<RunId>.txt`;
+- matching `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`;
+- `Step35-LastCheckpoint.txt`.
 
-- `INMETHOD_180` with no `INMETHOD_181` -> first `DirExistsAbsolute` call is the physical boundary;
-- `INMETHOD_181` then `INMETHOD_182` with no `INMETHOD_183` -> `MakeDirRecursiveAbsolute` is the physical boundary;
-- both post markers present -> continue localization; do not attribute the termination to either directory call.
+Use the final `INMETHOD_NPxxx_PRE/POST` marker and the same-run constructor static map to localize the exact callsite. Do not attribute the final resolver event as root cause merely because it is last.
 
-Cancellation is INCONCLUSIVE. A 0.0.131 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35. Do not broaden resolver/native/Harmony/Godot authority in this candidate.
+Cancellation is INCONCLUSIVE. A 0.0.132 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35. Do not broaden resolver/native/Harmony/Godot authority in this candidate.

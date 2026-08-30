@@ -235,3 +235,9 @@ Physical 0.0.129 reached the diagnostic invocation but failed normally before `I
 Physical 0.0.130 closes the diagnostic bridge metadata question: `Action<string>::Invoke(!0)` executes and durable in-game markers reach `SaveManager.get_Instance`. The next bounded experiment is not a compatibility transform and not a Godot bootstrap. 0.0.131 instruments only the statically verified path under that getter and the two Godot directory callsites inside `GodotFileIo.CreateDirectory`.
 
 Acceptance is evidence-only: identify the last durable entry/callsite marker. If a pre-call marker is durable and its post-call partner is absent, record that exact call as the physical boundary. Do not infer that framework assembly resolution immediately preceding a hard stop is itself causal. Do not authorize Godot startup, native game loading, later `OneTimeInitialization` phases, Harmony/MonoMod runtime patching, or broader resolver fallback from this diagnostic result.
+
+## Step 35.0.9 NullPlatform constructor callsite localization
+
+Physical 0.0.131 entered `NullPlatformUtilStrategy..ctor` and hard-terminated before `GodotFileIo..ctor`, so the next bounded experiment moves inward rather than forward. 0.0.132 preserves the exact transformed source and all resolver/startup prohibitions, then adds ordered pre/post markers around every existing non-base `call`/`callvirt`/`newobj` in that constructor. The same-run static map includes the exact constructor IL and matching `CALLSITE#` ordinals.
+
+Acceptance is evidence-only: identify the final NP pre/post pair. A pre marker without its post marker defines the exact outgoing-call frontier. If no NP marker appears after constructor entry, the next experiment instruments non-call IL rather than broadening resolver or Godot authority. If `GodotFileIo..ctor` appears, resume the preserved downstream markers. Diagnostic 4/4 remains NOT Step-35 closure.

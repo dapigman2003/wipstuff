@@ -1,13 +1,15 @@
-# StS2 Launcher iOS — Step 35.0.8 Save/Platform/Godot Native-Boundary Localization
+# StS2 Launcher iOS — Step 35.0.9 Null-Platform Constructor Callsite Localization
 
-Active candidate: **Step 35.0.8 / `0.0.131 (131)`**.
+Active candidate: **Step 35.0.9 / `0.0.132 (132)`**.
 
-Physical 0.0.130 proved the Step-35.0.7 generic-delegate bridge correction. Gate A/B passed, Gate C armed the diagnostic bridge, and durable game-body markers reached `ExecuteVeryEarly.MoveNext`, `TestMode.get_IsOn`, `SaveManager..cctor`, and `SaveManager.get_Instance`; a second `TestMode.get_IsOn` marker then appeared from work under that getter. `System.Text.Json` and `System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0` resolution followed, then the process hard-terminated before either `InitSettingsDataForTest()` or `InitSettingsData()` was entered. No matching `.ips` is available for that run.
+Steps 32–34 remain physically CLOSED POSITIVE 4/4. Step 35 remains OPEN, with physical 0.0.126 still the authoritative exact transformed-byte frontier.
 
-Exact `sts2.dll` analysis narrows the normal non-test branch further: `SaveManager.ConstructDefault()` -> `UserDataPathProvider.GetAccountScopedBasePath(...)` -> `PlatformUtil.get_PrimaryPlatform()` / `PlatformUtil..cctor` -> `NullPlatformUtilStrategy..ctor` -> `GodotFileIo..ctor` -> `GodotFileIo.CreateDirectory(string)`. `CreateDirectory` contains one `Godot.DirAccess.DirExistsAbsolute(string)` call and, when the directory is absent, one `MakeDirRecursiveAbsolute(string)` call.
+Physical 0.0.131 advanced the diagnostic frontier through `SaveManager.ConstructDefault`, `UserDataPathProvider.GetAccountScopedBasePath`, `PlatformUtil..cctor`, and `NullPlatformUtilStrategy..ctor`. The process then hard-terminated after the planned `System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0` binding and before `GodotFileIo..ctor` emitted its marker. Therefore the previous first-`DirAccess` hypothesis is not supported by the physical path actually reached.
 
-Step 35.0.8 adds only output-only entry markers on that path plus verified pre/post markers around those two Godot callsites. It does **not** initialize Godot, broaden runtime resolution, load native game code, invoke later `OneTimeInitialization` phases, or alter the exact closed Step-32 transformed source.
+Step 35.0.9 keeps the exact Step-35 source/resolver/startup authority unchanged and adds only an ordered pre/post sweep around every existing non-base `call`, `callvirt`, and `newobj` in `NullPlatformUtilStrategy..ctor`. The run-specific static map also includes that constructor's exact IL and `CALLSITE#xxx` ordinals, allowing the last durable NP marker to identify the outgoing call that did not return.
 
-The 0.0.129 `Action<string>::Invoke(string)` bug remains protected by a synthetic serialize/reopen host regression that requires the ECMA-correct `Action<string>::Invoke(!0)` MemberRef. A second synthetic round-trip regression protects the new callsite-marker placement.
+It does **not** initialize Godot, broaden runtime resolution, load native game code, invoke later `OneTimeInitialization` phases, or alter the exact closed Step-32 transformed source.
 
-**Authority:** 0.0.131 is still a diagnostic derivative. Even a 4/4 result cannot close exact Step 35 because Gate B/C execute an instrumented clone rather than the exact closed transformed bytes. Step 35 remains OPEN until a separately defined authoritative compatibility artifact passes its physical closure contract.
+**Authority:** 0.0.132 is still a diagnostic derivative. Even a 4/4 result cannot close exact Step 35 because Gate B/C execute an instrumented clone rather than the exact closed transformed bytes.
+
+Start with `docs/CURRENT-STATUS.md`, `docs/TESTING.md`, and `docs/REGRESSION-CONTRACTS.md` before changing Step-35 code.

@@ -389,3 +389,26 @@ Required invariants:
 - no Godot bootstrap/startup, native game loading, later OneTimeInitialization phase, game entry point, initializer-bearing dependency admission, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
 - `System.Collections.Concurrent` or other resolver traffic may be recorded as frontier context but must not be promoted to root cause without callsite/native evidence;
 - a 0.0.131 4/4 result is diagnostic completion only and **NOT Step-35 closure**.
+
+## Step 35.0.9 / 0.0.132 NullPlatform constructor callsite-sweep contract
+
+Physical 0.0.131 reached `INMETHOD_024 — NullPlatformUtilStrategy..ctor entered` and never reached `INMETHOD_025 — GodotFileIo..ctor entered`. The active 0.0.132 derivative must preserve every exact Step-35 authority constraint and may add only output-only instrumentation necessary to distinguish the existing call-like instructions inside that constructor.
+
+Required invariants:
+
+- exact closed Step-32 transformed source hash/identity/MVID remains unchanged and outside the CLR;
+- diagnostic source open remains file-backed `ReadingMode.Deferred`, with zero resolver requests before bounded writer-resolver configuration;
+- the diagnostic bridge remains serialized and verified as `Action<string>::Invoke(!0)`;
+- all Step-35.0.8 entry markers and selected Godot callsite marker pairs remain present and verified;
+- `NullPlatformUtilStrategy..ctor()` is found by exact stable type + full signature, not by assuming a post-write MethodDef token;
+- the new sweep enumerates only the constructor's original `call`, `callvirt`, and `newobj` instructions and never calls Cecil `Resolve`;
+- the direct base `.ctor` call is intentionally excluded from the sweep;
+- diagnostic bridge calls are excluded from the sweep;
+- each other original call-like instruction is wrapped by exactly one unique `INMETHOD_NPxxx_PRE/POST` pair using the original constructor CALLSITE ordinal;
+- a selected callsite that is a branch target is rejected before write;
+- serialized reopen under a rejecting resolver must verify each NP pair immediately around the same opcode and callee;
+- the run-specific static map includes `[NULL PLATFORM CTOR IL]` and exact `CALLSITE#xxx` ordinals;
+- a synthetic serialize/reopen host regression covers skipped base `.ctor` plus instrumented `newobj` and `call` instructions;
+- no Godot bootstrap/startup, native game loading, later OneTimeInitialization phase, game entry point, initializer-bearing dependency admission, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
+- the final `System.Collections.Concurrent` resolver record may be preserved as frontier context but cannot be promoted to root cause merely because it is last;
+- a 0.0.132 4/4 result is diagnostic completion only and **NOT Step-35 closure**.

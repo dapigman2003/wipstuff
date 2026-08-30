@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.8 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.9 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -142,9 +142,20 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         il.Append(il.Create(OpCodes.Call, awaitCall));
         il.Append(il.Create(OpCodes.Ret));
 
-        var map = TransformedRealStS2VeryEarlyInitialization.BuildStaticInstructionMap(wrapper, moveNext);
+        var nullType = new TypeDefinition("MegaCrit.Sts2.Core.Platform.Null", "NullPlatformUtilStrategy", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+        module.Types.Add(nullType);
+        var nullCtor = new MethodDefinition(".ctor", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+        nullType.Methods.Add(nullCtor);
+        var objectCtor = new MethodReference(".ctor", module.TypeSystem.Void, module.TypeSystem.Object) { HasThis = true };
+        var ctorIl = nullCtor.Body.GetILProcessor();
+        ctorIl.Append(ctorIl.Create(OpCodes.Ldarg_0));
+        ctorIl.Append(ctorIl.Create(OpCodes.Call, objectCtor));
+        ctorIl.Append(ctorIl.Create(OpCodes.Ret));
+
+        var map = TransformedRealStS2VeryEarlyInitialization.BuildStaticInstructionMap(wrapper, moveNext, nullCtor);
 
         StringAssert.Contains(map, "[MOVENEXT IL]");
+        StringAssert.Contains(map, "[NULL PLATFORM CTOR IL]");
         StringAssert.Contains(map, "CALLSITE#001");
         StringAssert.Contains(map, "AWAIT-CANDIDATE");
         StringAssert.Contains(map, "System.Runtime, Version=9.0.0.0");
@@ -266,6 +277,70 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         Assert.AreEqual(afterMarker, targetCall.Next.Operand);
         Assert.AreEqual(OpCodes.Call, targetCall.Next.Next!.OpCode);
         Assert.AreEqual("Emit", ((MethodReference)targetCall.Next.Next.Operand).Name);
+    }
+
+    [TestMethod]
+    public void DiagnosticNullPlatformConstructorCallsiteSweepRoundTripsEveryNonBaseCallLikeInstruction()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-nullplatform-sweep");
+        var assemblyPath = Path.Combine(temp.Path, "NullPlatformSweepFixture.dll");
+        IReadOnlyList<TransformedRealStS2VeryEarlyInitialization.DiagnosticCallsiteSweepEntry> plan;
+
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("NullPlatformSweepFixture", new Version(1, 0, 0, 0)),
+                   "NullPlatformSweepFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var bridge = new TypeDefinition("StS2Launcher.Step35Diagnostics", "ExecuteVeryEarlyCheckpointBridge", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(bridge);
+            var emit = new MethodDefinition("Emit", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            emit.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+            emit.Body.GetILProcessor().Append(emit.Body.GetILProcessor().Create(OpCodes.Ret));
+            bridge.Methods.Add(emit);
+
+            var helper = new TypeDefinition("Fixture", "Helper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(helper);
+            var helperCtor = new MethodDefinition(".ctor", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+            helper.Methods.Add(helperCtor);
+            var objectCtor = new MethodReference(".ctor", module.TypeSystem.Void, module.TypeSystem.Object) { HasThis = true };
+            var helperCtorIl = helperCtor.Body.GetILProcessor();
+            helperCtorIl.Append(helperCtorIl.Create(OpCodes.Ldarg_0));
+            helperCtorIl.Append(helperCtorIl.Create(OpCodes.Call, objectCtor));
+            helperCtorIl.Append(helperCtorIl.Create(OpCodes.Ret));
+            var ping = new MethodDefinition("Ping", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            ping.Body.GetILProcessor().Append(ping.Body.GetILProcessor().Create(OpCodes.Ret));
+            helper.Methods.Add(ping);
+
+            var nullType = new TypeDefinition("MegaCrit.Sts2.Core.Platform.Null", "NullPlatformUtilStrategy", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(nullType);
+            var ctor = new MethodDefinition(".ctor", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+            nullType.Methods.Add(ctor);
+            var il = ctor.Body.GetILProcessor();
+            il.Append(il.Create(OpCodes.Ldarg_0));
+            il.Append(il.Create(OpCodes.Call, objectCtor));
+            il.Append(il.Create(OpCodes.Newobj, helperCtor));
+            il.Append(il.Create(OpCodes.Pop));
+            il.Append(il.Create(OpCodes.Call, ping));
+            il.Append(il.Create(OpCodes.Ret));
+
+            plan = TransformedRealStS2VeryEarlyInitialization.InsertNullPlatformConstructorCallsiteMarkers(ctor, emit);
+            Assert.AreEqual(2, plan.Count);
+            Assert.AreEqual(2, plan[0].CallsiteOrdinal);
+            Assert.AreEqual(Code.Newobj, plan[0].OpCodeCode);
+            Assert.AreEqual(3, plan[1].CallsiteOrdinal);
+            Assert.AreEqual(Code.Call, plan[1].OpCodeCode);
+            assembly.Write(assemblyPath);
+        }
+
+        using var reopened = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var ctorAfter = reopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.NullPlatformTypeFullName)
+            .Methods.Single(method => method.FullName == TransformedRealStS2VeryEarlyInitialization.NullPlatformConstructorFullName);
+        foreach (var entry in plan)
+        {
+            Assert.IsTrue(ctorAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.BeforeMarker)));
+            Assert.IsTrue(ctorAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.AfterMarker)));
+        }
     }
 
     private static RuntimeBindingPreparedAssembly CreatePlanEntry(string relative, AssemblyName identity, byte[] bytes, bool isPrimary)
