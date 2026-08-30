@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 35.0.6 — DEFERRED CECIL OPEN + IN-METHOD LOCALIZATION";
+        "STEP 35.0.7 — GENERIC DELEGATE MEMBERREF FIX + IN-METHOD LOCALIZATION";
 
     public const string MilestoneLine =
         "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 CLOSED POSITIVE 4/4 • STEP 34 CLOSED POSITIVE 4/4 • STEP 35 OPEN";
 
     public const string Summary =
-        "Physical 0.0.126 remains the runtime frontier. Physical 0.0.127 and 0.0.128 both failed normally in Gate A before CLR admission on System.Runtime 9.0.0.0. Post-run source analysis with the exact trusted sts2.dll identified the 0.0.128 defect: diagnostic clone creation opened Cecil in ReadingMode.Immediate before configuring the bounded writer resolver. Step 35.0.6 / 0.0.129 mirrors the physically proven Step-32 ordering: deferred open, audit/configure the exact System.Runtime+Sentry constant-metadata surrogates, then write and rejecting-resolver reopen verification.";
+        "Physical 0.0.129 proved the deferred Cecil writer correction: Gate A/B passed and Gate C armed the diagnostic bridge, then the first diagnostic invocation returned a managed MissingMethodException for the synthetic Action<string>.Invoke(string) MemberRef before any INMETHOD_* marker. Step 35.0.7 / 0.0.130 changes only that bridge metadata signature to the ECMA-correct Action<string>::Invoke(!0) form and verifies the serialized MemberRef under rejecting resolution before CLR admission.";
 
     public const string InitialStatus =
-        "Status: Steps 32–34 are CLOSED POSITIVE at 4/4. Step 35 remains OPEN. Physical 0.0.128 did not test game execution; Gate A failed before resolver configuration because the diagnostic clone source used Cecil Immediate reading. Candidate 0.0.129 changes only that pre-write metadata-open ordering to Deferred and retains the exact transformed-source hashes, diagnostic-only authority, bounded writer surrogates, strict runtime resolver, INMETHOD localization, later-boundary prohibitions and physical acceptance rules.";
+        "Status: Steps 32–34 are CLOSED POSITIVE at 4/4. Step 35 remains OPEN. Physical 0.0.129 fixed diagnostic clone creation and reached the armed Gate-C invocation, but the instrumentation bridge encoded Action<T>.Invoke with concrete string instead of the declaring type generic variable !0. Candidate 0.0.130 corrects only that diagnostic MemberRef and retains exact-source hashes, deferred bounded writer resolution, strict runtime resolver, INMETHOD localization, later-boundary prohibitions and physical acceptance rules.";
 
-    public const string ExpectedDisplayVersion = "0.0.129";
-    public const string ExpectedBuildVersion = "129";
+    public const string ExpectedDisplayVersion = "0.0.130";
+    public const string ExpectedBuildVersion = "130";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -38,7 +38,7 @@ internal static class CurrentReleasePresentation
     public const string Step34ImplementationMarker =
         "physical Step33 transformed-primary-only admission -> fresh exact transformed requalification -> strict execution-capable private ALC -> exact transformed PrewarmJit type/signature/token 0x0600AFEA binding -> one MethodInfo.Invoke -> only exact host bindings + hash-pinned initializer-free prepared dependencies -> zero initializer-bearing/native/unplanned escape -> OfflineReady/source/transformed/plan isolation reproof";
     public const string Step35ImplementationMarker =
-        "physical Step34 exact PrewarmJit closure -> 0.0.124 exact Invoke frontier -> 0.0.125 static map -> 0.0.126 same-run durable correlation confirms final resolver marker System.Collections.Concurrent 8->9 and no C_INVOKE_RETURNED -> 0.0.127 and 0.0.128 Gate-A diagnostic-clone metadata-open failures on System.Runtime 9.0.0.0 before CLR admission -> exact trusted sts2.dll hash reverified -> 0.0.128 defect localized to Cecil ReadingMode.Immediate before bounded resolver Configure -> Step32-proven deferred-open then audited System.Runtime+Sentry in-memory constant-metadata surrogate configuration reused locally for diagnostic-clone serialization only -> exact source ExecuteVeryEarly token 0x06007D02 + async MoveNext token 0x0600BC71 -> exact Step32 transformed source reverified and left untouched -> separate identity/MVID-preserving Step35.0.6 diagnostic clone -> post-write constant-metadata fingerprint + rejecting-resolver reopen verification -> output-only INMETHOD entry markers -> launcher Action<string> callback armed immediately before one MethodInfo.Invoke -> strict runtime resolver/Task await <=60s/later boundaries unchanged -> isolation reproof";
+        "physical Step34 exact PrewarmJit closure -> exact ExecuteVeryEarly source token 0x06007D02 + async MoveNext token 0x0600BC71 -> 0.0.124 exact Invoke frontier -> 0.0.126 same-run durable correlation confirms no C_INVOKE_RETURNED -> 0.0.127/0.0.128 Gate-A Cecil failures -> exact trusted sts2.dll analysis -> 0.0.129 deferred-open bounded writer fix reaches Gate A/B PASS and armed Gate C -> managed MissingMethodException on synthetic Action<string>.Invoke(string) before INMETHOD_001 -> ECMA-335 generic declaring-type MemberRef correction to Action<string>::Invoke(!0) -> rejecting-resolver serialized bridge signature verification -> exact Step32 transformed source remains untouched -> separate identity/MVID-preserving Step35.0.7 diagnostic clone -> strict runtime resolver/Task await <=60s/later boundaries unchanged -> isolation reproof";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

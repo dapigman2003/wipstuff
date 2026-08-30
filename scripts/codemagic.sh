@@ -45,7 +45,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 35.0.6 In-Method Pre-First-Await Localization build environment"
+  echo "StS2 Launcher — Step 35.0.7 In-Method Pre-First-Await Localization build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -110,7 +110,7 @@ IPA_VERIFY_SECONDS="$(elapsed_seconds "$IPA_VERIFY_START_EPOCH")"
 TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
 
 {
-  echo "StS2 Launcher iOS — Step 35.0.6 In-Method Pre-First-Await Localization"
+  echo "StS2 Launcher iOS — Step 35.0.7 In-Method Pre-First-Await Localization"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"

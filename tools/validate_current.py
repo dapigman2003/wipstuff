@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 35.0.6 deferred Cecil open + in-method localization validation")
+print("StS2 Launcher — Step 35.0.7 generic delegate MemberRef fix + in-method localization validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>129</ApplicationVersion>" in project_text, "build version is 129")
-require("<ApplicationDisplayVersion>0.0.129</ApplicationDisplayVersion>" in project_text, "display version is 0.0.129")
-require(plist.get("CFBundleVersion") == "129", "Info.plist build version is 129")
-require(plist.get("CFBundleShortVersionString") == "0.0.129", "Info.plist display version is 0.0.129")
+require("<ApplicationVersion>130</ApplicationVersion>" in project_text, "build version is 130")
+require("<ApplicationDisplayVersion>0.0.130</ApplicationDisplayVersion>" in project_text, "display version is 0.0.130")
+require(plist.get("CFBundleVersion") == "130", "Info.plist build version is 130")
+require(plist.get("CFBundleShortVersionString") == "0.0.130", "Info.plist display version is 0.0.130")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 35.0.6 — DEFERRED CECIL OPEN + IN-METHOD LOCALIZATION" in release_presentation, "top launcher banner identifies active Step 35.0.6 deferred-open localization candidate")
-require("STEP 32 CLOSED POSITIVE 4/4" in release_presentation and "STEP 33 CLOSED POSITIVE 4/4" in release_presentation and "STEP 34 CLOSED POSITIVE 4/4" in release_presentation and "ExecuteVeryEarly" in release_presentation and "0x06007D02" in release_presentation and "0x0600BC71" in release_presentation and "0.0.126" in release_presentation and "0.0.127" in release_presentation and "System.Runtime 9.0.0.0" in release_presentation and "C_INVOKE_RETURNED" in release_presentation and "INMETHOD" in release_presentation and "diagnostic clone" in release_presentation, "top launcher banner preserves Step-32/33/34 closures, the physical 0.0.126 invoke frontier, the 0.0.127 Gate-A Cecil writer failure, and the 0.0.128 bounded-writer diagnostic boundary")
+require("STEP 35.0.7 — GENERIC DELEGATE MEMBERREF FIX + IN-METHOD LOCALIZATION" in release_presentation, "top launcher banner identifies active Step 35.0.7 generic-delegate MemberRef localization candidate")
+require("STEP 32 CLOSED POSITIVE 4/4" in release_presentation and "STEP 33 CLOSED POSITIVE 4/4" in release_presentation and "STEP 34 CLOSED POSITIVE 4/4" in release_presentation and "0.0.129" in release_presentation and "MissingMethodException" in release_presentation and "Action<string>.Invoke(string)" in release_presentation and "Action<string>::Invoke(!0)" in release_presentation and "INMETHOD" in release_presentation and "diagnostic clone" in release_presentation, "top launcher banner preserves closed Steps 32-34, records the physical 0.0.129 bridge failure, and identifies the 0.0.130 generic MemberRef correction")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.129"' in release_presentation and 'ExpectedBuildVersion = "129"' in release_presentation, "Step 35.0.6 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.130"' in release_presentation and 'ExpectedBuildVersion = "130"' in release_presentation, "Step 35.0.7 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -336,8 +336,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-35.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.129",
-    "STS2_BUILD_VERSION": "129",
+    "STS2_DISPLAY_VERSION": "0.0.130",
+    "STS2_BUILD_VERSION": "130",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -690,7 +690,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Step 35.0.6 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-35.0.6 candidate rather than retired Step 27")
+require("Step 35.0.7 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-35.0.7 candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -930,7 +930,7 @@ require("Game entry point invoked: NO" in step33_source and "Game type/member re
 require("OrderedAdmissionGatesReachFourOfFourPass" in step33_tests and "AdmissionStopsAfterFirstFailure" in step33_tests and "AdmissionOnlyContextLoadsPrimaryButRefusesPrivateDependencyAdmission" in step33_tests, "Step 33 host regressions protect gate order and admission-only private-dependency refusal")
 require("Step33-TransformedRealStS2AssemblyAdmission.txt" in step33_ui and "TRANSFORMED REAL STS2 CLR ADMISSION" in step33_ui, "iOS UI persists the dedicated Step-33 physical report")
 require("new TransformedRealStS2AssemblyAdmission(_launcherDataRoot)" in root_ui_text and "AddTransformedRealStS2AssemblyAdmissionControls(content)" in root_ui_text, "RootViewController wires Step 33 into the active device surface")
-require("Step33ImplementationMarker" in release_presentation and "Step34ImplementationMarker" in release_presentation and "Step35ImplementationMarker" in release_presentation and "0x06007D02" in release_presentation and "0x0600BC71" in release_presentation, "release presentation pins Step-33/34 closures and the Step-35.0.5 very-early diagnostic boundary")
+require("Step33ImplementationMarker" in release_presentation and "Step34ImplementationMarker" in release_presentation and "Step35ImplementationMarker" in release_presentation and "0x06007D02" in release_presentation and "0x0600BC71" in release_presentation, "release presentation pins Step-33/34 closures and the Step-35.0.7 very-early diagnostic boundary")
 
 # ---------------------------------------------------------------------------
 # Step 34.0 — controlled transformed real-StS2 PrewarmJit execution.
@@ -964,7 +964,7 @@ require("new TransformedRealStS2PrewarmJitExecution(_launcherDataRoot)" in root_
 require("Step34ImplementationMarker" in release_presentation and "0x0600AFEA" in release_presentation and "PrewarmJit" in release_presentation and "Step35ImplementationMarker" in release_presentation, "release presentation preserves the closed Step-34 exact transformed-site execution boundary while advancing Step 35")
 
 # ---------------------------------------------------------------------------
-# Step 35.0.6 — deferred-open diagnostic-clone in-method localization with exact-source authority preserved.
+# Step 35.0.7 — generic delegate MemberRef correction with exact-source authority preserved.
 # ---------------------------------------------------------------------------
 step35_source_path = ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitialization.cs"
 step35_gate_path = ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitializationGate.cs"
@@ -978,36 +978,38 @@ step35_gate = step35_gate_path.read_text() if step35_gate_path.is_file() else ""
 step35_summary = step35_summary_path.read_text() if step35_summary_path.is_file() else ""
 step35_tests = step35_tests_path.read_text() if step35_tests_path.is_file() else ""
 step35_ui = step35_ui_path.read_text() if step35_ui_path.is_file() else ""
-require(all(marker in step35_gate for marker in ["VerifiedExecutionPreflight = 1", "ExecutionCapableClrAdmission = 2", "DiagnosticExecuteVeryEarlyInvocation = 3", "FinalIsolationAudit = 4"]), "Step 35.0.6 exposes exactly four ordered diagnostic-localization gates")
-require("STEP 35.0.6 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE" in step35_summary and "Gates.Count(g => g.Passed)}/4" in step35_summary, "Step 35.0.6 summary reports four-of-four diagnostic completion without claiming exact Step-35 closure")
+require(all(marker in step35_gate for marker in ["VerifiedExecutionPreflight = 1", "ExecutionCapableClrAdmission = 2", "DiagnosticExecuteVeryEarlyInvocation = 3", "FinalIsolationAudit = 4"]), "Step 35.0.7 exposes exactly four ordered diagnostic-localization gates")
+require("STEP 35.0.7 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE" in step35_summary and "Gates.Count(g => g.Passed)}/4" in step35_summary, "Step 35.0.7 summary reports four-of-four diagnostic completion without claiming exact Step-35 closure")
 for marker35 in ["SourceTargetMethodToken = 0x06007D02", "SourceStateMachineMoveNextToken = 0x0600BC71", "<ExecuteVeryEarly>d__7", "System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()", "StS2Launcher-Step35-VeryEarly"]:
     require(marker35 in step35_source, f"Step 35 hard-pins exact very-early target/context evidence: {marker35}")
 require("RunSourceAdmissionAndPrivateCloneAsync" in step35_source and "RunDeterministicStackNeutralRewrite" in step35_source and "RunTransformedImageVerification" in step35_source and "RunFinalIsolationAuditAsync" in step35_source, "Step 35 Gate A re-runs the closed Step-32 A-D transform contract")
 require("FindMethodByToken" in step35_source and "FindVeryEarlyMoveNext" in step35_source and "ComputeMethodSemanticFingerprint" in step35_source and "CountLaterOneTimeInitializationCalls" in step35_source and "CountHarmonyMethodReferences" in step35_source, "Step 35 Gate A independently audits exact wrapper/async-state-machine semantics and later-boundary purity")
-require("BuildStaticInstructionMap" in step35_source and "CALLSITE#" in step35_source and "AWAIT-CANDIDATE" in step35_source and "DescribeMetadataScope" in step35_source and "GetVerifiedVeryEarlyStaticInstructionMap" in step35_source, "Step 35.0.6 retains the resolution-free static IL/callsite map from the already-verified exact transformed wrapper/MoveNext")
-require(all(marker in step35_source for marker in ["CreateInstrumentedDiagnosticClone", "GetDiagnosticMarkerTargets", "HasInjectedEntryMarkerAtStart", "DiagnosticBridgeTypeFullName", "INMETHOD_001", "INMETHOD_031", "INMETHOD_050", "INMETHOD_100", "C_DIAGNOSTIC_BRIDGE_ARMED", "preflight.DiagnosticPath", "preflight.DiagnosticSha256"]), "Step 35.0.6 creates a separately verified diagnostic clone and verifies durable in-method localization markers after serialization")
-require(all(marker in step35_source for marker in ["module.Write(diagnosticPath", "verifyModule.Mvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid", "transformedSha256AfterDiagnosticEmission", "ComputeSha256Hex(preflight.TransformedPath)", "markerCountVerified != expectedMarkerCount"]), "Step 35.0.6 preserves/rechecks the exact transformed source and verifies diagnostic-clone MVID/hash/marker provenance")
-require(all(marker in step35_source for marker in ["DiagnosticConstantMetadataWriteResolver", "DiagnosticCecilWriteSystemRuntimeIdentity", "DiagnosticCecilWriteSentryIdentity", "System.Reflection.BindingFlags", "Sentry.BreadcrumbLevel", "Sentry.SentryLevel", "CollectDiagnosticExternalConstantTypeRequirements", "resolver.Configure(module)", "resolver.ValidateWriteRequests()", "RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint", "verifiedConstantMetadataSha256.Equals(expectedConstantMetadataSha256", "External assembly bytes opened by the writer-only surrogate resolver: 0"]), "Step 35.0.6 reuses the Step-32 audited constant-metadata requirement set locally for Cecil serialization only and re-verifies constant metadata under rejecting reopen without changing protected Step-32 source")
-require("new DiagnosticConstantMetadataWriteResolver()" in step35_source and "new RejectingAssemblyResolver()" in step35_source, "Step 35.0.6 separates bounded writer-only Cecil resolution from rejecting post-write verification")
+require("BuildStaticInstructionMap" in step35_source and "CALLSITE#" in step35_source and "AWAIT-CANDIDATE" in step35_source and "DescribeMetadataScope" in step35_source and "GetVerifiedVeryEarlyStaticInstructionMap" in step35_source, "Step 35.0.7 retains the resolution-free static IL/callsite map from the already-verified exact transformed wrapper/MoveNext")
+require(all(marker in step35_source for marker in ["CreateInstrumentedDiagnosticClone", "GetDiagnosticMarkerTargets", "HasInjectedEntryMarkerAtStart", "DiagnosticBridgeTypeFullName", "INMETHOD_001", "INMETHOD_031", "INMETHOD_050", "INMETHOD_100", "C_DIAGNOSTIC_BRIDGE_ARMED", "preflight.DiagnosticPath", "preflight.DiagnosticSha256"]), "Step 35.0.7 creates a separately verified diagnostic clone and verifies durable in-method localization markers after serialization")
+require(all(marker in step35_source for marker in ["module.Write(diagnosticPath", "verifyModule.Mvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid", "transformedSha256AfterDiagnosticEmission", "ComputeSha256Hex(preflight.TransformedPath)", "markerCountVerified != expectedMarkerCount"]), "Step 35.0.7 preserves/rechecks the exact transformed source and verifies diagnostic-clone MVID/hash/marker provenance")
+require(all(marker in step35_source for marker in ["DiagnosticConstantMetadataWriteResolver", "DiagnosticCecilWriteSystemRuntimeIdentity", "DiagnosticCecilWriteSentryIdentity", "System.Reflection.BindingFlags", "Sentry.BreadcrumbLevel", "Sentry.SentryLevel", "CollectDiagnosticExternalConstantTypeRequirements", "resolver.Configure(module)", "resolver.ValidateWriteRequests()", "RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint", "verifiedConstantMetadataSha256.Equals(expectedConstantMetadataSha256", "External assembly bytes opened by the writer-only surrogate resolver: 0"]), "Step 35.0.7 reuses the Step-32 audited constant-metadata requirement set locally for Cecil serialization only and re-verifies constant metadata under rejecting reopen without changing protected Step-32 source")
+require("new DiagnosticConstantMetadataWriteResolver()" in step35_source and "new RejectingAssemblyResolver()" in step35_source, "Step 35.0.7 separates bounded writer-only Cecil resolution from rejecting post-write verification")
 clone_start = step35_source.find("private static DiagnosticCloneSnapshot CreateInstrumentedDiagnosticClone")
 clone_end = step35_source.find("private static void InsertEntryMarker", clone_start)
 clone_block = step35_source[clone_start:clone_end] if clone_start >= 0 and clone_end > clone_start else ""
-require("ReadingMode = ReadingMode.Deferred" in clone_block and "ReadingMode = ReadingMode.Immediate" not in clone_block and "InMemory = true" not in clone_block and clone_block.find("resolver.Configure(module)") < clone_block.find("module.Write(diagnosticPath") and "resolver.Requests.Count != 0" in clone_block, "Step 35.0.6 diagnostic clone mirrors Step-32 file-backed deferred-open -> zero-request -> configure -> write ordering")
+require("ReadingMode = ReadingMode.Deferred" in clone_block and "ReadingMode = ReadingMode.Immediate" not in clone_block and "InMemory = true" not in clone_block and clone_block.find("resolver.Configure(module)") < clone_block.find("module.Write(diagnosticPath") and "resolver.Requests.Count != 0" in clone_block, "Step 35.0.7 diagnostic clone mirrors Step-32 file-backed deferred-open -> zero-request -> configure -> write ordering")
+require(all(marker in clone_block for marker in ["new GenericParameter(\"T\", actionOpen)", "actionOpen.GenericParameters.Add(actionTypeParameter)", "new ParameterDefinition(actionTypeParameter)", "Action<string>::Invoke(!0)", "bridgeInvokeParameter.Type != GenericParameterType.Type", "bridgeInvokeParameter.Position != 0"]), "Step 35.0.7 encodes and post-write verifies the diagnostic Action<string> Invoke MemberRef with the declaring-type VAR(0) signature")
+require("invoke.Parameters.Add(new ParameterDefinition(module.TypeSystem.String))" not in clone_block, "Step 35.0.7 rejects the physically disproven synthetic Action<string>::Invoke(string) MemberRef encoding")
 require("sourceResolver.Requests.Count != 0" in step35_source and "transformedResolver.Requests.Count != 0" in step35_source, "Step 35 static target audit remains dependency-resolution rejecting")
 require("RunPreparedLoadPreflightAsync" in step35_source and "ControlledManagedInitialization.TargetSimpleName" in step35_source and "ControlledManagedInitialization.TargetVersion" in step35_source, "Step 35 requalifies the prepared plan and exact initializer-bearing 0Harmony boundary")
-require(all(marker in step35_source for marker in ["RunDiagnosticExecuteVeryEarlyInvocationAsync", "diagnostic Gate C requires a durable launcher-owned checkpoint callback", "method.ReturnType != typeof(Task)", "method.Invoke(null, null)", "task.WaitAsync(TimeSpan.FromSeconds(60), cancellationToken)"]), "Step 35.0.6 invokes only the diagnostic clone's Task-returning ExecuteVeryEarly once, requires durable in-method telemetry, and preserves the 60-second await boundary")
+require(all(marker in step35_source for marker in ["RunDiagnosticExecuteVeryEarlyInvocationAsync", "diagnostic Gate C requires a durable launcher-owned checkpoint callback", "method.ReturnType != typeof(Task)", "method.Invoke(null, null)", "task.WaitAsync(TimeSpan.FromSeconds(60), cancellationToken)"]), "Step 35.0.7 invokes only the diagnostic clone's Task-returning ExecuteVeryEarly once, requires durable in-method telemetry, and preserves the 60-second await boundary")
 require("AssemblyLoadContext.Default.LoadFromAssemblyName" in step35_source and "InitializerBearingRequests" in step35_source and "RejectedManagedRequests" in step35_source and "LoadUnmanagedDll" in step35_source, "Step 35 resolver stays exact-plan/fail-closed for initializer-bearing, unplanned and native requests")
-require(all(marker in step35_source for marker in ["B_LOADFROMSTREAM_START", "B_LOADFROMSTREAM_PASS", "C_BIND_TYPE_START", "C_BIND_METHOD_START", "C_INVOKE_START", "C_INVOKE_RETURNED", "C_TASK_CONFIRMED", "C_WAIT_START", "C_WAIT_COMPLETED", "RESOLVE_MANAGED_START", "RESOLVE_PRIVATE_PASS", "RESOLVE_HOST_PASS", "RESOLVE_NATIVE_REJECT"]), "Step 35.0.6 core retains durable B→C/invocation/resolver crash-localization markers")
-require(all(marker in step35_ui for marker in ["Step35-CurrentRun.txt", "Step35-LastCheckpoint.txt", "Step35-CrashCheckpoint-", "Step35-ExecuteVeryEarly-StaticMap-", "TryInitializeStep35RunTelemetry", "RUN_TELEMETRY_READY", "WriteStep35StaticMap", "Flush(flushToDisk: true)", "Environment.CurrentManagedThreadId", "CANCELLED / INCONCLUSIVE", "Output-only diagnostic"]), "Step 35.0.6 iOS surface retains fail-visible run-correlated durable telemetry and keeps cancellation inconclusive")
-require("crashCheckpoints.Any" in step35_tests and "B_LOADFROMSTREAM_START" in step35_tests and "RESOLVE_INITIALIZER_BEARING_REJECT" in step35_tests and "StaticInstructionMapCapturesCallsitesAndAwaitCandidatesWithoutResolution" in step35_tests, "Step 35.0.6 host regressions retain crash-checkpoint and static-map callsite/await coverage")
-require("OrderedDiagnosticLocalizationGatesReachFourOfFourWithoutClaimingClosure" in step35_tests and "VeryEarlyInitializationStopsAfterFirstFailure" in step35_tests and "VeryEarlyContextLoadsInitializerFreePrivateDependencyAndRejectsInitializerBearingDependency" in step35_tests and "Step35PinsTheExactVeryEarlyManagedInitializationTarget" in step35_tests, "Step 35.0.6 host regressions protect diagnostic gate order, exact source target and initializer-bearing refusal")
+require(all(marker in step35_source for marker in ["B_LOADFROMSTREAM_START", "B_LOADFROMSTREAM_PASS", "C_BIND_TYPE_START", "C_BIND_METHOD_START", "C_INVOKE_START", "C_INVOKE_RETURNED", "C_TASK_CONFIRMED", "C_WAIT_START", "C_WAIT_COMPLETED", "RESOLVE_MANAGED_START", "RESOLVE_PRIVATE_PASS", "RESOLVE_HOST_PASS", "RESOLVE_NATIVE_REJECT"]), "Step 35.0.7 core retains durable B→C/invocation/resolver crash-localization markers")
+require(all(marker in step35_ui for marker in ["Step35-CurrentRun.txt", "Step35-LastCheckpoint.txt", "Step35-CrashCheckpoint-", "Step35-ExecuteVeryEarly-StaticMap-", "TryInitializeStep35RunTelemetry", "RUN_TELEMETRY_READY", "WriteStep35StaticMap", "Flush(flushToDisk: true)", "Environment.CurrentManagedThreadId", "CANCELLED / INCONCLUSIVE", "Output-only diagnostic"]), "Step 35.0.7 iOS surface retains fail-visible run-correlated durable telemetry and keeps cancellation inconclusive")
+require("crashCheckpoints.Any" in step35_tests and "B_LOADFROMSTREAM_START" in step35_tests and "RESOLVE_INITIALIZER_BEARING_REJECT" in step35_tests and "StaticInstructionMapCapturesCallsitesAndAwaitCandidatesWithoutResolution" in step35_tests, "Step 35.0.7 host regressions retain crash-checkpoint and static-map callsite/await coverage")
+require("OrderedDiagnosticLocalizationGatesReachFourOfFourWithoutClaimingClosure" in step35_tests and "VeryEarlyInitializationStopsAfterFirstFailure" in step35_tests and "VeryEarlyContextLoadsInitializerFreePrivateDependencyAndRejectsInitializerBearingDependency" in step35_tests and "Step35PinsTheExactVeryEarlyManagedInitializationTarget" in step35_tests, "Step 35.0.7 host regressions protect diagnostic gate order, exact source target and initializer-bearing refusal")
 require("Assert.ThrowsException" not in step35_tests and "ThrowsExceptionAsync" not in step35_tests and "Assert.ThrowsExactly" in step35_tests, "Step 35 host regressions use supported MSTest v4 exception assertions")
-require("DIAGNOSTIC COMPLETE: STEP 35.0.6 — 4/4. NOT STEP 35 CLOSURE." in step35_ui and "exact Step 35 remains OPEN" in step35_ui, "Step 35.0.6 iOS success surface cannot masquerade as exact Step-35 closure")
-require("STEP-35.0.6 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE." in step35_source, "Step 35.0.6 Gate-C PASS wording explicitly remains diagnostic-only")
-require("PASS: STEP 35 CONTROLLED VERY-EARLY INITIALIZATION" not in step35_ui and "FIRST CONTROLLED INVOCATION/AWAIT OF THE EXACT TRANSFORMED REAL-STS2" not in step35_source and "ExactExecuteVeryEarlyInvocation = 3" not in step35_gate, "Step 35.0.6 active source/UI reject stale exact-closure wording")
+require("DIAGNOSTIC COMPLETE: STEP 35.0.7 — 4/4. NOT STEP 35 CLOSURE." in step35_ui and "exact Step 35 remains OPEN" in step35_ui, "Step 35.0.7 iOS success surface cannot masquerade as exact Step-35 closure")
+require("STEP-35.0.7 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE." in step35_source, "Step 35.0.7 Gate-C PASS wording explicitly remains diagnostic-only")
+require("PASS: STEP 35 CONTROLLED VERY-EARLY INITIALIZATION" not in step35_ui and "FIRST CONTROLLED INVOCATION/AWAIT OF THE EXACT TRANSFORMED REAL-STS2" not in step35_source and "ExactExecuteVeryEarlyInvocation = 3" not in step35_gate, "Step 35.0.7 active source/UI reject stale exact-closure wording")
 require("Step35-TransformedRealStS2VeryEarlyInitialization.txt" in step35_ui and "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION" in step35_ui and "UIButtonType.System" not in step35_ui, "Step 35 iOS UI persists the dedicated report and uses the numeric SystemButton font-size contract")
 require("new TransformedRealStS2VeryEarlyInitialization(_launcherDataRoot)" in root_ui_text and "AddTransformedRealStS2VeryEarlyInitializationControls(content)" in root_ui_text, "RootViewController wires Step 35 into the active device surface")
-require("Step35ImplementationMarker" in release_presentation and "0x06007D02" in release_presentation and "0x0600BC71" in release_presentation and "ExecuteVeryEarly" in release_presentation, "release presentation pins the Step-35.0.5 exact-source/instrumented-clone boundary")
+require("Step35ImplementationMarker" in release_presentation and "0x06007D02" in release_presentation and "0x0600BC71" in release_presentation and "ExecuteVeryEarly" in release_presentation, "release presentation pins the Step-35.0.7 exact-source/instrumented-clone boundary")
 
 # ---------------------------------------------------------------------------
 # Documentation model
@@ -1231,7 +1233,7 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 35 remains OPEN" in current_status and "Active candidate — Step 35.0.6 / 0.0.129 (129)" in current_status and "0.0.126" in current_status and "0.0.127" in current_status and "0.0.128" in current_status and "AssemblyResolutionException" in current_status and "System.Runtime, Version=9.0.0.0" in current_status and "ReadingMode.Immediate" in current_status and "ReadingMode.Deferred" in current_status and "C_INVOKE_RETURNED" in current_status and "0x06007D02" in current_status and "0x0600BC71" in current_status and "INMETHOD_*" in current_status and "diagnostic clone" in current_status, "current status preserves the 0.0.126 runtime frontier, both Gate-A tooling failures, and the active Step-35.0.6 deferred-open correction")
+require("Steps 01–26" in current_status and "Step 27" in current_status and "CLOSED NEGATIVE" in current_status and "CLOSED POSITIVE 5/5" in current_status and "Step 35 remains OPEN" in current_status and "Active candidate — Step 35.0.7 / 0.0.130 (130)" in current_status and "0.0.126" in current_status and "0.0.127" in current_status and "0.0.128" in current_status and "0.0.129" in current_status and "MissingMethodException" in current_status and "Action<string>::Invoke(!0)" in current_status and "C_INVOKE_RETURNED" in current_status and "0x06007D02" in current_status and "0x0600BC71" in current_status and "INMETHOD_*" in current_status and "diagnostic clone" in current_status, "current status preserves the exact 0.0.126 runtime frontier, records the 0.0.129 bridge MemberRef failure, and identifies the active Step-35.0.7 correction")
 
 master = read("docs/MASTER-PLAN.md")
 for heading in ["Product objective", "Non-negotiable security and content boundaries", "Authority model", "Canonical source architecture", "Major roadmap", "Definition of a closed step", "Resumption rule"]:
@@ -1277,6 +1279,8 @@ require((ROOT / "docs/history/reports/STEP-35.0.4-PHYSICAL-GATE-A-CECIL-WRITE-RE
 require((ROOT / "docs/history/steps/STEP-35.0.5-BOUNDED-CECIL-WRITER-RESOLUTION-FIX.md").is_file(), "Step 35.0.5 bounded Cecil writer-resolution fix record is present")
 require((ROOT / "docs/history/reports/STEP-35.0.5-PHYSICAL-GATE-A-DEFERRED-OPEN-FAILURE.txt").is_file(), "Step 35.0.5 physical repeated Gate-A failure record is present")
 require((ROOT / "docs/history/steps/STEP-35.0.6-DEFERRED-CECIL-OPEN-BEFORE-WRITER-CONFIGURATION.md").is_file(), "Step 35.0.6 deferred Cecil-open correction record is present")
+require((ROOT / "docs/history/reports/STEP-35.0.6-PHYSICAL-DIAGNOSTIC-BRIDGE-MEMBERREF-FAILURE.txt").is_file(), "Step 35.0.6 physical diagnostic bridge MemberRef failure record is present")
+require((ROOT / "docs/history/steps/STEP-35.0.7-GENERIC-DELEGATE-MEMBERREF-CORRECTION.md").is_file(), "Step 35.0.7 generic delegate MemberRef correction record is present")
 require(len(history_steps) >= 60, "historical documentation set is comprehensive", f"count={len(history_steps)}")
 
 # ---------------------------------------------------------------------------
@@ -1294,7 +1298,7 @@ for cache_path in [
     require(cache_path in codemagic, f"Codemagic preserves canonical cache path: {cache_path}")
 require("Step 35 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 35")
 require("LogFileName=step35.trx" in read("scripts/test.sh") and "artifacts/test-results/step35.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 35")
-require("Step 35.0.6 In-Method Pre-First-Await Localization build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 35.0.6")
+require("Step 35.0.7 In-Method Pre-First-Await Localization build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies Step 35.0.7")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1309,7 +1313,7 @@ require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical pr
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEP 35.0.6 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION" in verify_ipa and "step35-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step 35.0.6 device boundary")
+require("Expected device UI: STEP 35.0.7 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION" in verify_ipa and "step35-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step 35.0.7 device boundary")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")

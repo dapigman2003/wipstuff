@@ -1,0 +1,28 @@
+StS2 Launcher — Step 35.0.6 / 0.0.129 physical diagnostic bridge MemberRef failure
+
+Evidence source: sanitized summary of the same-run Step-35 text artifacts supplied after the physical run. Raw device-specific crash reports are not committed.
+
+App version/build: 0.0.129 (129)
+Run ID: 20260830T1420370609570Z-pid1112-2319942e61974a08a0ff786c712ec456
+PID: 1112
+Candidate: STEP 35.0.6 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION
+
+Result:
+- Gate A — VerifiedExecutionPreflight: PASS.
+- Same-run static ExecuteVeryEarly map was written.
+- Diagnostic clone SHA-256: 62583636d00f3169dda3b61686c39b0df875e4f2903d982b0f42492bdd5bd70b.
+- Exact closed transformed source re-hashed unchanged at 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef.
+- Gate B — ExecutionCapableClrAdmission: PASS.
+- Diagnostic clone LoadFromStream/identity/MVID/context ownership/zero-resolution admission checks passed.
+- Gate C bound the static parameterless Task-returning diagnostic ExecuteVeryEarly target and armed the bridge callback field as exact System.Action<string>.
+- C_INVOKE_START was written.
+- Planned GodotSharp and Steamworks.NET private loads passed; planned host framework resolutions passed.
+- Managed control returned with MissingMethodException: Method not found: void System.Action`1.Invoke(string).
+- No INMETHOD_* marker was emitted.
+- Gate C returned FAIL normally; Gate D did not run; RUN_END was written.
+- No native hard termination occurred in this run.
+
+Interpretation:
+0.0.129 proves the Step-35.0.6 deferred Cecil writer correction worked through clone emission/reopen verification and CLR admission. The new failure is inside the diagnostic instrumentation bridge itself before the first selected game-method entry marker. The callback field is valid enough to reflect as Action<string> and accept the launcher delegate; the synthetic callvirt MemberRef cannot bind at runtime because it was encoded with concrete System.String instead of the declaring generic type variable.
+
+This run does not supersede the exact 0.0.126 compatibility frontier. Because the diagnostic derivative failed before INMETHOD_001, it does not localize the original exact ExecuteVeryEarly hard kill.

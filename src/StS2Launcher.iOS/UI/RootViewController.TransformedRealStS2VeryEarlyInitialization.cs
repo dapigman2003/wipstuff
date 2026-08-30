@@ -21,12 +21,12 @@ public sealed partial class RootViewController
     private void AddTransformedRealStS2VeryEarlyInitializationControls(UIStackView content)
     {
         content.AddArrangedSubview(Label(
-            "Step 35.0.6 — In-Method Pre-First-Await Localization (ordered gates A–D; diagnostic clone only)",
+            "Step 35.0.7 — In-Method Pre-First-Await Localization (ordered gates A–D; diagnostic clone only)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
         _transformedRealStS2VeryEarlyInitializationButton = SystemButton(
-            "Run Step 35.0.6 A–D — Correlate Run → Reverify + Instrument Clone → Admit → Invoke Once → Localize/Audit",
+            "Run Step 35.0.7 A–D — Correlate Run → Reverify + Instrument Clone → Admit → Invoke Once → Localize/Audit",
             17);
         _transformedRealStS2VeryEarlyInitializationButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync();
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationButton);
@@ -38,7 +38,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationResultLabel);
 
         _transformedRealStS2VeryEarlyInitializationDetailLabel = Label(
-            "Physical 0.0.126 produced a fully same-run journal/map/manifest set and again stopped inside synchronous ExecuteVeryEarly execution after the final planned System.Collections.Concurrent 8→9 host resolution, with no C_INVOKE_RETURNED. Step 35.0.6 / 0.0.129 preserves the exact source transform, resolver plan, timeout and later-boundary prohibitions, but executes a separately generated diagnostic clone whose selected pre-first-await methods and relevant type initializers emit durable INMETHOD_* entry markers through a launcher callback. The exact Step-32 transformed source remains unchanged on disk and is re-hashed before the diagnostic clone is admitted.",
+            "Physical 0.0.126 remains the exact runtime frontier. Physical 0.0.129 proved the deferred diagnostic-clone writer path through Gate A/B and armed Gate C, then returned a managed MissingMethodException on the synthetic Action<string>.Invoke(string) bridge call before any INMETHOD_* marker. Step 35.0.7 / 0.0.130 corrects only that diagnostic MemberRef to Action<string>::Invoke(!0); the exact source transform, strict resolver plan, timeout and later-boundary prohibitions remain unchanged.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationDetailLabel);
@@ -75,7 +75,7 @@ public sealed partial class RootViewController
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: TELEMETRY FAIL / NOT RUN";
             _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SystemRed;
             _transformedRealStS2VeryEarlyInitializationDetailLabel.Text =
-                $"Step 35.0.6 refused to begin Gate A because durable run-correlated telemetry could not be established. No CLR admission or ExecuteVeryEarly invocation was attempted. {telemetryError}";
+                $"Step 35.0.7 refused to begin Gate A because durable run-correlated telemetry could not be established. No CLR admission or ExecuteVeryEarly invocation was attempted. {telemetryError}";
             _statusLabel.Text = "STEP 35 DIAGNOSTIC REFUSED — durable run journal could not be created/flushed. Preserve any Step35-CurrentRun/LastCheckpoint files and fix report storage before retry.";
             _statusLabel.TextColor = UIColor.SystemRed;
             return;
@@ -86,12 +86,12 @@ public sealed partial class RootViewController
         _transformedRealStS2VeryEarlyInitialization.Reset();
         _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE A RUNNING…";
         _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.Label;
-        _statusLabel.Text = $"STEP 35.0.6 RUN {_step35RunId} — durable telemetry established. Gate A re-manufactures/reverifies the closed transform, writes the same-run static map, then emits and verifies an instrumented diagnostic clone; no CLR admission yet.";
+        _statusLabel.Text = $"STEP 35.0.7 RUN {_step35RunId} — durable telemetry established. Gate A re-manufactures/reverifies the closed transform, writes the same-run static map, then emits and verifies an instrumented diagnostic clone; no CLR admission yet.";
         _statusLabel.TextColor = UIColor.Label;
 
         try
         {
-            WriteStep35CrashCheckpoint("RUN_START — fresh-process Step 35.0.6 diagnostic run started; exact transformed source/resolver policy remain frozen, while Gate B/C will use a separately verified in-method-instrumented diagnostic clone.");
+            WriteStep35CrashCheckpoint("RUN_START — fresh-process Step 35.0.7 diagnostic run started; exact transformed source/resolver policy remain frozen, while Gate B/C will use a separately verified in-method-instrumented diagnostic clone.");
             var token = _operationCts?.Token ?? CancellationToken.None;
             var progress = new Progress<TransformedRealStS2VeryEarlyInitializationProgress>(value =>
             {
@@ -119,7 +119,7 @@ public sealed partial class RootViewController
             WriteStep35CrashCheckpoint("A_STATIC_MAP_WRITE_RETURNED — run-correlated diagnostic static-map writer durably returned; about to select/schedule Gate B.");
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE B RUNNING…";
-            _statusLabel.Text = "STEP 35.0.6 GATE B — re-hash the exact transformed source, then CLR-admit only the separately verified diagnostic clone into the strict execution context and re-check zero-resolution primary admission behavior.";
+            _statusLabel.Text = "STEP 35.0.7 GATE B — re-hash the exact transformed source, then CLR-admit only the separately verified diagnostic clone into the strict execution context and re-check zero-resolution primary admission behavior.";
             WriteStep35CrashCheckpoint("B_SCHEDULE — Gate B UI selected; scheduling Gate B on Task.Run.");
             var gateB = await Task.Run(() => _transformedRealStS2VeryEarlyInitialization.RunExecutionCapableClrAdmission(WriteStep35CrashCheckpoint), token);
             WriteStep35CrashCheckpoint($"B_TASK_AWAIT_RESUMED — Gate B Task.Run await resumed on launcher thread; passed={gateB.Passed}.");
@@ -132,7 +132,7 @@ public sealed partial class RootViewController
             WriteStep35CrashCheckpoint("B_RESULT_RECORD_PASS — Gate B PASS recorded; about to select Gate C.");
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE C RUNNING…";
-            _statusLabel.Text = "STEP 35.0.6 GATE C — bind the diagnostic clone's ExecuteVeryEarly(), arm durable in-method checkpoints, invoke once, await its Task up to 60s, and fail closed on initializer-bearing/unplanned/native requests.";
+            _statusLabel.Text = "STEP 35.0.7 GATE C — bind the diagnostic clone's ExecuteVeryEarly(), arm durable in-method checkpoints, invoke once, await its Task up to 60s, and fail closed on initializer-bearing/unplanned/native requests.";
             WriteStep35CrashCheckpoint("C_UI_SELECTED — Gate C labels assigned on the main thread; UIKit may not have repainted before synchronous Gate-C work begins.");
             var gateC = await _transformedRealStS2VeryEarlyInitialization.RunDiagnosticExecuteVeryEarlyInvocationAsync(WriteStep35CrashCheckpoint, token);
             WriteStep35CrashCheckpoint($"C_TASK_AWAIT_RESUMED — Gate C async method returned to the UI caller; passed={gateC.Passed}.");
@@ -144,7 +144,7 @@ public sealed partial class RootViewController
             WriteStep35CrashCheckpoint("C_RESULT_RECORD_PASS — Gate C PASS recorded; about to select Gate D.");
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE D RUNNING…";
-            _statusLabel.Text = "STEP 35.0.6 GATE D — re-prove OfflineReady, exact-source/diagnostic-clone/plan/dependency hashes, diagnostic-clone residency, and zero broader startup/native escape.";
+            _statusLabel.Text = "STEP 35.0.7 GATE D — re-prove OfflineReady, exact-source/diagnostic-clone/plan/dependency hashes, diagnostic-clone residency, and zero broader startup/native escape.";
             WriteStep35CrashCheckpoint("D_START — entering final isolation audit.");
             var gateD = await _transformedRealStS2VeryEarlyInitialization.RunFinalIsolationAuditAsync(progress, token);
             WriteStep35CrashCheckpoint($"D_RESULT — passed={gateD.Passed}; gate={gateD.Gate}.");
@@ -154,8 +154,8 @@ public sealed partial class RootViewController
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = snapshot.Summary;
             _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.Label;
             _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
-                "All four Step 35.0.6 diagnostic gates completed. Preserve this report, but do not use it as Step-35 closure evidence: Gate B/C executed an instrumented derivative rather than the exact closed Step-32 transformed bytes. A 4/4 result proves only that this diagnostic clone survived the measured boundary under the strict resolver and supplies localization evidence for the next compatibility iteration. Step 35 remains OPEN.");
-            _statusLabel.Text = "DIAGNOSTIC COMPLETE: STEP 35.0.6 — 4/4. NOT STEP 35 CLOSURE. Preserve the localization evidence; exact Step 35 remains OPEN.";
+                "All four Step 35.0.7 diagnostic gates completed. Preserve this report, but do not use it as Step-35 closure evidence: Gate B/C executed an instrumented derivative rather than the exact closed Step-32 transformed bytes. A 4/4 result proves only that this diagnostic clone survived the measured boundary under the strict resolver and supplies localization evidence for the next compatibility iteration. Step 35 remains OPEN.");
+            _statusLabel.Text = "DIAGNOSTIC COMPLETE: STEP 35.0.7 — 4/4. NOT STEP 35 CLOSURE. Preserve the localization evidence; exact Step 35 remains OPEN.";
             _statusLabel.TextColor = UIColor.Label;
             WriteStep35CrashCheckpoint("RUN_DIAGNOSTIC_4OF4 — all Step-35.0.5 diagnostic gates completed; this derivative result does not close exact Step 35.");
         }
@@ -165,8 +165,8 @@ public sealed partial class RootViewController
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: CANCELLED / INCONCLUSIVE";
             _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SecondaryLabel;
             _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
-                "Step 35.0.6 was cancelled and is INCONCLUSIVE rather than diagnostic PASS/FAIL. If Gate B had begun, force-quit before retrying because the instrumented diagnostic clone and any initializer-free dependencies may now be CLR-resident; if Gate C invocation began, the diagnostic ExecuteVeryEarly may also have executed despite cancellation.");
-            _statusLabel.Text = "STEP 35.0.6 DIAGNOSTIC CANCELLED / INCONCLUSIVE — exact Step 35 remains OPEN; force-quit before retry if Gate B or C started.";
+                "Step 35.0.7 was cancelled and is INCONCLUSIVE rather than diagnostic PASS/FAIL. If Gate B had begun, force-quit before retrying because the instrumented diagnostic clone and any initializer-free dependencies may now be CLR-resident; if Gate C invocation began, the diagnostic ExecuteVeryEarly may also have executed despite cancellation.");
+            _statusLabel.Text = "STEP 35.0.7 DIAGNOSTIC CANCELLED / INCONCLUSIVE — exact Step 35 remains OPEN; force-quit before retry if Gate B or C started.";
             _statusLabel.TextColor = UIColor.SecondaryLabel;
         }
         catch (Exception ex)
@@ -174,8 +174,8 @@ public sealed partial class RootViewController
             WriteStep35CrashCheckpoint($"RUN_MANAGED_EXCEPTION — {ex.GetType().FullName}: {ex.Message}");
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: EXCEPTION";
             _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SystemRed;
-            _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail($"Unhandled Step 35.0.6 diagnostic exception: {ex.GetType().Name}: {ex.Message}");
-            _statusLabel.Text = "STEP 35.0.6 DIAGNOSTIC FAIL — preserve the evidence; this derivative failure is not by itself an exact Step-35 compatibility verdict. Force-quit before retry if Gate B started.";
+            _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail($"Unhandled Step 35.0.7 diagnostic exception: {ex.GetType().Name}: {ex.Message}");
+            _statusLabel.Text = "STEP 35.0.7 DIAGNOSTIC FAIL — preserve the evidence; this derivative failure is not by itself an exact Step-35 compatibility verdict. Force-quit before retry if Gate B started.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
         finally
@@ -183,7 +183,7 @@ public sealed partial class RootViewController
             WriteStep35CrashCheckpoint("RUN_FINALLY_ENTER — managed control reached the Step-35 finally block; writing the normal deterministic report.");
             await WriteDeviceTestReportFromLabelsAsync(
                 "Step35-TransformedRealStS2VeryEarlyInitialization.txt",
-                "StS2 Launcher — Step 35.0.6 Diagnostic Clone In-Method Localization",
+                "StS2 Launcher — Step 35.0.7 Diagnostic Clone In-Method Localization",
                 _transformedRealStS2VeryEarlyInitializationResultLabel,
                 _transformedRealStS2VeryEarlyInitializationDetailLabel,
                 CancellationToken.None);
@@ -206,7 +206,7 @@ public sealed partial class RootViewController
         if (!result.Passed && _statusLabel is not null)
         {
             var letter = (char)('A' + (int)result.Gate - 1);
-            _statusLabel.Text = $"STEP 35.0.6 DIAGNOSTIC FAIL at Gate {letter} ({result.Gate}). Stop here; later diagnostic gates were not run. Preserve the report; exact Step 35 remains OPEN. Force-quit before retry.";
+            _statusLabel.Text = $"STEP 35.0.7 DIAGNOSTIC FAIL at Gate {letter} ({result.Gate}). Stop here; later diagnostic gates were not run. Preserve the report; exact Step 35 remains OPEN. Force-quit before retry.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
         return result.Passed;
@@ -230,12 +230,12 @@ public sealed partial class RootViewController
         lines.Add("Step 35.0.1 physical 0.0.124 localization: Gate A passed; Gate B passed fully through LoadFromStream/identity/MVID/zero-resolution/residency checks; Gate C bound exact transformed ExecuteVeryEarly, entered MethodInfo.Invoke, loaded GodotSharp and Steamworks.NET plus exact host frameworks, then hard-terminated before C_INVOKE_RETURNED. The matching .ips repeats the main-thread PC=0x0 native signature and essentially the same runtime stack shape as 0.0.123.");
         lines.Add("Step 35.0.2 / 0.0.125 physical observation: the same main-thread PC=0x0 / CODESIGNING Invalid Page hard-kill family reproduced. The available static map predated the matching .ips process, while the expected fixed-name crash checkpoint was absent, proving that cross-run artifact correlation and silently swallowed telemetry errors were an evidence-quality gap.");
         lines.Add("Step 35.0.3 / 0.0.126 physical observation: same-run telemetry succeeded and the durable frontier again ended after the final planned System.Collections.Concurrent 8→9 host resolution with no C_INVOKE_RETURNED, so resolver traffic alone cannot distinguish the pre-first-await game callsite.");
-        lines.Add("Step 35.0.6 diagnostic scope: preserve the exact closed transformed source and resolver authority, create a separate identity/MVID-preserving diagnostic clone, inject durable entry markers into ExecuteVeryEarly.MoveNext plus the top-level pre-first-await game methods and relevant type initializers, arm one launcher-owned Action<string> callback immediately before Invoke, and use the last INMETHOD_* record to localize the hard kill. Exact transformed source bytes are never overwritten or CLR-loaded in this candidate.");
-        lines.Add("Exact Step-35 authority remains the 0.0.126 contract: the natural managed startup target is static parameterless Task-returning MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly(), source token 0x06007D02, on the exact closed transformed artifact. Candidate 0.0.129 does not execute that exact artifact; it uses a separately identified diagnostic derivative only for localization.");
+        lines.Add("Step 35.0.7 diagnostic scope: preserve the exact closed transformed source and resolver authority, create a separate identity/MVID-preserving diagnostic clone, inject durable entry markers into ExecuteVeryEarly.MoveNext plus the top-level pre-first-await game methods and relevant type initializers, arm one launcher-owned Action<string> callback immediately before Invoke, and use the last INMETHOD_* record to localize the hard kill. Exact transformed source bytes are never overwritten or CLR-loaded in this candidate.");
+        lines.Add("Exact Step-35 authority remains the 0.0.126 contract: the natural managed startup target is static parameterless Task-returning MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly(), source token 0x06007D02, on the exact closed transformed artifact. Candidate 0.0.130 does not execute that exact artifact; it uses a separately identified diagnostic derivative only for localization. Physical 0.0.129 reached the armed diagnostic invocation but failed in the bridge MemberRef before INMETHOD_001.");
         lines.Add("Resolver boundary: exact persisted host-framework bindings and hash-pinned initializer-free prepared private dependencies may be serviced on demand. The known initializer-bearing 0Harmony 2.4.2.0 dependency remains forbidden; any changed/additional initializer-bearing dependency, unplanned managed request, or native request fails closed.");
         lines.Add("Forbidden in Step 35: receipt-backed/prepared original sts2.dll CLR admission, intentional ExecuteEssential/ExecuteDeferred/PrewarmJit invocation by the launcher, game entry-point execution, Harmony/MonoMod API invocation or runtime patching, Godot/game startup, native game loading, arbitrary resolver fallback, or broad startup sequencing.");
         lines.Add("Cancellation semantics: CANCELLED is INCONCLUSIVE, not a compatibility FAIL. If Gate B has begun the process is spent; after Gate C invocation begins, cancellation cannot undo any code that already ran. Force-quit before retry.");
-        lines.Add("After Gate B, the instrumented diagnostic sts2 clone remains CLR-resident until force-quit on the physical non-collectible context. After Gate C, diagnostic ExecuteVeryEarly has executed once; do not rerun Step 35.0.6 in the same process.");
+        lines.Add("After Gate B, the instrumented diagnostic sts2 clone remains CLR-resident until force-quit on the physical non-collectible context. After Gate C, diagnostic ExecuteVeryEarly has executed once; do not rerun Step 35.0.7 in the same process.");
         lines.Add(tail);
         return string.Join("\n", lines);
     }
@@ -264,14 +264,14 @@ public sealed partial class RootViewController
 
                 WriteStep35TextFileDurably(
                     crashPath,
-                    "StS2 Launcher — Step 35.0.6 in-method localization crash checkpoint\n" +
+                    "StS2 Launcher — Step 35.0.7 in-method localization crash checkpoint\n" +
                     "Output-only diagnostic; never consumed as trusted runtime input.\n" +
                     $"Run ID: {runId}\n" +
                     $"Initialized UTC: {initializedUtc:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                     $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
-                    "Candidate: STEP 35.0.6 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION\n" +
+                    "Candidate: STEP 35.0.7 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION\n" +
                     "Execution policy: exact source transform/resolver/later-boundary prohibitions unchanged; Gate B/C execute only a separately verified diagnostic clone with output-only in-method entry markers.\n" +
                     $"Implementation: {CurrentReleasePresentation.Step35ImplementationMarker}\n\n");
 
@@ -304,7 +304,7 @@ public sealed partial class RootViewController
                     $"Crash journal: {crashFileName}\n" +
                     $"Static map: {staticMapFileName}\n" +
                     $"Last checkpoint: {Step35LastCheckpointFileName}\n" +
-                    "Candidate: STEP 35.0.6 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION\n");
+                    "Candidate: STEP 35.0.7 — IN-METHOD PRE-FIRST-AWAIT LOCALIZATION\n");
 
                 _step35RunId = runId;
                 _step35CrashCheckpointPath = crashPath;
@@ -338,7 +338,7 @@ public sealed partial class RootViewController
                 $"Process ID: {Environment.ProcessId}\n" +
                 $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                 $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
-                "Candidate: STEP 35.0.6 — same-run exact-source static map + instrumented diagnostic-clone localization\n" +
+                "Candidate: STEP 35.0.7 — same-run exact-source static map + instrumented diagnostic-clone localization\n" +
                 "This file is generated from the already-verified exact transformed image before CLR admission and is never consumed as runtime input.\n\n" +
                 body + "\n");
             return true;

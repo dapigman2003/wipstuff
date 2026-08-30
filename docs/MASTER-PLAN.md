@@ -224,3 +224,8 @@ Physical 0.0.126 validated same-run durable telemetry and reproduced the no-`C_I
 Physical 0.0.128 did not reach Gate B or game execution. It repeated the Gate-A `System.Runtime 9.0.0.0` `AssemblyResolutionException`. The exact trusted `sts2.dll` supplied for analysis matches the closed source SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`. Source review identified the immediate cause: Step 35.0.5 opened the diagnostic source module with Cecil `ReadingMode.Immediate` before configuring its bounded surrogate resolver, unlike physically closed Step 32.
 
 0.0.129 changes only that sequence to `ReadingMode.Deferred -> zero pre-configure resolver requests -> audited requirement collection/configuration -> marker injection/write -> bounded request validation -> rejecting reopen/semantic verification`. No external dependency bytes become writer inputs. If Gate A now passes, the existing Step-35.0.4 in-method diagnostic experiment proceeds unchanged.
+
+
+## Step 35.0.7 generic delegate MemberRef correction
+
+Physical 0.0.129 reached the diagnostic invocation but failed normally before `INMETHOD_001` with `MissingMethodException: Method not found: void System.Action`1.Invoke(string)`. Gate A/B passing means the deferred Cecil writer defect is closed for this diagnostic path. The next bounded correction is metadata-only within the diagnostic bridge: encode the generic member as `Action<string>::Invoke(!0)` rather than a concrete-parameter MemberRef, verify that serialized shape under rejecting resolution, and rerun the unchanged in-method localization experiment. This remains derivative evidence only and cannot close exact Step 35.

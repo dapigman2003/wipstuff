@@ -1,9 +1,9 @@
-# Release Checklist — Step 35.0.6 In-Method Pre-First-Await Localization
+# Release Checklist — Step 35.0.7 In-Method Pre-First-Await Localization
 
 ## Candidate identity
 
-- step/candidate: **Step 35.0.6**
-- version: `0.0.129 (129)`
+- step/candidate: **Step 35.0.7**
+- version: `0.0.130 (129)`
 - workflow: `ios-canonical`
 - expected IPA: `artifacts/StS2-Launcher-Step-35.ipa`
 - expected host TRX: `artifacts/test-results/step35.trx`
@@ -17,13 +17,14 @@
 
 - [ ] canonical static validation passes;
 - [ ] full host suite passes when a .NET SDK is available;
-- [ ] release identity is exactly `0.0.129 (129)`;
+- [ ] release identity is exactly `0.0.130 (129)`;
 - [ ] iOS publish/package succeeds under `MtouchLink=None`, `TrimMode=copy`, `MtouchInterpreter=-all`;
-- [ ] IPA verification succeeds and advertises Step 35.0.6 diagnostic localization;
+- [ ] IPA verification succeeds and advertises Step 35.0.7 diagnostic localization;
 - [ ] stable `ios-canonical` cache key and existing NuGet/Godot/iOS-arm64 obj cache paths remain intact;
 - [ ] the exact closed Step-32 transformed SHA-256 remains `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`;
 - [ ] Gate-A diagnostic clone source open uses Cecil `ReadingMode.Deferred`, observes zero resolver requests before `Configure`, and configures the audited writer-only surrogates before `module.Write`;
-- [ ] Gate A creates a separate `sts2.step35.0.6.instrumented.dll`, preserves identity/MVID, verifies its hash/signature/marker bridge, and immediately re-hashes the exact transformed source unchanged;
+- [ ] Gate A creates a separate `sts2.step35.0.7.instrumented.dll`, preserves identity/MVID, verifies its hash/signature/marker bridge, and immediately re-hashes the exact transformed source unchanged;
+- [ ] post-write rejecting-resolver verification proves the bridge callvirt is `Action<string>::Invoke(!0)` (type generic parameter position 0), not the physically failed `Invoke(string)` MemberRef;
 - [ ] Gate B CLR-loads only the diagnostic clone, never the exact transformed source or receipt-backed/prepared original;
 - [ ] Gate C arms `C_DIAGNOSTIC_BRIDGE_ARMED` before the one diagnostic-clone `ExecuteVeryEarly()` invocation;
 - [ ] active summary/UI/report text states that diagnostic 4/4 is **NOT STEP 35 CLOSURE**;
@@ -31,7 +32,7 @@
 
 ## Device run
 
-Force-quit/relaunch first. Run Step 35.0.6 once. Before Gate A, the UI must successfully establish durable run-correlated telemetry; a telemetry failure must stop visibly and perform no CLR admission/invocation.
+Force-quit/relaunch first. Run Step 35.0.7 once. Before Gate A, the UI must successfully establish durable run-correlated telemetry; a telemetry failure must stop visibly and perform no CLR admission/invocation.
 
 Gate A must re-run Step-32 A–D, verify exact `ExecuteVeryEarly` wrapper/MoveNext metadata, create and verify the separate diagnostic clone, re-hash the exact transformed source unchanged after clone emission, and write the same-Run-ID exact-source static map before Gate B.
 
@@ -41,4 +42,4 @@ If the app hard-terminates, **do not immediately rerun**. Preserve `Step35-Curre
 
 Cancellation is INCONCLUSIVE rather than compatibility failure, but the process is spent after Gate B/C begins.
 
-A 0.0.129 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35 because the executed image is an instrumented derivative. Step 35 remains OPEN until a separately defined authoritative transformed artifact passes its physical closure contract. Do not broaden resolver/native/Harmony/Godot authority in this diagnostic candidate.
+A 0.0.130 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35 because the executed image is an instrumented derivative. Step 35 remains OPEN until a separately defined authoritative transformed artifact passes its physical closure contract. Do not broaden resolver/native/Harmony/Godot authority in this diagnostic candidate.
