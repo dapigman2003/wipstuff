@@ -1,0 +1,8 @@
+Step 35.0.12 physical observation — 0.0.135 (135)
+Run ID: 20260831T1433421386140Z-pid12164-076599c6858346c3a188090293fd6dfb
+
+Gate A: PASS. Gate B: PASS. Gate C: managed FAIL. Launcher reached normal RUN_END.
+
+The diagnostic clone reported CommandLineHelper cctor MaxStack exact-source/diagnostic = 3 / 4 and four critical stack-neutral markers were present in the candidate. Runtime execution reached corrected INMETHOD_NP002_PRE before CommandLineHelper.TryGetValue, but no CommandLineHelper cctor entry marker, no critical marker, and no CL/CLTV marker executed. MethodInfo.Invoke returned a faulted Task with TypeInitializationException(PlatformUtil) -> TypeInitializationException(CommandLineHelper) -> InvalidProgramException. Resolver state remained within the planned managed/private boundary and recorded no native request.
+
+Conclusion: increasing/verifying MaxStack did not cure the pre-instruction-zero CLR rejection. The MaxStack-only diagnosis from physical 0.0.133 is disproven. This run is a diagnostic instrumentation negative and does not advance or retreat the authoritative exact-game frontier from physical 0.0.132. The next candidate must remove live-stack CommandLine callbacks and retain only empty-stack boundaries.

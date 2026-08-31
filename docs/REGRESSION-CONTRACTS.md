@@ -413,7 +413,7 @@ Required invariants:
 - the final `System.Collections.Concurrent` resolver record may be preserved as frontier context but cannot be promoted to root cause merely because it is last;
 - a 0.0.132 4/4 result is diagnostic completion only and **NOT Step-35 closure**.
 
-## Step 35.0.12 — corrected ordinals, MaxStack safety, and CommandLine localization
+## Step 35.0.13 — corrected ordinals, MaxStack safety, and CommandLine localization
 
 - Physical 0.0.132 proved `INMETHOD_NP003_PRE` corresponded to exact-source `CALLSITE#002`; injected bridge calls must be excluded **before** ordinal accounting.
 - NullPlatform's direct base `.ctor` remains unwrapped but still consumes exact-source CALLSITE#001.
@@ -430,3 +430,5 @@ Required invariants:
 - Host regressions must include actual CLR loading/execution of a generated tight-MaxStack rewritten cctor, not only Cecil round-trip inspection.
 - Exact Step-32 transformed source, resolver/native prohibitions, one-invocation rule, 60-second await, fresh-process rule, and no-Godot-bootstrap contract remain unchanged.
 - Diagnostic 4/4 is not exact Step-35 closure.
+
+Physical 0.0.135 observation: the MaxStack-hardened diagnostic clone still returned a faulted Task with nested System.InvalidProgramException before any CommandLineHelper cctor entry/critical marker executed, despite serialized cctor MaxStack 3 / 4 verification. The launcher reached normal RUN_END. This disproves the MaxStack-only diagnosis; Step 35.0.13 retires all live-stack CL/CLTV runtime callbacks and keeps only stack-neutral CommandLine boundaries.

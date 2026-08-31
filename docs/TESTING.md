@@ -1,18 +1,18 @@
-0.0.134 was stopped before physical testing: its host suite was 205/206 because the new MaxStack regression incorrectly required Cecil's serialized MaxStack to equal 4 rather than be at least the required minimum. 0.0.135 fixes only that test contract while retaining the executable CLR check.
+0.0.134 was stopped before physical testing: its host suite was 205/206 because the new MaxStack regression incorrectly required Cecil's serialized MaxStack to equal 4 rather than be at least the required minimum. 0.0.136 fixes only that test contract while retaining the executable CLR check.
 
-# Testing — Step 35.0.12
+# Testing — Step 35.0.13
 
-Active candidate: Step 35.0.12 / `0.0.135 (135)`.
+Active candidate: Step 35.0.13 / `0.0.136 (136)`.
 
-Release identity: IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, version `0.0.135 (135)`. The Codemagic workflow key remains `ios-canonical`.
+Release identity: IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, version `0.0.136 (136)`. The Codemagic workflow key remains `ios-canonical`.
 
-Running Step 34 and then Step 35 in the same process is invalid because Step 34 leaves `sts2` resident in a non-collectible private context. Always force-quit before Step 35. Once Gate B begins, the 0.0.135 process is spent and must be force-quit before another run.
+Running Step 34 and then Step 35 in the same process is invalid because Step 34 leaves `sts2` resident in a non-collectible private context. Always force-quit before Step 35. Once Gate B begins, the 0.0.136 process is spent and must be force-quit before another run.
 
-## Authority rule for 0.0.135
+## Authority rule for 0.0.136
 
-0.0.135 is a **diagnostic derivative**, not an exact Step-35 compatibility candidate. Gate A must re-create and verify the exact closed Step-32 transformed artifact, then create a separate instrumented clone. Gate B/C may CLR-admit and execute only that clone. A 4/4 result is localization evidence but **must not be recorded as Step-35 closure**.
+0.0.136 is a **diagnostic derivative**, not an exact Step-35 compatibility candidate. Gate A must re-create and verify the exact closed Step-32 transformed artifact, then create a separate instrumented clone. Gate B/C may CLR-admit and execute only that clone. A 4/4 result is localization evidence but **must not be recorded as Step-35 closure**.
 
-Before build, run `bash scripts/validate.sh` and `bash scripts/test.sh`. Static validation must protect closed Step 29–34 manifests, current release identity, exact target tokens, writer ordering, `Action<string>::Invoke(!0)`, corrected NP ordinals, MaxStack reservation/post-write verification, critical CommandLine boundaries, CL/CLTV sweeps, branch-target ordinal preservation, and source-tree cleanliness. Host tests require `dotnet`.
+Before build, run `bash scripts/validate.sh` and `bash scripts/test.sh`. Static validation must protect closed Step 29–34 manifests, current release identity, exact target tokens, writer ordering, `Action<string>::Invoke(!0)`, corrected NP ordinals, unchanged serialized CommandLine MaxStack, critical stack-neutral CommandLine boundaries, absence of production CL/CLTV live-stack sweeps, branch-target ordinal preservation, and source-tree cleanliness. Host tests require `dotnet`.
 
 The 0.0.133 regression is mandatory context: it physically returned managed `InvalidProgramException` before the CommandLine cctor entry marker and reached normal `RUN_END`. That result is an instrumentation failure, not a Godot compatibility verdict.
 
@@ -25,14 +25,14 @@ The host suite must include both structural and executable coverage:
 
 ## Durable telemetry
 
-All Step-35 telemetry is output-only and never trusted as runtime input. The exact-source static map is written after Gate-A semantic verification and before Gate B. For 0.0.135 it must include:
+All Step-35 telemetry is output-only and never trusted as runtime input. The exact-source static map is written after Gate-A semantic verification and before Gate B. For 0.0.136 it must include:
 
 - wrapper and MoveNext IL/callsites/await candidates;
 - `[NULL PLATFORM CTOR IL]` with exact original constructor `CALLSITE#xxx` ordinals;
 - `[COMMAND LINE HELPER CCTOR IL]` with the exact-source cctor MaxStack and exact `CALLSITE#xxx` ordinals;
 - `[COMMAND LINE HELPER TRYGETVALUE IL]` with exact method-body `CALLSITE#xxx` ordinals.
 
-0.0.135 retains prior markers through `INMETHOD_024`, `INMETHOD_025/026`, `INMETHOD_180/181`, and `INMETHOD_182/183`. It retains corrected `INMETHOD_NPxxx_PRE/POST`, `INMETHOD_CLxxx_PRE/POST`, `INMETHOD_CLTVxxx_PRE/POST`, and `INMETHOD_027`. It adds four redundant stack-neutral critical markers:
+0.0.136 retains prior markers through `INMETHOD_024`, `INMETHOD_025/026`, `INMETHOD_180/181`, and `INMETHOD_182/183`. It retains corrected `INMETHOD_NPxxx_PRE/POST`, `INMETHOD_CLxxx_PRE/POST`, `INMETHOD_CLTVxxx_PRE/POST`, and `INMETHOD_027`. It adds four redundant stack-neutral critical markers:
 
 - `INMETHOD_CL_CRITICAL_001_PRE` — before `_args` dictionary construction;
 - `INMETHOD_CL_CRITICAL_001_POST` — after `_args` dictionary assignment;

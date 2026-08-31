@@ -1,14 +1,14 @@
-# Release checklist — Step 35.0.12
+# Release checklist — Step 35.0.13
 
 Release identity:
 
-- display/build: `0.0.135 (135)`
+- display/build: `0.0.136 (136)`
 - IPA: `StS2-Launcher-Step-35.ipa`
 - active workflow: `ios-canonical`
 
 Before handing off/building:
 
-- [ ] release identity is exactly `0.0.135 (135)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] release identity is exactly `0.0.136 (136)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
 - [ ] `bash scripts/validate.sh` passes;
 - [ ] `bash scripts/test.sh` passes in a host with `dotnet`;
 - [ ] protected Step 29–34 manifests remain unchanged and valid;
@@ -26,4 +26,4 @@ Before handing off/building:
 - [ ] no Godot bootstrap/native game load/arbitrary resolver fallback/runtime Harmony patching was introduced;
 - [ ] no proprietary `sts2.dll`, GodotSharp, Steamworks, Sentry, deps file, app bundle, signing secret or credential is included in the source archive.
 
-For physical testing, force-quit before Step 35 and after any run where Gate B began. Preserve all matching run-correlated telemetry. Cancellation is INCONCLUSIVE. A 0.0.135 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35. Do not broaden resolver/native/Harmony/Godot authority in this candidate.
+For physical testing, force-quit before Step 35 and after any run where Gate B began. Preserve all matching run-correlated telemetry. Cancellation is INCONCLUSIVE. A 0.0.136 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35. Do not broaden resolver/native/Harmony/Godot authority in this candidate.
