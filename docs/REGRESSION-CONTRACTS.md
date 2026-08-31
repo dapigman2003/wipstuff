@@ -413,7 +413,7 @@ Required invariants:
 - the final `System.Collections.Concurrent` resolver record may be preserved as frontier context but cannot be promoted to root cause merely because it is last;
 - a 0.0.132 4/4 result is diagnostic completion only and **NOT Step-35 closure**.
 
-## Step 35.0.10 — corrected ordinals and CommandLine localization
+## Step 35.0.11 — corrected ordinals, MaxStack safety, and CommandLine localization
 
 - Physical 0.0.132 proved `INMETHOD_NP003_PRE` corresponded to exact-source `CALLSITE#002`; injected bridge calls must be excluded **before** ordinal accounting.
 - NullPlatform's direct base `.ctor` remains unwrapped but still consumes exact-source CALLSITE#001.
@@ -423,5 +423,10 @@ Required invariants:
 - Same-run exact-source output includes `[COMMAND LINE HELPER CCTOR IL]` and `[COMMAND LINE HELPER TRYGETVALUE IL]`.
 - The cctor plan must contain `Godot.OS.GetCmdlineArgs`; otherwise Gate A fails before CLR admission.
 - New CommandLine sweeps may skip unrelated branch-target callsites, but skipped calls still consume exact-source ordinals; the required Godot call cannot be silently skipped.
+- Physical 0.0.133 is pinned as a diagnostic instrumentation failure: corrected `NP002`, no CommandLine cctor/CL marker, nested `InvalidProgramException`, normal `RUN_END`; it must not be reclassified as a Godot compatibility result.
+- Every live-stack diagnostic callsite sweep reserves one additional `MaxStack` slot; targeted callsite markers are hardened likewise.
+- Gate A must record exact-source CommandLine cctor MaxStack and require serialized diagnostic MaxStack = source + 1.
+- Four stack-neutral critical markers must bracket `_args` dictionary construction/assignment and `Godot.OS.GetCmdlineArgs` invocation/result storage.
+- Host regressions must include actual CLR loading/execution of a generated tight-MaxStack rewritten cctor, not only Cecil round-trip inspection.
 - Exact Step-32 transformed source, resolver/native prohibitions, one-invocation rule, 60-second await, fresh-process rule, and no-Godot-bootstrap contract remain unchanged.
 - Diagnostic 4/4 is not exact Step-35 closure.

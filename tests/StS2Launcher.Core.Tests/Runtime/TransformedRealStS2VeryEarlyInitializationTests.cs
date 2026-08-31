@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.10 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.11 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -454,6 +454,150 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         {
             Assert.IsTrue(tryGetValueAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.BeforeMarker)));
             Assert.IsTrue(tryGetValueAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.AfterMarker)));
+        }
+    }
+
+
+    [TestMethod]
+    public void DiagnosticCommandLineCriticalMarkersAreStackNeutralAndSerializedWithMaxStackHeadroom()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-commandline-critical");
+        var assemblyPath = Path.Combine(temp.Path, "CommandLineCriticalFixture.dll");
+
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("CommandLineCriticalFixture", new Version(1, 0, 0, 0)),
+                   "CommandLineCriticalFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var bridge = new TypeDefinition("StS2Launcher.Step35Diagnostics", "ExecuteVeryEarlyCheckpointBridge", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(bridge);
+            var emit = new MethodDefinition("Emit", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            emit.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+            emit.Body.GetILProcessor().Append(emit.Body.GetILProcessor().Create(OpCodes.Ret));
+            bridge.Methods.Add(emit);
+
+            var godotSharp = new AssemblyNameReference("GodotSharp", new Version(4, 5, 1, 0));
+            module.AssemblyReferences.Add(godotSharp);
+            var dictionaryOpen = new TypeReference("Godot.Collections", "Dictionary`2", module, godotSharp, false);
+            dictionaryOpen.GenericParameters.Add(new GenericParameter("TKey", dictionaryOpen));
+            dictionaryOpen.GenericParameters.Add(new GenericParameter("TValue", dictionaryOpen));
+            var dictionaryString = new GenericInstanceType(dictionaryOpen);
+            dictionaryString.GenericArguments.Add(module.TypeSystem.String);
+            dictionaryString.GenericArguments.Add(module.TypeSystem.String);
+            var dictionaryCtor = new MethodReference(".ctor", module.TypeSystem.Void, dictionaryString)
+            {
+                HasThis = true,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+            var godotOs = new TypeReference("Godot", "OS", module, godotSharp, false);
+            var getCmdlineArgs = new MethodReference("GetCmdlineArgs", new ArrayType(module.TypeSystem.String), godotOs)
+            {
+                HasThis = false,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+
+            var commandLine = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "CommandLineHelper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(commandLine);
+            var argsField = new FieldDefinition("_args", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, dictionaryString);
+            commandLine.Fields.Add(argsField);
+            var cctor = new MethodDefinition(".cctor", Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+            cctor.Body.InitLocals = true;
+            cctor.Body.MaxStackSize = 1;
+            cctor.Body.Variables.Add(new VariableDefinition(new ArrayType(module.TypeSystem.String)));
+            commandLine.Methods.Add(cctor);
+            var il = cctor.Body.GetILProcessor();
+            il.Append(il.Create(OpCodes.Newobj, dictionaryCtor));
+            il.Append(il.Create(OpCodes.Stsfld, argsField));
+            il.Append(il.Create(OpCodes.Call, getCmdlineArgs));
+            il.Append(il.Create(OpCodes.Stloc_0));
+            il.Append(il.Create(OpCodes.Ret));
+
+            InsertSyntheticEntryMarker(cctor, emit, "INMETHOD_CCTOR — MegaCrit.Sts2.Core.Helpers.CommandLineHelper..cctor entered");
+            TransformedRealStS2VeryEarlyInitialization.InsertCommandLineHelperCriticalBoundaryMarkers(cctor, emit);
+            var plan = TransformedRealStS2VeryEarlyInitialization.InsertCommandLineHelperCctorCallsiteMarkers(cctor, emit);
+
+            Assert.AreEqual(2, plan.Count);
+            Assert.AreEqual(2, cctor.Body.MaxStackSize);
+            Assert.IsTrue(TransformedRealStS2VeryEarlyInitialization.HasCommandLineHelperCriticalBoundaryMarkers(cctor));
+            assembly.Write(assemblyPath);
+        }
+
+        using var reopened = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var cctorAfter = reopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTypeFullName)
+            .Methods.Single(method => method.Name == ".cctor");
+        Assert.AreEqual(2, cctorAfter.Body.MaxStackSize);
+        Assert.IsTrue(TransformedRealStS2VeryEarlyInitialization.HasCommandLineHelperCriticalBoundaryMarkers(cctorAfter));
+    }
+
+    [TestMethod]
+    public void DiagnosticCallsiteSweepRaisesMaxStackAndClrExecutesTightRewrittenCctor()
+    {
+        byte[] image;
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("CommandLineExecutableMaxStackFixture", new Version(1, 0, 0, 0)),
+                   "CommandLineExecutableMaxStackFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var bridge = new TypeDefinition("StS2Launcher.Step35Diagnostics", "ExecuteVeryEarlyCheckpointBridge", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(bridge);
+            var emit = new MethodDefinition("Emit", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            emit.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+            emit.Body.GetILProcessor().Append(emit.Body.GetILProcessor().Create(OpCodes.Ret));
+            bridge.Methods.Add(emit);
+
+            var helper = new TypeDefinition("Fixture", "Helper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(helper);
+            var consume3 = new MethodDefinition("Consume3", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            consume3.Parameters.Add(new ParameterDefinition(module.TypeSystem.Int32));
+            consume3.Parameters.Add(new ParameterDefinition(module.TypeSystem.Int32));
+            consume3.Parameters.Add(new ParameterDefinition(module.TypeSystem.Int32));
+            consume3.Body.GetILProcessor().Append(consume3.Body.GetILProcessor().Create(OpCodes.Ret));
+            helper.Methods.Add(consume3);
+
+            var commandLine = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "CommandLineHelper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(commandLine);
+            var cctor = new MethodDefinition(".cctor", Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+            cctor.Body.MaxStackSize = 3;
+            commandLine.Methods.Add(cctor);
+            var il = cctor.Body.GetILProcessor();
+            il.Append(il.Create(OpCodes.Ldc_I4_1));
+            il.Append(il.Create(OpCodes.Ldc_I4_2));
+            il.Append(il.Create(OpCodes.Ldc_I4_3));
+            il.Append(il.Create(OpCodes.Call, consume3));
+            il.Append(il.Create(OpCodes.Ret));
+            var touch = new MethodDefinition("Touch", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            touch.Body.GetILProcessor().Append(touch.Body.GetILProcessor().Create(OpCodes.Ret));
+            commandLine.Methods.Add(touch);
+
+            var plan = TransformedRealStS2VeryEarlyInitialization.InsertCommandLineHelperCctorCallsiteMarkers(cctor, emit);
+            Assert.AreEqual(1, plan.Count);
+            Assert.AreEqual(4, cctor.Body.MaxStackSize);
+
+            using var output = new MemoryStream();
+            assembly.Write(output);
+            image = output.ToArray();
+        }
+
+        using (var reopened = AssemblyDefinition.ReadAssembly(new MemoryStream(image), new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred }))
+        {
+            var cctorAfter = reopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTypeFullName)
+                .Methods.Single(method => method.Name == ".cctor");
+            Assert.AreEqual(4, cctorAfter.Body.MaxStackSize);
+        }
+
+        var loadContext = new AssemblyLoadContext("Step35-MaxStack-Executable-Regression", isCollectible: true);
+        try
+        {
+            using var input = new MemoryStream(image, writable: false);
+            var loaded = loadContext.LoadFromStream(input);
+            var type = loaded.GetType(TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTypeFullName, throwOnError: true)!;
+            type.GetMethod("Touch", BindingFlags.Public | BindingFlags.Static)!.Invoke(null, null);
+        }
+        finally
+        {
+            loadContext.Unload();
         }
     }
 

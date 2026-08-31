@@ -1,0 +1,47 @@
+StS2 Launcher — Step 35.0.10 physical 0.0.133 diagnostic result
+Classification: CLOSED DIAGNOSTIC NEGATIVE — instrumentation defect; exact Step 35 remains OPEN
+
+Run ID: 20260831T0237334411640Z-pid8208-e573b252aab842fa84144ce1a8af1a69
+App: 0.0.133 (133)
+Result: diagnostic localization FAIL 2/4, but the process ended normally.
+
+Physical facts
+--------------
+1. Gate A PASS and Gate B PASS. The exact transformed source remained SHA-256
+   39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef.
+2. Gate C reached ExecuteVeryEarly and reproduced the known chain through
+   NullPlatformUtilStrategy..ctor.
+3. Corrected ordinal accounting worked: the launcher durably emitted
+   INMETHOD_NP002_PRE before CommandLineHelper.TryGetValue. The exact-source
+   NullPlatform map also identifies TryGetValue as CALLSITE#002.
+4. No CommandLineHelper cctor entry marker, INMETHOD_CLxxx marker, INMETHOD_027,
+   or INMETHOD_CLTVxxx marker executed.
+5. MethodInfo.Invoke returned. The returned Task was already Faulted.
+6. The managed exception chain was PlatformUtil TypeInitializationException ->
+   CommandLineHelper TypeInitializationException -> System.InvalidProgramException.
+7. The launcher wrote its normal deterministic report and RUN_END. There was no
+   hard process termination in this run.
+
+Interpretation
+--------------
+The CLR rejected the newly instrumented CommandLineHelper..cctor before its first
+instruction executed. This does not supersede the 0.0.132 exact-game localization.
+The 0.0.133 generic callsite sweep inserted ldstr/call Emit immediately around
+original calls while original arguments/results could remain live on the evaluation
+stack, but it did not increase the method header MaxStack. CommandLineHelper..cctor
+contains original sites whose peak stack can therefore be raised by one by the
+instrumentation. Cecil write/reopen checks did not execute the rewritten method and
+failed to catch the invalid method header.
+
+Therefore 0.0.133 is an instrumentation failure, not evidence that
+Godot.OS.GetCmdlineArgs itself returned InvalidProgramException. The authoritative
+physical game frontier remains 0.0.132: work triggered by CommandLineHelper.TryGetValue
+enters type initialization and hard-terminates before the call returns.
+
+Required correction
+-------------------
+The next diagnostic must reserve MaxStack headroom for any marker that can run while
+original stack values are live, verify the serialized header, and include redundant
+stack-neutral markers around the earliest CommandLineHelper cctor operations so a
+single expensive device run can still localize dictionary initialization versus
+Godot.OS.GetCmdlineArgs.

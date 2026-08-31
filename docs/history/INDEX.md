@@ -214,3 +214,5 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.9-PHYSICAL-COMMANDLINE-BOUNDARY-AND-ORDINAL-DEFECT-0.0.132.txt` — physical 0.0.132 TryGetValue boundary plus +1 NP ordinal defect.
 - `steps/STEP-35.0.10-COMMANDLINE-GODOT-BOUNDARY-LOCALIZATION.md` — 0.0.133 corrected-ordinal and CommandLine/Godot localization design.
+- `reports/STEP-35.0.10-PHYSICAL-MAXSTACK-INSTRUMENTATION-FAILURE-0.0.133.txt` — physical 0.0.133 corrected NP002 but returned managed InvalidProgramException before any CommandLine cctor marker; normal RUN_END proves a diagnostic MaxStack defect.
+- `steps/STEP-35.0.11-MAXSTACK-SAFE-COMMANDLINE-GODOT-LOCALIZATION.md` — 0.0.134 MaxStack-safe and stack-neutral redundant CommandLine/Godot localization design.

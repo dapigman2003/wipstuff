@@ -31,3 +31,4 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-35.0.8-PHYSICAL-NULLPLATFORM-CONSTRUCTOR-LOCALIZATION-0.0.131.txt` — physical 0.0.131 advances to `NullPlatformUtilStrategy..ctor` and proves `GodotFileIo..ctor` was not reached.
 
 - `STEP-35.0.9-PHYSICAL-COMMANDLINE-BOUNDARY-AND-ORDINAL-DEFECT-0.0.132.txt` — run-correlated physical 0.0.132 evidence localizing at CommandLineHelper.TryGetValue and proving the NP +1 ordinal defect.
+- `STEP-35.0.10-PHYSICAL-MAXSTACK-INSTRUMENTATION-FAILURE-0.0.133.txt` — physical 0.0.133 corrected NP002 but the CommandLine cctor diagnostic was rejected with managed InvalidProgramException before its first marker; launcher reached normal RUN_END.
