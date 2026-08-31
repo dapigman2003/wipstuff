@@ -1,0 +1,22 @@
+StS2 Launcher — Step 35.0.9 physical 0.0.132 CommandLine boundary and ordinal-defect summary
+
+App version: 0.0.132 (132)
+Run ID: 20260830T2315426526590Z-pid5875-b77c63c238f74f8583333e46ce0257ee
+Process ID: 5875
+
+Gate A and Gate B passed. Gate C bound and invoked the diagnostic clone. Durable in-method evidence reached ExecuteVeryEarly.MoveNext, TestMode.get_IsOn, SaveManager..cctor, SaveManager.get_Instance, SaveManager.ConstructDefault, UserDataPathProvider.GetAccountScopedBasePath, PlatformUtil..cctor, and NullPlatformUtilStrategy..ctor.
+
+The final in-method marker was:
+INMETHOD_NP003_PRE — NullPlatformUtilStrategy..ctor CALLSITE#003 before call System.Boolean MegaCrit.Sts2.Core.Helpers.CommandLineHelper::TryGetValue(System.String,System.String&)
+
+There was no matching POST. The last durable resolver activity was System.Collections.Concurrent 8.0.0.0 binding to host 9.0.0.0. That event is contextual and is not elevated to causal evidence.
+
+The same-run exact-source [NULL PLATFORM CTOR IL] map showed:
+CALLSITE#001 System.Object::.ctor()
+CALLSITE#002 CommandLineHelper::TryGetValue(System.String,System.String&)
+CALLSITE#003 System.UInt64::TryParse(...)
+CALLSITE#004 GodotFileIo::.ctor(System.String)
+
+Therefore the runtime NP003 marker actually corresponded to exact-source CALLSITE#002. The diagnostic sweep had counted the previously injected entry-marker bridge Emit call before excluding it. Physical 0.0.132 thus established two facts: the hard-kill interval is inside work triggered by CommandLineHelper.TryGetValue before that call returns, and the dynamic NP ordinals were shifted +1. GodotFileIo..ctor was not reached.
+
+This remains diagnostic evidence. The exact-authority Step-35 compatibility frontier remains the previously defined exact transformed ExecuteVeryEarly contract.

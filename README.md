@@ -1,15 +1,13 @@
-# StS2 Launcher iOS — Step 35.0.9 Null-Platform Constructor Callsite Localization
+# StS2 Launcher — Step 35
 
-Active candidate: **Step 35.0.9 / `0.0.132 (132)`**.
+Active candidate: **Step 35.0.10 / 0.0.133 (133)** — Command-Line / Godot boundary localization.
 
-Steps 32–34 remain physically CLOSED POSITIVE 4/4. Step 35 remains OPEN, with physical 0.0.126 still the authoritative exact transformed-byte frontier.
+Steps 01–26 are closed. Step 27 is CLOSED NEGATIVE. Step 28 is CLOSED POSITIVE 5/5. Steps 29–34 are CLOSED POSITIVE 4/4. **Step 35 remains OPEN.**
 
-Physical 0.0.131 advanced the diagnostic frontier through `SaveManager.ConstructDefault`, `UserDataPathProvider.GetAccountScopedBasePath`, `PlatformUtil..cctor`, and `NullPlatformUtilStrategy..ctor`. The process then hard-terminated after the planned `System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0` binding and before `GodotFileIo..ctor` emitted its marker. Therefore the previous first-`DirAccess` hypothesis is not supported by the physical path actually reached.
+The authoritative exact-byte Step-35 frontier remains physical 0.0.126: exact transformed `ExecuteVeryEarly()` entered `MethodInfo.Invoke` and hard-terminated before `C_INVOKE_RETURNED`. Later builds are diagnostic derivatives only.
 
-Step 35.0.9 keeps the exact Step-35 source/resolver/startup authority unchanged and adds only an ordered pre/post sweep around every existing non-base `call`, `callvirt`, and `newobj` in `NullPlatformUtilStrategy..ctor`. The run-specific static map also includes that constructor's exact IL and `CALLSITE#xxx` ordinals, allowing the last durable NP marker to identify the outgoing call that did not return.
+Physical 0.0.132 narrowed the live frontier to `NullPlatformUtilStrategy..ctor` calling `CommandLineHelper.TryGetValue`. It durably emitted `INMETHOD_NP003_PRE` with no POST. The same-run exact-source map identifies that call as `CALLSITE#002`, proving both the TryGetValue/type-initialization failure interval and a +1 diagnostic ordinal bug caused by counting the injected entry-marker bridge call.
 
-It does **not** initialize Godot, broaden runtime resolution, load native game code, invoke later `OneTimeInitialization` phases, or alter the exact closed Step-32 transformed source.
+0.0.133 fixes that ordinal accounting and adds output-only localization for `CommandLineHelper..cctor` and `CommandLineHelper.TryGetValue`: exact-source static-map sections plus ordered `INMETHOD_CLxxx_PRE/POST` and `INMETHOD_CLTVxxx_PRE/POST` markers. Gate A fails closed unless the cctor sweep contains `Godot.OS.GetCmdlineArgs`. No Godot bootstrap, native game load, resolver broadening, later initialization phase, or runtime Harmony/MonoMod patching is authorized.
 
-**Authority:** 0.0.132 is still a diagnostic derivative. Even a 4/4 result cannot close exact Step 35 because Gate B/C execute an instrumented clone rather than the exact closed transformed bytes.
-
-Start with `docs/CURRENT-STATUS.md`, `docs/TESTING.md`, and `docs/REGRESSION-CONTRACTS.md` before changing Step-35 code.
+Start with `docs/CURRENT-STATUS.md`, `docs/REGRESSION-CONTRACTS.md`, and `docs/TESTING.md`. Historical step/evidence records are under `docs/history/` and mirrored in `history.zip`.

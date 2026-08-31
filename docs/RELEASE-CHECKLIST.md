@@ -1,37 +1,25 @@
-# Release Checklist — Step 35.0.9 Null-Platform Constructor Callsite Localization
+# Release checklist — Step 35.0.10
 
-## Identity
+Release identity:
 
-- step/candidate: **Step 35.0.9**
-- version: `0.0.132 (132)`
+- display/build: `0.0.133 (133)`
 - IPA: `StS2-Launcher-Step-35.ipa`
-- TRX: `step35.trx`
+- active workflow: `ios-canonical`
 
-## Before packaging
+Before handing off/building:
 
-- [ ] closed Step-32/33/34 manifests verify unchanged;
-- [ ] active Step-35.0.9 candidate manifest verifies;
-- [ ] canonical static validator passes completely;
-- [ ] host tests pass, including generic MemberRef round-trip, selected Godot callsite round-trip and NullPlatform constructor callsite-sweep round-trip;
-- [ ] release identity is exactly `0.0.132 (132)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
-- [ ] no supplied proprietary game DLLs/deps files are packaged into the launcher source archive;
-- [ ] IPA verification succeeds and advertises `STEP 35.0.9 — NULL-PLATFORM CONSTRUCTOR CALLSITE LOCALIZATION`;
-- [ ] Gate A creates `sts2.step35.0.9.instrumented.dll`, preserves identity/MVID, verifies prior markers plus every NullPlatform sweep pair after serialization, and immediately re-hashes the exact transformed source unchanged;
-- [ ] same-run static map contains `[NULL PLATFORM CTOR IL]` and constructor CALLSITE ordinals;
-- [ ] direct base constructor is intentionally not wrapped by the NP sweep;
-- [ ] no Godot bootstrap/startup or resolver broadening is present.
+- [ ] release identity is exactly `0.0.133 (133)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] `bash scripts/validate.sh` passes;
+- [ ] `bash scripts/test.sh` passes in a host with `dotnet`;
+- [ ] protected Step 29–34 manifests remain unchanged and valid;
+- [ ] current Step-35 candidate manifest matches all active candidate files;
+- [ ] exact Step-32 transformed source hash/semantic authority is unchanged;
+- [ ] same-run static map contains `[NULL PLATFORM CTOR IL]`, `[COMMAND LINE HELPER CCTOR IL]`, and `[COMMAND LINE HELPER TRYGETVALUE IL]`;
+- [ ] CL cctor plan is required to contain `Godot.OS.GetCmdlineArgs`;
+- [ ] injected diagnostic bridge calls do not consume exact-source CALLSITE ordinals;
+- [ ] regression reproduces production entry-marker-before-sweep ordering from physical 0.0.132;
+- [ ] CommandLine branch-target skip preserves exact-source ordinals and cannot silently skip required `Godot.OS.GetCmdlineArgs`;
+- [ ] no Godot bootstrap/native game load/arbitrary resolver fallback/runtime Harmony patching was introduced;
+- [ ] no proprietary `sts2.dll`, GodotSharp, Steamworks, Sentry, deps file, app bundle, signing secret or credential is included in the source archive.
 
-## Physical run
-
-Force-quit/relaunch first. Run Step 35.0.9 once. A telemetry-initialization failure must stop before Gate A. Once Gate B begins, the process is spent.
-
-After a hard termination preserve at minimum:
-
-- `Step35-CurrentRun.txt` if present;
-- matching `Step35-CrashCheckpoint-<RunId>.txt`;
-- matching `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`;
-- `Step35-LastCheckpoint.txt`.
-
-Use the final `INMETHOD_NPxxx_PRE/POST` marker and the same-run constructor static map to localize the exact callsite. Do not attribute the final resolver event as root cause merely because it is last.
-
-Cancellation is INCONCLUSIVE. A 0.0.132 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35. Do not broaden resolver/native/Harmony/Godot authority in this candidate.
+For physical testing, force-quit before Step 35 and after any run where Gate B began. Preserve all matching run-correlated telemetry. Cancellation is INCONCLUSIVE. A 0.0.133 A–D 4/4 result is **diagnostic completion only** and cannot close exact Step 35. Do not broaden resolver/native/Harmony/Godot authority in this candidate.

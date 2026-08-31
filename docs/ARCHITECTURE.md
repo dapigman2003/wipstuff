@@ -128,3 +128,7 @@ Physical 0.0.131 disproved the prior assumption that the first physically reache
 Step 35.0.9 / 0.0.132 therefore narrows instrumentation **inside the already-entered constructor**. It preserves all prior markers and wraps every original non-base `call`, `callvirt`, and `newobj` in `NullPlatformUtilStrategy..ctor` with ordered pre/post marker pairs. The base constructor is intentionally skipped so the diagnostic callback never runs while uninitialized `this` is held on the evaluation stack. The exact-source static map also includes the constructor's IL/CALLSITE ordinals so a physical marker can be mapped without reopening proprietary bytes. Any selected branch-target callsite fails instrumentation rather than silently changing coverage.
 
 This remains diagnostic-only. No Godot bootstrap, native game startup, resolver broadening, Harmony/MonoMod runtime patching or later initialization authority is introduced.
+
+## Step 35.0.10 command-line / Godot boundary localization
+
+Physical 0.0.132 placed the hard-kill interval inside the `CommandLineHelper.TryGetValue` invocation and exposed a +1 NP marker ordinal bug. Step 35.0.10 keeps exact-source/runtime authority unchanged but corrects ordinal accounting and instruments the original call-like instructions in `CommandLineHelper..cctor` and `TryGetValue` on the separately verified diagnostic clone. Exact-source maps are generated before CLR admission. The cctor diagnostic plan must include `Godot.OS.GetCmdlineArgs` or Gate A fails closed. This is localization architecture, not startup authorization.

@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.9 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.10 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -152,10 +152,32 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         ctorIl.Append(ctorIl.Create(OpCodes.Call, objectCtor));
         ctorIl.Append(ctorIl.Create(OpCodes.Ret));
 
-        var map = TransformedRealStS2VeryEarlyInitialization.BuildStaticInstructionMap(wrapper, moveNext, nullCtor);
+        var commandLineType = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "CommandLineHelper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+        module.Types.Add(commandLineType);
+        var commandLineCctor = new MethodDefinition(".cctor", Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+        commandLineType.Methods.Add(commandLineCctor);
+        var commandLineCctorIl = commandLineCctor.Body.GetILProcessor();
+        commandLineCctorIl.Append(commandLineCctorIl.Create(OpCodes.Call, awaitCall));
+        commandLineCctorIl.Append(commandLineCctorIl.Create(OpCodes.Ret));
+        var commandLineTryGetValue = new MethodDefinition("TryGetValue", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Boolean);
+        commandLineTryGetValue.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+        commandLineTryGetValue.Parameters.Add(new ParameterDefinition(new ByReferenceType(module.TypeSystem.String)));
+        commandLineType.Methods.Add(commandLineTryGetValue);
+        var commandLineTryGetValueIl = commandLineTryGetValue.Body.GetILProcessor();
+        commandLineTryGetValueIl.Append(commandLineTryGetValueIl.Create(OpCodes.Ldc_I4_0));
+        commandLineTryGetValueIl.Append(commandLineTryGetValueIl.Create(OpCodes.Ret));
+
+        var map = TransformedRealStS2VeryEarlyInitialization.BuildStaticInstructionMap(
+            wrapper,
+            moveNext,
+            nullCtor,
+            commandLineCctor,
+            commandLineTryGetValue);
 
         StringAssert.Contains(map, "[MOVENEXT IL]");
         StringAssert.Contains(map, "[NULL PLATFORM CTOR IL]");
+        StringAssert.Contains(map, "[COMMAND LINE HELPER CCTOR IL]");
+        StringAssert.Contains(map, "[COMMAND LINE HELPER TRYGETVALUE IL]");
         StringAssert.Contains(map, "CALLSITE#001");
         StringAssert.Contains(map, "AWAIT-CANDIDATE");
         StringAssert.Contains(map, "System.Runtime, Version=9.0.0.0");
@@ -324,6 +346,9 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             il.Append(il.Create(OpCodes.Call, ping));
             il.Append(il.Create(OpCodes.Ret));
 
+            // Reproduce production ordering: the entry checkpoint is injected before the callsite sweep.
+            // Physical 0.0.132 proved that counting this synthetic Emit call skewed every NP ordinal by +1.
+            InsertSyntheticEntryMarker(ctor, emit, "INMETHOD_024 — NullPlatformUtilStrategy..ctor entered");
             plan = TransformedRealStS2VeryEarlyInitialization.InsertNullPlatformConstructorCallsiteMarkers(ctor, emit);
             Assert.AreEqual(2, plan.Count);
             Assert.AreEqual(2, plan[0].CallsiteOrdinal);
@@ -341,6 +366,159 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             Assert.IsTrue(ctorAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.BeforeMarker)));
             Assert.IsTrue(ctorAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.AfterMarker)));
         }
+    }
+
+    [TestMethod]
+    public void DiagnosticCommandLineHelperSweepsIgnoreInjectedEntryBridgeAndRoundTripExactOrdinals()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-commandline-sweep");
+        var assemblyPath = Path.Combine(temp.Path, "CommandLineSweepFixture.dll");
+        IReadOnlyList<TransformedRealStS2VeryEarlyInitialization.DiagnosticCallsiteSweepEntry> cctorPlan;
+        IReadOnlyList<TransformedRealStS2VeryEarlyInitialization.DiagnosticCallsiteSweepEntry> tryGetValuePlan;
+
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("CommandLineSweepFixture", new Version(1, 0, 0, 0)),
+                   "CommandLineSweepFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var bridge = new TypeDefinition("StS2Launcher.Step35Diagnostics", "ExecuteVeryEarlyCheckpointBridge", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(bridge);
+            var emit = new MethodDefinition("Emit", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            emit.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+            emit.Body.GetILProcessor().Append(emit.Body.GetILProcessor().Create(OpCodes.Ret));
+            bridge.Methods.Add(emit);
+
+            var helper = new TypeDefinition("Fixture", "Helper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(helper);
+            var ping = new MethodDefinition("Ping", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+            ping.Body.GetILProcessor().Append(ping.Body.GetILProcessor().Create(OpCodes.Ret));
+            helper.Methods.Add(ping);
+
+            var godotSharp = new AssemblyNameReference("GodotSharp", new Version(4, 5, 1, 0));
+            module.AssemblyReferences.Add(godotSharp);
+            var godotOs = new TypeReference("Godot", "OS", module, godotSharp, false);
+            var getCmdlineArgs = new MethodReference("GetCmdlineArgs", new ArrayType(module.TypeSystem.String), godotOs)
+            {
+                HasThis = false,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+
+            var commandLine = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "CommandLineHelper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(commandLine);
+            var cctor = new MethodDefinition(".cctor", Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+            commandLine.Methods.Add(cctor);
+            var cctorIl = cctor.Body.GetILProcessor();
+            cctorIl.Append(cctorIl.Create(OpCodes.Call, ping));
+            cctorIl.Append(cctorIl.Create(OpCodes.Call, getCmdlineArgs));
+            cctorIl.Append(cctorIl.Create(OpCodes.Pop));
+            cctorIl.Append(cctorIl.Create(OpCodes.Ret));
+
+            var tryGetValue = new MethodDefinition("TryGetValue", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Boolean);
+            tryGetValue.Parameters.Add(new ParameterDefinition("key", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
+            tryGetValue.Parameters.Add(new ParameterDefinition("value", Mono.Cecil.ParameterAttributes.Out, new ByReferenceType(module.TypeSystem.String)));
+            commandLine.Methods.Add(tryGetValue);
+            var tryIl = tryGetValue.Body.GetILProcessor();
+            tryIl.Append(tryIl.Create(OpCodes.Call, ping));
+            tryIl.Append(tryIl.Create(OpCodes.Ldarg_1));
+            tryIl.Append(tryIl.Create(OpCodes.Ldnull));
+            tryIl.Append(tryIl.Create(OpCodes.Stind_Ref));
+            tryIl.Append(tryIl.Create(OpCodes.Ldc_I4_0));
+            tryIl.Append(tryIl.Create(OpCodes.Ret));
+
+            InsertSyntheticEntryMarker(cctor, emit, "INMETHOD_CCTOR — MegaCrit.Sts2.Core.Helpers.CommandLineHelper..cctor entered");
+            InsertSyntheticEntryMarker(tryGetValue, emit, "INMETHOD_027 — CommandLineHelper.TryGetValue entered");
+
+            cctorPlan = TransformedRealStS2VeryEarlyInitialization.InsertCommandLineHelperCctorCallsiteMarkers(cctor, emit);
+            tryGetValuePlan = TransformedRealStS2VeryEarlyInitialization.InsertCommandLineHelperTryGetValueCallsiteMarkers(tryGetValue, emit);
+
+            Assert.AreEqual(2, cctorPlan.Count);
+            Assert.AreEqual(1, cctorPlan[0].CallsiteOrdinal);
+            Assert.AreEqual(2, cctorPlan[1].CallsiteOrdinal);
+            StringAssert.Contains(cctorPlan[1].CalleeFullName, "Godot.OS::GetCmdlineArgs()");
+            Assert.AreEqual(1, tryGetValuePlan.Count);
+            Assert.AreEqual(1, tryGetValuePlan[0].CallsiteOrdinal);
+            assembly.Write(assemblyPath);
+        }
+
+        using var reopened = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var commandLineAfter = reopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTypeFullName);
+        var cctorAfter = commandLineAfter.Methods.Single(method => method.Name == ".cctor");
+        var tryGetValueAfter = commandLineAfter.Methods.Single(method => method.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTryGetValueFullName);
+        foreach (var entry in cctorPlan)
+        {
+            Assert.IsTrue(cctorAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.BeforeMarker)));
+            Assert.IsTrue(cctorAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.AfterMarker)));
+        }
+        foreach (var entry in tryGetValuePlan)
+        {
+            Assert.IsTrue(tryGetValueAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.BeforeMarker)));
+            Assert.IsTrue(tryGetValueAfter.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, entry.AfterMarker)));
+        }
+    }
+
+    [TestMethod]
+    public void DiagnosticCommandLineHelperSweepSkipsUnrelatedBranchTargetButPreservesExactOrdinals()
+    {
+        using var assembly = AssemblyDefinition.CreateAssembly(
+            new AssemblyNameDefinition("CommandLineBranchTargetFixture", new Version(1, 0, 0, 0)),
+            "CommandLineBranchTargetFixture",
+            ModuleKind.Dll);
+        var module = assembly.MainModule;
+
+        var bridge = new TypeDefinition("StS2Launcher.Step35Diagnostics", "ExecuteVeryEarlyCheckpointBridge", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+        module.Types.Add(bridge);
+        var emit = new MethodDefinition("Emit", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+        emit.Parameters.Add(new ParameterDefinition(module.TypeSystem.String));
+        emit.Body.GetILProcessor().Append(emit.Body.GetILProcessor().Create(OpCodes.Ret));
+        bridge.Methods.Add(emit);
+
+        var helper = new TypeDefinition("Fixture", "Helper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+        module.Types.Add(helper);
+        var ping = new MethodDefinition("Ping", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Void);
+        ping.Body.GetILProcessor().Append(ping.Body.GetILProcessor().Create(OpCodes.Ret));
+        helper.Methods.Add(ping);
+
+        var godotSharp = new AssemblyNameReference("GodotSharp", new Version(4, 5, 1, 0));
+        module.AssemblyReferences.Add(godotSharp);
+        var godotOs = new TypeReference("Godot", "OS", module, godotSharp, false);
+        var getCmdlineArgs = new MethodReference("GetCmdlineArgs", new ArrayType(module.TypeSystem.String), godotOs)
+        {
+            HasThis = false,
+            CallingConvention = MethodCallingConvention.Default,
+        };
+
+        var commandLine = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "CommandLineHelper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+        module.Types.Add(commandLine);
+        var cctor = new MethodDefinition(".cctor", Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+        commandLine.Methods.Add(cctor);
+        var il = cctor.Body.GetILProcessor();
+        var branchTargetCall = il.Create(OpCodes.Call, ping);
+        il.Append(il.Create(OpCodes.Br_S, branchTargetCall));
+        il.Append(il.Create(OpCodes.Nop));
+        il.Append(branchTargetCall);
+        il.Append(il.Create(OpCodes.Call, getCmdlineArgs));
+        il.Append(il.Create(OpCodes.Pop));
+        il.Append(il.Create(OpCodes.Ret));
+
+        InsertSyntheticEntryMarker(cctor, emit, "INMETHOD_CCTOR — MegaCrit.Sts2.Core.Helpers.CommandLineHelper..cctor entered");
+        var plan = TransformedRealStS2VeryEarlyInitialization.InsertCommandLineHelperCctorCallsiteMarkers(cctor, emit);
+
+        Assert.AreEqual(1, plan.Count);
+        Assert.AreEqual(2, plan[0].CallsiteOrdinal);
+        StringAssert.Contains(plan[0].CalleeFullName, "Godot.OS::GetCmdlineArgs()");
+        Assert.IsFalse(cctor.Body.Instructions.Any(instruction =>
+            instruction.OpCode.Code == Code.Ldstr &&
+            instruction.Operand is string marker &&
+            marker.StartsWith("INMETHOD_CL001_", StringComparison.Ordinal)));
+    }
+
+    private static void InsertSyntheticEntryMarker(MethodDefinition method, MethodReference emitReference, string marker)
+    {
+        var first = method.Body.Instructions[0];
+        var il = method.Body.GetILProcessor();
+        il.InsertBefore(first, Instruction.Create(OpCodes.Ldstr, marker));
+        il.InsertBefore(first, Instruction.Create(OpCodes.Call, emitReference));
     }
 
     private static RuntimeBindingPreparedAssembly CreatePlanEntry(string relative, AssemblyName identity, byte[] bytes, bool isPrimary)

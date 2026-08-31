@@ -1,62 +1,47 @@
-# Current Status — Step 35.0.9 Null-Platform Constructor Callsite Localization
+# Current status
 
-## Active candidate — Step 35.0.9 / 0.0.132 (132)
+## Active candidate — Step 35.0.10 / 0.0.133 (133)
 
-Steps 01–26 are closed; Step 27 is CLOSED NEGATIVE; Step 28 is CLOSED POSITIVE 5/5; Steps 29–34 are CLOSED POSITIVE 4/4. **Step 35 remains OPEN.**
+Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29, 30, 31, 32, 33 and 34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
-Physical 0.0.126 remains the authoritative **exact transformed-byte** Step-35 runtime frontier. It proved exact transformed `ExecuteVeryEarly()` admission/binding/invocation and a hard termination during the initial synchronous portion of `<ExecuteVeryEarly>d__7::MoveNext`, before `C_INVOKE_RETURNED` and before the first incomplete await. Exact source authority remains `ExecuteVeryEarly` token `0x06007D02`, async `MoveNext` token `0x0600BC71`, and closed Step-32 transformed SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`.
+The authoritative exact transformed Step-35 compatibility frontier remains physical **0.0.126**: exact `ExecuteVeryEarly()` entered `MethodInfo.Invoke` but no `C_INVOKE_RETURNED` was durably recorded. Diagnostic 0.0.127 and 0.0.128 failed in Gate A Cecil handling. 0.0.129 corrected deferred-open writer behavior but physically produced `MissingMethodException` from synthetic `Action<string>.Invoke(string)`. 0.0.130 corrected that MemberRef to `Action<string>::Invoke(!0)` and reached `SaveManager.get_Instance`. 0.0.131 reached `SaveManager.ConstructDefault`, `UserDataPathProvider.GetAccountScopedBasePath`, `PlatformUtil..cctor`, and `NullPlatformUtilStrategy..ctor`, but never `GodotFileIo..ctor`.
 
-Physical 0.0.127 and 0.0.128 failed normally during diagnostic-clone creation. Physical 0.0.129 failed normally with a managed `MissingMethodException`, exposing the malformed synthetic `Action<string>::Invoke(string)` MemberRef. Physical 0.0.130 corrected it to `Action<string>::Invoke(!0)` and localized the hard termination beneath `SaveManager.get_Instance` before either settings-init method.
+## Physical 0.0.132 finding
 
-## Physical 0.0.131 localization result
+The 0.0.132 Step 35.0.9 run established:
 
-Step 35.0.8 / 0.0.131 completed Gate A and Gate B, armed Gate C, and physically advanced the durable managed frontier. Same-run Run ID `20260830T1920262569650Z-pid4122-2714d6840a8c49ef91a759bd03de1834` established:
+- `ExecuteVeryEarly.MoveNext`, `TestMode.get_IsOn`, `SaveManager..cctor`, `SaveManager.get_Instance`, `SaveManager.ConstructDefault`, `UserDataPathProvider.GetAccountScopedBasePath`, `PlatformUtil..cctor`, and `NullPlatformUtilStrategy..ctor` all entered;
+- `INMETHOD_NP003_PRE` was durably emitted immediately before `System.Boolean MegaCrit.Sts2.Core.Helpers.CommandLineHelper::TryGetValue(System.String,System.String&)`;
+- no matching `INMETHOD_NP003_POST` appeared;
+- `INMETHOD_027` for the actual `TryGetValue` body did not exist in that candidate, so the hard-kill interval includes CLR type initialization triggered before the static method body can enter;
+- the last durable resolver event was `System.Collections.Concurrent, Version=8.0.0.0` binding to host 9.0.0.0. That is contextual evidence, not proof of causation.
 
-- exact transformed source still matched SHA-256 `39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef`;
-- the instrumented clone preserved identity/MVID and primary admission remained zero-resolution;
-- `INMETHOD_001` — `ExecuteVeryEarly.MoveNext` entered;
-- `INMETHOD_010` — `TestMode.get_IsOn` entered;
-- `SaveManager..cctor` entered;
-- `INMETHOD_020` — `SaveManager.get_Instance` entered;
-- `INMETHOD_021` — `SaveManager.ConstructDefault` entered;
-- the nested second `INMETHOD_010` appeared;
-- `INMETHOD_022` — `UserDataPathProvider.GetAccountScopedBasePath` entered;
-- `PlatformUtil..cctor` entered;
-- `System.Text.Json 9.0.0.0` bound to the host;
-- `INMETHOD_024` — `NullPlatformUtilStrategy..ctor` entered;
-- the last durable event was the planned `System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0` binding;
-- `INMETHOD_025` — `GodotFileIo..ctor(string)` never appeared;
-- neither `INMETHOD_180` nor any later `Godot.DirAccess` pre/post marker appeared;
-- no matching `.ips` is available.
+The same-run exact-source `[NULL PLATFORM CTOR IL]` map labels the base constructor `CALLSITE#001` and `CommandLineHelper.TryGetValue` **`CALLSITE#002`**. Runtime called the latter `NP003`, physically proving the +1 marker defect: the entry-marker bridge `Emit` call was inserted before the sweep and incorrectly consumed an ordinal.
 
-Therefore the physical frontier is **inside work executed by `NullPlatformUtilStrategy..ctor()` after its entry marker and before `GodotFileIo..ctor(string)` begins**. The final resolver event is still a frontier/context marker, not attributed root cause.
+Static inspection of the supplied matching managed assemblies shows `TryGetValue` is a thin dictionary lookup but its type initializer runs first and calls `Godot.OS.GetCmdlineArgs()`. That makes the Godot command-line wrapper/native callback boundary the leading hypothesis; 0.0.133 is designed to prove or disprove it physically rather than treating that inference as closure evidence.
 
-This result falsifies the prior first-`DirExistsAbsolute` hypothesis at the level tested by 0.0.131: execution never reached `GodotFileIo` at all.
+## Step 35.0.10 / 0.0.133 change
 
-## Step 35.0.9 / 0.0.132 change
+0.0.133 preserves every exact-source, writer-only resolver, runtime resolver, timeout, fresh-process, native and later-boundary prohibition from 0.0.132. It changes only output-only diagnostic instrumentation:
 
-0.0.132 preserves every exact-source, writer-only resolver, runtime resolver, timeout, fresh-process, native and later-boundary prohibition from 0.0.131. It preserves all prior entry/Godot callsite markers and adds only an ordered callsite sweep inside the exact managed `NullPlatformUtilStrategy..ctor()` body:
+- fix NullPlatform callsite accounting so injected bridge calls are ignored **before** exact-source ordinal counting;
+- keep the direct base constructor in ordinal accounting but do not wrap it;
+- add `INMETHOD_027 — CommandLineHelper.TryGetValue entered`;
+- keep the automatic `INMETHOD_CCTOR — MegaCrit.Sts2.Core.Helpers.CommandLineHelper..cctor entered` marker;
+- add `INMETHOD_CLxxx_PRE/POST` around eligible original `call`/`callvirt`/`newobj` instructions in `CommandLineHelper..cctor`;
+- require the CL plan to contain the `Godot.OS.GetCmdlineArgs` call, otherwise Gate A fails closed before CLR admission;
+- add `INMETHOD_CLTVxxx_PRE/POST` around eligible original call-like instructions in `CommandLineHelper.TryGetValue`;
+- for the new CommandLine sweeps, unrelated branch-target callsites may be skipped rather than aborting Gate A, but their exact-source ordinals are still consumed so later marker numbers remain aligned with the static map; the required `Godot.OS.GetCmdlineArgs` call may not be skipped;
+- extend the same-run exact-source map with `[COMMAND LINE HELPER CCTOR IL]` and `[COMMAND LINE HELPER TRYGETVALUE IL]` sections;
+- reproduce the real production ordering in host regressions so the physical 0.0.132 +1 bug cannot recur silently.
 
-- enumerate the constructor's original `call`, `callvirt`, and `newobj` instructions without Cecil `Resolve`;
-- intentionally do **not** wrap the direct base-constructor call, so the diagnostic callback never runs while an uninitialized `this` value is sitting on the evaluation stack;
-- wrap every other existing call-like instruction with a unique `INMETHOD_NPxxx_PRE` / `INMETHOD_NPxxx_POST` pair;
-- preserve the constructor's original CALLSITE ordinal in each marker;
-- refuse instrumentation if a selected callsite is itself a branch target;
-- reopen the serialized clone under rejecting resolution and require every planned pair immediately around the same opcode/callee;
-- require total serialized `INMETHOD_*` marker count to match the computed plan;
-- immediately re-hash the exact transformed source unchanged.
+The exact Step-35 source target remains `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()`, source token `0x06007D02`, state-machine MoveNext token `0x0600BC71`. Gate B/C still execute only a separately verified diagnostic clone; exact Step-32 transformed bytes remain outside the CLR during the diagnostic run.
 
-The same-run static map is also extended with `[NULL PLATFORM CTOR IL]`, including the exact constructor token/IL and `CALLSITE#xxx` ordinals. This makes the next physical evidence self-describing without requiring a later re-analysis of proprietary game bytes.
+## How to read the next physical run
 
-The synthetic Cecil regression for `Action<string>::Invoke(!0)` remains. The existing selected Godot pre/post round-trip test remains. A new synthetic serialize/reopen regression exercises the NullPlatform constructor sweep across `newobj` and `call`, while proving the direct base constructor is not wrapped.
+- `INMETHOD_CCTOR` followed by `INMETHOD_CLxxx_PRE` with no matching POST identifies the exact cctor outgoing call that did not return. If its callee is `Godot.OS.GetCmdlineArgs`, the Godot command-line boundary is physically established.
+- matching CL PRE/POST through cctor completion followed by `INMETHOD_027` proves type initialization returned and the actual `TryGetValue` body entered.
+- `INMETHOD_CLTVxxx_PRE` without matching POST then localizes inside the actual method-body call.
+- a managed Gate C failure is evidence; a hard kill is correlated by Run ID/PID through the durable journal and static map.
 
-## Decision rule for the next physical run
-
-Use the final durable `INMETHOD_NPxxx_PRE/POST` pair together with the same-run `[NULL PLATFORM CTOR IL]` section:
-
-- `PRE` without matching `POST`: the physical frontier is inside/at that exact outgoing call/newobj;
-- matching `POST` followed by the next `PRE`: the prior call returned normally; continue to the next ordinal;
-- constructor entry with **no** `INMETHOD_NPxxx_PRE`: the failure is between constructor entry/base construction and the first swept outgoing call, requiring a narrower non-call IL experiment rather than resolver/startup broadening;
-- if `INMETHOD_025` appears, the constructor completed far enough to begin `GodotFileIo`, so resume interpretation using the preserved downstream markers.
-
-Even if 0.0.132 reaches Gate D and reports 4/4, that is **Step 35.0.9 diagnostic localization complete — NOT Step 35 closure**. Godot/game startup, native game loading, initializer-bearing `0Harmony`, arbitrary managed fallback, later `OneTimeInitialization` phases, the game entry point, and Harmony/MonoMod runtime patching remain forbidden.
+Even if 0.0.133 reaches Gate D and reports 4/4, that is **Step 35.0.10 diagnostic localization complete — NOT Step 35 closure**. Godot/game startup, native game loading, initializer-bearing `0Harmony`, arbitrary managed fallback, later `OneTimeInitialization` phases, the game entry point, and Harmony/MonoMod runtime patching remain forbidden.

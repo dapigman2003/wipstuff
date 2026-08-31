@@ -29,3 +29,5 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-35.0.3-PHYSICAL-SAME-RUN-CORRELATION-AND-INVOKE-FRONTIER.txt` — sanitized physical 0.0.126 same-run telemetry result and final resolver marker.
 - `STEP-35.0.7-PHYSICAL-SAVEMANAGER-LOCALIZATION-0.0.130.txt` — physical 0.0.130 proves the corrected diagnostic bridge and localizes below `SaveManager.get_Instance`.
 - `STEP-35.0.8-PHYSICAL-NULLPLATFORM-CONSTRUCTOR-LOCALIZATION-0.0.131.txt` — physical 0.0.131 advances to `NullPlatformUtilStrategy..ctor` and proves `GodotFileIo..ctor` was not reached.
+
+- `STEP-35.0.9-PHYSICAL-COMMANDLINE-BOUNDARY-AND-ORDINAL-DEFECT-0.0.132.txt` — run-correlated physical 0.0.132 evidence localizing at CommandLineHelper.TryGetValue and proving the NP +1 ordinal defect.

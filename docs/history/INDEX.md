@@ -211,3 +211,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-35.0.8-SAVE-PLATFORM-GODOT-NATIVE-BOUNDARY-LOCALIZATION.md` — 0.0.131 diagnostic-only design: instrument the verified Save/Platform/Godot path and add pre/post markers around `DirAccess.DirExistsAbsolute` and `MakeDirRecursiveAbsolute`, with serialized adjacency verification and no Godot-startup authority expansion.
 - `reports/STEP-35.0.8-PHYSICAL-NULLPLATFORM-CONSTRUCTOR-LOCALIZATION-0.0.131.txt` — physical 0.0.131 reaches `NullPlatformUtilStrategy..ctor` and hard-terminates before `GodotFileIo..ctor`; final resolver record remains context only.
 - `steps/STEP-35.0.9-NULLPLATFORM-CONSTRUCTOR-CALLSITE-LOCALIZATION.md` — 0.0.132 diagnostic-only design: preserve all authority and sweep the constructor's existing non-base call/callvirt/newobj instructions with ordered pre/post markers plus exact constructor CALLSITE mapping.
+
+- `reports/STEP-35.0.9-PHYSICAL-COMMANDLINE-BOUNDARY-AND-ORDINAL-DEFECT-0.0.132.txt` — physical 0.0.132 TryGetValue boundary plus +1 NP ordinal defect.
+- `steps/STEP-35.0.10-COMMANDLINE-GODOT-BOUNDARY-LOCALIZATION.md` — 0.0.133 corrected-ordinal and CommandLine/Godot localization design.

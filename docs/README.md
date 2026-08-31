@@ -1,17 +1,7 @@
-# Documentation — Step 35.0.9 / 0.0.132
+# Documentation map
 
-Read `CURRENT-STATUS.md` first for the current authority/evidence boundary and `TESTING.md` before producing or interpreting a physical build.
+Current candidate: **Step 35.0.10 / 0.0.133 (133)**. Step 35 remains OPEN.
 
-Physical 0.0.131 proves execution enters `NullPlatformUtilStrategy..ctor` but does not reach `GodotFileIo..ctor`. 0.0.132 therefore localizes only inside that constructor by adding ordered pre/post markers around its existing non-base call-like instructions and by extending the same-run static map with the constructor IL/CALLSITE ordinals.
+Use `CURRENT-STATUS.md` for the latest physical frontier, `REGRESSION-CONTRACTS.md` for non-negotiable implementation constraints, `TESTING.md` for host/device procedure, `RELEASE-CHECKLIST.md` for packaging, and `MASTER-PLAN.md` for the durable roadmap. Historical immutable design and physical evidence live under `history/`.
 
-Do not revive previously closed-negative runtime patching, do not restore Immediate Cecil open before writer configuration, do not use source MethodDef tokens as post-write locators, and do not broaden Godot/native/resolver authority to make a diagnostic build pass.
-
-Key documents:
-
-- `CURRENT-STATUS.md` — authoritative current frontier and active candidate;
-- `ARCHITECTURE.md` — durable architecture and historical boundary decisions;
-- `REGRESSION-CONTRACTS.md` — implementation constraints that must survive revisions;
-- `TESTING.md` — host/static and physical-device procedure;
-- `REPORTS.md` — run-correlated evidence interpretation;
-- `RELEASE-CHECKLIST.md` — packaging/release identity checks;
-- `history/` — immutable step designs and physical-result records.
+The latest physical result is 0.0.132: `NullPlatformUtilStrategy..ctor` entered, emitted `INMETHOD_NP003_PRE` for `CommandLineHelper.TryGetValue`, then hard-terminated. The exact-source map labels the same call `CALLSITE#002`; 0.0.133 repairs that mapping and localizes `CommandLineHelper..cctor`, including the `Godot.OS.GetCmdlineArgs` boundary.

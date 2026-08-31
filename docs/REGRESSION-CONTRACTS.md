@@ -412,3 +412,16 @@ Required invariants:
 - no Godot bootstrap/startup, native game loading, later OneTimeInitialization phase, game entry point, initializer-bearing dependency admission, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
 - the final `System.Collections.Concurrent` resolver record may be preserved as frontier context but cannot be promoted to root cause merely because it is last;
 - a 0.0.132 4/4 result is diagnostic completion only and **NOT Step-35 closure**.
+
+## Step 35.0.10 — corrected ordinals and CommandLine localization
+
+- Physical 0.0.132 proved `INMETHOD_NP003_PRE` corresponded to exact-source `CALLSITE#002`; injected bridge calls must be excluded **before** ordinal accounting.
+- NullPlatform's direct base `.ctor` remains unwrapped but still consumes exact-source CALLSITE#001.
+- Production ordering is entry marker first, sweep second; a host regression must reproduce that ordering.
+- `CommandLineHelper.TryGetValue` has `INMETHOD_027`; its type initializer has the existing `INMETHOD_CCTOR` entry marker.
+- `CommandLineHelper..cctor` uses ordered `INMETHOD_CLxxx_PRE/POST`; `TryGetValue` uses `INMETHOD_CLTVxxx_PRE/POST`.
+- Same-run exact-source output includes `[COMMAND LINE HELPER CCTOR IL]` and `[COMMAND LINE HELPER TRYGETVALUE IL]`.
+- The cctor plan must contain `Godot.OS.GetCmdlineArgs`; otherwise Gate A fails before CLR admission.
+- New CommandLine sweeps may skip unrelated branch-target callsites, but skipped calls still consume exact-source ordinals; the required Godot call cannot be silently skipped.
+- Exact Step-32 transformed source, resolver/native prohibitions, one-invocation rule, 60-second await, fresh-process rule, and no-Godot-bootstrap contract remain unchanged.
+- Diagnostic 4/4 is not exact Step-35 closure.
