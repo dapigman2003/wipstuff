@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.11 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.12 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -584,7 +584,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         {
             var cctorAfter = reopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTypeFullName)
                 .Methods.Single(method => method.Name == ".cctor");
-            Assert.AreEqual(4, cctorAfter.Body.MaxStackSize);
+            Assert.IsTrue(cctorAfter.Body.MaxStackSize >= 4, $"Serialized MaxStack {cctorAfter.Body.MaxStackSize} must preserve at least the four slots required by the rewritten cctor.");
         }
 
         var loadContext = new AssemblyLoadContext("Step35-MaxStack-Executable-Regression", isCollectible: true);

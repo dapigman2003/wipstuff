@@ -1,6 +1,6 @@
 # Current status
 
-## Active candidate — Step 35.0.11 / 0.0.134 (134)
+## Active candidate — Step 35.0.12 / 0.0.135 (135)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29, 30, 31, 32, 33 and 34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
@@ -21,7 +21,9 @@ The 0.0.132 Step 35.0.9 run established:
 
 Static inspection of the supplied matching `sts2.dll` shows `TryGetValue` is a thin dictionary lookup but triggers `CommandLineHelper..cctor` first. The cctor begins by constructing the `_args` Godot dictionary and then calls `Godot.OS.GetCmdlineArgs()`.
 
-## Physical 0.0.133 diagnostic result
+## 0.0.134 was stopped before physical testing: its host suite was 205/206 because the new MaxStack regression incorrectly required Cecil's serialized MaxStack to equal 4 rather than be at least the required minimum. 0.0.135 fixes only that test contract while retaining the executable CLR check.
+
+Physical 0.0.133 diagnostic result
 
 0.0.133 Step 35.0.10 corrected the NP runtime marker to `INMETHOD_NP002_PRE`, matching exact-source CALLSITE#002. It then behaved differently from 0.0.132:
 
@@ -34,9 +36,9 @@ Static inspection of the supplied matching `sts2.dll` shows `TryGetValue` is a t
 
 This is **CLOSED DIAGNOSTIC NEGATIVE — instrumentation defect**. It does not advance or retreat the physical game frontier from 0.0.132. The generic cctor callsite sweep placed `ldstr; call Emit` around original calls while original arguments/results could remain live, raising transient stack depth by one without increasing the serialized method `MaxStack` header. Cecil write/reopen tests did not execute the rewritten method and therefore missed the invalid IL header.
 
-## Step 35.0.11 / 0.0.134 change
+## Step 35.0.12 / 0.0.135 change
 
-0.0.134 preserves every exact-source, writer-only resolver, runtime resolver, timeout, fresh-process, native and later-boundary prohibition from 0.0.133. It changes only output-only diagnostic instrumentation and verification:
+0.0.135 preserves every exact-source, writer-only resolver, runtime resolver, timeout, fresh-process, native and later-boundary prohibition from 0.0.133. It changes only output-only diagnostic instrumentation and verification:
 
 - corrected NullPlatform ordinal accounting remains;
 - every generic live-stack PRE/POST sweep reserves one additional `MaxStack` slot;
@@ -62,4 +64,4 @@ The redundant critical markers are the primary high-value evidence:
 - cctor completion followed by `INMETHOD_027`: type initialization returned and the actual `TryGetValue` body entered;
 - `INMETHOD_CLTVxxx_PRE` without POST: localizes inside the thin method-body dictionary lookup.
 
-Even if 0.0.134 reaches Gate D and reports 4/4, that is **Step 35.0.11 diagnostic localization complete — NOT Step 35 closure**. Godot/game startup, native game loading, initializer-bearing `0Harmony`, arbitrary managed fallback, later `OneTimeInitialization` phases, the game entry point, and Harmony/MonoMod runtime patching remain forbidden.
+Even if 0.0.135 reaches Gate D and reports 4/4, that is **Step 35.0.12 diagnostic localization complete — NOT Step 35 closure**. Godot/game startup, native game loading, initializer-bearing `0Harmony`, arbitrary managed fallback, later `OneTimeInitialization` phases, the game entry point, and Harmony/MonoMod runtime patching remain forbidden.

@@ -413,7 +413,7 @@ Required invariants:
 - the final `System.Collections.Concurrent` resolver record may be preserved as frontier context but cannot be promoted to root cause merely because it is last;
 - a 0.0.132 4/4 result is diagnostic completion only and **NOT Step-35 closure**.
 
-## Step 35.0.11 — corrected ordinals, MaxStack safety, and CommandLine localization
+## Step 35.0.12 — corrected ordinals, MaxStack safety, and CommandLine localization
 
 - Physical 0.0.132 proved `INMETHOD_NP003_PRE` corresponded to exact-source `CALLSITE#002`; injected bridge calls must be excluded **before** ordinal accounting.
 - NullPlatform's direct base `.ctor` remains unwrapped but still consumes exact-source CALLSITE#001.

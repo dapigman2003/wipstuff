@@ -1,0 +1,7 @@
+StS2 Launcher — Step 35.0.11 / 0.0.134 host regression contract failure
+
+Status: CLOSED DIAGNOSTIC BUILD-TIME NEGATIVE — do not spend a physical device run on this candidate.
+
+The canonical static validator passed 816/816, but the host regression suite reported 205 PASS / 1 FAIL. The only failing test was DiagnosticCallsiteSweepRaisesMaxStackAndClrExecutesTightRewrittenCctor. The rewritten fixture required a minimum MaxStack of 4, while Cecil serialization conservatively emitted MaxStack 8. The test incorrectly required exact equality to 4 even though the safety contract is that the serialized MaxStack must be at least the required minimum and the rewritten cctor must CLR-load/execute.
+
+Step 35.0.12 / 0.0.135 changes only that host-test contract: retain the executable CLR regression and require serialized MaxStack >= 4. Runtime instrumentation, exact transformed authority, resolver policy, stack-neutral critical markers, and all Step-35 prohibitions remain unchanged from the intended 0.0.134 diagnostic design.
