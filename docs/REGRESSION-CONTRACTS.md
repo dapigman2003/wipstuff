@@ -425,3 +425,21 @@ Required invariants:
 - Host coverage must include `ComprehensiveGodotSharpDiagnosticCloneUsesEntryOnlyMarkersAndPreservesIdentity`; Codemagic may not proceed to the iOS workload/build unless the complete host suite passes.
 - Exact Step-32 transformed source, resolver/native prohibitions, initializer-bearing refusal, one-invocation rule, 60-second await, fresh-process rule, and no-Godot-bootstrap contract remain unchanged.
 - Diagnostic 4/4 is not exact Step-35 closure.
+
+## Step 35.0.16 — callback-boundary controls + bounded managed command-line forward substitution
+
+Historical 0.0.138 physical behavior is preserved as evidence, not as a requirement that every later diagnostic must die at the same location.
+
+Current regressions require:
+
+- NATURAL preserves the original `Godot.Collections.Dictionary<string,string>` contract and exactly one natural `Godot.OS.GetCmdlineArgs()` call;
+- OS-RECON rewrites exactly `_args`, Dictionary `.ctor`, `set_Item`, and `TryGetValue` to the existing `System.Collections.Generic.Dictionary<string,string>` contract with correct generic VAR signatures and exactly one natural `Godot.OS.GetCmdlineArgs()` call;
+- FORWARD first satisfies the same four-reference Dictionary contract, then replaces exactly one natural `Godot.OS.GetCmdlineArgs()` call with the local diagnostic provider;
+- FORWARD serialized verification requires zero natural GetCmdlineArgs calls, exactly one local provider call, and a provider body equivalent to `ldc.i4.0; newarr System.String; ret`;
+- the provider rewrite may not add a new framework/private/native AssemblyRef and may not change CommandLine cctor MaxStack;
+- every serialized GodotSharp `INMETHOD_GS...` entry marker calls `GodotSharpCheckpointBridge.Emit`, not the sts2 bridge;
+- GodotSharp marker/recon closure includes `Godot.OS::.cctor()` and follows its local StringName/ClassDB/NativeFuncs boundary far enough to distinguish the 0.0.138 pre-GetCmdlineArgs failure;
+- native loading/bootstrap remains forbidden and output-only reconnaissance remains non-authorizing;
+- exact Step-32 transformed bytes remain untouched and diagnostic 4/4 remains non-closure evidence.
+
+The old rule that COMPAT must always retain natural GetCmdlineArgs remains valid specifically for OS-RECON, not for the new FORWARD mode.

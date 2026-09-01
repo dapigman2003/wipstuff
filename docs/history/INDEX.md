@@ -228,3 +228,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-35.0.14-COMPREHENSIVE-GODOT-NATIVE-RECONNAISSANCE.md` — comprehensive NATURAL/COMPAT design introduced for 0.0.137.
 - `reports/STEP-35.0.14-CODEMAGIC-HOST-REGRESSION-FAILURE-0.0.137.txt` — 0.0.137 static validation passed but Codemagic stopped at 208/209 host tests due to the derivative bridge-verifier mismatch; no IPA/device evidence.
 - `steps/STEP-35.0.15-GODOTSHARP-BRIDGE-VERIFIER-CORRECTION.md` — 0.0.138 derivative-specific entry-marker verification fix and active documentation/release cleanup.
+
+## Step 35.0.15 physical callback-boundary result / Step 35.0.16 forward probe
+
+- `reports/STEP-35.0.15-PHYSICAL-NATURAL-COMPAT-CALLBACK-BOUNDARIES-0.0.138.txt` — physical 0.0.138 NATURAL/COMPAT evidence: NATURAL reaches the Godot dictionary NativeFuncs callback thunk and stops after GS014; COMPAT physically proves the BCL dictionary substitution, then enters `Godot.OS::.cctor()` as GS033 before GS032 `GetCmdlineArgs`.
+- `steps/STEP-35.0.16-GODOT-CALLBACK-BOUNDARY-AND-MANAGED-COMMANDLINE-FORWARD-PROBE.md` — 0.0.139 three-mode diagnostic: retain NATURAL, deepen natural-OS cctor reconnaissance, and add exactly one local empty-args provider substitution on top of the proven four-reference managed Dictionary rewrite without Godot bootstrap/native loading.

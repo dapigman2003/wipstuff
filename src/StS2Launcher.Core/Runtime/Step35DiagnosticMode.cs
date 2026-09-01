@@ -1,14 +1,17 @@
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Both modes are diagnostic derivatives and can never close exact Step 35.
-/// NaturalGodotDictionaryRecon preserves the original CommandLineHelper Godot dictionary so the
-/// instrumented GodotSharp clone can localize the physically proven constructor failure.
-/// ManagedDictionaryCompatibility retains the bounded dictionary substitution introduced in the 0.0.137 pre-device candidate and carried into 0.0.138 so the same
-/// app build can advance to the next Godot boundary after a fresh-process relaunch.
+/// All modes are diagnostic derivatives and can never close exact Step 35.
+/// NaturalGodotDictionaryRecon preserves the original Godot dictionary/native path as the 0.0.138 control.
+/// ManagedDictionaryCompatibility keeps the proven four-reference BCL dictionary substitution while leaving
+/// Godot.OS.GetCmdlineArgs natural; 0.0.138 physically reached Godot.OS..cctor in this mode.
+/// ManagedCommandLineCompatibility adds one bounded substitution for that already-localized command-line
+/// provider and returns an empty managed string array, allowing the next non-Godot startup frontier to be measured
+/// without manufacturing Godot native callback state.
 /// </summary>
 public enum Step35DiagnosticMode
 {
     NaturalGodotDictionaryRecon = 0,
     ManagedDictionaryCompatibility = 1,
+    ManagedCommandLineCompatibility = 2,
 }

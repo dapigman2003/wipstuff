@@ -1,47 +1,68 @@
 # Current status
 
-## Active candidate — Step 35.0.15 / 0.0.138 (138)
+## Active candidate — Step 35.0.16 / 0.0.139 (139)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
-The authoritative exact transformed Step-35 compatibility frontier remains physical **0.0.126**: exact `ExecuteVeryEarly()` entered `MethodInfo.Invoke`, but no `C_INVOKE_RETURNED` was durably recorded. Later Step-35 builds are diagnostic derivatives unless a new exact-byte closure contract explicitly says otherwise.
+The authoritative exact-transformed Step-35 execution frontier remains physical **0.0.126**: exact `ExecuteVeryEarly()` entered `MethodInfo.Invoke`, but no `C_INVOKE_RETURNED` was durably recorded. All later Step-35 binaries are diagnostic derivatives unless a separately defined closure candidate restores explicit exact-byte execution authority.
 
-## Physical localization history
+## Physical localization through 0.0.136
 
-- **0.0.129:** deferred Cecil writing worked, but the synthetic bridge encoded `Action<string>.Invoke(string)` and failed normally. 0.0.130 corrected it to `Action<string>::Invoke(!0)`.
-- **0.0.130–0.0.131:** durable markers advanced through `SaveManager`, `UserDataPathProvider`, `PlatformUtil..cctor`, and `NullPlatformUtilStrategy..ctor`.
-- **0.0.132:** `INMETHOD_NP003_PRE` appeared before `CommandLineHelper.TryGetValue`; the exact-source map proved a +1 diagnostic ordinal defect and identified the physical interval as work triggered by `TryGetValue`.
-- **0.0.133:** corrected NP002, but live-stack CommandLine instrumentation produced managed `InvalidProgramException` before cctor instruction zero and reached normal `RUN_END`.
-- **0.0.135:** verified MaxStack headroom reproduced the same pre-zero `InvalidProgramException`, disproving MaxStack-only causation.
-- **0.0.136:** with all live-stack CL/CLTV callbacks removed, `CommandLineHelper..cctor` finally executed. The last in-method checkpoint was `INMETHOD_CL_CRITICAL_001_PRE` before `_args` construction. No POST, `CL_CRITICAL_002_PRE`, `INMETHOD_027`, `NP002_POST`, or `C_INVOKE_RETURNED` followed. The exact-source map identifies the instruction as `Godot.Collections.Dictionary<string,string>::.ctor()`. The final planned `System.Collections.Concurrent 8 -> 9` bind is context only; the PRE/no-POST pair is the localization evidence.
+- 0.0.129 isolated and corrected the synthetic `Action<string>` MemberRef issue; 0.0.130 established `Action<string>::Invoke(!0)` as the bridge contract.
+- 0.0.130–0.0.132 advanced through SaveManager/UserDataPathProvider/Platform/NullPlatform and into work triggered by `CommandLineHelper.TryGetValue`.
+- 0.0.133 and 0.0.135 proved live-stack CL/CLTV callsite sweeps could make the CommandLine cctor invalid before instruction zero; those probes remain retired.
+- 0.0.136 used only stack-neutral critical markers. It entered `CommandLineHelper..cctor`, emitted `CL_CRITICAL_001_PRE`, and terminated before the matching POST. The exact-source map localized that interval to `Godot.Collections.Dictionary<string,string>` construction before `_args` assignment.
 
-## 0.0.137 Codemagic result — pre-device failure
+## 0.0.137 Codemagic result
 
-0.0.137 never produced physical-run evidence. Its Codemagic artifact shows static validation PASS followed by **208/209 host tests passing**. The only failing test was `ComprehensiveGodotSharpDiagnosticCloneUsesEntryOnlyMarkersAndPreservesIdentity`.
+0.0.137 was a pre-device failure: static validation passed, host tests were **208/209**, and the sole failure was the GodotSharp derivative verifier checking the sts2 bridge type. No IPA/device evidence was produced. 0.0.138 corrected that verifier boundary without changing the intended runtime experiment.
 
-The failure was a verifier-only bridge mismatch. GodotSharp marker insertion correctly calls `StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge.Emit`, but the shared `HasInjectedEntryMarkerAtStart` verifier hard-coded `StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge`. The resulting exception said the serialized `INMETHOD_GS001` marker was not first in `Godot.Collections.Dictionary`2::.ctor()` even though the check was actually rejecting the bridge type. Because `scripts/codemagic.sh` runs host tests before workload install/iOS build, the pipeline stopped before IPA construction.
+## Physical 0.0.138 NATURAL/COMPAT result
 
-The supplied owner game files used to prepare 0.0.138 are consistent with the existing source authority: `sts2.dll` SHA-256 is `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, exactly the closed Step-32 source pin. The supplied `GodotSharp.dll` SHA-256 is `0e4897ecdfb31456a97c7d8028dfb8d7dbdc632e2f73fc9b438d7b266a139289`; this is recorded as observed input evidence, not promoted to a new global hard-coded authority.
+Two separate fresh-process runs were captured on 2026-09-01.
 
-## Step 35.0.15 / 0.0.138
+### NATURAL — `NaturalGodotDictionaryRecon`
 
-0.0.138 preserves the 0.0.137 comprehensive experiment and makes one functional correction: entry-marker verification now accepts the expected bridge type explicitly, and the GodotSharp derivative verification passes `GodotSharpDiagnosticBridgeTypeFullName`. The sts2 derivative continues to use the existing sts2 bridge default. No resolver, transform, invocation, native, or startup authority is broadened.
+Run ID `20260901T2040125125330Z-pid23845-5d0e9577b6624eada7d215301f748dda` advanced:
 
-Gate A still recreates and verifies the exact closed Step-32 transformed image, writes the exact-source static map, and keeps the exact source outside the CLR. It additionally performs **read-only reconnaissance** over the exact OfflineReady managed depot:
+`CommandLineHelper..cctor` → `CL_CRITICAL_001_PRE` → Godot generic Dictionary cctor/ctor → non-generic Godot Dictionary ctor → `NativeFuncs::godotsharp_dictionary_new()` → `NativeFuncs::godotsharp_dictionary_new(godot_dictionary&)` → `CustomUnsafe::AsPointer(godot_dictionary&)` (`GS014`), then hard termination.
 
-- GodotSharp assembly refs and selected critical/local IL;
-- GodotSharp P/Invoke declarations and `calli` sites;
-- `NativeFuncs` / `UnmanagedCallbacks` field-use sites;
-- native/Mach-O candidates under the managed depot, including architecture, linked dylibs, rpaths, bounded interesting symbols, and bounded printable strings relevant to Godot/.NET/native bootstrap;
-- no native binary is loaded or executed by reconnaissance.
+`CL_CRITICAL_001_POST` did not appear. This refines the 0.0.136 outer constructor interval into the GodotSharp native dictionary thunk.
 
-Gate A also emits a separate `GodotSharp.step35.0.15.instrumented.dll` derivative with same identity/MVID and **entry-only** markers in the bounded Dictionary/OS/NativeCalls/NativeFuncs call graph. Entry-only instrumentation is deliberate: the live-stack CL/CLTV sweep family remains retired after 0.0.133/0.0.135.
+### COMPAT — `ManagedDictionaryCompatibility`
 
-The same app offers two modes, each requiring a separate fresh process:
+Run ID `20260901T2041218794300Z-pid23901-efa52409cc044c019abd9968690909aa` emitted:
 
-- **NATURAL — `NaturalGodotDictionaryRecon`:** preserves the original `Godot.Collections.Dictionary<string,string>` contract in `CommandLineHelper`. Its purpose is to let the instrumented GodotSharp derivative emit inner method-entry evidence before the physically proven constructor hard-kill.
-- **COMPAT — `ManagedDictionaryCompatibility`:** applies exactly the bounded `_args` field / constructor / `set_Item` / `TryGetValue` substitution to `System.Collections.Generic.Dictionary<string,string>`. `Godot.OS.GetCmdlineArgs()` remains natural, allowing the same IPA to advance to that boundary if the dictionary bypass succeeds.
+`CL_CRITICAL_001_PRE` → `CL_CRITICAL_001_POST` → `CL_CRITICAL_002_PRE` → `INMETHOD_GS033 — Godot.OS::.cctor()`, then hard termination.
 
-For both modes, the prepared original GodotSharp is re-hashed before the diagnostic derivative is selected; the derivative is separately hash-pinned, preserves planned identity/MVID, and its callback bridge is armed before the resolver returns it. Runtime resolver authority is unchanged: exact planned host bindings and hash-pinned initializer-free private dependencies only. The known initializer-bearing `0Harmony 2.4.2.0` stays forbidden. Native load requests still fail closed. No Godot/game startup, entry-point execution, later OneTimeInitialization phase, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is authorized.
+`INMETHOD_GS032 — Godot.OS::GetCmdlineArgs()` and `CL_CRITICAL_002_POST` did not appear. Therefore the exact four-reference BCL Dictionary rewrite physically works and moves the frontier past the 0.0.136/NATURAL dictionary failure, while the next natural failure is **inside `Godot.OS` type initialization before GetCmdlineArgs body entry**.
 
-The exact Step-35 target remains `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()`, source token `0x06007D02`, async MoveNext source token `0x0600BC71`. A 0.0.138 diagnostic 4/4 from either mode remains **NOT Step-35 closure**.
+## Native callback interpretation
+
+The read-only 0.0.138 GodotSharp map shows:
+
+- the dictionary native thunk reads `NativeFuncs._unmanagedCallbacks.godotsharp_dictionary_new` and invokes it via `calli`;
+- `Godot.OS::.cctor()` begins with `StringName` creation and repeated `ClassDB_get_method_with_compatibility` method-bind initialization;
+- StringName construction and method-bind lookup likewise use function pointers stored under `NativeFuncs._unmanagedCallbacks`;
+- `NativeFuncs.Initialize(IntPtr,int)` sets its initialized flag and copies the supplied unmanaged callback struct into `_unmanagedCallbacks`;
+- the `GS021` marker for `NativeFuncs.Initialize` was not observed in the physical tails.
+
+This strongly supports the architectural diagnosis that managed GodotSharp wrappers are being touched before the current Step-35 no-bootstrap policy has established their native callback table. It is not absolute proof of a null callback address because 0.0.138 did not log the pointer values themselves.
+
+The final System.Collections / System.Collections.Concurrent resolver events remain context only. PRE/POST/GS ordering is the causal localization evidence.
+
+## Step 35.0.16 / 0.0.139
+
+0.0.139 does **not** bootstrap Godot and does **not** broaden native/runtime resolver authority. Gate A still re-manufactures/reverifies the exact closed Step-32 transformed source, writes same-run output-only maps, emits separately verified diagnostic derivatives, and immediately re-hashes the authoritative sources unchanged.
+
+Three fresh-process modes are exposed:
+
+1. **NATURAL — `NaturalGodotDictionaryRecon`**: preserve the original Godot Dictionary and natural Godot.OS path. This is primarily a regression/control mode now.
+2. **OS-RECON — `ManagedDictionaryCompatibility`**: retain exactly four substitutions (`CommandLineHelper._args`, Dictionary `.ctor`, `set_Item`, `TryGetValue`) to `System.Collections.Generic.Dictionary<string,string>`, leave `Godot.OS.GetCmdlineArgs()` natural, and deepen the GodotSharp entry-marker closure rooted at `Godot.OS::.cctor()` and `Godot.OS/MethodName::.cctor()` through StringName/ClassDB/NativeFuncs local callees.
+3. **FORWARD — `ManagedCommandLineCompatibility`**: apply those same four Dictionary substitutions plus exactly one call-site substitution in `CommandLineHelper..cctor`: natural `Godot.OS.GetCmdlineArgs()` is replaced by a local bridge method returning a new zero-length managed `string[]`. Post-write verification requires zero residual natural GetCmdlineArgs calls, exactly one local provider call, and provider IL equivalent to `ldc.i4.0; newarr System.String; ret`.
+
+The FORWARD empty-array behavior is a diagnostic compatibility choice, not a final command-line policy.
+
+Exact source pins remain unchanged. The owner-supplied source `sts2.dll` was previously verified at SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, matching the closed Step-32 authority; observed `GodotSharp.dll` SHA-256 is `0e4897ecdfb31456a97c7d8028dfb8d7dbdc632e2f73fc9b438d7b266a139289` and remains observed input evidence rather than a promoted global pin.
+
+The target remains `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()`, source token `0x06007D02`, async MoveNext source token `0x0600BC71`. A 0.0.139 diagnostic 4/4 from any mode is **NOT Step-35 closure**.

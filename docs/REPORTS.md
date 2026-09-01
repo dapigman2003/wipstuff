@@ -1,11 +1,13 @@
 # Reports
 
-Step 35.0.15 uses immutable same-run output-only telemetry. Preserve the matching report set from each physical run: `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, and the normal Step-35 result report.
+Step 35.0.16 uses immutable same-run output-only telemetry. Preserve `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, and the normal Step-35 result report for each fresh-process run.
 
-`Step35-ExecuteVeryEarly-StaticMap-*` remains derived from the already verified exact transformed `sts2` source before CLR admission. It includes `[NULL PLATFORM CTOR IL]`, `[COMMAND LINE HELPER CCTOR IL]`, and `[COMMAND LINE HELPER TRYGETVALUE IL]` for correlation with corrected NP and stack-neutral critical markers.
+`Step35-ExecuteVeryEarly-StaticMap-*` is generated from the already verified exact transformed sts2 image before CLR admission and is never consumed as runtime input. Its CommandLine sections remain the authority for correlating `CL_CRITICAL_001/002` with the exact natural instructions even when a diagnostic derivative substitutes those calls afterward.
 
-`Step35-GodotNativeReconnaissance-*` was introduced by the 0.0.137 design and is retained in 0.0.138. It is written before Gate B and contains the selected exact GodotSharp IL/native-boundary map, P/Invoke/calli/callback-field inventory, bounded read-only Mach-O inventory, and the complete `INMETHOD_GS...` runtime entry-marker plan. It is output only and is never consumed as trusted runtime input.
+`Step35-GodotNativeReconnaissance-*` remains read-only and pre-CLR. In 0.0.139 the selected managed map/entry-marker closure is expanded around `Godot.OS::.cctor`, `Godot.OS/MethodName::.cctor`, StringName, ClassDB, and relevant NativeFuncs callback thunks in addition to the Dictionary/GetCmdlineArgs chain. It also retains P/Invoke/calli/callback-field inventory and bounded Mach-O dependency/rpath/symbol/string inspection. No native image is loaded or executed by this report.
 
-NATURAL and COMPAT are separate fresh-process runs. The mode is written into the run journal and reconnaissance report so artifacts cannot be confused. A final resolver line does not prove causation: correlate runtime PRE/POST/GS markers with the same-run exact-source and GodotSharp maps. A 0.0.138 4/4 in either mode is diagnostic evidence only; Step 35 remains OPEN.
+The mode name is written into the journal/reconnaissance output. NATURAL, OS-RECON (`ManagedDictionaryCompatibility`), and FORWARD (`ManagedCommandLineCompatibility`) must never be compared without their Run IDs because their sts2 derivative hashes intentionally differ.
 
-The pre-device 0.0.137 Codemagic failure is retained separately in `docs/history/reports/STEP-35.0.14-CODEMAGIC-HOST-REGRESSION-FAILURE-0.0.137.txt`; it is CI evidence, not a physical-run report.
+Historical physical 0.0.138 NATURAL/COMPAT evidence is summarized in `docs/history/reports/STEP-35.0.15-PHYSICAL-NATURAL-COMPAT-CALLBACK-BOUNDARIES-0.0.138.txt`. The 0.0.137 Codemagic verifier failure remains separate CI evidence.
+
+A final resolver line remains contextual rather than causal. A 0.0.139 4/4 in any mode is diagnostic only; Step 35 remains OPEN.

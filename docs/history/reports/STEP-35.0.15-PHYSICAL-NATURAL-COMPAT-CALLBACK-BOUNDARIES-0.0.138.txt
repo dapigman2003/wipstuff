@@ -1,0 +1,58 @@
+StS2 Launcher — Step 35.0.15 physical NATURAL/COMPAT callback-boundary report
+Candidate: 0.0.138 (138)
+Physical date: 2026-09-01
+Status: DIAGNOSTIC EVIDENCE; STEP 35 REMAINS OPEN
+
+NATURAL run
+-----------
+Run ID: 20260901T2040125125330Z-pid23845-5d0e9577b6624eada7d215301f748dda
+Mode: NaturalGodotDictionaryRecon
+Gate A: PASS
+Gate B: reached execution-capable CLR admission
+Last durable runtime sequence:
+  INMETHOD_024 — NullPlatformUtilStrategy..ctor entered
+  INMETHOD_NP002_PRE
+  INMETHOD_CCTOR — CommandLineHelper..cctor entered
+  INMETHOD_CL_CRITICAL_001_PRE
+  INMETHOD_GS002 — Godot.Collections.Dictionary`2::.cctor()
+  INMETHOD_GS003 — Godot.Collections.Dictionary`2::.ctor()
+  INMETHOD_GS001 — Godot.Collections.Dictionary::.ctor()
+  INMETHOD_GS020 — NativeFuncs::godotsharp_dictionary_new()
+  INMETHOD_GS023 — NativeFuncs::godotsharp_dictionary_new(godot_dictionary&)
+  INMETHOD_GS014 — CustomUnsafe::AsPointer(godot_dictionary&)
+No CL_CRITICAL_001_POST followed.
+
+Interpretation: 0.0.138 refined the 0.0.136 interval from the outer Godot Dictionary constructor into the GodotSharp native dictionary thunk. Static reconnaissance shows the overload reads NativeFuncs._unmanagedCallbacks.godotsharp_dictionary_new and invokes it with calli. NativeFuncs.Initialize is the managed method that copies the unmanaged callback table into _unmanagedCallbacks; its GS021 entry marker did not appear in this run.
+
+COMPAT run
+----------
+Run ID: 20260901T2041218794300Z-pid23901-efa52409cc044c019abd9968690909aa
+Mode: ManagedDictionaryCompatibility
+Gate A: PASS
+Gate B: reached execution-capable CLR admission
+Last durable runtime sequence:
+  INMETHOD_024 — NullPlatformUtilStrategy..ctor entered
+  INMETHOD_NP002_PRE
+  INMETHOD_CCTOR — CommandLineHelper..cctor entered
+  INMETHOD_CL_CRITICAL_001_PRE
+  INMETHOD_CL_CRITICAL_001_POST
+  INMETHOD_CL_CRITICAL_002_PRE
+  INMETHOD_GS033 — Godot.OS::.cctor()
+No INMETHOD_GS032 Godot.OS::GetCmdlineArgs and no CL_CRITICAL_002_POST followed.
+
+Interpretation: the exact four-reference BCL Dictionary<string,string> substitution physically survived the 0.0.136/NATURAL dictionary frontier. The next failure occurs during Godot.OS type initialization, before GetCmdlineArgs body entry. Static GodotSharp IL shows OS::.cctor begins by constructing StringName("OS") and then resolves a large set of method-bind pointers through GodotObject.ClassDB_get_method_with_compatibility. Reconnaissance also shows StringName construction and method-bind lookup use NativeFuncs._unmanagedCallbacks calli thunks.
+
+Combined conclusion
+-------------------
+The two independent fresh-process runs are consistent with one architectural boundary: managed GodotSharp wrappers are reaching native callback-table thunks before this Step-35 execution policy has performed Godot/native bootstrap. This is strong evidence, not absolute proof of a single null function-pointer root cause because 0.0.138 did not log callback pointer values or instrument every OS::.cctor callee.
+
+The final System.Collections / System.Collections.Concurrent resolver events remain contextual, not causal. The decisive evidence is the in-method PRE/POST/GS ordering.
+
+Next experiment
+---------------
+Step 35.0.16 / 0.0.139 should preserve no-Godot-bootstrap/native-load refusal. It should:
+1. retain NATURAL as a historical control;
+2. retain the four-reference managed Dictionary substitution with natural Godot.OS and expand entry-only GodotSharp closure instrumentation rooted at OS::.cctor / OS.MethodName::.cctor / StringName / ClassDB/native callback thunks;
+3. add a separately identifiable FORWARD mode that combines the same four dictionary substitutions with exactly one local replacement of Godot.OS.GetCmdlineArgs() by a launcher-injected new string[0] provider;
+4. treat the empty command-line result as diagnostic compatibility only, not final product semantics;
+5. keep exact Step-32 transformed-byte authority, resolver restrictions, native-load refusal, initializer-bearing rejection and Step-35 non-closure language unchanged.

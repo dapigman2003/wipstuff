@@ -10,10 +10,10 @@ public sealed class TransformedRealStS2VeryEarlyInitializationGateSequence
     public void Record(TransformedRealStS2VeryEarlyInitializationGateResult result)
     {
         if (_results.Any(item => !item.Passed))
-            throw new InvalidOperationException("Step 35.0.15 diagnostic localization cannot advance after a failed gate.");
+            throw new InvalidOperationException("Step 35.0.16 diagnostic localization cannot advance after a failed gate.");
         var expected = (TransformedRealStS2VeryEarlyInitializationGate)(_results.Count + 1);
         if (result.Gate != expected)
-            throw new InvalidOperationException($"Expected Step 35.0.15 diagnostic gate {expected}, received {result.Gate}.");
+            throw new InvalidOperationException($"Expected Step 35.0.16 diagnostic gate {expected}, received {result.Gate}.");
         _results.Add(result);
     }
 

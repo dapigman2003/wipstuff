@@ -1,45 +1,44 @@
-# Testing — Step 35.0.15
+# Testing — Step 35.0.16
 
-Active candidate: Step 35.0.15 / `0.0.138 (138)` comprehensive GodotSharp/native reconnaissance. IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.16 / `0.0.139 (139)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
-0.0.137 was stopped by Codemagic before iOS build: static validation passed and host tests were 208/209, with the sole failure caused by the GodotSharp entry-marker verifier checking the sts2 bridge type. 0.0.138 must first prove that host regression green before any device run is considered valid.
+## Build/host prerequisites
 
-Running Step 34 and Step 35 in the same process is invalid. Once Gate B begins, the process is spent. **NATURAL and COMPAT must therefore be run as separate fresh-process runs**, but both modes are included in the same 0.0.138 IPA and require no rebuild between them.
+1. `bash scripts/validate.sh` must pass.
+2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.138 had at least 209 host tests; 0.0.139 adds managed-command-line and OS-cctor-closure regressions, so the passing total must be **210 or greater** unless tests are deliberately reorganized and documented.
+3. iOS build and `scripts/verify-ipa.sh` must pass before physical evidence is accepted.
+4. The exact Step-32 transformed source must requalify; protected Step 29–34 manifests must remain unchanged.
 
-## Authority rule
+The source archive generated outside Codemagic may record that `dotnet` is unavailable. Static validation is not a substitute for the Codemagic host suite.
 
-0.0.138 is diagnostic. Gate A must recreate/reverify the exact closed Step-32 transformed artifact and write its same-run exact-source map before CLR admission. Gate B/C execute only separately identified diagnostic derivatives. A 4/4 result is evidence only and cannot be recorded as exact Step-35 closure.
+## Fresh-process rule
 
-## Required host/static regressions
+Once Step-35 Gate B begins, the process is spent. Every mode must therefore start after force-quit/relaunch. Do not run Step 34 first in the same process. Do not run multiple Step-35 modes in one process.
 
-Run `bash scripts/validate.sh` and `bash scripts/test.sh` on a host with `dotnet`. Coverage must protect:
+## Recommended physical order
 
-- exact target tokens/hash/semantic authority and strict Step-35 resolver/native prohibitions;
-- ECMA-correct `Action<string>::Invoke(!0)` bridge encoding;
-- corrected NP ordinals and four stack-neutral CommandLine critical markers;
-- permanent absence of production live-stack CL/CLTV sweeps;
-- dual modes: NATURAL preserves the original Godot string dictionary; COMPAT applies exactly four BCL dictionary substitutions and leaves `Godot.OS.GetCmdlineArgs()` natural;
-- GodotSharp diagnostic clone preserves identity/MVID, reopens under rejecting resolution, and uses **entry-only** markers including Dictionary ctor, `OS.GetCmdlineArgs`, and `NativeCalls.godot_icall_0_108`;
-- serialized entry-marker verification validates the derivative-specific bridge: sts2 markers use `ExecuteVeryEarlyCheckpointBridge`, GodotSharp markers use `GodotSharpCheckpointBridge`;
-- GodotSharp source is unchanged after derivative creation;
-- read-only reconnaissance recognizes a synthetic arm64 Mach-O without mutating it and emits managed IL, P/Invoke/calli/callback-field, Mach-O dependency/rpath/symbol/string sections.
+The highest-value runs for 0.0.139 are:
 
-The Codemagic run is not build-ready unless `step35.trx` reports all tests passed and the host text report ends with `HOST UNIT TESTS: PASS`.
+1. **OS-RECON** — confirms/locates the inner `Godot.OS::.cctor()` boundary with the expanded GodotSharp closure. Expected historical prefix from 0.0.138: `CL_CRITICAL_001_PRE` → `CL_CRITICAL_001_POST` → `CL_CRITICAL_002_PRE` → OS cctor. New GS markers should identify whether termination occurs in StringName/type initialization, `OS.MethodName`, `ClassDB_get_method_with_compatibility`, or a specific NativeFuncs thunk.
+2. force-quit/relaunch.
+3. **FORWARD** — verifies the managed dictionary + managed empty-args path can pass `CL_CRITICAL_002_POST` and reveals the next startup frontier. High-value success markers include `CL_CRITICAL_002_POST`, `INMETHOD_027`, `NP002_POST`, and any later ExecuteVeryEarly markers.
 
-## Physical runs
+**NATURAL is optional** for 0.0.139 unless regression confirmation is desired; 0.0.138 already captured the dictionary-native-thunk frontier cleanly.
 
-For each fresh-process mode preserve the normal report plus:
+## Evidence to preserve
+
+For every physical run preserve the matching run-ID set:
 
 - `Step35-CurrentRun.txt`
 - `Step35-CrashCheckpoint-<RunId>.txt`
 - `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`
 - `Step35-GodotNativeReconnaissance-<RunId>.txt`
 - `Step35-LastCheckpoint.txt`
+- the normal Step-35 result report if one is produced
+- any iOS `.ips` crash/termination record with matching time/process if available
 
-Recommended order: run **NATURAL first** to measure the original 0.0.136 failure with inner GodotSharp entries; force-quit; relaunch and run **COMPAT** to test whether the bounded BCL dictionary substitution reaches the untouched `Godot.OS.GetCmdlineArgs()`/native callback path.
+Resolver events alone do not establish causation. Interpret them only with same-run PRE/POST/GS markers and static maps.
 
-High-value NATURAL outcome: after `CL_CRITICAL_001_PRE`, one or more `INMETHOD_GS...` markers identify the deepest GodotSharp managed method entered before termination. The separate reconnaissance file maps every GS marker to its exact method and provides the local IL/native-call context.
+## Closure rule
 
-High-value COMPAT sequence: `CL_CRITICAL_001_PRE` → `CL_CRITICAL_001_POST` proves the BCL dictionary path survived; `CL_CRITICAL_002_PRE` without POST localizes the next natural interval to `Godot.OS.GetCmdlineArgs()`; deeper `INMETHOD_GS...` entries can then distinguish `OS`, `GodotObject.GetPtr`, `NativeCalls`, `NativeFuncs`, or related local callees where present in the bounded marker plan.
-
-Cancellation is INCONCLUSIVE. Resolver events alone do not establish causation.
+All three 0.0.139 modes execute diagnostic derivatives. A 4/4 result means the selected diagnostic derivative survived its measured boundary; it cannot close exact Step 35. Cancellation is INCONCLUSIVE.

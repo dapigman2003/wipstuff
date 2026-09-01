@@ -630,6 +630,79 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
     }
 
     [TestMethod]
+    public void ManagedCommandLineCompatibilityReplacesExactlyOneGodotArgsCallWithLocalEmptyArrayProvider()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-commandline-managed-provider");
+        var assemblyPath = Path.Combine(temp.Path, "CommandLineManagedProviderFixture.dll");
+
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("CommandLineManagedProviderFixture", new Version(1, 0, 0, 0)),
+                   "CommandLineManagedProviderFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            var godotSharp = new AssemblyNameReference("GodotSharp", new Version(4, 5, 1, 0));
+            module.AssemblyReferences.Add(godotSharp);
+
+            var bridge = new TypeDefinition(
+                "StS2Launcher.Step35Diagnostics",
+                "ExecuteVeryEarlyCheckpointBridge",
+                Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Abstract | Mono.Cecil.TypeAttributes.Sealed,
+                module.TypeSystem.Object);
+            module.Types.Add(bridge);
+            var provider = new MethodDefinition(
+                TransformedRealStS2VeryEarlyInitialization.ManagedCommandLineArgsBridgeMethodName,
+                Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static,
+                new ArrayType(module.TypeSystem.String));
+            bridge.Methods.Add(provider);
+            var providerIl = provider.Body.GetILProcessor();
+            providerIl.Append(providerIl.Create(OpCodes.Ldc_I4_0));
+            providerIl.Append(providerIl.Create(OpCodes.Newarr, module.TypeSystem.String));
+            providerIl.Append(providerIl.Create(OpCodes.Ret));
+
+            var godotOs = new TypeReference("Godot", "OS", module, godotSharp, false);
+            var getCmdlineArgs = new MethodReference("GetCmdlineArgs", new ArrayType(module.TypeSystem.String), godotOs)
+            {
+                HasThis = false,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+            var commandLine = new TypeDefinition(
+                "MegaCrit.Sts2.Core.Helpers",
+                "CommandLineHelper",
+                Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
+                module.TypeSystem.Object);
+            module.Types.Add(commandLine);
+            var cctor = new MethodDefinition(
+                ".cctor",
+                Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName,
+                module.TypeSystem.Void);
+            commandLine.Methods.Add(cctor);
+            var cctorIl = cctor.Body.GetILProcessor();
+            cctorIl.Append(cctorIl.Create(OpCodes.Call, getCmdlineArgs));
+            cctorIl.Append(cctorIl.Create(OpCodes.Pop));
+            cctorIl.Append(cctorIl.Create(OpCodes.Ret));
+
+            var rewrite = TransformedRealStS2VeryEarlyInitialization.ApplyCommandLineHelperManagedCommandLineCompatibilityRewrite(cctor, provider);
+            Assert.AreEqual(1, rewrite.SubstitutionCount);
+            StringAssert.Contains(rewrite.ProviderFullName, TransformedRealStS2VeryEarlyInitialization.ManagedCommandLineArgsBridgeMethodName);
+            TransformedRealStS2VeryEarlyInitialization.VerifyCommandLineHelperManagedCommandLineCompatibilityRewrite(module, cctor);
+            assembly.Write(assemblyPath);
+        }
+
+        using var reopened = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var commandLineAfter = reopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTypeFullName);
+        var cctorAfter = commandLineAfter.Methods.Single(method => method.Name == ".cctor");
+        TransformedRealStS2VeryEarlyInitialization.VerifyCommandLineHelperManagedCommandLineCompatibilityRewrite(reopened.MainModule, cctorAfter);
+        Assert.AreEqual(0, cctorAfter.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference method &&
+            method.DeclaringType.FullName == "Godot.OS" && method.Name == "GetCmdlineArgs"));
+        Assert.AreEqual(1, cctorAfter.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference method &&
+            method.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.DiagnosticBridgeTypeFullName &&
+            method.Name == TransformedRealStS2VeryEarlyInitialization.ManagedCommandLineArgsBridgeMethodName));
+    }
+
+    [TestMethod]
     public void DiagnosticCallsiteSweepRaisesMaxStackAndClrExecutesTightRewrittenCctor()
     {
         byte[] image;
@@ -804,11 +877,28 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 AddMethod(dictionary, "Dispose", module.TypeSystem.Void);
                 AddMethod(dictionary, "GetEnumerator", module.TypeSystem.Object);
 
+                var stringName = new TypeDefinition("Godot", "StringName", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+                module.Types.Add(stringName);
+                var stringNameImplicit = AddMethod(stringName, "op_Implicit", module.TypeSystem.Object, module.TypeSystem.String);
+
+                var godotObject = new TypeDefinition("Godot", "GodotObject", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+                module.Types.Add(godotObject);
+                var classDb = AddMethod(godotObject, "ClassDB_get_method_with_compatibility", module.TypeSystem.Object);
+                AddMethod(godotObject, "GetPtr", module.TypeSystem.Object, module.TypeSystem.Object);
+
                 var os = new TypeDefinition("Godot", "OS", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
                 module.Types.Add(os);
                 AddMethod(os, "GetCmdlineArgs", new ArrayType(module.TypeSystem.String));
                 AddMethod(os, "get_Singleton", module.TypeSystem.Object);
-                AddMethod(os, ".cctor", module.TypeSystem.Void);
+                var osCctor = AddMethod(os, ".cctor", module.TypeSystem.Void);
+                osCctor.Body.Instructions.Clear();
+                var osCctorIl = osCctor.Body.GetILProcessor();
+                osCctorIl.Append(osCctorIl.Create(OpCodes.Ldstr, "OS"));
+                osCctorIl.Append(osCctorIl.Create(OpCodes.Call, stringNameImplicit));
+                osCctorIl.Append(osCctorIl.Create(OpCodes.Pop));
+                osCctorIl.Append(osCctorIl.Create(OpCodes.Call, classDb));
+                osCctorIl.Append(osCctorIl.Create(OpCodes.Pop));
+                osCctorIl.Append(osCctorIl.Create(OpCodes.Ret));
 
                 var nativeCalls = new TypeDefinition("Godot", "NativeCalls", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
                 module.Types.Add(nativeCalls);
@@ -835,6 +925,9 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             Assert.IsTrue(result.MarkerCount >= 6);
             StringAssert.Contains(result.MarkerMap, "Godot.Collections.Dictionary`2::.ctor");
             StringAssert.Contains(result.MarkerMap, "Godot.OS::GetCmdlineArgs");
+            StringAssert.Contains(result.MarkerMap, "Godot.OS::.cctor");
+            StringAssert.Contains(result.MarkerMap, "Godot.StringName::op_Implicit");
+            StringAssert.Contains(result.MarkerMap, "Godot.GodotObject::ClassDB_get_method_with_compatibility");
             StringAssert.Contains(result.MarkerMap, "godot_icall_0_108");
             Assert.IsTrue(File.Exists(clone));
 

@@ -105,24 +105,29 @@ internal static class Step35GodotReconnaissance
         AddMethods("Godot.Collections.Dictionary`2", ".cctor", ".ctor", "TryGetValue", "set_Item", "get_Item", "Dispose", "GetEnumerator");
         AddMethods("Godot.Collections.GodotDictionary", ".cctor", ".ctor", "Dispose", "TryGetValue", "set_Item", "get_Item");
         AddMethods("Godot.OS", ".cctor", "GetCmdlineArgs", "get_Singleton");
-        AddMethods("Godot.GodotObject", "GetPtr");
+        AddMethods("Godot.OS/MethodName", ".cctor");
+        AddMethods("Godot.StringName", ".cctor", "op_Implicit");
+        AddMethods("Godot.GodotObject", ".cctor", "GetPtr", "ClassDB_get_method_with_compatibility");
         AddMethods("Godot.NativeCalls", "godot_icall_0_108");
-        AddMethods("Godot.NativeInterop.NativeFuncs", "Initialize");
+        AddMethods("Godot.NativeInterop.NativeFuncs", ".cctor", "Initialize", "godotsharp_string_name_new_from_string", "godotsharp_method_bind_get_method_with_compatibility");
 
-        // Add local callees to depth two from the critical Dictionary ctor(s) and GetCmdlineArgs.
+        // 0.0.138 COMPAT entered Godot.OS..cctor but never reached GetCmdlineArgs. Expand the
+        // local call closure around the type initializer and MethodName initializer as well as the
+        // previously measured Dictionary/GetCmdlineArgs paths. This remains metadata-only.
         var byFullName = allTypes.SelectMany(type => type.Methods).Where(method => method.HasBody)
             .GroupBy(method => method.FullName, StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
         var queue = new Queue<(MethodDefinition Method, int Depth)>();
         foreach (var seed in selected.Where(method =>
                      (method.DeclaringType.FullName == "Godot.Collections.Dictionary`2" && method.Name == ".ctor") ||
-                     (method.DeclaringType.FullName == "Godot.OS" && method.Name == "GetCmdlineArgs")))
+                     (method.DeclaringType.FullName == "Godot.OS" && method.Name is "GetCmdlineArgs" or ".cctor") ||
+                     (method.DeclaringType.FullName == "Godot.OS/MethodName" && method.Name == ".cctor")))
             queue.Enqueue((seed, 0));
         var visited = new HashSet<string>(selected.Select(method => method.FullName), StringComparer.Ordinal);
-        while (queue.Count != 0 && visited.Count < 96)
+        while (queue.Count != 0 && visited.Count < 128)
         {
             var (method, depth) = queue.Dequeue();
-            if (depth >= 2) continue;
+            if (depth >= 3) continue;
             foreach (var instruction in method.Body.Instructions)
             {
                 if (instruction.Operand is not MethodReference called || !byFullName.TryGetValue(called.FullName, out var local))
