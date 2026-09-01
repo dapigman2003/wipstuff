@@ -1,1 +1,4 @@
-ERROR: dotnet is required to run host tests.
+StS2 Launcher — Step 35.0.15 host regression status
+LOCAL HANDOFF ENVIRONMENT: NOT RUN (dotnet is not installed in this sandbox).
+Required next proof: Codemagic scripts/test.sh must pass the complete host suite before iOS build.
+Prior 0.0.137 Codemagic evidence: 209 total, 208 passed, 1 failed; failure documented under docs/history/reports/STEP-35.0.14-CODEMAGIC-HOST-REGRESSION-FAILURE-0.0.137.txt.

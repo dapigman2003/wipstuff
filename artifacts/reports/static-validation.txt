@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-01T07:47:23Z
+UTC: 2026-09-01T17:49:12Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,8 +10,8 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 35.0.14 Managed Command-Line Dictionary compatibility validation
-Root: /mnt/data/sts137better/StS2Launcher-Step35-0.0.137
+StS2 Launcher — Step 35.0.15 Comprehensive GodotSharp / Native Recon + Dual Mode validation
+Root: /mnt/data/StS2Launcher-Step35-0.0.138
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 232 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 137
-PASS: display version is 0.0.137
-PASS: Info.plist build version is 137
-PASS: Info.plist display version is 0.0.137
+PASS: build version is 138
+PASS: display version is 0.0.138
+PASS: Info.plist build version is 138
+PASS: Info.plist display version is 0.0.138
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 35.0.14 comprehensive GodotSharp/native dual-mode candidate
-PASS: top launcher banner preserves physical Step-35 history and identifies active 0.0.137 comprehensive dual-mode reconnaissance derivative
+PASS: top launcher banner identifies active Step 35.0.15 comprehensive GodotSharp/native dual-mode candidate
+PASS: top launcher banner preserves physical/CI Step-35 history and identifies active 0.0.138 comprehensive dual-mode reconnaissance derivative
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 35.0.14 source pins expected bundle release identity
+PASS: Step 35.0.15 source pins expected bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -286,7 +286,7 @@ PASS: active CI/IPA/project graph has no retired Step-27 dependency: STEP27_INTE
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: Step27InterpretedPatchFixture
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: host-step27
 PASS: host tests no longer perform the retired Harmony release network acquisition
-PASS: IPA verification summary identifies the active Step-35.0.14 candidate rather than retired Step 27
+PASS: IPA verification summary identifies the active Step-35.0.15 candidate rather than retired Step 27
 PASS: retired Step-27 fixture is absent from iOS and host-test project graphs
 PASS: active regression contracts preserve the decisive Step-27 negative architecture result
 PASS: master plan continues to retire runtime Harmony/MonoMod replacement
@@ -450,7 +450,7 @@ PASS: Step 33 production report explicitly preserves the admission-only no-execu
 PASS: Step 33 host regressions protect gate order and admission-only private-dependency refusal
 PASS: iOS UI persists the dedicated Step-33 physical report
 PASS: RootViewController wires Step 33 into the active device surface
-PASS: release presentation pins Step-33/34 closures and the Step-35.0.14 very-early diagnostic boundary
+PASS: release presentation pins Step-33/34 closures and the Step-35.0.15 very-early diagnostic boundary
 PASS: Step 34 controlled-execution core exists
 PASS: Step 34 gate enum exists
 PASS: Step 34 summary exists
@@ -480,8 +480,8 @@ PASS: Step 35 host regressions exists
 PASS: Step 35 iOS report surface exists
 PASS: Step 35 diagnostic mode exists
 PASS: Step 35 Godot/native reconnaissance exists
-PASS: Step 35.0.14 exposes exactly four ordered diagnostic-localization gates
-PASS: Step 35.0.14 summary reports four-of-four diagnostic completion without claiming exact Step-35 closure
+PASS: Step 35.0.15 exposes exactly four ordered diagnostic-localization gates
+PASS: Step 35.0.15 summary reports four-of-four diagnostic completion without claiming exact Step-35 closure
 PASS: Step 35 hard-pins exact very-early target/context evidence: SourceTargetMethodToken = 0x06007D02
 PASS: Step 35 hard-pins exact very-early target/context evidence: SourceStateMachineMoveNextToken = 0x0600BC71
 PASS: Step 35 hard-pins exact very-early target/context evidence: <ExecuteVeryEarly>d__7
@@ -489,44 +489,46 @@ PASS: Step 35 hard-pins exact very-early target/context evidence: System.Threadi
 PASS: Step 35 hard-pins exact very-early target/context evidence: StS2Launcher-Step35-VeryEarly
 PASS: Step 35 Gate A re-runs the closed Step-32 A-D transform contract
 PASS: Step 35 Gate A independently audits exact wrapper/async-state-machine semantics and later-boundary purity
-PASS: Step 35.0.14 static map covers the exact NullPlatform constructor plus CommandLineHelper cctor/TryGetValue callsite ordinals without resolving dependencies
-PASS: Step 35.0.14 preserves prior sts2 diagnostics, supports natural/compat modes, and adds a separately verified entry-only GodotSharp diagnostic derivative
-PASS: Step 35.0.14 exposes NATURAL and COMPAT modes in one build
-PASS: Step 35.0.14 reconnaissance records managed/native boundaries and read-only arm64 Mach-O metadata
-PASS: Step 35.0.14 reconnaissance source performs no CLR/native image execution
-PASS: Step 35.0.14 excludes injected diagnostic bridge calls before exact-source callsite ordinal accounting
-PASS: Step 35.0.14 fails Gate A closed unless stack-neutral critical localization contains Godot.OS.GetCmdlineArgs
-PASS: Step 35.0.14 preserves and post-write verifies unchanged CommandLine cctor MaxStack
-PASS: Step 35.0.14 production clone forbids live-stack CL/CLTV sweep insertion
-PASS: Step 35.0.14 dictionary-only derivative reuses existing System.Collections, rewrites exactly the Godot string-dictionary contract with VAR signatures, removes residual affected-method Godot dictionary calls, and retains natural GetCmdlineArgs
-PASS: Step 35.0.14 has no duplicated cctor-verification guard that can suppress serialized entry-marker checks
-PASS: Step 35.0.14 carries redundant stack-neutral critical markers around dictionary and Godot command-line boundaries
-PASS: Step 35.0.14 preserves/rechecks the exact transformed source and verifies diagnostic-clone MVID/hash/marker provenance
-PASS: Step 35.0.14 reuses the Step-32 audited constant-metadata requirement set locally for Cecil serialization only
-PASS: Step 35.0.14 separates bounded writer-only Cecil resolution from rejecting post-write verification
-PASS: Step 35.0.14 diagnostic clone preserves deferred-open -> zero-request -> configure -> write ordering
-PASS: Step 35.0.14 preserves the physically corrected Action<string>::Invoke(!0) MemberRef
-PASS: Step 35.0.14 rejects the physically disproven synthetic Action<string>::Invoke(string) encoding
-PASS: Step 35.0.14 host regressions protect the Action<string>::Invoke(!0) encoding
-PASS: Step 35.0.14 host regressions cover the entry-only GodotSharp derivative and read-only Mach-O reconnaissance
+PASS: Step 35.0.15 static map covers the exact NullPlatform constructor plus CommandLineHelper cctor/TryGetValue callsite ordinals without resolving dependencies
+PASS: Step 35.0.15 preserves prior sts2 diagnostics, supports natural/compat modes, and adds a separately verified entry-only GodotSharp diagnostic derivative
+PASS: Step 35.0.15 exposes NATURAL and COMPAT modes in one build
+PASS: Step 35.0.15 reconnaissance records managed/native boundaries and read-only arm64 Mach-O metadata
+PASS: Step 35.0.15 reconnaissance source performs no CLR/native image execution
+PASS: Step 35.0.15 excludes injected diagnostic bridge calls before exact-source callsite ordinal accounting
+PASS: Step 35.0.15 fails Gate A closed unless stack-neutral critical localization contains Godot.OS.GetCmdlineArgs
+PASS: Step 35.0.15 preserves and post-write verifies unchanged CommandLine cctor MaxStack
+PASS: Step 35.0.15 production clone forbids live-stack CL/CLTV sweep insertion
+PASS: Step 35.0.15 dictionary-only derivative reuses existing System.Collections, rewrites exactly the Godot string-dictionary contract with VAR signatures, removes residual affected-method Godot dictionary calls, and retains natural GetCmdlineArgs
+PASS: Step 35.0.15 has no duplicated cctor-verification guard that can suppress serialized entry-marker checks
+PASS: Step 35.0.15 carries redundant stack-neutral critical markers around dictionary and Godot command-line boundaries
+PASS: Step 35.0.15 preserves/rechecks the exact transformed source and verifies diagnostic-clone MVID/hash/marker provenance
+PASS: Step 35.0.15 reuses the Step-32 audited constant-metadata requirement set locally for Cecil serialization only
+PASS: Step 35.0.15 separates bounded writer-only Cecil resolution from rejecting post-write verification
+PASS: Step 35.0.15 diagnostic clone preserves deferred-open -> zero-request -> configure -> write ordering
+PASS: Step 35.0.15 preserves the physically corrected Action<string>::Invoke(!0) MemberRef
+PASS: Step 35.0.15 rejects the physically disproven synthetic Action<string>::Invoke(string) encoding
+PASS: Step 35.0.15 host regressions protect the Action<string>::Invoke(!0) encoding
+PASS: Step 35.0.15 host regressions cover the entry-only GodotSharp derivative and read-only Mach-O reconnaissance
+PASS: Step 35.0.15 host regression directly verifies every serialized GS entry marker calls the GodotSharp bridge
 PASS: GodotSharp derivative uses deferred-open and entry-only instrumentation, never live-stack callsite sweeps
 PASS: GodotSharp derivative uses audited writer-only resolution, rejecting reopen, preserved MVID, and the corrected generic callback bridge
-PASS: Step 35.0.14 retains prior Godot callsite marker round-trip regression
-PASS: Step 35.0.14 regressions protect exact ordinals, managed dictionary generic MemberRefs, natural GetCmdlineArgs retention, critical boundaries and executable MaxStack safety
+PASS: Step 35.0.15 verifies serialized entry markers against the derivative-specific bridge type and protects the 0.0.137 208/209 regression
+PASS: Step 35.0.15 retains prior Godot callsite marker round-trip regression
+PASS: Step 35.0.15 regressions protect exact ordinals, managed dictionary generic MemberRefs, natural GetCmdlineArgs retention, critical boundaries and executable MaxStack safety
 PASS: Step 35 static target audit remains dependency-resolution free
-PASS: Step 35.0.14 invokes only the diagnostic clone's Task-returning ExecuteVeryEarly once, requires durable in-method telemetry, and preserves the 60-second await boundary
+PASS: Step 35.0.15 invokes only the diagnostic clone's Task-returning ExecuteVeryEarly once, requires durable in-method telemetry, and preserves the 60-second await boundary
 PASS: Step 35 resolver stays exact-plan/fail-closed for initializer-bearing, unplanned and native requests
-PASS: Step 35.0.14 core retains durable B→C/invocation/resolver crash-localization markers
-PASS: Step 35.0.14 iOS surface preserves the physical 0.0.136 frontier and exposes dual-mode comprehensive GodotSharp/native reconnaissance
-PASS: Step 35.0.14 host regressions retain crash-checkpoint and static-map coverage
-PASS: Step 35.0.14 host regressions protect diagnostic gate order, exact source target and initializer-bearing refusal
+PASS: Step 35.0.15 core retains durable B→C/invocation/resolver crash-localization markers
+PASS: Step 35.0.15 iOS surface preserves the physical 0.0.136 frontier and exposes dual-mode comprehensive GodotSharp/native reconnaissance
+PASS: Step 35.0.15 host regressions retain crash-checkpoint and static-map coverage
+PASS: Step 35.0.15 host regressions protect diagnostic gate order, exact source target and initializer-bearing refusal
 PASS: Step 35 host regressions use supported MSTest v4 exception assertions
-PASS: Step 35.0.14 iOS success surface cannot masquerade as exact Step-35 closure
-PASS: Step 35.0.14 Gate-C PASS wording explicitly remains diagnostic-only
-PASS: Step 35.0.14 active source/UI reject stale exact-closure wording
+PASS: Step 35.0.15 iOS success surface cannot masquerade as exact Step-35 closure
+PASS: Step 35.0.15 Gate-C PASS wording explicitly remains diagnostic-only
+PASS: Step 35.0.15 active source/UI reject stale exact-closure wording
 PASS: Step 35 iOS UI persists the dedicated report and uses the numeric SystemButton font-size contract
 PASS: RootViewController wires Step 35 into the active device surface
-PASS: release presentation pins the Step-35.0.14 exact-source/instrumented-clone boundary
+PASS: release presentation pins the Step-35.0.15 exact-source/instrumented-clone boundary and 0.0.137 CI provenance
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -712,8 +714,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status preserves exact authority, physical 0.0.136 dictionary frontier, and active 0.0.137 comprehensive dual-mode reconnaissance design
-PASS: testing and release-checklist docs pin the exact 0.0.137 (137) release identity
+PASS: current status preserves exact authority, physical 0.0.136 dictionary frontier, 0.0.137 CI failure, and active 0.0.138 comprehensive dual-mode reconnaissance design
+PASS: testing and release-checklist docs pin the exact 0.0.138 (138) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -801,7 +803,9 @@ PASS: Step 35.0.10 Command-Line/Godot boundary-localization design record is pre
 PASS: Step 35.0.10 physical 0.0.133 MaxStack instrumentation-failure report is present
 PASS: Step 35.0.13 physical 0.0.136 Godot dictionary-constructor boundary report is present
 PASS: superseded narrow Step 35.0.14 managed dictionary draft remains in history
-PASS: active Step 35.0.14 comprehensive Godot/native reconnaissance design record is present
+PASS: Step 35.0.14 comprehensive Godot/native reconnaissance design record is preserved as the 0.0.137 pre-device design
+PASS: 0.0.137 Codemagic 208/209 pre-device failure report is present
+PASS: Step 35.0.15 GodotSharp bridge-verifier correction record is present
 PASS: historical documentation set is comprehensive
 PASS: Codemagic exposes the stable canonical iOS workflow so caches survive numbered-step changes
 PASS: Codemagic no longer uses a step-numbered workflow key that would force cold caches on the next step
@@ -811,7 +815,7 @@ PASS: Codemagic preserves canonical cache path: $HOME/.cache/sts2launcher/godot-
 PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 PASS: host-test report heading identifies Step 35
 PASS: host-test TRX artifact identifies Step 35
-PASS: Codemagic build-environment report heading identifies Step 35.0.14 comprehensive dual-mode candidate
+PASS: Codemagic build-environment report heading identifies Step 35.0.15 comprehensive dual-mode candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -822,7 +826,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step 35.0.14 comprehensive dual-mode candidate
+PASS: IPA verifier advertises the active Step 35.0.15 comprehensive dual-mode candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -837,9 +841,9 @@ PASS: physically closed Step-33 implementation, tests, and closure evidence rema
 PASS: physically closed Step 34 implementation/evidence hash manifest exists
 PASS: physically closed Step-34 implementation, tests, and closure evidence remain hash-pinned
 PASS: Step 35 candidate boundary hash manifest exists
-PASS: Step 35.0.14 candidate manifest includes comprehensive implementation/tests, physical 0.0.136 evidence, and both superseded + active 0.0.137 design records
+PASS: Step 35.0.15 candidate manifest includes implementation/tests, physical 0.0.136 evidence, 0.0.137 CI failure provenance, and the 0.0.138 verifier correction record
 PASS: Step 35 implementation, active release wiring, and design/evidence docs are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 828 checks
+VALIDATION PASS: 832 checks

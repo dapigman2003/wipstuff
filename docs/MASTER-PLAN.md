@@ -242,11 +242,13 @@ Physical 0.0.131 entered `NullPlatformUtilStrategy..ctor` and hard-terminated be
 
 Acceptance is evidence-only: identify the final NP pre/post pair. A pre marker without its post marker defines the exact outgoing-call frontier. If no NP marker appears after constructor entry, the next experiment instruments non-call IL rather than broadening resolver or Godot authority. If `GodotFileIo..ctor` appears, resume the preserved downstream markers. Diagnostic 4/4 remains NOT Step-35 closure.
 
-## Step 35.0.14 — comprehensive GodotSharp/native reconnaissance + dual mode
+## Step 35.0.15 — comprehensive GodotSharp/native reconnaissance + bridge-verifier correction
 
 Physical 0.0.136 entered `CommandLineHelper..cctor`, emitted `INMETHOD_CL_CRITICAL_001_PRE` immediately before `_args` dictionary construction, and hard-terminated before the matching POST. The exact-source map identifies that operation as `Godot.Collections.Dictionary<string,string>::.ctor()`.
 
-The rebuilt 0.0.137 keeps exact Step-32 authority and all Step-35 resolver/startup prohibitions, but stops treating each physical build as a one-marker experiment. Gate A performs read-only reconnaissance over the exact OfflineReady depot, emits a bounded GodotSharp IL/PInvoke/calli/native-callback map plus Mach-O dependency/rpath/symbol/string inventory, and produces a separately verified **entry-only** GodotSharp diagnostic derivative. No native image is loaded or executed by reconnaissance.
+0.0.137 introduced the comprehensive two-mode design but never reached an IPA or physical run. Codemagic passed static validation and then stopped at 208/209 host tests because the GodotSharp post-write entry-marker verifier accidentally required the sts2 diagnostic bridge type.
+
+0.0.138 keeps exact Step-32 authority and all Step-35 resolver/startup prohibitions. The sole functional correction is derivative-specific entry-marker verification. Gate A still performs read-only reconnaissance over the exact OfflineReady depot, emits a bounded GodotSharp IL/PInvoke/calli/native-callback map plus Mach-O dependency/rpath/symbol/string inventory, and produces a separately verified **entry-only** GodotSharp diagnostic derivative. No native image is loaded or executed by reconnaissance.
 
 The same IPA exposes two separate fresh-process experiments. **NATURAL** preserves the original Godot string dictionary so the GodotSharp derivative can identify inner managed entries on the physically proven constructor path. **COMPAT** applies only the bounded four-reference `System.Collections.Generic.Dictionary<string,string>` substitution and leaves `Godot.OS.GetCmdlineArgs()` natural, allowing the same IPA to probe the next Godot/native-callback boundary after relaunch.
 

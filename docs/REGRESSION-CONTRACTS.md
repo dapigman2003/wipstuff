@@ -413,22 +413,15 @@ Required invariants:
 - the final `System.Collections.Concurrent` resolver record may be preserved as frontier context but cannot be promoted to root cause merely because it is last;
 - a 0.0.132 4/4 result is diagnostic completion only and **NOT Step-35 closure**.
 
-## Step 35.0.14 — corrected ordinals, MaxStack safety, and CommandLine localization
+## Step 35.0.15 — stack-neutral CommandLine + derivative-specific GodotSharp verification
 
-- Physical 0.0.132 proved `INMETHOD_NP003_PRE` corresponded to exact-source `CALLSITE#002`; injected bridge calls must be excluded **before** ordinal accounting.
-- NullPlatform's direct base `.ctor` remains unwrapped but still consumes exact-source CALLSITE#001.
-- Production ordering is entry marker first, sweep second; a host regression must reproduce that ordering.
-- `CommandLineHelper.TryGetValue` has `INMETHOD_027`; its type initializer has the existing `INMETHOD_CCTOR` entry marker.
-- `CommandLineHelper..cctor` uses ordered `INMETHOD_CLxxx_PRE/POST`; `TryGetValue` uses `INMETHOD_CLTVxxx_PRE/POST`.
-- Same-run exact-source output includes `[COMMAND LINE HELPER CCTOR IL]` and `[COMMAND LINE HELPER TRYGETVALUE IL]`.
-- The cctor plan must contain `Godot.OS.GetCmdlineArgs`; otherwise Gate A fails before CLR admission.
-- New CommandLine sweeps may skip unrelated branch-target callsites, but skipped calls still consume exact-source ordinals; the required Godot call cannot be silently skipped.
-- Physical 0.0.133 is pinned as a diagnostic instrumentation failure: corrected `NP002`, no CommandLine cctor/CL marker, nested `InvalidProgramException`, normal `RUN_END`; it must not be reclassified as a Godot compatibility result.
-- Every live-stack diagnostic callsite sweep reserves one additional `MaxStack` slot; targeted callsite markers are hardened likewise.
-- Gate A must record exact-source CommandLine cctor MaxStack and require serialized diagnostic MaxStack = source + 1.
-- Four stack-neutral critical markers must bracket `_args` dictionary construction/assignment and `Godot.OS.GetCmdlineArgs` invocation/result storage.
-- Host regressions must include actual CLR loading/execution of a generated tight-MaxStack rewritten cctor, not only Cecil round-trip inspection.
-- Exact Step-32 transformed source, resolver/native prohibitions, one-invocation rule, 60-second await, fresh-process rule, and no-Godot-bootstrap contract remain unchanged.
+- Physical 0.0.132 proved `INMETHOD_NP003_PRE` corresponded to exact-source `CALLSITE#002`; injected bridge calls must be excluded **before** ordinal accounting. NullPlatform's direct base `.ctor` remains unwrapped but still consumes exact-source CALLSITE#001.
+- Physical 0.0.133 and 0.0.135 are pinned as diagnostic instrumentation failures. The production diagnostic clone must not insert live-stack `INMETHOD_CLxxx_PRE/POST` or `INMETHOD_CLTVxxx_PRE/POST` callbacks. Their maps may remain output-only.
+- Four stack-neutral markers must bracket `_args` dictionary construction/assignment and `Godot.OS.GetCmdlineArgs` invocation/result storage. The cctor plan must contain `Godot.OS.GetCmdlineArgs`; otherwise Gate A fails before CLR admission.
+- Physical 0.0.136 is pinned as the latest device frontier: cctor entry plus `CL_CRITICAL_001_PRE`, no matching POST, localizing the interval to `Godot.Collections.Dictionary<string,string>` construction before assignment.
+- NATURAL must preserve the original Godot string-dictionary field/constructor/`set_Item`/`TryGetValue` contract. COMPAT must make exactly four corresponding substitutions to `System.Collections.Generic.Dictionary<string,string>`, preserve the required generic VAR MemberRefs, reuse the existing `System.Collections` metadata scope, and leave `Godot.OS.GetCmdlineArgs()` natural.
+- The separately emitted GodotSharp derivative must preserve assembly identity/MVID, use deferred-open plus bounded writer-only metadata resolution, reopen under rejecting resolution, and insert only entry markers in its bounded Dictionary/OS/NativeCalls/NativeFuncs graph.
+- Entry-marker verification is **bridge-specific**. `HasInjectedEntryMarkerAtStart` must validate both the marker and `Emit` call against an expected bridge type. sts2 derivative checks use `ExecuteVeryEarlyCheckpointBridge`; GodotSharp derivative checks explicitly use `GodotSharpCheckpointBridge`. Hard-coding the sts2 bridge for GodotSharp is forbidden; 0.0.137 Codemagic 208/209 is the regression evidence for this rule.
+- Host coverage must include `ComprehensiveGodotSharpDiagnosticCloneUsesEntryOnlyMarkersAndPreservesIdentity`; Codemagic may not proceed to the iOS workload/build unless the complete host suite passes.
+- Exact Step-32 transformed source, resolver/native prohibitions, initializer-bearing refusal, one-invocation rule, 60-second await, fresh-process rule, and no-Godot-bootstrap contract remain unchanged.
 - Diagnostic 4/4 is not exact Step-35 closure.
-
-Physical 0.0.135 observation: the MaxStack-hardened diagnostic clone still returned a faulted Task with nested System.InvalidProgramException before any CommandLineHelper cctor entry/critical marker executed, despite serialized cctor MaxStack 3 / 4 verification. The launcher reached normal RUN_END. This disproves the MaxStack-only diagnosis; Step 35.0.14 retires all live-stack CL/CLTV runtime callbacks and keeps only stack-neutral CommandLine boundaries.

@@ -1,0 +1,23 @@
+StS2 Launcher — Step 35.0.14 / 0.0.137 Codemagic pre-device result
+Date: 2026-09-01
+Status: PRE-DEVICE CI FAILURE — NO IPA/PHYSICAL EVIDENCE
+
+Observed Codemagic artifacts:
+- Static validation: PASS (828 checks in the 0.0.137 source snapshot).
+- Host tests: 209 total, 208 passed, 1 failed.
+- Failing test: ComprehensiveGodotSharpDiagnosticCloneUsesEntryOnlyMarkersAndPreservesIdentity.
+- Exception: System.IO.InvalidDataException from CreateInstrumentedGodotSharpDiagnosticClone post-write verification.
+- Reported target: Godot.Collections.Dictionary`2::.ctor(), marker INMETHOD_GS001.
+
+Root cause established from source inspection:
+- GodotSharp marker insertion used the correct GodotSharpCheckpointBridge.Emit reference.
+- Shared HasInjectedEntryMarkerAtStart verification hard-coded ExecuteVeryEarlyCheckpointBridge, the sts2 derivative bridge.
+- Therefore the verifier rejected a correctly shaped GodotSharp entry marker solely because its Emit call declared the separate GodotSharp bridge type.
+
+Pipeline consequence:
+- scripts/codemagic.sh uses set -e and runs scripts/test.sh before iOS workload install/build.
+- The host-test failure stopped the canonical pipeline before IPA construction.
+- 0.0.137 therefore has no device-run result and does not move the physical Step-35 frontier beyond 0.0.136.
+
+Next action:
+- Step 35.0.15 / 0.0.138 makes entry-marker verification derivative-specific while preserving the 0.0.137 runtime experiment and all existing resolver/native/startup prohibitions.

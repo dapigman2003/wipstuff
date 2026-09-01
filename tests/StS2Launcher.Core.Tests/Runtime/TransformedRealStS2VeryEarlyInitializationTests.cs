@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.14 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.15 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -840,6 +840,19 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
 
             using var reopened = AssemblyDefinition.ReadAssembly(clone, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
             Assert.IsNotNull(reopened.MainModule.Types.SingleOrDefault(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName));
+            var serializedGodotEntryMarkers = reopened.MainModule.Types
+                .SelectMany(type => type.Methods)
+                .Where(method => method.HasBody && method.Body.Instructions.Count >= 2 &&
+                                 method.Body.Instructions[0].OpCode.Code == Code.Ldstr &&
+                                 method.Body.Instructions[0].Operand is string marker &&
+                                 marker.StartsWith("INMETHOD_GS", StringComparison.Ordinal))
+                .ToArray();
+            Assert.IsTrue(serializedGodotEntryMarkers.Length >= 6);
+            Assert.IsTrue(serializedGodotEntryMarkers.All(method =>
+                method.Body.Instructions[1].OpCode.Code == Code.Call &&
+                method.Body.Instructions[1].Operand is MethodReference emitCall &&
+                emitCall.Name == "Emit" &&
+                emitCall.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName));
             Assert.IsFalse(reopened.MainModule.Types.SelectMany(type => type.Methods).Where(method => method.HasBody)
                 .SelectMany(method => method.Body.Instructions)
                 .Any(instruction => instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string marker && marker.StartsWith("INMETHOD_CL", StringComparison.Ordinal)));

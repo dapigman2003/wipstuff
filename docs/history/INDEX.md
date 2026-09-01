@@ -221,4 +221,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-35.0.12-PHYSICAL-PREZERO-INVALIDPROGRAM-0.0.135.txt` — physical 0.0.135 disproved the MaxStack-only diagnosis; cctor still rejected before instruction zero.
 - `reports/STEP-35.0.13-PHYSICAL-GODOT-DICTIONARY-CONSTRUCTOR-BOUNDARY-0.0.136.txt` — physical 0.0.136 entered CommandLineHelper..cctor and localized the hard termination to Godot string-dictionary construction before `_args` assignment.
 - `steps/STEP-35.0.14-MANAGED-COMMANDLINE-DICTIONARY-COMPATIBILITY.md` — 0.0.137 bounded diagnostic compatibility design replacing only CommandLineHelper's private Godot string dictionary with the existing BCL Dictionary contract while retaining natural GetCmdlineArgs.
-- `steps/STEP-35.0.14-COMPREHENSIVE-GODOT-NATIVE-RECONNAISSANCE.md` — rebuilt 0.0.137 active design: same IPA contains NATURAL and COMPAT fresh-process modes, read-only exact-depot Mach-O/native reconnaissance, and a separately verified entry-only GodotSharp diagnostic derivative; the earlier dictionary-only 0.0.137 draft is superseded before physical testing.
+- `steps/STEP-35.0.14-COMPREHENSIVE-GODOT-NATIVE-RECONNAISSANCE.md` — rebuilt 0.0.137 pre-device design: same IPA contains NATURAL and COMPAT fresh-process modes, read-only exact-depot Mach-O/native reconnaissance, and a separately verified entry-only GodotSharp diagnostic derivative; the earlier dictionary-only 0.0.137 draft is superseded before physical testing.
+
+## Step 35.0.14–35.0.15 pre-device comprehensive reconnaissance transition
+
+- `steps/STEP-35.0.14-COMPREHENSIVE-GODOT-NATIVE-RECONNAISSANCE.md` — comprehensive NATURAL/COMPAT design introduced for 0.0.137.
+- `reports/STEP-35.0.14-CODEMAGIC-HOST-REGRESSION-FAILURE-0.0.137.txt` — 0.0.137 static validation passed but Codemagic stopped at 208/209 host tests due to the derivative bridge-verifier mismatch; no IPA/device evidence.
+- `steps/STEP-35.0.15-GODOTSHARP-BRIDGE-VERIFIER-CORRECTION.md` — 0.0.138 derivative-specific entry-marker verification fix and active documentation/release cleanup.

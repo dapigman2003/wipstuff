@@ -1,9 +1,9 @@
 # Documentation map
 
-Current candidate: **Step 35.0.14 / 0.0.137 (137)**. Step 35 remains OPEN.
+Current candidate: **Step 35.0.15 / 0.0.138 (138)**. Step 35 remains OPEN.
 
-Use `CURRENT-STATUS.md` for the latest physical frontier, `REGRESSION-CONTRACTS.md` for non-negotiable implementation constraints, `TESTING.md` for host/device procedure, `RELEASE-CHECKLIST.md` for packaging, and `MASTER-PLAN.md` for the durable roadmap. Historical immutable design and physical evidence live under `history/`.
+Use `CURRENT-STATUS.md` for the latest physical/CI frontier, `REGRESSION-CONTRACTS.md` for non-negotiable implementation constraints, `TESTING.md` for host/device procedure, `RELEASE-CHECKLIST.md` for packaging, and `MASTER-PLAN.md` for the durable roadmap. Historical immutable design and physical/CI evidence live under `history/`.
 
-Physical 0.0.132 remains the game-frontier localization: `NullPlatformUtilStrategy..ctor` triggered `CommandLineHelper.TryGetValue` and hard-terminated before return. 0.0.134 was stopped before physical testing: its host suite was 205/206 because the new MaxStack regression incorrectly required Cecil's serialized MaxStack to equal 4 rather than be at least the required minimum. 0.0.137 fixes only that test contract while retaining the executable CLR check.
+Physical 0.0.136 is the latest device evidence: `CommandLineHelper..cctor` reached `INMETHOD_CL_CRITICAL_001_PRE` and hard-terminated during `Godot.Collections.Dictionary<string,string>` construction before `_args` assignment.
 
-Physical 0.0.133 corrected the ordinal to NP002 but its new CommandLine cctor sweep was rejected with managed `InvalidProgramException` before any cctor marker and the launcher reached normal `RUN_END`; that is a diagnostic MaxStack defect. 0.0.137 reserves/verifies MaxStack and adds stack-neutral critical boundaries around dictionary setup and `Godot.OS.GetCmdlineArgs`.
+0.0.137 did **not** reach a physical run. Codemagic stopped at 208/209 host tests because the new GodotSharp derivative verifier checked its entry marker against the sts2 diagnostic bridge type. Step 35.0.15 / 0.0.138 fixes that verifier-only mismatch, keeps live-stack CL/CLTV runtime sweeps retired, and otherwise preserves the same NATURAL/COMPAT comprehensive GodotSharp/native reconnaissance design.

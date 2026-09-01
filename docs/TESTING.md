@@ -1,12 +1,14 @@
-# Testing — Step 35.0.14
+# Testing — Step 35.0.15
 
-Active candidate: Step 35.0.14 / `0.0.137 (137)` comprehensive GodotSharp/native reconnaissance. IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.15 / `0.0.138 (138)` comprehensive GodotSharp/native reconnaissance. IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
-Running Step 34 and Step 35 in the same process is invalid. Once Gate B begins, the process is spent. **NATURAL and COMPAT must therefore be run as separate fresh-process runs**, but both modes are included in the same 0.0.137 IPA and require no rebuild between them.
+0.0.137 was stopped by Codemagic before iOS build: static validation passed and host tests were 208/209, with the sole failure caused by the GodotSharp entry-marker verifier checking the sts2 bridge type. 0.0.138 must first prove that host regression green before any device run is considered valid.
+
+Running Step 34 and Step 35 in the same process is invalid. Once Gate B begins, the process is spent. **NATURAL and COMPAT must therefore be run as separate fresh-process runs**, but both modes are included in the same 0.0.138 IPA and require no rebuild between them.
 
 ## Authority rule
 
-0.0.137 is diagnostic. Gate A must recreate/reverify the exact closed Step-32 transformed artifact and write its same-run exact-source map before CLR admission. Gate B/C execute only separately identified diagnostic derivatives. A 4/4 result is evidence only and cannot be recorded as exact Step-35 closure.
+0.0.138 is diagnostic. Gate A must recreate/reverify the exact closed Step-32 transformed artifact and write its same-run exact-source map before CLR admission. Gate B/C execute only separately identified diagnostic derivatives. A 4/4 result is evidence only and cannot be recorded as exact Step-35 closure.
 
 ## Required host/static regressions
 
@@ -18,8 +20,11 @@ Run `bash scripts/validate.sh` and `bash scripts/test.sh` on a host with `dotnet
 - permanent absence of production live-stack CL/CLTV sweeps;
 - dual modes: NATURAL preserves the original Godot string dictionary; COMPAT applies exactly four BCL dictionary substitutions and leaves `Godot.OS.GetCmdlineArgs()` natural;
 - GodotSharp diagnostic clone preserves identity/MVID, reopens under rejecting resolution, and uses **entry-only** markers including Dictionary ctor, `OS.GetCmdlineArgs`, and `NativeCalls.godot_icall_0_108`;
+- serialized entry-marker verification validates the derivative-specific bridge: sts2 markers use `ExecuteVeryEarlyCheckpointBridge`, GodotSharp markers use `GodotSharpCheckpointBridge`;
 - GodotSharp source is unchanged after derivative creation;
 - read-only reconnaissance recognizes a synthetic arm64 Mach-O without mutating it and emits managed IL, P/Invoke/calli/callback-field, Mach-O dependency/rpath/symbol/string sections.
+
+The Codemagic run is not build-ready unless `step35.trx` reports all tests passed and the host text report ends with `HOST UNIT TESTS: PASS`.
 
 ## Physical runs
 

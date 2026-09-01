@@ -31,8 +31,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     public const uint SourceStateMachineMoveNextToken = 0x0600BC71;
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
-    private const string DiagnosticCloneFileName = "sts2.step35.0.14.instrumented.dll";
-    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.14.instrumented.dll";
+    private const string DiagnosticCloneFileName = "sts2.step35.0.15.instrumented.dll";
+    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.15.instrumented.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
     internal const string NullPlatformTypeFullName = "MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy";
@@ -203,15 +203,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     throw new InvalidDataException("Step-35 ExecuteVeryEarly unexpectedly contains a direct Harmony method reference.");
 
                 var transformedNullPlatformType = EnumerateTypes(transformedModule.Types).SingleOrDefault(type => type.FullName == NullPlatformTypeFullName)
-                    ?? throw new MissingMemberException($"Step-35.0.14 static-map target type missing: {NullPlatformTypeFullName}.");
+                    ?? throw new MissingMemberException($"Step-35.0.15 static-map target type missing: {NullPlatformTypeFullName}.");
                 var transformedNullPlatformConstructor = transformedNullPlatformType.Methods.SingleOrDefault(method => method.FullName == NullPlatformConstructorFullName && method.HasBody)
-                    ?? throw new MissingMethodException($"Step-35.0.14 static-map target constructor missing: {NullPlatformConstructorFullName}.");
+                    ?? throw new MissingMethodException($"Step-35.0.15 static-map target constructor missing: {NullPlatformConstructorFullName}.");
                 var transformedCommandLineHelperType = EnumerateTypes(transformedModule.Types).SingleOrDefault(type => type.FullName == CommandLineHelperTypeFullName)
-                    ?? throw new MissingMemberException($"Step-35.0.14 static-map target type missing: {CommandLineHelperTypeFullName}.");
+                    ?? throw new MissingMemberException($"Step-35.0.15 static-map target type missing: {CommandLineHelperTypeFullName}.");
                 var transformedCommandLineHelperCctor = transformedCommandLineHelperType.Methods.SingleOrDefault(method => method.Name == ".cctor" && method.IsStatic && method.HasBody)
-                    ?? throw new MissingMethodException($"Step-35.0.14 static-map target cctor missing: {CommandLineHelperTypeFullName}..cctor.");
+                    ?? throw new MissingMethodException($"Step-35.0.15 static-map target cctor missing: {CommandLineHelperTypeFullName}..cctor.");
                 var transformedCommandLineHelperTryGetValue = transformedCommandLineHelperType.Methods.SingleOrDefault(method => method.FullName == CommandLineHelperTryGetValueFullName && method.HasBody)
-                    ?? throw new MissingMethodException($"Step-35.0.14 static-map target method missing: {CommandLineHelperTryGetValueFullName}.");
+                    ?? throw new MissingMethodException($"Step-35.0.15 static-map target method missing: {CommandLineHelperTryGetValueFullName}.");
                 veryEarlyStaticInstructionMap = BuildStaticInstructionMap(
                     transformedMethod,
                     transformedMoveNext,
@@ -226,7 +226,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             progress?.Report(new(gate, 5, 8, transformedPath,
                 "Exact source/transformed ExecuteVeryEarly wrapper + async MoveNext semantics requalified; no direct ExecuteEssential/ExecuteDeferred/PrewarmJit or Harmony call crosses this boundary."));
 
-            stage = "Step-35.0.14 diagnostic-clone instrumentation";
+            stage = "Step-35.0.15 diagnostic-clone instrumentation";
             var diagnosticRoot = Path.Combine(_launcherDataRoot, "Step35-ExecuteVeryEarlyDiagnostic");
             Directory.CreateDirectory(diagnosticRoot);
             var diagnosticPath = Path.Combine(diagnosticRoot, DiagnosticCloneFileName);
@@ -235,9 +235,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             VerifyFileLength(transformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "exact transformed primary after diagnostic-clone emission");
             var transformedSha256AfterDiagnosticEmission = ComputeSha256Hex(transformedPath);
             if (!transformedSha256AfterDiagnosticEmission.Equals(transformedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35.0.14 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
+                throw new InvalidDataException("Step-35.0.15 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
             progress?.Report(new(gate, 6, 8, diagnosticPath,
-                $"Exact transformed image requalified, then a Step-35.0.14 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
+                $"Exact transformed image requalified, then a Step-35.0.15 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
 
             stage = "Step-21/22 prepared execution-plan preflight";
             var preparedResult = await _preparedPreflight.RunPreparedLoadPreflightAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -277,21 +277,21 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
 
             stage = "GodotSharp diagnostic clone + installed-bundle native reconnaissance";
             var preparedGodotSharp = prepared.SingleOrDefault(item => !item.Plan.IsPrimary && string.Equals(item.AssemblyName.Name, "GodotSharp", StringComparison.OrdinalIgnoreCase))
-                ?? throw new InvalidDataException("Step-35.0.14 comprehensive reconnaissance requires the exact prepared GodotSharp private dependency.");
+                ?? throw new InvalidDataException("Step-35.0.15 comprehensive reconnaissance requires the exact prepared GodotSharp private dependency.");
             if (preparedGodotSharp.ModuleInitializerCount != 0)
-                throw new InvalidDataException("Step-35.0.14 refuses to create a runtime diagnostic derivative from initializer-bearing GodotSharp metadata.");
+                throw new InvalidDataException("Step-35.0.15 refuses to create a runtime diagnostic derivative from initializer-bearing GodotSharp metadata.");
             var godotSharpDiagnosticPath = Path.Combine(diagnosticRoot, GodotSharpDiagnosticCloneFileName);
             var godotSharpDiagnostic = CreateInstrumentedGodotSharpDiagnosticClone(preparedGodotSharp.PreparedPath, godotSharpDiagnosticPath);
             if (!godotSharpDiagnostic.AssemblyIdentity.Equals(preparedGodotSharp.Plan.AssemblyFullName, StringComparison.Ordinal))
-                throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic identity drifted from prepared plan: {godotSharpDiagnostic.AssemblyIdentity} != {preparedGodotSharp.Plan.AssemblyFullName}.");
+                throw new InvalidDataException($"Step-35.0.15 GodotSharp diagnostic identity drifted from prepared plan: {godotSharpDiagnostic.AssemblyIdentity} != {preparedGodotSharp.Plan.AssemblyFullName}.");
             VerifyFileLength(preparedGodotSharp.PreparedPath, preparedGodotSharp.Plan.Length, "prepared GodotSharp after diagnostic-clone emission");
             var godotSourceSha1AfterDiagnostic = ComputeSha1Hex(preparedGodotSharp.PreparedPath);
             if (!godotSourceSha1AfterDiagnostic.Equals(preparedGodotSharp.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic-clone emission changed the exact prepared source; refusing to continue.");
+                throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic-clone emission changed the exact prepared source; refusing to continue.");
 
             var offlineForRecon = await _offlineInspection.RunAsync(progress: null, cancellationToken).ConfigureAwait(false);
             if (!offlineForRecon.Success || !offlineForRecon.ExactManagedTreeVerified || string.IsNullOrWhiteSpace(offlineForRecon.ManagedInstallRelativePath))
-                throw new InvalidDataException("Step-35.0.14 native reconnaissance requires the exact Step-13 OfflineReady managed tree.");
+                throw new InvalidDataException("Step-35.0.15 native reconnaissance requires the exact Step-13 OfflineReady managed tree.");
             var managedInstallRoot = ResolveChildPath(_launcherDataRoot, NormalizeRelative(offlineForRecon.ManagedInstallRelativePath), "Step-35 managed-install reconnaissance root");
             var godotReconnaissanceReport = Step35GodotReconnaissance.BuildReport(managedInstallRoot, preparedGodotSharp.PreparedPath);
 
@@ -330,8 +330,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 $"Source SHA-256: {sourceSha256}\n" +
                 $"Transformed SHA-256: {transformedSha256}\n" +
                 $"Transformed bytes: {TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes:N0}\n" +
-                $"Step-35.0.14 diagnostic clone SHA-256: {diagnostic.Sha256}\n" +
-                $"Step-35.0.14 diagnostic clone bytes: {diagnostic.Length:N0}\n" +
+                $"Step-35.0.15 diagnostic clone SHA-256: {diagnostic.Sha256}\n" +
+                $"Step-35.0.15 diagnostic clone bytes: {diagnostic.Length:N0}\n" +
                 $"Injected durable sts2 checkpoint markers: {diagnostic.MarkerCount:N0}\n" +
                 $"Diagnostic mode: {diagnosticMode}\n" +
                 $"GodotSharp diagnostic clone SHA-256: {godotSharpDiagnostic.Sha256}\n" +
@@ -425,19 +425,19 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 throw new InvalidOperationException("Step 35 Gate B requires a fresh dedicated load context.");
 
             stage = "immediate exact-transformed and diagnostic-clone hash recheck";
-            Checkpoint(crashCheckpoint, "B_HASH_START — rechecking the exact closed transformed primary and the Step-35.0.14 instrumented diagnostic clone before CLR admission.");
+            Checkpoint(crashCheckpoint, "B_HASH_START — rechecking the exact closed transformed primary and the Step-35.0.15 instrumented diagnostic clone before CLR admission.");
             VerifyFileLength(preflight.TransformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "exact transformed primary");
             var exactImmediateSha256 = ComputeSha256Hex(preflight.TransformedPath);
             if (!exactImmediateSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35 exact transformed image changed between Gate A verification and Gate B CLR admission.");
-            VerifyFileLength(preflight.DiagnosticPath, preflight.DiagnosticLength, "Step-35.0.14 instrumented diagnostic clone");
+            VerifyFileLength(preflight.DiagnosticPath, preflight.DiagnosticLength, "Step-35.0.15 instrumented diagnostic clone");
             var immediateSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
             if (!immediateSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35.0.14 diagnostic clone changed between Gate A instrumentation and Gate B CLR admission.");
-            VerifyFileLength(preflight.GodotSharpDiagnostic.Path, preflight.GodotSharpDiagnostic.Length, "Step-35.0.14 GodotSharp diagnostic clone");
+                throw new InvalidDataException("Step-35.0.15 diagnostic clone changed between Gate A instrumentation and Gate B CLR admission.");
+            VerifyFileLength(preflight.GodotSharpDiagnostic.Path, preflight.GodotSharpDiagnostic.Length, "Step-35.0.15 GodotSharp diagnostic clone");
             var immediateGodotSha256 = ComputeSha256Hex(preflight.GodotSharpDiagnostic.Path);
             if (!immediateGodotSha256.Equals(preflight.GodotSharpDiagnostic.Sha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone changed between Gate A instrumentation and Gate B admission preparation.");
+                throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic clone changed between Gate A instrumentation and Gate B admission preparation.");
             Checkpoint(crashCheckpoint, $"B_HASH_PASS — exact transformed source still matched {exactImmediateSha256}; sts2 diagnostic clone matched {immediateSha256}; GodotSharp diagnostic derivative matched {immediateGodotSha256}.");
 
             stage = "execution-capable strict AssemblyLoadContext construction";
@@ -463,11 +463,11 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "B_ALC_CONSTRUCT_PASS — strict Step-35 execution AssemblyLoadContext constructed.");
 
             stage = "instrumented diagnostic sts2.dll LoadFromStream";
-            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_START — entering Step-35.0.14 instrumented diagnostic-clone LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched on disk.");
+            Checkpoint(crashCheckpoint, "B_LOADPRIMARY_START — entering Step-35.0.15 instrumented diagnostic-clone LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched on disk.");
             var assembly = context.LoadPrimary(preflight.DiagnosticPath, immediateSha256);
             Checkpoint(crashCheckpoint, "B_LOADPRIMARY_PASS — instrumented diagnostic clone returned from LoadPrimary/LoadFromStream.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(assembly), context))
-                throw new InvalidDataException("The Step-35.0.14 diagnostic sts2.dll clone did not load into the dedicated Step-35 AssemblyLoadContext.");
+                throw new InvalidDataException("The Step-35.0.15 diagnostic sts2.dll clone did not load into the dedicated Step-35 AssemblyLoadContext.");
             Checkpoint(crashCheckpoint, "B_CONTEXT_OWNERSHIP_PASS — instrumented diagnostic clone belongs to the dedicated Step-35 AssemblyLoadContext.");
 
             Checkpoint(crashCheckpoint, "B_GETNAME_START — reading loaded diagnostic-clone assembly identity.");
@@ -484,7 +484,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
             {
                 throw new InvalidDataException(
-                    "Step-35.0.14 diagnostic-clone admission no longer matches the physically closed Step-33 zero-resolution admission behavior. " +
+                    "Step-35.0.15 diagnostic-clone admission no longer matches the physically closed Step-33 zero-resolution admission behavior. " +
                     context.FormatResolverState());
             }
             Checkpoint(crashCheckpoint, "B_ZERO_RESOLUTION_PASS — primary admission produced zero managed/private/initializer/rejected/native resolution activity.");
@@ -502,7 +502,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "B_PASS_RETURN — Gate B completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35.0.14 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
+                "STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35.0.15 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
                 $"Loaded identity: {actualIdentity}\n" +
                 $"Loaded MVID: {actualMvid}\n" +
                 $"AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
@@ -544,7 +544,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         try
         {
             if (crashCheckpoint is null)
-                throw new InvalidOperationException("Step-35.0.14 diagnostic Gate C requires a durable launcher-owned checkpoint callback; refusing to execute an instrumented clone without in-method telemetry.");
+                throw new InvalidOperationException("Step-35.0.15 diagnostic Gate C requires a durable launcher-owned checkpoint callback; refusing to execute an instrumented clone without in-method telemetry.");
             Checkpoint(crashCheckpoint, "C_ENTRY — entered Gate C diagnostic-clone ExecuteVeryEarly binding/invocation/await boundary; exact transformed source remains outside the CLR.");
             ThrowIfDisposed();
             var preflight = RequirePreflight();
@@ -569,7 +569,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var targetType = admission.Assembly.GetType(TargetTypeFullName, throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException(TargetTypeFullName);
             if (!ReferenceEquals(targetType.Assembly, admission.Assembly))
-                throw new InvalidDataException("Step-35.0.14 target type did not bind from the admitted diagnostic sts2 clone.");
+                throw new InvalidDataException("Step-35.0.15 target type did not bind from the admitted diagnostic sts2 clone.");
             Checkpoint(crashCheckpoint, "C_BIND_TYPE_PASS — OneTimeInitialization target type bound from the separately verified diagnostic sts2 clone.");
 
             Checkpoint(crashCheckpoint, "C_BIND_METHOD_START — calling Type.GetMethod for the diagnostic clone's static parameterless ExecuteVeryEarly.");
@@ -583,22 +583,22 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "C_BIND_METHOD_PASS — diagnostic-clone ExecuteVeryEarly MethodInfo binding returned.");
 
             if (!ReferenceEquals(method.DeclaringType, targetType) || !method.IsStatic || method.ReturnType != typeof(Task) || method.GetParameters().Length != 0)
-                throw new InvalidDataException("Step-35.0.14 reflected diagnostic ExecuteVeryEarly identity/signature drifted from the exact static parameterless System.Threading.Tasks.Task target.");
+                throw new InvalidDataException("Step-35.0.15 reflected diagnostic ExecuteVeryEarly identity/signature drifted from the exact static parameterless System.Threading.Tasks.Task target.");
             Checkpoint(crashCheckpoint, "C_SIGNATURE_PASS — reflected instrumented method retains the exact static parameterless Task-returning target contract.");
             if (method.MetadataToken != unchecked((int)preflight.DiagnosticMethodToken))
-                throw new InvalidDataException($"Step-35.0.14 reflected instrumented ExecuteVeryEarly token drifted: 0x{method.MetadataToken:X8} != preflight diagnostic 0x{preflight.DiagnosticMethodToken:X8}.");
+                throw new InvalidDataException($"Step-35.0.15 reflected instrumented ExecuteVeryEarly token drifted: 0x{method.MetadataToken:X8} != preflight diagnostic 0x{preflight.DiagnosticMethodToken:X8}.");
             Checkpoint(crashCheckpoint, $"C_TOKEN_PASS — reflected ExecuteVeryEarly token matched 0x{method.MetadataToken:X8}.");
             if (method.Module.ModuleVersionId != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
                 throw new InvalidDataException("Step-35 reflected ExecuteVeryEarly module MVID drifted from the closed transformed image.");
             Checkpoint(crashCheckpoint, $"C_MVID_PASS — reflected diagnostic-clone ExecuteVeryEarly module MVID matched {method.Module.ModuleVersionId}.");
 
-            stage = "Step-35.0.14 in-method checkpoint bridge arm";
+            stage = "Step-35.0.15 in-method checkpoint bridge arm";
             var bridgeType = admission.Assembly.GetType(DiagnosticBridgeTypeFullName, throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException(DiagnosticBridgeTypeFullName);
             var bridgeField = bridgeType.GetField(DiagnosticBridgeCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
                 ?? throw new MissingFieldException(DiagnosticBridgeTypeFullName, DiagnosticBridgeCallbackFieldName);
             if (bridgeField.FieldType != typeof(Action<string>))
-                throw new InvalidDataException($"Step-35.0.14 diagnostic bridge field type drifted: {bridgeField.FieldType.FullName}.");
+                throw new InvalidDataException($"Step-35.0.15 diagnostic bridge field type drifted: {bridgeField.FieldType.FullName}.");
             bridgeField.SetValue(null, crashCheckpoint);
             Checkpoint(crashCheckpoint, $"C_DIAGNOSTIC_BRIDGE_ARMED — instrumented diagnostic clone callback armed; markerCount={preflight.DiagnosticMarkerCount}. The next durable INMETHOD_* record is emitted from inside the executing sts2.dll method body.");
 
@@ -606,7 +606,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Task task;
             try
             {
-                Checkpoint(crashCheckpoint, "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for the Step-35.0.14 instrumented ExecuteVeryEarly diagnostic clone.");
+                Checkpoint(crashCheckpoint, "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for the Step-35.0.15 instrumented ExecuteVeryEarly diagnostic clone.");
                 var result = method.Invoke(null, null);
                 Checkpoint(crashCheckpoint, "C_INVOKE_RETURNED — MethodInfo.Invoke returned to the launcher.");
                 task = result as Task
@@ -617,7 +617,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             {
                 var target = ex.InnerException ?? ex;
                 throw new InvalidOperationException(
-                    "Step-35.0.14 instrumented ExecuteVeryEarly threw synchronously during the first controlled invocation. " +
+                    "Step-35.0.15 instrumented ExecuteVeryEarly threw synchronously during the first controlled invocation. " +
                     DescribeException(target) + "\nResolver state at failure: " + context.FormatResolverState(), target);
             }
 
@@ -640,7 +640,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    "Step-35.0.14 diagnostic-clone ExecuteVeryEarly Task faulted during the controlled await. " +
+                    "Step-35.0.15 diagnostic-clone ExecuteVeryEarly Task faulted during the controlled await. " +
                     DescribeException(ex) + "\nResolver state at failure: " + context.FormatResolverState(), ex);
             }
 
@@ -678,7 +678,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "C_PASS_RETURN — Gate C completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "STEP-35.0.14 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE.\n" +
+                "STEP-35.0.15 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE.\n" +
                 $"Target type: {TargetTypeFullName}\n" +
                 $"Target method: {TargetMethodFullName}\n" +
                 $"Reflected diagnostic-clone MethodDef token: 0x{method.MetadataToken:X8}\n" +
@@ -749,10 +749,10 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 throw new InvalidDataException("Verified exact transformed sts2.dll changed after ExecuteVeryEarly diagnostic execution.");
             var diagnosticSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
             if (!diagnosticSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35.0.14 instrumented diagnostic clone changed during ExecuteVeryEarly execution.");
+                throw new InvalidDataException("Step-35.0.15 instrumented diagnostic clone changed during ExecuteVeryEarly execution.");
             var godotDiagnosticSha256 = ComputeSha256Hex(preflight.GodotSharpDiagnostic.Path);
             if (!godotDiagnosticSha256.Equals(preflight.GodotSharpDiagnostic.Sha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone changed during ExecuteVeryEarly execution.");
+                throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic clone changed during ExecuteVeryEarly execution.");
             progress?.Report(new(gate, 2, 4, preflight.DiagnosticPath, "Exact transformed source plus sts2/GodotSharp diagnostic derivatives remain byte-identical to their Gate-A hashes."));
             var planSha256 = ComputeSha256Hex(_planPath);
             if (!planSha256.Equals(preflight.PlanSha256, StringComparison.OrdinalIgnoreCase))
@@ -778,14 +778,14 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 throw new InvalidDataException("Step-35 final resolver/native isolation counters are not clean. " + context.FormatResolverState());
             var matches = FindLoadedStS2Assemblies();
             if (matches.Length != 1 || !ReferenceEquals(matches[0], admission.Assembly) || !ReferenceEquals(AssemblyLoadContext.GetLoadContext(admission.Assembly), context))
-                throw new InvalidDataException("Step-35.0.14 diagnostic-clone CLR residency/context ownership drifted during final audit.");
+                throw new InvalidDataException("Step-35.0.15 diagnostic-clone CLR residency/context ownership drifted during final audit.");
             if (execution.MethodToken != unchecked((int)preflight.DiagnosticMethodToken))
-                throw new InvalidDataException("Step-35.0.14 execution snapshot diagnostic ExecuteVeryEarly token drifted during final audit.");
+                throw new InvalidDataException("Step-35.0.15 execution snapshot diagnostic ExecuteVeryEarly token drifted during final audit.");
 
             progress?.Report(new(gate, 4, 4, preflight.DiagnosticPath, "Final source/diagnostic-clone/plan/dependency/context isolation checks passed."));
 
             return Pass(gate,
-                "STEP-35.0.14 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n" +
+                "STEP-35.0.15 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n" +
                 $"Post-execution OfflineReady: PASS ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
                 $"Verified exact transformed SHA-256 unchanged: {transformedSha256}\n" +
@@ -795,7 +795,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 $"Runtime-binding plan SHA-256 unchanged: {planSha256}\n" +
                 $"Unique resident sts2 identity: {admission.AssemblyFullName}\n" +
                 $"Resident sts2 AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
-                "Resident sts2 load input: Step-35.0.14 instrumented diagnostic clone derived from the reverified exact Step-32 transformed image\n" +
+                "Resident sts2 load input: Step-35.0.15 instrumented diagnostic clone derived from the reverified exact Step-32 transformed image\n" +
                 $"Initializer-free prepared private dependencies resident and re-hashed: {verifiedPrivate:N0}\n" +
                 $"Managed resolver requests total: {context.ManagedResolverRequests.Count:N0}\n" +
                 $"Exact planned host-framework loads total: {context.HostLoads.Count:N0}\n" +
@@ -809,7 +809,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 "Game entry point / ExecuteEssential / ExecuteDeferred intentionally invoked by launcher: NO\n" +
                 "Harmony/MonoMod runtime patching intentionally invoked by launcher: NO\n" +
                 "Godot/game startup intentionally requested by launcher: NO\n" +
-                "After a 0.0.137 diagnostic 4/4 result, Step 35 remains OPEN. Use the localization evidence to design a separately defined compatibility candidate, then return to an explicitly authoritative transformed artifact for physical closure testing.");
+                "After a 0.0.138 diagnostic 4/4 result, Step 35 remains OPEN. Use the localization evidence to design a separately defined compatibility candidate, then return to an explicitly authoritative transformed artifact for physical closure testing.");
         }
         catch (OperationCanceledException)
         {
@@ -923,7 +923,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[NULL PLATFORM CTOR IL]");
             lines.Add($"NullPlatform constructor: token=0x{nullPlatformConstructor.MetadataToken.ToUInt32():X8}; {nullPlatformConstructor.FullName}");
-            lines.Add("Step 35.0.14 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
+            lines.Add("Step 35.0.15 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
             AppendInstructionMap(lines, nullPlatformConstructor);
         }
         if (commandLineHelperCctor is not null)
@@ -932,7 +932,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add("[COMMAND LINE HELPER CCTOR IL]");
             lines.Add($"CommandLineHelper cctor: token=0x{commandLineHelperCctor.MetadataToken.ToUInt32():X8}; {commandLineHelperCctor.FullName}");
             lines.Add($"CommandLineHelper cctor exact-source MaxStack={commandLineHelperCctor.Body.MaxStackSize}; instructions={commandLineHelperCctor.Body.Instructions.Count}; locals={commandLineHelperCctor.Body.Variables.Count}; handlers={commandLineHelperCctor.Body.ExceptionHandlers.Count}");
-            lines.Add("Step 35.0.14 retains this exact-source CALLSITE map for correlation. Runtime mode is chosen separately: NATURAL preserves this Godot dictionary contract for deep GodotSharp entry-marker localization; COMPAT rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string>. Both modes retain four stack-neutral critical markers and leave Godot.OS.GetCmdlineArgs natural.");
+            lines.Add("Step 35.0.15 retains this exact-source CALLSITE map for correlation. Runtime mode is chosen separately: NATURAL preserves this Godot dictionary contract for deep GodotSharp entry-marker localization; COMPAT rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string>. Both modes retain four stack-neutral critical markers and leave Godot.OS.GetCmdlineArgs natural.");
             AppendInstructionMap(lines, commandLineHelperCctor);
         }
         if (commandLineHelperTryGetValue is not null)
@@ -940,7 +940,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[COMMAND LINE HELPER TRYGETVALUE IL]");
             lines.Add($"CommandLineHelper TryGetValue: token=0x{commandLineHelperTryGetValue.MetadataToken.ToUInt32():X8}; {commandLineHelperTryGetValue.FullName}");
-            lines.Add("Step 35.0.14 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL preserves the Godot dictionary TryGetValue MemberRef; COMPAT rewrites only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
+            lines.Add("Step 35.0.15 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL preserves the Godot dictionary TryGetValue MemberRef; COMPAT rewrites only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
             AppendInstructionMap(lines, commandLineHelperTryGetValue);
         }
         return string.Join("\n", lines);
@@ -1060,7 +1060,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                }))
         {
             if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step-35.0.14 diagnostic deferred-open unexpectedly resolved a dependency before the bounded writer resolver was configured.");
+                throw new InvalidDataException("Step-35.0.15 diagnostic deferred-open unexpectedly resolved a dependency before the bounded writer resolver was configured.");
 
             var constantPlan = resolver.Configure(module);
             expectedConstantMetadataSha256 = RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint(module);
@@ -1069,7 +1069,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             approvedConstantRequirementCount = constantPlan.ApprovedRequirementCount;
 
             if (EnumerateTypes(module.Types).Any(type => type.FullName == DiagnosticBridgeTypeFullName))
-                throw new InvalidDataException("Step-35.0.14 diagnostic bridge type already exists in the exact transformed image.");
+                throw new InvalidDataException("Step-35.0.15 diagnostic bridge type already exists in the exact transformed image.");
 
             var bridge = new TypeDefinition(
                 "StS2Launcher.Step35Diagnostics",
@@ -1083,7 +1083,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 .Where(reference => reference.Name == "System.Runtime")
                 .OrderByDescending(reference => reference.Version)
                 .FirstOrDefault()
-                ?? throw new InvalidDataException("Step-35.0.14 diagnostic clone requires the existing System.Runtime metadata scope.");
+                ?? throw new InvalidDataException("Step-35.0.15 diagnostic clone requires the existing System.Runtime metadata scope.");
             var (actionStringType, invoke) = CreateDiagnosticActionStringInvokeReference(module, systemRuntime);
             var callbackField = new FieldDefinition(
                 DiagnosticBridgeCallbackFieldName,
@@ -1116,10 +1116,10 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             foreach (var item in markers)
             {
                 var type = EnumerateTypes(module.Types).SingleOrDefault(candidate => candidate.FullName == item.TypeName)
-                    ?? throw new MissingMemberException($"Step-35.0.14 diagnostic marker target type missing: {item.TypeName}.");
+                    ?? throw new MissingMemberException($"Step-35.0.15 diagnostic marker target type missing: {item.TypeName}.");
                 var methods = type.Methods.Where(method => method.FullName == item.MethodFullName && method.HasBody).ToArray();
                 if (methods.Length != 1)
-                    throw new MissingMethodException($"Step-35.0.14 expected exactly one managed-IL marker target {item.MethodFullName}, found {methods.Length}.");
+                    throw new MissingMethodException($"Step-35.0.15 expected exactly one managed-IL marker target {item.MethodFullName}, found {methods.Length}.");
                 InsertEntryMarker(methods[0], emitReference, item.Marker);
                 markerCount++;
 
@@ -1138,32 +1138,32 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             foreach (var item in GetDiagnosticCallsiteMarkerTargets())
             {
                 var type = EnumerateTypes(module.Types).SingleOrDefault(candidate => candidate.FullName == item.TypeName)
-                    ?? throw new MissingMemberException($"Step-35.0.14 diagnostic callsite target type missing: {item.TypeName}.");
+                    ?? throw new MissingMemberException($"Step-35.0.15 diagnostic callsite target type missing: {item.TypeName}.");
                 var method = type.Methods.SingleOrDefault(candidate => candidate.FullName == item.MethodFullName && candidate.HasBody)
-                    ?? throw new MissingMethodException($"Step-35.0.14 diagnostic callsite target method missing: {item.MethodFullName}.");
+                    ?? throw new MissingMethodException($"Step-35.0.15 diagnostic callsite target method missing: {item.MethodFullName}.");
                 InsertCallsiteMarkers(method, emitReference, item.CalleeFullName, item.BeforeMarker, item.AfterMarker);
                 markerCount += 2;
             }
 
             var nullPlatformType = EnumerateTypes(module.Types).SingleOrDefault(candidate => candidate.FullName == NullPlatformTypeFullName)
-                ?? throw new MissingMemberException($"Step-35.0.14 NullPlatform callsite-sweep type missing: {NullPlatformTypeFullName}.");
+                ?? throw new MissingMemberException($"Step-35.0.15 NullPlatform callsite-sweep type missing: {NullPlatformTypeFullName}.");
             var nullPlatformConstructor = nullPlatformType.Methods.SingleOrDefault(candidate => candidate.FullName == NullPlatformConstructorFullName && candidate.HasBody)
-                ?? throw new MissingMethodException($"Step-35.0.14 NullPlatform callsite-sweep constructor missing: {NullPlatformConstructorFullName}.");
+                ?? throw new MissingMethodException($"Step-35.0.15 NullPlatform callsite-sweep constructor missing: {NullPlatformConstructorFullName}.");
             nullPlatformCallsitePlan = InsertNullPlatformConstructorCallsiteMarkers(nullPlatformConstructor, emitReference);
             markerCount += checked(nullPlatformCallsitePlan.Count * 2);
 
             var commandLineType = EnumerateTypes(module.Types).SingleOrDefault(candidate => candidate.FullName == CommandLineHelperTypeFullName)
-                ?? throw new MissingMemberException($"Step-35.0.14 CommandLineHelper sweep type missing: {CommandLineHelperTypeFullName}.");
+                ?? throw new MissingMemberException($"Step-35.0.15 CommandLineHelper sweep type missing: {CommandLineHelperTypeFullName}.");
             var commandLineCctor = commandLineType.Methods.SingleOrDefault(candidate => candidate.Name == ".cctor" && candidate.IsStatic && candidate.HasBody)
-                ?? throw new MissingMethodException($"Step-35.0.14 CommandLineHelper cctor missing: {CommandLineHelperTypeFullName}..cctor.");
+                ?? throw new MissingMethodException($"Step-35.0.15 CommandLineHelper cctor missing: {CommandLineHelperTypeFullName}..cctor.");
             var commandLineTryGetValue = commandLineType.Methods.SingleOrDefault(candidate => candidate.FullName == CommandLineHelperTryGetValueFullName && candidate.HasBody)
-                ?? throw new MissingMethodException($"Step-35.0.14 CommandLineHelper method missing: {CommandLineHelperTryGetValueFullName}.");
+                ?? throw new MissingMethodException($"Step-35.0.15 CommandLineHelper method missing: {CommandLineHelperTryGetValueFullName}.");
 
             // Physical 0.0.133 and 0.0.135 proved that live-stack CL/CLTV callbacks can invalidate
             // CommandLineHelper..cctor before instruction zero, so they stay retired. Physical 0.0.136
             // then entered the stack-neutral cctor and hard-terminated after CL_CRITICAL_001_PRE but before
             // the matching POST, localizing the physical interval to Godot.Collections.Dictionary<string,string>
-            // construction before _args assignment. Step 35.0.14 keeps the exact-source map and markers but
+            // construction before _args assignment. Step 35.0.15 keeps the exact-source map and markers but
             // rewrites only that private container contract to System.Collections.Generic.Dictionary<string,string>.
             // Godot.OS.GetCmdlineArgs remains natural so the next physical boundary is not silently bypassed.
             commandLineCctorOriginalMaxStack = commandLineCctor.Body.MaxStackSize;
@@ -1173,7 +1173,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             {
                 var commandLineManagedDictionaryRewrite = ApplyCommandLineHelperManagedDictionaryCompatibilityRewrite(module, commandLineCctor, commandLineTryGetValue);
                 if (commandLineManagedDictionaryRewrite.SubstitutionCount != 4)
-                    throw new InvalidDataException($"Step-35.0.14 expected exactly four CommandLine managed-dictionary compatibility substitutions; observed {commandLineManagedDictionaryRewrite.SubstitutionCount}.");
+                    throw new InvalidDataException($"Step-35.0.15 expected exactly four CommandLine managed-dictionary compatibility substitutions; observed {commandLineManagedDictionaryRewrite.SubstitutionCount}.");
                 commandLineManagedDictionarySubstitutionCount = commandLineManagedDictionaryRewrite.SubstitutionCount;
             }
             else
@@ -1182,7 +1182,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             }
             commandLineCctorDiagnosticMaxStack = commandLineCctor.Body.MaxStackSize;
             if (commandLineCctorDiagnosticMaxStack != commandLineCctorOriginalMaxStack)
-                throw new InvalidDataException($"Step-35.0.14 stack-neutral CommandLineHelper cctor unexpectedly changed MaxStack before serialization: original={commandLineCctorOriginalMaxStack}, diagnostic={commandLineCctorDiagnosticMaxStack}.");
+                throw new InvalidDataException($"Step-35.0.15 stack-neutral CommandLineHelper cctor unexpectedly changed MaxStack before serialization: original={commandLineCctorOriginalMaxStack}, diagnostic={commandLineCctorDiagnosticMaxStack}.");
 
             Directory.CreateDirectory(Path.GetDirectoryName(diagnosticPath) ?? throw new InvalidOperationException("Diagnostic clone path has no parent."));
             module.Write(diagnosticPath, new WriterParameters { WriteSymbols = false });
@@ -1203,13 +1203,13 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             AssemblyResolver = verifyResolver,
         });
         if (verifyResolver.Requests.Count != 0)
-            throw new InvalidDataException("Step-35.0.14 diagnostic clone verification unexpectedly resolved a dependency.");
+            throw new InvalidDataException("Step-35.0.15 diagnostic clone verification unexpectedly resolved a dependency.");
         var verifiedConstantMetadataSha256 = RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint(verifyModule);
         if (!verifiedConstantMetadataSha256.Equals(expectedConstantMetadataSha256, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException("Step-35.0.14 diagnostic clone changed the exact transformed image's constant metadata semantics during Cecil serialization.");
+            throw new InvalidDataException("Step-35.0.15 diagnostic clone changed the exact transformed image's constant metadata semantics during Cecil serialization.");
         if (verifyModule.Assembly?.Name.FullName != TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity ||
             verifyModule.Mvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
-            throw new InvalidDataException("Step-35.0.14 diagnostic clone changed assembly identity or MVID.");
+            throw new InvalidDataException("Step-35.0.15 diagnostic clone changed assembly identity or MVID.");
         var target = RealStS2PrepareMethodRewrite.FindMethodByStableIdentity(verifyModule, TargetTypeFullName, TargetMethodFullName);
         RequireVeryEarlySignature(target, "diagnostic clone");
         var moveNext = FindVeryEarlyMoveNext(verifyModule);
@@ -1221,7 +1221,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             bridgeEmitMethods.Length != 1 || !bridgeEmitMethods[0].IsStatic || !bridgeEmitMethods[0].HasBody || bridgeEmitMethods[0].ReturnType.FullName != "System.Void" ||
             bridgeEmitMethods[0].Parameters.Count != 1 || bridgeEmitMethods[0].Parameters[0].ParameterType.FullName != "System.String")
         {
-            throw new InvalidDataException("Step-35.0.14 diagnostic bridge field/method signature drifted after serialization.");
+            throw new InvalidDataException("Step-35.0.15 diagnostic bridge field/method signature drifted after serialization.");
         }
 
         // 0.0.129 physically proved that a synthetically encoded Action<string>::Invoke(string)
@@ -1239,7 +1239,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             bridgeInvoke.Parameters[0].ParameterType is not GenericParameter bridgeInvokeParameter ||
             bridgeInvokeParameter.Type != GenericParameterType.Type || bridgeInvokeParameter.Position != 0)
         {
-            throw new InvalidDataException("Step-35.0.14 diagnostic bridge Invoke MemberRef is not encoded as Action<string>::Invoke(!0).");
+            throw new InvalidDataException("Step-35.0.15 diagnostic bridge Invoke MemberRef is not encoded as Action<string>::Invoke(!0).");
         }
 
         var expectedMarkerCount = 0;
@@ -1247,11 +1247,11 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         foreach (var item in GetDiagnosticMarkerTargets())
         {
             var type = EnumerateTypes(verifyModule.Types).SingleOrDefault(candidate => candidate.FullName == item.TypeName)
-                ?? throw new MissingMemberException($"Step-35.0.14 diagnostic verification target type missing: {item.TypeName}.");
+                ?? throw new MissingMemberException($"Step-35.0.15 diagnostic verification target type missing: {item.TypeName}.");
             var method = type.Methods.SingleOrDefault(candidate => candidate.FullName == item.MethodFullName && candidate.HasBody)
-                ?? throw new MissingMethodException($"Step-35.0.14 diagnostic verification target method missing: {item.MethodFullName}.");
+                ?? throw new MissingMethodException($"Step-35.0.15 diagnostic verification target method missing: {item.MethodFullName}.");
             if (!HasInjectedEntryMarkerAtStart(method, item.Marker))
-                throw new InvalidDataException($"Step-35.0.14 marker is not the first stack-neutral checkpoint in {item.MethodFullName}: {item.Marker}.");
+                throw new InvalidDataException($"Step-35.0.15 marker is not the first stack-neutral checkpoint in {item.MethodFullName}: {item.Marker}.");
             expectedMarkerCount++;
 
             var cctor = type.Methods.SingleOrDefault(candidate => candidate.Name == ".cctor" && candidate.IsStatic && candidate.HasBody);
@@ -1259,7 +1259,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             {
                 var cctorMarker = $"INMETHOD_CCTOR — {item.TypeName}..cctor entered";
                 if (!HasInjectedEntryMarkerAtStart(cctor, cctorMarker))
-                    throw new InvalidDataException($"Step-35.0.14 cctor marker is not the first stack-neutral checkpoint in {item.TypeName}..cctor.");
+                    throw new InvalidDataException($"Step-35.0.15 cctor marker is not the first stack-neutral checkpoint in {item.TypeName}..cctor.");
                 expectedMarkerCount++;
             }
         }
@@ -1267,40 +1267,40 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         foreach (var item in GetDiagnosticCallsiteMarkerTargets())
         {
             var type = EnumerateTypes(verifyModule.Types).SingleOrDefault(candidate => candidate.FullName == item.TypeName)
-                ?? throw new MissingMemberException($"Step-35.0.14 diagnostic callsite verification type missing: {item.TypeName}.");
+                ?? throw new MissingMemberException($"Step-35.0.15 diagnostic callsite verification type missing: {item.TypeName}.");
             var method = type.Methods.SingleOrDefault(candidate => candidate.FullName == item.MethodFullName && candidate.HasBody)
-                ?? throw new MissingMethodException($"Step-35.0.14 diagnostic callsite verification method missing: {item.MethodFullName}.");
+                ?? throw new MissingMethodException($"Step-35.0.15 diagnostic callsite verification method missing: {item.MethodFullName}.");
             if (!HasInjectedCallsiteMarkers(method, item.CalleeFullName, item.BeforeMarker, item.AfterMarker))
-                throw new InvalidDataException($"Step-35.0.14 callsite markers did not serialize immediately around {item.CalleeFullName} in {item.MethodFullName}.");
+                throw new InvalidDataException($"Step-35.0.15 callsite markers did not serialize immediately around {item.CalleeFullName} in {item.MethodFullName}.");
             expectedMarkerCount += 2;
         }
 
         var verifiedNullPlatformType = EnumerateTypes(verifyModule.Types).SingleOrDefault(candidate => candidate.FullName == NullPlatformTypeFullName)
-            ?? throw new MissingMemberException($"Step-35.0.14 serialized NullPlatform sweep type missing: {NullPlatformTypeFullName}.");
+            ?? throw new MissingMemberException($"Step-35.0.15 serialized NullPlatform sweep type missing: {NullPlatformTypeFullName}.");
         var verifiedNullPlatformConstructor = verifiedNullPlatformType.Methods.SingleOrDefault(candidate => candidate.FullName == NullPlatformConstructorFullName && candidate.HasBody)
-            ?? throw new MissingMethodException($"Step-35.0.14 serialized NullPlatform sweep constructor missing: {NullPlatformConstructorFullName}.");
+            ?? throw new MissingMethodException($"Step-35.0.15 serialized NullPlatform sweep constructor missing: {NullPlatformConstructorFullName}.");
         foreach (var entry in nullPlatformCallsitePlan)
         {
             if (!HasInjectedDiagnosticCallsiteMarkers(verifiedNullPlatformConstructor, entry))
-                throw new InvalidDataException($"Step-35.0.14 serialized NullPlatform CALLSITE#{entry.CallsiteOrdinal:D3} marker pair drifted around {entry.CalleeFullName}.");
+                throw new InvalidDataException($"Step-35.0.15 serialized NullPlatform CALLSITE#{entry.CallsiteOrdinal:D3} marker pair drifted around {entry.CalleeFullName}.");
             expectedMarkerCount += 2;
         }
 
         var verifiedCommandLineType = EnumerateTypes(verifyModule.Types).SingleOrDefault(candidate => candidate.FullName == CommandLineHelperTypeFullName)
-            ?? throw new MissingMemberException($"Step-35.0.14 serialized CommandLineHelper sweep type missing: {CommandLineHelperTypeFullName}.");
+            ?? throw new MissingMemberException($"Step-35.0.15 serialized CommandLineHelper sweep type missing: {CommandLineHelperTypeFullName}.");
         var verifiedCommandLineCctor = verifiedCommandLineType.Methods.SingleOrDefault(candidate => candidate.Name == ".cctor" && candidate.IsStatic && candidate.HasBody)
-            ?? throw new MissingMethodException($"Step-35.0.14 serialized CommandLineHelper cctor missing: {CommandLineHelperTypeFullName}..cctor.");
+            ?? throw new MissingMethodException($"Step-35.0.15 serialized CommandLineHelper cctor missing: {CommandLineHelperTypeFullName}..cctor.");
         if (verifiedCommandLineCctor.Body.MaxStackSize != commandLineCctorDiagnosticMaxStack ||
             verifiedCommandLineCctor.Body.MaxStackSize != commandLineCctorOriginalMaxStack)
         {
-            throw new InvalidDataException($"Step-35.0.14 serialized stack-neutral CommandLineHelper cctor MaxStack drifted: original={commandLineCctorOriginalMaxStack}, observed={verifiedCommandLineCctor.Body.MaxStackSize}.");
+            throw new InvalidDataException($"Step-35.0.15 serialized stack-neutral CommandLineHelper cctor MaxStack drifted: original={commandLineCctorOriginalMaxStack}, observed={verifiedCommandLineCctor.Body.MaxStackSize}.");
         }
         if (!HasCommandLineHelperCriticalBoundaryMarkers(verifiedCommandLineCctor))
-            throw new InvalidDataException("Step-35.0.14 serialized CommandLineHelper cctor critical stack-neutral markers drifted.");
+            throw new InvalidDataException("Step-35.0.15 serialized CommandLineHelper cctor critical stack-neutral markers drifted.");
         expectedMarkerCount += 4;
 
         var verifiedCommandLineTryGetValue = verifiedCommandLineType.Methods.SingleOrDefault(candidate => candidate.FullName == CommandLineHelperTryGetValueFullName && candidate.HasBody)
-            ?? throw new MissingMethodException($"Step-35.0.14 serialized CommandLineHelper TryGetValue missing: {CommandLineHelperTryGetValueFullName}.");
+            ?? throw new MissingMethodException($"Step-35.0.15 serialized CommandLineHelper TryGetValue missing: {CommandLineHelperTryGetValueFullName}.");
         if (diagnosticMode == Step35DiagnosticMode.ManagedDictionaryCompatibility)
             VerifyCommandLineHelperManagedDictionaryCompatibilityRewrite(verifiedCommandLineType, verifiedCommandLineCctor, verifiedCommandLineTryGetValue);
         else
@@ -1312,7 +1312,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             .SelectMany(method => method.Body.Instructions)
             .Count(instruction => instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string text && text.StartsWith("INMETHOD_", StringComparison.Ordinal));
         if (markerCountVerified != expectedMarkerCount)
-            throw new InvalidDataException($"Step-35.0.14 diagnostic clone marker count drifted after serialization: expected {expectedMarkerCount}, observed {markerCountVerified}.");
+            throw new InvalidDataException($"Step-35.0.15 diagnostic clone marker count drifted after serialization: expected {expectedMarkerCount}, observed {markerCountVerified}.");
 
         return new DiagnosticCloneSnapshot(
             diagnosticPath,
@@ -1356,8 +1356,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                }))
         {
             if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic deferred-open unexpectedly resolved a dependency before writer configuration.");
-            sourceIdentity = module.Assembly?.Name.FullName ?? throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic source has no assembly identity.");
+                throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic deferred-open unexpectedly resolved a dependency before writer configuration.");
+            sourceIdentity = module.Assembly?.Name.FullName ?? throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic source has no assembly identity.");
             sourceMvid = module.Mvid;
             var constantPlan = resolver.Configure(module);
             constantRequirementFingerprint = constantPlan.RequirementFingerprintSha256;
@@ -1366,7 +1366,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             approvedConstantRequirementCount = constantPlan.ApprovedRequirementCount;
 
             if (EnumerateTypes(module.Types).Any(type => type.FullName == GodotSharpDiagnosticBridgeTypeFullName))
-                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic bridge type already exists in the exact prepared image.");
+                throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic bridge type already exists in the exact prepared image.");
 
             var bridge = new TypeDefinition(
                 "StS2Launcher.Step35Diagnostics",
@@ -1380,7 +1380,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 .Where(reference => reference.Name == "System.Runtime")
                 .OrderByDescending(reference => reference.Version)
                 .FirstOrDefault()
-                ?? throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone requires the existing System.Runtime metadata scope.");
+                ?? throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic clone requires the existing System.Runtime metadata scope.");
             var (actionStringType, invoke) = CreateDiagnosticActionStringInvokeReference(module, systemRuntime);
             var callbackField = new FieldDefinition(
                 GodotSharpDiagnosticBridgeCallbackFieldName,
@@ -1409,13 +1409,13 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var emitReference = module.ImportReference(emit);
             markerPlan = BuildGodotSharpDiagnosticMarkerPlan(module);
             if (markerPlan.Count < 6)
-                throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic marker plan is unexpectedly sparse: {markerPlan.Count} method(s).");
+                throw new InvalidDataException($"Step-35.0.15 GodotSharp diagnostic marker plan is unexpectedly sparse: {markerPlan.Count} method(s).");
             foreach (var item in markerPlan)
             {
                 var method = EnumerateTypes(module.Types)
                     .SelectMany(type => type.Methods)
                     .SingleOrDefault(method => method.FullName == item.MethodFullName && method.HasBody)
-                    ?? throw new MissingMethodException($"Step-35.0.14 GodotSharp diagnostic marker target disappeared: {item.MethodFullName}.");
+                    ?? throw new MissingMethodException($"Step-35.0.15 GodotSharp diagnostic marker target disappeared: {item.MethodFullName}.");
                 InsertEntryMarker(method, emitReference, item.Marker);
             }
 
@@ -1436,9 +1436,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             AssemblyResolver = verifyResolver,
         });
         if (verifyResolver.Requests.Count != 0)
-            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic verification unexpectedly resolved a dependency.");
+            throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic verification unexpectedly resolved a dependency.");
         if ((verifyModule.Assembly?.Name.FullName ?? string.Empty) != sourceIdentity || verifyModule.Mvid != sourceMvid)
-            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone changed assembly identity or MVID.");
+            throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic clone changed assembly identity or MVID.");
 
         var bridgeType = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == GodotSharpDiagnosticBridgeTypeFullName)
             ?? throw new MissingMemberException(GodotSharpDiagnosticBridgeTypeFullName);
@@ -1447,14 +1447,14 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         var bridgeEmit = bridgeType.Methods.SingleOrDefault(method => method.Name == "Emit" && method.HasBody)
             ?? throw new MissingMethodException(GodotSharpDiagnosticBridgeTypeFullName, "Emit");
         if (callback.FieldType.FullName != "System.Action`1<System.String>" || bridgeEmit.Parameters.Count != 1 || bridgeEmit.Parameters[0].ParameterType.FullName != "System.String")
-            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic bridge signature drifted after serialization.");
+            throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic bridge signature drifted after serialization.");
         var invokeSites = bridgeEmit.Body.Instructions.Where(instruction => instruction.OpCode.Code == Code.Callvirt && instruction.Operand is MethodReference).ToArray();
         if (invokeSites.Length != 1 || invokeSites[0].Operand is not MethodReference bridgeInvoke ||
             bridgeInvoke.Name != "Invoke" || bridgeInvoke.Parameters.Count != 1 ||
             bridgeInvoke.Parameters[0].ParameterType is not GenericParameter bridgeInvokeParameter ||
             bridgeInvokeParameter.Type != GenericParameterType.Type || bridgeInvokeParameter.Position != 0)
         {
-            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic bridge Invoke MemberRef is not encoded as Action<string>::Invoke(!0).");
+            throw new InvalidDataException("Step-35.0.15 GodotSharp diagnostic bridge Invoke MemberRef is not encoded as Action<string>::Invoke(!0).");
         }
 
         foreach (var item in markerPlan)
@@ -1462,15 +1462,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var method = EnumerateTypes(verifyModule.Types)
                 .SelectMany(type => type.Methods)
                 .SingleOrDefault(method => method.FullName == item.MethodFullName && method.HasBody)
-                ?? throw new MissingMethodException($"Step-35.0.14 serialized GodotSharp marker target missing: {item.MethodFullName}.");
-            if (!HasInjectedEntryMarkerAtStart(method, item.Marker))
-                throw new InvalidDataException($"Step-35.0.14 serialized GodotSharp marker is not first in {item.MethodFullName}: {item.Marker}.");
+                ?? throw new MissingMethodException($"Step-35.0.15 serialized GodotSharp marker target missing: {item.MethodFullName}.");
+            if (!HasInjectedEntryMarkerAtStart(method, item.Marker, GodotSharpDiagnosticBridgeTypeFullName))
+                throw new InvalidDataException($"Step-35.0.15 serialized GodotSharp marker is not first in {item.MethodFullName}: {item.Marker}.");
         }
         var markerCount = EnumerateTypes(verifyModule.Types).SelectMany(type => type.Methods).Where(method => method.HasBody)
             .SelectMany(method => method.Body.Instructions)
             .Count(instruction => instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string text && text.StartsWith("INMETHOD_GS", StringComparison.Ordinal));
         if (markerCount != markerPlan.Count)
-            throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic marker count drifted: expected {markerPlan.Count}, observed {markerCount}.");
+            throw new InvalidDataException($"Step-35.0.15 GodotSharp diagnostic marker count drifted: expected {markerPlan.Count}, observed {markerCount}.");
 
         var markerMap = string.Join("\n", markerPlan.Select(item => $"{item.Marker} | {item.MethodFullName}"));
         return new GodotSharpDiagnosticCloneSnapshot(
@@ -1510,11 +1510,11 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         AddByName("Godot.NativeInterop.NativeFuncs", "Initialize");
 
         if (!selected.Values.Any(method => method.DeclaringType.FullName == "Godot.Collections.Dictionary`2" && method.Name == ".ctor"))
-            throw new MissingMethodException("Step-35.0.14 GodotSharp diagnostic requires at least one Godot.Collections.Dictionary`2 constructor.");
+            throw new MissingMethodException("Step-35.0.15 GodotSharp diagnostic requires at least one Godot.Collections.Dictionary`2 constructor.");
         if (!selected.Values.Any(method => method.DeclaringType.FullName == "Godot.OS" && method.Name == "GetCmdlineArgs"))
-            throw new MissingMethodException("Step-35.0.14 GodotSharp diagnostic requires Godot.OS.GetCmdlineArgs.");
+            throw new MissingMethodException("Step-35.0.15 GodotSharp diagnostic requires Godot.OS.GetCmdlineArgs.");
         if (!selected.Values.Any(method => method.DeclaringType.FullName == "Godot.NativeCalls" && method.Name == "godot_icall_0_108"))
-            throw new MissingMethodException("Step-35.0.14 GodotSharp diagnostic requires Godot.NativeCalls.godot_icall_0_108.");
+            throw new MissingMethodException("Step-35.0.15 GodotSharp diagnostic requires Godot.NativeCalls.godot_icall_0_108.");
 
         var localByFullName = allMethods.GroupBy(method => method.FullName, StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
@@ -1590,16 +1590,16 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         ArgumentNullException.ThrowIfNull(cctor);
         ArgumentNullException.ThrowIfNull(tryGetValue);
         if (cctor.DeclaringType.FullName != CommandLineHelperTypeFullName || cctor.Name != ".cctor" || !cctor.IsStatic || !cctor.HasBody)
-            throw new InvalidDataException($"Step-35.0.14 managed CommandLine dictionary rewrite refuses unexpected cctor: {cctor.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 managed CommandLine dictionary rewrite refuses unexpected cctor: {cctor.FullName}.");
         if (tryGetValue.FullName != CommandLineHelperTryGetValueFullName || !tryGetValue.HasBody || !ReferenceEquals(cctor.DeclaringType, tryGetValue.DeclaringType))
-            throw new InvalidDataException($"Step-35.0.14 managed CommandLine dictionary rewrite refuses unexpected TryGetValue method: {tryGetValue.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 managed CommandLine dictionary rewrite refuses unexpected TryGetValue method: {tryGetValue.FullName}.");
 
         var systemCollectionsScopes = module.AssemblyReferences
             .Where(reference => reference.Name == "System.Collections")
             .OrderByDescending(reference => reference.Version)
             .ToArray();
         if (systemCollectionsScopes.Length != 1)
-            throw new InvalidDataException($"Step-35.0.14 requires exactly one existing System.Collections AssemblyRef in sts2; found {systemCollectionsScopes.Length}.");
+            throw new InvalidDataException($"Step-35.0.15 requires exactly one existing System.Collections AssemblyRef in sts2; found {systemCollectionsScopes.Length}.");
         var systemCollections = systemCollectionsScopes[0];
 
         // Construct the MemberRefs exactly like ECMA-335 expects for a constructed generic declaring
@@ -1617,10 +1617,10 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
 
         var argsFields = cctor.DeclaringType.Fields.Where(field => field.Name == "_args" && field.IsStatic).ToArray();
         if (argsFields.Length != 1)
-            throw new InvalidDataException($"Step-35.0.14 expected exactly one static CommandLineHelper._args field; found {argsFields.Length}.");
+            throw new InvalidDataException($"Step-35.0.15 expected exactly one static CommandLineHelper._args field; found {argsFields.Length}.");
         var argsField = argsFields[0];
         if (!argsField.FieldType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal))
-            throw new InvalidDataException($"Step-35.0.14 expected CommandLineHelper._args to use the exact Godot string dictionary before compatibility rewriting; observed {argsField.FieldType.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 expected CommandLineHelper._args to use the exact Godot string dictionary before compatibility rewriting; observed {argsField.FieldType.FullName}.");
         argsField.FieldType = dictionaryString;
 
         var godotDictionaryCtorSites = cctor.Body.Instructions.Where(instruction =>
@@ -1629,7 +1629,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             callee.Name == ".ctor" &&
             callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal)).ToArray();
         if (godotDictionaryCtorSites.Length != 1)
-            throw new InvalidDataException($"Step-35.0.14 expected exactly one Godot string-dictionary constructor in CommandLineHelper..cctor; found {godotDictionaryCtorSites.Length}.");
+            throw new InvalidDataException($"Step-35.0.15 expected exactly one Godot string-dictionary constructor in CommandLineHelper..cctor; found {godotDictionaryCtorSites.Length}.");
         godotDictionaryCtorSites[0].Operand = new MethodReference(".ctor", module.TypeSystem.Void, dictionaryString)
         {
             HasThis = true,
@@ -1643,7 +1643,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             callee.Name == "set_Item" &&
             callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal)).ToArray();
         if (godotDictionarySetterSites.Length != 1)
-            throw new InvalidDataException($"Step-35.0.14 expected exactly one Godot string-dictionary set_Item in CommandLineHelper..cctor; found {godotDictionarySetterSites.Length}.");
+            throw new InvalidDataException($"Step-35.0.15 expected exactly one Godot string-dictionary set_Item in CommandLineHelper..cctor; found {godotDictionarySetterSites.Length}.");
         var managedSetter = new MethodReference("set_Item", module.TypeSystem.Void, dictionaryString)
         {
             HasThis = true,
@@ -1660,7 +1660,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             callee.Name == "TryGetValue" &&
             callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal)).ToArray();
         if (godotDictionaryTryGetValueSites.Length != 1)
-            throw new InvalidDataException($"Step-35.0.14 expected exactly one Godot string-dictionary TryGetValue in CommandLineHelper.TryGetValue; found {godotDictionaryTryGetValueSites.Length}.");
+            throw new InvalidDataException($"Step-35.0.15 expected exactly one Godot string-dictionary TryGetValue in CommandLineHelper.TryGetValue; found {godotDictionaryTryGetValueSites.Length}.");
         var managedTryGetValue = new MethodReference("TryGetValue", module.TypeSystem.Boolean, dictionaryString)
         {
             HasThis = true,
@@ -1677,7 +1677,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             callee.DeclaringType.FullName == "Godot.OS" &&
             callee.Name == "GetCmdlineArgs");
         if (naturalGetCmdlineArgsCount != 1)
-            throw new InvalidDataException($"Step-35.0.14 requires the natural Godot.OS.GetCmdlineArgs call to remain exactly once after the dictionary-only compatibility rewrite; observed {naturalGetCmdlineArgsCount}.");
+            throw new InvalidDataException($"Step-35.0.15 requires the natural Godot.OS.GetCmdlineArgs call to remain exactly once after the dictionary-only compatibility rewrite; observed {naturalGetCmdlineArgsCount}.");
 
         return new CommandLineManagedDictionaryRewriteSnapshot(4, dictionaryString.FullName);
     }
@@ -1688,11 +1688,11 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         MethodDefinition tryGetValue)
     {
         var argsField = commandLineType.Fields.SingleOrDefault(field => field.Name == "_args" && field.IsStatic)
-            ?? throw new InvalidDataException("Step-35.0.14 serialized CommandLineHelper._args field is missing.");
+            ?? throw new InvalidDataException("Step-35.0.15 serialized CommandLineHelper._args field is missing.");
         if (argsField.FieldType.FullName != ManagedStringDictionaryFullName)
-            throw new InvalidDataException($"Step-35.0.14 serialized CommandLineHelper._args field is not the managed string dictionary: {argsField.FieldType.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 serialized CommandLineHelper._args field is not the managed string dictionary: {argsField.FieldType.FullName}.");
         if (argsField.FieldType.Scope is not AssemblyNameReference argsScope || argsScope.Name != "System.Collections")
-            throw new InvalidDataException($"Step-35.0.14 serialized managed CommandLineHelper._args field scope drifted from the existing System.Collections contract: {argsField.FieldType.Scope}.");
+            throw new InvalidDataException($"Step-35.0.15 serialized managed CommandLineHelper._args field scope drifted from the existing System.Collections contract: {argsField.FieldType.Scope}.");
 
         static MethodReference RequireOne(MethodDefinition method, string name)
         {
@@ -1703,20 +1703,20 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 .Where(reference => reference.DeclaringType.FullName == ManagedStringDictionaryFullName && reference.Name == name)
                 .ToArray();
             if (matches.Length != 1)
-                throw new InvalidDataException($"Step-35.0.14 serialized managed CommandLine rewrite expected exactly one {ManagedStringDictionaryFullName}::{name} in {method.FullName}; found {matches.Length}.");
+                throw new InvalidDataException($"Step-35.0.15 serialized managed CommandLine rewrite expected exactly one {ManagedStringDictionaryFullName}::{name} in {method.FullName}; found {matches.Length}.");
             return matches[0];
         }
 
         var ctor = RequireOne(cctor, ".ctor");
         if (ctor.Parameters.Count != 0 || !ctor.HasThis)
-            throw new InvalidDataException("Step-35.0.14 serialized managed Dictionary<string,string> constructor MemberRef drifted.");
+            throw new InvalidDataException("Step-35.0.15 serialized managed Dictionary<string,string> constructor MemberRef drifted.");
 
         var setter = RequireOne(cctor, "set_Item");
         if (setter.Parameters.Count != 2 ||
             setter.Parameters[0].ParameterType is not GenericParameter setterKey || setterKey.Type != GenericParameterType.Type || setterKey.Position != 0 ||
             setter.Parameters[1].ParameterType is not GenericParameter setterValue || setterValue.Type != GenericParameterType.Type || setterValue.Position != 1)
         {
-            throw new InvalidDataException("Step-35.0.14 serialized managed Dictionary<string,string>.set_Item MemberRef is not encoded as set_Item(!0,!1).");
+            throw new InvalidDataException("Step-35.0.15 serialized managed Dictionary<string,string>.set_Item MemberRef is not encoded as set_Item(!0,!1).");
         }
 
         var tryGetValueReference = RequireOne(tryGetValue, "TryGetValue");
@@ -1725,7 +1725,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             tryGetValueReference.Parameters[1].ParameterType is not ByReferenceType byRefValue ||
             byRefValue.ElementType is not GenericParameter tryValue || tryValue.Type != GenericParameterType.Type || tryValue.Position != 1)
         {
-            throw new InvalidDataException("Step-35.0.14 serialized managed Dictionary<string,string>.TryGetValue MemberRef is not encoded as TryGetValue(!0,!1&).");
+            throw new InvalidDataException("Step-35.0.15 serialized managed Dictionary<string,string>.TryGetValue MemberRef is not encoded as TryGetValue(!0,!1&).");
         }
 
         var residualGodotDictionaryReferences = cctor.Body.Instructions.Concat(tryGetValue.Body.Instructions)
@@ -1733,7 +1733,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                                   reference.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal))
             .ToArray();
         if (residualGodotDictionaryReferences.Length != 0)
-            throw new InvalidDataException($"Step-35.0.14 serialized CommandLine methods retained {residualGodotDictionaryReferences.Length} Godot string-dictionary call reference(s).");
+            throw new InvalidDataException($"Step-35.0.15 serialized CommandLine methods retained {residualGodotDictionaryReferences.Length} Godot string-dictionary call reference(s).");
 
         var naturalGetCmdlineArgsCount = cctor.Body.Instructions.Count(instruction =>
             instruction.OpCode.Code == Code.Call &&
@@ -1741,7 +1741,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             callee.DeclaringType.FullName == "Godot.OS" &&
             callee.Name == "GetCmdlineArgs");
         if (naturalGetCmdlineArgsCount != 1)
-            throw new InvalidDataException($"Step-35.0.14 serialized dictionary-only compatibility clone changed the natural Godot.OS.GetCmdlineArgs call count: {naturalGetCmdlineArgsCount}.");
+            throw new InvalidDataException($"Step-35.0.15 serialized dictionary-only compatibility clone changed the natural Godot.OS.GetCmdlineArgs call count: {naturalGetCmdlineArgsCount}.");
     }
 
     internal static void VerifyCommandLineHelperNaturalGodotDictionaryPreserved(
@@ -1750,9 +1750,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         MethodDefinition tryGetValue)
     {
         var argsField = commandLineType.Fields.SingleOrDefault(field => field.Name == "_args" && field.IsStatic)
-            ?? throw new InvalidDataException("Step-35.0.14 natural-recon CommandLineHelper._args field is missing.");
+            ?? throw new InvalidDataException("Step-35.0.15 natural-recon CommandLineHelper._args field is missing.");
         if (!argsField.FieldType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal))
-            throw new InvalidDataException($"Step-35.0.14 natural-recon CommandLineHelper._args no longer uses the exact Godot string dictionary: {argsField.FieldType.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 natural-recon CommandLineHelper._args no longer uses the exact Godot string dictionary: {argsField.FieldType.FullName}.");
 
         var ctorCount = cctor.Body.Instructions.Count(instruction =>
             instruction.OpCode.Code == Code.Newobj && instruction.Operand is MethodReference callee &&
@@ -1764,19 +1764,19 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             instruction.OpCode.Code == Code.Callvirt && instruction.Operand is MethodReference callee &&
             callee.Name == "TryGetValue" && callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal));
         if (ctorCount != 1 || setterCount != 1 || tryCount != 1)
-            throw new InvalidDataException($"Step-35.0.14 natural-recon Godot string-dictionary references drifted: ctor={ctorCount}, set_Item={setterCount}, TryGetValue={tryCount}.");
+            throw new InvalidDataException($"Step-35.0.15 natural-recon Godot string-dictionary references drifted: ctor={ctorCount}, set_Item={setterCount}, TryGetValue={tryCount}.");
 
         var naturalGetCmdlineArgsCount = cctor.Body.Instructions.Count(instruction =>
             instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference callee &&
             callee.DeclaringType.FullName == "Godot.OS" && callee.Name == "GetCmdlineArgs");
         if (naturalGetCmdlineArgsCount != 1)
-            throw new InvalidDataException($"Step-35.0.14 natural-recon clone changed the Godot.OS.GetCmdlineArgs call count: {naturalGetCmdlineArgsCount}.");
+            throw new InvalidDataException($"Step-35.0.15 natural-recon clone changed the Godot.OS.GetCmdlineArgs call count: {naturalGetCmdlineArgsCount}.");
     }
 
     internal static void InsertCommandLineHelperCriticalBoundaryMarkers(MethodDefinition method, MethodReference emitReference)
     {
         if (method.DeclaringType.FullName != CommandLineHelperTypeFullName || method.Name != ".cctor" || !method.IsStatic || !method.HasBody)
-            throw new InvalidDataException($"Step-35.0.14 critical CommandLineHelper cctor markers refuse unexpected method: {method.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 critical CommandLineHelper cctor markers refuse unexpected method: {method.FullName}.");
 
         var original = method.Body.Instructions.ToArray();
         var dictionaryCtor = original.SingleOrDefault(instruction =>
@@ -1784,12 +1784,12 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             instruction.Operand is MethodReference callee &&
             callee.Name == ".ctor" &&
             callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal))
-            ?? throw new InvalidDataException("Step-35.0.14 could not locate the exact CommandLineHelper _args dictionary constructor.");
+            ?? throw new InvalidDataException("Step-35.0.15 could not locate the exact CommandLineHelper _args dictionary constructor.");
         var dictionaryStore = dictionaryCtor.Next;
         if (dictionaryStore is null || dictionaryStore.OpCode.Code != Code.Stsfld ||
             dictionaryStore.Operand is not FieldReference dictionaryField || dictionaryField.Name != "_args")
         {
-            throw new InvalidDataException("Step-35.0.14 requires the CommandLineHelper _args stsfld immediately after its dictionary constructor.");
+            throw new InvalidDataException("Step-35.0.15 requires the CommandLineHelper _args stsfld immediately after its dictionary constructor.");
         }
 
         var getCmdlineArgs = original.SingleOrDefault(instruction =>
@@ -1797,15 +1797,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             instruction.Operand is MethodReference callee &&
             callee.DeclaringType.FullName == "Godot.OS" &&
             callee.Name == "GetCmdlineArgs")
-            ?? throw new InvalidDataException("Step-35.0.14 could not locate Godot.OS.GetCmdlineArgs in CommandLineHelper..cctor.");
+            ?? throw new InvalidDataException("Step-35.0.15 could not locate Godot.OS.GetCmdlineArgs in CommandLineHelper..cctor.");
         var cmdlineStore = getCmdlineArgs.Next;
         if (cmdlineStore is null || cmdlineStore.OpCode.Code is not (Code.Stloc or Code.Stloc_0 or Code.Stloc_1 or Code.Stloc_2 or Code.Stloc_3 or Code.Stloc_S))
-            throw new InvalidDataException("Step-35.0.14 requires Godot.OS.GetCmdlineArgs to store its result immediately before the stack-neutral POST marker.");
+            throw new InvalidDataException("Step-35.0.15 requires Godot.OS.GetCmdlineArgs to store its result immediately before the stack-neutral POST marker.");
 
         foreach (var critical in new[] { dictionaryCtor, dictionaryStore, getCmdlineArgs, cmdlineStore })
         {
             if (IsInstructionBranchTarget(method, critical))
-                throw new InvalidDataException($"Step-35.0.14 refuses a critical CommandLineHelper marker at branch target IL_{critical.Offset:X4}.");
+                throw new InvalidDataException($"Step-35.0.15 refuses a critical CommandLineHelper marker at branch target IL_{critical.Offset:X4}.");
         }
 
         EnsureMinimumDiagnosticMaxStack(method, 1);
@@ -1865,7 +1865,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         MethodReference emitReference)
     {
         if (method.FullName != NullPlatformConstructorFullName)
-            throw new InvalidDataException($"Step-35.0.14 NullPlatform callsite sweep refuses unexpected method: {method.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 NullPlatform callsite sweep refuses unexpected method: {method.FullName}.");
         return InsertDiagnosticCallsiteSweepMarkers(
             method,
             emitReference,
@@ -1880,7 +1880,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         MethodReference emitReference)
     {
         if (method.DeclaringType.FullName != CommandLineHelperTypeFullName || method.Name != ".cctor" || !method.IsStatic)
-            throw new InvalidDataException($"Step-35.0.14 CommandLineHelper cctor sweep refuses unexpected method: {method.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 CommandLineHelper cctor sweep refuses unexpected method: {method.FullName}.");
         return InsertDiagnosticCallsiteSweepMarkers(
             method,
             emitReference,
@@ -1895,7 +1895,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         MethodReference emitReference)
     {
         if (method.FullName != CommandLineHelperTryGetValueFullName)
-            throw new InvalidDataException($"Step-35.0.14 CommandLineHelper TryGetValue sweep refuses unexpected method: {method.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 CommandLineHelper TryGetValue sweep refuses unexpected method: {method.FullName}.");
         return InsertDiagnosticCallsiteSweepMarkers(
             method,
             emitReference,
@@ -1951,7 +1951,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (isBranchTarget)
             {
                 if (failOnBranchTarget)
-                    throw new InvalidDataException($"Step-35.0.14 refuses to sweep branch-target CALLSITE#{callsiteOrdinal:D3} ({callee.FullName}) in {method.FullName}.");
+                    throw new InvalidDataException($"Step-35.0.15 refuses to sweep branch-target CALLSITE#{callsiteOrdinal:D3} ({callee.FullName}) in {method.FullName}.");
                 continue;
             }
 
@@ -1967,7 +1967,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         }
 
         if (result.Count == 0)
-            throw new InvalidDataException($"Step-35.0.14 diagnostic callsite sweep found no eligible managed call/newobj target in {method.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 diagnostic callsite sweep found no eligible managed call/newobj target in {method.FullName}.");
 
         // PRE/POST markers may execute while original call arguments or return values are still
         // on the evaluation stack. Reserve one additional slot in the method header. Physical
@@ -2013,12 +2013,12 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                                   callee.FullName == calleeFullName)
             .ToArray();
         if (matches.Length != 1)
-            throw new InvalidDataException($"Step-35.0.14 expected exactly one callsite for {calleeFullName} in {method.FullName}; found {matches.Length}.");
+            throw new InvalidDataException($"Step-35.0.15 expected exactly one callsite for {calleeFullName} in {method.FullName}; found {matches.Length}.");
 
         var callsite = matches[0];
         var isBranchTarget = IsInstructionBranchTarget(method, callsite);
         if (isBranchTarget)
-            throw new InvalidDataException($"Step-35.0.14 refuses to place a pre-call marker on branch-target callsite {calleeFullName} in {method.FullName}.");
+            throw new InvalidDataException($"Step-35.0.15 refuses to place a pre-call marker on branch-target callsite {calleeFullName} in {method.FullName}.");
 
         ReserveLiveStackDiagnosticMarkerSlot(method);
         var il = method.Body.GetILProcessor();
@@ -2076,7 +2076,10 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     private static bool HasInjectedEntryMarker(MethodDefinition method, string marker)
         => method.HasBody && method.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, marker));
 
-    private static bool HasInjectedEntryMarkerAtStart(MethodDefinition method, string marker)
+    private static bool HasInjectedEntryMarkerAtStart(
+        MethodDefinition method,
+        string marker,
+        string expectedBridgeTypeFullName = DiagnosticBridgeTypeFullName)
     {
         if (!method.HasBody || method.Body.Instructions.Count < 2)
             return false;
@@ -2084,7 +2087,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         var callInstruction = method.Body.Instructions[1];
         return markerInstruction.OpCode.Code == Code.Ldstr && Equals(markerInstruction.Operand, marker) &&
                callInstruction.OpCode.Code == Code.Call && callInstruction.Operand is MethodReference call &&
-               call.Name == "Emit" && call.DeclaringType.FullName == DiagnosticBridgeTypeFullName;
+               call.Name == "Emit" && call.DeclaringType.FullName == expectedBridgeTypeFullName;
     }
 
     internal sealed record GodotSharpDiagnosticCloneSnapshot(
@@ -2564,14 +2567,14 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (leaf is null || leaf.Scope is ModuleDefinition)
                 return;
             if (leaf.Scope is not AssemblyNameReference assemblyReference)
-                throw new InvalidDataException($"Step-35.0.14 constant provider '{provider}' has unsupported metadata scope '{leaf.Scope?.MetadataScopeType}'.");
+                throw new InvalidDataException($"Step-35.0.15 constant provider '{provider}' has unsupported metadata scope '{leaf.Scope?.MetadataScopeType}'.");
 
             var typeCode = Type.GetTypeCode(constant.GetType());
             if (!IsSupportedDiagnosticConstantTypeCode(typeCode))
-                throw new InvalidDataException($"Step-35.0.14 constant provider '{provider}' has unsupported constant storage type {constant.GetType().FullName}.");
+                throw new InvalidDataException($"Step-35.0.15 constant provider '{provider}' has unsupported constant storage type {constant.GetType().FullName}.");
             var key = new DiagnosticExternalConstantTypeKey(assemblyReference.FullName, leaf.FullName, leaf.IsNested);
             if (requirements.TryGetValue(key, out var prior) && prior != typeCode)
-                throw new InvalidDataException($"Step-35.0.14 external constant type '{leaf.FullName}' has inconsistent storage types {prior} and {typeCode}.");
+                throw new InvalidDataException($"Step-35.0.15 external constant type '{leaf.FullName}' has inconsistent storage types {prior} and {typeCode}.");
             requirements[key] = typeCode;
         }
 
@@ -2654,7 +2657,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             TypeCode.UInt64 => sourceModule.TypeSystem.UInt64,
             TypeCode.Single => sourceModule.TypeSystem.Single,
             TypeCode.Double => sourceModule.TypeSystem.Double,
-            _ => throw new InvalidDataException($"Unsupported Step-35.0.14 constant storage type {typeCode}."),
+            _ => throw new InvalidDataException($"Unsupported Step-35.0.15 constant storage type {typeCode}."),
         };
 
     private sealed class SelfAuditingConstantMetadataWriteResolver : IAssemblyResolver
@@ -2668,7 +2671,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         internal SelfAuditingConstantMetadataResolutionPlan Configure(ModuleDefinition sourceModule)
         {
             if (_configured)
-                throw new InvalidOperationException("The Step-35.0.14 self-auditing GodotSharp constant-metadata resolver was already configured.");
+                throw new InvalidOperationException("The Step-35.0.15 self-auditing GodotSharp constant-metadata resolver was already configured.");
             _configured = true;
             var requirements = CollectDiagnosticExternalConstantTypeRequirements(sourceModule);
             var fingerprintText = string.Join("\n", requirements
@@ -2682,7 +2685,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             {
                 var matches = sourceModule.AssemblyReferences.Where(reference => reference.FullName.Equals(identity, StringComparison.Ordinal)).ToArray();
                 if (matches.Length != 1)
-                    throw new InvalidDataException($"Step-35.0.14 GodotSharp source must contain exactly one AssemblyRef for self-audited constant scope {identity}; found {matches.Length}.");
+                    throw new InvalidDataException($"Step-35.0.15 GodotSharp source must contain exactly one AssemblyRef for self-audited constant scope {identity}; found {matches.Length}.");
                 assemblyReferences.Add(identity, matches[0]);
             }
 
@@ -2701,7 +2704,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 foreach (var requirement in scopeGroup.OrderBy(pair => pair.Key.TypeFullName, StringComparer.Ordinal))
                 {
                     if (requirement.Key.IsNested)
-                        throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
+                        throw new InvalidDataException($"Step-35.0.15 GodotSharp diagnostic does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
                     var separator = requirement.Key.TypeFullName.LastIndexOf('.');
                     var typeNamespace = separator < 0 ? string.Empty : requirement.Key.TypeFullName[..separator];
                     var typeName = separator < 0 ? requirement.Key.TypeFullName : requirement.Key.TypeFullName[(separator + 1)..];
@@ -2732,7 +2735,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         {
             var unexpected = _requests.Where(value => !_surrogates.ContainsKey(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal).ToArray();
             if (unexpected.Length != 0)
-                throw new InvalidDataException("Step-35.0.14 GodotSharp Cecil serialization attempted an unapproved assembly resolution: " + string.Join(" | ", unexpected));
+                throw new InvalidDataException("Step-35.0.15 GodotSharp Cecil serialization attempted an unapproved assembly resolution: " + string.Join(" | ", unexpected));
         }
 
         public void Dispose()
@@ -2759,7 +2762,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         internal DiagnosticConstantMetadataResolutionPlan Configure(ModuleDefinition sourceModule)
         {
             if (_configured)
-                throw new InvalidOperationException("The Step-35.0.14 constant-metadata write resolver was already configured.");
+                throw new InvalidOperationException("The Step-35.0.15 constant-metadata write resolver was already configured.");
             _configured = true;
 
             var requirements = CollectDiagnosticExternalConstantTypeRequirements(sourceModule);
@@ -2770,7 +2773,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             {
                 var matches = sourceModule.AssemblyReferences.Where(reference => reference.FullName.Equals(identity, StringComparison.Ordinal)).ToArray();
                 if (matches.Length != 1)
-                    throw new InvalidDataException($"Step-35.0.14 source must contain exactly one AssemblyRef for audited constant-metadata scope {identity}; found {matches.Length}.");
+                    throw new InvalidDataException($"Step-35.0.15 source must contain exactly one AssemblyRef for audited constant-metadata scope {identity}; found {matches.Length}.");
                 assemblyReferences.Add(identity, matches[0]);
             }
 
@@ -2790,7 +2793,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 foreach (var requirement in scopeGroup.OrderBy(pair => pair.Key.TypeFullName, StringComparer.Ordinal))
                 {
                     if (requirement.Key.IsNested)
-                        throw new InvalidDataException($"Step-35.0.14 does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
+                        throw new InvalidDataException($"Step-35.0.15 does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
                     var separator = requirement.Key.TypeFullName.LastIndexOf('.');
                     var typeNamespace = separator < 0 ? string.Empty : requirement.Key.TypeFullName[..separator];
                     var typeName = separator < 0 ? requirement.Key.TypeFullName : requirement.Key.TypeFullName[(separator + 1)..];
@@ -2821,7 +2824,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var detail = new List<string>();
             if (missing.Length != 0) detail.Add("missing/changed audited requirement(s): " + string.Join(" | ", missing));
             if (unexpected.Length != 0) detail.Add("unexpected requirement(s): " + string.Join(" | ", unexpected));
-            throw new InvalidDataException("Step-35.0.14 external constant-metadata requirement set drifted from the physically proven Step-32 audit; " + string.Join("; ", detail));
+            throw new InvalidDataException("Step-35.0.15 external constant-metadata requirement set drifted from the physically proven Step-32 audit; " + string.Join("; ", detail));
         }
 
         private static string FormatRequirement(DiagnosticExternalConstantTypeKey key, TypeCode typeCode)
@@ -2841,10 +2844,10 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         internal void ValidateWriteRequests()
         {
             if (_requests.Count == 0)
-                throw new InvalidDataException("Step-35.0.14 expected Cecil serialization to use at least one bounded constant-metadata surrogate, but no write-time resolution request occurred.");
+                throw new InvalidDataException("Step-35.0.15 expected Cecil serialization to use at least one bounded constant-metadata surrogate, but no write-time resolution request occurred.");
             var unexpected = _requests.Where(value => !_surrogates.ContainsKey(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal).ToArray();
             if (unexpected.Length != 0)
-                throw new InvalidDataException("Step-35.0.14 Cecil serialization attempted an unapproved assembly resolution: " + string.Join(" | ", unexpected));
+                throw new InvalidDataException("Step-35.0.15 Cecil serialization attempted an unapproved assembly resolution: " + string.Join(" | ", unexpected));
         }
 
         public void Dispose()
