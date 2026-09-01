@@ -756,6 +756,142 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             marker.StartsWith("INMETHOD_CL001_", StringComparison.Ordinal)));
     }
 
+    [TestMethod]
+    public void ComprehensiveGodotSharpDiagnosticCloneUsesEntryOnlyMarkersAndPreservesIdentity()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "sts2-step35-godotsharp-clone-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var source = Path.Combine(root, "GodotSharp.dll");
+            var clone = Path.Combine(root, "GodotSharp.step35.instrumented.dll");
+            using (var assembly = AssemblyDefinition.CreateAssembly(
+                       new AssemblyNameDefinition("GodotSharp", new Version(4, 5, 1, 0)),
+                       "GodotSharp",
+                       ModuleKind.Dll))
+            {
+                var module = assembly.MainModule;
+                module.AssemblyReferences.Add(new AssemblyNameReference("System.Runtime", new Version(8, 0, 0, 0)));
+
+                static MethodDefinition AddMethod(TypeDefinition type, string name, TypeReference returnType, params TypeReference[] parameters)
+                {
+                    var method = new MethodDefinition(name,
+                        Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static,
+                        returnType);
+                    foreach (var parameter in parameters) method.Parameters.Add(new ParameterDefinition(parameter));
+                    var il = method.Body.GetILProcessor();
+                    if (returnType.MetadataType == MetadataType.Boolean) il.Append(il.Create(OpCodes.Ldc_I4_0));
+                    else if (returnType.MetadataType != MetadataType.Void) il.Append(il.Create(OpCodes.Ldnull));
+                    il.Append(il.Create(OpCodes.Ret));
+                    type.Methods.Add(method);
+                    return method;
+                }
+
+                var dictionary = new TypeDefinition("Godot.Collections", "Dictionary`2",
+                    Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
+                    module.TypeSystem.Object);
+                dictionary.GenericParameters.Add(new GenericParameter("TKey", dictionary));
+                dictionary.GenericParameters.Add(new GenericParameter("TValue", dictionary));
+                module.Types.Add(dictionary);
+                var ctor = new MethodDefinition(".ctor",
+                    Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName,
+                    module.TypeSystem.Void);
+                ctor.Body.GetILProcessor().Append(ctor.Body.GetILProcessor().Create(OpCodes.Ret));
+                dictionary.Methods.Add(ctor);
+                AddMethod(dictionary, "TryGetValue", module.TypeSystem.Boolean, module.TypeSystem.String, new ByReferenceType(module.TypeSystem.String));
+                AddMethod(dictionary, "set_Item", module.TypeSystem.Void, module.TypeSystem.String, module.TypeSystem.String);
+                AddMethod(dictionary, "get_Item", module.TypeSystem.String, module.TypeSystem.String);
+                AddMethod(dictionary, "Dispose", module.TypeSystem.Void);
+                AddMethod(dictionary, "GetEnumerator", module.TypeSystem.Object);
+
+                var os = new TypeDefinition("Godot", "OS", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+                module.Types.Add(os);
+                AddMethod(os, "GetCmdlineArgs", new ArrayType(module.TypeSystem.String));
+                AddMethod(os, "get_Singleton", module.TypeSystem.Object);
+                AddMethod(os, ".cctor", module.TypeSystem.Void);
+
+                var nativeCalls = new TypeDefinition("Godot", "NativeCalls", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+                module.Types.Add(nativeCalls);
+                AddMethod(nativeCalls, "godot_icall_0_108", module.TypeSystem.Object);
+
+                var nativeFuncs = new TypeDefinition("Godot.NativeInterop", "NativeFuncs", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+                module.Types.Add(nativeFuncs);
+                AddMethod(nativeFuncs, "Initialize", module.TypeSystem.Void);
+
+                assembly.Write(source);
+            }
+
+            Guid sourceMvid;
+            string sourceIdentity;
+            using (var sourceAssembly = AssemblyDefinition.ReadAssembly(source))
+            {
+                sourceMvid = sourceAssembly.MainModule.Mvid;
+                sourceIdentity = sourceAssembly.Name.FullName;
+            }
+
+            var result = TransformedRealStS2VeryEarlyInitialization.CreateInstrumentedGodotSharpDiagnosticClone(source, clone);
+            Assert.AreEqual(sourceIdentity, result.AssemblyIdentity);
+            Assert.AreEqual(sourceMvid, result.Mvid);
+            Assert.IsTrue(result.MarkerCount >= 6);
+            StringAssert.Contains(result.MarkerMap, "Godot.Collections.Dictionary`2::.ctor");
+            StringAssert.Contains(result.MarkerMap, "Godot.OS::GetCmdlineArgs");
+            StringAssert.Contains(result.MarkerMap, "godot_icall_0_108");
+            Assert.IsTrue(File.Exists(clone));
+
+            using var reopened = AssemblyDefinition.ReadAssembly(clone, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+            Assert.IsNotNull(reopened.MainModule.Types.SingleOrDefault(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName));
+            Assert.IsFalse(reopened.MainModule.Types.SelectMany(type => type.Methods).Where(method => method.HasBody)
+                .SelectMany(method => method.Body.Instructions)
+                .Any(instruction => instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string marker && marker.StartsWith("INMETHOD_CL", StringComparison.Ordinal)));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void ComprehensiveGodotNativeReconnaissanceParsesReadOnlyMachOAndManagedMap()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "sts2-step35-native-recon-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var godot = Path.Combine(root, "GodotSharp.dll");
+            using (var assembly = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("GodotSharp", new Version(4, 5, 1, 0)), "GodotSharp", ModuleKind.Dll))
+            {
+                var module = assembly.MainModule;
+                module.AssemblyReferences.Add(new AssemblyNameReference("System.Runtime", new Version(8, 0, 0, 0)));
+                foreach (var (ns, name) in new[]
+                         {
+                             ("Godot.Collections", "Dictionary`2"), ("Godot", "OS"), ("Godot", "NativeCalls"), ("Godot.NativeInterop", "NativeFuncs")
+                         })
+                    module.Types.Add(new TypeDefinition(ns, name, Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object));
+                assembly.Write(godot);
+            }
+
+            var nativeDir = Path.Combine(root, "SlayTheSpire2.app", "Contents", "MacOS");
+            Directory.CreateDirectory(nativeDir);
+            var macho = new byte[64];
+            macho[0] = 0xCF; macho[1] = 0xFA; macho[2] = 0xED; macho[3] = 0xFE; // MH_MAGIC_64
+            macho[4] = 0x0C; macho[7] = 0x01; // CPU_TYPE_ARM64 = 0x0100000c
+            macho[12] = 0x02; // MH_EXECUTE
+            File.WriteAllBytes(Path.Combine(nativeDir, "Slay the Spire 2"), macho);
+
+            var beforeGodot = File.ReadAllBytes(godot);
+            var report = Step35GodotReconnaissance.BuildReport(root, godot);
+            CollectionAssert.AreEqual(beforeGodot, File.ReadAllBytes(godot));
+            StringAssert.Contains(report, "[GODOTSHARP MANAGED / NATIVE-BOUNDARY MAP]");
+            StringAssert.Contains(report, "[MACH-O / NATIVE INVENTORY]");
+            StringAssert.Contains(report, "Mach-O images recognized: 1");
+            StringAssert.Contains(report, "cpu=0x0100000C");
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
     private static void InsertSyntheticEntryMarker(MethodDefinition method, MethodReference emitReference, string marker)
     {
         var first = method.Body.Instructions[0];

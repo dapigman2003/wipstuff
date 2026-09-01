@@ -1,0 +1,1 @@
+ERROR: dotnet is required to run host tests.

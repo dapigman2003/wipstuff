@@ -1,10 +1,6 @@
-# Release checklist — Step 35.0.14
+# Release checklist — Step 35.0.14 comprehensive 0.0.137
 
-Release identity:
-
-- display/build: `0.0.137 (137)`
-- IPA: `StS2-Launcher-Step-35.ipa`
-- active workflow: `ios-canonical`
+Release identity: display/build `0.0.137 (137)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
 
 Before handoff/build:
 
@@ -16,10 +12,14 @@ Before handoff/build:
 - [ ] physical 0.0.136 is documented as cctor entry + `CL_CRITICAL_001_PRE` with no POST, localizing to Godot string-dictionary construction before assignment;
 - [ ] runtime CL/CLTV live-stack sweeps remain retired;
 - [ ] four stack-neutral CommandLine critical markers remain;
-- [ ] exactly four managed dictionary substitutions are applied and post-write verified;
-- [ ] rewrite reuses the existing `System.Collections` AssemblyRef and generic VAR MemberRefs;
-- [ ] natural `Godot.OS.GetCmdlineArgs()` remains exactly once;
-- [ ] no Godot bootstrap, native game load, arbitrary resolver fallback, or runtime Harmony/MonoMod patching was introduced;
-- [ ] no proprietary game DLLs, app bundle, signing secret, or credential is included in the source archive.
+- [ ] `Step35DiagnosticMode` exposes NATURAL and COMPAT in the same app, with fresh-process semantics;
+- [ ] NATURAL preserves the exact Godot string dictionary contract;
+- [ ] COMPAT applies exactly four managed dictionary substitutions, reuses existing `System.Collections`, preserves generic VAR MemberRefs, and leaves `Godot.OS.GetCmdlineArgs()` natural;
+- [ ] a separate GodotSharp derivative preserves assembly identity/MVID and contains bounded entry-only probes, never live-stack sweeps;
+- [ ] Gate A writes `Step35-GodotNativeReconnaissance-<RunId>.txt` before Gate B;
+- [ ] reconnaissance is read-only and inventories GodotSharp IL/PInvoke/calli/callback fields plus native Mach-O dependencies/rpaths/bounded symbols/strings;
+- [ ] exact prepared GodotSharp is hash-reverified before the separately hash-pinned derivative is selected;
+- [ ] no Godot bootstrap, native game load, arbitrary resolver fallback, later startup phase, entry point, or runtime Harmony/MonoMod patching was introduced;
+- [ ] no proprietary game DLLs, native app bundle, signing secret, or credential is included in the source archive.
 
-For physical testing, force-quit before Step 35 and after any run where Gate B began. A 0.0.137 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.
+For physical testing, run NATURAL and COMPAT in separate fresh processes. A 0.0.137 A–D 4/4 result from either mode is diagnostic completion only and cannot close exact Step 35.

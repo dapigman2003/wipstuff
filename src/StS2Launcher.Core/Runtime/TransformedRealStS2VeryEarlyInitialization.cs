@@ -32,6 +32,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
     private const string DiagnosticCloneFileName = "sts2.step35.0.14.instrumented.dll";
+    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.14.instrumented.dll";
+    internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
+    internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
     internal const string NullPlatformTypeFullName = "MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy";
     internal const string NullPlatformConstructorFullName = "System.Void MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy::.ctor()";
     internal const string CommandLineHelperTypeFullName = "MegaCrit.Sts2.Core.Helpers.CommandLineHelper";
@@ -66,6 +69,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     private ExecutionSnapshot? _execution;
     private Step35ExecutionLoadContext? _loadContext;
     private bool _disposed;
+
+    public Step35DiagnosticMode DiagnosticMode { get; set; } = Step35DiagnosticMode.ManagedDictionaryCompatibility;
 
     public TransformedRealStS2VeryEarlyInitialization(string launcherDataRoot, bool collectibleLoadContext = false)
     {
@@ -225,13 +230,14 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var diagnosticRoot = Path.Combine(_launcherDataRoot, "Step35-ExecuteVeryEarlyDiagnostic");
             Directory.CreateDirectory(diagnosticRoot);
             var diagnosticPath = Path.Combine(diagnosticRoot, DiagnosticCloneFileName);
-            var diagnostic = CreateInstrumentedDiagnosticClone(transformedPath, diagnosticPath);
+            var diagnosticMode = DiagnosticMode;
+            var diagnostic = CreateInstrumentedDiagnosticClone(transformedPath, diagnosticPath, diagnosticMode);
             VerifyFileLength(transformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "exact transformed primary after diagnostic-clone emission");
             var transformedSha256AfterDiagnosticEmission = ComputeSha256Hex(transformedPath);
             if (!transformedSha256AfterDiagnosticEmission.Equals(transformedSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35.0.14 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
             progress?.Report(new(gate, 6, 8, diagnosticPath,
-                $"Exact transformed image requalified, then a Step-35.0.14 diagnostic-only clone was emitted with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, exactly four managed Dictionary<string,string> compatibility substitutions, and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
+                $"Exact transformed image requalified, then a Step-35.0.14 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
 
             stage = "Step-21/22 prepared execution-plan preflight";
             var preparedResult = await _preparedPreflight.RunPreparedLoadPreflightAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -269,7 +275,28 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     (initializerBearing.Length == 0 ? "<none>" : string.Join(" | ", initializerBearing.Select(item => item.Plan.AssemblyFullName))));
             }
 
-            progress?.Report(new(gate, 7, 8, _planPath, "Prepared runtime-binding plan and exact initializer-bearing boundary requalified; no prepared assembly has been CLR-loaded."));
+            stage = "GodotSharp diagnostic clone + installed-bundle native reconnaissance";
+            var preparedGodotSharp = prepared.SingleOrDefault(item => !item.Plan.IsPrimary && string.Equals(item.AssemblyName.Name, "GodotSharp", StringComparison.OrdinalIgnoreCase))
+                ?? throw new InvalidDataException("Step-35.0.14 comprehensive reconnaissance requires the exact prepared GodotSharp private dependency.");
+            if (preparedGodotSharp.ModuleInitializerCount != 0)
+                throw new InvalidDataException("Step-35.0.14 refuses to create a runtime diagnostic derivative from initializer-bearing GodotSharp metadata.");
+            var godotSharpDiagnosticPath = Path.Combine(diagnosticRoot, GodotSharpDiagnosticCloneFileName);
+            var godotSharpDiagnostic = CreateInstrumentedGodotSharpDiagnosticClone(preparedGodotSharp.PreparedPath, godotSharpDiagnosticPath);
+            if (!godotSharpDiagnostic.AssemblyIdentity.Equals(preparedGodotSharp.Plan.AssemblyFullName, StringComparison.Ordinal))
+                throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic identity drifted from prepared plan: {godotSharpDiagnostic.AssemblyIdentity} != {preparedGodotSharp.Plan.AssemblyFullName}.");
+            VerifyFileLength(preparedGodotSharp.PreparedPath, preparedGodotSharp.Plan.Length, "prepared GodotSharp after diagnostic-clone emission");
+            var godotSourceSha1AfterDiagnostic = ComputeSha1Hex(preparedGodotSharp.PreparedPath);
+            if (!godotSourceSha1AfterDiagnostic.Equals(preparedGodotSharp.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic-clone emission changed the exact prepared source; refusing to continue.");
+
+            var offlineForRecon = await _offlineInspection.RunAsync(progress: null, cancellationToken).ConfigureAwait(false);
+            if (!offlineForRecon.Success || !offlineForRecon.ExactManagedTreeVerified || string.IsNullOrWhiteSpace(offlineForRecon.ManagedInstallRelativePath))
+                throw new InvalidDataException("Step-35.0.14 native reconnaissance requires the exact Step-13 OfflineReady managed tree.");
+            var managedInstallRoot = ResolveChildPath(_launcherDataRoot, NormalizeRelative(offlineForRecon.ManagedInstallRelativePath), "Step-35 managed-install reconnaissance root");
+            var godotReconnaissanceReport = Step35GodotReconnaissance.BuildReport(managedInstallRoot, preparedGodotSharp.PreparedPath);
+
+            progress?.Report(new(gate, 7, 8, godotSharpDiagnosticPath,
+                $"Prepared runtime-binding plan requalified; emitted a separately hash-pinned GodotSharp diagnostic clone with {godotSharpDiagnostic.MarkerCount:N0} entry-only markers, and completed read-only Mach-O/native + GodotSharp IL reconnaissance over the exact OfflineReady tree. No prepared/native image was executed."));
 
             _preflight = new ExecutionPreflightSnapshot(
                 transformedPath,
@@ -280,6 +307,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 diagnostic.MethodToken,
                 diagnostic.MoveNextToken,
                 diagnostic.MarkerCount,
+                diagnosticMode,
+                godotSharpDiagnostic,
+                godotReconnaissanceReport,
                 transformedMethodToken,
                 transformedMoveNextToken,
                 targetSemanticSha256,
@@ -302,7 +332,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 $"Transformed bytes: {TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes:N0}\n" +
                 $"Step-35.0.14 diagnostic clone SHA-256: {diagnostic.Sha256}\n" +
                 $"Step-35.0.14 diagnostic clone bytes: {diagnostic.Length:N0}\n" +
-                $"Injected durable checkpoint markers: {diagnostic.MarkerCount:N0}\n" +
+                $"Injected durable sts2 checkpoint markers: {diagnostic.MarkerCount:N0}\n" +
+                $"Diagnostic mode: {diagnosticMode}\n" +
+                $"GodotSharp diagnostic clone SHA-256: {godotSharpDiagnostic.Sha256}\n" +
+                $"GodotSharp diagnostic clone bytes: {godotSharpDiagnostic.Length:N0}\n" +
+                $"GodotSharp entry-only checkpoint markers: {godotSharpDiagnostic.MarkerCount:N0}\n" +
+                $"GodotSharp MVID preserved: {godotSharpDiagnostic.Mvid}\n" +
+                $"GodotSharp writer constant-requirement fingerprint SHA-256: {godotSharpDiagnostic.ConstantRequirementFingerprintSha256}\n" +
+                $"GodotSharp writer-only resolution requests / scopes / requirements: {godotSharpDiagnostic.WriteResolutionRequestCount:N0} / {godotSharpDiagnostic.ApprovedConstantScopeCount:N0} / {godotSharpDiagnostic.ApprovedConstantRequirementCount:N0}\n" +
+                "Read-only installed-bundle Mach-O/native reconnaissance: COMPLETE\n" +
                 $"CommandLineHelper cctor MaxStack exact-source/diagnostic: {diagnostic.CommandLineCctorOriginalMaxStack} / {diagnostic.CommandLineCctorDiagnosticMaxStack}\n" +
                 "CommandLineHelper critical stack-neutral markers: 4\n" +
                 $"CommandLineHelper managed dictionary compatibility substitutions: {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0}\n" +
@@ -349,6 +387,18 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         return RequirePreflight().VeryEarlyStaticInstructionMap;
     }
 
+    public string GetVerifiedGodotReconnaissanceReport()
+    {
+        ThrowIfDisposed();
+        return RequirePreflight().GodotReconnaissanceReport;
+    }
+
+    public string GetVerifiedGodotSharpDiagnosticMarkerMap()
+    {
+        ThrowIfDisposed();
+        return RequirePreflight().GodotSharpDiagnostic.MarkerMap;
+    }
+
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
@@ -384,16 +434,31 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var immediateSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
             if (!immediateSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35.0.14 diagnostic clone changed between Gate A instrumentation and Gate B CLR admission.");
-            Checkpoint(crashCheckpoint, $"B_HASH_PASS — exact transformed source still matched {exactImmediateSha256}; instrumented diagnostic clone matched {immediateSha256}.");
+            VerifyFileLength(preflight.GodotSharpDiagnostic.Path, preflight.GodotSharpDiagnostic.Length, "Step-35.0.14 GodotSharp diagnostic clone");
+            var immediateGodotSha256 = ComputeSha256Hex(preflight.GodotSharpDiagnostic.Path);
+            if (!immediateGodotSha256.Equals(preflight.GodotSharpDiagnostic.Sha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone changed between Gate A instrumentation and Gate B admission preparation.");
+            Checkpoint(crashCheckpoint, $"B_HASH_PASS — exact transformed source still matched {exactImmediateSha256}; sts2 diagnostic clone matched {immediateSha256}; GodotSharp diagnostic derivative matched {immediateGodotSha256}.");
 
             stage = "execution-capable strict AssemblyLoadContext construction";
             Checkpoint(crashCheckpoint, "B_ALC_CONSTRUCT_START — constructing strict Step-35 execution AssemblyLoadContext.");
+            var godotOverride = new PrivateDiagnosticOverride(
+                "GodotSharp",
+                preflight.GodotSharpDiagnostic.Path,
+                preflight.GodotSharpDiagnostic.Sha256,
+                preflight.GodotSharpDiagnostic.Length,
+                preflight.GodotSharpDiagnostic.AssemblyIdentity,
+                preflight.GodotSharpDiagnostic.Mvid,
+                GodotSharpDiagnosticBridgeTypeFullName,
+                GodotSharpDiagnosticBridgeCallbackFieldName,
+                preflight.GodotSharpDiagnostic.MarkerCount);
             var context = new Step35ExecutionLoadContext(
                 LoadContextName,
                 preflight.Plan,
                 preflight.PreparedAssemblies,
                 _collectibleLoadContext,
-                crashCheckpoint);
+                crashCheckpoint,
+                [godotOverride]);
             _loadContext = context;
             Checkpoint(crashCheckpoint, "B_ALC_CONSTRUCT_PASS — strict Step-35 execution AssemblyLoadContext constructed.");
 
@@ -685,7 +750,10 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var diagnosticSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
             if (!diagnosticSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35.0.14 instrumented diagnostic clone changed during ExecuteVeryEarly execution.");
-            progress?.Report(new(gate, 2, 4, preflight.DiagnosticPath, "Exact transformed source and instrumented diagnostic clone remain byte-identical to their Gate-A hashes."));
+            var godotDiagnosticSha256 = ComputeSha256Hex(preflight.GodotSharpDiagnostic.Path);
+            if (!godotDiagnosticSha256.Equals(preflight.GodotSharpDiagnostic.Sha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone changed during ExecuteVeryEarly execution.");
+            progress?.Report(new(gate, 2, 4, preflight.DiagnosticPath, "Exact transformed source plus sts2/GodotSharp diagnostic derivatives remain byte-identical to their Gate-A hashes."));
             var planSha256 = ComputeSha256Hex(_planPath);
             if (!planSha256.Equals(preflight.PlanSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Prepared runtime-binding plan changed during Step-35 execution.");
@@ -721,7 +789,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 $"Post-execution OfflineReady: PASS ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
                 $"Verified exact transformed SHA-256 unchanged: {transformedSha256}\n" +
-                $"Instrumented diagnostic clone SHA-256 unchanged: {diagnosticSha256}\n" +
+                $"Instrumented sts2 diagnostic clone SHA-256 unchanged: {diagnosticSha256}\n" +
+                $"Instrumented GodotSharp diagnostic clone SHA-256 unchanged: {godotDiagnosticSha256}\n" +
+                $"Diagnostic mode: {preflight.DiagnosticMode}\n" +
                 $"Runtime-binding plan SHA-256 unchanged: {planSha256}\n" +
                 $"Unique resident sts2 identity: {admission.AssemblyFullName}\n" +
                 $"Resident sts2 AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
@@ -729,7 +799,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 $"Initializer-free prepared private dependencies resident and re-hashed: {verifiedPrivate:N0}\n" +
                 $"Managed resolver requests total: {context.ManagedResolverRequests.Count:N0}\n" +
                 $"Exact planned host-framework loads total: {context.HostLoads.Count:N0}\n" +
-                $"Prepared private dependency loads total: {context.PrivateLoads.Count:N0}\n" +
+                $"Prepared/diagnostic private dependency loads total: {context.PrivateLoads.Count:N0}\n" +
+                $"GodotSharp entry-only marker plan size: {preflight.GodotSharpDiagnostic.MarkerCount:N0}\n" +
                 "Initializer-bearing private dependency requests: 0\n" +
                 "Unplanned managed resolution: NO\n" +
                 "Native game resolution/loading: NO\n" +
@@ -861,7 +932,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add("[COMMAND LINE HELPER CCTOR IL]");
             lines.Add($"CommandLineHelper cctor: token=0x{commandLineHelperCctor.MetadataToken.ToUInt32():X8}; {commandLineHelperCctor.FullName}");
             lines.Add($"CommandLineHelper cctor exact-source MaxStack={commandLineHelperCctor.Body.MaxStackSize}; instructions={commandLineHelperCctor.Body.Instructions.Count}; locals={commandLineHelperCctor.Body.Variables.Count}; handlers={commandLineHelperCctor.Body.ExceptionHandlers.Count}");
-            lines.Add("Step 35.0.14 retains this exact-source CALLSITE map for correlation. The runtime derivative emits no live-stack CL sweep markers, rewrites only the Godot string-dictionary field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string>, and retains four stack-neutral critical markers; Godot.OS.GetCmdlineArgs remains natural.");
+            lines.Add("Step 35.0.14 retains this exact-source CALLSITE map for correlation. Runtime mode is chosen separately: NATURAL preserves this Godot dictionary contract for deep GodotSharp entry-marker localization; COMPAT rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string>. Both modes retain four stack-neutral critical markers and leave Godot.OS.GetCmdlineArgs natural.");
             AppendInstructionMap(lines, commandLineHelperCctor);
         }
         if (commandLineHelperTryGetValue is not null)
@@ -869,7 +940,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[COMMAND LINE HELPER TRYGETVALUE IL]");
             lines.Add($"CommandLineHelper TryGetValue: token=0x{commandLineHelperTryGetValue.MetadataToken.ToUInt32():X8}; {commandLineHelperTryGetValue.FullName}");
-            lines.Add("Step 35.0.14 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. The derivative rewrites only this method's Godot dictionary TryGetValue MemberRef to the BCL Dictionary<string,string> equivalent; INMETHOD_027 proves method entry and outer NP002_POST proves return.");
+            lines.Add("Step 35.0.14 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL preserves the Godot dictionary TryGetValue MemberRef; COMPAT rewrites only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
             AppendInstructionMap(lines, commandLineHelperTryGetValue);
         }
         return string.Join("\n", lines);
@@ -953,7 +1024,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         ("MegaCrit.Sts2.Core.Saves.GodotFileIo", "System.Void MegaCrit.Sts2.Core.Saves.GodotFileIo::CreateDirectory(System.String)", "Godot.Error Godot.DirAccess::MakeDirRecursiveAbsolute(System.String)", "INMETHOD_182 — GodotFileIo.CreateDirectory before Godot.DirAccess.MakeDirRecursiveAbsolute", "INMETHOD_183 — GodotFileIo.CreateDirectory after Godot.DirAccess.MakeDirRecursiveAbsolute"),
     ];
 
-    private static DiagnosticCloneSnapshot CreateInstrumentedDiagnosticClone(string exactTransformedPath, string diagnosticPath)
+    private static DiagnosticCloneSnapshot CreateInstrumentedDiagnosticClone(string exactTransformedPath, string diagnosticPath, Step35DiagnosticMode diagnosticMode)
     {
         if (File.Exists(diagnosticPath))
             File.Delete(diagnosticPath);
@@ -1098,10 +1169,17 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             commandLineCctorOriginalMaxStack = commandLineCctor.Body.MaxStackSize;
             InsertCommandLineHelperCriticalBoundaryMarkers(commandLineCctor, emitReference);
             markerCount += 4;
-            var commandLineManagedDictionaryRewrite = ApplyCommandLineHelperManagedDictionaryCompatibilityRewrite(module, commandLineCctor, commandLineTryGetValue);
-            if (commandLineManagedDictionaryRewrite.SubstitutionCount != 4)
-                throw new InvalidDataException($"Step-35.0.14 expected exactly four CommandLine managed-dictionary compatibility substitutions; observed {commandLineManagedDictionaryRewrite.SubstitutionCount}.");
-            commandLineManagedDictionarySubstitutionCount = commandLineManagedDictionaryRewrite.SubstitutionCount;
+            if (diagnosticMode == Step35DiagnosticMode.ManagedDictionaryCompatibility)
+            {
+                var commandLineManagedDictionaryRewrite = ApplyCommandLineHelperManagedDictionaryCompatibilityRewrite(module, commandLineCctor, commandLineTryGetValue);
+                if (commandLineManagedDictionaryRewrite.SubstitutionCount != 4)
+                    throw new InvalidDataException($"Step-35.0.14 expected exactly four CommandLine managed-dictionary compatibility substitutions; observed {commandLineManagedDictionaryRewrite.SubstitutionCount}.");
+                commandLineManagedDictionarySubstitutionCount = commandLineManagedDictionaryRewrite.SubstitutionCount;
+            }
+            else
+            {
+                commandLineManagedDictionarySubstitutionCount = 0;
+            }
             commandLineCctorDiagnosticMaxStack = commandLineCctor.Body.MaxStackSize;
             if (commandLineCctorDiagnosticMaxStack != commandLineCctorOriginalMaxStack)
                 throw new InvalidDataException($"Step-35.0.14 stack-neutral CommandLineHelper cctor unexpectedly changed MaxStack before serialization: original={commandLineCctorOriginalMaxStack}, diagnostic={commandLineCctorDiagnosticMaxStack}.");
@@ -1223,7 +1301,10 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
 
         var verifiedCommandLineTryGetValue = verifiedCommandLineType.Methods.SingleOrDefault(candidate => candidate.FullName == CommandLineHelperTryGetValueFullName && candidate.HasBody)
             ?? throw new MissingMethodException($"Step-35.0.14 serialized CommandLineHelper TryGetValue missing: {CommandLineHelperTryGetValueFullName}.");
-        VerifyCommandLineHelperManagedDictionaryCompatibilityRewrite(verifiedCommandLineType, verifiedCommandLineCctor, verifiedCommandLineTryGetValue);
+        if (diagnosticMode == Step35DiagnosticMode.ManagedDictionaryCompatibility)
+            VerifyCommandLineHelperManagedDictionaryCompatibilityRewrite(verifiedCommandLineType, verifiedCommandLineCctor, verifiedCommandLineTryGetValue);
+        else
+            VerifyCommandLineHelperNaturalGodotDictionaryPreserved(verifiedCommandLineType, verifiedCommandLineCctor, verifiedCommandLineTryGetValue);
 
         var markerCountVerified = EnumerateTypes(verifyModule.Types)
             .SelectMany(type => type.Methods)
@@ -1249,6 +1330,218 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             approvedConstantScopeCount,
             approvedConstantRequirementCount,
             writeResolutionIdentities);
+    }
+
+    internal static GodotSharpDiagnosticCloneSnapshot CreateInstrumentedGodotSharpDiagnosticClone(string exactPreparedPath, string diagnosticPath)
+    {
+        if (File.Exists(diagnosticPath))
+            File.Delete(diagnosticPath);
+
+        string sourceIdentity;
+        Guid sourceMvid;
+        string constantRequirementFingerprint;
+        int writeResolutionRequestCount;
+        string writeResolutionIdentities;
+        int syntheticConstantTypeCount;
+        int approvedConstantScopeCount;
+        int approvedConstantRequirementCount;
+        IReadOnlyList<GodotSharpDiagnosticMarker> markerPlan;
+
+        using var resolver = new SelfAuditingConstantMetadataWriteResolver();
+        using (var module = ModuleDefinition.ReadModule(exactPreparedPath, new ReaderParameters
+               {
+                   ReadSymbols = false,
+                   ReadingMode = ReadingMode.Deferred,
+                   AssemblyResolver = resolver,
+               }))
+        {
+            if (resolver.Requests.Count != 0)
+                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic deferred-open unexpectedly resolved a dependency before writer configuration.");
+            sourceIdentity = module.Assembly?.Name.FullName ?? throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic source has no assembly identity.");
+            sourceMvid = module.Mvid;
+            var constantPlan = resolver.Configure(module);
+            constantRequirementFingerprint = constantPlan.RequirementFingerprintSha256;
+            syntheticConstantTypeCount = constantPlan.SyntheticTypeCount;
+            approvedConstantScopeCount = constantPlan.ApprovedScopeCount;
+            approvedConstantRequirementCount = constantPlan.ApprovedRequirementCount;
+
+            if (EnumerateTypes(module.Types).Any(type => type.FullName == GodotSharpDiagnosticBridgeTypeFullName))
+                throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic bridge type already exists in the exact prepared image.");
+
+            var bridge = new TypeDefinition(
+                "StS2Launcher.Step35Diagnostics",
+                "GodotSharpCheckpointBridge",
+                Mono.Cecil.TypeAttributes.Class | Mono.Cecil.TypeAttributes.Abstract | Mono.Cecil.TypeAttributes.Sealed |
+                Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.BeforeFieldInit,
+                module.TypeSystem.Object);
+            module.Types.Add(bridge);
+
+            var systemRuntime = module.AssemblyReferences
+                .Where(reference => reference.Name == "System.Runtime")
+                .OrderByDescending(reference => reference.Version)
+                .FirstOrDefault()
+                ?? throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone requires the existing System.Runtime metadata scope.");
+            var (actionStringType, invoke) = CreateDiagnosticActionStringInvokeReference(module, systemRuntime);
+            var callbackField = new FieldDefinition(
+                GodotSharpDiagnosticBridgeCallbackFieldName,
+                Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static,
+                actionStringType);
+            bridge.Fields.Add(callbackField);
+
+            var emit = new MethodDefinition(
+                "Emit",
+                Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+                module.TypeSystem.Void);
+            emit.Parameters.Add(new ParameterDefinition("marker", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
+            bridge.Methods.Add(emit);
+            var emitIl = emit.Body.GetILProcessor();
+            var haveCallback = Instruction.Create(OpCodes.Nop);
+            emitIl.Append(Instruction.Create(OpCodes.Ldsfld, callbackField));
+            emitIl.Append(Instruction.Create(OpCodes.Dup));
+            emitIl.Append(Instruction.Create(OpCodes.Brtrue_S, haveCallback));
+            emitIl.Append(Instruction.Create(OpCodes.Pop));
+            emitIl.Append(Instruction.Create(OpCodes.Ret));
+            emitIl.Append(haveCallback);
+            emitIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+            emitIl.Append(Instruction.Create(OpCodes.Callvirt, invoke));
+            emitIl.Append(Instruction.Create(OpCodes.Ret));
+
+            var emitReference = module.ImportReference(emit);
+            markerPlan = BuildGodotSharpDiagnosticMarkerPlan(module);
+            if (markerPlan.Count < 6)
+                throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic marker plan is unexpectedly sparse: {markerPlan.Count} method(s).");
+            foreach (var item in markerPlan)
+            {
+                var method = EnumerateTypes(module.Types)
+                    .SelectMany(type => type.Methods)
+                    .SingleOrDefault(method => method.FullName == item.MethodFullName && method.HasBody)
+                    ?? throw new MissingMethodException($"Step-35.0.14 GodotSharp diagnostic marker target disappeared: {item.MethodFullName}.");
+                InsertEntryMarker(method, emitReference, item.Marker);
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(diagnosticPath) ?? throw new InvalidOperationException("GodotSharp diagnostic clone path has no parent."));
+            module.Write(diagnosticPath, new WriterParameters { WriteSymbols = false });
+            resolver.ValidateWriteRequests();
+            writeResolutionRequestCount = resolver.Requests.Count;
+            writeResolutionIdentities = string.Join(" | ", resolver.Requests.Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal));
+        }
+
+        var length = new FileInfo(diagnosticPath).Length;
+        var sha256 = ComputeSha256Hex(diagnosticPath);
+        using var verifyResolver = new RejectingAssemblyResolver();
+        using var verifyModule = ModuleDefinition.ReadModule(diagnosticPath, new ReaderParameters
+        {
+            ReadSymbols = false,
+            ReadingMode = ReadingMode.Deferred,
+            AssemblyResolver = verifyResolver,
+        });
+        if (verifyResolver.Requests.Count != 0)
+            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic verification unexpectedly resolved a dependency.");
+        if ((verifyModule.Assembly?.Name.FullName ?? string.Empty) != sourceIdentity || verifyModule.Mvid != sourceMvid)
+            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic clone changed assembly identity or MVID.");
+
+        var bridgeType = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == GodotSharpDiagnosticBridgeTypeFullName)
+            ?? throw new MissingMemberException(GodotSharpDiagnosticBridgeTypeFullName);
+        var callback = bridgeType.Fields.SingleOrDefault(field => field.Name == GodotSharpDiagnosticBridgeCallbackFieldName)
+            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpDiagnosticBridgeCallbackFieldName);
+        var bridgeEmit = bridgeType.Methods.SingleOrDefault(method => method.Name == "Emit" && method.HasBody)
+            ?? throw new MissingMethodException(GodotSharpDiagnosticBridgeTypeFullName, "Emit");
+        if (callback.FieldType.FullName != "System.Action`1<System.String>" || bridgeEmit.Parameters.Count != 1 || bridgeEmit.Parameters[0].ParameterType.FullName != "System.String")
+            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic bridge signature drifted after serialization.");
+        var invokeSites = bridgeEmit.Body.Instructions.Where(instruction => instruction.OpCode.Code == Code.Callvirt && instruction.Operand is MethodReference).ToArray();
+        if (invokeSites.Length != 1 || invokeSites[0].Operand is not MethodReference bridgeInvoke ||
+            bridgeInvoke.Name != "Invoke" || bridgeInvoke.Parameters.Count != 1 ||
+            bridgeInvoke.Parameters[0].ParameterType is not GenericParameter bridgeInvokeParameter ||
+            bridgeInvokeParameter.Type != GenericParameterType.Type || bridgeInvokeParameter.Position != 0)
+        {
+            throw new InvalidDataException("Step-35.0.14 GodotSharp diagnostic bridge Invoke MemberRef is not encoded as Action<string>::Invoke(!0).");
+        }
+
+        foreach (var item in markerPlan)
+        {
+            var method = EnumerateTypes(verifyModule.Types)
+                .SelectMany(type => type.Methods)
+                .SingleOrDefault(method => method.FullName == item.MethodFullName && method.HasBody)
+                ?? throw new MissingMethodException($"Step-35.0.14 serialized GodotSharp marker target missing: {item.MethodFullName}.");
+            if (!HasInjectedEntryMarkerAtStart(method, item.Marker))
+                throw new InvalidDataException($"Step-35.0.14 serialized GodotSharp marker is not first in {item.MethodFullName}: {item.Marker}.");
+        }
+        var markerCount = EnumerateTypes(verifyModule.Types).SelectMany(type => type.Methods).Where(method => method.HasBody)
+            .SelectMany(method => method.Body.Instructions)
+            .Count(instruction => instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string text && text.StartsWith("INMETHOD_GS", StringComparison.Ordinal));
+        if (markerCount != markerPlan.Count)
+            throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic marker count drifted: expected {markerPlan.Count}, observed {markerCount}.");
+
+        var markerMap = string.Join("\n", markerPlan.Select(item => $"{item.Marker} | {item.MethodFullName}"));
+        return new GodotSharpDiagnosticCloneSnapshot(
+            diagnosticPath,
+            sha256,
+            length,
+            sourceIdentity,
+            sourceMvid,
+            markerCount,
+            markerMap,
+            constantRequirementFingerprint,
+            writeResolutionRequestCount,
+            syntheticConstantTypeCount,
+            approvedConstantScopeCount,
+            approvedConstantRequirementCount,
+            writeResolutionIdentities);
+    }
+
+    private static IReadOnlyList<GodotSharpDiagnosticMarker> BuildGodotSharpDiagnosticMarkerPlan(ModuleDefinition module)
+    {
+        var allTypes = EnumerateTypes(module.Types).ToArray();
+        var allMethods = allTypes.SelectMany(type => type.Methods).Where(method => method.HasBody).ToArray();
+        var selected = new Dictionary<string, MethodDefinition>(StringComparer.Ordinal);
+        void Add(MethodDefinition method) => selected.TryAdd(method.FullName, method);
+        void AddByName(string typeName, params string[] methodNames)
+        {
+            var type = allTypes.SingleOrDefault(candidate => candidate.FullName == typeName);
+            if (type is null) return;
+            foreach (var method in type.Methods.Where(method => method.HasBody && methodNames.Contains(method.Name, StringComparer.Ordinal))) Add(method);
+        }
+
+        AddByName("Godot.Collections.Dictionary`2", ".cctor", ".ctor", "TryGetValue", "set_Item", "get_Item", "Dispose", "GetEnumerator");
+        AddByName("Godot.Collections.GodotDictionary", ".cctor", ".ctor", "TryGetValue", "set_Item", "get_Item", "Dispose");
+        AddByName("Godot.OS", ".cctor", "GetCmdlineArgs", "get_Singleton");
+        AddByName("Godot.GodotObject", "GetPtr");
+        AddByName("Godot.NativeCalls", "godot_icall_0_108");
+        AddByName("Godot.NativeInterop.NativeFuncs", "Initialize");
+
+        if (!selected.Values.Any(method => method.DeclaringType.FullName == "Godot.Collections.Dictionary`2" && method.Name == ".ctor"))
+            throw new MissingMethodException("Step-35.0.14 GodotSharp diagnostic requires at least one Godot.Collections.Dictionary`2 constructor.");
+        if (!selected.Values.Any(method => method.DeclaringType.FullName == "Godot.OS" && method.Name == "GetCmdlineArgs"))
+            throw new MissingMethodException("Step-35.0.14 GodotSharp diagnostic requires Godot.OS.GetCmdlineArgs.");
+        if (!selected.Values.Any(method => method.DeclaringType.FullName == "Godot.NativeCalls" && method.Name == "godot_icall_0_108"))
+            throw new MissingMethodException("Step-35.0.14 GodotSharp diagnostic requires Godot.NativeCalls.godot_icall_0_108.");
+
+        var localByFullName = allMethods.GroupBy(method => method.FullName, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
+        var queue = new Queue<(MethodDefinition Method, int Depth)>();
+        foreach (var seed in selected.Values.Where(method =>
+                     (method.DeclaringType.FullName == "Godot.Collections.Dictionary`2" && method.Name == ".ctor") ||
+                     (method.DeclaringType.FullName == "Godot.OS" && method.Name == "GetCmdlineArgs") ||
+                     (method.DeclaringType.FullName == "Godot.NativeCalls" && method.Name == "godot_icall_0_108")))
+            queue.Enqueue((seed, 0));
+        while (queue.Count != 0 && selected.Count < 96)
+        {
+            var (method, depth) = queue.Dequeue();
+            if (depth >= 3) continue;
+            foreach (var instruction in method.Body.Instructions)
+            {
+                if (instruction.Operand is not MethodReference called || !localByFullName.TryGetValue(called.FullName, out var local)) continue;
+                if (selected.TryAdd(local.FullName, local)) queue.Enqueue((local, depth + 1));
+            }
+        }
+
+        var ordered = selected.Values
+            .OrderBy(method => method.DeclaringType.FullName, StringComparer.Ordinal)
+            .ThenBy(method => method.MetadataToken.ToUInt32())
+            .Take(96)
+            .ToArray();
+        return ordered.Select((method, index) => new GodotSharpDiagnosticMarker(
+            $"INMETHOD_GS{index + 1:D3} — GodotSharp {method.FullName}", method.FullName)).ToArray();
     }
 
     internal static (GenericInstanceType ActionStringType, MethodReference InvokeReference) CreateDiagnosticActionStringInvokeReference(
@@ -1449,6 +1742,35 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             callee.Name == "GetCmdlineArgs");
         if (naturalGetCmdlineArgsCount != 1)
             throw new InvalidDataException($"Step-35.0.14 serialized dictionary-only compatibility clone changed the natural Godot.OS.GetCmdlineArgs call count: {naturalGetCmdlineArgsCount}.");
+    }
+
+    internal static void VerifyCommandLineHelperNaturalGodotDictionaryPreserved(
+        TypeDefinition commandLineType,
+        MethodDefinition cctor,
+        MethodDefinition tryGetValue)
+    {
+        var argsField = commandLineType.Fields.SingleOrDefault(field => field.Name == "_args" && field.IsStatic)
+            ?? throw new InvalidDataException("Step-35.0.14 natural-recon CommandLineHelper._args field is missing.");
+        if (!argsField.FieldType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal))
+            throw new InvalidDataException($"Step-35.0.14 natural-recon CommandLineHelper._args no longer uses the exact Godot string dictionary: {argsField.FieldType.FullName}.");
+
+        var ctorCount = cctor.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Newobj && instruction.Operand is MethodReference callee &&
+            callee.Name == ".ctor" && callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal));
+        var setterCount = cctor.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Callvirt && instruction.Operand is MethodReference callee &&
+            callee.Name == "set_Item" && callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal));
+        var tryCount = tryGetValue.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Callvirt && instruction.Operand is MethodReference callee &&
+            callee.Name == "TryGetValue" && callee.DeclaringType.FullName.StartsWith("Godot.Collections.Dictionary`2<System.String,System.String>", StringComparison.Ordinal));
+        if (ctorCount != 1 || setterCount != 1 || tryCount != 1)
+            throw new InvalidDataException($"Step-35.0.14 natural-recon Godot string-dictionary references drifted: ctor={ctorCount}, set_Item={setterCount}, TryGetValue={tryCount}.");
+
+        var naturalGetCmdlineArgsCount = cctor.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference callee &&
+            callee.DeclaringType.FullName == "Godot.OS" && callee.Name == "GetCmdlineArgs");
+        if (naturalGetCmdlineArgsCount != 1)
+            throw new InvalidDataException($"Step-35.0.14 natural-recon clone changed the Godot.OS.GetCmdlineArgs call count: {naturalGetCmdlineArgsCount}.");
     }
 
     internal static void InsertCommandLineHelperCriticalBoundaryMarkers(MethodDefinition method, MethodReference emitReference)
@@ -1765,6 +2087,34 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                call.Name == "Emit" && call.DeclaringType.FullName == DiagnosticBridgeTypeFullName;
     }
 
+    internal sealed record GodotSharpDiagnosticCloneSnapshot(
+        string Path,
+        string Sha256,
+        long Length,
+        string AssemblyIdentity,
+        Guid Mvid,
+        int MarkerCount,
+        string MarkerMap,
+        string ConstantRequirementFingerprintSha256,
+        int WriteResolutionRequestCount,
+        int SyntheticConstantTypeCount,
+        int ApprovedConstantScopeCount,
+        int ApprovedConstantRequirementCount,
+        string WriteResolutionIdentities);
+
+    private sealed record GodotSharpDiagnosticMarker(string Marker, string MethodFullName);
+
+    internal sealed record PrivateDiagnosticOverride(
+        string SimpleName,
+        string Path,
+        string Sha256,
+        long Length,
+        string AssemblyIdentity,
+        Guid Mvid,
+        string BridgeTypeFullName,
+        string BridgeCallbackFieldName,
+        int MarkerCount);
+
     private sealed record DiagnosticCloneSnapshot(
         string Path,
         string Sha256,
@@ -1971,6 +2321,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         uint DiagnosticMethodToken,
         uint DiagnosticMoveNextToken,
         int DiagnosticMarkerCount,
+        Step35DiagnosticMode DiagnosticMode,
+        GodotSharpDiagnosticCloneSnapshot GodotSharpDiagnostic,
+        string GodotReconnaissanceReport,
         uint TransformedMethodToken,
         uint TransformedMoveNextToken,
         string TargetSemanticSha256,
@@ -2005,6 +2358,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     internal sealed class Step35ExecutionLoadContext : AssemblyLoadContext
     {
         private readonly IReadOnlyDictionary<string, PreparedExecutionEntry> _privateBySimpleName;
+        private readonly IReadOnlyDictionary<string, PrivateDiagnosticOverride> _diagnosticOverridesBySimpleName;
         private readonly RuntimeBindingHostFramework[] _hostBindings;
         private readonly Action<string>? _crashCheckpoint;
 
@@ -2013,7 +2367,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             RuntimeFrameworkBindingPlanDocument plan,
             IReadOnlyList<PreparedExecutionEntry> preparedAssemblies,
             bool isCollectible,
-            Action<string>? crashCheckpoint = null)
+            Action<string>? crashCheckpoint = null,
+            IReadOnlyList<PrivateDiagnosticOverride>? diagnosticOverrides = null)
             : base(name, isCollectible)
         {
             _crashCheckpoint = crashCheckpoint;
@@ -2027,6 +2382,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     throw new InvalidDataException($"Step-35 resolver received duplicate prepared simple name '{simple}'.");
             }
             _privateBySimpleName = privateBySimpleName;
+            var overrides = new Dictionary<string, PrivateDiagnosticOverride>(StringComparer.OrdinalIgnoreCase);
+            foreach (var item in diagnosticOverrides ?? Array.Empty<PrivateDiagnosticOverride>())
+            {
+                if (!privateBySimpleName.ContainsKey(item.SimpleName))
+                    throw new InvalidDataException($"Step-35 diagnostic private override has no prepared-plan source: {item.SimpleName}.");
+                if (!overrides.TryAdd(item.SimpleName, item))
+                    throw new InvalidDataException($"Step-35 duplicate diagnostic private override: {item.SimpleName}.");
+            }
+            _diagnosticOverridesBySimpleName = overrides;
             _hostBindings = plan.HostFrameworkBindings;
         }
 
@@ -2096,15 +2460,43 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     throw new InvalidDataException("Step-35 prepared private dependency SHA-1 changed immediately before load: " + privateAssembly.Plan.RelativePath);
                 Checkpoint($"RESOLVE_PRIVATE_HASH_PASS — {requestedFullName}; sha1={hash}");
 
-                using var stream = new FileStream(privateAssembly.PreparedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var selectedPath = privateAssembly.PreparedPath;
+                PrivateDiagnosticOverride? diagnosticOverride = null;
+                if (_diagnosticOverridesBySimpleName.TryGetValue(assemblyName.Name, out var selectedOverride))
+                {
+                    diagnosticOverride = selectedOverride;
+                    VerifyFileLength(selectedOverride.Path, selectedOverride.Length, $"Step-35 diagnostic private override {selectedOverride.SimpleName}");
+                    var diagnosticSha256 = ComputeSha256Hex(selectedOverride.Path);
+                    if (!diagnosticSha256.Equals(selectedOverride.Sha256, StringComparison.OrdinalIgnoreCase))
+                        throw new InvalidDataException($"Step-35 diagnostic private override SHA-256 changed immediately before load: {selectedOverride.SimpleName}.");
+                    selectedPath = selectedOverride.Path;
+                    Checkpoint($"RESOLVE_PRIVATE_DIAGNOSTIC_SELECTED — {requestedFullName}; derivativeSha256={diagnosticSha256}; markerCount={selectedOverride.MarkerCount}");
+                }
+
+                using var stream = new FileStream(selectedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 Checkpoint($"RESOLVE_PRIVATE_LOADFROMSTREAM_START — {requestedFullName}");
                 var loaded = LoadFromStream(stream);
                 Checkpoint($"RESOLVE_PRIVATE_LOADFROMSTREAM_PASS — {requestedFullName}");
                 var actualFullName = loaded.GetName().FullName ?? loaded.GetName().Name ?? string.Empty;
                 if (!actualFullName.Equals(privateAssembly.Plan.AssemblyFullName, StringComparison.Ordinal))
                     throw new FileLoadException($"Step-35 private dependency loaded identity drifted. Planned '{privateAssembly.Plan.AssemblyFullName}', actual '{actualFullName}'.");
-                PrivateLoads.Add($"{requestedFullName} => {actualFullName}");
-                Checkpoint($"RESOLVE_PRIVATE_PASS — {requestedFullName} => {actualFullName}");
+
+                if (diagnosticOverride is not null)
+                {
+                    if (!actualFullName.Equals(diagnosticOverride.AssemblyIdentity, StringComparison.Ordinal) || loaded.ManifestModule.ModuleVersionId != diagnosticOverride.Mvid)
+                        throw new FileLoadException($"Step-35 diagnostic private override identity/MVID drifted for {diagnosticOverride.SimpleName}.");
+                    var bridgeType = loaded.GetType(diagnosticOverride.BridgeTypeFullName, throwOnError: true, ignoreCase: false)
+                        ?? throw new MissingMemberException(diagnosticOverride.BridgeTypeFullName);
+                    var bridgeField = bridgeType.GetField(diagnosticOverride.BridgeCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
+                        ?? throw new MissingFieldException(diagnosticOverride.BridgeTypeFullName, diagnosticOverride.BridgeCallbackFieldName);
+                    if (bridgeField.FieldType != typeof(Action<string>))
+                        throw new InvalidDataException($"Step-35 diagnostic private bridge field type drifted for {diagnosticOverride.SimpleName}: {bridgeField.FieldType.FullName}.");
+                    bridgeField.SetValue(null, _crashCheckpoint);
+                    Checkpoint($"GODOT_DIAGNOSTIC_BRIDGE_ARMED — {diagnosticOverride.SimpleName} entry-only callback armed before resolver returned the assembly; markerCount={diagnosticOverride.MarkerCount}.");
+                }
+
+                PrivateLoads.Add($"{requestedFullName} => {actualFullName}" + (diagnosticOverride is null ? string.Empty : " [diagnostic derivative]"));
+                Checkpoint($"RESOLVE_PRIVATE_PASS — {requestedFullName} => {actualFullName}" + (diagnosticOverride is null ? string.Empty : " [diagnostic derivative]"));
                 return loaded;
             }
 
@@ -2264,6 +2656,97 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             TypeCode.Double => sourceModule.TypeSystem.Double,
             _ => throw new InvalidDataException($"Unsupported Step-35.0.14 constant storage type {typeCode}."),
         };
+
+    private sealed class SelfAuditingConstantMetadataWriteResolver : IAssemblyResolver
+    {
+        private readonly List<string> _requests = [];
+        private readonly Dictionary<string, AssemblyDefinition> _surrogates = new(StringComparer.Ordinal);
+        private bool _configured;
+
+        internal IReadOnlyList<string> Requests => _requests;
+
+        internal SelfAuditingConstantMetadataResolutionPlan Configure(ModuleDefinition sourceModule)
+        {
+            if (_configured)
+                throw new InvalidOperationException("The Step-35.0.14 self-auditing GodotSharp constant-metadata resolver was already configured.");
+            _configured = true;
+            var requirements = CollectDiagnosticExternalConstantTypeRequirements(sourceModule);
+            var fingerprintText = string.Join("\n", requirements
+                .OrderBy(pair => pair.Key.AssemblyFullName, StringComparer.Ordinal)
+                .ThenBy(pair => pair.Key.TypeFullName, StringComparer.Ordinal)
+                .Select(pair => $"{pair.Key.AssemblyFullName}|{pair.Key.TypeFullName}|{pair.Value}|nested={pair.Key.IsNested}"));
+            var fingerprint = Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(fingerprintText))).ToLowerInvariant();
+
+            var assemblyReferences = new Dictionary<string, AssemblyNameReference>(StringComparer.Ordinal);
+            foreach (var identity in requirements.Keys.Select(key => key.AssemblyFullName).Distinct(StringComparer.Ordinal))
+            {
+                var matches = sourceModule.AssemblyReferences.Where(reference => reference.FullName.Equals(identity, StringComparison.Ordinal)).ToArray();
+                if (matches.Length != 1)
+                    throw new InvalidDataException($"Step-35.0.14 GodotSharp source must contain exactly one AssemblyRef for self-audited constant scope {identity}; found {matches.Length}.");
+                assemblyReferences.Add(identity, matches[0]);
+            }
+
+            var syntheticTypeCount = 0;
+            foreach (var scopeGroup in requirements.GroupBy(pair => pair.Key.AssemblyFullName, StringComparer.Ordinal).OrderBy(group => group.Key, StringComparer.Ordinal))
+            {
+                var sourceReference = assemblyReferences[scopeGroup.Key];
+                var surrogateName = new AssemblyNameDefinition(sourceReference.Name, sourceReference.Version)
+                {
+                    Culture = sourceReference.Culture,
+                    PublicKeyToken = sourceReference.PublicKeyToken is null ? [] : sourceReference.PublicKeyToken.ToArray(),
+                };
+                var safeName = sourceReference.Name.Replace('.', '-');
+                var surrogate = AssemblyDefinition.CreateAssembly(surrogateName, $"Step35.GodotSharp.{safeName}.ConstantMetadataSurrogate.dll", ModuleKind.Dll);
+                _surrogates.Add(scopeGroup.Key, surrogate);
+                foreach (var requirement in scopeGroup.OrderBy(pair => pair.Key.TypeFullName, StringComparer.Ordinal))
+                {
+                    if (requirement.Key.IsNested)
+                        throw new InvalidDataException($"Step-35.0.14 GodotSharp diagnostic does not permit nested external constant type synthesis: {requirement.Key.TypeFullName}.");
+                    var separator = requirement.Key.TypeFullName.LastIndexOf('.');
+                    var typeNamespace = separator < 0 ? string.Empty : requirement.Key.TypeFullName[..separator];
+                    var typeName = separator < 0 ? requirement.Key.TypeFullName : requirement.Key.TypeFullName[(separator + 1)..];
+                    var enumBase = new TypeReference("System", "Enum", surrogate.MainModule, surrogateName);
+                    var syntheticEnum = new TypeDefinition(typeNamespace, typeName,
+                        Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Sealed, enumBase);
+                    syntheticEnum.Fields.Add(new FieldDefinition("value__",
+                        Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.SpecialName | Mono.Cecil.FieldAttributes.RTSpecialName,
+                        GetDiagnosticPrimitiveConstantType(sourceModule, requirement.Value)));
+                    surrogate.MainModule.Types.Add(syntheticEnum);
+                    syntheticTypeCount++;
+                }
+            }
+            return new SelfAuditingConstantMetadataResolutionPlan(syntheticTypeCount, _surrogates.Count, requirements.Count, fingerprint);
+        }
+
+        public AssemblyDefinition Resolve(AssemblyNameReference name) => ResolveCore(name);
+        public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters) => ResolveCore(name);
+        private AssemblyDefinition ResolveCore(AssemblyNameReference name)
+        {
+            _requests.Add(name.FullName);
+            if (!_configured || !_surrogates.TryGetValue(name.FullName, out var surrogate))
+                throw new AssemblyResolutionException(name);
+            return surrogate;
+        }
+
+        internal void ValidateWriteRequests()
+        {
+            var unexpected = _requests.Where(value => !_surrogates.ContainsKey(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal).ToArray();
+            if (unexpected.Length != 0)
+                throw new InvalidDataException("Step-35.0.14 GodotSharp Cecil serialization attempted an unapproved assembly resolution: " + string.Join(" | ", unexpected));
+        }
+
+        public void Dispose()
+        {
+            foreach (var surrogate in _surrogates.Values) surrogate.Dispose();
+            _surrogates.Clear();
+        }
+    }
+
+    private sealed record SelfAuditingConstantMetadataResolutionPlan(
+        int SyntheticTypeCount,
+        int ApprovedScopeCount,
+        int ApprovedRequirementCount,
+        string RequirementFingerprintSha256);
 
     private sealed class DiagnosticConstantMetadataWriteResolver : IAssemblyResolver
     {

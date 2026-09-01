@@ -1,3 +1,5 @@
+> **Superseded pre-physical draft.** This narrow 0.0.137 design was replaced before device testing by `STEP-35.0.14-COMPREHENSIVE-GODOT-NATIVE-RECONNAISSANCE.md`. It is retained only as history.
+
 # Step 35.0.14 — Managed CommandLine dictionary compatibility probe
 
 Candidate: `0.0.137 (137)`.

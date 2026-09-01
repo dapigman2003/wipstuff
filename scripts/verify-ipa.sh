@@ -245,5 +245,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 35.0.14 — MANAGED COMMAND-LINE DICTIONARY COMPATIBILITY PROBE"
+  echo "  Expected device UI: STEP 35.0.14 — COMPREHENSIVE GODOTSHARP / NATIVE RECON + DUAL MODE"
 } | tee artifacts/logs/step35-ipa-verification-summary.log

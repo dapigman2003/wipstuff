@@ -9,26 +9,34 @@ public sealed partial class RootViewController
     private UILabel? _transformedRealStS2VeryEarlyInitializationResultLabel;
     private UILabel? _transformedRealStS2VeryEarlyInitializationDetailLabel;
     private UIButton? _transformedRealStS2VeryEarlyInitializationButton;
+    private UIButton? _step35NaturalGodotReconButton;
     private readonly object _step35CrashCheckpointSync = new();
     private const string Step35CurrentRunFileName = "Step35-CurrentRun.txt";
     private const string Step35LastCheckpointFileName = "Step35-LastCheckpoint.txt";
     private string? _step35RunId;
     private string? _step35CrashCheckpointPath;
     private string? _step35StaticMapPath;
+    private string? _step35GodotReconnaissancePath;
     private string? _step35LastCheckpointPath;
     private bool _step35RunTelemetryReady;
 
     private void AddTransformedRealStS2VeryEarlyInitializationControls(UIStackView content)
     {
         content.AddArrangedSubview(Label(
-            "Step 35.0.14 — Managed Command-Line Dictionary Compatibility Probe (ordered gates A–D; diagnostic clone only)",
+            "Step 35.0.14 — Comprehensive GodotSharp / Native Reconnaissance (dual diagnostic modes; ordered gates A–D)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
+        _step35NaturalGodotReconButton = SystemButton(
+            "Run Step 35.0.14 NATURAL — Reverify → Deep GodotSharp/Native Recon → Preserve Godot Dictionary → Invoke Once",
+            16);
+        _step35NaturalGodotReconButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.NaturalGodotDictionaryRecon);
+        content.AddArrangedSubview(_step35NaturalGodotReconButton);
+
         _transformedRealStS2VeryEarlyInitializationButton = SystemButton(
-            "Run Step 35.0.14 A–D — Reverify → Managed CommandLine Dictionary Rewrite → Admit → Invoke Once → Localize/Audit",
+            "Run Step 35.0.14 COMPAT — Reverify → Deep Recon → Managed Dictionary Rewrite → Invoke Once",
             17);
-        _transformedRealStS2VeryEarlyInitializationButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync();
+        _transformedRealStS2VeryEarlyInitializationButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.ManagedDictionaryCompatibility);
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationButton);
 
         _transformedRealStS2VeryEarlyInitializationResultLabel = Label(
@@ -38,19 +46,22 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationResultLabel);
 
         _transformedRealStS2VeryEarlyInitializationDetailLabel = Label(
-            "Physical 0.0.136 entered CommandLineHelper..cctor, emitted INMETHOD_CL_CRITICAL_001_PRE, then hard-terminated before _args assignment. Step 35.0.14 / 0.0.137 preserves those stack-neutral boundaries but rewrites only the private command-line dictionary from Godot.Collections.Dictionary<string,string> to System.Collections.Generic.Dictionary<string,string>; Godot.OS.GetCmdlineArgs remains natural for the next physical boundary.",
+            "Physical 0.0.136 entered CommandLineHelper..cctor and stopped inside Godot.Collections.Dictionary<string,string> construction. This rebuilt 0.0.137 adds read-only bundle-wide Mach-O/native reconnaissance, a separately verified entry-instrumented GodotSharp derivative, and two fresh-process modes: NATURAL preserves the failing Godot dictionary for inner localization; COMPAT applies only the four-reference BCL dictionary substitution to advance toward the untouched Godot.OS.GetCmdlineArgs boundary.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationDetailLabel);
     }
 
-    private async Task RunTransformedRealStS2VeryEarlyInitializationAsync()
+    private async Task RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode diagnosticMode)
     {
         if (_transformedRealStS2VeryEarlyInitializationResultLabel is null ||
             _transformedRealStS2VeryEarlyInitializationDetailLabel is null ||
             _transformedRealStS2VeryEarlyInitializationButton is null ||
+            _step35NaturalGodotReconButton is null ||
             _statusLabel is null)
             return;
+
+        _transformedRealStS2VeryEarlyInitialization.DiagnosticMode = diagnosticMode;
 
         if (!CurrentReleasePresentation.BundleIdentityMatchesExpected)
         {
@@ -86,12 +97,12 @@ public sealed partial class RootViewController
         _transformedRealStS2VeryEarlyInitialization.Reset();
         _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE A RUNNING…";
         _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.Label;
-        _statusLabel.Text = $"STEP 35.0.14 RUN {_step35RunId} — durable telemetry established. Gate A re-manufactures/reverifies the closed transform, writes the same-run exact-source static map, then emits and verifies a diagnostic clone with the four-reference managed CommandLine dictionary compatibility rewrite plus stack-neutral critical markers; no CLR admission yet.";
+        _statusLabel.Text = $"STEP 35.0.14 RUN {_step35RunId} — mode={diagnosticMode}. Gate A re-manufactures/reverifies the closed transform, emits the mode-specific sts2 derivative plus an entry-only GodotSharp derivative, and writes exact-source + Mach-O/native reconnaissance before any CLR admission.";
         _statusLabel.TextColor = UIColor.Label;
 
         try
         {
-            WriteStep35CrashCheckpoint("RUN_START — fresh-process Step 35.0.14 diagnostic compatibility run started; exact transformed source/resolver policy remain frozen, while Gate B/C use only a separately verified clone with corrected NP ordinals, stack-neutral CommandLine critical boundaries, and exactly four managed Dictionary<string,string> substitutions; natural Godot.OS.GetCmdlineArgs remains untouched.");
+            WriteStep35CrashCheckpoint($"RUN_START — fresh-process Step 35.0.14 comprehensive diagnostic run started; mode={diagnosticMode}; exact transformed source/resolver policy remain frozen; Gate A adds read-only GodotSharp/Mach-O reconnaissance and verifies both sts2 + GodotSharp diagnostic derivatives; all GodotSharp runtime probes are entry-only; natural Godot.OS.GetCmdlineArgs remains untouched.");
             var token = _operationCts?.Token ?? CancellationToken.None;
             var progress = new Progress<TransformedRealStS2VeryEarlyInitializationProgress>(value =>
             {
@@ -116,7 +127,19 @@ public sealed partial class RootViewController
                 _statusLabel.TextColor = UIColor.SystemRed;
                 return;
             }
-            WriteStep35CrashCheckpoint("A_STATIC_MAP_WRITE_RETURNED — run-correlated diagnostic static-map writer durably returned; about to select/schedule Gate B.");
+            WriteStep35CrashCheckpoint("A_STATIC_MAP_WRITE_RETURNED — run-correlated diagnostic static-map writer durably returned; writing comprehensive Godot/native reconnaissance before any CLR admission.");
+            if (!WriteStep35GodotReconnaissance(out var godotReconError))
+            {
+                WriteStep35CrashCheckpoint($"A_GODOT_RECON_WRITE_FAILED_STOP — {godotReconError}");
+                _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GODOT/NATIVE RECON TELEMETRY FAIL / STOPPED BEFORE GATE B";
+                _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SystemRed;
+                _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
+                    $"Gate A compatibility checks and in-memory reconnaissance passed, but the run-correlated Godot/native report could not be durably written. Gate B/C were intentionally not attempted. {godotReconError}");
+                _statusLabel.Text = "STEP 35 DIAGNOSTIC STOP — comprehensive reconnaissance telemetry failed before CLR admission; this is not a compatibility FAIL.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+                return;
+            }
+            WriteStep35CrashCheckpoint("A_GODOT_RECON_WRITE_RETURNED — run-correlated GodotSharp IL + Mach-O/native reconnaissance durably returned; about to select/schedule Gate B.");
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE B RUNNING…";
             _statusLabel.Text = "STEP 35.0.14 GATE B — re-hash the exact transformed source, then CLR-admit only the separately verified diagnostic clone into the strict execution context and re-check zero-resolution primary admission behavior.";
@@ -132,7 +155,7 @@ public sealed partial class RootViewController
             WriteStep35CrashCheckpoint("B_RESULT_RECORD_PASS — Gate B PASS recorded; about to select Gate C.");
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE C RUNNING…";
-            _statusLabel.Text = "STEP 35.0.14 GATE C — bind the diagnostic clone's ExecuteVeryEarly(), arm durable entry checkpoints plus corrected NP and stack-neutral CommandLine boundaries, execute the verified managed dictionary compatibility derivative once, await up to 60s, and fail closed on initializer-bearing/unplanned/native requests.";
+            _statusLabel.Text = $"STEP 35.0.14 GATE C — mode={diagnosticMode}; invoke the verified sts2 derivative once. The resolver substitutes only the separately verified GodotSharp diagnostic derivative and arms its entry-only callback before returning it; native loads, bootstrap expansion, initializer-bearing and unplanned requests remain fail-closed.";
             WriteStep35CrashCheckpoint("C_UI_SELECTED — Gate C labels assigned on the main thread; UIKit may not have repainted before synchronous Gate-C work begins.");
             var gateC = await _transformedRealStS2VeryEarlyInitialization.RunDiagnosticExecuteVeryEarlyInvocationAsync(WriteStep35CrashCheckpoint, token);
             WriteStep35CrashCheckpoint($"C_TASK_AWAIT_RESUMED — Gate C async method returned to the UI caller; passed={gateC.Passed}.");
@@ -183,7 +206,7 @@ public sealed partial class RootViewController
             WriteStep35CrashCheckpoint("RUN_FINALLY_ENTER — managed control reached the Step-35 finally block; writing the normal deterministic report.");
             await WriteDeviceTestReportFromLabelsAsync(
                 "Step35-TransformedRealStS2VeryEarlyInitialization.txt",
-                "StS2 Launcher — Step 35.0.14 Managed Command-Line Dictionary Compatibility Probe",
+                "StS2 Launcher — Step 35.0.14 Comprehensive GodotSharp / Native Reconnaissance",
                 _transformedRealStS2VeryEarlyInitializationResultLabel,
                 _transformedRealStS2VeryEarlyInitializationDetailLabel,
                 CancellationToken.None);
@@ -237,8 +260,8 @@ public sealed partial class RootViewController
         lines.Add("Step 35.0.10 / physical 0.0.133 observation: NP ordinal accounting was corrected to INMETHOD_NP002_PRE, but no CommandLineHelper cctor entry/CL/CLTV marker executed. MethodInfo.Invoke returned a faulted Task whose nested cause was System.InvalidProgramException, and the launcher reached normal RUN_END. This is a diagnostic instrumentation defect: the live-stack sweep raised transient stack depth without raising the serialized cctor MaxStack header; it does not advance or retreat the exact-game frontier from 0.0.132.");
         lines.Add("Step 35.0.12 / physical 0.0.135 observation: verified cctor MaxStack headroom still produced the same pre-instruction-zero InvalidProgramException, disproving MaxStack-only causation and motivating retirement of all live-stack CL/CLTV runtime callbacks.");
         lines.Add("Step 35.0.13 / physical 0.0.136 observation: the stack-neutral-only clone entered CommandLineHelper..cctor and emitted INMETHOD_CL_CRITICAL_001_PRE before _args dictionary construction, then hard-terminated before CL_CRITICAL_001_POST, CL_CRITICAL_002_PRE, INMETHOD_027, NP002_POST, or C_INVOKE_RETURNED. The final durable resolver event was the planned System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0 binding; it remains contextual, while the PRE/no-POST pair physically localizes the interval to Godot.Collections.Dictionary<string,string> construction before assignment.");
-        lines.Add("Step 35.0.14 diagnostic compatibility scope: preserve every prior marker and exact source/resolver/startup authority; keep live-stack CL/CLTV runtime sweeps retired; preserve exact-source CL/CLTV maps and unchanged cctor MaxStack; retain four stack-neutral critical markers; rewrite only CommandLineHelper._args plus its dictionary .ctor/set_Item/TryGetValue MemberRefs to System.Collections.Generic.Dictionary<string,string>; leave Godot.OS.GetCmdlineArgs natural. No game/Godot bootstrap, native load, or resolver broadening is authorized.");
-        lines.Add("0.0.137 compatibility probe: CL_CRITICAL_001_PRE/POST now brackets managed Dictionary<string,string> construction/assignment in the derivative; INMETHOD_CL_CRITICAL_002_PRE/POST still brackets the untouched Godot.OS.GetCmdlineArgs call. Generic CL/CLTV runtime sweeps remain retired; their exact-source maps remain output-only.");
+        lines.Add("Step 35.0.14 comprehensive diagnostic scope: preserve every prior exact source/resolver/startup authority and keep live-stack CL/CLTV callbacks retired. Gate A additionally performs read-only bundle-wide Mach-O dependency/rpath/symbol/string reconnaissance plus a GodotSharp IL/native-callback map, then emits a separately verified GodotSharp derivative with entry-only markers around the dictionary/GetCmdlineArgs/native-call chain. No native image is loaded or executed by reconnaissance.");
+        lines.Add("0.0.137 dual-mode probe: NATURAL preserves Godot.Collections.Dictionary<string,string> so the GodotSharp entry markers can localize the 0.0.136 constructor hard-kill internally; COMPAT rewrites only CommandLineHelper._args plus .ctor/set_Item/TryGetValue to System.Collections.Generic.Dictionary<string,string> so a separate fresh-process run can advance toward the untouched Godot.OS.GetCmdlineArgs/native-callback boundary without a new app build. Both remain diagnostic derivatives only.");
         lines.Add("Exact Step-35 authority remains the 0.0.126 contract: the natural managed startup target is static parameterless Task-returning MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly(), source token 0x06007D02, on the exact closed transformed artifact. Candidate 0.0.137 executes only a separately identified diagnostic derivative for localization; a diagnostic 4/4 cannot close Step 35.");
         lines.Add("Resolver boundary: exact persisted host-framework bindings and hash-pinned initializer-free prepared private dependencies may be serviced on demand. The known initializer-bearing 0Harmony 2.4.2.0 dependency remains forbidden; any changed/additional initializer-bearing dependency, unplanned managed request, or native request fails closed.");
         lines.Add("Forbidden in Step 35: receipt-backed/prepared original sts2.dll CLR admission, intentional ExecuteEssential/ExecuteDeferred/PrewarmJit invocation by the launcher, game entry-point execution, Harmony/MonoMod API invocation or runtime patching, Godot/game startup, native game loading, arbitrary resolver fallback, or broad startup sequencing.");
@@ -256,6 +279,7 @@ public sealed partial class RootViewController
             _step35RunId = null;
             _step35CrashCheckpointPath = null;
             _step35StaticMapPath = null;
+            _step35GodotReconnaissancePath = null;
             _step35LastCheckpointPath = null;
 
             try
@@ -265,22 +289,25 @@ public sealed partial class RootViewController
                 var runId = $"{initializedUtc:yyyyMMddTHHmmssfffffffZ}-pid{Environment.ProcessId}-{Guid.NewGuid():N}";
                 var crashFileName = $"Step35-CrashCheckpoint-{runId}.txt";
                 var staticMapFileName = $"Step35-ExecuteVeryEarly-StaticMap-{runId}.txt";
+                var godotReconFileName = $"Step35-GodotNativeReconnaissance-{runId}.txt";
                 var crashPath = Path.Combine(_deviceTestReportWriter.ReportsRoot, crashFileName);
                 var staticMapPath = Path.Combine(_deviceTestReportWriter.ReportsRoot, staticMapFileName);
+                var godotReconPath = Path.Combine(_deviceTestReportWriter.ReportsRoot, godotReconFileName);
                 var lastCheckpointPath = Path.Combine(_deviceTestReportWriter.ReportsRoot, Step35LastCheckpointFileName);
                 var currentRunPath = Path.Combine(_deviceTestReportWriter.ReportsRoot, Step35CurrentRunFileName);
 
                 WriteStep35TextFileDurably(
                     crashPath,
-                    "StS2 Launcher — Step 35.0.14 Managed Command-Line Dictionary compatibility crash checkpoint\n" +
+                    "StS2 Launcher — Step 35.0.14 Comprehensive GodotSharp / Native reconnaissance crash checkpoint\n" +
                     "Output-only diagnostic; never consumed as trusted runtime input.\n" +
                     $"Run ID: {runId}\n" +
                     $"Initialized UTC: {initializedUtc:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                     $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
-                    "Candidate: STEP 35.0.14 — MANAGED COMMAND-LINE DICTIONARY COMPATIBILITY PROBE\n" +
-                    "Execution policy: exact source transform/resolver/later-boundary prohibitions unchanged; Gate B/C execute only a separately verified diagnostic clone with output-only exact-source maps, corrected NP sweep, stack-neutral CommandLine boundaries, and exactly four managed string-dictionary substitutions; natural Godot.OS.GetCmdlineArgs remains untouched; CL/CLTV callsite maps remain output-only.\n" +
+                    "Candidate: STEP 35.0.14 — COMPREHENSIVE GODOTSHARP / NATIVE RECONNAISSANCE + DUAL MODE\n" +
+                    $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
+                    "Execution policy: exact source transform/resolver/later-boundary prohibitions unchanged; Gate A performs read-only bundle-wide native/GodotSharp inspection and emits separately verified sts2 + GodotSharp diagnostic derivatives; GodotSharp probes are entry-only; NATURAL preserves the original Godot command-line dictionary, COMPAT applies only the bounded four-reference BCL dictionary substitution; natural Godot.OS.GetCmdlineArgs remains untouched; native loads and Godot bootstrap remain forbidden.\n" +
                     $"Implementation: {CurrentReleasePresentation.Step35ImplementationMarker}\n\n");
 
                 var initialLine = $"{initializedUtc:O} | run={runId} | pid={Environment.ProcessId} | managedThread={Environment.CurrentManagedThreadId} | RUN_TELEMETRY_READY — run-specific journal created and durably flushed before Gate A.";
@@ -299,6 +326,7 @@ public sealed partial class RootViewController
                     $"Run ID: {runId}\n" +
                     $"Journal: {crashFileName}\n" +
                     $"Static map: {staticMapFileName}\n" +
+                    $"Godot/native reconnaissance: {godotReconFileName}\n" +
                     initialLine + "\n");
 
                 WriteStep35TextFileDurably(
@@ -311,12 +339,15 @@ public sealed partial class RootViewController
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                     $"Crash journal: {crashFileName}\n" +
                     $"Static map: {staticMapFileName}\n" +
+                    $"Godot/native reconnaissance: {godotReconFileName}\n" +
                     $"Last checkpoint: {Step35LastCheckpointFileName}\n" +
-                    "Candidate: STEP 35.0.14 — MANAGED COMMAND-LINE DICTIONARY COMPATIBILITY PROBE\n");
+                    $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
+                    "Candidate: STEP 35.0.14 — COMPREHENSIVE GODOTSHARP / NATIVE RECONNAISSANCE + DUAL MODE\n");
 
                 _step35RunId = runId;
                 _step35CrashCheckpointPath = crashPath;
                 _step35StaticMapPath = staticMapPath;
+                _step35GodotReconnaissancePath = godotReconPath;
                 _step35LastCheckpointPath = lastCheckpointPath;
                 _step35RunTelemetryReady = true;
                 return true;
@@ -327,6 +358,38 @@ public sealed partial class RootViewController
                 Console.Error.WriteLine($"Step-35 run-telemetry initialization failed: {error}");
                 return false;
             }
+        }
+    }
+
+    private bool WriteStep35GodotReconnaissance(out string error)
+    {
+        error = string.Empty;
+        try
+        {
+            if (!_step35RunTelemetryReady || string.IsNullOrWhiteSpace(_step35RunId) || string.IsNullOrWhiteSpace(_step35GodotReconnaissancePath))
+                throw new InvalidOperationException("Step-35 run telemetry is not initialized for Godot/native reconnaissance.");
+
+            var body = _transformedRealStS2VeryEarlyInitialization.GetVerifiedGodotReconnaissanceReport();
+            var markerMap = _transformedRealStS2VeryEarlyInitialization.GetVerifiedGodotSharpDiagnosticMarkerMap();
+            WriteStep35TextFileDurably(
+                _step35GodotReconnaissancePath,
+                $"Run ID: {_step35RunId}\n" +
+                $"Process ID: {Environment.ProcessId}\n" +
+                $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
+                $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
+                $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
+                "Candidate: STEP 35.0.14 — COMPREHENSIVE GODOTSHARP / NATIVE RECONNAISSANCE + OPTIONAL COMMAND-LINE DICTIONARY COMPATIBILITY\n" +
+                "This file is output-only and is written before Gate B CLR admission.\n\n" +
+                body +
+                "\n\n[GODOTSHARP RUNTIME ENTRY-MARKER PLAN]\n" +
+                markerMap + "\n");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = $"{ex.GetType().Name}: {ex.Message}";
+            Console.Error.WriteLine($"Step-35 Godot/native reconnaissance write failed: {error}");
+            return false;
         }
     }
 
@@ -346,7 +409,7 @@ public sealed partial class RootViewController
                 $"Process ID: {Environment.ProcessId}\n" +
                 $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                 $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
-                "Candidate: STEP 35.0.14 — same-run exact-source static map + managed CommandLine dictionary compatibility diagnostic clone\n" +
+                "Candidate: STEP 35.0.14 — same-run exact-source static map + comprehensive GodotSharp/native dual-mode diagnostic\n" +
                 "This file is generated from the already-verified exact transformed image before CLR admission and is never consumed as runtime input.\n\n" +
                 body + "\n");
             return true;
@@ -369,6 +432,7 @@ public sealed partial class RootViewController
                     string.IsNullOrWhiteSpace(_step35RunId) ||
                     string.IsNullOrWhiteSpace(_step35CrashCheckpointPath) ||
                     string.IsNullOrWhiteSpace(_step35StaticMapPath) ||
+                    string.IsNullOrWhiteSpace(_step35GodotReconnaissancePath) ||
                     string.IsNullOrWhiteSpace(_step35LastCheckpointPath))
                 {
                     Console.Error.WriteLine("Step-35 crash-checkpoint append skipped because run telemetry is not initialized.");
@@ -393,6 +457,7 @@ public sealed partial class RootViewController
                     $"Run ID: {_step35RunId}\n" +
                     $"Journal: {Path.GetFileName(_step35CrashCheckpointPath)}\n" +
                     $"Static map: {Path.GetFileName(_step35StaticMapPath)}\n" +
+                    $"Godot/native reconnaissance: {Path.GetFileName(_step35GodotReconnaissancePath)}\n" +
                     line + "\n");
             }
         }
