@@ -1,0 +1,42 @@
+Step 35.0.13 / physical 0.0.136 — Godot string-dictionary constructor boundary
+
+Run ID: 20260831T2025212464720Z-pid14708-4d9c46373c034fcba7b5a9534fc70489
+PID: 14708
+App: 0.0.136 (136)
+Candidate: Step 35.0.13 stack-neutral CommandLine / Godot boundary localization
+
+Outcome
+-------
+The process hard-terminated during Gate C. There was no C_INVOKE_RETURNED and no normal RUN_END. Step 35 remains OPEN; this was a diagnostic derivative and cannot change exact-byte authority.
+
+Durable in-method tail
+----------------------
+INMETHOD_024 — NullPlatformUtilStrategy..ctor entered
+INMETHOD_NP002_PRE — before CommandLineHelper.TryGetValue
+INMETHOD_CCTOR — MegaCrit.Sts2.Core.Helpers.CommandLineHelper..cctor entered
+INMETHOD_CL_CRITICAL_001_PRE — CommandLineHelper..cctor before _args dictionary construction
+RESOLVE_MANAGED_START — System.Collections.Concurrent, Version=8.0.0.0
+RESOLVE_HOST_START — System.Collections.Concurrent, Version=8.0.0.0
+RESOLVE_HOST_PASS — System.Collections.Concurrent, Version=8.0.0.0 => host 9.0.0.0
+
+Absent after the final PRE
+--------------------------
+INMETHOD_CL_CRITICAL_001_POST
+INMETHOD_CL_CRITICAL_002_PRE / POST
+INMETHOD_027 — CommandLineHelper.TryGetValue entered
+INMETHOD_NP002_POST
+C_INVOKE_RETURNED
+RUN_END
+
+Exact-source correlation
+------------------------
+The same-run static map shows CommandLineHelper..cctor begins with:
+CALLSITE#001 — newobj Godot.Collections.Dictionary<string,string>::.ctor()
+stsfld CommandLineHelper::_args
+CALLSITE#002 — Godot.OS::GetCmdlineArgs()
+
+Therefore the physical 0.0.136 PRE/no-POST pair localizes the measured hard-termination interval to work performed by Godot.Collections.Dictionary<string,string> construction before _args assignment. The final System.Collections.Concurrent 8->9 resolver event is compatible with GodotSharp managed/type loading but is not, by itself, root-cause proof.
+
+Classification
+--------------
+CLOSED DIAGNOSTIC LOCALIZATION RESULT. The 0.0.133/0.0.135 pre-instruction-zero InvalidProgramException instrumentation defect is no longer present in this stack-neutral-only clone. The next bounded compatibility experiment may detach only CommandLineHelper's private dictionary container from Godot while preserving the natural Godot.OS.GetCmdlineArgs call and every resolver/native/Godot-startup prohibition.

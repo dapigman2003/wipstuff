@@ -1,69 +1,31 @@
 # Current status
 
-## Active candidate — Step 35.0.13 / 0.0.136 (136)
+## Active candidate — Step 35.0.14 / 0.0.137 (137)
 
-Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29, 30, 31, 32, 33 and 34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
+Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
-The authoritative exact transformed Step-35 compatibility frontier remains physical **0.0.126**: exact `ExecuteVeryEarly()` entered `MethodInfo.Invoke` but no `C_INVOKE_RETURNED` was durably recorded. Diagnostic builds after that are localization derivatives and do not supersede exact-byte authority.
+The authoritative exact transformed Step-35 compatibility frontier remains physical **0.0.126**: exact `ExecuteVeryEarly()` entered `MethodInfo.Invoke`, but no `C_INVOKE_RETURNED` was durably recorded. Diagnostic derivatives after that do not supersede exact-byte authority.
 
-0.0.129 fixed deferred Cecil writer opening but physically proved `MissingMethodException` from a bad synthetic `Action<string>.Invoke(string)` MemberRef. 0.0.130 corrected it to `Action<string>::Invoke(!0)` and reached `SaveManager.get_Instance`. 0.0.131 reached `SaveManager.ConstructDefault`, `UserDataPathProvider.GetAccountScopedBasePath`, `PlatformUtil..cctor`, and `NullPlatformUtilStrategy..ctor`, but never `GodotFileIo..ctor`.
+## Physical localization history
 
-## Physical 0.0.132 game-frontier finding
+- **0.0.129:** bounded deferred Cecil writer path worked, but the synthetic `Action<string>.Invoke(string)` MemberRef failed. 0.0.130 corrected it to `Action<string>::Invoke(!0)`.
+- **0.0.130–0.0.131:** durable markers advanced through `SaveManager`, `UserDataPathProvider`, `PlatformUtil..cctor`, and `NullPlatformUtilStrategy..ctor`; `GodotFileIo..ctor` had not begun.
+- **0.0.132:** `INMETHOD_NP003_PRE` appeared before `CommandLineHelper.TryGetValue`; the exact-source map showed this was CALLSITE#002, proving a +1 diagnostic ordinal defect. No POST appeared.
+- **0.0.133:** corrected NP002, but live-stack CommandLine instrumentation produced managed `InvalidProgramException` before cctor instruction zero and reached normal `RUN_END`.
+- **0.0.135:** verified MaxStack headroom reproduced the same pre-zero `InvalidProgramException`, disproving MaxStack-only causation.
+- **0.0.136:** with all live-stack CL/CLTV runtime callbacks removed, the cctor finally executed. The run emitted `INMETHOD_CCTOR — ...CommandLineHelper..cctor entered` and `INMETHOD_CL_CRITICAL_001_PRE — ... before _args dictionary construction`, then stopped before the matching POST, `CL_CRITICAL_002_PRE`, `INMETHOD_027`, `NP002_POST`, or `C_INVOKE_RETURNED`. The final resolver event was the planned `System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0` binding; that event is contextual, while the PRE/no-POST pair localizes the physical interval to `Godot.Collections.Dictionary<string,string>` construction before assignment.
 
-The 0.0.132 Step 35.0.9 run established:
+## Step 35.0.14 / 0.0.137 change
 
-- the known chain through `NullPlatformUtilStrategy..ctor` entered;
-- `INMETHOD_NP003_PRE` was durably emitted immediately before `CommandLineHelper.TryGetValue`;
-- no matching POST appeared;
-- the same-run exact-source `[NULL PLATFORM CTOR IL]` map identifies `TryGetValue` as **CALLSITE#002**, physically proving the +1 NP diagnostic ordinal defect;
-- `GodotFileIo..ctor` was not reached;
-- the last `System.Collections.Concurrent 8.0.0.0 → host 9.0.0.0` resolver event remains contextual, not causal evidence.
+0.0.137 is a **diagnostic compatibility derivative**. Gate A still recreates and re-verifies the exact closed Step-32 transformed image and writes the exact-source static maps before producing a separate clone. The clone preserves all prior telemetry and runtime authority but applies one narrow managed substitution inside `CommandLineHelper`:
 
-Static inspection of the supplied matching `sts2.dll` shows `TryGetValue` is a thin dictionary lookup but triggers `CommandLineHelper..cctor` first. The cctor begins by constructing the `_args` Godot dictionary and then calls `Godot.OS.GetCmdlineArgs()`.
+- `_args`: `Godot.Collections.Dictionary<string,string>` -> `System.Collections.Generic.Dictionary<string,string>`;
+- cctor `newobj`: Godot dictionary constructor -> BCL dictionary constructor;
+- cctor `set_Item(!0,!1)`: Godot dictionary -> BCL dictionary;
+- `TryGetValue(!0,!1&)`: Godot dictionary -> BCL dictionary.
 
-## 0.0.134 was stopped before physical testing: its host suite was 205/206 because the new MaxStack regression incorrectly required Cecil's serialized MaxStack to equal 4 rather than be at least the required minimum. 0.0.136 fixes only that test contract while retaining the executable CLR check.
+The rewrite uses the existing `System.Collections` AssemblyRef and preserves ECMA-335 generic VAR signatures. Gate A reopens the serialized clone and verifies all four substitutions, zero residual Godot string-dictionary call references in the affected methods, unchanged cctor MaxStack, and exactly one untouched `Godot.OS.GetCmdlineArgs()` call.
 
-Physical 0.0.133 diagnostic result
+The stack-neutral critical markers remain. In the derivative, `CL_CRITICAL_001_PRE/POST` brackets managed `Dictionary<string,string>` construction/assignment. `CL_CRITICAL_002_PRE/POST` still brackets the natural `Godot.OS.GetCmdlineArgs()` call. No Godot bootstrap, native game loading, resolver broadening, later `OneTimeInitialization` phase, entry-point execution, or runtime Harmony/MonoMod patching is authorized.
 
-0.0.133 Step 35.0.10 corrected the NP runtime marker to `INMETHOD_NP002_PRE`, matching exact-source CALLSITE#002. It then behaved differently from 0.0.132:
-
-- no `CommandLineHelper..cctor` entry marker executed;
-- no `INMETHOD_CLxxx_PRE/POST`, `INMETHOD_027`, or `INMETHOD_CLTVxxx_PRE/POST` marker executed;
-- `MethodInfo.Invoke` returned;
-- the returned `Task` was already faulted;
-- the exception chain was `PlatformUtil` `TypeInitializationException` → `CommandLineHelper` `TypeInitializationException` → `System.InvalidProgramException`;
-- the launcher wrote its normal report and durable `RUN_END`.
-
-This is **CLOSED DIAGNOSTIC NEGATIVE — instrumentation defect**. It does not advance or retreat the physical game frontier from 0.0.132. The generic cctor callsite sweep placed `ldstr; call Emit` around original calls while original arguments/results could remain live, raising transient stack depth by one without increasing the serialized method `MaxStack` header. Cecil write/reopen tests did not execute the rewritten method and therefore missed the invalid IL header.
-
-## Step 35.0.13 / 0.0.136 change
-
-0.0.136 preserves every exact-source, writer-only resolver, runtime resolver, timeout, fresh-process, native and later-boundary prohibition from 0.0.133. It changes only output-only diagnostic instrumentation and verification:
-
-- corrected NullPlatform ordinal accounting remains;
-- every generic live-stack PRE/POST sweep reserves one additional `MaxStack` slot;
-- the targeted callsite-marker helper is hardened the same way for future deeper GodotFileIo reachability;
-- Gate A captures the exact-source `CommandLineHelper..cctor` MaxStack, requires the diagnostic cctor to be exactly source+1, serializes the clone, reopens it, and verifies that header again;
-- the same-run static map prints the exact-source CommandLine cctor MaxStack in `[COMMAND LINE HELPER CCTOR IL]`, while `[COMMAND LINE HELPER TRYGETVALUE IL]` retains the thin body map;
-- four **stack-neutral** critical markers are inserted at empty-stack boundaries: `INMETHOD_CL_CRITICAL_001_PRE/POST` around `_args` dictionary construction/assignment and `INMETHOD_CL_CRITICAL_002_PRE/POST` around `Godot.OS.GetCmdlineArgs()` invocation/result storage;
-- the full corrected `INMETHOD_CLxxx_PRE/POST` cctor sweep and `INMETHOD_CLTVxxx_PRE/POST` `TryGetValue` sweep remain;
-- Gate A still fails closed unless the CL plan includes `Godot.OS.GetCmdlineArgs`;
-- host regression coverage now includes actual CLR loading/execution of a generated tight-MaxStack rewritten cctor, not only Cecil round-trip inspection.
-
-The exact Step-35 source target remains `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()`, source token `0x06007D02`, state-machine MoveNext token `0x0600BC71`. Gate B/C execute only a separately verified diagnostic clone; exact Step-32 transformed bytes remain outside the CLR during the diagnostic run.
-
-## How to read the next physical run
-
-The redundant critical markers are the primary high-value evidence:
-
-- no CommandLine cctor entry marker: rejection/JIT/type-init failure before instruction zero;
-- cctor entry but no dictionary critical PRE: failure immediately after entry instrumentation;
-- dictionary critical PRE without POST: failure during Godot dictionary construction/assignment;
-- dictionary POST followed by `Godot.OS.GetCmdlineArgs` critical PRE without POST: physical localization to `Godot.OS.GetCmdlineArgs()`;
-- GetCmdlineArgs critical POST: that Godot call returned; subsequent CL markers localize parser work;
-- cctor completion followed by `INMETHOD_027`: type initialization returned and the actual `TryGetValue` body entered;
-- `INMETHOD_CLTVxxx_PRE` without POST: localizes inside the thin method-body dictionary lookup.
-
-Even if 0.0.136 reaches Gate D and reports 4/4, that is **Step 35.0.13 diagnostic localization complete — NOT Step 35 closure**. Godot/game startup, native game loading, initializer-bearing `0Harmony`, arbitrary managed fallback, later `OneTimeInitialization` phases, the game entry point, and Harmony/MonoMod runtime patching remain forbidden.
-
-Physical 0.0.135 observation: the MaxStack-hardened diagnostic clone still returned a faulted Task with nested System.InvalidProgramException before any CommandLineHelper cctor entry/critical marker executed, despite serialized cctor MaxStack 3 / 4 verification. The launcher reached normal RUN_END. This disproves the MaxStack-only diagnosis; Step 35.0.13 retires all live-stack CL/CLTV runtime callbacks and keeps only stack-neutral CommandLine boundaries.
+The exact Step-35 target remains `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()`, source token `0x06007D02`, async MoveNext source token `0x0600BC71`. A 0.0.137 diagnostic 4/4 result remains **NOT Step-35 closure**.

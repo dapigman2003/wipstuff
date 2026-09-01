@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.13 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.14 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -528,6 +528,105 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             .Methods.Single(method => method.Name == ".cctor");
         Assert.AreEqual(2, cctorAfter.Body.MaxStackSize);
         Assert.IsTrue(TransformedRealStS2VeryEarlyInitialization.HasCommandLineHelperCriticalBoundaryMarkers(cctorAfter));
+    }
+
+    [TestMethod]
+    public void DiagnosticCommandLineManagedDictionaryRewriteRoundTripsGenericVarMemberRefsAndRetainsNaturalGodotArgsCall()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-commandline-managed-dictionary");
+        var assemblyPath = Path.Combine(temp.Path, "CommandLineManagedDictionaryFixture.dll");
+
+        using (var assembly = AssemblyDefinition.CreateAssembly(
+                   new AssemblyNameDefinition("CommandLineManagedDictionaryFixture", new Version(1, 0, 0, 0)),
+                   "CommandLineManagedDictionaryFixture",
+                   ModuleKind.Dll))
+        {
+            var module = assembly.MainModule;
+            module.AssemblyReferences.Add(new AssemblyNameReference("System.Collections", new Version(9, 0, 0, 0)));
+            var godotSharp = new AssemblyNameReference("GodotSharp", new Version(4, 5, 1, 0));
+            module.AssemblyReferences.Add(godotSharp);
+
+            var godotDictionaryOpen = new TypeReference("Godot.Collections", "Dictionary`2", module, godotSharp, false);
+            var godotKey = new GenericParameter("TKey", godotDictionaryOpen);
+            var godotValue = new GenericParameter("TValue", godotDictionaryOpen);
+            godotDictionaryOpen.GenericParameters.Add(godotKey);
+            godotDictionaryOpen.GenericParameters.Add(godotValue);
+            var godotDictionaryString = new GenericInstanceType(godotDictionaryOpen);
+            godotDictionaryString.GenericArguments.Add(module.TypeSystem.String);
+            godotDictionaryString.GenericArguments.Add(module.TypeSystem.String);
+
+            var godotCtor = new MethodReference(".ctor", module.TypeSystem.Void, godotDictionaryString)
+            {
+                HasThis = true,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+            var godotSetter = new MethodReference("set_Item", module.TypeSystem.Void, godotDictionaryString)
+            {
+                HasThis = true,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+            godotSetter.Parameters.Add(new ParameterDefinition(godotKey));
+            godotSetter.Parameters.Add(new ParameterDefinition(godotValue));
+            var godotTryGetValue = new MethodReference("TryGetValue", module.TypeSystem.Boolean, godotDictionaryString)
+            {
+                HasThis = true,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+            godotTryGetValue.Parameters.Add(new ParameterDefinition(godotKey));
+            godotTryGetValue.Parameters.Add(new ParameterDefinition(new ByReferenceType(godotValue)));
+
+            var godotOs = new TypeReference("Godot", "OS", module, godotSharp, false);
+            var getCmdlineArgs = new MethodReference("GetCmdlineArgs", new ArrayType(module.TypeSystem.String), godotOs)
+            {
+                HasThis = false,
+                CallingConvention = MethodCallingConvention.Default,
+            };
+
+            var commandLine = new TypeDefinition("MegaCrit.Sts2.Core.Helpers", "CommandLineHelper", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+            module.Types.Add(commandLine);
+            var argsField = new FieldDefinition("_args", Mono.Cecil.FieldAttributes.Private | Mono.Cecil.FieldAttributes.Static, godotDictionaryString);
+            commandLine.Fields.Add(argsField);
+
+            var cctor = new MethodDefinition(".cctor", Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+            commandLine.Methods.Add(cctor);
+            var cctorIl = cctor.Body.GetILProcessor();
+            cctorIl.Append(cctorIl.Create(OpCodes.Newobj, godotCtor));
+            cctorIl.Append(cctorIl.Create(OpCodes.Stsfld, argsField));
+            cctorIl.Append(cctorIl.Create(OpCodes.Call, getCmdlineArgs));
+            cctorIl.Append(cctorIl.Create(OpCodes.Pop));
+            cctorIl.Append(cctorIl.Create(OpCodes.Ldsfld, argsField));
+            cctorIl.Append(cctorIl.Create(OpCodes.Ldstr, "key"));
+            cctorIl.Append(cctorIl.Create(OpCodes.Ldstr, "value"));
+            cctorIl.Append(cctorIl.Create(OpCodes.Callvirt, godotSetter));
+            cctorIl.Append(cctorIl.Create(OpCodes.Ret));
+
+            var tryGetValue = new MethodDefinition("TryGetValue", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, module.TypeSystem.Boolean);
+            tryGetValue.Parameters.Add(new ParameterDefinition("key", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
+            tryGetValue.Parameters.Add(new ParameterDefinition("value", Mono.Cecil.ParameterAttributes.Out, new ByReferenceType(module.TypeSystem.String)));
+            commandLine.Methods.Add(tryGetValue);
+            var tryIl = tryGetValue.Body.GetILProcessor();
+            tryIl.Append(tryIl.Create(OpCodes.Ldsfld, argsField));
+            tryIl.Append(tryIl.Create(OpCodes.Ldarg_0));
+            tryIl.Append(tryIl.Create(OpCodes.Ldarg_1));
+            tryIl.Append(tryIl.Create(OpCodes.Callvirt, godotTryGetValue));
+            tryIl.Append(tryIl.Create(OpCodes.Ret));
+
+            var rewrite = TransformedRealStS2VeryEarlyInitialization.ApplyCommandLineHelperManagedDictionaryCompatibilityRewrite(module, cctor, tryGetValue);
+            Assert.AreEqual(4, rewrite.SubstitutionCount);
+            Assert.AreEqual(TransformedRealStS2VeryEarlyInitialization.ManagedStringDictionaryFullName, rewrite.ManagedDictionaryTypeFullName);
+            Assert.AreEqual(1, module.AssemblyReferences.Count(reference => reference.Name == "System.Collections"));
+            TransformedRealStS2VeryEarlyInitialization.VerifyCommandLineHelperManagedDictionaryCompatibilityRewrite(commandLine, cctor, tryGetValue);
+            assembly.Write(assemblyPath);
+        }
+
+        using var reopened = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
+        var commandLineAfter = reopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTypeFullName);
+        var cctorAfter = commandLineAfter.Methods.Single(method => method.Name == ".cctor");
+        var tryGetValueAfter = commandLineAfter.Methods.Single(method => method.FullName == TransformedRealStS2VeryEarlyInitialization.CommandLineHelperTryGetValueFullName);
+        TransformedRealStS2VeryEarlyInitialization.VerifyCommandLineHelperManagedDictionaryCompatibilityRewrite(commandLineAfter, cctorAfter, tryGetValueAfter);
+        Assert.AreEqual(1, cctorAfter.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference method &&
+            method.DeclaringType.FullName == "Godot.OS" && method.Name == "GetCmdlineArgs"));
     }
 
     [TestMethod]

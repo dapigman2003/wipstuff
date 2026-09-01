@@ -219,3 +219,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-35.0.11-0.0.134-HOST-REGRESSION-CONTRACT-FAILURE.txt` — 0.0.134 stopped before physical testing because the host regression asserted exact serialized MaxStack=4 instead of the required minimum; 0.0.136 corrects the test contract.
 
 - `reports/STEP-35.0.12-PHYSICAL-PREZERO-INVALIDPROGRAM-0.0.135.txt` — physical 0.0.135 disproved the MaxStack-only diagnosis; cctor still rejected before instruction zero.
+- `reports/STEP-35.0.13-PHYSICAL-GODOT-DICTIONARY-CONSTRUCTOR-BOUNDARY-0.0.136.txt` — physical 0.0.136 entered CommandLineHelper..cctor and localized the hard termination to Godot string-dictionary construction before `_args` assignment.
+- `steps/STEP-35.0.14-MANAGED-COMMANDLINE-DICTIONARY-COMPATIBILITY.md` — 0.0.137 bounded diagnostic compatibility design replacing only CommandLineHelper's private Godot string dictionary with the existing BCL Dictionary contract while retaining natural GetCmdlineArgs.
