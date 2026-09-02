@@ -1,0 +1,20 @@
+Step 35.0.19 / 0.0.142 Codemagic — iOS compile namespace failure
+
+Candidate: 0.0.142 (142)
+Evidence source: Codemagic artifact bundle wipstuff_17_artifacts.zip
+
+Observed pipeline result
+
+- Static validation: PASS, 855 checks.
+- Host unit tests: PASS, 211/211.
+- Step-15 standalone native-link preflight: PASS; arm64 preflight executable linked all callback-handoff bridge roots, including sts2_step15_is_runtime_interop_ready, sts2_step15_has_dotnet_feature, sts2_step15_is_dotnet_runtime_initialized, and sts2_step15_get_runtime_interop_funcs.
+- iOS compilation: FAIL before IPA packaging.
+- Repeated compiler diagnostic: CS0103, "The name 'GodotStep15NativeBridge' does not exist in the current context" in RootViewController.TransformedRealStS2VeryEarlyInitialization.cs.
+
+Diagnosis
+
+GodotStep15NativeBridge.cs is present under namespace StS2Launcher.iOS.Platform, and the established RootViewController.Godot.cs partial already imports StS2Launcher.iOS.Platform. The new Step-35 partial referenced GodotStep15NativeBridge but omitted that namespace import. The native bridge itself and the callback-handoff runtime design were not implicated by this compile failure.
+
+Disposition
+
+0.0.142 produced no IPA and no device evidence. Advance to Step 35.0.20 / 0.0.143 with only the missing `using StS2Launcher.iOS.Platform;` compile-integration correction plus release/provenance/static guards. CORE-HANDOFF runtime semantics remain unchanged.

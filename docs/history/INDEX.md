@@ -247,3 +247,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.18-CODEMAGIC-CALLBACK-TELEMETRY-ASSERTION-FAILURE-0.0.141.txt` — 0.0.141 static 853/853 PASS, host 210/211; sole failure was the negative callback-table test expecting zero checkpoints even though production intentionally emitted one durable `CB_INITIALIZE_MANAGED_FAIL` before any preflight/CLR work. No IPA/device evidence.
 - `steps/STEP-35.0.19-CALLBACK-FAILURE-TELEMETRY-CONTRACT-CORRECTION.md` — 0.0.142 correction: runtime experiment unchanged; negative regression now requires exactly one managed-failure checkpoint and proves `CB_INIT_ENTRY` was not reached.
+
+## Step 35.0.19 CI compile failure / Step 35.0.20 compile-integration correction
+
+- `reports/STEP-35.0.19-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.142.txt` — 0.0.142 passed 855/855 static checks, 211/211 host tests, and native-link preflight, then iOS compilation failed with CS0103 because the new Step-35 partial omitted the `StS2Launcher.iOS.Platform` namespace import; no IPA/device evidence.
+- `steps/STEP-35.0.20-CALLBACK-HANDOFF-COMPILE-INTEGRATION-CORRECTION.md` — 0.0.143 adds only the missing Platform namespace import plus release/provenance/static guards; CORE-HANDOFF runtime semantics are unchanged.

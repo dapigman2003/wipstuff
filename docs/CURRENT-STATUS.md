@@ -1,6 +1,6 @@
 # Current status
 
-## Active candidate — Step 35.0.19 / 0.0.142 (142)
+## Active candidate — Step 35.0.20 / 0.0.143 (143)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
@@ -10,7 +10,7 @@ The authoritative exact-transformed Step-35 execution frontier remains physical 
 
 0.0.129–0.0.136 localized the pre-first-await failure through SaveManager/UserDataPathProvider/Platform/NullPlatform into `CommandLineHelper..cctor`, with 0.0.136 placing the hard termination between `CL_CRITICAL_001_PRE` and `CL_CRITICAL_001_POST` around Godot `Dictionary<string,string>` construction. The retired live-stack CL/CLTV probes remain negative instrumentation evidence.
 
-0.0.137 was a pre-device Codemagic failure at **208/209** host tests due solely to the GodotSharp derivative verifier checking the sts2 bridge type. 0.0.138 corrected that verifier. 0.0.139 did not produce an IPA: static validation passed, Codemagic executed **210** host tests, **209 passed / 1 failed**, and the only failure was the stale Step-35.0.15 gate-summary assertion while production emitted Step 35.0.16. 0.0.140 corrected that release/test consistency defect. 0.0.141 likewise stopped before IPA packaging: static validation passed **853/853**, Codemagic executed **211** host tests, **210 passed / 1 failed**, and the sole failure was the new negative callback-table regression expecting zero checkpoints even though production intentionally emitted one durable `CB_INITIALIZE_MANAGED_FAIL` before any preflight/CLR work. 0.0.142 corrects only that test/telemetry contract.
+0.0.137 was a pre-device Codemagic failure at **208/209** host tests due solely to the GodotSharp derivative verifier checking the sts2 bridge type. 0.0.138 corrected that verifier. 0.0.139 did not produce an IPA: static validation passed, Codemagic executed **210** host tests, **209 passed / 1 failed**, and the only failure was the stale Step-35.0.15 gate-summary assertion while production emitted Step 35.0.16. 0.0.140 corrected that release/test consistency defect. 0.0.141 likewise stopped before IPA packaging: static validation passed **853/853**, Codemagic executed **211** host tests, **210 passed / 1 failed**, and the sole failure was the new negative callback-table regression expecting zero checkpoints even though production intentionally emitted one durable `CB_INITIALIZE_MANAGED_FAIL` before any preflight/CLR work. 0.0.142 corrected that contract, passed **855/855 static checks**, **211/211 host tests**, and the Step-15 standalone native-link preflight, then failed during iOS C# compilation with CS0103 because the Step-35 partial omitted `using StS2Launcher.iOS.Platform;` while referencing `GodotStep15NativeBridge`. 0.0.143 corrects only that compile-time namespace visibility defect.
 
 ## Physical 0.0.138 callback boundary
 
@@ -42,9 +42,9 @@ GodotSharp `NativeFuncs.Initialize(IntPtr,int)` validates the callback table siz
 
 The uploaded main game executable is 179,706,736 bytes with SHA-256 `7fadae8d46f0074ba745bc3beebe31a13df5fafed2f2ac69cd68b3c5dd8508e6`, matching the 0.0.140 reconnaissance inventory. Native inspection identifies the standard Godot 4.5.1 C# interop side including `godotsharp::get_runtime_interop_funcs(int&)` and Godot C#/Mono module symbols. This supports using the same source-built Godot 4.5.1 engine as the callback-table producer instead of fabricating callbacks or loading the game executable.
 
-## Step 35.0.19 / 0.0.142 telemetry-contract correction and active design
+## Step 35.0.20 / 0.0.143 compile-integration correction and active design
 
-0.0.142 preserves the 0.0.141 runtime experiment unchanged. The only Step-35.0.19 correction is the negative host-test contract: invalid callback metadata must still be rejected before preflight/CLR work while producing exactly one durable `CB_INITIALIZE_MANAGED_FAIL` record, and `CB_INIT_ENTRY` must remain unreachable.
+0.0.143 preserves the 0.0.142 runtime experiment unchanged. The only Step-35.0.20 runtime-source integration correction is the explicit `using StS2Launcher.iOS.Platform;` import in the Step-35 iOS partial so `GodotStep15NativeBridge` resolves during iOS compilation. The 0.0.142 telemetry contract remains unchanged: invalid callback metadata must be rejected before preflight/CLR work while producing exactly one durable `CB_INITIALIZE_MANAGED_FAIL`, and `CB_INIT_ENTRY` remains unreachable.
 
 The three prior controls are preserved unchanged. A fourth diagnostic mode, `GodotCoreCallbackHandoff`, is the sole exception to their no-Godot-state rule.
 
@@ -54,4 +54,4 @@ The bridge obtains `godotsharp::get_runtime_interop_funcs(size)`, rejects null/e
 
 The game native executable is **not loaded**. No callback address is invented. ExecuteEssential, ExecuteDeferred, entry-point execution, native game resolution, arbitrary resolver fallback, and Harmony/MonoMod runtime patching remain forbidden. Exact source pins `0x06007D02` / `0x0600BC71` and the Step-32 transformed authority remain unchanged.
 
-A 0.0.142 diagnostic 4/4, including CORE-HANDOFF, is **NOT Step-35 closure**.
+A 0.0.143 diagnostic 4/4, including CORE-HANDOFF, is **NOT Step-35 closure**.

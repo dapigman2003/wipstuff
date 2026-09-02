@@ -1,12 +1,12 @@
-# Release checklist — Step 35.0.19 / 0.0.142
+# Release checklist — Step 35.0.20 / 0.0.143
 
-Release identity: display/build `0.0.142 (142)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.143 (143)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
 
-0.0.142 is a pre-device test-contract correction over 0.0.141: runtime behavior is unchanged; the invalid callback-table regression now requires the intentional single `CB_INITIALIZE_MANAGED_FAIL` checkpoint and proves `CB_INIT_ENTRY` was not reached.
+0.0.143 is a pre-device compile-integration correction over 0.0.142: runtime behavior is unchanged; the Step-35 iOS partial now explicitly imports `StS2Launcher.iOS.Platform` so `GodotStep15NativeBridge` resolves during the iOS compile.
 
 Before handoff/build:
 
-- [ ] release identity is exactly `0.0.142 (142)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] release identity is exactly `0.0.143 (143)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
 - [ ] `bash scripts/validate.sh` passes;
 - [ ] `bash scripts/test.sh` passes on a host with `dotnet`; expected count is 211 or greater after the new callback-handoff regression;
 - [ ] pinned Godot 4.5.1 iOS source builds with `module_mono_enabled=yes` and standalone native-link preflight passes;
@@ -23,4 +23,4 @@ Before handoff/build:
 - [ ] runtime native **game** resolution remains rejected; no game executable/library, later OneTimeInitialization phase, entry point, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
 - [ ] no proprietary game DLL/native app bundle/signing secret/credential is included in the source archive.
 
-Physical testing for the new mode: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. The old three controls need not be rerun unless regression confirmation is desired. A 0.0.142 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.
+Physical testing for the new mode: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. The old three controls need not be rerun unless regression confirmation is desired. A 0.0.143 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.

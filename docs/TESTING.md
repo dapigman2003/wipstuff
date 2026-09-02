@@ -1,11 +1,11 @@
-# Testing — Step 35.0.19
+# Testing — Step 35.0.20
 
-Active candidate: Step 35.0.19 / `0.0.142 (142)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.20 / `0.0.143 (143)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
 ## Build/host prerequisites
 
 1. `bash scripts/validate.sh` must pass.
-2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.141 executed **211** host tests: **210 passed / 1 failed** solely because the invalid-table regression expected zero checkpoints instead of the intentional one `CB_INITIALIZE_MANAGED_FAIL`. 0.0.142 corrects that assertion without changing runtime behavior, so expect **211 or greater** and require all to pass unless tests are deliberately reorganized and documented.
+2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.142 proved **211/211 host tests PASS** after the callback-telemetry correction. 0.0.143 changes only the iOS partial namespace import and release/provenance guards, so expect **211 or greater** and require all to pass unless tests are deliberately reorganized and documented.
 3. Codemagic must successfully rebuild the pinned Godot 4.5.1 iOS static archive with `module_mono_enabled=yes`, pass the standalone native-link preflight, then build and verify the IPA.
 4. The exact Step-32 transformed source must requalify; protected Step 29–34 manifests must remain unchanged.
 
@@ -52,4 +52,4 @@ Resolver events alone do not establish causation. Interpret them with same-run P
 
 ## Closure rule
 
-All four 0.0.142 modes execute diagnostic derivatives. A 4/4 result cannot close exact Step 35. Cancellation is INCONCLUSIVE.
+All four 0.0.143 modes execute diagnostic derivatives. A 4/4 result cannot close exact Step 35. Cancellation is INCONCLUSIVE.
