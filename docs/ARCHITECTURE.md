@@ -154,12 +154,17 @@ Step 35.0.17 / 0.0.140 preserves the Step 35.0.16 three-mode runtime architectur
 
 ## Step 35.0.20 Godot core callback-handoff compile-integration correction
 
-0.0.143 does not change the 0.0.142 callback-handoff runtime architecture. 0.0.142 already proved 855/855 static checks, 211/211 host tests, and the native-link preflight; its iOS compile then exposed one integration defect: the Step-35 partial omitted the `StS2Launcher.iOS.Platform` import required to resolve `GodotStep15NativeBridge`. 0.0.143 adds only that import plus provenance/static guards.
+0.0.144 does not change the 0.0.142 callback-handoff runtime architecture. 0.0.142 already proved 855/855 static checks, 211/211 host tests, and the native-link preflight; its iOS compile then exposed one integration defect: the Step-35 partial omitted the `StS2Launcher.iOS.Platform` import required to resolve `GodotStep15NativeBridge`. 0.0.144 adds only that import plus provenance/static guards.
 
 Physical 0.0.140 moved the problem out of CommandLineHelper: FORWARD passes both command-line boundaries and reaches `GodotFileIo.CreateDirectory`, where `Godot.DirAccess.DirExistsAbsolute` immediately enters the same StringName/NativeFuncs callback pipeline that killed OS-RECON. The active architecture therefore stops extending individual managed substitutes.
 
-0.0.143 preserves NATURAL/OS-RECON/FORWARD as no-Godot-state controls and adds one explicit `GodotCoreCallbackHandoff` mode. The pinned Godot 4.5.1 iOS archive is rebuilt with `module_mono_enabled=yes`. The project-owned Step-15 smoke scene still has no `dotnet` feature, so the native C# language/GDMono scaffolding may exist while the Godot-managed runtime remains uninitialized. Runtime checks fail closed if that assumption is false.
+0.0.144 preserves NATURAL/OS-RECON/FORWARD as no-Godot-state controls and adds one explicit `GodotCoreCallbackHandoff` mode. The pinned Godot 4.5.1 iOS archive is rebuilt with `module_mono_enabled=yes`. The project-owned Step-15 smoke scene still has no `dotnet` feature, so the native C# language/GDMono scaffolding may exist while the Godot-managed runtime remains uninitialized. Runtime checks fail closed if that assumption is false.
 
 The Step-15 native bridge exposes only readiness/state plus the pointer/size returned by upstream `godotsharp::get_runtime_interop_funcs`. It does not call a callback or initialize managed GodotSharp. Step 35 then loads only the separately verified private GodotSharp diagnostic derivative through its strict ALC, binds exact `NativeFuncs.Initialize(IntPtr,int)`, proves `initialized=false`, invokes once, proves `initialized=true`, and records the resolver baseline. Gate C proceeds only if no resolver/native activity changed between the handoff and the natural ExecuteVeryEarly binding.
 
 The game native executable remains data-only evidence and is never loaded by the launcher. CORE-HANDOFF is a diagnostic of a legitimate engine prerequisite, not permission for broad Godot/game startup and not Step-35 closure authority.
+
+
+## Step 35.0.21 singleton acquisition boundary
+
+Physical 0.0.143 proves the project-owned Godot callback table can drive the private GodotSharp derivative through callback-backed dictionary, StringName, and method-bind operations. The next boundary is reverse object association: `OS.get_Singleton()` must obtain the native OS singleton and map it to a managed `OSInstance`. 0.0.144 instruments that boundary without creating a surrogate singleton or bypassing Godot semantics.

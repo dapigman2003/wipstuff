@@ -267,10 +267,13 @@ A successful FORWARD run does not establish final command-line semantics and can
 
 0.0.139 stopped before IPA packaging at 209/210 host tests because the gate-summary regression still expected Step 35.0.15 while production emitted Step 35.0.16. 0.0.140 changes no runtime compatibility semantics. It corrects the stale assertion, advances release/diagnostic identity, and statically couples production/test summary identity so this provenance drift is rejected before host testing. After Codemagic passes, the planned physical sequence remains OS-RECON then FORWARD in separate fresh processes.
 
-## Step 35.0.20 — prove the real Godot core callback prerequisite
+## Step 35.0.20 — callback-handoff compile integration correction
 
-Physical 0.0.140 established that managed command-line compatibility is not the end of the problem: after FORWARD clears CommandLineHelper, the next required filesystem operation reaches the same uninitialized GodotSharp callback path. Do not continue replacing isolated Godot wrappers merely to move the frontier.
+Physical 0.0.140 established that managed command-line compatibility was not the end of the problem, so 0.0.141/0.0.142 introduced the Step15-live CORE-HANDOFF design. 0.0.142 proved 855/855 static checks and 211/211 host tests but failed iOS compilation solely because the Step-35 partial lacked `using StS2Launcher.iOS.Platform;`. 0.0.143 added only that namespace import and reached physical device execution.
 
-0.0.143 preserves the 0.0.142 CORE-HANDOFF experiment unchanged. 0.0.142 proved 855/855 static checks and 211/211 host tests but failed iOS compilation solely because the Step-35 partial lacked `using StS2Launcher.iOS.Platform;`. 0.0.143 adds that compile-integration correction. Once Codemagic compilation/build verification is green, use the already-proven Step-15 project-owned Godot 4.5.1 engine as the legitimate native-state owner, expose its exact upstream runtime interop callback table, initialize only the verified private GodotSharp derivative, then rerun the natural diagnostic ExecuteVeryEarly path. Preserve the three old modes as controls.
+The runtime design remained fail-closed: obtain the source-built Godot 4.5.1 runtime interop callback table only from an already-proven Step-15 engine, initialize only the verified private GodotSharp derivative, reject competing managed-runtime state, and leave native game loading and later OneTimeInitialization phases forbidden.
 
-If CORE-HANDOFF advances beyond the old GS031/GS024 boundaries, map the next semantically required engine prerequisite before designing any broader startup integration. If it fails before or inside `NativeFuncs.Initialize`, treat that as a native build/ABI/readiness result. If it reaches diagnostic 4/4, Step 35 still remains open until a separately defined exact-authority closure candidate is designed.
+
+## Step 35.0.21 — singleton acquisition localization
+
+Physical 0.0.143 turns the callback-table hypothesis into positive evidence: the exact source-built table is accepted and previously fatal callback operations execute. The next investigation is the reverse native-to-managed object association needed by `OS.get_Singleton()`. 0.0.144 keeps runtime behavior fixed and increases observability only. If the next frontier is the managed-instance creation callback, the following design decision should address legitimate Godot managed-callback registration rather than fabricate wrappers.

@@ -38,6 +38,8 @@ internal static class Step35GodotReconnaissance
         "Godot.OS",
         "Godot.NativeCalls",
         "Godot.NativeInterop.NativeFuncs",
+        "Godot.NativeInterop.InteropUtils",
+        "Godot.NativeInterop.Marshaling",
     ];
 
     internal static string BuildReport(string managedInstallRoot, string godotSharpPath)
@@ -106,22 +108,33 @@ internal static class Step35GodotReconnaissance
         AddMethods("Godot.Collections.GodotDictionary", ".cctor", ".ctor", "Dispose", "TryGetValue", "set_Item", "get_Item");
         AddMethods("Godot.OS", ".cctor", "GetCmdlineArgs", "get_Singleton");
         AddMethods("Godot.OS/MethodName", ".cctor");
+        AddMethods("Godot.OSInstance", ".ctor");
         AddMethods("Godot.StringName", ".cctor", "op_Implicit");
-        AddMethods("Godot.GodotObject", ".cctor", "GetPtr", "ClassDB_get_method_with_compatibility");
+        AddMethods("Godot.GodotObject", ".cctor", "GetPtr", "ClassDB_get_method_with_compatibility", "ConstructAndInitialize");
         AddMethods("Godot.NativeCalls", "godot_icall_0_108");
-        AddMethods("Godot.NativeInterop.NativeFuncs", ".cctor", "Initialize", "godotsharp_string_name_new_from_string", "godotsharp_method_bind_get_method_with_compatibility");
+        AddMethods("Godot.NativeInterop.InteropUtils", "EngineGetSingleton", "UnmanagedGetManaged");
+        AddMethods("Godot.NativeInterop.Marshaling", "ConvertStringToNative");
+        AddMethods("Godot.NativeInterop.GodotBoolExtensions", "ToBool");
+        AddMethods("Godot.NativeInterop.NativeFuncs", ".cctor", "Initialize",
+            "godotsharp_string_name_new_from_string",
+            "godotsharp_method_bind_get_method_with_compatibility",
+            "godotsharp_engine_get_singleton",
+            "godotsharp_internal_unmanaged_get_script_instance_managed",
+            "godotsharp_internal_unmanaged_get_instance_binding_managed",
+            "godotsharp_internal_unmanaged_instance_binding_create_managed");
 
-        // 0.0.138 COMPAT entered Godot.OS..cctor but never reached GetCmdlineArgs. Expand the
-        // local call closure around the type initializer and MethodName initializer as well as the
-        // previously measured Dictionary/GetCmdlineArgs paths. This remains metadata-only.
+        // Physical 0.0.143 CORE-HANDOFF reached Godot.OS.GetCmdlineArgs -> OS.get_Singleton
+        // after the callback table was initialized. Expand the metadata-only local closure around
+        // singleton acquisition/wrapping while retaining the prior Dictionary/OS paths.
         var byFullName = allTypes.SelectMany(type => type.Methods).Where(method => method.HasBody)
             .GroupBy(method => method.FullName, StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
         var queue = new Queue<(MethodDefinition Method, int Depth)>();
         foreach (var seed in selected.Where(method =>
                      (method.DeclaringType.FullName == "Godot.Collections.Dictionary`2" && method.Name == ".ctor") ||
-                     (method.DeclaringType.FullName == "Godot.OS" && method.Name is "GetCmdlineArgs" or ".cctor") ||
-                     (method.DeclaringType.FullName == "Godot.OS/MethodName" && method.Name == ".cctor")))
+                     (method.DeclaringType.FullName == "Godot.OS" && method.Name is "GetCmdlineArgs" or ".cctor" or "get_Singleton") ||
+                     (method.DeclaringType.FullName == "Godot.OS/MethodName" && method.Name == ".cctor") ||
+                     (method.DeclaringType.FullName == "Godot.NativeInterop.InteropUtils" && method.Name is "EngineGetSingleton" or "UnmanagedGetManaged")))
             queue.Enqueue((seed, 0));
         var visited = new HashSet<string>(selected.Select(method => method.FullName), StringComparer.Ordinal);
         while (queue.Count != 0 && visited.Count < 128)

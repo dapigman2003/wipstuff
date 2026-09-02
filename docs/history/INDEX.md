@@ -252,3 +252,6 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.19-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.142.txt` — 0.0.142 passed 855/855 static checks, 211/211 host tests, and native-link preflight, then iOS compilation failed with CS0103 because the new Step-35 partial omitted the `StS2Launcher.iOS.Platform` namespace import; no IPA/device evidence.
 - `steps/STEP-35.0.20-CALLBACK-HANDOFF-COMPILE-INTEGRATION-CORRECTION.md` — 0.0.143 adds only the missing Platform namespace import plus release/provenance/static guards; CORE-HANDOFF runtime semantics are unchanged.
+
+- `reports/STEP-35.0.20-PHYSICAL-CORE-HANDOFF-SINGLETON-FRONTIER-0.0.143.txt` — physical CORE-HANDOFF accepts the exact 1,800-byte/225-pointer callback table, clears the old dictionary/StringName boundaries, and stops at `Godot.OS::get_Singleton()`.
+- `steps/STEP-35.0.21-GODOT-SINGLETON-ACQUISITION-LOCALIZATION.md` — 0.0.144 keeps CORE-HANDOFF natural and expands only singleton acquisition/native-to-managed wrapping diagnostics.

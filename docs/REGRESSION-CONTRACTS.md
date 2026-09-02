@@ -452,9 +452,9 @@ The old rule that COMPAT must always retain natural GetCmdlineArgs remains valid
 - 0.0.140 must not alter the 0.0.139 NATURAL / OS-RECON / FORWARD compatibility semantics while correcting release/test provenance.
 - A host-suite pass only authorizes IPA construction; it does not convert diagnostic derivatives into exact Step-35 closure evidence.
 
-## Step 35.0.20 — exact Godot callback-handoff boundary
+## Step 35.0.21 — exact Godot callback-handoff boundary
 
-The following contracts are release-blocking for 0.0.143:
+The following contracts are release-blocking for 0.0.144:
 
 - Invalid CORE-HANDOFF callback metadata must throw before preflight/CLR work, emit exactly one durable `CB_INITIALIZE_MANAGED_FAIL` at `stage=initialization`, and never reach `CB_INIT_ENTRY`.
 
@@ -467,4 +467,9 @@ The following contracts are release-blocking for 0.0.143:
 - Managed Step 35 may initialize only the verified private GodotSharp derivative. It must bind exact `Godot.NativeInterop.NativeFuncs.Initialize(IntPtr,int)`, require `NativeFuncs.initialized=false`, invoke once, then require `initialized=true`.
 - Callback handoff is between Gate B and Gate C. Resolver/native counters established by the handoff become an immutable baseline and must remain unchanged before natural target binding.
 - Native **game** loading, receipt-backed original sts2 CLR admission, later OneTimeInitialization phases, game entry point, Harmony/MonoMod runtime patching, and arbitrary resolver fallback remain forbidden.
-- Static validation must require the active Step 35.0.20 production/test summary identity, the explicit `StS2Launcher.iOS.Platform` import in the Step-35 iOS partial, and the callback-handoff source/build/link/UI invariants. The stale Step 35.0.15 summary remains explicitly rejected.
+- Static validation must require the active Step 35.0.21 production/test summary identity, the explicit `StS2Launcher.iOS.Platform` import in the Step-35 iOS partial, and the callback-handoff source/build/link/UI invariants. The stale Step 35.0.15 summary remains explicitly rejected.
+
+
+## Step 35.0.21 singleton-localization contracts
+
+0.0.144 must preserve CORE-HANDOFF table acquisition and one-time `NativeFuncs.Initialize` semantics from 0.0.143. It must not restore the FORWARD empty-args rewrite in CORE-HANDOFF, fabricate an `OSInstance`, or initialize Godot's competing managed runtime. The GodotSharp derivative must include entry markers for `InteropUtils.EngineGetSingleton`, `UnmanagedGetManaged`, `Marshaling.ConvertStringToNative`, `godotsharp_engine_get_singleton`, and the native-to-managed script/instance-binding callbacks when present.

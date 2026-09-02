@@ -1,0 +1,24 @@
+STEP 35.0.20 PHYSICAL CORE-HANDOFF RESULT — 0.0.143
+
+Run ID: 20260902T0723583787590Z-pid29589-9282faa3f81c4671894cabcfb6a117ec
+App: 0.0.143 (143)
+Mode: GodotCoreCallbackHandoff
+Prerequisite: Step 15 Gates A-C passed in the same process.
+
+Result
+- Gate A passed and emitted the same-run static/reconnaissance artifacts.
+- Gate B passed with the exact transformed source hash and the verified sts2/GodotSharp diagnostic derivatives.
+- The Step-15 engine reported engineStarted=True, setup=True, interopReady=True, dotnetFeature=False, godotDotNetInitialized=False.
+- The source-built Godot 4.5.1 runtime interop table was returned at 1,800 bytes / 225 pointers.
+- Private GodotSharp NativeFuncs.Initialize(IntPtr,int) entered (GS025), returned, and the launcher verified initialized=true.
+- The natural CommandLineHelper path then passed the former native dictionary crash boundary: CL_CRITICAL_001_POST was reached.
+- Godot.OS..cctor entered and successfully progressed through StringName creation and the method-bind compatibility lookup sweep that previously could not execute.
+- Godot.OS.GetCmdlineArgs entered.
+- Last durable checkpoint: INMETHOD_GS039 — Godot.OS::get_Singleton().
+- CL_CRITICAL_002_POST was not reached.
+
+Interpretation
+This is a positive physical result for the callback-table hypothesis. The exact source-built runtime interop table is accepted by the private GodotSharp derivative and makes previously fatal callback-backed dictionary/StringName/method-bind calls operational. The remaining frontier is later: OS.get_Singleton lazily acquires/wraps the native OS singleton. The 0.0.143 GodotSharp marker plan did not include InteropUtils.EngineGetSingleton or its native-to-managed wrapping callbacks, so this run cannot distinguish which child operation is the next hard boundary.
+
+Disposition
+Do not reintroduce the managed dictionary/empty-args bypass into CORE-HANDOFF. Advance to Step 35.0.21 with runtime behavior unchanged and expand only the GodotSharp reconnaissance/entry-marker closure around OS singleton acquisition: InteropUtils.EngineGetSingleton, InteropUtils.UnmanagedGetManaged, Marshaling.ConvertStringToNative, NativeFuncs.godotsharp_engine_get_singleton, and the native-to-managed instance-binding callbacks. Step 35 remains OPEN.

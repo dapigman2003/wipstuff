@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.20 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.21 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -929,6 +929,19 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 var nativeFuncs = new TypeDefinition("Godot.NativeInterop", "NativeFuncs", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
                 module.Types.Add(nativeFuncs);
                 AddMethod(nativeFuncs, "Initialize", module.TypeSystem.Void);
+                AddMethod(nativeFuncs, "godotsharp_engine_get_singleton", module.TypeSystem.Object, module.TypeSystem.Object);
+                AddMethod(nativeFuncs, "godotsharp_internal_unmanaged_get_script_instance_managed", module.TypeSystem.Object, module.TypeSystem.Object);
+                AddMethod(nativeFuncs, "godotsharp_internal_unmanaged_get_instance_binding_managed", module.TypeSystem.Object, module.TypeSystem.Object);
+                AddMethod(nativeFuncs, "godotsharp_internal_unmanaged_instance_binding_create_managed", module.TypeSystem.Object, module.TypeSystem.Object, module.TypeSystem.Object);
+
+                var interopUtils = new TypeDefinition("Godot.NativeInterop", "InteropUtils", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+                module.Types.Add(interopUtils);
+                AddMethod(interopUtils, "EngineGetSingleton", module.TypeSystem.Object, module.TypeSystem.String);
+                AddMethod(interopUtils, "UnmanagedGetManaged", module.TypeSystem.Object, module.TypeSystem.Object);
+
+                var marshaling = new TypeDefinition("Godot.NativeInterop", "Marshaling", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
+                module.Types.Add(marshaling);
+                AddMethod(marshaling, "ConvertStringToNative", module.TypeSystem.Object, module.TypeSystem.String);
 
                 assembly.Write(source);
             }
@@ -950,6 +963,10 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             StringAssert.Contains(result.MarkerMap, "Godot.OS::.cctor");
             StringAssert.Contains(result.MarkerMap, "Godot.StringName::op_Implicit");
             StringAssert.Contains(result.MarkerMap, "Godot.GodotObject::ClassDB_get_method_with_compatibility");
+            StringAssert.Contains(result.MarkerMap, "Godot.NativeInterop.InteropUtils::EngineGetSingleton");
+            StringAssert.Contains(result.MarkerMap, "Godot.NativeInterop.InteropUtils::UnmanagedGetManaged");
+            StringAssert.Contains(result.MarkerMap, "godotsharp_engine_get_singleton");
+            StringAssert.Contains(result.MarkerMap, "godotsharp_internal_unmanaged_instance_binding_create_managed");
             StringAssert.Contains(result.MarkerMap, "godot_icall_0_108");
             Assert.IsTrue(File.Exists(clone));
 

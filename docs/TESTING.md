@@ -1,11 +1,11 @@
-# Testing — Step 35.0.20
+# Testing — Step 35.0.21
 
-Active candidate: Step 35.0.20 / `0.0.143 (143)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.21 / `0.0.144 (144)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
 ## Build/host prerequisites
 
 1. `bash scripts/validate.sh` must pass.
-2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.142 proved **211/211 host tests PASS** after the callback-telemetry correction. 0.0.143 changes only the iOS partial namespace import and release/provenance guards, so expect **211 or greater** and require all to pass unless tests are deliberately reorganized and documented.
+2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.142 proved **211/211 host tests PASS** after the callback-telemetry correction. 0.0.144 expands only GodotSharp diagnostic/reconnaissance marker selection, so expect **211 or greater** and require all to pass unless tests are deliberately reorganized and documented.
 3. Codemagic must successfully rebuild the pinned Godot 4.5.1 iOS static archive with `module_mono_enabled=yes`, pass the standalone native-link preflight, then build and verify the IPA.
 4. The exact Step-32 transformed source must requalify; protected Step 29–34 manifests must remain unchanged.
 
@@ -34,7 +34,7 @@ High-value progression is:
 
 Do not hard-code an expected callback-table byte count in interpretation; accept the size reported by the exact source-built engine and verified by the managed receiver.
 
-The key physical question is whether the natural dictionary path now advances beyond the old GS031 frontier and whether subsequent StringName/OS/DirAccess calls advance beyond GS024. A later new frontier is useful evidence; a managed 4/4 is still diagnostic only.
+Physical 0.0.143 already answered the old callback question positively. For 0.0.144 the key physical question is the child sequence after `GS039 Godot.OS::get_Singleton()`: look for entry into `InteropUtils.EngineGetSingleton`, `Marshaling.ConvertStringToNative`, `NativeFuncs.godotsharp_engine_get_singleton`, `InteropUtils.UnmanagedGetManaged`, and then the script/instance-binding callbacks. The last durable child marker localizes the next hard boundary. A managed 4/4 is still diagnostic only.
 
 ## Evidence to preserve
 
@@ -52,4 +52,4 @@ Resolver events alone do not establish causation. Interpret them with same-run P
 
 ## Closure rule
 
-All four 0.0.143 modes execute diagnostic derivatives. A 4/4 result cannot close exact Step 35. Cancellation is INCONCLUSIVE.
+All four 0.0.144 modes execute diagnostic derivatives. A 4/4 result cannot close exact Step 35. Cancellation is INCONCLUSIVE.
