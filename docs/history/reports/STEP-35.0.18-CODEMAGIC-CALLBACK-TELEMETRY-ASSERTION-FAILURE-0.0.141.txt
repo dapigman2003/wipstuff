@@ -1,0 +1,30 @@
+StS2 Launcher — Step 35.0.18 / 0.0.141 Codemagic callback-telemetry assertion failure
+
+UTC workflow evidence: 2026-09-02 04:42Z
+Candidate: Step 35.0.18 / 0.0.141 (141)
+Physical/device status: NOT REACHED
+
+Static validation:
+- PASS: 853 checks
+
+Host regression suite:
+- Total tests: 211
+- Passed: 210
+- Failed: 1
+
+Sole failing test:
+- GodotCoreCallbackHandoffRejectsMissingTableBeforeAnyPreflightOrClrWork
+
+Failure:
+- expected checkpoints.Count == 0
+- actual checkpoints.Count == 1
+- assertion message claimed invalid callback metadata must be rejected before CLR admission or callback telemetry begins.
+
+Diagnosis:
+The production implementation validates callback-table pointer/size metadata before RequirePreflight(), RequireAdmission(), RequireLoadContext(), or any CLR callback-handoff work. Its outer catch intentionally emits exactly one durable CB_INITIALIZE_MANAGED_FAIL checkpoint for every managed rejection, including invalid metadata. Therefore the observed single checkpoint is expected failure telemetry, not evidence that preflight/CLR work began.
+
+Disposition:
+- Keep the production failure checkpoint.
+- Correct the host regression to require exactly one CB_INITIALIZE_MANAGED_FAIL checkpoint at stage=initialization, containing ArgumentException, and prove CB_INIT_ENTRY was not reached.
+- Preserve the 0.0.141 runtime experiment unchanged in 0.0.142.
+- Pipeline stopped at the host-test gate; no IPA/device evidence was produced by this run.

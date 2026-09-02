@@ -242,3 +242,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.17-PHYSICAL-THREE-MODE-CALLBACK-BOUNDARY-0.0.140.txt` — physical NATURAL/OS-RECON/FORWARD evidence; FORWARD clears CommandLineHelper and reproduces the callback boundary at GodotFileIo/DirAccess.
 - `steps/STEP-35.0.18-GODOT-CORE-CALLBACK-HANDOFF-PROBE.md` — 0.0.141 design using the live Step-15 source-built Godot 4.5.1 callback table without loading the game native executable.
+
+## Step 35.0.18 CI failure / Step 35.0.19 telemetry-contract correction
+
+- `reports/STEP-35.0.18-CODEMAGIC-CALLBACK-TELEMETRY-ASSERTION-FAILURE-0.0.141.txt` — 0.0.141 static 853/853 PASS, host 210/211; sole failure was the negative callback-table test expecting zero checkpoints even though production intentionally emitted one durable `CB_INITIALIZE_MANAGED_FAIL` before any preflight/CLR work. No IPA/device evidence.
+- `steps/STEP-35.0.19-CALLBACK-FAILURE-TELEMETRY-CONTRACT-CORRECTION.md` — 0.0.142 correction: runtime experiment unchanged; negative regression now requires exactly one managed-failure checkpoint and proves `CB_INIT_ENTRY` was not reached.

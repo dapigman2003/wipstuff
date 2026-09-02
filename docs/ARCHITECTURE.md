@@ -152,11 +152,13 @@ This is still localization/compatibility architecture, not Godot startup authori
 
 Step 35.0.17 / 0.0.140 preserves the Step 35.0.16 three-mode runtime architecture exactly. The only change is candidate/provenance consistency: production gate summaries, host assertions, diagnostic filenames, UI/report labels, CI/IPA labels, and bundle identity advance together. Static validation now rejects a stale Step-35.0.15 success-summary assertion before Codemagic host execution. No resolver, rewrite, GodotSharp, native-callback, bootstrap, or invocation policy is broadened.
 
-## Step 35.0.18 Godot core callback-handoff architecture
+## Step 35.0.19 Godot core callback-handoff telemetry-contract correction
+
+0.0.142 does not change the 0.0.141 callback-handoff runtime architecture. It corrects only the negative host regression so early invalid callback metadata still produces one durable `CB_INITIALIZE_MANAGED_FAIL` while proving no `CB_INIT_ENTRY`, preflight, admission, or CLR handoff work occurred.
 
 Physical 0.0.140 moved the problem out of CommandLineHelper: FORWARD passes both command-line boundaries and reaches `GodotFileIo.CreateDirectory`, where `Godot.DirAccess.DirExistsAbsolute` immediately enters the same StringName/NativeFuncs callback pipeline that killed OS-RECON. The active architecture therefore stops extending individual managed substitutes.
 
-0.0.141 preserves NATURAL/OS-RECON/FORWARD as no-Godot-state controls and adds one explicit `GodotCoreCallbackHandoff` mode. The pinned Godot 4.5.1 iOS archive is rebuilt with `module_mono_enabled=yes`. The project-owned Step-15 smoke scene still has no `dotnet` feature, so the native C# language/GDMono scaffolding may exist while the Godot-managed runtime remains uninitialized. Runtime checks fail closed if that assumption is false.
+0.0.142 preserves NATURAL/OS-RECON/FORWARD as no-Godot-state controls and adds one explicit `GodotCoreCallbackHandoff` mode. The pinned Godot 4.5.1 iOS archive is rebuilt with `module_mono_enabled=yes`. The project-owned Step-15 smoke scene still has no `dotnet` feature, so the native C# language/GDMono scaffolding may exist while the Godot-managed runtime remains uninitialized. Runtime checks fail closed if that assumption is false.
 
 The Step-15 native bridge exposes only readiness/state plus the pointer/size returned by upstream `godotsharp::get_runtime_interop_funcs`. It does not call a callback or initialize managed GodotSharp. Step 35 then loads only the separately verified private GodotSharp diagnostic derivative through its strict ALC, binds exact `NativeFuncs.Initialize(IntPtr,int)`, proves `initialized=false`, invokes once, proves `initialized=true`, and records the resolver baseline. Gate C proceeds only if no resolver/native activity changed between the handoff and the natural ExecuteVeryEarly binding.
 

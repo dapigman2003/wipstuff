@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.18 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.19 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -39,7 +39,11 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             subject.RunGodotCoreCallbackHandoffInitialization(IntPtr.Zero, 0, checkpoints.Add));
 
         StringAssert.Contains(ex.Message, "non-null");
-        Assert.AreEqual(0, checkpoints.Count, "Invalid native callback-table metadata must be rejected before CLR admission or callback telemetry begins.");
+        Assert.AreEqual(1, checkpoints.Count, "Invalid native callback-table metadata must be rejected before preflight/CLR work while still producing one durable managed-failure checkpoint.");
+        StringAssert.Contains(checkpoints[0], "CB_INITIALIZE_MANAGED_FAIL");
+        StringAssert.Contains(checkpoints[0], "stage=initialization");
+        StringAssert.Contains(checkpoints[0], "System.ArgumentException");
+        Assert.IsFalse(checkpoints[0].Contains("CB_INIT_ENTRY", StringComparison.Ordinal), "Invalid metadata must not advance to the callback-handoff entry boundary.");
         Assert.AreEqual(3, (int)Step35DiagnosticMode.GodotCoreCallbackHandoff);
     }
 
