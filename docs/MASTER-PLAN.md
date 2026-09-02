@@ -266,3 +266,11 @@ A successful FORWARD run does not establish final command-line semantics and can
 ## Step 35.0.17 — release-summary consistency correction
 
 0.0.139 stopped before IPA packaging at 209/210 host tests because the gate-summary regression still expected Step 35.0.15 while production emitted Step 35.0.16. 0.0.140 changes no runtime compatibility semantics. It corrects the stale assertion, advances release/diagnostic identity, and statically couples production/test summary identity so this provenance drift is rejected before host testing. After Codemagic passes, the planned physical sequence remains OS-RECON then FORWARD in separate fresh processes.
+
+## Step 35.0.18 — prove the real Godot core callback prerequisite
+
+Physical 0.0.140 established that managed command-line compatibility is not the end of the problem: after FORWARD clears CommandLineHelper, the next required filesystem operation reaches the same uninitialized GodotSharp callback path. Do not continue replacing isolated Godot wrappers merely to move the frontier.
+
+The next experiment is 0.0.141 CORE-HANDOFF. Use the already-proven Step-15 project-owned Godot 4.5.1 engine as the legitimate native-state owner, expose its exact upstream runtime interop callback table, initialize only the verified private GodotSharp derivative, then rerun the natural diagnostic ExecuteVeryEarly path. Preserve the three old modes as controls.
+
+If CORE-HANDOFF advances beyond the old GS031/GS024 boundaries, map the next semantically required engine prerequisite before designing any broader startup integration. If it fails before or inside `NativeFuncs.Initialize`, treat that as a native build/ABI/readiness result. If it reaches diagnostic 4/4, Step 35 still remains open until a separately defined exact-authority closure candidate is designed.

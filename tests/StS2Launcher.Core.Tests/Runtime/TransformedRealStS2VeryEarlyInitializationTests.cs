@@ -22,7 +22,25 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.17 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.18 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+    }
+
+    [TestMethod]
+    public void GodotCoreCallbackHandoffRejectsMissingTableBeforeAnyPreflightOrClrWork()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-callback-handoff-validation");
+        using var subject = new TransformedRealStS2VeryEarlyInitialization(temp.Path, collectibleLoadContext: true)
+        {
+            DiagnosticMode = Step35DiagnosticMode.GodotCoreCallbackHandoff,
+        };
+        var checkpoints = new List<string>();
+
+        var ex = Assert.ThrowsExactly<ArgumentException>(() =>
+            subject.RunGodotCoreCallbackHandoffInitialization(IntPtr.Zero, 0, checkpoints.Add));
+
+        StringAssert.Contains(ex.Message, "non-null");
+        Assert.AreEqual(0, checkpoints.Count, "Invalid native callback-table metadata must be rejected before CLR admission or callback telemetry begins.");
+        Assert.AreEqual(3, (int)Step35DiagnosticMode.GodotCoreCallbackHandoff);
     }
 
     [TestMethod]

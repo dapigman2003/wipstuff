@@ -9,9 +9,14 @@
 #import "drivers/apple_embedded/os_apple_embedded.h"
 #import "drivers/apple_embedded/view_controller.h"
 
+#include "core/config/engine.h"
 #include "core/config/project_settings.h"
+#include "modules/mono/csharp_script.h"
+#include "modules/mono/glue/runtime_interop.h"
+#include "modules/mono/mono_gd/gd_mono.h"
 #include "core/io/dir_access.h"
 #include "core/io/file_access.h"
+#include "core/os/os.h"
 #include "core/string/ustring.h"
 #include "core/version.h"
 
@@ -321,4 +326,63 @@ STS2_STEP15_EXPORT int sts2_step15_focus_out_count() {
 
 STS2_STEP15_EXPORT int sts2_step15_focus_in_count() {
     return g_focus_in_count.load();
+}
+
+
+// Step 35.0.18 diagnostic-only bridge: expose the exact Godot 4.5.1 runtime
+// interop callback table from the same source-built engine that owns the live
+// ClassDB/StringName/Engine state. This does not initialize managed GodotSharp,
+// call any callback, or load a .NET runtime. The managed Step-35 probe decides
+// whether/when to pass this table to its separately verified GodotSharp clone.
+STS2_STEP15_EXPORT int sts2_step15_is_runtime_interop_ready() {
+    if (!on_main_thread() || !g_started.load()) {
+        return 0;
+    }
+    if (Engine::get_singleton() == nullptr || ProjectSettings::get_singleton() == nullptr) {
+        return 0;
+    }
+    if (CSharpLanguage::get_singleton() == nullptr || GDMono::get_singleton() == nullptr) {
+        return 0;
+    }
+    return 1;
+}
+
+STS2_STEP15_EXPORT int sts2_step15_has_dotnet_feature() {
+    return OS::get_singleton() != nullptr && OS::get_singleton()->has_feature("dotnet") ? 1 : 0;
+}
+
+STS2_STEP15_EXPORT int sts2_step15_is_dotnet_runtime_initialized() {
+    GDMono *gdmono = GDMono::get_singleton();
+    return gdmono != nullptr && gdmono->is_runtime_initialized() ? 1 : 0;
+}
+
+STS2_STEP15_EXPORT const void *sts2_step15_get_runtime_interop_funcs(int *r_size) {
+    if (r_size != nullptr) {
+        *r_size = 0;
+    }
+    if (!sts2_step15_is_runtime_interop_ready()) {
+        set_error("Godot runtime interop callbacks requested before the Step 15 engine/C# native module reached the required main-thread ready state.");
+        return nullptr;
+    }
+
+    int32_t size = 0;
+    const void **callbacks = godotsharp::get_runtime_interop_funcs(size);
+    if (callbacks == nullptr || size <= 0 || (size % (int32_t)sizeof(void *)) != 0) {
+        set_error("Godot runtime interop callback table was null, empty, or not pointer-size aligned.");
+        return nullptr;
+    }
+
+    const int32_t count = size / (int32_t)sizeof(void *);
+    for (int32_t i = 0; i < count; i++) {
+        if (callbacks[i] == nullptr) {
+            set_error("Godot runtime interop callback table contained a null function pointer.");
+            return nullptr;
+        }
+    }
+
+    if (r_size != nullptr) {
+        *r_size = size;
+    }
+    g_last_error.clear();
+    return callbacks;
 }

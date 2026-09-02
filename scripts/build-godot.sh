@@ -80,7 +80,7 @@ for marker in (
     "godot-main-symbol-patch=v1",
     "godot-embedded-view-controller-service-patch=v1",
     "godot-empty-ios-plugin-glue=v1",
-    "scons-options=platform=ios,target=template_release,arch=arm64,metal=yes,vulkan=no,opengl3=yes,lto=none",
+    "scons-options=platform=ios,target=template_release,arch=arm64,metal=yes,vulkan=no,opengl3=yes,lto=none,module_mono_enabled=yes",
 ):
     h.update(marker.encode("utf-8"))
     h.update(b"\0")
@@ -288,6 +288,7 @@ echo "Building Godot $GODOT_TAG iOS arm64 static archive with native Metal (jobs
     vulkan=no \
     opengl3=yes \
     lto=none \
+    module_mono_enabled=yes \
     -j"$JOBS"
 ) 2>&1 | tee -a "$LOG_DIR/step15-godot-build.log"
 
@@ -330,6 +331,7 @@ rm -rf "$SOURCE_DIR" "$SCONS_VENV"
   echo "main() collision patch: PASS"
   echo "apple_embedded_main retained: PASS"
   echo "Step 15 bridge exports retained: PASS"
+  echo "Godot native C#/.NET module: enabled for Step-35.0.18 runtime interop callback-table exposure (managed Godot assemblies are not built here)"
   echo "Metal: enabled"
   echo "Vulkan/MoltenVK: disabled for this foundation build"
   echo "OpenGLES fallback objects: compiled for upstream iOS archive compatibility; Step 15 runtime is forced to Metal"

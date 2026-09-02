@@ -1,9 +1,9 @@
 # Documentation map
 
-Current candidate: **Step 35.0.17 / 0.0.140 (140)**. Step 35 remains OPEN.
+Current candidate: **Step 35.0.18 / 0.0.141 (141)**. Step 35 remains OPEN.
 
 Use `CURRENT-STATUS.md` for the latest physical/CI frontier, `REGRESSION-CONTRACTS.md` for non-negotiable implementation constraints, `TESTING.md` for host/device procedure, `RELEASE-CHECKLIST.md` for packaging, and `MASTER-PLAN.md` for the durable roadmap. Historical immutable design and physical/CI evidence live under `history/`.
 
-Physical **0.0.138** remains the latest device evidence. NATURAL entered the GodotSharp dictionary native thunk and stopped after `INMETHOD_GS014`; COMPAT physically proved the four-reference BCL dictionary substitution by emitting `CL_CRITICAL_001_POST`, then entered `Godot.OS::.cctor()` as `INMETHOD_GS033` before `GetCmdlineArgs` entry.
+Physical **0.0.140** is the latest device evidence. NATURAL reached GS031 in the Godot dictionary native thunk. OS-RECON reached `Godot.OS::.cctor` → StringName → GS024. FORWARD cleared both command-line boundaries and reached `GodotFileIo.CreateDirectory` → `Godot.DirAccess.DirExistsAbsolute` → StringName → GS024. This establishes a repeated general GodotSharp callback-initialization boundary.
 
-0.0.139 did **not** reach IPA/device testing. Static validation passed and Codemagic executed 210 host tests; 209 passed and one stale release-summary assertion still expected Step 35.0.15 while production emitted Step 35.0.16. Step 35.0.17 / 0.0.140 fixes only that test/release consistency boundary, preserves the three-mode NATURAL / OS-RECON / FORWARD runtime experiment, and adds a static guard against candidate-summary drift.
+Step 35.0.18 / 0.0.141 preserves NATURAL / OS-RECON / FORWARD and adds a separately gated CORE-HANDOFF mode. CORE-HANDOFF requires the already-live Step-15 smoke engine, rejects `dotnet` feature / competing Godot-managed-runtime state, obtains the exact source-built Godot 4.5.1 runtime callback table, initializes only the verified private GodotSharp derivative with it, and then measures the natural ExecuteVeryEarly path.

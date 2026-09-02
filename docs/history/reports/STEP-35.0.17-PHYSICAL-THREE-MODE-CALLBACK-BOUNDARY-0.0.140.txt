@@ -1,0 +1,58 @@
+StS2 Launcher — Step 35.0.17 / 0.0.140 physical three-mode callback-boundary report
+Date: 2026-09-02 UTC
+Status: DIAGNOSTIC PHYSICAL EVIDENCE; NOT STEP-35 CLOSURE
+
+Release: 0.0.140 (140)
+Candidate: Step 35.0.17
+
+NATURAL
+Run ID: 20260902T0314561308390Z-pid27225-dc1c7965503e49608e9885d4aaadf308
+Mode: NaturalGodotDictionaryRecon
+Durable tail:
+  CommandLineHelper..cctor entered
+  CL_CRITICAL_001_PRE
+  GS002 Godot.Collections.Dictionary`2::.cctor
+  GS003 Godot.Collections.Dictionary`2::.ctor
+  GS001 Godot.Collections.Dictionary::.ctor
+  GS023 NativeFuncs.godotsharp_dictionary_new()
+  GS029 NativeFuncs.godotsharp_dictionary_new(godot_dictionary&)
+  GS016 CustomUnsafe.AsPointer(godot_dictionary&)
+  GS031 godot_dictionary::GetUnsafeAddress()
+Then hard termination. CL_CRITICAL_001_POST absent.
+
+OS-RECON
+Run ID: 20260902T0316052903150Z-pid27290-bea403a746e94110badf7ac0bdd64028
+Mode: ManagedDictionaryCompatibility
+Durable tail:
+  CL_CRITICAL_001_PRE
+  CL_CRITICAL_001_POST
+  CL_CRITICAL_002_PRE
+  GS041 Godot.OS::.cctor
+  GS043 Godot.StringName::op_Implicit(System.String)
+  GS024 NativeFuncs.godotsharp_string_name_new_from_string(System.String)
+Then hard termination. Natural Godot.OS.GetCmdlineArgs body entry and CL_CRITICAL_002_POST absent.
+
+FORWARD
+Run ID: 20260902T0316528641190Z-pid27300-269a3ecd1fbd4738a15fbc7c732b6726
+Mode: ManagedCommandLineCompatibility
+Durable tail:
+  CL_CRITICAL_001_PRE
+  CL_CRITICAL_001_POST
+  CL_CRITICAL_002_PRE
+  CL_CRITICAL_002_POST
+  INMETHOD_027 CommandLineHelper.TryGetValue entered
+  NP002_POST
+  NP004_PRE before GodotFileIo::.ctor(".")
+  INMETHOD_025 GodotFileIo::.ctor entered
+  INMETHOD_026 GodotFileIo.CreateDirectory entered
+  INMETHOD_180 before Godot.DirAccess.DirExistsAbsolute
+  GS043 Godot.StringName::op_Implicit(System.String)
+  GS024 NativeFuncs.godotsharp_string_name_new_from_string(System.String)
+Then hard termination.
+
+Interpretation
+FORWARD physically validates the bounded managed Dictionary + empty-command-line diagnostic path through CommandLineHelper. The next semantically required Godot filesystem operation independently reproduces the same StringName/NativeFuncs callback boundary seen in OS-RECON. This is therefore a general GodotSharp-before-native-callback-initialization boundary rather than a CommandLineHelper-specific defect.
+
+The 0.0.140 GodotSharp static map identifies NativeFuncs.Initialize(IntPtr,int) as the receiver that validates/copies the unmanaged callback table into NativeFuncs._unmanagedCallbacks. Its GS025 entry marker was not observed in any of the three physical runs before callback-backed wrappers executed.
+
+No 0.0.140 result closes exact Step 35. The authoritative exact-transformed frontier remains separately defined.

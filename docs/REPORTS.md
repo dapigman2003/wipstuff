@@ -1,13 +1,13 @@
 # Reports
 
-Step 35.0.17 uses immutable same-run output-only telemetry. Preserve `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, and the normal Step-35 result report for each fresh-process run.
+Step 35.0.18 uses immutable same-run output-only telemetry. Preserve `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, and the normal Step-35 result report.
 
-`Step35-ExecuteVeryEarly-StaticMap-*` is generated from the already verified exact transformed sts2 image before CLR admission and is never consumed as runtime input. Its CommandLine sections remain the authority for correlating `CL_CRITICAL_001/002` with the exact natural instructions even when a diagnostic derivative substitutes those calls afterward.
+The static map is derived from the already verified exact transformed sts2 image before CLR admission and is never runtime input. The Godot/native reconnaissance report is likewise read-only and pre-CLR; it retains GodotSharp P/Invoke/calli/callback-field inventory plus bounded Mach-O dependency/rpath/symbol/string inspection.
 
-`Step35-GodotNativeReconnaissance-*` remains read-only and pre-CLR. In 0.0.140 the selected managed map/entry-marker closure is expanded around `Godot.OS::.cctor`, `Godot.OS/MethodName::.cctor`, StringName, ClassDB, and relevant NativeFuncs callback thunks in addition to the Dictionary/GetCmdlineArgs chain. It also retains P/Invoke/calli/callback-field inventory and bounded Mach-O dependency/rpath/symbol/string inspection. No native image is loaded or executed by this report.
+Physical 0.0.140 evidence is recorded separately from the 0.0.141 design: NATURAL reaches GS031; OS-RECON reaches OS cctor→StringName→GS024; FORWARD passes `CL_CRITICAL_002_POST` and `NP002_POST` then reaches GodotFileIo→DirAccess→StringName→GS024.
 
-The mode name is written into the journal/reconnaissance output. NATURAL, OS-RECON (`ManagedDictionaryCompatibility`), and FORWARD (`ManagedCommandLineCompatibility`) must never be compared without their Run IDs because their sts2 derivative hashes intentionally differ.
+0.0.141 writes the selected mode into every same-run artifact. In CORE-HANDOFF, callback readiness/table/managed-initialization events are additionally journaled as `CB_*` checkpoints. The callback table itself is not dumped or persisted as trusted input; only its observed address/size and progression markers are diagnostic output.
 
-Historical physical 0.0.138 NATURAL/COMPAT evidence is summarized in `docs/history/reports/STEP-35.0.15-PHYSICAL-NATURAL-COMPAT-CALLBACK-BOUNDARIES-0.0.138.txt`. The 0.0.137 Codemagic verifier failure remains separate CI evidence. The 0.0.139 Codemagic 209/210 stale-summary failure is recorded separately and produced no IPA/device evidence.
+Historical 0.0.137 verifier failure, physical 0.0.138 NATURAL/COMPAT evidence, and 0.0.139 Codemagic 209/210 stale-summary failure remain separate provenance records under `docs/history/`.
 
-A final resolver line remains contextual rather than causal. A 0.0.140 4/4 in any mode is diagnostic only; Step 35 remains OPEN.
+A final resolver line remains contextual rather than causal. A 0.0.141 4/4 in any mode is diagnostic only; Step 35 remains OPEN.

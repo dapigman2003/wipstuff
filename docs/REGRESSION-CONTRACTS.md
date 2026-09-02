@@ -451,3 +451,18 @@ The old rule that COMPAT must always retain natural GetCmdlineArgs remains valid
 - Static validation must require the active Step 35.0.17 summary in both production and test source and reject the stale Step 35.0.15 assertion that caused 0.0.139 Codemagic 209/210.
 - 0.0.140 must not alter the 0.0.139 NATURAL / OS-RECON / FORWARD compatibility semantics while correcting release/test provenance.
 - A host-suite pass only authorizes IPA construction; it does not convert diagnostic derivatives into exact Step-35 closure evidence.
+
+## Step 35.0.18 — exact Godot callback-handoff boundary
+
+The following contracts are release-blocking for 0.0.141:
+
+- NATURAL, OS-RECON and FORWARD retain their existing fresh-process/no-Godot semantics and rewrite counts.
+- `GodotCoreCallbackHandoff = 3` is the only mode allowed to begin with Step-15 Godot process state.
+- The Step-15 smoke project must not contain a `dotnet` project feature.
+- The pinned source-built Godot archive must be built with `module_mono_enabled=yes` and export the four callback-handoff bridge roots through both `ReferenceNativeSymbol` and standalone native-link preflight.
+- Native readiness requires Engine, ProjectSettings, CSharpLanguage and GDMono native scaffolding; the UI must refuse if the project has the `dotnet` feature or GDMono reports its runtime initialized.
+- The native bridge may return only the exact `godotsharp::get_runtime_interop_funcs` pointer/size. It must reject null/empty/non-pointer-aligned tables and null callback entries. It must not execute a callback itself.
+- Managed Step 35 may initialize only the verified private GodotSharp derivative. It must bind exact `Godot.NativeInterop.NativeFuncs.Initialize(IntPtr,int)`, require `NativeFuncs.initialized=false`, invoke once, then require `initialized=true`.
+- Callback handoff is between Gate B and Gate C. Resolver/native counters established by the handoff become an immutable baseline and must remain unchanged before natural target binding.
+- Native **game** loading, receipt-backed original sts2 CLR admission, later OneTimeInitialization phases, game entry point, Harmony/MonoMod runtime patching, and arbitrary resolver fallback remain forbidden.
+- Static validation must require the active Step 35.0.18 production/test summary identity and the callback-handoff source/build/link/UI invariants. The stale Step 35.0.15 summary remains explicitly rejected.

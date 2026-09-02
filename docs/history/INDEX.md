@@ -239,3 +239,6 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.16-CODEMAGIC-STALE-SUMMARY-ASSERTION-FAILURE-0.0.139.txt` — 0.0.139 static 837/837 PASS, host 209/210; sole failure was a stale Step-35.0.15 success-summary assertion. Pipeline stopped before IPA/device evidence.
 - `steps/STEP-35.0.17-RELEASE-SUMMARY-CONSISTENCY-CORRECTION.md` — 0.0.140 correction: no runtime-semantic change; update the stale assertion, advance candidate identity, and statically require production/test summary agreement before Codemagic.
+
+- `reports/STEP-35.0.17-PHYSICAL-THREE-MODE-CALLBACK-BOUNDARY-0.0.140.txt` — physical NATURAL/OS-RECON/FORWARD evidence; FORWARD clears CommandLineHelper and reproduces the callback boundary at GodotFileIo/DirAccess.
+- `steps/STEP-35.0.18-GODOT-CORE-CALLBACK-HANDOFF-PROBE.md` — 0.0.141 design using the live Step-15 source-built Godot 4.5.1 callback table without loading the game native executable.

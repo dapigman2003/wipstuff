@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>140</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.140</ApplicationDisplayVersion>
+    <ApplicationVersion>141</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.141</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -162,6 +162,10 @@
     <ReferenceNativeSymbol Include="sts2_step15_is_engine_started" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_is_metal_layer_ready" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_is_rendering_active" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_is_runtime_interop_ready" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_has_dotnet_feature" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_is_dotnet_runtime_initialized" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_get_runtime_interop_funcs" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_is_setup_finished" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_last_error" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_render_marker_ready" SymbolType="Function" />

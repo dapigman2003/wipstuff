@@ -57,6 +57,18 @@ internal static class GodotStep15NativeBridge
     [DllImport(InternalLibrary, EntryPoint = "sts2_step15_focus_in_count", CallingConvention = CallingConvention.Cdecl)]
     private static extern int FocusInCountNative();
 
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_is_runtime_interop_ready", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int IsRuntimeInteropReadyNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_has_dotnet_feature", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int HasDotNetFeatureNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_is_dotnet_runtime_initialized", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int IsDotNetRuntimeInitializedNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_get_runtime_interop_funcs", CallingConvention = CallingConvention.Cdecl)]
+    private static extern IntPtr GetRuntimeInteropFunctionsNative(out int sizeBytes);
+
     public static string EngineVersion => PtrToString(GetEngineVersionNative());
     public static string LastError => PtrToString(GetLastErrorNative());
     public static bool IsEngineStarted => IsEngineStartedNative() != 0;
@@ -70,6 +82,12 @@ internal static class GodotStep15NativeBridge
     public static int ForegroundCount => ForegroundCountNative();
     public static int FocusOutCount => FocusOutCountNative();
     public static int FocusInCount => FocusInCountNative();
+    public static bool IsRuntimeInteropReady => IsRuntimeInteropReadyNative() != 0;
+    public static bool HasDotNetFeature => HasDotNetFeatureNative() != 0;
+    public static bool IsDotNetRuntimeInitialized => IsDotNetRuntimeInitializedNative() != 0;
+
+    public static IntPtr GetRuntimeInteropFunctions(out int sizeBytes) =>
+        GetRuntimeInteropFunctionsNative(out sizeBytes);
 
     public static int Start(IntPtr parentController, IntPtr containerView, string projectPath) =>
         StartNative(parentController, containerView, projectPath);

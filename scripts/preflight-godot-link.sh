@@ -81,6 +81,10 @@ const char *sts2_step15_get_engine_version(void);
 int sts2_step15_start(void *, void *, const char *);
 int sts2_step15_requires_process_restart(void);
 int sts2_step15_is_metal_layer_ready(void);
+int sts2_step15_is_runtime_interop_ready(void);
+int sts2_step15_has_dotnet_feature(void);
+int sts2_step15_is_dotnet_runtime_initialized(void);
+const void *sts2_step15_get_runtime_interop_funcs(int *);
 int sts2_step15_touch_marker_ready(void);
 }
 
@@ -91,15 +95,24 @@ int main(int argc, char **argv) {
     using VersionFn = const char *(*)(void);
     using StartFn = int (*)(void *, void *, const char *);
     using IntFn = int (*)(void);
+    using InteropFn = const void *(*)(int *);
 
     volatile VersionFn version_fn = &sts2_step15_get_engine_version;
     volatile StartFn start_fn = &sts2_step15_start;
     volatile IntFn restart_fn = &sts2_step15_requires_process_restart;
     volatile IntFn metal_fn = &sts2_step15_is_metal_layer_ready;
+    volatile IntFn interop_ready_fn = &sts2_step15_is_runtime_interop_ready;
+    volatile IntFn dotnet_feature_fn = &sts2_step15_has_dotnet_feature;
+    volatile IntFn dotnet_initialized_fn = &sts2_step15_is_dotnet_runtime_initialized;
+    volatile InteropFn interop_fn = &sts2_step15_get_runtime_interop_funcs;
     volatile IntFn touch_fn = &sts2_step15_touch_marker_ready;
 
     if (argc == -1) {
         return start_fn(nullptr, nullptr, argv ? argv[0] : nullptr);
+    }
+    if (argc == -2) {
+        int size = 0;
+        return interop_fn(&size) == nullptr || size <= 0 || interop_ready_fn() < 0 || dotnet_feature_fn() < 0 || dotnet_initialized_fn() < 0;
     }
     return version_fn() == nullptr || restart_fn() < 0 || metal_fn() < 0 || touch_fn() < 0;
 }
