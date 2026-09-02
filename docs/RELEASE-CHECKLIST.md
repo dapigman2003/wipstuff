@@ -1,12 +1,12 @@
-# Release checklist — Step 35.0.16 / 0.0.139
+# Release checklist — Step 35.0.17 / 0.0.140
 
-Release identity: display/build `0.0.139 (139)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.140 (140)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
 
 Before handoff/build:
 
-- [ ] release identity is exactly `0.0.139 (139)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] release identity is exactly `0.0.140 (140)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
 - [ ] `bash scripts/validate.sh` passes;
-- [ ] `bash scripts/test.sh` passes on a host with `dotnet`; expected count is 210 or greater after the new regressions;
+- [ ] `bash scripts/test.sh` passes on a host with `dotnet`; expected count is 210 or greater, with the 0.0.139 stale Step-35.0.15 summary assertion corrected;
 - [ ] protected Step 29–34 manifests remain unchanged and valid;
 - [ ] exact Step-32 transformed source authority and tokens `0x06007D02` / `0x0600BC71` remain unchanged;
 - [ ] physical 0.0.138 NATURAL/COMPAT evidence is documented: NATURAL last inner marker GS014; COMPAT has `CL_CRITICAL_001_POST`, `CL_CRITICAL_002_PRE`, GS033 OS cctor, no GS032/GetCmdlineArgs;
@@ -21,4 +21,4 @@ Before handoff/build:
 - [ ] runtime native resolution remains rejected; no Godot bootstrap, native game load, arbitrary resolver fallback, later OneTimeInitialization phase, entry point, or Harmony/MonoMod runtime patching is introduced;
 - [ ] no proprietary game DLLs/native app bundle/signing secret/credential is included in the source archive.
 
-Physical testing: run OS-RECON first, force-quit/relaunch, then FORWARD. NATURAL is optional regression confirmation. A 0.0.139 A–D 4/4 result from any mode is diagnostic completion only and cannot close exact Step 35.
+Physical testing: run OS-RECON first, force-quit/relaunch, then FORWARD. NATURAL is optional regression confirmation. A 0.0.140 A–D 4/4 result from any mode is diagnostic completion only and cannot close exact Step 35.

@@ -1,0 +1,26 @@
+StS2 Launcher — Step 35.0.16 / 0.0.139 Codemagic host regression failure
+
+Classification: PRE-DEVICE CI FAILURE. No IPA/device evidence was produced.
+
+Codemagic environment/report evidence:
+- Static validation: PASS, 837 checks.
+- Host runtime: .NET 9.0.314.
+- Host tests executed: 210.
+- Passed: 209.
+- Failed: 1.
+- Failed test: OrderedDiagnosticLocalizationGatesReachFourOfFourWithoutClaimingClosure.
+
+Failure detail:
+The production TransformedRealStS2VeryEarlyInitializationSummary correctly emitted:
+  STEP 35.0.16 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE
+
+The test still asserted the obsolete prior-candidate string:
+  STEP 35.0.15 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE
+
+The strings differed only at the candidate-step digit. The test failed before the iOS build/IPA stages. The uploaded artifact set contains build-environment/cache/static-validation/host-test/TRX outputs only and no IPA verification artifact.
+
+Interpretation:
+This is a release/test-consistency regression, not physical or runtime evidence against the Step 35.0.16 NATURAL / OS-RECON / FORWARD experiment. The runtime compatibility design remains unchanged for the correction candidate.
+
+Required correction:
+Advance to Step 35.0.17 / 0.0.140, update the stale host assertion to the active summary identity, add a static guard that production/test summary identity agree, preserve 0.0.139 as failed CI provenance, and rerun Codemagic before any physical test.

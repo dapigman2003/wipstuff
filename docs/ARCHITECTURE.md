@@ -146,3 +146,8 @@ The sts2 diagnostic derivative now has three explicit modes. NATURAL performs no
 The separate GodotSharp diagnostic derivative remains identity/MVID-preserving and entry-only. Its marker closure now includes roots at `Godot.OS::.cctor()` and `Godot.OS/MethodName::.cctor()` and explicitly includes StringName, `GodotObject.ClassDB_get_method_with_compatibility`, and relevant `NativeFuncs` callback thunks/cctors. No live-stack probes are added. Read-only reconnaissance follows the same expanded local graph while retaining P/Invoke/calli/callback-field and Mach-O inventory.
 
 This is still localization/compatibility architecture, not Godot startup authorization. A future architecture decision must explicitly choose between establishing a legitimate Godot native callback/bootstrap path and continuing narrowly justified managed substitutions; Step 35.0.16 intentionally does neither globally.
+
+
+## Step 35.0.17 release/test consistency architecture
+
+Step 35.0.17 / 0.0.140 preserves the Step 35.0.16 three-mode runtime architecture exactly. The only change is candidate/provenance consistency: production gate summaries, host assertions, diagnostic filenames, UI/report labels, CI/IPA labels, and bundle identity advance together. Static validation now rejects a stale Step-35.0.15 success-summary assertion before Codemagic host execution. No resolver, rewrite, GodotSharp, native-callback, bootstrap, or invocation policy is broadened.

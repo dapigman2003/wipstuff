@@ -1,1 +1,18 @@
-ERROR: dotnet is required to run host tests.
+StS2 Launcher — Step 35.0.17 / 0.0.140 host regression status
+
+Local packaging environment: dotnet unavailable; host suite was not executed here.
+
+Previous Codemagic attempt (Step 35.0.16 / 0.0.139):
+- .NET 9.0.314
+- 210 tests executed
+- 209 passed
+- 1 failed
+- sole failure: OrderedDiagnosticLocalizationGatesReachFourOfFourWithoutClaimingClosure
+- cause: stale test expected Step 35.0.15 success summary while production emitted Step 35.0.16
+- no IPA/device evidence produced
+
+0.0.140 correction:
+- stale host assertion updated to active Step 35.0.17 summary
+- static validation additionally requires production/test summary identity to match and rejects the stale Step 35.0.15 assertion
+
+Required next proof: run the complete host suite in Codemagic and require all 210 or greater tests to pass before iOS build/IPA/device evidence is accepted.

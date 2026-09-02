@@ -443,3 +443,11 @@ Current regressions require:
 - exact Step-32 transformed bytes remain untouched and diagnostic 4/4 remains non-closure evidence.
 
 The old rule that COMPAT must always retain natural GetCmdlineArgs remains valid specifically for OS-RECON, not for the new FORWARD mode.
+
+
+## Step 35.0.17 — release-summary identity consistency
+
+- The production `TransformedRealStS2VeryEarlyInitializationSummary` success string and the corresponding host gate-sequence assertion must use the exact same active candidate step.
+- Static validation must require the active Step 35.0.17 summary in both production and test source and reject the stale Step 35.0.15 assertion that caused 0.0.139 Codemagic 209/210.
+- 0.0.140 must not alter the 0.0.139 NATURAL / OS-RECON / FORWARD compatibility semantics while correcting release/test provenance.
+- A host-suite pass only authorizes IPA construction; it does not convert diagnostic derivatives into exact Step-35 closure evidence.

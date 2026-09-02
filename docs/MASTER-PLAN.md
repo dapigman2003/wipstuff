@@ -261,3 +261,8 @@ Physical 0.0.138 materially changed the Step-35 hypothesis. NATURAL reached the 
 0.0.139 must not silently initialize Godot. Instead it performs two complementary experiments in addition to retaining NATURAL as a control: OS-RECON deepens entry-only localization inside the natural OS cctor; FORWARD substitutes only the already-localized command-line Godot dependency with an empty managed string array so execution can reveal the next non-Godot startup requirement.
 
 A successful FORWARD run does not establish final command-line semantics and cannot close Step 35. It only answers whether the current very-early path can advance when command-line parsing is detached from Godot native state. If the next frontier is another Godot API that is semantically required, the project must decide explicitly whether to design a legitimate Godot bootstrap/native callback initialization step or another narrowly justified compatibility abstraction. That architectural decision requires new evidence and must not be inferred from a diagnostic derivative.
+
+
+## Step 35.0.17 — release-summary consistency correction
+
+0.0.139 stopped before IPA packaging at 209/210 host tests because the gate-summary regression still expected Step 35.0.15 while production emitted Step 35.0.16. 0.0.140 changes no runtime compatibility semantics. It corrects the stale assertion, advances release/diagnostic identity, and statically couples production/test summary identity so this provenance drift is rejected before host testing. After Codemagic passes, the planned physical sequence remains OS-RECON then FORWARD in separate fresh processes.

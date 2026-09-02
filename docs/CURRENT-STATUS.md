@@ -1,6 +1,6 @@
 # Current status
 
-## Active candidate — Step 35.0.16 / 0.0.139 (139)
+## Active candidate — Step 35.0.17 / 0.0.140 (140)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
@@ -51,9 +51,15 @@ This strongly supports the architectural diagnosis that managed GodotSharp wrapp
 
 The final System.Collections / System.Collections.Concurrent resolver events remain context only. PRE/POST/GS ordering is the causal localization evidence.
 
-## Step 35.0.16 / 0.0.139
+## 0.0.139 Codemagic result
 
-0.0.139 does **not** bootstrap Godot and does **not** broaden native/runtime resolver authority. Gate A still re-manufactures/reverifies the exact closed Step-32 transformed source, writes same-run output-only maps, emits separately verified diagnostic derivatives, and immediately re-hashes the authoritative sources unchanged.
+0.0.139 did **not** produce an IPA or physical evidence. Static validation passed at 837 checks. Codemagic executed **210** host tests: **209 passed, 1 failed**. The only failure was `OrderedDiagnosticLocalizationGatesReachFourOfFourWithoutClaimingClosure`, whose assertion still expected `STEP 35.0.15 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE` while the production summary correctly emitted Step 35.0.16. This was a test/provenance mismatch, not evidence against the OS-RECON/FORWARD runtime experiment.
+
+## Step 35.0.17 / 0.0.140
+
+0.0.140 changes no Step-35 runtime compatibility behavior from 0.0.139. It corrects the stale gate-summary assertion, advances all active release/diagnostic identity to Step 35.0.17 / 0.0.140, and statically requires production/test summary identity to agree before host testing.
+
+0.0.140 does **not** bootstrap Godot and does **not** broaden native/runtime resolver authority. Gate A still re-manufactures/reverifies the exact closed Step-32 transformed source, writes same-run output-only maps, emits separately verified diagnostic derivatives, and immediately re-hashes the authoritative sources unchanged.
 
 Three fresh-process modes are exposed:
 
@@ -65,4 +71,4 @@ The FORWARD empty-array behavior is a diagnostic compatibility choice, not a fin
 
 Exact source pins remain unchanged. The owner-supplied source `sts2.dll` was previously verified at SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`, matching the closed Step-32 authority; observed `GodotSharp.dll` SHA-256 is `0e4897ecdfb31456a97c7d8028dfb8d7dbdc632e2f73fc9b438d7b266a139289` and remains observed input evidence rather than a promoted global pin.
 
-The target remains `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()`, source token `0x06007D02`, async MoveNext source token `0x0600BC71`. A 0.0.139 diagnostic 4/4 from any mode is **NOT Step-35 closure**.
+The target remains `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()`, source token `0x06007D02`, async MoveNext source token `0x0600BC71`. A 0.0.140 diagnostic 4/4 from any mode is **NOT Step-35 closure**.

@@ -1,6 +1,6 @@
 # StS2 Launcher — Step 35
 
-Active candidate: **Step 35.0.16 / 0.0.139 (139)** — Godot callback-boundary reconnaissance plus a bounded managed command-line forward probe.
+Active candidate: **Step 35.0.17 / 0.0.140 (140)** — Godot callback-boundary reconnaissance plus a bounded managed command-line forward probe.
 
 Steps 01–26 are closed. Step 27 is CLOSED NEGATIVE. Step 28 is CLOSED POSITIVE 5/5. Steps 29–34 are CLOSED POSITIVE 4/4. **Step 35 remains OPEN.** The exact transformed authority is unchanged: the natural target remains the closed Step-32 `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()` image. Diagnostic derivatives can measure compatibility frontiers but cannot close exact Step 35.
 
@@ -8,7 +8,9 @@ Physical **0.0.138** produced the key NATURAL/COMPAT split. NATURAL entered the 
 
 The 0.0.138 reconnaissance maps both regions to `NativeFuncs._unmanagedCallbacks` function-pointer thunks. `NativeFuncs.Initialize` is the managed method that copies the callback table; its entry marker was not observed in either physical sequence. This is strong evidence that the current no-Godot-bootstrap Step-35 path is reaching GodotSharp native callback plumbing before that plumbing is initialized, but 0.0.138 did not log callback pointer values and therefore does not prove a single null-pointer root cause.
 
-0.0.139 preserves the execution policy and offers three fresh-process diagnostic modes in one IPA:
+0.0.139 did **not** reach IPA packaging: Codemagic ran 210 host tests, passed 209, and failed only `OrderedDiagnosticLocalizationGatesReachFourOfFourWithoutClaimingClosure` because the test still expected the obsolete Step 35.0.15 summary while production correctly emitted Step 35.0.16. Step 35.0.17 / 0.0.140 corrects that release/test-consistency defect only; the 0.0.139 runtime experiment is unchanged.
+
+0.0.140 preserves the execution policy and offers three fresh-process diagnostic modes in one IPA:
 
 - **NATURAL** — original Godot Dictionary and natural Godot.OS path; retained as a control.
 - **OS-RECON** (`ManagedDictionaryCompatibility`) — the physically proven four-reference BCL Dictionary substitution, with natural `Godot.OS.GetCmdlineArgs()` retained. GodotSharp entry-only closure instrumentation is expanded from `Godot.OS::.cctor()` / `OS.MethodName::.cctor()` through StringName/ClassDB/NativeFuncs local callees.

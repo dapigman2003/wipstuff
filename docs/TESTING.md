@@ -1,11 +1,11 @@
-# Testing — Step 35.0.16
+# Testing — Step 35.0.17
 
-Active candidate: Step 35.0.16 / `0.0.139 (139)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.17 / `0.0.140 (140)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
 ## Build/host prerequisites
 
 1. `bash scripts/validate.sh` must pass.
-2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.138 had at least 209 host tests; 0.0.139 adds managed-command-line and OS-cctor-closure regressions, so the passing total must be **210 or greater** unless tests are deliberately reorganized and documented.
+2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.139 executed 210 host tests and exposed one stale summary assertion; 0.0.140 must pass **all 210 or greater** host tests unless tests are deliberately reorganized and documented.
 3. iOS build and `scripts/verify-ipa.sh` must pass before physical evidence is accepted.
 4. The exact Step-32 transformed source must requalify; protected Step 29–34 manifests must remain unchanged.
 
@@ -17,13 +17,13 @@ Once Step-35 Gate B begins, the process is spent. Every mode must therefore star
 
 ## Recommended physical order
 
-The highest-value runs for 0.0.139 are:
+The highest-value runs for 0.0.140 are:
 
 1. **OS-RECON** — confirms/locates the inner `Godot.OS::.cctor()` boundary with the expanded GodotSharp closure. Expected historical prefix from 0.0.138: `CL_CRITICAL_001_PRE` → `CL_CRITICAL_001_POST` → `CL_CRITICAL_002_PRE` → OS cctor. New GS markers should identify whether termination occurs in StringName/type initialization, `OS.MethodName`, `ClassDB_get_method_with_compatibility`, or a specific NativeFuncs thunk.
 2. force-quit/relaunch.
 3. **FORWARD** — verifies the managed dictionary + managed empty-args path can pass `CL_CRITICAL_002_POST` and reveals the next startup frontier. High-value success markers include `CL_CRITICAL_002_POST`, `INMETHOD_027`, `NP002_POST`, and any later ExecuteVeryEarly markers.
 
-**NATURAL is optional** for 0.0.139 unless regression confirmation is desired; 0.0.138 already captured the dictionary-native-thunk frontier cleanly.
+**NATURAL is optional** for 0.0.140 unless regression confirmation is desired; 0.0.138 already captured the dictionary-native-thunk frontier cleanly.
 
 ## Evidence to preserve
 
@@ -41,4 +41,4 @@ Resolver events alone do not establish causation. Interpret them only with same-
 
 ## Closure rule
 
-All three 0.0.139 modes execute diagnostic derivatives. A 4/4 result means the selected diagnostic derivative survived its measured boundary; it cannot close exact Step 35. Cancellation is INCONCLUSIVE.
+All three 0.0.140 modes execute diagnostic derivatives. A 4/4 result means the selected diagnostic derivative survived its measured boundary; it cannot close exact Step 35. Cancellation is INCONCLUSIVE.

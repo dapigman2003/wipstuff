@@ -233,3 +233,9 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.15-PHYSICAL-NATURAL-COMPAT-CALLBACK-BOUNDARIES-0.0.138.txt` — physical 0.0.138 NATURAL/COMPAT evidence: NATURAL reaches the Godot dictionary NativeFuncs callback thunk and stops after GS014; COMPAT physically proves the BCL dictionary substitution, then enters `Godot.OS::.cctor()` as GS033 before GS032 `GetCmdlineArgs`.
 - `steps/STEP-35.0.16-GODOT-CALLBACK-BOUNDARY-AND-MANAGED-COMMANDLINE-FORWARD-PROBE.md` — 0.0.139 three-mode diagnostic: retain NATURAL, deepen natural-OS cctor reconnaissance, and add exactly one local empty-args provider substitution on top of the proven four-reference managed Dictionary rewrite without Godot bootstrap/native loading.
+
+
+## Step 35.0.16 CI failure / Step 35.0.17 correction
+
+- `reports/STEP-35.0.16-CODEMAGIC-STALE-SUMMARY-ASSERTION-FAILURE-0.0.139.txt` — 0.0.139 static 837/837 PASS, host 209/210; sole failure was a stale Step-35.0.15 success-summary assertion. Pipeline stopped before IPA/device evidence.
+- `steps/STEP-35.0.17-RELEASE-SUMMARY-CONSISTENCY-CORRECTION.md` — 0.0.140 correction: no runtime-semantic change; update the stale assertion, advance candidate identity, and statically require production/test summary agreement before Codemagic.

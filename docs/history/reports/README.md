@@ -33,3 +33,5 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-35.0.9-PHYSICAL-COMMANDLINE-BOUNDARY-AND-ORDINAL-DEFECT-0.0.132.txt` — run-correlated physical 0.0.132 evidence localizing at CommandLineHelper.TryGetValue and proving the NP +1 ordinal defect.
 - `STEP-35.0.10-PHYSICAL-MAXSTACK-INSTRUMENTATION-FAILURE-0.0.133.txt` — physical 0.0.133 corrected NP002 but the CommandLine cctor diagnostic was rejected with managed InvalidProgramException before its first marker; launcher reached normal RUN_END.
 - `STEP-35.0.14-CODEMAGIC-HOST-REGRESSION-FAILURE-0.0.137.txt` — 0.0.137 pre-device Codemagic result: static validation passed, host tests 208/209, sole failure traced to the GodotSharp entry-marker verifier hard-coding the sts2 bridge type; pipeline stopped before IPA construction.
+
+- `STEP-35.0.16-CODEMAGIC-STALE-SUMMARY-ASSERTION-FAILURE-0.0.139.txt` — 0.0.139 pre-device Codemagic result: static 837/837 PASS, host 209/210; the sole failure was a stale Step-35.0.15 diagnostic-summary assertion, so no IPA/device evidence was produced.
