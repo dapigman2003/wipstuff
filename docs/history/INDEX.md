@@ -270,3 +270,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.23-PHYSICAL-MANAGED-PLUGIN-BOOTSTRAP-RESOLVER-GUARD-0.0.146.txt` — physical 0.0.146 completes 37-pointer ManagedCallbacks creation, game-script lookup, GDMonoCache reverse-cache adoption, reverseBindingReady=true, and GD_OnCoreApiAssemblyLoaded; Gate C then fails before target binding only because the old pre-bootstrap resolver snapshot rejects the exact eight-request bootstrap framework delta.
 - `steps/STEP-35.0.24-POST-BOOTSTRAP-RESOLVER-BASELINE-CORRECTION.md` — 0.0.147 preserves the successful bridge unchanged, validates that exact eight-request/eight-host-load/zero-private-load delta, seals a post-bootstrap resolver baseline, and requires zero further drift before natural Gate C.
+
+## Step 35.0.24 Codemagic host-test mismatch / Step 35.0.25 correction
+
+- `reports/STEP-35.0.24-CODEMAGIC-HOST-REGRESSION-MESSAGE-FAILURE-0.0.147.txt` — 0.0.147 passed 881/881 static checks but stopped at 212/213 host tests because one negative test required a stale `preflight` substring instead of the actual Gate-A exception text.
+- `steps/STEP-35.0.25-HOST-REGRESSION-CONTRACT-CORRECTION.md` — 0.0.148 preserves the 0.0.147 runtime unchanged and corrects only that host regression contract plus release/provenance guards.

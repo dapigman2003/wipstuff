@@ -32,7 +32,7 @@ public sealed partial class RootViewController
             $"CB_REVERSE_BINDING_STATE_BEFORE — csharpLanguage={hasCSharpLanguage}; godotApiCacheUpdated={apiCacheUpdated}; createManagedBindingCallback={hasCreateBindingCallback}; reverseBindingReady={reverseBindingReady}; externalBridgeInstalled={externalBridgeInstalled}; godotDotNetInitialized={GodotStep15NativeBridge.IsDotNetRuntimeInitialized}.");
 
         if (!hasCSharpLanguage || apiCacheUpdated || hasCreateBindingCallback || reverseBindingReady || externalBridgeInstalled || GodotStep15NativeBridge.IsDotNetRuntimeInitialized)
-            throw new InvalidOperationException("CORE-HANDOFF Step-35.0.24 requires the physically proven 0.0.145 baseline: CSharpLanguage present, Godot API cache/reverse callbacks absent, no prior external bridge, and no Godot-owned .NET runtime.");
+            throw new InvalidOperationException("CORE-HANDOFF Step-35.0.25 requires the physically proven 0.0.145 baseline: CSharpLanguage present, Godot API cache/reverse callbacks absent, no prior external bridge, and no Godot-owned .NET runtime.");
         WriteStep35CrashCheckpoint("CB_REVERSE_BASELINE_PASS — physical 0.0.145 missing-reverse-binding baseline reproduced; starting one coordinated generated-plugin bootstrap experiment instead of another callsite bypass/probe.");
 
         var managedCallbacksSizeBytes = GodotStep15NativeBridge.ManagedCallbacksSizeBytes;

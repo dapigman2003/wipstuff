@@ -1,0 +1,31 @@
+Step 35.0.24 / 0.0.147 Codemagic host regression message failure
+
+Codemagic UTC: 2026-09-03
+Candidate: Step 35.0.24 / 0.0.147 (147)
+
+Static validation:
+  VALIDATION PASS: 881 checks
+
+Host unit tests:
+  Total tests: 213
+  Passed: 212
+  Failed: 1
+
+Sole failing test:
+  GodotManagedPluginResolverBaselineRejectsMissingPreflightWithDurableFailure
+
+Failure:
+  Assert.IsTrue(ex.Message.Contains("preflight", StringComparison.OrdinalIgnoreCase))
+  actual: false
+
+Production exception contract reached by the negative test:
+  Step 35 Gate A must pass before Gate B.
+
+Interpretation:
+  The negative path behaved correctly by rejecting resolver-baseline sealing before Gate A/preflight. The test incorrectly required the literal word "preflight" even though production names the ordered gate directly. This is a host-test contract mismatch, not a managed-plugin bootstrap or post-bootstrap resolver-baseline runtime failure.
+
+Build consequence:
+  Codemagic stopped at the host-test stage. No iOS compile/link/IPA result is present in the artifact bundle.
+
+Runtime disposition:
+  Preserve 0.0.147 runtime behavior unchanged. Correct only the negative test assertion and release/provenance guards in 0.0.148.

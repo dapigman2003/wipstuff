@@ -1,6 +1,6 @@
 # Current status
 
-## Active candidate — Step 35.0.24 / 0.0.147 (147)
+## Active candidate — Step 35.0.25 / 0.0.148 (148)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
@@ -22,6 +22,12 @@ The bridge preparation itself caused exactly eight additional planned framework 
 ## Step 35.0.24 / 0.0.147 post-bootstrap resolver baseline correction
 
 0.0.147 leaves the physically successful 0.0.146 bridge bootstrap unchanged. After `CB_MANAGED_PLUGIN_BOOTSTRAP_PASS`, it accepts only the exact measured eight-request/eight-host-load/zero-private-load bootstrap delta, requires zero initializer-bearing/rejected/native escape, records `CB_POST_BOOTSTRAP_RESOLVER_BASELINE_PASS`, and freezes those counters. Gate C then requires the resolver/native state to remain exactly unchanged from that post-bootstrap baseline before binding natural diagnostic `ExecuteVeryEarly`. Any extra request still fails closed.
+
+## 0.0.147 Codemagic host-regression message failure / 0.0.148 correction
+
+Codemagic for 0.0.147 passed **881/881 static checks** and reached **212/213 host tests** (213 total: 212 passed / 1 failed). The sole failure was `GodotManagedPluginResolverBaselineRejectsMissingPreflightWithDurableFailure`: production correctly threw `Step 35 Gate A must pass before Gate B.`, but the negative test incorrectly required the literal word `preflight`. The workflow stopped at host tests, so no iOS compile/link/IPA result was produced.
+
+Step 35.0.25 / 0.0.148 changes only that negative host-test assertion to pin the actual production exception contract. The 0.0.147 managed-plugin bridge bootstrap and post-bootstrap resolver-seal runtime are unchanged.
 
 The launcher still does **not** start another CLR, load the game native executable, fabricate individual callbacks, or claim/set Godot `GDMono::runtime_initialized`. This remains diagnostic compatibility work, not exact Step-35 closure.
 

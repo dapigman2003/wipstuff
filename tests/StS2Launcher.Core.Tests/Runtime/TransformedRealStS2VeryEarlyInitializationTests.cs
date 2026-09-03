@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.24 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.25 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -81,7 +81,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() =>
             subject.SealGodotManagedPluginBootstrapResolverBaseline(checkpoints.Add));
 
-        Assert.IsTrue(ex.Message.Contains("preflight", StringComparison.OrdinalIgnoreCase));
+        Assert.AreEqual("Step 35 Gate A must pass before Gate B.", ex.Message);
         Assert.AreEqual(1, checkpoints.Count);
         StringAssert.Contains(checkpoints[0], "CB_POST_BOOTSTRAP_RESOLVER_BASELINE_FAIL");
         StringAssert.Contains(checkpoints[0], "stage=initialization");
