@@ -169,7 +169,7 @@ The game native executable remains data-only evidence and is never loaded by the
 
 Physical 0.0.143 proves the project-owned Godot callback table can drive the private GodotSharp derivative through callback-backed dictionary, StringName, and method-bind operations. The next boundary is reverse object association: `OS.get_Singleton()` must obtain the native OS singleton and map it to a managed `OSInstance`. 0.0.144 instruments that boundary without creating a surrogate singleton or bypassing Godot semantics.
 
-## Step 35.0.22 reverse-binding readiness boundary
+## Step 35.0.23 reverse-binding readiness boundary
 
-The Step-15 source-built Godot native module now exposes two distinct interop-state observations. The already proven 225-pointer runtime interop table supplies managed->native GodotSharp callbacks. Physical 0.0.144 shows `UnmanagedGetManaged` then requires native->managed instance-binding state. 0.0.145 reads CSharpLanguage/GDMonoCache readiness only; it does not populate the managed callback cache. Gate C is fail-closed when reverse binding is absent.
+The Step-15 source-built Godot native module exposes two interop directions. The physically proven 225-pointer runtime interop table supplies managed->native GodotSharp callbacks. Physical 0.0.145 then proved CSharpLanguage exists while the native->managed `GDMonoCache::ManagedCallbacks` cache is absent. 0.0.146 reproduces the generated GodotPlugins managed bootstrap in the existing launcher CLR, creates the full 37-pointer ManagedCallbacks struct, and adopts that complete struct through the same `GDMonoCache::update_godot_api_cache` operation used by Godot 4.5.1. The standard `GD_OnCoreApiAssemblyLoaded` reverse callback remains its own physical boundary. The launcher deliberately does not claim/set `GDMono::runtime_initialized`.
 

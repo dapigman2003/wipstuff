@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -33,8 +34,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     public const uint SourceStateMachineMoveNextToken = 0x0600BC71;
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
-    private const string DiagnosticCloneFileName = "sts2.step35.0.22.instrumented.dll";
-    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.22.instrumented.dll";
+    private const string DiagnosticCloneFileName = "sts2.step35.0.23.instrumented.dll";
+    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.23.instrumented.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
     internal const string NullPlatformTypeFullName = "MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy";
@@ -71,6 +72,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     private PrimaryAdmissionSnapshot? _admission;
     private ExecutionSnapshot? _execution;
     private CallbackHandoffSnapshot? _callbackHandoff;
+    private bool _managedPluginReverseBridgePrepared;
     private Step35ExecutionLoadContext? _loadContext;
     private bool _disposed;
 
@@ -508,7 +510,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "B_PASS_RETURN — Gate B completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35.0.22 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
+                "STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35.0.23 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
                 $"Loaded identity: {actualIdentity}\n" +
                 $"Loaded MVID: {actualMvid}\n" +
                 $"AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
@@ -536,7 +538,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.22 callback-handoff mode deliberately loads the already hash-pinned GodotSharp diagnostic derivative into the dedicated context and reflects only its exact NativeFuncs.Initialize(IntPtr,int) callback-table receiver.")]
+        Justification = "Step 35.0.23 callback-handoff mode deliberately loads the already hash-pinned GodotSharp diagnostic derivative into the dedicated context and reflects only its exact NativeFuncs.Initialize(IntPtr,int) callback-table receiver.")]
     public string RunGodotCoreCallbackHandoffInitialization(
         IntPtr callbackTable,
         int callbackTableSizeBytes,
@@ -614,6 +616,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 throw new InvalidDataException("Step-35 callback handoff escaped the allowed resolver boundary. " + context.FormatResolverState());
 
             _callbackHandoff = new CallbackHandoffSnapshot(
+                godotAssembly,
                 callbackTable,
                 callbackTableSizeBytes,
                 context.ManagedResolverRequests.Count,
@@ -636,11 +639,170 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.22 deliberately reflects and invokes one instrumented diagnostic clone of the exact async initialization method after re-verifying the exact transformed source. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
+        Justification = "Step 35.0.23 deliberately reflects and invokes one instrumented diagnostic clone of the exact async initialization method after re-verifying the exact transformed source. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.22 reflects and invokes only the separately verified diagnostic clone of ExecuteVeryEarly; this derivative is localization evidence and is never exact Step-35 closure evidence.")]
+        Justification = "Step 35.0.23 reflects and invokes only the separately verified diagnostic clone of ExecuteVeryEarly; this derivative is localization evidence and is never exact Step-35 closure evidence.")]
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026",
+        Justification = "Step 35.0.23 managed-plugin bootstrap preparation reflects only the exact GodotPlugins.Game.Main generated entry-point contract plus GodotSharp ManagedCallbacks.Create(IntPtr) and ScriptManagerBridge.LookupScriptsInAssembly(Assembly) in the already verified private assemblies.")]
+    public byte[] PrepareGodotManagedPluginReverseBridge(
+        int managedCallbacksSizeBytes,
+        Action<string>? crashCheckpoint)
+    {
+        var stage = "initialization";
+        try
+        {
+            if (DiagnosticMode != Step35DiagnosticMode.GodotCoreCallbackHandoff)
+                throw new InvalidOperationException("Godot managed-plugin reverse-bridge preparation is permitted only in the explicit GodotCoreCallbackHandoff diagnostic mode.");
+            if (crashCheckpoint is null)
+                throw new InvalidOperationException("Step-35.0.23 managed-plugin reverse-bridge preparation requires durable launcher-owned checkpoint telemetry.");
+            if (managedCallbacksSizeBytes <= 0 || managedCallbacksSizeBytes % IntPtr.Size != 0)
+                throw new ArgumentException("Godot managed callback-table size must be positive and pointer-size aligned.", nameof(managedCallbacksSizeBytes));
+            if (_managedPluginReverseBridgePrepared)
+                throw new InvalidOperationException("Step-35.0.23 managed-plugin reverse bridge has already been prepared in this execution context.");
+
+            ThrowIfDisposed();
+            var preflight = RequirePreflight();
+            var admission = RequireAdmission();
+            var context = RequireLoadContext();
+            var handoff = _callbackHandoff
+                ?? throw new InvalidOperationException("The managed->native GodotSharp callback handoff must complete before reverse-bridge preparation.");
+            var godotAssembly = handoff.GodotSharpAssembly;
+            Checkpoint(crashCheckpoint, $"CB_REVERSE_PREP_ENTRY — reproducing the generated Godot managed-plugin bridge contract in the existing launcher CLR; nativeManagedCallbacksBytes={managedCallbacksSizeBytes}.");
+
+            if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotAssembly), context) ||
+                !string.Equals(godotAssembly.GetName().FullName, preflight.GodotSharpDiagnostic.AssemblyIdentity, StringComparison.Ordinal) ||
+                godotAssembly.ManifestModule.ModuleVersionId != preflight.GodotSharpDiagnostic.Mvid)
+                throw new InvalidDataException("Step-35.0.23 reverse-bridge preparation lost the verified private GodotSharp identity/context.");
+            if (context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
+                throw new InvalidDataException("Step-35.0.23 reverse-bridge preparation entered with dirty forbidden resolver state. " + context.FormatResolverState());
+
+            stage = "generated game plugin entry-point contract audit";
+            var pluginType = admission.Assembly.GetType("GodotPlugins.Game.Main", throwOnError: true, ignoreCase: false)
+                ?? throw new MissingMemberException("GodotPlugins.Game.Main");
+            var pluginInitialize = pluginType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(candidate =>
+                {
+                    if (!string.Equals(candidate.Name, "InitializeFromGameProject", StringComparison.Ordinal) || !candidate.IsStatic)
+                        return false;
+                    var parameters = candidate.GetParameters();
+                    return parameters.Length == 4 &&
+                           parameters[0].ParameterType == typeof(IntPtr) &&
+                           parameters[1].ParameterType == typeof(IntPtr) &&
+                           parameters[2].ParameterType == typeof(IntPtr) &&
+                           parameters[3].ParameterType == typeof(int) &&
+                           string.Equals(candidate.ReturnType.FullName, "Godot.NativeInterop.godot_bool", StringComparison.Ordinal);
+                })
+                ?? throw new MissingMethodException("GodotPlugins.Game.Main", "InitializeFromGameProject(IntPtr,IntPtr,IntPtr,int)");
+            var unmanagedEntryPoint = pluginInitialize.CustomAttributes
+                .SingleOrDefault(attribute => string.Equals(attribute.AttributeType.FullName, "System.Runtime.InteropServices.UnmanagedCallersOnlyAttribute", StringComparison.Ordinal));
+            var entryPointName = unmanagedEntryPoint?.NamedArguments
+                .SingleOrDefault(argument => string.Equals(argument.MemberName, "EntryPoint", StringComparison.Ordinal)).TypedValue.Value as string;
+            if (!string.Equals(entryPointName, "godotsharp_game_main_init", StringComparison.Ordinal))
+                throw new InvalidDataException("Generated GodotPlugins.Game.Main.InitializeFromGameProject no longer exposes the expected unmanaged entry point godotsharp_game_main_init.");
+            Checkpoint(crashCheckpoint, $"CB_GAME_PLUGIN_ENTRY_CONTRACT_PASS — verified generated GodotPlugins.Game.Main.InitializeFromGameProject; token=0x{pluginInitialize.MetadataToken:X8}; unmanagedEntry=godotsharp_game_main_init. The launcher will reproduce its managed substeps rather than invoke the UnmanagedCallersOnly method directly.");
+
+            stage = "GodotSharp ManagedCallbacks contract audit";
+            var managedCallbacksType = godotAssembly.GetType("Godot.Bridge.ManagedCallbacks", throwOnError: true, ignoreCase: false)
+                ?? throw new MissingMemberException("Godot.Bridge.ManagedCallbacks");
+            var callbackFields = managedCallbacksType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .OrderBy(field => field.MetadataToken)
+                .ToArray();
+            if (callbackFields.Length != 37 || callbackFields.Any(field => !field.FieldType.IsFunctionPointer))
+                throw new InvalidDataException($"GodotSharp ManagedCallbacks layout drifted: expected 37 unmanaged function-pointer fields, found {callbackFields.Length}.");
+            foreach (var requiredFieldName in new[] { "ScriptManagerBridge_CreateManagedForGodotObjectBinding", "GD_OnCoreApiAssemblyLoaded" })
+            {
+                if (!callbackFields.Any(field => string.Equals(field.Name, requiredFieldName, StringComparison.Ordinal)))
+                    throw new MissingFieldException("Godot.Bridge.ManagedCallbacks", requiredFieldName);
+            }
+            var managedSizeFromLayout = checked(callbackFields.Length * IntPtr.Size);
+            if (managedCallbacksSizeBytes != managedSizeFromLayout)
+                throw new InvalidDataException($"Native/managed ManagedCallbacks size mismatch: native={managedCallbacksSizeBytes}, reflectedPointerLayout={managedSizeFromLayout}.");
+            var createManagedCallbacks = managedCallbacksType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(candidate =>
+                {
+                    if (!string.Equals(candidate.Name, "Create", StringComparison.Ordinal) || candidate.ReturnType != typeof(void))
+                        return false;
+                    var parameters = candidate.GetParameters();
+                    return parameters.Length == 1 && parameters[0].ParameterType == typeof(IntPtr);
+                })
+                ?? throw new MissingMethodException("Godot.Bridge.ManagedCallbacks", "Create(IntPtr)");
+            Checkpoint(crashCheckpoint, $"CB_MANAGED_CALLBACKS_BIND_PASS — GodotSharp ManagedCallbacks layout verified; fields={callbackFields.Length}; bytes={managedCallbacksSizeBytes}; required reverse/core-api callbacks present.");
+
+            stage = "ManagedCallbacks.Create(IntPtr)";
+            var callbackBytes = new byte[managedCallbacksSizeBytes];
+            var unmanagedBuffer = Marshal.AllocHGlobal(managedCallbacksSizeBytes);
+            try
+            {
+                for (var offset = 0; offset < managedCallbacksSizeBytes; offset += IntPtr.Size)
+                    Marshal.WriteIntPtr(unmanagedBuffer, offset, IntPtr.Zero);
+                Checkpoint(crashCheckpoint, "CB_MANAGED_CALLBACKS_CREATE_START — invoking GodotSharp ManagedCallbacks.Create(IntPtr) into launcher-owned temporary native memory; no callback is invoked here.");
+                try
+                {
+                    createManagedCallbacks.Invoke(null, new object?[] { unmanagedBuffer });
+                }
+                catch (TargetInvocationException ex)
+                {
+                    var target = ex.InnerException ?? ex;
+                    throw new InvalidOperationException("GodotSharp ManagedCallbacks.Create(IntPtr) faulted while producing the reverse callback table. " + DescribeException(target), target);
+                }
+                Checkpoint(crashCheckpoint, "CB_MANAGED_CALLBACKS_CREATE_RETURNED — ManagedCallbacks.Create(IntPtr) returned to the launcher.");
+
+                for (var index = 0; index < callbackFields.Length; index++)
+                {
+                    var pointer = Marshal.ReadIntPtr(unmanagedBuffer, index * IntPtr.Size);
+                    if (pointer == IntPtr.Zero)
+                        throw new InvalidDataException($"GodotSharp ManagedCallbacks.Create produced a null callback pointer at slot {index} ({callbackFields[index].Name}).");
+                }
+                Marshal.Copy(unmanagedBuffer, callbackBytes, 0, callbackBytes.Length);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(unmanagedBuffer);
+            }
+            Checkpoint(crashCheckpoint, $"CB_MANAGED_CALLBACKS_CREATE_PASS — generated reverse callback table contains {callbackFields.Length} non-null pointers; bytes={callbackBytes.Length}.");
+
+            stage = "ScriptManagerBridge.LookupScriptsInAssembly";
+            var scriptManagerBridge = godotAssembly.GetType("Godot.Bridge.ScriptManagerBridge", throwOnError: true, ignoreCase: false)
+                ?? throw new MissingMemberException("Godot.Bridge.ScriptManagerBridge");
+            var lookupScripts = scriptManagerBridge.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(candidate =>
+                {
+                    if (!string.Equals(candidate.Name, "LookupScriptsInAssembly", StringComparison.Ordinal) || candidate.ReturnType != typeof(void))
+                        return false;
+                    var parameters = candidate.GetParameters();
+                    return parameters.Length == 1 && parameters[0].ParameterType == typeof(Assembly);
+                })
+                ?? throw new MissingMethodException("Godot.Bridge.ScriptManagerBridge", "LookupScriptsInAssembly(Assembly)");
+            Checkpoint(crashCheckpoint, "CB_SCRIPT_LOOKUP_START — registering generated Godot script metadata from the already admitted diagnostic sts2 assembly, matching the game plugin bootstrap contract.");
+            try
+            {
+                lookupScripts.Invoke(null, new object?[] { admission.Assembly });
+            }
+            catch (TargetInvocationException ex)
+            {
+                var target = ex.InnerException ?? ex;
+                throw new InvalidOperationException("Godot ScriptManagerBridge.LookupScriptsInAssembly faulted during generated plugin bootstrap reproduction. " + DescribeException(target), target);
+            }
+            Checkpoint(crashCheckpoint, "CB_SCRIPT_LOOKUP_RETURNED — ScriptManagerBridge.LookupScriptsInAssembly returned to the launcher.");
+
+            if (context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
+                throw new InvalidDataException("Step-35.0.23 reverse-bridge preparation escaped the allowed resolver boundary. " + context.FormatResolverState());
+
+            _managedPluginReverseBridgePrepared = true;
+            Checkpoint(crashCheckpoint, $"CB_REVERSE_PREP_PASS — managed half of generated Godot plugin bootstrap reproduced; callbacks={callbackFields.Length}; bytes={callbackBytes.Length}; {context.FormatResolverState()}.");
+            return callbackBytes;
+        }
+        catch (Exception ex)
+        {
+            Checkpoint(crashCheckpoint, $"CB_REVERSE_PREP_MANAGED_FAIL — stage={stage}; {ex.GetType().FullName}: {ex.Message}");
+            throw;
+        }
+    }
+
     public async Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunDiagnosticExecuteVeryEarlyInvocationAsync(
         Action<string>? crashCheckpoint,
         CancellationToken cancellationToken = default)
@@ -650,7 +812,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         try
         {
             if (crashCheckpoint is null)
-                throw new InvalidOperationException("Step-35.0.22 diagnostic Gate C requires a durable launcher-owned checkpoint callback; refusing to execute an instrumented clone without in-method telemetry.");
+                throw new InvalidOperationException("Step-35.0.23 diagnostic Gate C requires a durable launcher-owned checkpoint callback; refusing to execute an instrumented clone without in-method telemetry.");
             Checkpoint(crashCheckpoint, "C_ENTRY — entered Gate C diagnostic-clone ExecuteVeryEarly binding/invocation/await boundary; exact transformed source remains outside the CLR.");
             ThrowIfDisposed();
             var preflight = RequirePreflight();
@@ -799,7 +961,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "C_PASS_RETURN — Gate C completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "STEP-35.0.22 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE.\n" +
+                "STEP-35.0.23 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE.\n" +
                 $"Target type: {TargetTypeFullName}\n" +
                 $"Target method: {TargetMethodFullName}\n" +
                 $"Reflected diagnostic-clone MethodDef token: 0x{method.MetadataToken:X8}\n" +
@@ -908,7 +1070,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             progress?.Report(new(gate, 4, 4, preflight.DiagnosticPath, "Final source/diagnostic-clone/plan/dependency/context isolation checks passed."));
 
             return Pass(gate,
-                "STEP-35.0.22 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n" +
+                "STEP-35.0.23 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n" +
                 $"Post-execution OfflineReady: PASS ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
                 $"Verified exact transformed SHA-256 unchanged: {transformedSha256}\n" +
@@ -1048,7 +1210,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[NULL PLATFORM CTOR IL]");
             lines.Add($"NullPlatform constructor: token=0x{nullPlatformConstructor.MetadataToken.ToUInt32():X8}; {nullPlatformConstructor.FullName}");
-            lines.Add("Step 35.0.22 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
+            lines.Add("Step 35.0.23 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
             AppendInstructionMap(lines, nullPlatformConstructor);
         }
         if (commandLineHelperCctor is not null)
@@ -1057,7 +1219,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add("[COMMAND LINE HELPER CCTOR IL]");
             lines.Add($"CommandLineHelper cctor: token=0x{commandLineHelperCctor.MetadataToken.ToUInt32():X8}; {commandLineHelperCctor.FullName}");
             lines.Add($"CommandLineHelper cctor exact-source MaxStack={commandLineHelperCctor.Body.MaxStackSize}; instructions={commandLineHelperCctor.Body.Instructions.Count}; locals={commandLineHelperCctor.Body.Variables.Count}; handlers={commandLineHelperCctor.Body.ExceptionHandlers.Count}");
-            lines.Add("Step 35.0.22 retains this exact-source CALLSITE map for correlation. NATURAL and CORE-HANDOFF preserve the Godot dictionary/GetCmdlineArgs contract; OS-RECON rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string> and keeps natural GetCmdlineArgs; FORWARD adds only the verified local empty-string-array provider substitution. All modes retain four stack-neutral critical markers.");
+            lines.Add("Step 35.0.23 retains this exact-source CALLSITE map for correlation. NATURAL and CORE-HANDOFF preserve the Godot dictionary/GetCmdlineArgs contract; OS-RECON rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string> and keeps natural GetCmdlineArgs; FORWARD adds only the verified local empty-string-array provider substitution. All modes retain four stack-neutral critical markers.");
             AppendInstructionMap(lines, commandLineHelperCctor);
         }
         if (commandLineHelperTryGetValue is not null)
@@ -1065,7 +1227,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[COMMAND LINE HELPER TRYGETVALUE IL]");
             lines.Add($"CommandLineHelper TryGetValue: token=0x{commandLineHelperTryGetValue.MetadataToken.ToUInt32():X8}; {commandLineHelperTryGetValue.FullName}");
-            lines.Add("Step 35.0.22 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL and CORE-HANDOFF preserve the Godot dictionary TryGetValue MemberRef; OS-RECON/FORWARD rewrite only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
+            lines.Add("Step 35.0.23 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL and CORE-HANDOFF preserve the Godot dictionary TryGetValue MemberRef; OS-RECON/FORWARD rewrite only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
             AppendInstructionMap(lines, commandLineHelperTryGetValue);
         }
         return string.Join("\n", lines);
@@ -1305,7 +1467,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             // CommandLineHelper..cctor before instruction zero, so they stay retired. Physical 0.0.136
             // then entered the stack-neutral cctor and hard-terminated after CL_CRITICAL_001_PRE but before
             // the matching POST, localizing the physical interval to Godot.Collections.Dictionary<string,string>
-            // construction before _args assignment. Step 35.0.22 keeps the exact-source map and markers.
+            // construction before _args assignment. Step 35.0.23 keeps the exact-source map and markers.
             // NATURAL preserves the Godot dictionary path, OS-RECON rewrites only that private container contract,
             // and FORWARD adds exactly one already-localized GetCmdlineArgs provider substitution.
             commandLineCctorOriginalMaxStack = commandLineCctor.Body.MaxStackSize;
@@ -2620,6 +2782,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         string ImmediateSha256);
 
     private sealed record CallbackHandoffSnapshot(
+        Assembly GodotSharpAssembly,
         IntPtr CallbackTable,
         int CallbackTableSizeBytes,
         int ManagedResolverRequests,

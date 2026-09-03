@@ -10,8 +10,8 @@
 
     <ApplicationId>com.community.sts2launcher</ApplicationId>
     <ApplicationTitle>StS2 Launcher</ApplicationTitle>
-    <ApplicationVersion>145</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.145</ApplicationDisplayVersion>
+    <ApplicationVersion>146</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.146</ApplicationDisplayVersion>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -169,6 +169,11 @@
     <ReferenceNativeSymbol Include="sts2_step15_is_godot_api_cache_updated" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_has_managed_create_binding_callback" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_is_reverse_binding_ready" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_get_managed_callbacks_size" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_is_external_managed_bridge_installed" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_install_external_managed_callbacks" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_signal_external_core_api_loaded" SymbolType="Function" />
+    <ReferenceNativeSymbol Include="sts2_step15_did_external_core_api_signal_return" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_get_runtime_interop_funcs" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_is_setup_finished" SymbolType="Function" />
     <ReferenceNativeSymbol Include="sts2_step15_last_error" SymbolType="Function" />

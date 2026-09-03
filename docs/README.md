@@ -1,9 +1,9 @@
 # Documentation map
 
-Current candidate: **Step 35.0.22 / 0.0.145 (145)**. Step 35 remains OPEN.
+Current candidate: **Step 35.0.23 / 0.0.146 (146)**. Step 35 remains OPEN.
 
 Use `CURRENT-STATUS.md` for the latest physical/CI frontier, `REGRESSION-CONTRACTS.md` for non-negotiable implementation constraints, `TESTING.md` for host/device procedure, `RELEASE-CHECKLIST.md` for packaging, and `MASTER-PLAN.md` for the durable roadmap. Historical immutable design and physical/CI evidence live under `history/`.
 
 Physical **0.0.144** is the latest device evidence. It preserves the 0.0.143 callback-table success, obtains the OS singleton, enters `InteropUtils.UnmanagedGetManaged`, returns from the script-instance query far enough to evaluate its bool, and stops inside `godotsharp_internal_unmanaged_get_instance_binding_managed` before create-binding. Physical **0.0.143** first proved the 1,800-byte / 225-pointer callback handoff.  CORE-HANDOFF accepted the exact 1,800-byte / 225-pointer Step-15 callback table, returned from `NativeFuncs.Initialize` with `initialized=true`, cleared the old dictionary/StringName boundaries, and reached `Godot.OS.GetCmdlineArgs()` → `Godot.OS.get_Singleton()`. Physical **0.0.140** remains the three-control baseline: NATURAL reached GS031 in the Godot dictionary native thunk. OS-RECON reached `Godot.OS::.cctor` → StringName → GS024. FORWARD cleared both command-line boundaries and reached `GodotFileIo.CreateDirectory` → `Godot.DirAccess.DirExistsAbsolute` → StringName → GS024. This establishes a repeated general GodotSharp callback-initialization boundary.
 
-Step 35.0.22 / 0.0.145 changes no game behavior. After the successful managed->native callback handoff it reads CSharpLanguage/GDMonoCache reverse-binding readiness. If the managed create-binding callback/cache is absent, CORE-HANDOFF records `CB_REVERSE_BINDING_NOT_READY_STOP` and returns before Gate C.
+Physical 0.0.145 proved the reverse managed callback/cache is absent. Step 35.0.23 / 0.0.146 now reproduces the generated Godot managed-plugin bridge contract in the existing launcher CLR: create the complete GodotSharp ManagedCallbacks table, register game scripts, adopt the full struct into source-built Godot, signal the standard core-API-loaded callback, then continue natural Gate C only after bootstrap PASS.

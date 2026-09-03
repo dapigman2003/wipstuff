@@ -260,3 +260,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.21-PHYSICAL-REVERSE-BINDING-FRONTIER-0.0.144.txt` — physical CORE-HANDOFF reaches native OS singleton lookup, `UnmanagedGetManaged`, script-instance query, and stops inside GS035 instance-binding retrieval before GS036 create-binding.
 - `steps/STEP-35.0.22-GODOT-REVERSE-BINDING-READINESS-PROBE.md` — 0.0.145 adds read-only Godot native->managed callback/cache readiness telemetry and a fail-closed pre-Gate-C stop.
+
+## Step 35.0.22–35.0.23 managed-plugin bridge bootstrap
+
+- `reports/STEP-35.0.22-PHYSICAL-REVERSE-BINDING-PREFLIGHT-0.0.145.txt` — physical CORE-HANDOFF cleanly reports CSharpLanguage present while Godot API cache/create-binding/reverse-binding/runtime-initialized are all absent, then stops normally before Gate C.
+- `steps/STEP-35.0.23-GODOT-MANAGED-PLUGIN-BRIDGE-BOOTSTRAP.md` — 0.0.146 reproduces the generated GodotPlugins managed bootstrap contract inside the existing launcher CLR, adopts the complete ManagedCallbacks struct into source-built Godot, isolates the standard core-API-loaded reverse callback, and keeps exact Step 35 open.

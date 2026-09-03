@@ -1,29 +1,28 @@
-# Release checklist — Step 35.0.22 / 0.0.145
+# Release checklist — Step 35.0.23 / 0.0.146
 
-Release identity: display/build `0.0.145 (145)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.146 (146)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
 
-0.0.144 is a post-physical diagnostic expansion over 0.0.143: CORE-HANDOFF runtime behavior is unchanged; only the verified GodotSharp singleton-acquisition/reverse-binding marker and reconnaissance closure is expanded.
+Physical 0.0.145 is the trigger: the 1,800-byte / 225-pointer NativeFuncs handoff passed, then CSharpLanguage was present while API cache/create-binding/reverse-binding/runtime-initialized were false; Gate C was safely skipped and the run ended normally. 0.0.146 replaces further marker-by-marker probing with one coordinated generated Godot managed-plugin bridge bootstrap.
 
 Before handoff/build:
 
-- [ ] release identity is exactly `0.0.145 (145)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] release identity is exactly `0.0.146 (146)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
 - [ ] `bash scripts/validate.sh` passes;
-- [ ] `bash scripts/test.sh` passes on a host with `dotnet`; expected count is 211 or greater after the new callback-handoff regression;
+- [ ] `bash scripts/test.sh` passes on a host with `dotnet`;
 - [ ] pinned Godot 4.5.1 iOS source builds with `module_mono_enabled=yes` and standalone native-link preflight passes;
 - [ ] protected Step 29–34 manifests remain unchanged and valid;
 - [ ] exact Step-32 authority and tokens `0x06007D02` / `0x0600BC71` remain unchanged;
-- [ ] physical 0.0.140 NATURAL/OS-RECON/FORWARD evidence remains documented, and physical 0.0.143 CORE-HANDOFF evidence records the 1,800-byte/225-pointer table, GS025 Initialize return/`initialized=true`, and the new `Godot.OS.get_Singleton()` frontier;
-- [ ] `Step35DiagnosticMode` exposes NATURAL, OS-RECON, FORWARD, and CORE-HANDOFF;
-- [ ] NATURAL preserves natural Godot Dictionary/GetCmdlineArgs; OS-RECON retains exactly four managed Dictionary substitutions; FORWARD adds exactly one verified `new string[0]` provider substitution;
+- [ ] physical 0.0.145 reverse-binding preflight is documented with `csharpLanguage=True`, `godotApiCacheUpdated=False`, `createManagedBindingCallback=False`, `reverseBindingReady=False`, `godotDotNetInitialized=False`, and normal pre-Gate-C stop;
+- [ ] `Step35DiagnosticMode` still exposes NATURAL, OS-RECON, FORWARD, and CORE-HANDOFF;
 - [ ] Step-15 smoke `project.godot` contains no `dotnet` feature;
-- [ ] native Step-15 bridge roots `sts2_step15_is_runtime_interop_ready`, `sts2_step15_has_dotnet_feature`, `sts2_step15_is_dotnet_runtime_initialized`, and `sts2_step15_get_runtime_interop_funcs` are ReferenceNativeSymbol/link-preflight roots;
-- [ ] callback export requires live Engine/ProjectSettings/CSharpLanguage/GDMono native state and returns only the exact `godotsharp::get_runtime_interop_funcs` pointer/size after null/alignment/null-entry checks;
-- [ ] CORE-HANDOFF UI refuses if the Step-15 engine is not setup-complete, if the smoke project advertises `dotnet`, or if Godot's own .NET runtime is initialized;
-- [ ] managed handoff binds exact private GodotSharp `NativeFuncs.Initialize(IntPtr,int)`, requires `initialized=false`, invokes once, requires `initialized=true`, and freezes resolver/native counters before Gate C;
-- [ ] GodotSharp diagnostic/reconnaissance closure includes `InteropUtils.EngineGetSingleton`, `UnmanagedGetManaged`, `ConvertStringToNative`, `godotsharp_engine_get_singleton`, and native-to-managed script/instance-binding callbacks;
+- [ ] native Step-15 bridge roots the callback-table exports plus `sts2_step15_get_managed_callbacks_size`, `sts2_step15_install_external_managed_callbacks`, `sts2_step15_is_external_managed_bridge_installed`, `sts2_step15_signal_external_core_api_loaded`, and `sts2_step15_did_external_core_api_signal_return`;
+- [ ] managed bootstrap verifies `GodotPlugins.Game.Main.InitializeFromGameProject` with unmanaged entry point `godotsharp_game_main_init` but does not directly invoke that `UnmanagedCallersOnly` method;
+- [ ] private GodotSharp `ManagedCallbacks` is verified as exactly 37 unmanaged function-pointer fields and `ManagedCallbacks.Create(IntPtr)` must return all non-null pointers;
+- [ ] `ScriptManagerBridge.LookupScriptsInAssembly` is called only on the already admitted diagnostic sts2 assembly;
+- [ ] native cache adoption accepts only the complete exact-size callback struct, is single-shot, requires no Godot-owned initialized .NET runtime, and uses `GDMonoCache::update_godot_api_cache` rather than assigning individual callbacks;
+- [ ] `GD_OnCoreApiAssemblyLoaded` is its own durable boundary after cache adoption;
+- [ ] launcher never writes/fakes `GDMono::runtime_initialized` or `initialized` ownership state;
 - [ ] runtime native **game** resolution remains rejected; no game executable/library, later OneTimeInitialization phase, entry point, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
 - [ ] no proprietary game DLL/native app bundle/signing secret/credential is included in the source archive.
 
-Physical testing for the new mode: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. The old three controls need not be rerun unless regression confirmation is desired. A 0.0.145 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.
-
-- [ ] CORE-HANDOFF reverse-binding readiness exports are linked and `CB_REVERSE_BINDING_STATE`/fail-closed pre-Gate-C behavior are preserved.
+Physical testing: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. Preserve the run-correlated reports. A 0.0.146 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.

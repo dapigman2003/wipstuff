@@ -1,6 +1,6 @@
 # Current status
 
-## Active candidate — Step 35.0.22 / 0.0.145 (145)
+## Active candidate — Step 35.0.23 / 0.0.146 (146)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
@@ -9,9 +9,15 @@ Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED PO
 
 Run `20260902T1749100715980Z-pid32517-8963408799ff47c69d2afb674c3817cf` preserved the successful 1,800 bytes / 225 pointers CORE-HANDOFF and `initialized=true`. The natural path entered `Godot.OS.GetCmdlineArgs()` -> `Godot.OS.get_Singleton()` -> `InteropUtils.EngineGetSingleton` -> `godotsharp_engine_get_singleton` -> `UnmanagedGetManaged`. The script-instance query returned far enough for `GodotBoolExtensions.ToBool`, then the final durable marker was **GS035 `NativeFuncs.godotsharp_internal_unmanaged_get_instance_binding_managed(IntPtr)`**. GS036 `godotsharp_internal_unmanaged_instance_binding_create_managed` was not reached. This proves native singleton lookup succeeds and localizes the next hard boundary to Godot native->managed instance-binding association state.
 
-## Step 35.0.22 / 0.0.145 reverse-binding readiness design
+## Physical 0.0.145 reverse-binding readiness result
 
-0.0.145 preserves the CORE-HANDOFF runtime callback handoff and natural sts2/GodotSharp callsites. Immediately after `NativeFuncs.Initialize` returns, it reads four project-owned source-built Godot facts: CSharpLanguage singleton presence, `GDMonoCache::godot_api_cache_updated`, `ScriptManagerBridge_CreateManagedForGodotObjectBinding` pointer presence, and their aggregate readiness. It records `CB_REVERSE_BINDING_STATE`. If readiness is false it records `CB_REVERSE_BINDING_NOT_READY_STOP` and returns before Gate C; if true it records `CB_REVERSE_BINDING_READY_PASS` and continues naturally. It does not initialize Godot's managed runtime, update the cache, call a managed binding callback, create a surrogate OS object, or load the game native executable.
+Run `20260903T0329320479790Z-pid37654-cb70acd45f2d48049455249a539c60bd` re-proved the private GodotSharp 1,800-byte / 225-pointer handoff (`NativeFuncs.Initialize` returned with `initialized=true`) and then recorded `csharpLanguage=True`, `godotApiCacheUpdated=False`, `createManagedBindingCallback=False`, `reverseBindingReady=False`, and `godotDotNetInitialized=False`. 0.0.145 stopped at `CB_REVERSE_BINDING_NOT_READY_STOP`, did not invoke Gate C / ExecuteVeryEarly, and reached normal `RUN_END`. This is positive diagnostic evidence that the GS035 frontier is missing Godot native->managed managed-plugin/cache initialization rather than another managed->native callback-table defect.
+
+## Step 35.0.23 / 0.0.146 generated managed-plugin bridge bootstrap
+
+0.0.146 preserves the proven CORE-HANDOFF `NativeFuncs.Initialize` path, then verifies the admitted sts2 diagnostic clone's generated `GodotPlugins.Game.Main.InitializeFromGameProject` / `godotsharp_game_main_init` contract. In the existing launcher CLR it asks private GodotSharp to create the complete 37-pointer `Godot.Bridge.ManagedCallbacks` table and calls `ScriptManagerBridge.LookupScriptsInAssembly` on the admitted game derivative. A project-owned native bridge then validates and copies that complete exact-size struct into source-built Godot through `GDMonoCache::update_godot_api_cache`. The standard `GD_OnCoreApiAssemblyLoaded` reverse callback is invoked as a separate durable boundary. Natural Gate C runs only if the reverse cache is ready and that callback returns.
+
+The launcher still does **not** start another CLR, load the game native executable, fabricate individual callbacks, or claim/set Godot `GDMono::runtime_initialized`. This is a coordinated lifecycle compatibility experiment, not exact Step-35 closure.
 
 The authoritative exact-transformed Step-35 execution frontier remains physical **0.0.126**: exact `ExecuteVeryEarly()` entered `MethodInfo.Invoke`, but no `C_INVOKE_RETURNED` was durably recorded. All later Step-35 binaries are diagnostic derivatives unless a separately defined closure candidate restores explicit exact-byte execution authority.
 

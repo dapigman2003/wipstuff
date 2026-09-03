@@ -78,6 +78,23 @@ internal static class GodotStep15NativeBridge
     [DllImport(InternalLibrary, EntryPoint = "sts2_step15_is_reverse_binding_ready", CallingConvention = CallingConvention.Cdecl)]
     private static extern int IsReverseBindingReadyNative();
 
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_get_managed_callbacks_size", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int GetManagedCallbacksSizeNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_is_external_managed_bridge_installed", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int IsExternalManagedBridgeInstalledNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_install_external_managed_callbacks", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int InstallExternalManagedCallbacksNative(
+        [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex = 1)] byte[] callbacks,
+        int sizeBytes);
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_signal_external_core_api_loaded", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int SignalExternalCoreApiLoadedNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_did_external_core_api_signal_return", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int DidExternalCoreApiSignalReturnNative();
+
     [DllImport(InternalLibrary, EntryPoint = "sts2_step15_get_runtime_interop_funcs", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr GetRuntimeInteropFunctionsNative(out int sizeBytes);
 
@@ -102,6 +119,14 @@ internal static class GodotStep15NativeBridge
     public static bool IsGodotApiCacheUpdated => IsGodotApiCacheUpdatedNative() != 0;
     public static bool HasManagedCreateBindingCallback => HasManagedCreateBindingCallbackNative() != 0;
     public static bool IsReverseBindingReady => IsReverseBindingReadyNative() != 0;
+    public static int ManagedCallbacksSizeBytes => GetManagedCallbacksSizeNative();
+    public static bool IsExternalManagedBridgeInstalled => IsExternalManagedBridgeInstalledNative() != 0;
+    public static bool DidExternalCoreApiSignalReturn => DidExternalCoreApiSignalReturnNative() != 0;
+
+    public static bool InstallExternalManagedCallbacks(byte[] callbacks) =>
+        callbacks is { Length: > 0 } && InstallExternalManagedCallbacksNative(callbacks, callbacks.Length) != 0;
+
+    public static bool SignalExternalCoreApiLoaded() => SignalExternalCoreApiLoadedNative() != 0;
 
     public static IntPtr GetRuntimeInteropFunctions(out int sizeBytes) =>
         GetRuntimeInteropFunctionsNative(out sizeBytes);

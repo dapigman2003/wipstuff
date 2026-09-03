@@ -41,6 +41,8 @@ std::atomic<int> g_background_count{ 0 };
 std::atomic<int> g_foreground_count{ 0 };
 std::atomic<int> g_focus_out_count{ 0 };
 std::atomic<int> g_focus_in_count{ 0 };
+std::atomic<int> g_external_managed_bridge_installed{ 0 };
+std::atomic<int> g_external_core_api_signal_returned{ 0 };
 std::string g_last_error;
 
 void set_error(const char *message) {
@@ -357,7 +359,7 @@ STS2_STEP15_EXPORT int sts2_step15_is_dotnet_runtime_initialized() {
     return gdmono != nullptr && gdmono->is_runtime_initialized() ? 1 : 0;
 }
 
-// Step 35.0.22 diagnostic-only reverse-binding readiness. These exports
+// Step 35.0.23 diagnostic-only reverse-binding readiness. These exports
 // read existing Godot C# native-module state only. They do not initialize the
 // Godot-managed runtime, mutate GDMonoCache, create instance bindings, or call
 // any managed callback.
@@ -379,6 +381,94 @@ STS2_STEP15_EXPORT int sts2_step15_is_reverse_binding_ready() {
                    GDMonoCache::managed_callbacks.ScriptManagerBridge_CreateManagedForGodotObjectBinding != nullptr
             ? 1
             : 0;
+}
+
+// Step 35.0.23 diagnostic-only external-host bridge adoption. This does not
+// start hostfxr/CoreCLR, load a game native image, or fabricate individual
+// callback pointers. The managed launcher reproduces the generated GodotPlugins
+// bootstrap in its existing CLR and supplies the complete ManagedCallbacks
+// struct produced by GodotSharp ManagedCallbacks.Create(IntPtr).
+STS2_STEP15_EXPORT int sts2_step15_get_managed_callbacks_size() {
+    return (int)sizeof(GDMonoCache::ManagedCallbacks);
+}
+
+STS2_STEP15_EXPORT int sts2_step15_is_external_managed_bridge_installed() {
+    return g_external_managed_bridge_installed.load();
+}
+
+STS2_STEP15_EXPORT int sts2_step15_install_external_managed_callbacks(const void *p_callbacks, int p_size) {
+    if (!on_main_thread() || !g_started.load()) {
+        set_error("External managed callback installation requires the live Step 15 engine on the main thread.");
+        return 0;
+    }
+    if (CSharpLanguage::get_singleton() == nullptr || GDMono::get_singleton() == nullptr) {
+        set_error("External managed callback installation requires CSharpLanguage and GDMono native scaffolding.");
+        return 0;
+    }
+    if (GDMono::get_singleton()->is_runtime_initialized()) {
+        set_error("External managed callback installation refuses to compete with a Godot-owned initialized .NET runtime.");
+        return 0;
+    }
+    if (GDMonoCache::godot_api_cache_updated || g_external_managed_bridge_installed.load()) {
+        set_error("External managed callback installation is single-shot and requires an untouched Godot API cache.");
+        return 0;
+    }
+    if (p_callbacks == nullptr || p_size != (int)sizeof(GDMonoCache::ManagedCallbacks)) {
+        set_error("External managed callback table was null or did not match sizeof(GDMonoCache::ManagedCallbacks).");
+        return 0;
+    }
+
+    GDMonoCache::ManagedCallbacks callbacks{};
+    memcpy(&callbacks, p_callbacks, sizeof(callbacks));
+    if (callbacks.ScriptManagerBridge_CreateManagedForGodotObjectBinding == nullptr ||
+            callbacks.GD_OnCoreApiAssemblyLoaded == nullptr) {
+        set_error("External managed callback table is missing required reverse-binding/core-API callbacks.");
+        return 0;
+    }
+
+    // This is the same cache-adoption operation performed by normal Godot managed initialization
+    // immediately after GodotPlugins.Game.Main.InitializeFromGameProject returns.
+    // It copies the complete callback struct by value; it does not invoke a callback.
+    GDMonoCache::update_godot_api_cache(callbacks);
+    if (!GDMonoCache::godot_api_cache_updated ||
+            GDMonoCache::managed_callbacks.ScriptManagerBridge_CreateManagedForGodotObjectBinding == nullptr) {
+        set_error("Godot API cache did not become reverse-binding ready after external callback adoption.");
+        return 0;
+    }
+
+    g_external_managed_bridge_installed.store(1);
+    g_last_error.clear();
+    return 1;
+}
+
+STS2_STEP15_EXPORT int sts2_step15_signal_external_core_api_loaded() {
+    if (!on_main_thread() || !g_started.load()) {
+        set_error("External core-API-loaded signal requires the live Step 15 engine on the main thread.");
+        return 0;
+    }
+    if (!g_external_managed_bridge_installed.load() || !GDMonoCache::godot_api_cache_updated ||
+            GDMonoCache::managed_callbacks.GD_OnCoreApiAssemblyLoaded == nullptr) {
+        set_error("External core-API-loaded signal requires the installed managed callback cache.");
+        return 0;
+    }
+    if (g_external_core_api_signal_returned.load()) {
+        set_error("External core-API-loaded signal is single-shot.");
+        return 0;
+    }
+
+#ifdef DEBUG_ENABLED
+    const bool debug = true;
+#else
+    const bool debug = false;
+#endif
+    GDMonoCache::managed_callbacks.GD_OnCoreApiAssemblyLoaded(debug);
+    g_external_core_api_signal_returned.store(1);
+    g_last_error.clear();
+    return 1;
+}
+
+STS2_STEP15_EXPORT int sts2_step15_did_external_core_api_signal_return() {
+    return g_external_core_api_signal_returned.load();
 }
 
 STS2_STEP15_EXPORT const void *sts2_step15_get_runtime_interop_funcs(int *r_size) {

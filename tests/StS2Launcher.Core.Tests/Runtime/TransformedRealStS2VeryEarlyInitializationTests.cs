@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.22 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.23 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -45,6 +45,27 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         StringAssert.Contains(checkpoints[0], "System.ArgumentException");
         Assert.IsFalse(checkpoints[0].Contains("CB_INIT_ENTRY", StringComparison.Ordinal), "Invalid metadata must not advance to the callback-handoff entry boundary.");
         Assert.AreEqual(3, (int)Step35DiagnosticMode.GodotCoreCallbackHandoff);
+    }
+
+    [TestMethod]
+    public void GodotManagedPluginReverseBridgeRejectsInvalidNativeSizeBeforePreflightOrClrWork()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-managed-plugin-reverse-size-validation");
+        using var subject = new TransformedRealStS2VeryEarlyInitialization(temp.Path, collectibleLoadContext: true)
+        {
+            DiagnosticMode = Step35DiagnosticMode.GodotCoreCallbackHandoff,
+        };
+        var checkpoints = new List<string>();
+
+        var ex = Assert.ThrowsExactly<ArgumentException>(() =>
+            subject.PrepareGodotManagedPluginReverseBridge(0, checkpoints.Add));
+
+        StringAssert.Contains(ex.Message, "positive");
+        Assert.AreEqual(1, checkpoints.Count);
+        StringAssert.Contains(checkpoints[0], "CB_REVERSE_PREP_MANAGED_FAIL");
+        StringAssert.Contains(checkpoints[0], "stage=initialization");
+        StringAssert.Contains(checkpoints[0], "System.ArgumentException");
+        Assert.IsFalse(checkpoints[0].Contains("CB_REVERSE_PREP_ENTRY", StringComparison.Ordinal));
     }
 
     [TestMethod]

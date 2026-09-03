@@ -1,0 +1,26 @@
+StS2 Launcher — Step 35.0.22 physical reverse-binding preflight result — 0.0.145 (145)
+
+Run ID: 20260903T0329320479790Z-pid37654-cb70acd45f2d48049455249a539c60bd
+Mode: GodotCoreCallbackHandoff
+Result: CLOSED POSITIVE FOR THE READ-ONLY PREFLIGHT QUESTION; EXACT STEP 35 REMAINS OPEN.
+
+Observed sequence:
+- Gate A PASS and Gate B PASS.
+- Exact source-built Godot runtime interop table returned and remained 1,800 bytes / 225 pointers.
+- Private GodotSharp NativeFuncs.Initialize(IntPtr,int) entered once, returned, and initialized=true.
+- CB_MANAGED_HANDOFF_RETURNED recorded PASS.
+- CB_REVERSE_BINDING_STATE recorded:
+  csharpLanguage=True
+  godotApiCacheUpdated=False
+  createManagedBindingCallback=False
+  reverseBindingReady=False
+  godotDotNetInitialized=False
+- CB_REVERSE_BINDING_NOT_READY_STOP returned before Gate C.
+- ExecuteVeryEarly was not invoked in 0.0.145 after the stop.
+- Managed finally/report path returned normally and RUN_END was durable.
+
+Interpretation:
+The prior 0.0.144 GS035 hard termination was not caused by failure to obtain the native OS singleton. The source-built C# language/GDMono scaffolding exists, but the Godot native->managed ManagedCallbacks cache was never populated. This cleanly separates the already-proven managed->native 225-pointer handoff from the missing reverse managed-plugin lifecycle.
+
+Safety/authority:
+This result is diagnostic only. It does not close exact Step 35, authorize ExecuteEssential/ExecuteDeferred, load the game native executable, or claim that Godot owns an initialized .NET runtime.

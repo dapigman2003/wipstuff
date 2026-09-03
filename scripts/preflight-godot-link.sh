@@ -88,6 +88,11 @@ int sts2_step15_has_csharp_language_singleton(void);
 int sts2_step15_is_godot_api_cache_updated(void);
 int sts2_step15_has_managed_create_binding_callback(void);
 int sts2_step15_is_reverse_binding_ready(void);
+int sts2_step15_get_managed_callbacks_size(void);
+int sts2_step15_is_external_managed_bridge_installed(void);
+int sts2_step15_install_external_managed_callbacks(const void *, int);
+int sts2_step15_signal_external_core_api_loaded(void);
+int sts2_step15_did_external_core_api_signal_return(void);
 const void *sts2_step15_get_runtime_interop_funcs(int *);
 int sts2_step15_touch_marker_ready(void);
 }
@@ -100,6 +105,7 @@ int main(int argc, char **argv) {
     using StartFn = int (*)(void *, void *, const char *);
     using IntFn = int (*)(void);
     using InteropFn = const void *(*)(int *);
+    using InstallCallbacksFn = int (*)(const void *, int);
 
     volatile VersionFn version_fn = &sts2_step15_get_engine_version;
     volatile StartFn start_fn = &sts2_step15_start;
@@ -112,6 +118,11 @@ int main(int argc, char **argv) {
     volatile IntFn api_cache_fn = &sts2_step15_is_godot_api_cache_updated;
     volatile IntFn create_binding_fn = &sts2_step15_has_managed_create_binding_callback;
     volatile IntFn reverse_binding_fn = &sts2_step15_is_reverse_binding_ready;
+    volatile IntFn callbacks_size_fn = &sts2_step15_get_managed_callbacks_size;
+    volatile IntFn external_bridge_state_fn = &sts2_step15_is_external_managed_bridge_installed;
+    volatile IntFn core_api_signal_fn = &sts2_step15_signal_external_core_api_loaded;
+    volatile IntFn core_api_signal_state_fn = &sts2_step15_did_external_core_api_signal_return;
+    volatile InstallCallbacksFn install_external_callbacks_fn = &sts2_step15_install_external_managed_callbacks;
     volatile InteropFn interop_fn = &sts2_step15_get_runtime_interop_funcs;
     volatile IntFn touch_fn = &sts2_step15_touch_marker_ready;
 
@@ -120,7 +131,7 @@ int main(int argc, char **argv) {
     }
     if (argc == -2) {
         int size = 0;
-        return interop_fn(&size) == nullptr || size <= 0 || interop_ready_fn() < 0 || dotnet_feature_fn() < 0 || dotnet_initialized_fn() < 0 || csharp_language_fn() < 0 || api_cache_fn() < 0 || create_binding_fn() < 0 || reverse_binding_fn() < 0;
+        return interop_fn(&size) == nullptr || size <= 0 || interop_ready_fn() < 0 || dotnet_feature_fn() < 0 || dotnet_initialized_fn() < 0 || csharp_language_fn() < 0 || api_cache_fn() < 0 || create_binding_fn() < 0 || reverse_binding_fn() < 0 || callbacks_size_fn == nullptr || external_bridge_state_fn == nullptr || core_api_signal_fn == nullptr || core_api_signal_state_fn == nullptr || install_external_callbacks_fn == nullptr;
     }
     return version_fn() == nullptr || restart_fn() < 0 || metal_fn() < 0 || touch_fn() < 0;
 }
