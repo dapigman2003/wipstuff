@@ -34,8 +34,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     public const uint SourceStateMachineMoveNextToken = 0x0600BC71;
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
-    private const string DiagnosticCloneFileName = "sts2.step35.0.25.instrumented.dll";
-    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.25.instrumented.dll";
+    private const string DiagnosticCloneFileName = "sts2.step35.0.26.instrumented.dll";
+    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.26.instrumented.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
     internal const string NullPlatformTypeFullName = "MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy";
@@ -513,7 +513,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "B_PASS_RETURN — Gate B completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35.0.25 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
+                "STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35.0.26 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.\n" +
                 $"Loaded identity: {actualIdentity}\n" +
                 $"Loaded MVID: {actualMvid}\n" +
                 $"AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
@@ -541,7 +541,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.25 callback-handoff mode deliberately loads the already hash-pinned GodotSharp diagnostic derivative into the dedicated context and reflects only its exact NativeFuncs.Initialize(IntPtr,int) callback-table receiver.")]
+        Justification = "Step 35.0.26 callback-handoff mode deliberately loads the already hash-pinned GodotSharp diagnostic derivative into the dedicated context and reflects only its exact NativeFuncs.Initialize(IntPtr,int) callback-table receiver.")]
     public string RunGodotCoreCallbackHandoffInitialization(
         IntPtr callbackTable,
         int callbackTableSizeBytes,
@@ -642,15 +642,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.25 deliberately reflects and invokes one instrumented diagnostic clone of the exact async initialization method after re-verifying the exact transformed source. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
+        Justification = "Step 35.0.26 deliberately reflects and invokes one instrumented diagnostic clone of the exact async initialization method after re-verifying the exact transformed source. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.25 reflects and invokes only the separately verified diagnostic clone of ExecuteVeryEarly; this derivative is localization evidence and is never exact Step-35 closure evidence.")]
+        Justification = "Step 35.0.26 reflects and invokes only the separately verified diagnostic clone of ExecuteVeryEarly; this derivative is localization evidence and is never exact Step-35 closure evidence.")]
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.25 managed-plugin bootstrap preparation reflects only the exact GodotPlugins.Game.Main generated entry-point contract plus GodotSharp ManagedCallbacks.Create(IntPtr) and ScriptManagerBridge.LookupScriptsInAssembly(Assembly) in the already verified private assemblies.")]
+        Justification = "Step 35.0.26 managed-plugin bootstrap preparation reflects only the exact GodotPlugins.Game.Main generated entry-point contract plus GodotSharp ManagedCallbacks.Create(IntPtr) and ScriptManagerBridge.LookupScriptsInAssembly(Assembly) in the already verified private assemblies.")]
     public byte[] PrepareGodotManagedPluginReverseBridge(
         int managedCallbacksSizeBytes,
         Action<string>? crashCheckpoint)
@@ -661,11 +661,11 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (DiagnosticMode != Step35DiagnosticMode.GodotCoreCallbackHandoff)
                 throw new InvalidOperationException("Godot managed-plugin reverse-bridge preparation is permitted only in the explicit GodotCoreCallbackHandoff diagnostic mode.");
             if (crashCheckpoint is null)
-                throw new InvalidOperationException("Step-35.0.25 managed-plugin reverse-bridge preparation requires durable launcher-owned checkpoint telemetry.");
+                throw new InvalidOperationException("Step-35.0.26 managed-plugin reverse-bridge preparation requires durable launcher-owned checkpoint telemetry.");
             if (managedCallbacksSizeBytes <= 0 || managedCallbacksSizeBytes % IntPtr.Size != 0)
                 throw new ArgumentException("Godot managed callback-table size must be positive and pointer-size aligned.", nameof(managedCallbacksSizeBytes));
             if (_managedPluginReverseBridgePrepared)
-                throw new InvalidOperationException("Step-35.0.25 managed-plugin reverse bridge has already been prepared in this execution context.");
+                throw new InvalidOperationException("Step-35.0.26 managed-plugin reverse bridge has already been prepared in this execution context.");
 
             ThrowIfDisposed();
             var preflight = RequirePreflight();
@@ -679,9 +679,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotAssembly), context) ||
                 !string.Equals(godotAssembly.GetName().FullName, preflight.GodotSharpDiagnostic.AssemblyIdentity, StringComparison.Ordinal) ||
                 godotAssembly.ManifestModule.ModuleVersionId != preflight.GodotSharpDiagnostic.Mvid)
-                throw new InvalidDataException("Step-35.0.25 reverse-bridge preparation lost the verified private GodotSharp identity/context.");
+                throw new InvalidDataException("Step-35.0.26 reverse-bridge preparation lost the verified private GodotSharp identity/context.");
             if (context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
-                throw new InvalidDataException("Step-35.0.25 reverse-bridge preparation entered with dirty forbidden resolver state. " + context.FormatResolverState());
+                throw new InvalidDataException("Step-35.0.26 reverse-bridge preparation entered with dirty forbidden resolver state. " + context.FormatResolverState());
 
             stage = "generated game plugin entry-point contract audit";
             var pluginType = admission.Assembly.GetType("GodotPlugins.Game.Main", throwOnError: true, ignoreCase: false)
@@ -793,7 +793,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "CB_SCRIPT_LOOKUP_RETURNED — ScriptManagerBridge.LookupScriptsInAssembly returned to the launcher.");
 
             if (context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
-                throw new InvalidDataException("Step-35.0.25 reverse-bridge preparation escaped the allowed resolver boundary. " + context.FormatResolverState());
+                throw new InvalidDataException("Step-35.0.26 reverse-bridge preparation escaped the allowed resolver boundary. " + context.FormatResolverState());
 
             _managedPluginReverseBridgePrepared = true;
             Checkpoint(crashCheckpoint, $"CB_REVERSE_PREP_PASS — managed half of generated Godot plugin bootstrap reproduced; callbacks={callbackFields.Length}; bytes={callbackBytes.Length}; {context.FormatResolverState()}.");
@@ -814,7 +814,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (DiagnosticMode != Step35DiagnosticMode.GodotCoreCallbackHandoff)
                 throw new InvalidOperationException("Managed-plugin resolver baseline sealing is permitted only in the explicit GodotCoreCallbackHandoff diagnostic mode.");
             if (crashCheckpoint is null)
-                throw new InvalidOperationException("Step-35.0.25 post-bootstrap resolver baseline requires durable launcher-owned checkpoint telemetry.");
+                throw new InvalidOperationException("Step-35.0.26 post-bootstrap resolver baseline requires durable launcher-owned checkpoint telemetry.");
 
             ThrowIfDisposed();
             _ = RequirePreflight();
@@ -827,7 +827,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             if (_managedPluginBootstrapResolverBaseline is not null)
                 throw new InvalidOperationException("The post-bootstrap resolver baseline has already been sealed in this execution context.");
             if (context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
-                throw new InvalidDataException("Step-35.0.25 bootstrap resolver sealing observed forbidden resolver/native activity. " + context.FormatResolverState());
+                throw new InvalidDataException("Step-35.0.26 bootstrap resolver sealing observed forbidden resolver/native activity. " + context.FormatResolverState());
 
             string[] expectedManagedDelta =
             [
@@ -846,7 +846,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             var privateDelta = context.PrivateLoads.Skip(handoff.PrivateLoads).ToArray();
             if (managedDelta.Length != expectedManagedDelta.Length ||
                 !managedDelta.OrderBy(item => item, StringComparer.Ordinal).SequenceEqual(expectedManagedDelta.OrderBy(item => item, StringComparer.Ordinal), StringComparer.Ordinal))
-                throw new InvalidDataException("Step-35.0.25 generated-plugin bootstrap managed resolver delta drifted from the physically measured 0.0.146 eight-request host-framework closure. Observed: " + string.Join(" | ", managedDelta));
+                throw new InvalidDataException("Step-35.0.26 generated-plugin bootstrap managed resolver delta drifted from the physically measured 0.0.146 eight-request host-framework closure. Observed: " + string.Join(" | ", managedDelta));
             var hostRequestDelta = hostDelta
                 .Select(item =>
                 {
@@ -856,9 +856,9 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 .ToArray();
             if (hostRequestDelta.Length != expectedManagedDelta.Length ||
                 !hostRequestDelta.OrderBy(item => item, StringComparer.Ordinal).SequenceEqual(expectedManagedDelta.OrderBy(item => item, StringComparer.Ordinal), StringComparer.Ordinal))
-                throw new InvalidDataException("Step-35.0.25 generated-plugin bootstrap host-load delta drifted from the exact managed request closure. Observed: " + string.Join(" | ", hostDelta));
+                throw new InvalidDataException("Step-35.0.26 generated-plugin bootstrap host-load delta drifted from the exact managed request closure. Observed: " + string.Join(" | ", hostDelta));
             if (privateDelta.Length != 0)
-                throw new InvalidDataException("Step-35.0.25 generated-plugin bootstrap unexpectedly loaded an additional private dependency: " + string.Join(" | ", privateDelta));
+                throw new InvalidDataException("Step-35.0.26 generated-plugin bootstrap unexpectedly loaded an additional private dependency: " + string.Join(" | ", privateDelta));
 
             _managedPluginBootstrapResolverBaseline = new ManagedPluginBootstrapResolverSnapshot(
                 context.ManagedResolverRequests.Count,
@@ -887,7 +887,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         try
         {
             if (crashCheckpoint is null)
-                throw new InvalidOperationException("Step-35.0.25 diagnostic Gate C requires a durable launcher-owned checkpoint callback; refusing to execute an instrumented clone without in-method telemetry.");
+                throw new InvalidOperationException("Step-35.0.26 diagnostic Gate C requires a durable launcher-owned checkpoint callback; refusing to execute an instrumented clone without in-method telemetry.");
             Checkpoint(crashCheckpoint, "C_ENTRY — entered Gate C diagnostic-clone ExecuteVeryEarly binding/invocation/await boundary; exact transformed source remains outside the CLR.");
             ThrowIfDisposed();
             var preflight = RequirePreflight();
@@ -897,8 +897,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
 
             if (DiagnosticMode == Step35DiagnosticMode.GodotCoreCallbackHandoff)
             {
-                var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step-35.0.25 GodotCoreCallbackHandoff mode requires the controlled NativeFuncs.Initialize handoff after Gate B and before Gate C.");
-                var bootstrapBaseline = _managedPluginBootstrapResolverBaseline ?? throw new InvalidOperationException("Step-35.0.25 GodotCoreCallbackHandoff mode requires the generated-plugin resolver baseline to be sealed after bootstrap and before Gate C.");
+                var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step-35.0.26 GodotCoreCallbackHandoff mode requires the controlled NativeFuncs.Initialize handoff after Gate B and before Gate C.");
+                var bootstrapBaseline = _managedPluginBootstrapResolverBaseline ?? throw new InvalidOperationException("Step-35.0.26 GodotCoreCallbackHandoff mode requires the generated-plugin resolver baseline to be sealed after bootstrap and before Gate C.");
                 if (context.ManagedResolverRequests.Count != bootstrapBaseline.ManagedResolverRequests ||
                     context.HostLoads.Count != bootstrapBaseline.HostLoads ||
                     context.PrivateLoads.Count != bootstrapBaseline.PrivateLoads ||
@@ -1037,7 +1037,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             Checkpoint(crashCheckpoint, "C_PASS_RETURN — Gate C completed successfully and is returning its PASS result.");
 
             return Pass(gate,
-                "STEP-35.0.25 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE.\n" +
+                "STEP-35.0.26 DIAGNOSTIC-CLONE EXECUTEVERYEARLY INVOCATION/AWAIT COMPLETED NORMALLY; THIS IS LOCALIZATION EVIDENCE, NOT EXACT STEP-35 CLOSURE.\n" +
                 $"Target type: {TargetTypeFullName}\n" +
                 $"Target method: {TargetMethodFullName}\n" +
                 $"Reflected diagnostic-clone MethodDef token: 0x{method.MetadataToken:X8}\n" +
@@ -1091,7 +1091,19 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
 
             stage = "post-execution OfflineReady and source reproof";
             progress?.Report(new(gate, 0, 4, null, "Re-proving the receipt-backed install after instrumented diagnostic ExecuteVeryEarly initialization."));
-            var offline = await _offlineInspection.RunAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+            IProgress<SteamOfflineInstallProgress>? offlineProgress = progress is null
+                ? null
+                : new CallbackProgress<SteamOfflineInstallProgress>(value =>
+                    progress.Report(new(
+                        gate,
+                        value.CompletedFiles,
+                        value.TotalFiles,
+                        value.CurrentFile,
+                        $"Gate D OfflineReady {value.Phase} — {value.Message}",
+                        value.CompletedBytes,
+                        value.TotalBytes,
+                        value.Phase.ToString())));
+            var offline = await _offlineInspection.RunAsync(offlineProgress, cancellationToken).ConfigureAwait(false);
             if (offline.Outcome == SteamOfflineInstallOutcome.Cancelled)
                 throw new OperationCanceledException("Step 35 final OfflineReady audit was cancelled.", cancellationToken);
             if (!offline.Success || string.IsNullOrWhiteSpace(offline.ManagedInstallRelativePath))
@@ -1146,7 +1158,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             progress?.Report(new(gate, 4, 4, preflight.DiagnosticPath, "Final source/diagnostic-clone/plan/dependency/context isolation checks passed."));
 
             return Pass(gate,
-                "STEP-35.0.25 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n" +
+                "STEP-35.0.26 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n" +
                 $"Post-execution OfflineReady: PASS ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
                 $"Verified exact transformed SHA-256 unchanged: {transformedSha256}\n" +
@@ -1286,7 +1298,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[NULL PLATFORM CTOR IL]");
             lines.Add($"NullPlatform constructor: token=0x{nullPlatformConstructor.MetadataToken.ToUInt32():X8}; {nullPlatformConstructor.FullName}");
-            lines.Add("Step 35.0.25 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
+            lines.Add("Step 35.0.26 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
             AppendInstructionMap(lines, nullPlatformConstructor);
         }
         if (commandLineHelperCctor is not null)
@@ -1295,7 +1307,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add("[COMMAND LINE HELPER CCTOR IL]");
             lines.Add($"CommandLineHelper cctor: token=0x{commandLineHelperCctor.MetadataToken.ToUInt32():X8}; {commandLineHelperCctor.FullName}");
             lines.Add($"CommandLineHelper cctor exact-source MaxStack={commandLineHelperCctor.Body.MaxStackSize}; instructions={commandLineHelperCctor.Body.Instructions.Count}; locals={commandLineHelperCctor.Body.Variables.Count}; handlers={commandLineHelperCctor.Body.ExceptionHandlers.Count}");
-            lines.Add("Step 35.0.25 retains this exact-source CALLSITE map for correlation. NATURAL and CORE-HANDOFF preserve the Godot dictionary/GetCmdlineArgs contract; OS-RECON rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string> and keeps natural GetCmdlineArgs; FORWARD adds only the verified local empty-string-array provider substitution. All modes retain four stack-neutral critical markers.");
+            lines.Add("Step 35.0.26 retains this exact-source CALLSITE map for correlation. NATURAL and CORE-HANDOFF preserve the Godot dictionary/GetCmdlineArgs contract; OS-RECON rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string> and keeps natural GetCmdlineArgs; FORWARD adds only the verified local empty-string-array provider substitution. All modes retain four stack-neutral critical markers.");
             AppendInstructionMap(lines, commandLineHelperCctor);
         }
         if (commandLineHelperTryGetValue is not null)
@@ -1303,7 +1315,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[COMMAND LINE HELPER TRYGETVALUE IL]");
             lines.Add($"CommandLineHelper TryGetValue: token=0x{commandLineHelperTryGetValue.MetadataToken.ToUInt32():X8}; {commandLineHelperTryGetValue.FullName}");
-            lines.Add("Step 35.0.25 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL and CORE-HANDOFF preserve the Godot dictionary TryGetValue MemberRef; OS-RECON/FORWARD rewrite only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
+            lines.Add("Step 35.0.26 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL and CORE-HANDOFF preserve the Godot dictionary TryGetValue MemberRef; OS-RECON/FORWARD rewrite only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
             AppendInstructionMap(lines, commandLineHelperTryGetValue);
         }
         return string.Join("\n", lines);
@@ -1543,7 +1555,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             // CommandLineHelper..cctor before instruction zero, so they stay retired. Physical 0.0.136
             // then entered the stack-neutral cctor and hard-terminated after CL_CRITICAL_001_PRE but before
             // the matching POST, localizing the physical interval to Godot.Collections.Dictionary<string,string>
-            // construction before _args assignment. Step 35.0.25 keeps the exact-source map and markers.
+            // construction before _args assignment. Step 35.0.26 keeps the exact-source map and markers.
             // NATURAL preserves the Godot dictionary path, OS-RECON rewrites only that private container contract,
             // and FORWARD adds exactly one already-localized GetCmdlineArgs provider substitution.
             commandLineCctorOriginalMaxStack = commandLineCctor.Body.MaxStackSize;
@@ -3382,6 +3394,11 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                 surrogate.Dispose();
             _surrogates.Clear();
         }
+    }
+
+    private sealed class CallbackProgress<T>(Action<T> callback) : IProgress<T>
+    {
+        public void Report(T value) => callback(value);
     }
 
     private sealed record DiagnosticConstantMetadataResolutionPlan(int SyntheticTypeCount, int ApprovedScopeCount, int ApprovedRequirementCount);

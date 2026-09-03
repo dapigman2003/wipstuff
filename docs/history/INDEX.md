@@ -275,3 +275,7 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.24-CODEMAGIC-HOST-REGRESSION-MESSAGE-FAILURE-0.0.147.txt` — 0.0.147 passed 881/881 static checks but stopped at 212/213 host tests because one negative test required a stale `preflight` substring instead of the actual Gate-A exception text.
 - `steps/STEP-35.0.25-HOST-REGRESSION-CONTRACT-CORRECTION.md` — 0.0.148 preserves the 0.0.147 runtime unchanged and corrects only that host regression contract plus release/provenance guards.
+
+## Step 35.0.26 Gate-D observability / Codemagic warm-toolchain cache
+
+- `steps/STEP-35.0.26-GATE-D-PROGRESS-WARM-CACHE.md` — 0.0.149 preserves the proven bridge/Gate-C contract, adds Gate-D intra-file byte progress plus a dedicated UI progress surface, and caches/verifies the pinned .NET+iOS workload toolchain for repeat Codemagic runs.

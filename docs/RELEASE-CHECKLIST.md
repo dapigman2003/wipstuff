@@ -1,12 +1,12 @@
-# Release checklist — Step 35.0.25 / 0.0.148
+# Release checklist — Step 35.0.26 / 0.0.149
 
-Release identity: display/build `0.0.148 (148)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.149 (149)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
 
-Physical 0.0.146 proved the bridge. 0.0.147 added the exact post-bootstrap resolver seal, but Codemagic stopped at 212/213 host tests solely because one negative test required a stale `preflight` substring. 0.0.148 preserves the 0.0.147 runtime unchanged and corrects only that host-test contract.
+Physical 0.0.146 proved the bridge. 0.0.147 added the exact post-bootstrap resolver seal, but Codemagic stopped at 212/213 host tests solely because one negative test required a stale `preflight` substring. 0.0.148 corrected the host-test contract and has reached Gate D on-device. 0.0.149 preserves the bridge/Gate-C contract, adds live Gate-D forwarded file/byte progress plus heartbeat liveness, and caches/verifies the pinned Codemagic .NET+iOS workload toolchain.
 
 Before handoff/build:
 
-- [ ] release identity is exactly `0.0.148 (148)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] release identity is exactly `0.0.149 (149)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
 - [ ] `bash scripts/validate.sh` passes;
 - [ ] `bash scripts/test.sh` passes on a host with `dotnet`;
 - [ ] pinned Godot 4.5.1 iOS source builds with `module_mono_enabled=yes` and standalone native-link preflight passes;
@@ -23,6 +23,9 @@ Before handoff/build:
 - [ ] `GD_OnCoreApiAssemblyLoaded` is its own durable boundary after cache adoption;
 - [ ] launcher never writes/fakes `GDMono::runtime_initialized` or `initialized` ownership state;
 - [ ] runtime native **game** resolution remains rejected; no game executable/library, later OneTimeInitialization phase, entry point, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
+- [ ] Gate D forwards the protected `SteamOfflineInstallProgress` checkpoints into Step-35 progress without modifying the physically protected Step-13 verifier;
+- [ ] Step-35 UI includes a dedicated Gate-D progress bar/latest-file/throughput surface plus a one-second elapsed/last-progress heartbeat;
+- [ ] Codemagic caches `$HOME/.dotnet` and validates the exact `9.0.314.3` iOS workload marker before skipping workload installation;
 - [ ] no proprietary game DLL/native app bundle/signing secret/credential is included in the source archive.
 
-Physical testing: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. Preserve the run-correlated reports. A 0.0.148 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.
+Physical testing: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. Preserve the run-correlated reports. A 0.0.149 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.

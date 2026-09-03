@@ -5,4 +5,7 @@ public sealed record TransformedRealStS2VeryEarlyInitializationProgress(
     int ProcessedItems,
     int TotalItems,
     string? CurrentPath,
-    string Detail);
+    string Detail,
+    ulong ProcessedBytes = 0,
+    ulong TotalBytes = 0,
+    string? Phase = null);

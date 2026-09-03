@@ -1,11 +1,11 @@
-# Testing — Step 35.0.25
+# Testing — Step 35.0.26
 
-Active candidate: Step 35.0.25 / `0.0.148 (148)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.26 / `0.0.149 (149)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
 ## Build/host prerequisites
 
 1. `bash scripts/validate.sh` must pass.
-2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.142 proved **211/211 host tests PASS** after the callback-telemetry correction; 0.0.147 added the post-bootstrap resolver-baseline regression guard but Codemagic reached 212/213 host tests because one negative test required a stale `preflight` substring. 0.0.148 corrects only that message assertion; require all current host tests to pass.
+2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.142 proved **211/211 host tests PASS** after the callback-telemetry correction; 0.0.147 added the post-bootstrap resolver-baseline regression guard but Codemagic reached 212/213 host tests because one negative test required a stale `preflight` substring. 0.0.148 corrected that message assertion; 0.0.149 adds one regression for intra-file OfflineReady progress. Require all current host tests to pass.
 3. Codemagic must successfully rebuild the pinned Godot 4.5.1 iOS static archive with `module_mono_enabled=yes`, pass the standalone native-link preflight including the new managed-callback adoption exports, then build and verify the IPA.
 4. The exact Step-32 transformed source must requalify; protected Step 29–34 manifests must remain unchanged.
 
@@ -24,7 +24,7 @@ CORE-HANDOFF intentionally uses a different sequence:
 
 Do not run another Step-35 mode in that process after Gate B begins.
 
-## 0.0.148 CORE-HANDOFF expected evidence
+## 0.0.149 CORE-HANDOFF expected evidence
 
 The run should reproduce the full physically proven 0.0.146 bridge sequence through:
 
@@ -37,7 +37,7 @@ The run should reproduce the full physically proven 0.0.146 bridge sequence thro
 → `CB_CORE_API_SIGNAL_RETURNED`
 → `CB_MANAGED_PLUGIN_BOOTSTRAP_PASS`.
 
-0.0.148 must then emit:
+0.0.149 must then emit:
 
 `CB_POST_BOOTSTRAP_RESOLVER_BASELINE_PASS` with `addedManaged=8`, `addedHost=8`, `addedPrivate=0`
 → `CB_POST_BOOTSTRAP_RESOLVER_BASELINE_RETURNED`
@@ -47,7 +47,12 @@ The run should reproduce the full physically proven 0.0.146 bridge sequence thro
 
 If `CB_POST_BOOTSTRAP_RESOLVER_BASELINE_FAIL` appears, preserve the full resolver state: the generated bootstrap dependency closure drifted and Gate C must remain blocked. If the baseline passes but Gate C later observes another request before target binding, that new request is a separate resolver-boundary regression.
 
-Godot `GDMono::is_runtime_initialized()` is intentionally expected to remain false in this experiment; 0.0.148 must not fake ownership of the launcher CLR.
+Godot `GDMono::is_runtime_initialized()` is intentionally expected to remain false in this experiment; 0.0.149 must not fake ownership of the launcher CLR.
+
+
+## Gate D live-progress expectation
+
+Once Gate C passes and Gate D begins, the UI must show a dedicated progress bar and text summary. During receipt-backed full-tree verification, the existing verifier file/byte checkpoints drive the bar and summary. A one-second heartbeat continues to update elapsed time and time-since-last-verifier-progress while a single large file is inside its SHA-1 operation, so the PCK interval is visibly alive even though the protected Step-13 verifier is unchanged. After the receipt hash reaches 100%, the indicator reserves its final quarter for the remaining Gate-D source/diagnostic/plan/dependency/context checks. Backgrounding the app is not part of this test contract; keep it foregrounded for clean evidence.
 
 ## Evidence to preserve
 
@@ -65,4 +70,4 @@ Resolver events alone do not establish causation. Interpret them with same-run P
 
 ## Closure rule
 
-All four 0.0.148 modes execute diagnostic derivatives. A 4/4 result cannot close exact Step 35. Cancellation is INCONCLUSIVE.
+All four 0.0.149 modes execute diagnostic derivatives. A 4/4 result cannot close exact Step 35. Cancellation is INCONCLUSIVE.

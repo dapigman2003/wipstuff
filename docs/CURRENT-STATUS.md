@@ -1,8 +1,15 @@
 # Current status
 
-## Active candidate — Step 35.0.25 / 0.0.148 (148)
+## Active candidate — Step 35.0.26 / 0.0.149 (149)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
+
+
+## Step 35.0.26 / 0.0.149 Gate-D observability + Codemagic cache
+
+The current device observation has reached Gate D on 0.0.148, but Gate D can appear stationary because its nested `SteamOfflineInstallInspection` did not forward progress and a single large PCK hash could consume a long interval without changing the file count. 0.0.149 preserves the proven Godot bridge and Gate-C resolver contract while forwarding the existing OfflineReady file/byte telemetry and displaying a dedicated Gate-D progress bar, latest verified file, byte totals, observed throughput, and a one-second elapsed/last-progress heartbeat so a long single-file SHA-1 no longer looks dead.
+
+Codemagic already restores the NuGet caches, source-built Godot archive, and the large iOS arm64 `obj` cache. 0.0.149 additionally caches `$HOME/.dotnet`, verifies the exact pinned SDK/workload marker, and skips the network workload install only when `ios` is actually registered for workload set `9.0.314.3`. This is build-time only and does not change the game/bridge execution contract.
 
 
 ## Physical 0.0.144 reverse-binding frontier

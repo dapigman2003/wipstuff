@@ -1,6 +1,6 @@
 workflows:
   ios-canonical:
-    name: Step 35.0.25 - Host Regression Contract Correction
+    name: Step 35.0.26 - Gate D Progress + Warm Toolchain Cache
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -19,13 +19,18 @@ workflows:
         - $CM_BUILD_DIR/.nuget/packages
         - $HOME/.cache/sts2launcher/godot-step15
 
+        # Reuse the exact pinned .NET SDK + iOS workload instead of downloading/installing
+        # 9.0.314 / 9.0.314.3 on every canonical run. The build script still verifies
+        # the SDK version and workload marker before trusting this cache.
+        - $HOME/.dotnet
+
         # Dominant Step-32 timing sink: .NET iOS publish/AOT intermediates.
         # Cache only the canonical Release/net9.0-ios/ios-arm64 intermediate tree;
         # MSBuild remains responsible for invalidating inputs that actually changed.
         - $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 
     scripts:
-      - name: Validate, test, build, and verify Step 35.0.25
+      - name: Validate, test, build, and verify Step 35.0.26
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
