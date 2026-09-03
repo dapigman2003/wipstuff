@@ -1,6 +1,6 @@
 # Current status
 
-## Active candidate — Step 35.0.23 / 0.0.146 (146)
+## Active candidate — Step 35.0.24 / 0.0.147 (147)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
@@ -13,11 +13,17 @@ Run `20260902T1749100715980Z-pid32517-8963408799ff47c69d2afb674c3817cf` preserve
 
 Run `20260903T0329320479790Z-pid37654-cb70acd45f2d48049455249a539c60bd` re-proved the private GodotSharp 1,800-byte / 225-pointer handoff (`NativeFuncs.Initialize` returned with `initialized=true`) and then recorded `csharpLanguage=True`, `godotApiCacheUpdated=False`, `createManagedBindingCallback=False`, `reverseBindingReady=False`, and `godotDotNetInitialized=False`. 0.0.145 stopped at `CB_REVERSE_BINDING_NOT_READY_STOP`, did not invoke Gate C / ExecuteVeryEarly, and reached normal `RUN_END`. This is positive diagnostic evidence that the GS035 frontier is missing Godot native->managed managed-plugin/cache initialization rather than another managed->native callback-table defect.
 
-## Step 35.0.23 / 0.0.146 generated managed-plugin bridge bootstrap
+## Physical 0.0.146 managed-plugin bootstrap success / resolver-guard stop
 
-0.0.146 preserves the proven CORE-HANDOFF `NativeFuncs.Initialize` path, then verifies the admitted sts2 diagnostic clone's generated `GodotPlugins.Game.Main.InitializeFromGameProject` / `godotsharp_game_main_init` contract. In the existing launcher CLR it asks private GodotSharp to create the complete 37-pointer `Godot.Bridge.ManagedCallbacks` table and calls `ScriptManagerBridge.LookupScriptsInAssembly` on the admitted game derivative. A project-owned native bridge then validates and copies that complete exact-size struct into source-built Godot through `GDMonoCache::update_godot_api_cache`. The standard `GD_OnCoreApiAssemblyLoaded` reverse callback is invoked as a separate durable boundary. Natural Gate C runs only if the reverse cache is ready and that callback returns.
+Run `20260903T1603566955510Z-pid41300-dfbd3965930c42f7b5dc70da9a2cffbb` reproduced the proven 1,800-byte / 225-pointer managed->native handoff and then completed the generated reverse bridge. `ManagedCallbacks.Create(IntPtr)` returned a **296-byte table with 37 non-null pointers**; `ScriptManagerBridge.LookupScriptsInAssembly` returned; `GDMonoCache::update_godot_api_cache` adoption returned with `godotApiCacheUpdated=True`, `createManagedBindingCallback=True`, `reverseBindingReady=True`, `externalBridgeInstalled=True`; and the deliberate native->managed `GD_OnCoreApiAssemblyLoaded` signal returned successfully.
 
-The launcher still does **not** start another CLR, load the game native executable, fabricate individual callbacks, or claim/set Godot `GDMono::runtime_initialized`. This is a coordinated lifecycle compatibility experiment, not exact Step-35 closure.
+The bridge preparation itself caused exactly eight additional planned framework resolver requests / eight host loads and zero additional private loads, with initializer-bearing, rejected, and native activity all remaining zero. Immediately afterward Gate C failed normally with `InvalidDataException` **before target type binding** because the old callback-handoff snapshot still expected the pre-bootstrap resolver counts (`managed=2; host=1; private=1`) rather than the post-bootstrap state (`managed=10; host=9; private=1`). This is a resolver-contract defect in 0.0.146, not a failure of the managed-plugin bridge.
+
+## Step 35.0.24 / 0.0.147 post-bootstrap resolver baseline correction
+
+0.0.147 leaves the physically successful 0.0.146 bridge bootstrap unchanged. After `CB_MANAGED_PLUGIN_BOOTSTRAP_PASS`, it accepts only the exact measured eight-request/eight-host-load/zero-private-load bootstrap delta, requires zero initializer-bearing/rejected/native escape, records `CB_POST_BOOTSTRAP_RESOLVER_BASELINE_PASS`, and freezes those counters. Gate C then requires the resolver/native state to remain exactly unchanged from that post-bootstrap baseline before binding natural diagnostic `ExecuteVeryEarly`. Any extra request still fails closed.
+
+The launcher still does **not** start another CLR, load the game native executable, fabricate individual callbacks, or claim/set Godot `GDMono::runtime_initialized`. This remains diagnostic compatibility work, not exact Step-35 closure.
 
 The authoritative exact-transformed Step-35 execution frontier remains physical **0.0.126**: exact `ExecuteVeryEarly()` entered `MethodInfo.Invoke`, but no `C_INVOKE_RETURNED` was durably recorded. All later Step-35 binaries are diagnostic derivatives unless a separately defined closure candidate restores explicit exact-byte execution authority.
 

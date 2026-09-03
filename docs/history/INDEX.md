@@ -265,3 +265,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.22-PHYSICAL-REVERSE-BINDING-PREFLIGHT-0.0.145.txt` — physical CORE-HANDOFF cleanly reports CSharpLanguage present while Godot API cache/create-binding/reverse-binding/runtime-initialized are all absent, then stops normally before Gate C.
 - `steps/STEP-35.0.23-GODOT-MANAGED-PLUGIN-BRIDGE-BOOTSTRAP.md` — 0.0.146 reproduces the generated GodotPlugins managed bootstrap contract inside the existing launcher CLR, adopts the complete ManagedCallbacks struct into source-built Godot, isolates the standard core-API-loaded reverse callback, and keeps exact Step 35 open.
+
+## Step 35.0.23 physical bridge success / Step 35.0.24 resolver-baseline correction
+
+- `reports/STEP-35.0.23-PHYSICAL-MANAGED-PLUGIN-BOOTSTRAP-RESOLVER-GUARD-0.0.146.txt` — physical 0.0.146 completes 37-pointer ManagedCallbacks creation, game-script lookup, GDMonoCache reverse-cache adoption, reverseBindingReady=true, and GD_OnCoreApiAssemblyLoaded; Gate C then fails before target binding only because the old pre-bootstrap resolver snapshot rejects the exact eight-request bootstrap framework delta.
+- `steps/STEP-35.0.24-POST-BOOTSTRAP-RESOLVER-BASELINE-CORRECTION.md` — 0.0.147 preserves the successful bridge unchanged, validates that exact eight-request/eight-host-load/zero-private-load delta, seals a post-bootstrap resolver baseline, and requires zero further drift before natural Gate C.

@@ -32,7 +32,7 @@ public sealed partial class RootViewController
             $"CB_REVERSE_BINDING_STATE_BEFORE — csharpLanguage={hasCSharpLanguage}; godotApiCacheUpdated={apiCacheUpdated}; createManagedBindingCallback={hasCreateBindingCallback}; reverseBindingReady={reverseBindingReady}; externalBridgeInstalled={externalBridgeInstalled}; godotDotNetInitialized={GodotStep15NativeBridge.IsDotNetRuntimeInitialized}.");
 
         if (!hasCSharpLanguage || apiCacheUpdated || hasCreateBindingCallback || reverseBindingReady || externalBridgeInstalled || GodotStep15NativeBridge.IsDotNetRuntimeInitialized)
-            throw new InvalidOperationException("CORE-HANDOFF Step-35.0.23 requires the physically proven 0.0.145 baseline: CSharpLanguage present, Godot API cache/reverse callbacks absent, no prior external bridge, and no Godot-owned .NET runtime.");
+            throw new InvalidOperationException("CORE-HANDOFF Step-35.0.24 requires the physically proven 0.0.145 baseline: CSharpLanguage present, Godot API cache/reverse callbacks absent, no prior external bridge, and no Godot-owned .NET runtime.");
         WriteStep35CrashCheckpoint("CB_REVERSE_BASELINE_PASS — physical 0.0.145 missing-reverse-binding baseline reproduced; starting one coordinated generated-plugin bootstrap experiment instead of another callsite bypass/probe.");
 
         var managedCallbacksSizeBytes = GodotStep15NativeBridge.ManagedCallbacksSizeBytes;
@@ -73,6 +73,8 @@ public sealed partial class RootViewController
         if (!coreApiSignalReturned || !GodotStep15NativeBridge.DidExternalCoreApiSignalReturn)
             throw new InvalidOperationException("CORE-HANDOFF GD_OnCoreApiAssemblyLoaded signal failed: " + GodotStep15NativeBridge.LastError);
 
-        WriteStep35CrashCheckpoint("CB_MANAGED_PLUGIN_BOOTSTRAP_PASS — generated game-plugin managed substeps, complete reverse callback cache adoption, and standard core-API-loaded callback all returned; proceeding to the unchanged NATURAL Gate-C ExecuteVeryEarly diagnostic path. Godot GDMono runtime_initialized remains deliberately unclaimed by the launcher.");
+        WriteStep35CrashCheckpoint("CB_MANAGED_PLUGIN_BOOTSTRAP_PASS — generated game-plugin managed substeps, complete reverse callback cache adoption, and standard core-API-loaded callback all returned; sealing the exact physical 0.0.146 bootstrap resolver delta before unchanged NATURAL Gate C. Godot GDMono runtime_initialized remains deliberately unclaimed by the launcher.");
+        var resolverBaselineDetail = _transformedRealStS2VeryEarlyInitialization.SealGodotManagedPluginBootstrapResolverBaseline(WriteStep35CrashCheckpoint);
+        WriteStep35CrashCheckpoint("CB_POST_BOOTSTRAP_RESOLVER_BASELINE_RETURNED — " + resolverBaselineDetail);
     }
 }

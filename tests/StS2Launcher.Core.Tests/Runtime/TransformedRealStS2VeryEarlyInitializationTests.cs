@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.23 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.24 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -66,6 +66,27 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         StringAssert.Contains(checkpoints[0], "stage=initialization");
         StringAssert.Contains(checkpoints[0], "System.ArgumentException");
         Assert.IsFalse(checkpoints[0].Contains("CB_REVERSE_PREP_ENTRY", StringComparison.Ordinal));
+    }
+
+    [TestMethod]
+    public void GodotManagedPluginResolverBaselineRejectsMissingPreflightWithDurableFailure()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-post-bootstrap-resolver-baseline-validation");
+        using var subject = new TransformedRealStS2VeryEarlyInitialization(temp.Path, collectibleLoadContext: true)
+        {
+            DiagnosticMode = Step35DiagnosticMode.GodotCoreCallbackHandoff,
+        };
+        var checkpoints = new List<string>();
+
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() =>
+            subject.SealGodotManagedPluginBootstrapResolverBaseline(checkpoints.Add));
+
+        Assert.IsTrue(ex.Message.Contains("preflight", StringComparison.OrdinalIgnoreCase));
+        Assert.AreEqual(1, checkpoints.Count);
+        StringAssert.Contains(checkpoints[0], "CB_POST_BOOTSTRAP_RESOLVER_BASELINE_FAIL");
+        StringAssert.Contains(checkpoints[0], "stage=initialization");
+        StringAssert.Contains(checkpoints[0], "System.InvalidOperationException");
+        Assert.IsFalse(checkpoints[0].Contains("CB_POST_BOOTSTRAP_RESOLVER_BASELINE_PASS", StringComparison.Ordinal));
     }
 
     [TestMethod]

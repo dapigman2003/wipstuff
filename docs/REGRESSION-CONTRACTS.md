@@ -474,7 +474,7 @@ The following contracts are release-blocking for 0.0.144:
 
 0.0.144 must preserve CORE-HANDOFF table acquisition and one-time `NativeFuncs.Initialize` semantics from 0.0.143. It must not restore the FORWARD empty-args rewrite in CORE-HANDOFF, fabricate an `OSInstance`, or initialize Godot's competing managed runtime. The GodotSharp derivative must include entry markers for `InteropUtils.EngineGetSingleton`, `UnmanagedGetManaged`, `Marshaling.ConvertStringToNative`, `godotsharp_engine_get_singleton`, and the native-to-managed script/instance-binding callbacks when present.
 
-## Step 35.0.23 reverse-binding readiness contracts
+## Step 35.0.24 reverse-binding readiness contracts
 
 - CORE-HANDOFF must retain the exact 1,800-byte / 225-pointer `NativeFuncs.Initialize(IntPtr,int)` handoff.
 - The native readiness bridge may read only CSharpLanguage presence, `GDMonoCache::godot_api_cache_updated`, and `ScriptManagerBridge_CreateManagedForGodotObjectBinding` pointer presence.

@@ -278,7 +278,7 @@ The runtime design remained fail-closed: obtain the source-built Godot 4.5.1 run
 
 Physical 0.0.143 turns the callback-table hypothesis into positive evidence: the exact source-built table is accepted and previously fatal callback operations execute. The next investigation is the reverse native-to-managed object association needed by `OS.get_Singleton()`. 0.0.144 keeps runtime behavior fixed and increases observability only. If the next frontier is the managed-instance creation callback, the following design decision should address legitimate Godot managed-callback registration rather than fabricate wrappers.
 
-## Step 35.0.23 — managed-plugin bridge bootstrap
+## Step 35.0.24 — managed-plugin bridge bootstrap
 
-Physical 0.0.144 separated the interop problem into two directions, and 0.0.145 answered the reverse-state question: managed->native is working while CSharpLanguage exists without the Godot managed callback/cache lifecycle. 0.0.146 therefore deliberately hosts the generated Godot managed-plugin bridge contract inside the existing launcher CLR, adopts the complete reverse callback struct into the source-built engine, and uses the standard core-API-loaded callback plus natural Gate C as the next architectural proof. No additional local game-call substitution is introduced.
+Physical 0.0.144 separated the interop problem into two directions, and 0.0.145 answered the reverse-state question: managed->native is working while CSharpLanguage exists without the Godot managed callback/cache lifecycle. Physical 0.0.146 then proved that generated bridge contract end-to-end through reverse cache adoption and the standard core-API-loaded callback. Its only stop was the stale pre-bootstrap resolver snapshot. 0.0.147 therefore keeps the bridge unchanged, validates its exact measured framework-resolution delta, seals a post-bootstrap resolver baseline, and resumes natural Gate C. No additional local game-call substitution is introduced.
 

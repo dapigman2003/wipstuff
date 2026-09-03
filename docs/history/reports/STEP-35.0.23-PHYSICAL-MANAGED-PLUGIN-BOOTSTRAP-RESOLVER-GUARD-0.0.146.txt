@@ -1,0 +1,40 @@
+StS2 Launcher — Step 35.0.23 physical managed-plugin bootstrap / resolver-guard result — 0.0.146 (146)
+
+Run ID: 20260903T1603566955510Z-pid41300-dfbd3965930c42f7b5dc70da9a2cffbb
+Mode: GodotCoreCallbackHandoff
+Result: MANAGED-PLUGIN BOOTSTRAP CLOSED POSITIVE; GATE-C RESOLVER PRECHECK CONTRACT FAILED BEFORE TARGET BINDING; EXACT STEP 35 REMAINS OPEN.
+
+Observed sequence:
+- Gate A PASS and Gate B PASS.
+- Exact source-built Godot runtime interop table returned at 1,800 bytes / 225 pointers.
+- Private GodotSharp NativeFuncs.Initialize(IntPtr,int) returned with initialized=true.
+- Pre-bootstrap reverse state reproduced physical 0.0.145: CSharpLanguage=True while API cache/create-binding/reverse-binding/external bridge/runtime-initialized were false.
+- Generated GodotPlugins.Game.Main.InitializeFromGameProject contract verified at token 0x06000062 / entry point godotsharp_game_main_init.
+- Godot.Bridge.ManagedCallbacks layout verified as 37 unmanaged function-pointer fields / 296 bytes.
+- ManagedCallbacks.Create(IntPtr) returned; all 37 pointers were non-null.
+- ScriptManagerBridge.LookupScriptsInAssembly returned.
+- Managed bootstrap preparation added exactly eight managed framework requests / eight host loads / zero private loads beyond the callback-handoff snapshot; initializer-bearing/rejected/native activity remained zero.
+- Native GDMonoCache::update_godot_api_cache adoption returned true.
+- Reverse state after install: csharpLanguage=True; godotApiCacheUpdated=True; createManagedBindingCallback=True; reverseBindingReady=True; externalBridgeInstalled=True; godotDotNetInitialized=False.
+- Standard GD_OnCoreApiAssemblyLoaded callback returned true.
+- CB_MANAGED_PLUGIN_BOOTSTRAP_PASS was durable.
+- Gate C entered, then returned managed InvalidDataException before C_BIND_TYPE_START because the precheck still compared resolver counters with the old callback-handoff snapshot (managed=2; host=1; private=1) rather than the legitimate post-bootstrap state (managed=10; host=9; private=1).
+- No target type binding or ExecuteVeryEarly invocation occurred after that guard failure.
+- Managed finally/report path was reached normally.
+
+Exact bootstrap resolver delta observed after the callback-handoff snapshot:
+- System.Runtime, Version=9.0.0.0
+- System.Runtime.InteropServices, Version=9.0.0.0
+- System.Runtime.InteropServices, Version=8.0.0.0
+- System.Collections.Concurrent, Version=8.0.0.0
+- System.Runtime.Loader, Version=8.0.0.0
+- System.Threading, Version=8.0.0.0
+- System.Collections, Version=8.0.0.0
+- System.Linq, Version=8.0.0.0
+All were serviced only by exact persisted host-framework bindings.
+
+Interpretation:
+The coordinated reverse Godot managed-plugin lifecycle is physically viable in the existing launcher CLR: full callback creation, script registration, native cache adoption, reverse instance-binding readiness, and the first deliberate native->managed core-API callback all succeed. The 0.0.146 failure is a stale resolver-baseline accounting defect in Gate C, not a managed-plugin bootstrap compatibility failure.
+
+Safety/authority:
+This result is diagnostic only. It does not close exact Step 35, authorize ExecuteEssential/ExecuteDeferred, load the game native executable, start a second CLR, fabricate callbacks, or claim GDMono runtime_initialized ownership.

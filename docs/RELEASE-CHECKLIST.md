@@ -1,12 +1,12 @@
-# Release checklist — Step 35.0.23 / 0.0.146
+# Release checklist — Step 35.0.24 / 0.0.147
 
-Release identity: display/build `0.0.146 (146)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.147 (147)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
 
-Physical 0.0.145 is the trigger: the 1,800-byte / 225-pointer NativeFuncs handoff passed, then CSharpLanguage was present while API cache/create-binding/reverse-binding/runtime-initialized were false; Gate C was safely skipped and the run ended normally. 0.0.146 replaces further marker-by-marker probing with one coordinated generated Godot managed-plugin bridge bootstrap.
+Physical 0.0.146 is the trigger: the 37-pointer managed callback table, script registration, reverse-cache adoption, and GD_OnCoreApiAssemblyLoaded all returned successfully. Gate C then failed before target binding only because its resolver guard still used the pre-bootstrap callback-handoff counters. 0.0.147 preserves the bridge unchanged and seals an exact post-bootstrap resolver baseline.
 
 Before handoff/build:
 
-- [ ] release identity is exactly `0.0.146 (146)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] release identity is exactly `0.0.147 (147)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
 - [ ] `bash scripts/validate.sh` passes;
 - [ ] `bash scripts/test.sh` passes on a host with `dotnet`;
 - [ ] pinned Godot 4.5.1 iOS source builds with `module_mono_enabled=yes` and standalone native-link preflight passes;
@@ -25,4 +25,4 @@ Before handoff/build:
 - [ ] runtime native **game** resolution remains rejected; no game executable/library, later OneTimeInitialization phase, entry point, arbitrary resolver fallback, or Harmony/MonoMod runtime patching is introduced;
 - [ ] no proprietary game DLL/native app bundle/signing secret/credential is included in the source archive.
 
-Physical testing: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. Preserve the run-correlated reports. A 0.0.146 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.
+Physical testing: fresh process → Step 15 Gates A–C → without force-quitting, Step 35 CORE-HANDOFF once. Preserve the run-correlated reports. A 0.0.147 A–D 4/4 result is diagnostic completion only and cannot close exact Step 35.
