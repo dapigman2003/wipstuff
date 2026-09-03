@@ -168,3 +168,8 @@ The game native executable remains data-only evidence and is never loaded by the
 ## Step 35.0.21 singleton acquisition boundary
 
 Physical 0.0.143 proves the project-owned Godot callback table can drive the private GodotSharp derivative through callback-backed dictionary, StringName, and method-bind operations. The next boundary is reverse object association: `OS.get_Singleton()` must obtain the native OS singleton and map it to a managed `OSInstance`. 0.0.144 instruments that boundary without creating a surrogate singleton or bypassing Godot semantics.
+
+## Step 35.0.22 reverse-binding readiness boundary
+
+The Step-15 source-built Godot native module now exposes two distinct interop-state observations. The already proven 225-pointer runtime interop table supplies managed->native GodotSharp callbacks. Physical 0.0.144 shows `UnmanagedGetManaged` then requires native->managed instance-binding state. 0.0.145 reads CSharpLanguage/GDMonoCache readiness only; it does not populate the managed callback cache. Gate C is fail-closed when reverse binding is absent.
+

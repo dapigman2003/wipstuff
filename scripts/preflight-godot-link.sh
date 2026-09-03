@@ -84,6 +84,10 @@ int sts2_step15_is_metal_layer_ready(void);
 int sts2_step15_is_runtime_interop_ready(void);
 int sts2_step15_has_dotnet_feature(void);
 int sts2_step15_is_dotnet_runtime_initialized(void);
+int sts2_step15_has_csharp_language_singleton(void);
+int sts2_step15_is_godot_api_cache_updated(void);
+int sts2_step15_has_managed_create_binding_callback(void);
+int sts2_step15_is_reverse_binding_ready(void);
 const void *sts2_step15_get_runtime_interop_funcs(int *);
 int sts2_step15_touch_marker_ready(void);
 }
@@ -104,6 +108,10 @@ int main(int argc, char **argv) {
     volatile IntFn interop_ready_fn = &sts2_step15_is_runtime_interop_ready;
     volatile IntFn dotnet_feature_fn = &sts2_step15_has_dotnet_feature;
     volatile IntFn dotnet_initialized_fn = &sts2_step15_is_dotnet_runtime_initialized;
+    volatile IntFn csharp_language_fn = &sts2_step15_has_csharp_language_singleton;
+    volatile IntFn api_cache_fn = &sts2_step15_is_godot_api_cache_updated;
+    volatile IntFn create_binding_fn = &sts2_step15_has_managed_create_binding_callback;
+    volatile IntFn reverse_binding_fn = &sts2_step15_is_reverse_binding_ready;
     volatile InteropFn interop_fn = &sts2_step15_get_runtime_interop_funcs;
     volatile IntFn touch_fn = &sts2_step15_touch_marker_ready;
 
@@ -112,7 +120,7 @@ int main(int argc, char **argv) {
     }
     if (argc == -2) {
         int size = 0;
-        return interop_fn(&size) == nullptr || size <= 0 || interop_ready_fn() < 0 || dotnet_feature_fn() < 0 || dotnet_initialized_fn() < 0;
+        return interop_fn(&size) == nullptr || size <= 0 || interop_ready_fn() < 0 || dotnet_feature_fn() < 0 || dotnet_initialized_fn() < 0 || csharp_language_fn() < 0 || api_cache_fn() < 0 || create_binding_fn() < 0 || reverse_binding_fn() < 0;
     }
     return version_fn() == nullptr || restart_fn() < 0 || metal_fn() < 0 || touch_fn() < 0;
 }

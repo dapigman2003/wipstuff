@@ -14,6 +14,7 @@
 #include "modules/mono/csharp_script.h"
 #include "modules/mono/glue/runtime_interop.h"
 #include "modules/mono/mono_gd/gd_mono.h"
+#include "modules/mono/mono_gd/gd_mono_cache.h"
 #include "core/io/dir_access.h"
 #include "core/io/file_access.h"
 #include "core/os/os.h"
@@ -354,6 +355,30 @@ STS2_STEP15_EXPORT int sts2_step15_has_dotnet_feature() {
 STS2_STEP15_EXPORT int sts2_step15_is_dotnet_runtime_initialized() {
     GDMono *gdmono = GDMono::get_singleton();
     return gdmono != nullptr && gdmono->is_runtime_initialized() ? 1 : 0;
+}
+
+// Step 35.0.22 diagnostic-only reverse-binding readiness. These exports
+// read existing Godot C# native-module state only. They do not initialize the
+// Godot-managed runtime, mutate GDMonoCache, create instance bindings, or call
+// any managed callback.
+STS2_STEP15_EXPORT int sts2_step15_has_csharp_language_singleton() {
+    return CSharpLanguage::get_singleton() != nullptr ? 1 : 0;
+}
+
+STS2_STEP15_EXPORT int sts2_step15_is_godot_api_cache_updated() {
+    return GDMonoCache::godot_api_cache_updated ? 1 : 0;
+}
+
+STS2_STEP15_EXPORT int sts2_step15_has_managed_create_binding_callback() {
+    return GDMonoCache::managed_callbacks.ScriptManagerBridge_CreateManagedForGodotObjectBinding != nullptr ? 1 : 0;
+}
+
+STS2_STEP15_EXPORT int sts2_step15_is_reverse_binding_ready() {
+    return CSharpLanguage::get_singleton() != nullptr &&
+                   GDMonoCache::godot_api_cache_updated &&
+                   GDMonoCache::managed_callbacks.ScriptManagerBridge_CreateManagedForGodotObjectBinding != nullptr
+            ? 1
+            : 0;
 }
 
 STS2_STEP15_EXPORT const void *sts2_step15_get_runtime_interop_funcs(int *r_size) {

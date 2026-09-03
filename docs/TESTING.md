@@ -1,6 +1,6 @@
-# Testing — Step 35.0.21
+# Testing — Step 35.0.22
 
-Active candidate: Step 35.0.21 / `0.0.144 (144)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.22 / `0.0.145 (145)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
 ## Build/host prerequisites
 
@@ -53,3 +53,7 @@ Resolver events alone do not establish causation. Interpret them with same-run P
 ## Closure rule
 
 All four 0.0.144 modes execute diagnostic derivatives. A 4/4 result cannot close exact Step 35. Cancellation is INCONCLUSIVE.
+
+## 0.0.145 CORE-HANDOFF device procedure
+
+Use a fresh app process. Run Step 15 Gates A-C first and leave that engine live. Then run Step 35 CORE-HANDOFF once. Preserve the run-correlated Step35 journal/recon/static-map/last-checkpoint files. The expected diagnostic outcome is `CB_INITIALIZE_PASS`, then `CB_REVERSE_BINDING_STATE`; if reverse binding is absent the run should stop cleanly at `CB_REVERSE_BINDING_NOT_READY_STOP` with no Gate-C invocation. Do not force a second CORE-HANDOFF in the same process.

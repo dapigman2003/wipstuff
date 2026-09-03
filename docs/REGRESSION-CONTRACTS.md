@@ -473,3 +473,13 @@ The following contracts are release-blocking for 0.0.144:
 ## Step 35.0.21 singleton-localization contracts
 
 0.0.144 must preserve CORE-HANDOFF table acquisition and one-time `NativeFuncs.Initialize` semantics from 0.0.143. It must not restore the FORWARD empty-args rewrite in CORE-HANDOFF, fabricate an `OSInstance`, or initialize Godot's competing managed runtime. The GodotSharp derivative must include entry markers for `InteropUtils.EngineGetSingleton`, `UnmanagedGetManaged`, `Marshaling.ConvertStringToNative`, `godotsharp_engine_get_singleton`, and the native-to-managed script/instance-binding callbacks when present.
+
+## Step 35.0.22 reverse-binding readiness contracts
+
+- CORE-HANDOFF must retain the exact 1,800-byte / 225-pointer `NativeFuncs.Initialize(IntPtr,int)` handoff.
+- The native readiness bridge may read only CSharpLanguage presence, `GDMonoCache::godot_api_cache_updated`, and `ScriptManagerBridge_CreateManagedForGodotObjectBinding` pointer presence.
+- It must not call `GDMono::initialize`, `GDMonoCache::update_godot_api_cache`, or any managed reverse-binding callback.
+- A false aggregate readiness result must durably emit `CB_REVERSE_BINDING_NOT_READY_STOP` and return before Gate C/`ExecuteVeryEarly`.
+- A true result may continue the unchanged natural CORE-HANDOFF diagnostic path.
+- Physical 0.0.144 GS035 is diagnostic provenance; it does not close exact Step 35.
+

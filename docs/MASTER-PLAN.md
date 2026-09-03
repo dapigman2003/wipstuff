@@ -277,3 +277,8 @@ The runtime design remained fail-closed: obtain the source-built Godot 4.5.1 run
 ## Step 35.0.21 — singleton acquisition localization
 
 Physical 0.0.143 turns the callback-table hypothesis into positive evidence: the exact source-built table is accepted and previously fatal callback operations execute. The next investigation is the reverse native-to-managed object association needed by `OS.get_Singleton()`. 0.0.144 keeps runtime behavior fixed and increases observability only. If the next frontier is the managed-instance creation callback, the following design decision should address legitimate Godot managed-callback registration rather than fabricate wrappers.
+
+## Step 35.0.22 — reverse-binding readiness probe
+
+Physical 0.0.144 separated the interop problem into two directions: the managed->native callback table is working, while native->managed Godot object association reaches GS035 and hard-terminates before create-binding. 0.0.145 measures whether Godot's managed callback/cache state exists after the Step-15 smoke engine and stops before the known crash when it does not. The result decides whether the next architecture must deliberately host the legitimate Godot managed-plugin lifecycle rather than extend local compatibility substitutions.
+

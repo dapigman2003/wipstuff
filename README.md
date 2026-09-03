@@ -1,8 +1,8 @@
 # StS2 Launcher — Step 35
 
-Active candidate: **Step 35.0.21 / 0.0.144 (144)** — CORE-HANDOFF singleton-acquisition localization.
+Active candidate: **Step 35.0.22 / 0.0.145 (145)** — CORE-HANDOFF reverse-binding readiness probe.
 
-0.0.143 reached device execution. With Step 15 already live, CORE-HANDOFF obtained the exact source-built Godot 4.5.1 runtime interop table (1,800 bytes / 225 pointers), entered and returned from private GodotSharp `NativeFuncs.Initialize(IntPtr,int)`, verified `initialized=true`, cleared the former dictionary/StringName callback crashes, completed the OS method-bind sweep, entered `Godot.OS.GetCmdlineArgs()`, and stopped at `Godot.OS.get_Singleton()`. 0.0.144 preserves that runtime behavior and expands only singleton acquisition/native-to-managed wrapping diagnostics.
+0.0.144 reached the next device frontier. With Step 15 already live, CORE-HANDOFF preserved the successful 1,800-byte / 225-pointer managed->native callback handoff, obtained the native OS singleton, entered `InteropUtils.UnmanagedGetManaged`, completed the script-instance query far enough to evaluate its Godot bool, and hard-terminated inside `NativeFuncs.godotsharp_internal_unmanaged_get_instance_binding_managed(IntPtr)` before the create-binding callback. 0.0.145 keeps that runtime path unchanged but checks Godot native->managed binding readiness before Gate C and stops safely if it is absent.
 
 Steps 01–26 are closed. Step 27 is CLOSED NEGATIVE. Step 28 is CLOSED POSITIVE 5/5. Steps 29–34 are CLOSED POSITIVE 4/4. **Step 35 remains OPEN.** The exact transformed authority is unchanged: the natural target remains the closed Step-32 `MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()` image, source token `0x06007D02`, async MoveNext source token `0x0600BC71`. Diagnostic derivatives measure compatibility frontiers but cannot close exact Step 35.
 
@@ -12,13 +12,13 @@ That independent filesystem reproduction makes the boundary general rather than 
 
 The owner-uploaded game executable used for native reconnaissance is 179,706,736 bytes, SHA-256 `7fadae8d46f0074ba745bc3beebe31a13df5fafed2f2ac69cd68b3c5dd8508e6`, exactly matching the main executable inventoried by the 0.0.140 report. Its Godot 4.5.1 native side exposes the standard `godotsharp::get_runtime_interop_funcs(int&)` producer rather than a game-specific callback format.
 
-0.0.144 preserves all three prior controls and the physically successful fourth CORE-HANDOFF mode:
+0.0.145 preserves all three prior controls and the physically successful fourth CORE-HANDOFF mode:
 
 - **NATURAL** — unchanged original Godot Dictionary/OS path; fresh-process/no-Godot control.
 - **OS-RECON** (`ManagedDictionaryCompatibility`) — exactly four BCL `Dictionary<string,string>` substitutions; natural `Godot.OS.GetCmdlineArgs()` retained; fresh-process/no-Godot control.
 - **FORWARD** (`ManagedCommandLineCompatibility`) — the same four Dictionary substitutions plus exactly one local `new string[0]` provider replacing `Godot.OS.GetCmdlineArgs()` in `CommandLineHelper..cctor`; fresh-process/no-Godot control.
 - **CORE-HANDOFF** (`GodotCoreCallbackHandoff`) — requires the already-proven project-owned Step-15 smoke engine in the same process. The native bridge requires Godot Engine/ProjectSettings/CSharpLanguage/GDMono scaffolding, rejects a `dotnet` project feature or an already initialized Godot .NET runtime, obtains the exact source-built Godot 4.5.1 runtime-interoperability callback pointer/size, verifies a non-null pointer-aligned table with no null entries, and passes it exactly once to the verified private GodotSharp derivative's `NativeFuncs.Initialize(IntPtr,int)` before the natural Step-35 diagnostic invocation.
 
-CORE-HANDOFF does **not** load the game's native executable, does not fabricate function pointers, does not invoke the game entry point, and does not authorize ExecuteEssential/ExecuteDeferred, arbitrary resolver fallback, or Harmony/MonoMod runtime patching. The Step-15 smoke project itself has no `dotnet` feature. A 0.0.144 diagnostic 4/4 still cannot close exact Step 35.
+CORE-HANDOFF does **not** load the game's native executable, does not fabricate function pointers, does not invoke the game entry point, and does not authorize ExecuteEssential/ExecuteDeferred, arbitrary resolver fallback, or Harmony/MonoMod runtime patching. The Step-15 smoke project itself has no `dotnet` feature. In CORE-HANDOFF, 0.0.145 additionally reads CSharpLanguage/GDMonoCache reverse-binding readiness after the successful callback-table handoff. If that state is absent, it records a fail-closed pre-Gate-C stop rather than repeating the known GS035 hard termination. A diagnostic 4/4 still cannot close exact Step 35.
 
 Start with `docs/CURRENT-STATUS.md`, `docs/REGRESSION-CONTRACTS.md`, and `docs/TESTING.md`. Historical step/evidence records are under `docs/history/` and mirrored in `history.zip`. The source archive contains no proprietary game-managed/native payload.

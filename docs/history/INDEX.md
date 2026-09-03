@@ -255,3 +255,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.20-PHYSICAL-CORE-HANDOFF-SINGLETON-FRONTIER-0.0.143.txt` — physical CORE-HANDOFF accepts the exact 1,800-byte/225-pointer callback table, clears the old dictionary/StringName boundaries, and stops at `Godot.OS::get_Singleton()`.
 - `steps/STEP-35.0.21-GODOT-SINGLETON-ACQUISITION-LOCALIZATION.md` — 0.0.144 keeps CORE-HANDOFF natural and expands only singleton acquisition/native-to-managed wrapping diagnostics.
+
+## Step 35.0.21–35.0.22 reverse-binding frontier
+
+- `reports/STEP-35.0.21-PHYSICAL-REVERSE-BINDING-FRONTIER-0.0.144.txt` — physical CORE-HANDOFF reaches native OS singleton lookup, `UnmanagedGetManaged`, script-instance query, and stops inside GS035 instance-binding retrieval before GS036 create-binding.
+- `steps/STEP-35.0.22-GODOT-REVERSE-BINDING-READINESS-PROBE.md` — 0.0.145 adds read-only Godot native->managed callback/cache readiness telemetry and a fail-closed pre-Gate-C stop.

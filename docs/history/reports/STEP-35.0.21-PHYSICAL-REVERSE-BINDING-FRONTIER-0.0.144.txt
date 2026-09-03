@@ -1,0 +1,28 @@
+STEP 35.0.21 PHYSICAL REVERSE-BINDING FRONTIER — 0.0.144
+
+Run ID: 20260902T1749100715980Z-pid32517-8963408799ff47c69d2afb674c3817cf
+App: 0.0.144 (144)
+Mode: GodotCoreCallbackHandoff
+
+Prerequisite
+- Step 15 Gates A-C had already passed in the same process.
+- CORE-HANDOFF retained natural sts2/GodotSharp behavior and supplied only the project-owned source-built Godot 4.5.1 runtime interop table.
+
+Observed result
+- Gate A/B and callback-table handoff passed.
+- Natural ExecuteVeryEarly progressed through OS static initialization and method-bind setup.
+- Godot.OS.GetCmdlineArgs entered.
+- Godot.OS.get_Singleton entered.
+- InteropUtils.EngineGetSingleton entered.
+- Marshaling.ConvertStringToNative entered.
+- NativeFuncs.godotsharp_engine_get_singleton entered and returned far enough for UnmanagedGetManaged to execute.
+- InteropUtils.UnmanagedGetManaged entered.
+- NativeFuncs.godotsharp_internal_unmanaged_get_script_instance_managed entered and returned far enough for GodotBoolExtensions.ToBool.
+- Final durable marker: INMETHOD_GS035 — NativeFuncs.godotsharp_internal_unmanaged_get_instance_binding_managed(IntPtr).
+- INMETHOD_GS036 — godotsharp_internal_unmanaged_instance_binding_create_managed was not reached.
+
+Interpretation
+The source-built 1,800-byte / 225-pointer runtime interop table continues to function for managed->native GodotSharp calls. Native OS singleton lookup itself is no longer the frontier. The hard termination is localized to the native->managed instance-binding callback used by UnmanagedGetManaged after no usable script-instance binding was returned. This identifies a second interop direction: Godot native code requires its managed callback/cache state for object association.
+
+Closure status
+Diagnostic evidence only. Exact Step 35 remains OPEN; exact transformed authority and later-boundary prohibitions are unchanged.

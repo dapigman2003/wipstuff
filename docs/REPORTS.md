@@ -1,6 +1,6 @@
 # Reports
 
-Step 35.0.21 uses immutable same-run output-only telemetry. 0.0.144 preserves the physically successful 0.0.143 CORE-HANDOFF runtime path and expands only the singleton acquisition/native-to-managed wrapping marker/reconnaissance closure. Preserve `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, and the normal Step-35 result report.
+Step 35.0.22 uses immutable same-run output-only telemetry. Physical 0.0.144 localized the next frontier to GS035 native instance-binding retrieval. 0.0.145 preserves the successful callback handoff and adds `CB_REVERSE_BINDING_STATE`, `CB_REVERSE_BINDING_NOT_READY_STOP`, and `CB_REVERSE_BINDING_READY_PASS` before Gate C. Preserve `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, and the normal Step-35 result report.
 
 The static map is derived from the already verified exact transformed sts2 image before CLR admission and is never runtime input. The Godot/native reconnaissance report is likewise read-only and pre-CLR; it retains GodotSharp P/Invoke/calli/callback-field inventory plus bounded Mach-O dependency/rpath/symbol/string inspection.
 

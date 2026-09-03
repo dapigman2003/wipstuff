@@ -66,6 +66,18 @@ internal static class GodotStep15NativeBridge
     [DllImport(InternalLibrary, EntryPoint = "sts2_step15_is_dotnet_runtime_initialized", CallingConvention = CallingConvention.Cdecl)]
     private static extern int IsDotNetRuntimeInitializedNative();
 
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_has_csharp_language_singleton", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int HasCSharpLanguageSingletonNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_is_godot_api_cache_updated", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int IsGodotApiCacheUpdatedNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_has_managed_create_binding_callback", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int HasManagedCreateBindingCallbackNative();
+
+    [DllImport(InternalLibrary, EntryPoint = "sts2_step15_is_reverse_binding_ready", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int IsReverseBindingReadyNative();
+
     [DllImport(InternalLibrary, EntryPoint = "sts2_step15_get_runtime_interop_funcs", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr GetRuntimeInteropFunctionsNative(out int sizeBytes);
 
@@ -85,6 +97,11 @@ internal static class GodotStep15NativeBridge
     public static bool IsRuntimeInteropReady => IsRuntimeInteropReadyNative() != 0;
     public static bool HasDotNetFeature => HasDotNetFeatureNative() != 0;
     public static bool IsDotNetRuntimeInitialized => IsDotNetRuntimeInitializedNative() != 0;
+
+    public static bool HasCSharpLanguageSingleton => HasCSharpLanguageSingletonNative() != 0;
+    public static bool IsGodotApiCacheUpdated => IsGodotApiCacheUpdatedNative() != 0;
+    public static bool HasManagedCreateBindingCallback => HasManagedCreateBindingCallbackNative() != 0;
+    public static bool IsReverseBindingReady => IsReverseBindingReadyNative() != 0;
 
     public static IntPtr GetRuntimeInteropFunctions(out int sizeBytes) =>
         GetRuntimeInteropFunctionsNative(out sizeBytes);
