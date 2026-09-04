@@ -1,6 +1,6 @@
 workflows:
   ios-canonical:
-    name: Step 35.0.27 - Exact Authority Closure + Gate D Finalization
+    name: Step 35.0.28 - Exact Authority Closure + Gate D Finalization
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -30,7 +30,7 @@ workflows:
         - $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 
     scripts:
-      - name: Validate, test, build, and verify Step 35.0.27
+      - name: Validate, test, build, and verify Step 35.0.28
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh

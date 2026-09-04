@@ -1,15 +1,15 @@
 # Current status
 
-## Active candidate — Step 35.0.27 / 0.0.150 (150)
+## Active candidate — Step 35.0.28 / 0.0.151 (151)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
 
-## Step 35.0.27 / 0.0.150 exact-authority closure + Gate-D finalization
+## Step 35.0.28 / 0.0.151 exact-authority compile integration correction
 
 Physical 0.0.149 completed diagnostic Gate C end-to-end. `C_INVOKE_RETURNED`, `C_TASK_CONFIRMED` with `RanToCompletion`, `C_WAIT_COMPLETED`, `C_POST_RESOLVER_PASS`, `C_PASS_RETURN`, `C_TASK_AWAIT_RESUMED passed=True`, and `C_RESULT_RECORD_PASS` are all durable. Gate D then began. The device UI subsequently displayed terminal 4/4 final source/diagnostic-clone/plan/dependency/context checks with a full progress bar, but the durable journal remained at `D_START` for an extended interval. Because 0.0.149 did not journal internal Gate-D finalization boundaries, this is not promoted to formal Gate-D PASS.
 
-0.0.150 adds durable `D_AUDIT_ENTRY`, `D_OFFLINE_READY_RETURNED`, `D_FINAL_CHECKS_PASS`, `D_RESULT_CONSTRUCT_START`, `D_RESULT_CONSTRUCT_RETURNED`, `D_FINAL_PROGRESS_EMITTED`, `D_TASK_RETURN_START`, `D_TASK_AWAIT_RESUMED`, and `D_RESULT_RECORD_PASS` boundaries, while keeping Gate-D progress on compact UI controls. It also adds `GodotCoreExactClosure`: Gate B admits the exact closed Step-32 transformed sts2 bytes, the strict context resolves exact prepared GodotSharp instead of the diagnostic override, the already-proven 225-pointer/37-pointer bridge is reproduced, and Gate C invokes the exact transformed ExecuteVeryEarly authority once.
+0.0.150 added durable `D_AUDIT_ENTRY`, `D_OFFLINE_READY_RETURNED`, `D_FINAL_CHECKS_PASS`, `D_RESULT_CONSTRUCT_START`, `D_RESULT_CONSTRUCT_RETURNED`, `D_FINAL_PROGRESS_EMITTED`, `D_TASK_RETURN_START`, `D_TASK_AWAIT_RESUMED`, and `D_RESULT_RECORD_PASS` boundaries, and introduced `GodotCoreExactClosure`: Gate B admits the exact closed Step-32 transformed sts2 bytes, the strict context resolves exact prepared GodotSharp instead of the diagnostic override, the already-proven 225-pointer/37-pointer bridge is reproduced, and Gate C invokes the exact transformed ExecuteVeryEarly authority once. Codemagic 0.0.150 passed **895/895 static validation**, **214/214 host tests**, and the Step-15 standalone native-link preflight, then iOS compilation stopped on exactly one `CS0103` in `RootViewController.Step35ManagedPluginBootstrap.cs` because the partial referenced `Step35DiagnosticMode` without importing `StS2Launcher.Core.Runtime`. 0.0.151 adds that namespace import and a static guard for it; the exact-closure/bridge/Gate-D runtime logic is otherwise unchanged.
 
 The source-built Godot 4.5.1 bridge remains an explicitly defined project-owned same-version prerequisite, not the exact game-native callback producer. Native game loading, later OneTimeInitialization phases, entry point, Harmony/MonoMod runtime patching, and arbitrary resolver fallback remain forbidden. The warm Codemagic `.NET 9.0.314` / workload `9.0.314.3` cache from 0.0.149 is preserved.
 

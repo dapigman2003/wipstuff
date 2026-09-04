@@ -559,7 +559,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.27 Godot bridge modes deliberately load either the hash-pinned GodotSharp diagnostic derivative or the exact prepared GodotSharp bytes into the dedicated context and reflect only the exact NativeFuncs.Initialize(IntPtr,int) callback-table receiver.")]
+        Justification = "Step 35.0.28 Godot bridge modes deliberately load either the hash-pinned GodotSharp diagnostic derivative or the exact prepared GodotSharp bytes into the dedicated context and reflect only the exact NativeFuncs.Initialize(IntPtr,int) callback-table receiver.")]
     public string RunGodotCoreCallbackHandoffInitialization(
         IntPtr callbackTable,
         int callbackTableSizeBytes,
@@ -660,15 +660,15 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.27 reflects the verified async initialization target from either the diagnostic clone or, only in explicit exact-authority mode, the exact closed transformed image. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
+        Justification = "Step 35.0.28 reflects the verified async initialization target from either the diagnostic clone or, only in explicit exact-authority mode, the exact closed transformed image. The dynamic payload is preserved by the physical copy/no-link runtime policy.")]
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.27 legacy modes reflect the separately verified diagnostic clone; explicit GodotCoreExactClosure reflects the exact closed transformed ExecuteVeryEarly authority after the same bridge prerequisite is established.")]
+        Justification = "Step 35.0.28 legacy modes reflect the separately verified diagnostic clone; explicit GodotCoreExactClosure reflects the exact closed transformed ExecuteVeryEarly authority after the same bridge prerequisite is established.")]
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026",
-        Justification = "Step 35.0.27 managed-plugin bootstrap preparation reflects only the exact GodotPlugins.Game.Main generated entry-point contract plus GodotSharp ManagedCallbacks.Create(IntPtr) and ScriptManagerBridge.LookupScriptsInAssembly(Assembly) in the already verified private assemblies.")]
+        Justification = "Step 35.0.28 managed-plugin bootstrap preparation reflects only the exact GodotPlugins.Game.Main generated entry-point contract plus GodotSharp ManagedCallbacks.Create(IntPtr) and ScriptManagerBridge.LookupScriptsInAssembly(Assembly) in the already verified private assemblies.")]
     public byte[] PrepareGodotManagedPluginReverseBridge(
         int managedCallbacksSizeBytes,
         Action<string>? crashCheckpoint)
@@ -1383,7 +1383,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[NULL PLATFORM CTOR IL]");
             lines.Add($"NullPlatform constructor: token=0x{nullPlatformConstructor.MetadataToken.ToUInt32():X8}; {nullPlatformConstructor.FullName}");
-            lines.Add("Step 35.0.27 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
+            lines.Add("Step 35.0.28 dynamic constructor markers use the exact-source CALLSITE ordinals below; the direct base-constructor call is intentionally not wrapped.");
             AppendInstructionMap(lines, nullPlatformConstructor);
         }
         if (commandLineHelperCctor is not null)
@@ -1392,7 +1392,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add("[COMMAND LINE HELPER CCTOR IL]");
             lines.Add($"CommandLineHelper cctor: token=0x{commandLineHelperCctor.MetadataToken.ToUInt32():X8}; {commandLineHelperCctor.FullName}");
             lines.Add($"CommandLineHelper cctor exact-source MaxStack={commandLineHelperCctor.Body.MaxStackSize}; instructions={commandLineHelperCctor.Body.Instructions.Count}; locals={commandLineHelperCctor.Body.Variables.Count}; handlers={commandLineHelperCctor.Body.ExceptionHandlers.Count}");
-            lines.Add("Step 35.0.27 retains this exact-source CALLSITE map for correlation. NATURAL, CORE-HANDOFF, and EXACT-CLOSURE preserve the Godot dictionary/GetCmdlineArgs contract; OS-RECON rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string> and keeps natural GetCmdlineArgs; FORWARD adds only the verified local empty-string-array provider substitution. All modes retain four stack-neutral critical markers.");
+            lines.Add("Step 35.0.28 retains this exact-source CALLSITE map for correlation. NATURAL, CORE-HANDOFF, and EXACT-CLOSURE preserve the Godot dictionary/GetCmdlineArgs contract; OS-RECON rewrites only the field/.ctor/set_Item/TryGetValue contract to System.Collections.Generic.Dictionary<string,string> and keeps natural GetCmdlineArgs; FORWARD adds only the verified local empty-string-array provider substitution. All modes retain four stack-neutral critical markers.");
             AppendInstructionMap(lines, commandLineHelperCctor);
         }
         if (commandLineHelperTryGetValue is not null)
@@ -1400,7 +1400,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             lines.Add(string.Empty);
             lines.Add("[COMMAND LINE HELPER TRYGETVALUE IL]");
             lines.Add($"CommandLineHelper TryGetValue: token=0x{commandLineHelperTryGetValue.MetadataToken.ToUInt32():X8}; {commandLineHelperTryGetValue.FullName}");
-            lines.Add("Step 35.0.27 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL, CORE-HANDOFF, and EXACT-CLOSURE preserve the Godot dictionary TryGetValue MemberRef; OS-RECON/FORWARD rewrite only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
+            lines.Add("Step 35.0.28 retains this exact-source CALLSITE map for correlation and emits no CLTV sweep markers. NATURAL, CORE-HANDOFF, and EXACT-CLOSURE preserve the Godot dictionary TryGetValue MemberRef; OS-RECON/FORWARD rewrite only that reference to the BCL Dictionary<string,string> equivalent. INMETHOD_027 proves method entry and outer NP002_POST proves return.");
             AppendInstructionMap(lines, commandLineHelperTryGetValue);
         }
         return string.Join("\n", lines);
@@ -1640,7 +1640,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
             // CommandLineHelper..cctor before instruction zero, so they stay retired. Physical 0.0.136
             // then entered the stack-neutral cctor and hard-terminated after CL_CRITICAL_001_PRE but before
             // the matching POST, localizing the physical interval to Godot.Collections.Dictionary<string,string>
-            // construction before _args assignment. Step 35.0.27 keeps the exact-source map and markers.
+            // construction before _args assignment. Step 35.0.28 keeps the exact-source map and markers.
             // NATURAL preserves the Godot dictionary path, OS-RECON rewrites only that private container contract,
             // and FORWARD adds exactly one already-localized GetCmdlineArgs provider substitution.
             commandLineCctorOriginalMaxStack = commandLineCctor.Body.MaxStackSize;

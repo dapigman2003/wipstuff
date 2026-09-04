@@ -284,3 +284,8 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.26-PHYSICAL-DIAGNOSTIC-GATE-C-PASS-GATE-D-FINAL-UI-BOUNDARY-0.0.149.txt` — physical 0.0.149 proves diagnostic ExecuteVeryEarly Invoke/Task await/confinement and Gate-C record PASS; the UI reaches terminal Gate-D 4/4 final-check progress while durable telemetry remains at D_START, so no formal Gate-D PASS is claimed.
 - `steps/STEP-35.0.27-EXACT-AUTHORITY-CLOSURE-GATE-D-FINALIZATION.md` — 0.0.150 adds durable Gate-D finalization boundaries and an explicit exact-authority mode using the exact closed transformed sts2 plus exact prepared GodotSharp through the physically proven source-built Godot bridge prerequisite.
+
+## Step 35.0.27 Codemagic compile stop / Step 35.0.28 compile integration
+
+- `reports/STEP-35.0.27-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.150.txt` — 0.0.150 passed 895/895 static, 214/214 host tests, and Step-15 native-link preflight, then iOS compile stopped on one missing `StS2Launcher.Core.Runtime` import in the managed-plugin bootstrap partial; no IPA/device conclusion.
+- `steps/STEP-35.0.28-EXACT-CLOSURE-COMPILE-INTEGRATION-CORRECTION.md` — 0.0.151 adds only the missing namespace import plus a static regression guard, preserving exact-closure/bridge/Gate-D runtime behavior.

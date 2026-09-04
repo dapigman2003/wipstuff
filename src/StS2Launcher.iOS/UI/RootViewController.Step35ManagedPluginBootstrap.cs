@@ -1,3 +1,4 @@
+using StS2Launcher.Core.Runtime;
 using StS2Launcher.iOS.Platform;
 
 namespace StS2Launcher.iOS;

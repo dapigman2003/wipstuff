@@ -1,0 +1,25 @@
+STEP 35.0.27 / 0.0.150 CODEMAGIC — EXACT-CLOSURE COMPILE-INTEGRATION FAILURE
+
+Release: 0.0.150 (150)
+Candidate: Step 35.0.27 — Exact Authority Closure + Gate D Finalization
+Codemagic UTC: 2026-09-04
+
+RESULT
+- Static validation: PASS — 895/895.
+- Host regression suite: PASS — 214/214 executed/passed, 0 failed.
+- Step-15 standalone native-link preflight: PASS.
+- iOS restore: PASS.
+- iOS compile/publish: FAIL before IPA creation.
+
+SOLE COMPILE ERROR
+src/StS2Launcher.iOS/UI/RootViewController.Step35ManagedPluginBootstrap.cs(9,96):
+error CS0103: The name 'Step35DiagnosticMode' does not exist in the current context
+
+CAUSE
+The Step-35 managed-plugin bootstrap partial referenced Step35DiagnosticMode.GodotCoreExactClosure but imported only StS2Launcher.iOS.Platform. Step35DiagnosticMode is declared in StS2Launcher.Core.Runtime. Other Step-35 UI partials already imported that namespace, which hid the integration defect from source-only static validation and host tests because the iOS project was not compiled locally.
+
+INTERPRETATION
+This is a compile-integration defect only. No 0.0.150 IPA was produced and no 0.0.150 device/runtime conclusion is available. The exact-authority/Gate-D runtime design was not exercised. The strongest proofs remain physical 0.0.149 diagnostic Gate-C PASS / Gate-D terminal UI boundary and Codemagic 0.0.150 static+host+native-link PASS.
+
+CORRECTION AUTHORITY
+0.0.151 / Step 35.0.28 adds exactly the missing `using StS2Launcher.Core.Runtime;` import to RootViewController.Step35ManagedPluginBootstrap.cs, adds a static validator guard so the partial cannot lose that import silently, and advances release/provenance identity. Exact-closure, bridge, resolver, and Gate-D runtime behavior remain unchanged.
