@@ -1,11 +1,11 @@
-# Testing — Step 35.0.28
+# Testing — Step 35.0.29
 
-Active candidate: Step 35.0.28 / `0.0.151 (151)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
+Active candidate: Step 35.0.29 / `0.0.152 (152)`, IPA `StS2-Launcher-Step-35.ipa`, TRX `step35.trx`, workflow `ios-canonical`.
 
 ## Build/host prerequisites
 
 1. `bash scripts/validate.sh` must pass.
-2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.142 proved **211/211 host tests PASS** after the callback-telemetry correction; 0.0.147 added the post-bootstrap resolver-baseline regression guard but Codemagic reached 212/213 host tests because one negative test required a stale `preflight` substring. 0.0.148 corrected that message assertion; 0.0.149 added Gate-D progress; 0.0.151 adds exact-mode and Gate-D finalization regressions. Require all current host tests to pass.
+2. `bash scripts/test.sh` must pass on a host with the pinned .NET SDK. 0.0.142 proved **211/211 host tests PASS** after the callback-telemetry correction; 0.0.147 added the post-bootstrap resolver-baseline regression guard but Codemagic reached 212/213 host tests because one negative test required a stale `preflight` substring. 0.0.148 corrected that message assertion; 0.0.149 added Gate-D progress; 0.0.150 added exact-mode and Gate-D finalization regressions; 0.0.152 changes only the bootstrap partial's declared-namespace import. Require all current host tests to pass.
 3. Codemagic must successfully rebuild the pinned Godot 4.5.1 iOS static archive with `module_mono_enabled=yes`, pass the standalone native-link preflight including the new managed-callback adoption exports, then build and verify the IPA.
 4. The exact Step-32 transformed source must requalify; protected Step 29–34 manifests must remain unchanged.
 
@@ -24,7 +24,7 @@ CORE-HANDOFF intentionally uses a different sequence:
 
 Do not run another Step-35 mode in that process after Gate B begins.
 
-## 0.0.151 EXACT-CLOSURE expected evidence
+## 0.0.152 EXACT-CLOSURE expected evidence
 
 The run should reproduce the full physically proven 0.0.146 bridge sequence through:
 
@@ -47,7 +47,7 @@ Both bridge modes must emit:
 
 If `CB_POST_BOOTSTRAP_RESOLVER_BASELINE_FAIL` appears, preserve the full resolver state: the generated bootstrap dependency closure drifted and Gate C must remain blocked. If the baseline passes but Gate C later observes another request before target binding, that new request is a separate resolver-boundary regression.
 
-Godot `GDMono::is_runtime_initialized()` is intentionally expected to remain false; 0.0.151 must not fake ownership of the launcher CLR. For the substantive test, choose **EXACT-CLOSURE** after Step 15. Expect Gate B to report exact transformed CLR authority, exact prepared GodotSharp in the bridge, `C_EXACT_AUTHORITY_PASS`, exact transformed token binding, successful Invoke/Task await if compatible, then the durable Gate-D finalization sequence.
+Godot `GDMono::is_runtime_initialized()` is intentionally expected to remain false; 0.0.152 must not fake ownership of the launcher CLR. For the substantive test, choose **EXACT-CLOSURE** after Step 15. Expect Gate B to report exact transformed CLR authority, exact prepared GodotSharp in the bridge, `C_EXACT_AUTHORITY_PASS`, exact transformed token binding, successful Invoke/Task await if compatible, then the durable Gate-D finalization sequence.
 
 
 ## Gate D live-progress / finalization expectation

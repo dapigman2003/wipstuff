@@ -1,0 +1,26 @@
+StS2 Launcher — Step 35.0.28 / 0.0.151 Codemagic iOS declared-namespace compile failure
+
+Codemagic evidence:
+- static validation: 899/899 PASS
+- host regression tests: 214/214 PASS
+- Step-15 standalone native-link preflight: PASS
+- iOS build: FAIL before IPA creation
+
+Single decisive compile error:
+src/StS2Launcher.iOS/UI/RootViewController.Step35ManagedPluginBootstrap.cs(1,25):
+CS0234: The type or namespace name 'Runtime' does not exist in the namespace 'StS2Launcher.Core'
+
+Cause:
+0.0.151 attempted `using StS2Launcher.Core.Runtime;` after the prior 0.0.150 missing-import error.
+The physical source declaration in src/StS2Launcher.Core/Runtime/Step35DiagnosticMode.cs is:
+`namespace StS2Launcher.Core;`
+The folder name `Runtime` is organizational only and is not part of the declared namespace.
+
+Interpretation:
+This is a compile-integration defect only. No iOS executable/IPA was produced and no exact-authority runtime behavior was exercised. The 0.0.150/0.0.151 exact-closure, managed-plugin bridge, resolver, and Gate-D runtime design is not implicated.
+
+Cache observation:
+The canonical cache report still showed `$HOME/.dotnet` as COLD/MISSING while Home NuGet, isolated iOS NuGet, the Godot Step-15 cache, and the 2.8 GiB iOS arm64 obj cache were restored. Because the workflow has not yet reached a successful cache-save cycle since `$HOME/.dotnet` was added, retain the current cache design for the next successful build before changing it again.
+
+Step 35.0.29 / 0.0.152 correction:
+Replace only the invalid bootstrap import with `using StS2Launcher.Core;`, add a static guard that pins the declared namespace, advance release/provenance identity, and preserve exact-closure/bridge/Gate-D runtime behavior unchanged.

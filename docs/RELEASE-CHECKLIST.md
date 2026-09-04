@@ -1,15 +1,15 @@
-# Release checklist — Step 35.0.28 / 0.0.151
+# Release checklist — Step 35.0.29 / 0.0.152
 
-Release identity: display/build `0.0.151 (151)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.152 (152)`, IPA `StS2-Launcher-Step-35.ipa`, workflow `ios-canonical`.
 
-Codemagic 0.0.150 proved 895/895 static validation, 214/214 host tests and Step-15 standalone native-link preflight, then iOS compile failed on one missing `StS2Launcher.Core.Runtime` import in `RootViewController.Step35ManagedPluginBootstrap.cs`. 0.0.151 corrects only that compile integration defect plus provenance/static guards; exact-closure runtime behavior is unchanged.
+Codemagic 0.0.151 proved 899/899 static validation, 214/214 host tests and Step-15 standalone native-link preflight, then iOS compile failed on one `CS0234` because `RootViewController.Step35ManagedPluginBootstrap.cs` imported `StS2Launcher.Core.Runtime` even though `Step35DiagnosticMode` is declared in `StS2Launcher.Core`. 0.0.152 corrects only that declared-namespace import plus provenance/static guards; exact-closure runtime behavior is unchanged.
 
-Physical 0.0.149 completed diagnostic Gate C and reached Gate D. Its UI displayed terminal Gate-D 4/4 final-check progress while durable telemetry remained at D_START, so no formal Gate-D PASS is claimed. 0.0.151 preserves the bridge/resolver behavior, adds durable Gate-D finalization boundaries and compact finalization UI, and adds the explicit exact-authority closure mode using exact transformed sts2 plus exact prepared GodotSharp.
+Physical 0.0.149 completed diagnostic Gate C and reached Gate D. Its UI displayed terminal Gate-D 4/4 final-check progress while durable telemetry remained at D_START, so no formal Gate-D PASS is claimed. 0.0.152 preserves the bridge/resolver behavior, adds durable Gate-D finalization boundaries and compact finalization UI, and adds the explicit exact-authority closure mode using exact transformed sts2 plus exact prepared GodotSharp.
 
 
 Before handoff/build:
 
-- [ ] release identity is exactly `0.0.151 (151)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
+- [ ] release identity is exactly `0.0.152 (152)` in csproj, Info.plist, shell release constants, UI source, testing docs and this checklist;
 - [ ] `bash scripts/validate.sh` passes;
 - [ ] `bash scripts/test.sh` passes on a host with `dotnet`;
 - [ ] pinned Godot 4.5.1 iOS source builds with `module_mono_enabled=yes` and standalone native-link preflight passes;
