@@ -1,0 +1,33 @@
+Step 35.0.26 / 0.0.149 physical diagnostic result
+Run ID: 20260904T0112314367240Z-pid46842-ee3b00f288eb462ba856e25c992fbe4b
+
+Physical authority
+- Candidate: 0.0.149 (149), Step 35.0.26.
+- Mode: GodotCoreCallbackHandoff diagnostic derivative.
+- Exact Step-32 source/transformed authority remained unchanged.
+
+Durable Gate-C result
+- Managed-plugin bootstrap and post-bootstrap resolver baseline succeeded.
+- C_RESOLVER_PRECHECK_PASS occurred before target binding.
+- MethodInfo.Invoke returned to the launcher.
+- The returned Task initially reported RanToCompletion.
+- The predeclared <=60-second await returned with status RanToCompletion.
+- C_POST_RESOLVER_PASS recorded initializerBearing=0, rejected=0, native=0.
+- C_PRIVATE_CONTEXT_ENUM_PASS recorded three private-context assemblies.
+- C_PASS_RETURN, C_TASK_AWAIT_RESUMED passed=True, and C_RESULT_RECORD_PASS all occurred.
+
+Gate-D observation
+- The durable journal then recorded D_START and no later D_* record because 0.0.149 did not yet journal Gate-D internal finalization boundaries.
+- Separately, the on-device UI visibly reached the terminal Gate-D progress state: 4/4 final source/diagnostic-clone/plan/dependency/context isolation checks, with a full progress bar.
+- The UI remained at that terminal progress state for an extended interval and the heartbeat continued advancing.
+- Because the terminal progress event was UI-only and no durable D_RESULT/RUN_END exists for this run, this report does NOT promote 0.0.149 to a formal Gate-D PASS or a diagnostic 4/4.
+
+Interpretation
+- Diagnostic Gate C is physically CLOSED POSITIVE for this run: ExecuteVeryEarly returned and awaited normally under the proven bidirectional Godot bridge with resolver/native confinement intact.
+- The remaining 0.0.149 issue is localized after the terminal Gate-D final-check progress event and before durable Gate-D/UI completion evidence.
+- Step 35 exact authority remains OPEN because 0.0.149 Gate B/C CLR-loaded diagnostic derivatives.
+
+Next candidate
+- 0.0.150 adds durable D_AUDIT_ENTRY / D_OFFLINE_READY_RETURNED / D_FINAL_CHECKS_PASS / D_RESULT_CONSTRUCT_* / D_FINAL_PROGRESS_EMITTED / D_TASK_RETURN_START / D_TASK_AWAIT_RESUMED boundaries and avoids heavy historical-detail relayout during Gate D.
+- In the same iteration it adds GodotCoreExactClosure: exact closed Step-32 transformed sts2 bytes plus exact prepared GodotSharp become the CLR authority inputs, while the already-proven source-built Godot 4.5.1 bridge prerequisite is reproduced unchanged.
+- No native game executable loading, later OneTimeInitialization phase, entry point, Harmony/MonoMod runtime patching, or arbitrary resolver fallback is authorized.

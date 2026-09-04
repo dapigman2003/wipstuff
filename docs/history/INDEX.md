@@ -279,3 +279,8 @@ The current architecture and plan always live one level up in `docs/`.
 ## Step 35.0.26 Gate-D observability / Codemagic warm-toolchain cache
 
 - `steps/STEP-35.0.26-GATE-D-PROGRESS-WARM-CACHE.md` — 0.0.149 preserves the proven bridge/Gate-C contract, adds Gate-D intra-file byte progress plus a dedicated UI progress surface, and caches/verifies the pinned .NET+iOS workload toolchain for repeat Codemagic runs.
+
+## Step 35.0.26 physical Gate-C pass / Step 35.0.27 exact-authority transition
+
+- `reports/STEP-35.0.26-PHYSICAL-DIAGNOSTIC-GATE-C-PASS-GATE-D-FINAL-UI-BOUNDARY-0.0.149.txt` — physical 0.0.149 proves diagnostic ExecuteVeryEarly Invoke/Task await/confinement and Gate-C record PASS; the UI reaches terminal Gate-D 4/4 final-check progress while durable telemetry remains at D_START, so no formal Gate-D PASS is claimed.
+- `steps/STEP-35.0.27-EXACT-AUTHORITY-CLOSURE-GATE-D-FINALIZATION.md` — 0.0.150 adds durable Gate-D finalization boundaries and an explicit exact-authority mode using the exact closed transformed sts2 plus exact prepared GodotSharp through the physically proven source-built Godot bridge prerequisite.

@@ -1,15 +1,17 @@
 # Current status
 
-## Active candidate — Step 35.0.26 / 0.0.149 (149)
+## Active candidate — Step 35.0.27 / 0.0.150 (150)
 
 Steps 01–26 are closed. Step 27 is **CLOSED NEGATIVE**. Step 28 is **CLOSED POSITIVE 5/5**. Steps 29–34 are **CLOSED POSITIVE 4/4**. **Step 35 remains OPEN.**
 
 
-## Step 35.0.26 / 0.0.149 Gate-D observability + Codemagic cache
+## Step 35.0.27 / 0.0.150 exact-authority closure + Gate-D finalization
 
-The current device observation has reached Gate D on 0.0.148, but Gate D can appear stationary because its nested `SteamOfflineInstallInspection` did not forward progress and a single large PCK hash could consume a long interval without changing the file count. 0.0.149 preserves the proven Godot bridge and Gate-C resolver contract while forwarding the existing OfflineReady file/byte telemetry and displaying a dedicated Gate-D progress bar, latest verified file, byte totals, observed throughput, and a one-second elapsed/last-progress heartbeat so a long single-file SHA-1 no longer looks dead.
+Physical 0.0.149 completed diagnostic Gate C end-to-end. `C_INVOKE_RETURNED`, `C_TASK_CONFIRMED` with `RanToCompletion`, `C_WAIT_COMPLETED`, `C_POST_RESOLVER_PASS`, `C_PASS_RETURN`, `C_TASK_AWAIT_RESUMED passed=True`, and `C_RESULT_RECORD_PASS` are all durable. Gate D then began. The device UI subsequently displayed terminal 4/4 final source/diagnostic-clone/plan/dependency/context checks with a full progress bar, but the durable journal remained at `D_START` for an extended interval. Because 0.0.149 did not journal internal Gate-D finalization boundaries, this is not promoted to formal Gate-D PASS.
 
-Codemagic already restores the NuGet caches, source-built Godot archive, and the large iOS arm64 `obj` cache. 0.0.149 additionally caches `$HOME/.dotnet`, verifies the exact pinned SDK/workload marker, and skips the network workload install only when `ios` is actually registered for workload set `9.0.314.3`. This is build-time only and does not change the game/bridge execution contract.
+0.0.150 adds durable `D_AUDIT_ENTRY`, `D_OFFLINE_READY_RETURNED`, `D_FINAL_CHECKS_PASS`, `D_RESULT_CONSTRUCT_START`, `D_RESULT_CONSTRUCT_RETURNED`, `D_FINAL_PROGRESS_EMITTED`, `D_TASK_RETURN_START`, `D_TASK_AWAIT_RESUMED`, and `D_RESULT_RECORD_PASS` boundaries, while keeping Gate-D progress on compact UI controls. It also adds `GodotCoreExactClosure`: Gate B admits the exact closed Step-32 transformed sts2 bytes, the strict context resolves exact prepared GodotSharp instead of the diagnostic override, the already-proven 225-pointer/37-pointer bridge is reproduced, and Gate C invokes the exact transformed ExecuteVeryEarly authority once.
+
+The source-built Godot 4.5.1 bridge remains an explicitly defined project-owned same-version prerequisite, not the exact game-native callback producer. Native game loading, later OneTimeInitialization phases, entry point, Harmony/MonoMod runtime patching, and arbitrary resolver fallback remain forbidden. The warm Codemagic `.NET 9.0.314` / workload `9.0.314.3` cache from 0.0.149 is preserved.
 
 
 ## Physical 0.0.144 reverse-binding frontier

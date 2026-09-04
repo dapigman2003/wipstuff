@@ -11,6 +11,7 @@ public sealed partial class RootViewController
     private DateTimeOffset? _step35GateDLastProgressAt;
     private string _step35GateDLastProgressText = "Gate D integrity audit progress will appear here.";
     private NSTimer? _step35GateDHeartbeatTimer;
+    private bool _step35GateDFinalChecksReported;
 
     private void AddStep35GateDProgressControls(UIStackView content)
     {
@@ -38,6 +39,7 @@ public sealed partial class RootViewController
         StopStep35GateDHeartbeat();
         _step35GateDProgressStartedAt = visible ? DateTimeOffset.UtcNow : null;
         _step35GateDLastProgressAt = visible ? DateTimeOffset.UtcNow : null;
+        _step35GateDFinalChecksReported = false;
         _step35GateDProgressView.Progress = 0f;
         _step35GateDProgressView.Hidden = !visible;
         _step35GateDProgressLabel.Hidden = !visible;
@@ -61,11 +63,10 @@ public sealed partial class RootViewController
 
         double overallFraction;
         string summary;
+        var terminalPostHashProgress = value.TotalBytes == 0 && value.TotalItems > 0 && value.ProcessedItems >= value.TotalItems;
         if (value.TotalBytes > 0)
         {
             var hashFraction = Math.Clamp((double)value.ProcessedBytes / value.TotalBytes, 0d, 1d);
-            // The receipt-backed full-tree hash is the dominant Gate-D operation. Reserve
-            // 75% of this UI indicator for it and the final 25% for the remaining isolation checks.
             overallFraction = hashFraction * 0.75d;
             var percent = hashFraction * 100d;
             summary = $"Gate D receipt hash — {percent:0.0}% • {value.ProcessedItems:N0}/{value.TotalItems:N0} files • {FormatStep35GateDBytes(value.ProcessedBytes)} / {FormatStep35GateDBytes(value.TotalBytes)}";
@@ -74,7 +75,9 @@ public sealed partial class RootViewController
         {
             var postHashFraction = Math.Clamp((double)value.ProcessedItems / value.TotalItems, 0d, 1d);
             overallFraction = 0.75d + (postHashFraction * 0.25d);
-            summary = $"Gate D post-hash isolation checks — {value.ProcessedItems:N0}/{value.TotalItems:N0}";
+            summary = terminalPostHashProgress
+                ? $"Gate D verification COMPLETE — {value.ProcessedItems:N0}/{value.TotalItems:N0}. Finalizing the Gate-D result…"
+                : $"Gate D post-hash isolation checks — {value.ProcessedItems:N0}/{value.TotalItems:N0}";
         }
         else
         {
@@ -84,6 +87,8 @@ public sealed partial class RootViewController
 
         _step35GateDProgressView.SetProgress((float)Math.Clamp(overallFraction, 0d, 1d), animated: true);
         _step35GateDLastProgressAt = DateTimeOffset.UtcNow;
+        if (terminalPostHashProgress)
+            _step35GateDFinalChecksReported = true;
 
         var rateText = string.Empty;
         if (value.ProcessedBytes > 0 && _step35GateDProgressStartedAt is { } started)
@@ -102,6 +107,20 @@ public sealed partial class RootViewController
             : $"\nLatest verifier file: {value.CurrentPath}";
         _step35GateDLastProgressText = summary + rateText + current;
         _step35GateDProgressLabel.Text = BuildStep35GateDHeartbeatText();
+    }
+
+    private void CompleteStep35GateDProgress(bool passed, string authority)
+    {
+        if (_step35GateDProgressView is null || _step35GateDProgressLabel is null)
+            return;
+        StopStep35GateDHeartbeat();
+        _step35GateDProgressView.SetProgress(1f, animated: false);
+        _step35GateDFinalChecksReported = true;
+        var elapsed = _step35GateDProgressStartedAt is { } started
+            ? DateTimeOffset.UtcNow - started
+            : TimeSpan.Zero;
+        _step35GateDLastProgressText = $"Gate D {(passed ? "COMPLETE — PASS" : "COMPLETE — FAIL")} • {authority}\nElapsed: {FormatStep35GateDTime(elapsed)}";
+        _step35GateDProgressLabel.Text = _step35GateDLastProgressText;
     }
 
     private void StartStep35GateDHeartbeat()
@@ -127,6 +146,14 @@ public sealed partial class RootViewController
         var now = DateTimeOffset.UtcNow;
         var elapsed = now - started;
         var sinceProgress = _step35GateDLastProgressAt is { } last ? now - last : elapsed;
+        if (_step35GateDFinalChecksReported)
+        {
+            var warning = sinceProgress.TotalSeconds >= 10d
+                ? " • finalization is taking longer than expected; durable D_* checkpoints will identify the boundary"
+                : string.Empty;
+            return _step35GateDLastProgressText +
+                   $"\nElapsed: {FormatStep35GateDTime(elapsed)} • finalization wait: {FormatStep35GateDTime(sinceProgress)}{warning}";
+        }
         return _step35GateDLastProgressText +
                $"\nElapsed: {FormatStep35GateDTime(elapsed)} • last verifier progress: {FormatStep35GateDTime(sinceProgress)} ago";
     }
