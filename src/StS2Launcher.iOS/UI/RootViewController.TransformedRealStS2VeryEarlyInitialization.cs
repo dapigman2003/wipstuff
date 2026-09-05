@@ -1,3 +1,4 @@
+using Foundation;
 using StS2Launcher.Core;
 using StS2Launcher.iOS.Platform;
 
@@ -26,36 +27,36 @@ public sealed partial class RootViewController
     private void AddTransformedRealStS2VeryEarlyInitializationControls(UIStackView content)
     {
         content.AddArrangedSubview(Label(
-            "Step 35.0.30 — Exact-authority closure candidate + Gate-D finalization (four diagnostic controls + one exact mode; ordered gates A–D)",
+            "Step 35.0.31 — Exact-authority closure candidate + Gate-D finalization (four diagnostic controls + one exact mode; ordered gates A–D)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
         _step35NaturalGodotReconButton = SystemButton(
-            "Run Step 35.0.30 NATURAL diagnostic — Reverify → Preserve Godot Dictionary/OS Path → Invoke Once",
+            "Run Step 35.0.31 NATURAL diagnostic — Reverify → Preserve Godot Dictionary/OS Path → Invoke Once",
             16);
         _step35NaturalGodotReconButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.NaturalGodotDictionaryRecon);
         content.AddArrangedSubview(_step35NaturalGodotReconButton);
 
         _transformedRealStS2VeryEarlyInitializationButton = SystemButton(
-            "Run Step 35.0.30 OS-RECON diagnostic — Reverify → Managed Dictionary → Natural Godot.OS → Invoke Once",
+            "Run Step 35.0.31 OS-RECON diagnostic — Reverify → Managed Dictionary → Natural Godot.OS → Invoke Once",
             17);
         _transformedRealStS2VeryEarlyInitializationButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.ManagedDictionaryCompatibility);
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationButton);
 
         _step35ManagedCommandLineCompatibilityButton = SystemButton(
-            "Run Step 35.0.30 FORWARD diagnostic — Reverify → Managed Dictionary + Managed Empty Args → Invoke Once",
+            "Run Step 35.0.31 FORWARD diagnostic — Reverify → Managed Dictionary + Managed Empty Args → Invoke Once",
             17);
         _step35ManagedCommandLineCompatibilityButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.ManagedCommandLineCompatibility);
         content.AddArrangedSubview(_step35ManagedCommandLineCompatibilityButton);
 
         _step35GodotCoreCallbackHandoffButton = SystemButton(
-            "Run Step 35.0.30 CORE-HANDOFF diagnostic — Step 15 → Proven Bridge → Diagnostic sts2/GodotSharp",
+            "Run Step 35.0.31 CORE-HANDOFF diagnostic — Step 15 → Proven Bridge → Diagnostic sts2/GodotSharp",
             17);
         _step35GodotCoreCallbackHandoffButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.GodotCoreCallbackHandoff);
         content.AddArrangedSubview(_step35GodotCoreCallbackHandoffButton);
 
         _step35GodotExactClosureButton = SystemButton(
-            "Run Step 35.0.30 EXACT-CLOSURE — Step 15 → Exact Transformed sts2 + Exact GodotSharp → Proven Bridge → Invoke Exact Authority",
+            "Run Step 35.0.31 EXACT-CLOSURE — Step 15 → Exact Transformed sts2 + Exact GodotSharp → Proven Bridge → Invoke Exact Authority",
             16);
         _step35GodotExactClosureButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.GodotCoreExactClosure);
         content.AddArrangedSubview(_step35GodotExactClosureButton);
@@ -67,7 +68,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationResultLabel);
 
         _transformedRealStS2VeryEarlyInitializationDetailLabel = Label(
-            "Physical 0.0.152: EXACT-CLOSURE admitted exact transformed sts2 + exact prepared GodotSharp, exact ExecuteVeryEarly returned RanToCompletion, OfflineReady re-proved 428/428, and Gate D constructed passed=true/exactAuthority=true before the UIKit await continuation stalled after D_TASK_RETURN_START. 0.0.153 keeps that exact runtime path unchanged and schedules Gate D behind an outer Task.Run completion boundary so the UI can record the already-proven result.",
+            "Physical 0.0.153: EXACT-CLOSURE again completed exact ExecuteVeryEarly and Gate D, then durably reached D_WORKER_RETURN with passed=true/exactAuthority=true; the captured UIKit await continuation still never resumed. 0.0.154 keeps the exact runtime path unchanged, uses ConfigureAwait(false) after the outer worker, and explicitly marshals only final UIKit mutations to the main thread.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationDetailLabel);
@@ -134,7 +135,7 @@ public sealed partial class RootViewController
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: TELEMETRY FAIL / NOT RUN";
             _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SystemRed;
             _transformedRealStS2VeryEarlyInitializationDetailLabel.Text =
-                $"Step 35.0.30 refused to begin Gate A because durable run-correlated telemetry could not be established. No CLR admission or ExecuteVeryEarly invocation was attempted. {telemetryError}";
+                $"Step 35.0.31 refused to begin Gate A because durable run-correlated telemetry could not be established. No CLR admission or ExecuteVeryEarly invocation was attempted. {telemetryError}";
             _statusLabel.Text = "STEP 35 DIAGNOSTIC REFUSED — durable run journal could not be created/flushed. Preserve any Step35-CurrentRun/LastCheckpoint files and fix report storage before retry.";
             _statusLabel.TextColor = UIColor.SystemRed;
             return;
@@ -146,12 +147,12 @@ public sealed partial class RootViewController
         _transformedRealStS2VeryEarlyInitialization.Reset();
         _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE A RUNNING…";
         _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.Label;
-        _statusLabel.Text = $"STEP 35.0.30 RUN {_step35RunId} — mode={diagnosticMode}; exactAuthority={exactAuthorityMode}. Gate A re-manufactures/reverifies the closed transform and emits diagnostic derivatives for static/reconnaissance evidence. Gate B will admit {(exactAuthorityMode ? "the exact closed transformed sts2 bytes" : "the selected diagnostic sts2 derivative")}.";
+        _statusLabel.Text = $"STEP 35.0.31 RUN {_step35RunId} — mode={diagnosticMode}; exactAuthority={exactAuthorityMode}. Gate A re-manufactures/reverifies the closed transform and emits diagnostic derivatives for static/reconnaissance evidence. Gate B will admit {(exactAuthorityMode ? "the exact closed transformed sts2 bytes" : "the selected diagnostic sts2 derivative")}.";
         _statusLabel.TextColor = UIColor.Label;
 
         try
         {
-            WriteStep35CrashCheckpoint($"RUN_START — Step 35.0.30 run started; mode={diagnosticMode}; callbackHandoffMode={callbackHandoffMode}; exactAuthority={exactAuthorityMode}; exact transformed source/resolver authority remains frozen. NATURAL/OS-RECON/FORWARD preserve their fresh-process diagnostic contracts. CORE-HANDOFF uses diagnostic CLR inputs after the proven Step-15 bridge. EXACT-CLOSURE uses exact transformed sts2 plus exact prepared GodotSharp after that same bridge prerequisite.");
+            WriteStep35CrashCheckpoint($"RUN_START — Step 35.0.31 run started; mode={diagnosticMode}; callbackHandoffMode={callbackHandoffMode}; exactAuthority={exactAuthorityMode}; exact transformed source/resolver authority remains frozen. NATURAL/OS-RECON/FORWARD preserve their fresh-process diagnostic contracts. CORE-HANDOFF uses diagnostic CLR inputs after the proven Step-15 bridge. EXACT-CLOSURE uses exact transformed sts2 plus exact prepared GodotSharp after that same bridge prerequisite.");
             var token = _operationCts?.Token ?? CancellationToken.None;
             var progress = new Progress<TransformedRealStS2VeryEarlyInitializationProgress>(value =>
             {
@@ -203,8 +204,8 @@ public sealed partial class RootViewController
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE B RUNNING…";
             _statusLabel.Text = exactAuthorityMode
-                ? "STEP 35.0.30 GATE B — re-hash and CLR-admit the exact closed Step-32 transformed sts2 bytes; diagnostic derivatives remain evidence-only and outside the CLR authority path."
-                : "STEP 35.0.30 GATE B — re-hash the exact transformed source, then CLR-admit only the separately verified diagnostic clone and re-check zero-resolution primary admission behavior.";
+                ? "STEP 35.0.31 GATE B — re-hash and CLR-admit the exact closed Step-32 transformed sts2 bytes; diagnostic derivatives remain evidence-only and outside the CLR authority path."
+                : "STEP 35.0.31 GATE B — re-hash the exact transformed source, then CLR-admit only the separately verified diagnostic clone and re-check zero-resolution primary admission behavior.";
             WriteStep35CrashCheckpoint("B_SCHEDULE — Gate B UI selected; scheduling Gate B on Task.Run.");
             var gateB = await Task.Run(() => _transformedRealStS2VeryEarlyInitialization.RunExecutionCapableClrAdmission(WriteStep35CrashCheckpoint), token);
             WriteStep35CrashCheckpoint($"B_TASK_AWAIT_RESUMED — Gate B Task.Run await resumed on launcher thread; passed={gateB.Passed}.");
@@ -221,8 +222,8 @@ public sealed partial class RootViewController
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE C RUNNING…";
             _statusLabel.Text = exactAuthorityMode
-                ? "STEP 35.0.30 GATE C — invoke the exact closed transformed ExecuteVeryEarly once and await it; exact prepared GodotSharp uses the physically proven bridge. No diagnostic derivative is CLR input."
-                : $"STEP 35.0.30 GATE C — mode={diagnosticMode}; invoke the verified sts2 diagnostic derivative once. CORE-HANDOFF uses the verified GodotSharp diagnostic derivative; native game loads, initializer-bearing and unplanned requests remain fail-closed.";
+                ? "STEP 35.0.31 GATE C — invoke the exact closed transformed ExecuteVeryEarly once and await it; exact prepared GodotSharp uses the physically proven bridge. No diagnostic derivative is CLR input."
+                : $"STEP 35.0.31 GATE C — mode={diagnosticMode}; invoke the verified sts2 diagnostic derivative once. CORE-HANDOFF uses the verified GodotSharp diagnostic derivative; native game loads, initializer-bearing and unplanned requests remain fail-closed.";
             WriteStep35CrashCheckpoint("C_UI_SELECTED — Gate C labels assigned on the main thread; UIKit may not have repainted before synchronous Gate-C work begins.");
             var gateC = await _transformedRealStS2VeryEarlyInitialization.RunDiagnosticExecuteVeryEarlyInvocationAsync(WriteStep35CrashCheckpoint, token);
             WriteStep35CrashCheckpoint($"C_TASK_AWAIT_RESUMED — Gate C async method returned to the UI caller; passed={gateC.Passed}.");
@@ -236,8 +237,8 @@ public sealed partial class RootViewController
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE D RUNNING…";
             ResetStep35GateDProgress(visible: true);
             _statusLabel.Text = exactAuthorityMode
-                ? "STEP 35.0.30 GATE D — exact-authority final reproof: OfflineReady, exact transformed CLR input, plan/dependency hashes, exact residency, and zero broader startup/native escape."
-                : "STEP 35.0.30 GATE D — re-prove OfflineReady, exact-source/diagnostic-clone/plan/dependency hashes, diagnostic-clone residency, and zero broader startup/native escape.";
+                ? "STEP 35.0.31 GATE D — exact-authority final reproof: OfflineReady, exact transformed CLR input, plan/dependency hashes, exact residency, and zero broader startup/native escape."
+                : "STEP 35.0.31 GATE D — re-prove OfflineReady, exact-source/diagnostic-clone/plan/dependency hashes, diagnostic-clone residency, and zero broader startup/native escape.";
             WriteStep35CrashCheckpoint($"D_START — entering final isolation audit; exactAuthority={exactAuthorityMode}.");
             WriteStep35CrashCheckpoint("D_WORKER_SCHEDULE — scheduling the Gate-D audit behind an outer Task.Run boundary so UIKit SynchronizationContext is not responsible for completing the core audit Task.");
             var gateD = await Task.Run(async () =>
@@ -247,69 +248,105 @@ public sealed partial class RootViewController
                     .ConfigureAwait(false);
                 WriteStep35CrashCheckpoint($"D_WORKER_RETURN — outer Gate-D worker observed core result; passed={result.Passed}; exactAuthority={exactAuthorityMode}.");
                 return result;
-            }, token);
-            WriteStep35CrashCheckpoint($"D_TASK_AWAIT_RESUMED — outer Gate-D worker Task returned to the UI caller; passed={gateD.Passed}; exactAuthority={exactAuthorityMode}.");
-            CompleteStep35GateDProgress(gateD.Passed, exactAuthorityMode ? "exact transformed authority" : "diagnostic derivative");
-            WriteStep35CrashCheckpoint($"D_RESULT — passed={gateD.Passed}; gate={gateD.Gate}.");
-            if (!RecordTransformedRealStS2VeryEarlyInitializationGate(gateD)) return;
-            WriteStep35CrashCheckpoint("D_RESULT_RECORD_PASS — Gate D PASS recorded in the ordered gate sequence.");
+            }, token).ConfigureAwait(false);
+            WriteStep35CrashCheckpoint($"D_THREADPOOL_CONTINUATION — outer Gate-D Task completed without recapturing UIKit SynchronizationContext; passed={gateD.Passed}; exactAuthority={exactAuthorityMode}; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}.");
 
-            var snapshot = _transformedRealStS2VeryEarlyInitializationGates.Snapshot();
-            _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.Label;
-            if (exactAuthorityMode)
+            var gateDRecorded = false;
+            void FinalizeGateDOnMainThread()
             {
-                _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "EXACT STEP 35 CLOSURE CANDIDATE: COMPLETE — 4/4";
-                _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
-                    "All four exact-authority gates completed. Gate B admitted the exact closed Step-32 transformed sts2 bytes rather than the Step-35 diagnostic derivative; exact prepared GodotSharp received the physically proven source-built Godot 4.5.1 bridge; exact ExecuteVeryEarly returned and awaited successfully; Gate D re-proved OfflineReady, hashes, resolver/native confinement, and CLR ownership. Under this explicitly defined launcher-host authority, this is the physical closure candidate for Step 35.");
-                _statusLabel.Text = "EXACT STEP 35 CLOSURE CANDIDATE COMPLETE — 4/4. Preserve the run-correlated report/checkpoints before advancing to the next initialization phase.";
-                WriteStep35CrashCheckpoint("RUN_EXACT_STEP35_4OF4 — exact closed transformed sts2 authority completed Gates A-D under the physically proven source-built Godot bridge prerequisite.");
+                WriteStep35CrashCheckpoint($"D_UI_DISPATCH_ENTER — explicit main-thread Gate-D finalization entered; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}.");
+                CompleteStep35GateDProgress(gateD.Passed, exactAuthorityMode ? "exact transformed authority" : "diagnostic derivative");
+                WriteStep35CrashCheckpoint($"D_RESULT — passed={gateD.Passed}; gate={gateD.Gate}.");
+                gateDRecorded = RecordTransformedRealStS2VeryEarlyInitializationGate(gateD);
+                if (!gateDRecorded)
+                {
+                    WriteStep35CrashCheckpoint("D_RESULT_RECORD_FAIL_STOP — Gate D result was recorded as FAIL on the explicit main-thread dispatch.");
+                    return;
+                }
+                WriteStep35CrashCheckpoint("D_RESULT_RECORD_PASS — Gate D PASS recorded in the ordered gate sequence on the explicit main-thread dispatch.");
+
+                var snapshot = _transformedRealStS2VeryEarlyInitializationGates.Snapshot();
+                _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.Label;
+                if (exactAuthorityMode)
+                {
+                    _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "EXACT STEP 35 CLOSURE CANDIDATE: COMPLETE — 4/4";
+                    _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
+                        "All four exact-authority gates completed. Gate B admitted the exact closed Step-32 transformed sts2 bytes rather than the Step-35 diagnostic derivative; exact prepared GodotSharp received the physically proven source-built Godot 4.5.1 bridge; exact ExecuteVeryEarly returned and awaited successfully; Gate D re-proved OfflineReady, hashes, resolver/native confinement, and CLR ownership. Under this explicitly defined launcher-host authority, this is the physical closure candidate for Step 35.");
+                    _statusLabel.Text = "EXACT STEP 35 CLOSURE CANDIDATE COMPLETE — 4/4. Preserve the run-correlated report/checkpoints before advancing to Step 36.";
+                    WriteStep35CrashCheckpoint("RUN_EXACT_STEP35_4OF4 — exact closed transformed sts2 authority completed Gates A-D under the physically proven source-built Godot bridge prerequisite.");
+                }
+                else
+                {
+                    _transformedRealStS2VeryEarlyInitializationResultLabel.Text = snapshot.Summary;
+                    _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
+                        "All four Step 35.0.31 diagnostic gates completed. Preserve this report, but do not use it as Step-35 closure evidence: Gate B/C executed an instrumented derivative rather than the exact closed Step-32 transformed bytes. The diagnostic 4/4 remains localization evidence; use a fresh process and the EXACT-CLOSURE button for the exact-authority attempt.");
+                    _statusLabel.Text = "DIAGNOSTIC COMPLETE: STEP 35.0.31 — 4/4. Use a fresh process + Step 15 + EXACT-CLOSURE for the exact-authority closure attempt.";
+                    WriteStep35CrashCheckpoint("RUN_DIAGNOSTIC_4OF4 — all Step-35.0.31 diagnostic gates completed; derivative result remains diagnostic evidence only.");
+                }
+                _statusLabel.TextColor = UIColor.Label;
+                WriteStep35CrashCheckpoint("D_UI_DISPATCH_RETURN — explicit main-thread Gate-D finalization completed.");
             }
+
+            if (NSThread.IsMain)
+                FinalizeGateDOnMainThread();
             else
-            {
-                _transformedRealStS2VeryEarlyInitializationResultLabel.Text = snapshot.Summary;
-                _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
-                    "All four Step 35.0.30 diagnostic gates completed. Preserve this report, but do not use it as Step-35 closure evidence: Gate B/C executed an instrumented derivative rather than the exact closed Step-32 transformed bytes. The diagnostic 4/4 remains localization evidence; use a fresh process and the EXACT-CLOSURE button for the exact-authority attempt.");
-                _statusLabel.Text = "DIAGNOSTIC COMPLETE: STEP 35.0.30 — 4/4. Use a fresh process + Step 15 + EXACT-CLOSURE for the exact-authority closure attempt.";
-                WriteStep35CrashCheckpoint("RUN_DIAGNOSTIC_4OF4 — all Step-35.0.27 diagnostic gates completed; derivative result remains diagnostic evidence only.");
-            }
-            _statusLabel.TextColor = UIColor.Label;
+                InvokeOnMainThread(FinalizeGateDOnMainThread);
+
+            if (!gateDRecorded)
+                return;
         }
         catch (OperationCanceledException)
         {
             WriteStep35CrashCheckpoint("RUN_CANCELLED_INCONCLUSIVE — operator cancellation is not a compatibility FAIL; if Gate B/C began, this process is spent and must be force-quit before retry.");
-            _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: CANCELLED / INCONCLUSIVE";
-            _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SecondaryLabel;
-            _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
-                $"Step 35.0.30 was cancelled and is INCONCLUSIVE. If Gate B had begun, force-quit before retrying because the selected {(exactAuthorityMode ? "exact transformed authority" : "diagnostic derivative")} and dependencies may now be CLR-resident; if Gate C invocation began, ExecuteVeryEarly may also have executed despite cancellation.");
-            _statusLabel.Text = exactAuthorityMode
-                ? "STEP 35.0.30 EXACT-CLOSURE CANCELLED / INCONCLUSIVE — no closure verdict; force-quit before retry if Gate B or C started."
-                : "STEP 35.0.30 DIAGNOSTIC CANCELLED / INCONCLUSIVE — exact Step 35 remains OPEN; force-quit before retry if Gate B or C started.";
-            _statusLabel.TextColor = UIColor.SecondaryLabel;
+            void ApplyCancelledUi()
+            {
+                _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: CANCELLED / INCONCLUSIVE";
+                _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SecondaryLabel;
+                _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
+                    $"Step 35.0.31 was cancelled and is INCONCLUSIVE. If Gate B had begun, force-quit before retrying because the selected {(exactAuthorityMode ? "exact transformed authority" : "diagnostic derivative")} and dependencies may now be CLR-resident; if Gate C invocation began, ExecuteVeryEarly may also have executed despite cancellation.");
+                _statusLabel.Text = exactAuthorityMode
+                    ? "STEP 35.0.31 EXACT-CLOSURE CANCELLED / INCONCLUSIVE — no closure verdict; force-quit before retry if Gate B or C started."
+                    : "STEP 35.0.31 DIAGNOSTIC CANCELLED / INCONCLUSIVE — exact Step 35 remains OPEN; force-quit before retry if Gate B or C started.";
+                _statusLabel.TextColor = UIColor.SecondaryLabel;
+            }
+            if (NSThread.IsMain) ApplyCancelledUi(); else InvokeOnMainThread(ApplyCancelledUi);
         }
         catch (Exception ex)
         {
             WriteStep35CrashCheckpoint($"RUN_MANAGED_EXCEPTION — {ex.GetType().FullName}: {ex.Message}");
-            _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: EXCEPTION";
-            _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SystemRed;
-            _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail($"Unhandled Step 35.0.30 {(exactAuthorityMode ? "exact-authority" : "diagnostic")} exception: {ex.GetType().Name}: {ex.Message}");
-            _statusLabel.Text = exactAuthorityMode
-                ? "STEP 35.0.30 EXACT-CLOSURE FAIL — preserve the exact-authority checkpoints; force-quit before retry if Gate B started."
-                : "STEP 35.0.30 DIAGNOSTIC FAIL — preserve the evidence; this derivative failure is not by itself an exact Step-35 compatibility verdict. Force-quit before retry if Gate B started.";
-            _statusLabel.TextColor = UIColor.SystemRed;
+            void ApplyExceptionUi()
+            {
+                _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: EXCEPTION";
+                _transformedRealStS2VeryEarlyInitializationResultLabel.TextColor = UIColor.SystemRed;
+                _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail($"Unhandled Step 35.0.31 {(exactAuthorityMode ? "exact-authority" : "diagnostic")} exception: {ex.GetType().Name}: {ex.Message}");
+                _statusLabel.Text = exactAuthorityMode
+                    ? "STEP 35.0.31 EXACT-CLOSURE FAIL — preserve the exact-authority checkpoints; force-quit before retry if Gate B started."
+                    : "STEP 35.0.31 DIAGNOSTIC FAIL — preserve the evidence; this derivative failure is not by itself an exact Step-35 compatibility verdict. Force-quit before retry if Gate B started.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            }
+            if (NSThread.IsMain) ApplyExceptionUi(); else InvokeOnMainThread(ApplyExceptionUi);
         }
         finally
         {
-            StopStep35GateDHeartbeat();
-            WriteStep35CrashCheckpoint("RUN_FINALLY_ENTER — managed control reached the Step-35 finally block; writing the normal deterministic report.");
+            WriteStep35CrashCheckpoint($"RUN_FINALLY_ENTER — managed control reached the Step-35 finally block; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}; writing the normal deterministic report without requiring a captured UIKit continuation.");
+            if (NSThread.IsMain)
+                StopStep35GateDHeartbeat();
+            else
+                InvokeOnMainThread(StopStep35GateDHeartbeat);
+
             await WriteDeviceTestReportFromLabelsAsync(
                 "Step35-TransformedRealStS2VeryEarlyInitialization.txt",
-                "StS2 Launcher — Step 35.0.30 Exact-Authority Closure + Gate-D Finalization",
+                "StS2 Launcher — Step 35.0.31 Exact-Authority Closure + Explicit Main-Queue Finalization",
                 _transformedRealStS2VeryEarlyInitializationResultLabel,
                 _transformedRealStS2VeryEarlyInitializationDetailLabel,
-                CancellationToken.None);
+                CancellationToken.None).ConfigureAwait(false);
             WriteStep35CrashCheckpoint("RUN_NORMAL_REPORT_RETURNED — normal Step35 report writer returned.");
-            EndSteamOperation();
-            WriteStep35CrashCheckpoint("RUN_END — Step-35 UI operation ended normally.");
+
+            if (NSThread.IsMain)
+                EndSteamOperation();
+            else
+                InvokeOnMainThread(EndSteamOperation);
+            WriteStep35CrashCheckpoint("RUN_END — Step-35 UI operation ended normally after explicit main-thread teardown.");
         }
     }
 
@@ -326,7 +363,7 @@ public sealed partial class RootViewController
         if (!result.Passed && _statusLabel is not null)
         {
             var letter = (char)('A' + (int)result.Gate - 1);
-            _statusLabel.Text = $"STEP 35.0.30 FAIL at Gate {letter} ({result.Gate}). Stop here; later gates were not run. Preserve the run-correlated evidence and force-quit before retry.";
+            _statusLabel.Text = $"STEP 35.0.31 FAIL at Gate {letter} ({result.Gate}). Stop here; later gates were not run. Preserve the run-correlated evidence and force-quit before retry.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
         return result.Passed;
@@ -357,14 +394,14 @@ public sealed partial class RootViewController
         lines.Add("Step 35.0.10 / physical 0.0.133 observation: NP ordinal accounting was corrected to INMETHOD_NP002_PRE, but no CommandLineHelper cctor entry/CL/CLTV marker executed. MethodInfo.Invoke returned a faulted Task whose nested cause was System.InvalidProgramException, and the launcher reached normal RUN_END. This is a diagnostic instrumentation defect: the live-stack sweep raised transient stack depth without raising the serialized cctor MaxStack header; it does not advance or retreat the exact-game frontier from 0.0.132.");
         lines.Add("Step 35.0.12 / physical 0.0.135 observation: verified cctor MaxStack headroom still produced the same pre-instruction-zero InvalidProgramException, disproving MaxStack-only causation and motivating retirement of all live-stack CL/CLTV runtime callbacks.");
         lines.Add("Step 35.0.13 / physical 0.0.136 observation: the stack-neutral-only clone entered CommandLineHelper..cctor and emitted INMETHOD_CL_CRITICAL_001_PRE before _args dictionary construction, then hard-terminated before CL_CRITICAL_001_POST, CL_CRITICAL_002_PRE, INMETHOD_027, NP002_POST, or C_INVOKE_RETURNED. The final durable resolver event was the planned System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0 binding; it remains contextual, while the PRE/no-POST pair physically localizes the interval to Godot.Collections.Dictionary<string,string> construction before assignment.");
-        lines.Add("Step 35.0.30 comprehensive scope: preserve every prior exact source/resolver/later-startup authority and keep live-stack CL/CLTV callbacks retired. Gate A still performs read-only bundle-wide Mach-O dependency/rpath/symbol/string reconnaissance plus a GodotSharp IL/native-callback map and emits separately verified sts2 + GodotSharp diagnostic derivatives. Reconnaissance itself never loads or executes a native game image.");
+        lines.Add("Step 35.0.31 comprehensive scope: preserve every prior exact source/resolver/later-startup authority and keep live-stack CL/CLTV callbacks retired. Gate A still performs read-only bundle-wide Mach-O dependency/rpath/symbol/string reconnaissance plus a GodotSharp IL/native-callback map and emits separately verified sts2 + GodotSharp diagnostic derivatives. Reconnaissance itself never loads or executes a native game image.");
         lines.Add("Physical 0.0.140 three-mode proof: NATURAL reached GS031 godot_dictionary::GetUnsafeAddress; OS-RECON passed CL_CRITICAL_001_POST and reached Godot.OS..cctor -> StringName.op_Implicit -> GS024 NativeFuncs.godotsharp_string_name_new_from_string; FORWARD passed CL_CRITICAL_002_POST, INMETHOD_027 and NP002_POST, then reached GodotFileIo.CreateDirectory -> Godot.DirAccess.DirExistsAbsolute -> StringName -> GS024. The repeated callback boundary is therefore not command-line-specific.");
         lines.Add("Physical 0.0.146 proved the coordinated managed-plugin bootstrap itself: the 37-pointer ManagedCallbacks table was created, ScriptManagerBridge.LookupScriptsInAssembly returned, native GDMonoCache adoption set godotApiCacheUpdated/createManagedBindingCallback/reverseBindingReady/externalBridgeInstalled true, and GD_OnCoreApiAssemblyLoaded returned. Gate C then failed before target binding because the old callback-handoff resolver snapshot did not account for the bootstrap's exact eight additional planned host-framework requests; initializer-bearing/rejected/native activity remained zero.");
-        lines.Add("Physical 0.0.152 exact-authority evidence: exact ExecuteVeryEarly returned, its Task was RanToCompletion, post-await confinement passed, OfflineReady re-proved 428/428, exact authority/plan/dependency/resolver/context checks passed, and Gate D constructed passed=true/exactAuthority=true. The last durable marker was D_TASK_RETURN_START, so the remaining defect is the UIKit await continuation/result-record path. 0.0.153 wraps Gate D in an outer Task.Run completion boundary without changing core authority behavior.");
+        lines.Add("Physical 0.0.153 exact-authority evidence: exact ExecuteVeryEarly returned RanToCompletion; Gate D re-proved OfflineReady 428/428 and all authority/plan/dependency/resolver/context checks; the core returned passed=true/exactAuthority=true; and the outer worker durably recorded D_WORKER_RETURN. The remaining defect is only the captured UIKit continuation. 0.0.154 removes that capture with ConfigureAwait(false) and explicit main-thread finalization without changing core authority behavior.");
         lines.Add("Resolver boundary: exact persisted host-framework bindings and hash-pinned initializer-free prepared private dependencies may be serviced on demand. The known initializer-bearing 0Harmony 2.4.2.0 dependency remains forbidden; any changed/additional initializer-bearing dependency, unplanned managed request, or native game request fails closed.");
         lines.Add("Forbidden in every Step-35.0.27 mode: receipt-backed/prepared original sts2.dll CLR admission, intentional ExecuteEssential/ExecuteDeferred/PrewarmJit invocation by the launcher, game entry-point execution, Harmony/MonoMod API invocation or runtime patching, native game loading, arbitrary resolver fallback, or broad game startup sequencing. NATURAL/OS-RECON/FORWARD additionally forbid any Godot startup; CORE-HANDOFF and EXACT-CLOSURE permit only the already-proven Step-15 smoke engine plus the complete managed/native bridge bootstrap. EXACT-CLOSURE uniquely admits the exact closed transformed sts2 artifact and exact prepared GodotSharp as CLR authority inputs.");
         lines.Add("Cancellation semantics: CANCELLED is INCONCLUSIVE, not a compatibility FAIL. If Gate B has begun the process is spent; after Gate C invocation begins, cancellation cannot undo any code that already ran. Force-quit before retry.");
-        lines.Add("After Gate B, the selected sts2 CLR input remains resident until force-quit on the physical non-collectible context. In diagnostic modes it is the instrumented derivative; in EXACT-CLOSURE it is the exact closed transformed artifact. After Gate C, the selected ExecuteVeryEarly has executed once; do not rerun Step 35.0.30 in the same process.");
+        lines.Add("After Gate B, the selected sts2 CLR input remains resident until force-quit on the physical non-collectible context. In diagnostic modes it is the instrumented derivative; in EXACT-CLOSURE it is the exact closed transformed artifact. After Gate C, the selected ExecuteVeryEarly has executed once; do not rerun Step 35.0.31 in the same process.");
         lines.Add(tail);
         return string.Join("\n", lines);
     }

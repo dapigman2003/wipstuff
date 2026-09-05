@@ -1,0 +1,24 @@
+StS2 Launcher — Step 35.0.30 physical 0.0.153 result
+OUTER WORKER RETURNED; CAPTURED UI CONTINUATION STILL DID NOT RESUME
+
+App version: 0.0.153 (153)
+Run ID: 20260905T0713064067570Z-pid57383-38ba2dc27595400995a1d0ad5e6a2c18
+Mode: GodotCoreExactClosure
+
+Physical result
+---------------
+The exact-authority Step-35 runtime remained positive. Gate D re-proved OfflineReady 428/428, trusted original sts2.dll, exact transformed CLR authority, plan/dependency hashes, resolver/native confinement, and exact context ownership. The core constructed a PASS result with exactAuthority=True, emitted terminal progress, and began returning it.
+
+0.0.153 added an outer Task.Run completion boundary. That worker also returned successfully and durably recorded:
+
+D_WORKER_RETURN — outer Gate-D worker observed core result; passed=True; exactAuthority=True.
+
+The prior captured UI-side await continuation still did not emit D_TASK_AWAIT_RESUMED, D_RESULT_RECORD_PASS, RUN_EXACT_STEP35_4OF4, or RUN_END. The app remained operator-visible rather than crashing.
+
+Interpretation
+--------------
+This excludes the Gate-D core task and the outer worker task as the cause of the visible finalization stall. The remaining defect is the captured UIKit/.NET synchronization-context continuation used after the worker completion. This is UI/control-flow plumbing, not a Slay the Spire 2 or Godot compatibility failure.
+
+Next correction
+---------------
+Step 35.0.31 / 0.0.154 must not add another captured-await wrapper. It must allow Gate-D completion to continue on a noncaptured thread-pool continuation via ConfigureAwait(false), then explicitly marshal only UIKit mutations to the main thread. Step 36 should consume the durable exact Step-35 core-closure state rather than requiring the historical UI gate snapshot.

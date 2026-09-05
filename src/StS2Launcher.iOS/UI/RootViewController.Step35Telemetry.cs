@@ -32,14 +32,14 @@ public sealed partial class RootViewController
 
                 WriteStep35TextFileDurably(
                     crashPath,
-                    "StS2 Launcher — Step 35.0.30 Comprehensive GodotSharp / Native reconnaissance crash checkpoint\n" +
+                    "StS2 Launcher — Step 35.0.31 Comprehensive GodotSharp / Native reconnaissance crash checkpoint\n" +
                     "Output-only diagnostic; never consumed as trusted runtime input.\n" +
                     $"Run ID: {runId}\n" +
                     $"Initialized UTC: {initializedUtc:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                     $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
-                    "Candidate: STEP 35.0.30 — EXACT-AUTHORITY CLOSURE + GATE-D FINALIZATION\n" +
+                    "Candidate: STEP 35.0.31 — EXACT-AUTHORITY CLOSURE + GATE-D FINALIZATION\n" +
                     $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
                     "Execution policy: exact source transform/resolver/later-game-boundary prohibitions unchanged; Gate A performs read-only bundle-wide native/GodotSharp inspection and emits separately verified sts2 + GodotSharp diagnostic derivatives; GodotSharp probes are entry-only. NATURAL preserves the original Godot dictionary/native path; OS-RECON applies only the bounded four-reference BCL dictionary substitution and keeps Godot.OS natural; FORWARD adds exactly one local new string[0] provider substitution for Godot.OS.GetCmdlineArgs. Those three controls require a fresh process with no Godot state. CORE-HANDOFF is the sole explicit exception: it requires the already-proven Step-15 smoke engine, rejects dotnet-feature or Godot-managed-runtime state, and hands the exact source-built callback table to the private GodotSharp derivative. Native game loading remains forbidden.\n" +
                     $"Implementation: {CurrentReleasePresentation.Step35ImplementationMarker}\n\n");
@@ -76,7 +76,7 @@ public sealed partial class RootViewController
                     $"Godot/native reconnaissance: {godotReconFileName}\n" +
                     $"Last checkpoint: {Step35LastCheckpointFileName}\n" +
                     $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
-                    "Candidate: STEP 35.0.30 — EXACT-AUTHORITY CLOSURE + GATE-D FINALIZATION\n");
+                    "Candidate: STEP 35.0.31 — EXACT-AUTHORITY CLOSURE + GATE-D FINALIZATION\n");
 
                 _step35RunId = runId;
                 _step35CrashCheckpointPath = crashPath;
@@ -112,7 +112,7 @@ public sealed partial class RootViewController
                 $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                 $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
                 $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
-                "Candidate: STEP 35.0.30 — COMPREHENSIVE GODOTSHARP / NATIVE RECONNAISSANCE + EXACT-AUTHORITY CLOSURE\n" +
+                "Candidate: STEP 35.0.31 — COMPREHENSIVE GODOTSHARP / NATIVE RECONNAISSANCE + EXACT-AUTHORITY CLOSURE\n" +
                 "This file is output-only and is written before Gate B CLR admission.\n\n" +
                 body +
                 "\n\n[GODOTSHARP RUNTIME ENTRY-MARKER PLAN]\n" +
@@ -143,7 +143,7 @@ public sealed partial class RootViewController
                 $"Process ID: {Environment.ProcessId}\n" +
                 $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                 $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
-                "Candidate: STEP 35.0.30 — same-run exact-source static map + GodotSharp callback-boundary five-mode closure candidate\n" +
+                "Candidate: STEP 35.0.31 — same-run exact-source static map + GodotSharp callback-boundary five-mode closure candidate\n" +
                 "This file is generated from the already-verified exact transformed image before CLR admission and is never consumed as runtime input.\n\n" +
                 body + "\n");
             return true;

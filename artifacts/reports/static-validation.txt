@@ -1,17 +1,5 @@
-StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-05T02:35:17Z
-Checking active shell syntax...
-PASS: shell syntax — scripts/build-godot.sh
-PASS: shell syntax — scripts/build-ios.sh
-PASS: shell syntax — scripts/codemagic.sh
-PASS: shell syntax — scripts/lib/current-release.sh
-PASS: shell syntax — scripts/preflight-godot-link.sh
-PASS: shell syntax — scripts/test.sh
-PASS: shell syntax — scripts/validate.sh
-PASS: shell syntax — scripts/verify-ipa.sh
-PASS: Python validator compiles
-StS2 Launcher — Step 35.0.30 / Step 36.0 UI Return Fix + Controlled Exact ExecuteEssential validation
-Root: /mnt/data/work153/StS2Launcher-Step36-0.0.153
+StS2 Launcher — Step 35.0.31 / Step 36.0 UI Return Fix + Controlled Exact ExecuteEssential validation
+Root: /mnt/data/work154/StS2Launcher-Step36-0.0.154
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 243 C# files
@@ -22,9 +10,9 @@ PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
 PASS: build version is 153
-PASS: display version is 0.0.153
-PASS: Info.plist build version is 153
-PASS: Info.plist display version is 0.0.153
+PASS: display version is 0.0.154
+PASS: Info.plist build version is 154
+PASS: Info.plist display version is 0.0.154
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +20,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 35.0.30 / Step 36.0 combined candidate
-PASS: top launcher banner preserves bridge/CI provenance, records physical 0.0.152 exact core closure, and identifies the Step-36 advance
+PASS: top launcher banner identifies active Step 35.0.31 / Step 36.0 combined candidate
+PASS: top launcher banner preserves bridge/CI provenance, records physical 0.0.153 worker-return localization, and identifies the Step-36 advance
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 35.0.30 / Step 36.0 source pins expected bundle release identity
+PASS: Step 35.0.31 / Step 36.0 source pins expected bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -483,9 +471,9 @@ PASS: Step 35 managed-plugin bootstrap iOS partial exists
 PASS: Step 35 telemetry iOS partial exists
 PASS: Step 35 diagnostic mode exists
 PASS: Step 35 Godot/native reconnaissance exists
-PASS: Step 35.0.30 retains exactly four ordered A-D gates shared by diagnostic and exact-authority modes
-PASS: Step 35.0.30 diagnostic summary keeps diagnostic 4/4 distinct from exact closure
-PASS: Step 35.0.30 host gate-summary assertion matches the active production diagnostic summary identity
+PASS: Step 35.0.31 retains exactly four ordered A-D gates shared by diagnostic and exact-authority modes
+PASS: Step 35.0.31 diagnostic summary keeps diagnostic 4/4 distinct from exact closure
+PASS: Step 35.0.31 host gate-summary assertion matches the active production diagnostic summary identity
 PASS: Step 35.0.26 static validation rejects the stale 0.0.139 Step-35.0.15 gate-summary assertion
 PASS: Step 35 hard-pins exact very-early target/context evidence: SourceTargetMethodToken = 0x06007D02
 PASS: Step 35 hard-pins exact very-early target/context evidence: SourceStateMachineMoveNextToken = 0x0600BC71
@@ -494,39 +482,39 @@ PASS: Step 35 hard-pins exact very-early target/context evidence: System.Threadi
 PASS: Step 35 hard-pins exact very-early target/context evidence: StS2Launcher-Step35-VeryEarly
 PASS: Step 35 Gate A re-runs the closed Step-32 A-D transform contract
 PASS: Step 35 Gate A independently audits exact wrapper/async-state-machine semantics and later-boundary purity
-PASS: Step 35.0.30 static map covers the exact NullPlatform constructor plus CommandLineHelper cctor/TryGetValue callsite ordinals without resolving dependencies
-PASS: Step 35.0.30 preserves prior sts2 diagnostics, supports natural/compat modes, and adds a separately verified entry-only GodotSharp diagnostic derivative
-PASS: Step 35.0.30 GodotSharp derivative fails closed on the exact singleton acquisition/native-to-managed localization targets
-PASS: Step 35.0.30 host regression protects singleton-acquisition marker coverage
-PASS: Step 35.0.30 read-only reconnaissance mirrors singleton acquisition/native-to-managed callback coverage
-PASS: Step 35.0.30 exposes NATURAL and COMPAT modes in one build
-PASS: Step 35.0.30 reconnaissance records managed/native boundaries and read-only arm64 Mach-O metadata
-PASS: Step 35.0.30 reconnaissance source performs no CLR/native image execution
-PASS: Step 35.0.30 excludes injected diagnostic bridge calls before exact-source callsite ordinal accounting
-PASS: Step 35.0.30 fails Gate A closed unless stack-neutral critical localization contains Godot.OS.GetCmdlineArgs
-PASS: Step 35.0.30 preserves and post-write verifies unchanged CommandLine cctor MaxStack
-PASS: Step 35.0.30 production clone forbids live-stack CL/CLTV sweep insertion
-PASS: Step 35.0.30 dictionary-only derivative reuses existing System.Collections, rewrites exactly the Godot string-dictionary contract with VAR signatures, removes residual affected-method Godot dictionary calls, and retains natural GetCmdlineArgs
-PASS: Step 35.0.30 has no duplicated cctor-verification guard that can suppress serialized entry-marker checks
-PASS: Step 35.0.30 carries redundant stack-neutral critical markers around dictionary and Godot command-line boundaries
+PASS: Step 35.0.31 static map covers the exact NullPlatform constructor plus CommandLineHelper cctor/TryGetValue callsite ordinals without resolving dependencies
+PASS: Step 35.0.31 preserves prior sts2 diagnostics, supports natural/compat modes, and adds a separately verified entry-only GodotSharp diagnostic derivative
+PASS: Step 35.0.31 GodotSharp derivative fails closed on the exact singleton acquisition/native-to-managed localization targets
+PASS: Step 35.0.31 host regression protects singleton-acquisition marker coverage
+PASS: Step 35.0.31 read-only reconnaissance mirrors singleton acquisition/native-to-managed callback coverage
+PASS: Step 35.0.31 exposes NATURAL and COMPAT modes in one build
+PASS: Step 35.0.31 reconnaissance records managed/native boundaries and read-only arm64 Mach-O metadata
+PASS: Step 35.0.31 reconnaissance source performs no CLR/native image execution
+PASS: Step 35.0.31 excludes injected diagnostic bridge calls before exact-source callsite ordinal accounting
+PASS: Step 35.0.31 fails Gate A closed unless stack-neutral critical localization contains Godot.OS.GetCmdlineArgs
+PASS: Step 35.0.31 preserves and post-write verifies unchanged CommandLine cctor MaxStack
+PASS: Step 35.0.31 production clone forbids live-stack CL/CLTV sweep insertion
+PASS: Step 35.0.31 dictionary-only derivative reuses existing System.Collections, rewrites exactly the Godot string-dictionary contract with VAR signatures, removes residual affected-method Godot dictionary calls, and retains natural GetCmdlineArgs
+PASS: Step 35.0.31 has no duplicated cctor-verification guard that can suppress serialized entry-marker checks
+PASS: Step 35.0.31 carries redundant stack-neutral critical markers around dictionary and Godot command-line boundaries
 PASS: Step 35.0.26 preserves/rechecks the exact transformed source and verifies diagnostic-clone MVID/hash/marker provenance
 PASS: Step 35.0.26 reuses the Step-32 audited constant-metadata requirement set locally for Cecil serialization only
 PASS: Step 35.0.26 separates bounded writer-only Cecil resolution from rejecting post-write verification
 PASS: Step 35.0.26 diagnostic clone preserves deferred-open -> zero-request -> configure -> write ordering
 PASS: Step 35.0.26 preserves the physically corrected Action<string>::Invoke(!0) MemberRef
 PASS: Step 35.0.26 rejects the physically disproven synthetic Action<string>::Invoke(string) encoding
-PASS: Step 35.0.30 host regressions protect the Action<string>::Invoke(!0) encoding
-PASS: Step 35.0.30 host regressions cover the entry-only GodotSharp derivative and read-only Mach-O reconnaissance
-PASS: Step 35.0.30 host regression directly verifies every serialized GS entry marker calls the GodotSharp bridge
+PASS: Step 35.0.31 host regressions protect the Action<string>::Invoke(!0) encoding
+PASS: Step 35.0.31 host regressions cover the entry-only GodotSharp derivative and read-only Mach-O reconnaissance
+PASS: Step 35.0.31 host regression directly verifies every serialized GS entry marker calls the GodotSharp bridge
 PASS: GodotSharp derivative uses deferred-open and entry-only instrumentation, never live-stack callsite sweeps
 PASS: GodotSharp derivative uses audited writer-only resolution, rejecting reopen, preserved MVID, and the corrected generic callback bridge
 PASS: Step 35.0.26 verifies serialized entry markers against the derivative-specific bridge type and protects the 0.0.137 208/209 regression
 PASS: Step 35.0.26 exposes the NATURAL, OS-RECON, FORWARD, and Step15-live CORE-HANDOFF mode identities
 PASS: Step 35.0.26 CORE-HANDOFF loads only the verified private GodotSharp derivative, binds exact NativeFuncs.Initialize(IntPtr,int), requires initialized=false, invokes once, and preserves a resolver baseline before Gate C
-PASS: Step 35.0.30 host regression rejects invalid native callback metadata before preflight/CLR work while preserving exactly one durable managed-failure checkpoint and proving CB_INIT_ENTRY was not reached
-PASS: Step 35.0.30 host regression rejects invalid native ManagedCallbacks size before preflight/CLR work
-PASS: Step 35.0.30 host regression pins the actual Gate-A missing-preflight exception contract instead of requiring a stale preflight substring
-PASS: Step 35.0.30 host regression protects the post-bootstrap resolver-baseline failure contract
+PASS: Step 35.0.31 host regression rejects invalid native callback metadata before preflight/CLR work while preserving exactly one durable managed-failure checkpoint and proving CB_INIT_ENTRY was not reached
+PASS: Step 35.0.31 host regression rejects invalid native ManagedCallbacks size before preflight/CLR work
+PASS: Step 35.0.31 host regression pins the actual Gate-A missing-preflight exception contract instead of requiring a stale preflight substring
+PASS: Step 35.0.31 host regression protects the post-bootstrap resolver-baseline failure contract
 PASS: Step 35.0.26 native Step-15 bridge exposes only the source-built Godot runtime interop table after C# native scaffolding readiness and reports competing dotnet state
 PASS: Step 35.0.26 managed native bridge exposes callback-table readiness/state/pointer without loading a game native image
 PASS: Step 35.0.26 native bridge preserves readiness telemetry and adds complete-struct cache adoption plus the standard isolated core-API reverse callback
@@ -534,7 +522,7 @@ PASS: Step 35.0.26 external bridge does not start or fake Godot runtime ownershi
 PASS: Step 35.0.26 managed native bridge exposes complete reverse-bootstrap state and operations
 PASS: iOS ReferenceNativeSymbol roots preserve every Step-35.0.25 managed-plugin bootstrap export
 PASS: standalone Step-15 link preflight roots every managed-plugin bootstrap export
-PASS: Step 35.0.30 core reproduces and verifies the generated game-plugin managed bootstrap contract instead of invoking the UnmanagedCallersOnly entry point directly
+PASS: Step 35.0.31 core reproduces and verifies the generated game-plugin managed bootstrap contract instead of invoking the UnmanagedCallersOnly entry point directly
 PASS: Step 35.0.26 seals the exact physical 0.0.146 eight-request/eight-host-load/zero-private bootstrap resolver delta and freezes it before Gate C
 PASS: Step 35.0.26 CORE-HANDOFF carries one coordinated reverse-bootstrap sequence with durable boundaries before natural Gate C
 PASS: Step 35.0.26 natural Gate C occurs only after managed-plugin bootstrap PASS
@@ -542,32 +530,32 @@ PASS: Step 35.0.26 iOS bootstrap seals and records the post-bootstrap resolver b
 PASS: pinned Step-15 source build enables Godot's native mono/C# module required for the exact callback-table producer
 PASS: standalone Step-15 native-link preflight carries unresolved roots for every callback-handoff export
 PASS: project-owned Step-15 smoke project does not advertise a dotnet project feature
-PASS: Step 35.0.30 iOS surface gates CORE-HANDOFF on an already-live Step-15 engine, rejects competing dotnet state, obtains the exact native table, and records the managed handoff
+PASS: Step 35.0.31 iOS surface gates CORE-HANDOFF on an already-live Step-15 engine, rejects competing dotnet state, obtains the exact native table, and records the managed handoff
 PASS: Step 35.0.26 Step-35 iOS partial explicitly imports the Platform namespace required to resolve GodotStep15NativeBridge and protects the 0.0.142 CS0103 compile regression
-PASS: Step 35.0.30 FORWARD mode is a bounded one-call-site empty-string-array substitution with post-write verification
-PASS: Step 35.0.30 host regression protects the exact one-site managed command-line provider rewrite
-PASS: Step 35.0.30 GodotSharp derivative expands entry-only closure around OS type initialization and callback thunks
-PASS: Step 35.0.30 read-only reconnaissance mirrors the expanded OS/callback closure
-PASS: Step 35.0.30 retains prior Godot callsite marker round-trip regression
-PASS: Step 35.0.30 regressions protect exact ordinals, managed dictionary generic MemberRefs, natural GetCmdlineArgs retention, critical boundaries and executable MaxStack safety
+PASS: Step 35.0.31 FORWARD mode is a bounded one-call-site empty-string-array substitution with post-write verification
+PASS: Step 35.0.31 host regression protects the exact one-site managed command-line provider rewrite
+PASS: Step 35.0.31 GodotSharp derivative expands entry-only closure around OS type initialization and callback thunks
+PASS: Step 35.0.31 read-only reconnaissance mirrors the expanded OS/callback closure
+PASS: Step 35.0.31 retains prior Godot callsite marker round-trip regression
+PASS: Step 35.0.31 regressions protect exact ordinals, managed dictionary generic MemberRefs, natural GetCmdlineArgs retention, critical boundaries and executable MaxStack safety
 PASS: Step 35 static target audit remains dependency-resolution free
-PASS: Step 35.0.30 invokes the selected Task-returning ExecuteVeryEarly once, supports exact-authority token binding, and preserves the 60-second await boundary
+PASS: Step 35.0.31 invokes the selected Task-returning ExecuteVeryEarly once, supports exact-authority token binding, and preserves the 60-second await boundary
 PASS: Step 35 resolver stays exact-plan/fail-closed for initializer-bearing, unplanned and native requests
-PASS: Step 35.0.30 core retains durable B→C/invocation/resolver crash-localization markers
-PASS: Step 35.0.30 iOS surface preserves the physical 0.0.140 three-mode proof and exposes the separately gated CORE-HANDOFF diagnostic
-PASS: Step 35.0.30 host regressions retain crash-checkpoint and static-map coverage
-PASS: Step 35.0.30 host regressions protect diagnostic gate order, exact source target and initializer-bearing refusal
+PASS: Step 35.0.31 core retains durable B→C/invocation/resolver crash-localization markers
+PASS: Step 35.0.31 iOS surface preserves the physical 0.0.140 three-mode proof and exposes the separately gated CORE-HANDOFF diagnostic
+PASS: Step 35.0.31 host regressions retain crash-checkpoint and static-map coverage
+PASS: Step 35.0.31 host regressions protect diagnostic gate order, exact source target and initializer-bearing refusal
 PASS: Step 35 host regressions use supported MSTest v4 exception assertions
-PASS: Step 35.0.30 iOS surface separates diagnostic 4/4 from the explicit exact-authority closure candidate
-PASS: Step 35.0.30 managed-plugin bootstrap partial imports the declared StS2Launcher.Core namespace for Step35DiagnosticMode exact-closure compile integration
-PASS: Step 35.0.30 Gate D forwards protected OfflineReady file/byte checkpoints into the Step-35 progress contract
-PASS: Step 35.0.30 iOS surface exposes dedicated Gate-D file/byte progress plus a live heartbeat during long single-file hashes
-PASS: Step 35.0.30 leaves the physically protected Step-13 OfflineReady verifier implementation unchanged
-PASS: Step 35.0.30 Gate-C PASS wording distinguishes diagnostic from exact authority
-PASS: Step 35.0.30 exact-authority mode uses the existing four-gate contract and exact transformed CLR authority without inventing a fifth gate
-PASS: Step 35.0.30 host regressions pin exact-closure mode value and fail-closed callback metadata
-PASS: Step 35.0.30 core durably localizes Gate-D finalization around result construction/progress/return
-PASS: Step 35.0.30 UI durably records Gate-D Task resumption and result recording
+PASS: Step 35.0.31 iOS surface separates diagnostic 4/4 from the explicit exact-authority closure candidate
+PASS: Step 35.0.31 managed-plugin bootstrap partial imports the declared StS2Launcher.Core namespace for Step35DiagnosticMode exact-closure compile integration
+PASS: Step 35.0.31 Gate D forwards protected OfflineReady file/byte checkpoints into the Step-35 progress contract
+PASS: Step 35.0.31 iOS surface exposes dedicated Gate-D file/byte progress plus a live heartbeat during long single-file hashes
+PASS: Step 35.0.31 leaves the physically protected Step-13 OfflineReady verifier implementation unchanged
+PASS: Step 35.0.31 Gate-C PASS wording distinguishes diagnostic from exact authority
+PASS: Step 35.0.31 exact-authority mode uses the existing four-gate contract and exact transformed CLR authority without inventing a fifth gate
+PASS: Step 35.0.31 host regressions pin exact-closure mode value and fail-closed callback metadata
+PASS: Step 35.0.31 core durably localizes Gate-D finalization around result construction/progress/return
+PASS: Step 35.0.31 bypasses captured UIKit await continuation and explicitly finalizes Gate D on the main thread
 PASS: Step 35 iOS UI persists the dedicated report and uses the numeric SystemButton font-size contract
 PASS: RootViewController wires Step 35 into the active device surface
 PASS: release presentation pins the Step-35 exact-source/instrumented-clone boundary and 0.0.138 physical provenance
@@ -580,7 +568,7 @@ PASS: Step 36 gate sequence exists
 PASS: Step 36 host regressions exists
 PASS: Step 36 iOS surface exists
 PASS: Step 35 exact core result explicitly hands authority forward to Step 36 without broadening its invocation path
-PASS: Step 35.0.30 routes Gate-D completion through an outer worker and durably localizes worker/UI return
+PASS: Step 35.0.31 routes Gate-D completion through an outer worker, noncapturing continuation, and explicit main-thread finalization
 PASS: Step 36.0 defines exactly four ordered A-D gates
 PASS: Step 36.0 summary requires ordered four-of-four completion
 PASS: Step 36.0 pins exact ExecuteEssential identity/token and state transition
@@ -592,7 +580,8 @@ PASS: Step 36 Gate C invokes exact ExecuteEssential once, requires state 2, and 
 PASS: Step 36 Gate D re-proves OfflineReady, authority/plan/dependency hashes, context ownership and final state
 PASS: Step 36 explicitly keeps deferred/prewarm/entry/Harmony/native-game boundaries forbidden
 PASS: Step 36 iOS surface exposes only the separately gated exact ExecuteEssential sequence after Step-35 exact closure
-PASS: Step 36 Gate D uses the same outer-worker completion pattern as the Step-35 UI-return fix
+PASS: Step 36 prerequisite keys off durable exact Step-35 core closure rather than the stalled UI gate snapshot
+PASS: Step 36 Gate D proactively uses the same noncapturing continuation plus explicit-main-thread finalization pattern
 PASS: Step 36 emits durable run-correlated checkpoint/static-map/final-report evidence
 PASS: Step 36 host regressions pin gate order and exact ExecuteEssential authority constants
 PASS: Step 36 MSTest v4 regressions avoid removed ThrowsException APIs
@@ -785,8 +774,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status records physical 0.0.152 exact Step-35 core closure, UI-return fix, and active Step-36 boundary
-PASS: testing and release-checklist docs pin the exact 0.0.153 (153) release identity
+PASS: current status records physical 0.0.153 worker-return localization, explicit-main-queue fix, and active Step-36 boundary
+PASS: testing and release-checklist docs pin the exact 0.0.154 (154) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -912,7 +901,7 @@ PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.i
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
 PASS: host-test report heading identifies Step 36
 PASS: host-test TRX artifact identifies Step 36
-PASS: Codemagic build-environment report heading identifies the combined Step 35.0.30 / Step 36.0 candidate
+PASS: Codemagic build-environment report heading identifies the combined Step 35.0.31 / Step 36.0 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -938,12 +927,12 @@ PASS: physically closed Step-33 implementation, tests, and closure evidence rema
 PASS: physically closed Step 34 implementation/evidence hash manifest exists
 PASS: physically closed Step-34 implementation, tests, and closure evidence remain hash-pinned
 PASS: Step 35 candidate boundary hash manifest exists
-PASS: Step 35.0.29 candidate manifest includes implementation/tests, native/build bridge, prior provenance, physical 0.0.149 evidence, 0.0.150/0.0.151 CI compile failures, and active declared-namespace correction
+PASS: Step 35.0.31 candidate manifest includes implementation/tests, native/build bridge, prior provenance, physical 0.0.153 worker-return evidence, and active explicit-main-queue correction
 PASS: Step 35 implementation, active release wiring, and design/evidence docs are hash-pinned
 PASS: Step 36 active candidate hash manifest exists
-PASS: Step 36 candidate manifest pins the UI-return fix, exact ExecuteEssential implementation/tests, active release wiring, and physical Step-35 closure provenance
+PASS: Step 36 candidate manifest pins the explicit-main-queue fix, exact ExecuteEssential implementation/tests, active release wiring, and physical Step-35 closure provenance
 PASS: Step 36 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 932 checks
+VALIDATION PASS: 933 checks

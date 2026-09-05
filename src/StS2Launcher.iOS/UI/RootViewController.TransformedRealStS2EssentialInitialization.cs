@@ -1,3 +1,4 @@
+using Foundation;
 using StS2Launcher.Core;
 using System.Text;
 
@@ -21,7 +22,7 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Step 36.0 — Controlled Exact ExecuteEssential (requires same-process Step 35 EXACT-CLOSURE 4/4)",
+            "Step 36.0 — Controlled Exact ExecuteEssential (requires same-process exact Step-35 core closure)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
@@ -66,13 +67,12 @@ public sealed partial class RootViewController
         }
 
         if (!_transformedRealStS2VeryEarlyInitialization.ExactStep35CoreClosurePassed ||
-            !_transformedRealStS2VeryEarlyInitializationGates.Snapshot().Passed ||
             _transformedRealStS2VeryEarlyInitialization.DiagnosticMode != Step35DiagnosticMode.GodotCoreExactClosure)
         {
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: PREREQUISITE NOT MET";
             _step36ResultLabel.TextColor = UIColor.SystemOrange;
-            _step36DetailLabel.Text = "Step 36.0 requires a completed Step 35 EXACT-CLOSURE 4/4 in this same process. From a fresh launch run Step 15 Gates A-C, then Step 35 EXACT-CLOSURE once, wait for the Step-35 4/4 result to finalize, then press Step 36.0 without force-quitting or backgrounding the app.";
-            _statusLabel.Text = "STEP 36 REFUSED — exact Step-35 same-process closure is not present.";
+            _step36DetailLabel.Text = "Step 36.0 requires the same-process exact Step-35 core closure. From a fresh launch run Step 15 Gates A-C, then Step 35 EXACT-CLOSURE once. The core Gate-D result must be passed=true/exactAuthority=true; Step 36 no longer depends on the historical UIKit await/result-record continuation.";
+            _statusLabel.Text = "STEP 36 REFUSED — exact Step-35 same-process core closure is not present.";
             _statusLabel.TextColor = UIColor.SystemOrange;
             return;
         }
@@ -135,7 +135,7 @@ public sealed partial class RootViewController
                     _step36ProgressLabel.Text = $"Step 36 Gate D — {value.ProcessedItems:N0}/{value.TotalItems:N0}: {value.Detail}";
                 }
             });
-            WriteStep36Checkpoint("E_D_WORKER_SCHEDULE — scheduling Step-36 Gate D behind an outer Task.Run completion boundary.");
+            WriteStep36Checkpoint("E_D_WORKER_SCHEDULE — scheduling Step-36 Gate D behind an outer Task.Run completion boundary; completion continuation explicitly avoids UIKit SynchronizationContext.");
             var gateD = await Task.Run(async () =>
             {
                 var result = await _transformedRealStS2VeryEarlyInitialization
@@ -143,49 +143,82 @@ public sealed partial class RootViewController
                     .ConfigureAwait(false);
                 WriteStep36Checkpoint($"E_D_WORKER_RETURN — outer Step-36 Gate-D worker observed result; passed={result.Passed}.");
                 return result;
-            }, token);
-            WriteStep36Checkpoint($"E_D_TASK_AWAIT_RESUMED — outer Step-36 Gate-D worker returned to UI caller; passed={gateD.Passed}.");
-            if (!RecordStep36Gate(gateD)) return;
+            }, token).ConfigureAwait(false);
+            WriteStep36Checkpoint($"E_D_THREADPOOL_CONTINUATION — outer Step-36 Gate-D Task completed without recapturing UIKit SynchronizationContext; passed={gateD.Passed}; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}.");
 
-            var snapshot = _step36Gates.Snapshot();
-            _step36ResultLabel.Text = snapshot.Summary;
-            _step36ResultLabel.TextColor = UIColor.Label;
-            _step36DetailLabel.Text =
-                "All four Step 36.0 gates passed. Exact transformed ExecuteEssential was statically re-proved, bound from the same exact Step-35 CLR authority, invoked once, returned normally with OneTimeInitialization state 1→2, and final OfflineReady/hash/resolver/context reproof passed. This advances only the essential initialization boundary; ExecuteDeferred, PrewarmJit, game entry, native game loading, and broader startup remain separate future gates.";
-            _step36ProgressLabel.Text = "Step 36 Gate D COMPLETE — PASS";
-            _statusLabel.Text = "STEP 36.0 COMPLETE — 4/4. Preserve Step36 run artifacts before advancing to deferred initialization.";
-            _statusLabel.TextColor = UIColor.Label;
-            WriteStep36Checkpoint("RUN_STEP36_4OF4 — exact ExecuteEssential boundary completed all four gates; later initialization remains forbidden.");
+            var gateDRecorded = false;
+            void FinalizeStep36GateDOnMainThread()
+            {
+                WriteStep36Checkpoint($"E_D_UI_DISPATCH_ENTER — explicit main-thread Step-36 Gate-D finalization entered; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}.");
+                gateDRecorded = RecordStep36Gate(gateD);
+                if (gateDRecorded)
+                {
+                    WriteStep36Checkpoint("E_D_RESULT_RECORD_PASS — Step-36 Gate-D PASS recorded on explicit main-thread dispatch.");
+                    var snapshot = _step36Gates.Snapshot();
+                    _step36ResultLabel.Text = snapshot.Summary;
+                    _step36ResultLabel.TextColor = UIColor.Label;
+                    _step36DetailLabel.Text =
+                        "All four Step 36.0 gates passed. Exact transformed ExecuteEssential was statically re-proved, bound from the same exact Step-35 CLR authority, invoked once, returned normally with OneTimeInitialization state 1→2, and final OfflineReady/hash/resolver/context reproof passed. This advances only the essential initialization boundary; ExecuteDeferred, PrewarmJit, game entry, native game loading, and broader startup remain separate future gates.";
+                    _step36ProgressLabel.Text = "Step 36 Gate D COMPLETE — PASS";
+                    _statusLabel.Text = "STEP 36.0 COMPLETE — 4/4. Preserve Step36 run artifacts before advancing to deferred initialization.";
+                    _statusLabel.TextColor = UIColor.Label;
+                    WriteStep36Checkpoint("RUN_STEP36_4OF4 — exact ExecuteEssential boundary completed all four gates; later initialization remains forbidden.");
+                }
+                else
+                {
+                    WriteStep36Checkpoint("E_D_RESULT_RECORD_FAIL_STOP — Step-36 Gate-D result recorded as FAIL on explicit main-thread dispatch.");
+                }
+                WriteStep36Checkpoint("E_D_UI_DISPATCH_RETURN — explicit main-thread Step-36 Gate-D finalization completed.");
+            }
+
+            if (NSThread.IsMain)
+                FinalizeStep36GateDOnMainThread();
+            else
+                InvokeOnMainThread(FinalizeStep36GateDOnMainThread);
+
+            if (!gateDRecorded)
+                return;
         }
         catch (OperationCanceledException)
         {
             WriteStep36Checkpoint("RUN_CANCELLED_INCONCLUSIVE — Step 36 cancellation is not a compatibility verdict; if Gate C began, force-quit before retry.");
-            _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: CANCELLED / INCONCLUSIVE";
-            _step36ResultLabel.TextColor = UIColor.SecondaryLabel;
-            _statusLabel.Text = "STEP 36 CANCELLED / INCONCLUSIVE — force-quit before retry if Gate C started.";
-            _statusLabel.TextColor = UIColor.SecondaryLabel;
+            void ApplyCancelledUi()
+            {
+                _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: CANCELLED / INCONCLUSIVE";
+                _step36ResultLabel.TextColor = UIColor.SecondaryLabel;
+                _statusLabel.Text = "STEP 36 CANCELLED / INCONCLUSIVE — force-quit before retry if Gate C started.";
+                _statusLabel.TextColor = UIColor.SecondaryLabel;
+            }
+            if (NSThread.IsMain) ApplyCancelledUi(); else InvokeOnMainThread(ApplyCancelledUi);
         }
         catch (Exception ex)
         {
             WriteStep36Checkpoint($"RUN_MANAGED_EXCEPTION — {ex.GetType().FullName}: {ex.Message}");
-            _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: EXCEPTION";
-            _step36ResultLabel.TextColor = UIColor.SystemRed;
-            _step36DetailLabel.Text = $"Unhandled Step 36.0 exception: {ex.GetType().Name}: {ex.Message}";
-            _statusLabel.Text = "STEP 36 FAIL — preserve Step36 artifacts; force-quit before retry if Gate C started.";
-            _statusLabel.TextColor = UIColor.SystemRed;
+            void ApplyExceptionUi()
+            {
+                _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: EXCEPTION";
+                _step36ResultLabel.TextColor = UIColor.SystemRed;
+                _step36DetailLabel.Text = $"Unhandled Step 36.0 exception: {ex.GetType().Name}: {ex.Message}";
+                _statusLabel.Text = "STEP 36 FAIL — preserve Step36 artifacts; force-quit before retry if Gate C started.";
+                _statusLabel.TextColor = UIColor.SystemRed;
+            }
+            if (NSThread.IsMain) ApplyExceptionUi(); else InvokeOnMainThread(ApplyExceptionUi);
         }
         finally
         {
-            WriteStep36Checkpoint("RUN_FINALLY_ENTER — Step-36 managed control reached finally; writing deterministic report.");
+            WriteStep36Checkpoint($"RUN_FINALLY_ENTER — Step-36 managed control reached finally; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}; writing deterministic report without requiring a captured UIKit continuation.");
             await WriteDeviceTestReportFromLabelsAsync(
                 "Step36-TransformedRealStS2EssentialInitialization.txt",
                 "StS2 Launcher — Step 36.0 Controlled Exact ExecuteEssential",
                 _step36ResultLabel,
                 _step36DetailLabel,
-                CancellationToken.None);
+                CancellationToken.None).ConfigureAwait(false);
             WriteStep36Checkpoint("RUN_NORMAL_REPORT_RETURNED — Step36 report writer returned.");
-            EndSteamOperation();
-            WriteStep36Checkpoint("RUN_END — Step-36 UI operation ended normally.");
+            if (NSThread.IsMain)
+                EndSteamOperation();
+            else
+                InvokeOnMainThread(EndSteamOperation);
+            WriteStep36Checkpoint("RUN_END — Step-36 UI operation ended normally after explicit main-thread teardown.");
         }
     }
 

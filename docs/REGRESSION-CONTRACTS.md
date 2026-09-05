@@ -484,9 +484,9 @@ The following contracts are release-blocking for 0.0.144:
 - Physical 0.0.144 GS035 is diagnostic provenance; it does not close exact Step 35.
 
 
-## Step 35.0.30 / Step 36.0 — UI-return correction and controlled ExecuteEssential
+## Step 35.0.31 / Step 36.0 — UI-return correction and controlled ExecuteEssential
 
-0.0.153 must preserve the physical 0.0.152 exact Step-35 core result. The Gate-D UI fix may change only task scheduling/completion plumbing: an outer `Task.Run` boundary must observe the unchanged core `RunFinalIsolationAuditAsync` result before UIKit resumes. It must not alter exact sts2/GodotSharp authority, bridge tables, resolver policy, ExecuteVeryEarly invocation count, or Gate-D isolation checks.
+0.0.154 must preserve the physical 0.0.152/0.0.153 exact Step-35 core result. Physical 0.0.153 already proves the outer `Task.Run` worker returns `passed=true; exactAuthority=true`; therefore the UI correction must not add another captured-await layer. The outer Gate-D await must use `ConfigureAwait(false)`, then final UIKit mutation must be explicitly dispatched with `InvokeOnMainThread`. It must not alter exact sts2/GodotSharp authority, bridge tables, resolver policy, ExecuteVeryEarly invocation count, or Gate-D isolation checks.
 
 Step 36.0 additionally requires:
 

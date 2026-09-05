@@ -1,6 +1,6 @@
-# Release checklist — Step 35.0.30 / Step 36.0 / 0.0.153
+# Release checklist — Step 35.0.31 / Step 36.0 / 0.0.154
 
-Release identity: display/build `0.0.153 (153)`, IPA `StS2-Launcher-Step-36.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.154 (154)`, IPA `StS2-Launcher-Step-36.ipa`, workflow `ios-canonical`.
 
 - [ ] static validation passes;
 - [ ] host regression suite passes with Step-36 tests;

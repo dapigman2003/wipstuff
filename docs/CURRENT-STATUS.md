@@ -1,23 +1,16 @@
 # Current status
 
-## Active candidate — Step 35.0.30 / Step 36.0 / 0.0.153 (153)
+## Active candidate — Step 35.0.31 / Step 36.0 / 0.0.154 (154)
 
-Steps 32–34 remain CLOSED POSITIVE. Physical 0.0.152 establishes **positive exact Step-35 core closure** under the explicitly defined source-built Godot 4.5.1 bridge prerequisite: exact transformed sts2 and exact prepared GodotSharp were the CLR inputs; exact ExecuteVeryEarly returned and awaited `RanToCompletion`; post-await resolver/native confinement passed; OfflineReady re-proved 428/428; exact authority/plan/dependency/context checks passed; and Gate D constructed `passed=True; exactAuthority=True`.
+Steps 32–34 remain CLOSED POSITIVE. Physical 0.0.152 established **positive exact Step-35 core closure** under the explicitly defined source-built Godot 4.5.1 bridge prerequisite: exact transformed sts2 and exact prepared GodotSharp were the CLR inputs; exact ExecuteVeryEarly returned and awaited `RanToCompletion`; post-await resolver/native confinement passed; OfflineReady re-proved 428/428; exact authority/plan/dependency/context checks passed; and Gate D constructed `passed=True; exactAuthority=True`.
 
-The final 0.0.152 durable marker was `D_TASK_RETURN_START`. No `D_TASK_AWAIT_RESUMED` followed, while the app remained responsive with the terminal 4/4/finalization UI visible. This localizes the remaining defect to the UIKit await/result-record continuation after the already-completed core Gate-D result.
+Physical 0.0.153 then proved the outer worker itself also returns that already-passed result. The final durable sequence is `D_RESULT_CONSTRUCT_RETURNED` → `D_TASK_RETURN_START` → `D_WORKER_RETURN`, with `passed=True; exactAuthority=True`. The captured UIKit await continuation still never ran. That isolates the defect to continuation capture/dispatch rather than Gate D, the game, or the worker task.
 
-### 0.0.153 Step-35 UI-return correction
+### 0.0.154 Step-35 explicit-main-queue correction
 
-Gate D is now scheduled behind an outer `Task.Run` worker boundary. The inner core audit retains its existing `ConfigureAwait(false)` behavior and exact authority checks. New durable markers distinguish:
+Gate D still runs behind the outer worker, but the outer await now uses `ConfigureAwait(false)`. After `D_WORKER_RETURN`, completion remains on a thread-pool continuation and records `D_THREADPOOL_CONTINUATION`. Final Gate-D UI mutation is then explicitly marshaled with `InvokeOnMainThread`, bounded by `D_UI_DISPATCH_ENTER` / `D_UI_DISPATCH_RETURN`. Report snapshotting already marshals label reads; final heartbeat teardown and `EndSteamOperation` are explicitly sent to the main thread as needed.
 
-- `D_WORKER_SCHEDULE`
-- core `D_RESULT_CONSTRUCT_RETURNED`
-- core `D_TASK_RETURN_START`
-- outer `D_WORKER_RETURN`
-- UI `D_TASK_AWAIT_RESUMED`
-- `D_RESULT_RECORD_PASS`
-
-No Step-35 bridge/resolver/game-member behavior is broadened by this fix.
+Step 36 no longer requires the Step-35 UI gate-sequence snapshot to say 4/4. It requires the durable core closure flag plus exact-closure mode; the Step-36 core performs its own same-process authority continuity checks before any new invocation. Step-36 Gate D uses the same `ConfigureAwait(false)` + explicit-main-queue finalization pattern proactively.
 
 ## Step 36.0 — Controlled exact ExecuteEssential
 
