@@ -22,12 +22,12 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Step 36.0.1 — Exact Game Resource-Pack Handoff + Controlled ExecuteEssential",
+            "Step 36.0.2 — Exact ExecuteEssential Failure-Chain Capture",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
         _step36EssentialButton = SystemButton(
-            "Run Step 36.0.1 A–D — Reprove → Mount Receipt-Backed Game PCK → Invoke ExecuteEssential → Final Audit",
+            "Run Step 36.0.2 A–D — Reprove → Mount PCK → Invoke Once → Capture Full Failure Chain",
             16);
         _step36EssentialButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2EssentialInitializationAsync();
         content.AddArrangedSubview(_step36EssentialButton);
@@ -39,7 +39,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_step36ResultLabel);
 
         _step36DetailLabel = Label(
-            "Physical 0.0.154 reached exact ExecuteEssential and failed only because source-built Godot still exposed the Step-15 smoke resource tree: res://localization/eng did not exist. Step 36.0.1 first mounts the exact receipt-backed Slay the Spire 2 PCK into the already-live source-built Godot resource filesystem with replaceFiles=false, proves that res://localization/eng is visible, then invokes only exact transformed OneTimeInitialization.ExecuteEssential() once. ExecuteDeferred, PrewarmJit, the game entry point, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native game loading remain forbidden.",
+            "Physical 0.0.155 closes the game-PCK resource boundary: the exact receipt-backed PCK mounts successfully and res://localization/eng is visible before Gate C. The unchanged exact ExecuteEssential invocation then throws through a nested TargetInvocationException chain, but 0.0.155 records only the outer reflection message. Step 36.0.2 preserves the same one-call runtime experiment and adds durable full exception-chain/base-exception/loader-exception, post-failure state, resolver/load delta, and sts2/GodotSharp load-context telemetry. No retry, state reset, child-method probe, ExecuteDeferred, PrewarmJit, game entry, Harmony/MonoMod runtime patching, arbitrary resolver fallback, or native game loading is authorized.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_step36DetailLabel);

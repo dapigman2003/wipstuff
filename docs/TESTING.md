@@ -1,6 +1,6 @@
-# Testing — Step 35.0.31 / Step 36.0.1
+# Testing — Step 35.0.31 / Step 36.0.2
 
-Active candidate: `0.0.155 (155)`, IPA `StS2-Launcher-Step-36.ipa`, TRX `step36.trx`, workflow `ios-canonical`.
+Active candidate: `0.0.156 (156)`, IPA `StS2-Launcher-Step-36.ipa`, TRX `step36.trx`, workflow `ios-canonical`.
 
 ## CI
 
@@ -10,7 +10,7 @@ Active candidate: `0.0.155 (155)`, IPA `StS2-Launcher-Step-36.ipa`, TRX `step36.
 4. iOS publish/link must pass.
 5. `scripts/verify-ipa.sh` must verify the exact release identity, runtime policy, fixture payloads, and absence of proprietary game payloads.
 
-## Physical 0.0.155 sequence
+## Physical 0.0.156 sequence
 
 Fresh launch:
 
@@ -18,7 +18,7 @@ Fresh launch:
 2. Leave the Step-15 smoke engine alive in the same process.
 3. Run Step 35 EXACT-CLOSURE once.
 4. Require durable `D_WORKER_RETURN`, then `D_THREADPOOL_CONTINUATION`, `D_UI_DISPATCH_ENTER`, `D_RESULT_RECORD_PASS`, `D_UI_DISPATCH_RETURN`, `RUN_EXACT_STEP35_4OF4`, and normal `RUN_END`.
-5. Without force-quitting/backgrounding, press Step 36.0.1 once.
+5. Without force-quitting/backgrounding, press Step 36.0.2 once.
 
 Expected Step-36 evidence:
 
@@ -32,3 +32,7 @@ Expected Step-36 evidence:
 - Gate D: OfflineReady, exact authority/plan/dependency/context reproof, then `E_D_THREADPOOL_CONTINUATION`, `E_D_UI_DISPATCH_ENTER`, `E_D_RESULT_RECORD_PASS`, and `RUN_STEP36_4OF4`.
 
 If Step-36 Gate C begins, do not retry in the same process. Preserve Step36 checkpoint/static-map/report artifacts first.
+
+
+### Step 36.0.2 failure evidence
+On Gate-C failure preserve the run-correlated journal and final report. The report must expose the complete exception depths, `GetBaseException()`, any `ReflectionTypeLoadException.LoaderExceptions`, state after failure, resolver/load deltas, and sts2/GodotSharp load-context continuity. Do not retry Step 36 in the same process.

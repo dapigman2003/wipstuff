@@ -500,3 +500,10 @@ Step 36.0 additionally requires:
 - zero initializer-bearing, rejected managed, or native resolver escape;
 - final OfflineReady/source/transformed/plan/private-dependency/context reproof;
 - intentional invocation of ExecuteDeferred, PrewarmJit, game entry point, Harmony/MonoMod APIs, or native game loading remains forbidden.
+
+
+## Step 36.0.2 — full ExecuteEssential failure-chain observability
+
+Physical 0.0.155 proves the Step-36 game-resource handoff: exact receipt-backed PCK lookup, additive exact-GodotSharp `LoadResourcePack`, and `res://localization/eng` probe all pass before the unchanged exact ExecuteEssential invocation. The active defect is diagnostic loss: the physical failure is reported only as nested `TargetInvocationException: Arg_TargetInvocationException`.
+
+0.0.156 may change **observation only**. Gate C must retain exactly one `binding.Method.Invoke(null, null)` and must not retry, reset `OneTimeInitialization._state`, directly invoke ExecuteEssential child methods, authorize deferred/prewarm/entry execution, or broaden resolver/native policy. On failure it must preserve every `InnerException`, `GetBaseException()`, loader exceptions for `ReflectionTypeLoadException`, HResult/source/target/stack, post-failure state, resolver/load deltas, and sts2/GodotSharp private-load-context continuity.

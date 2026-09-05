@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StS2Launcher.Core;
 
@@ -48,6 +49,31 @@ public sealed class TransformedRealStS2EssentialInitializationTests
         Assert.AreEqual(2, TransformedRealStS2VeryEarlyInitialization.ExpectedStateAfterEssential);
         Assert.AreEqual("SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck", TransformedRealStS2VeryEarlyInitialization.GameResourcePackRelativePath);
         Assert.AreEqual("res://localization/eng", TransformedRealStS2VeryEarlyInitialization.RequiredLocalizationProbePath);
+    }
+
+
+    [TestMethod]
+    public void ExecuteEssentialFailureFormatterPreservesNestedReflectionEvidence()
+    {
+        var loaderFailure = new FileNotFoundException("loader dependency missing");
+        var typeLoad = new ReflectionTypeLoadException(
+            new Type[] { typeof(string) },
+            new Exception[] { loaderFailure },
+            "type load failed");
+        var innerInvocation = new TargetInvocationException("inner invoke failed", typeLoad);
+        var outerInvocation = new TargetInvocationException("outer invoke failed", innerInvocation);
+
+        var diagnostic = TransformedRealStS2VeryEarlyInitialization.FormatExceptionDiagnostic(outerInvocation);
+
+        StringAssert.Contains(diagnostic, "Exception depth 0: System.Reflection.TargetInvocationException");
+        StringAssert.Contains(diagnostic, "Exception depth 1: System.Reflection.TargetInvocationException");
+        StringAssert.Contains(diagnostic, "Exception depth 2: System.Reflection.ReflectionTypeLoadException");
+        StringAssert.Contains(diagnostic, "LoaderExceptions: 1");
+        StringAssert.Contains(diagnostic, "System.IO.FileNotFoundException: loader dependency missing");
+        StringAssert.Contains(diagnostic, "Base exception: System.Reflection.ReflectionTypeLoadException: type load failed");
+        StringAssert.Contains(diagnostic, "Base HResult:");
+        StringAssert.Contains(diagnostic, "Base TargetSite:");
+        StringAssert.Contains(diagnostic, "Base StackTrace:");
     }
 
     [TestMethod]

@@ -6,7 +6,7 @@ using Mono.Cecil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 36.0.1 boundary. This phase is intentionally available only after the exact Step-35 core closure has
+/// Step 36.0.2 boundary. This phase is intentionally available only after the exact Step-35 core closure has
 /// completed in the same process. It preserves the exact closed Step-32 transformed sts2 assembly and exact
 /// prepared GodotSharp bridge established by Step 35, statically re-proves ExecuteEssential against the exact
 /// source/transformed pair, mounts the exact receipt-backed game PCK into the live Godot resource filesystem, invokes only ExecuteEssential once, and then re-proves isolation. ExecuteDeferred,
@@ -268,15 +268,34 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
             stage = "single exact ExecuteEssential invocation";
             Checkpoint(checkpoint, $"E_C_INVOKE_START — invoking exact transformed ExecuteEssential once on managedThread={Environment.CurrentManagedThreadId}; stateBefore={stateBefore}; gamePackMounted={resourceHandoff.PackRelativePath}; localizationProbe={resourceHandoff.LocalizationProbePath}. This synchronous boundary has no launcher retry in the same process.");
+            var resolverCountBefore = context.ManagedResolverRequests.Count;
+            var hostLoadCountBefore = context.HostLoads.Count;
+            var privateLoadCountBefore = context.PrivateLoads.Count;
+            var initializerBearingCountBefore = context.InitializerBearingRequests.Count;
+            var rejectedManagedCountBefore = context.RejectedManagedRequests.Count;
+            var nativeLoadCountBefore = context.NativeLoadAttempts.Count;
             try
             {
                 binding.Method.Invoke(null, null);
             }
-            catch (TargetInvocationException ex) when (ex.InnerException is not null)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException(
-                    $"Exact transformed ExecuteEssential threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}",
-                    ex.InnerException);
+                var stateAfterFailure = TryReadOneTimeInitializationState(binding.StateField);
+                var diagnostic = BuildEssentialInvocationFailureDiagnostic(
+                    ex,
+                    stateBefore,
+                    stateAfterFailure,
+                    binding.Method,
+                    context,
+                    resolverCountBefore,
+                    hostLoadCountBefore,
+                    privateLoadCountBefore,
+                    initializerBearingCountBefore,
+                    rejectedManagedCountBefore,
+                    nativeLoadCountBefore);
+                foreach (var line in diagnostic.CheckpointLines)
+                    Checkpoint(checkpoint, line);
+                throw new InvalidOperationException(diagnostic.ReportText, ex);
             }
             Checkpoint(checkpoint, "E_C_INVOKE_RETURNED — exact transformed ExecuteEssential returned to the launcher.");
 
@@ -314,7 +333,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         }
         catch (Exception ex)
         {
-            Checkpoint(checkpoint, $"E_C_FAIL — stage={stage}; {ex.GetType().FullName}: {ex.Message}");
+            Checkpoint(checkpoint, $"E_C_FAIL — stage={stage}; top={ex.GetType().FullName}; base={ex.GetBaseException().GetType().FullName}; message={SanitizeCheckpoint(ex.GetBaseException().Message)}");
             _essentialExecution = null;
             return EssentialFail(gate, stage, ex);
         }
@@ -647,6 +666,152 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return string.Join("\n", lines) + "\n";
     }
 
+
+    internal static string FormatExceptionDiagnostic(Exception exception)
+    {
+        var lines = new List<string>();
+        var current = exception;
+        var depth = 0;
+        while (current is not null)
+        {
+            lines.Add($"Exception depth {depth}: {current.GetType().FullName}");
+            lines.Add($"  Message: {current.Message}");
+            lines.Add($"  HResult: 0x{current.HResult:X8}");
+            lines.Add($"  Source: {current.Source ?? "<null>"}");
+            lines.Add($"  TargetSite: {FormatTargetSite(current.TargetSite)}");
+            lines.Add("  StackTrace:");
+            lines.Add(IndentMultiline(current.StackTrace ?? "<null>", "    "));
+            if (current is ReflectionTypeLoadException typeLoad && typeLoad.LoaderExceptions is { Length: > 0 })
+            {
+                lines.Add($"  LoaderExceptions: {typeLoad.LoaderExceptions.Length}");
+                for (var i = 0; i < typeLoad.LoaderExceptions.Length; i++)
+                {
+                    var loader = typeLoad.LoaderExceptions[i];
+                    if (loader is null)
+                    {
+                        lines.Add($"    [{i}] <null>");
+                        continue;
+                    }
+                    lines.Add($"    [{i}] {loader.GetType().FullName}: {loader.Message}");
+                    lines.Add($"        HResult: 0x{loader.HResult:X8}");
+                    lines.Add($"        Source: {loader.Source ?? "<null>"}");
+                    lines.Add($"        TargetSite: {FormatTargetSite(loader.TargetSite)}");
+                    lines.Add("        StackTrace:");
+                    lines.Add(IndentMultiline(loader.StackTrace ?? "<null>", "          "));
+                }
+            }
+            current = current.InnerException;
+            depth++;
+        }
+
+        var baseException = exception.GetBaseException();
+        lines.Add($"Base exception: {baseException.GetType().FullName}: {baseException.Message}");
+        lines.Add($"Base HResult: 0x{baseException.HResult:X8}");
+        lines.Add($"Base Source: {baseException.Source ?? "<null>"}");
+        lines.Add($"Base TargetSite: {FormatTargetSite(baseException.TargetSite)}");
+        lines.Add("Base StackTrace:");
+        lines.Add(IndentMultiline(baseException.StackTrace ?? "<null>", "  "));
+        return string.Join("\n", lines);
+    }
+
+    private static EssentialInvocationFailureDiagnostic BuildEssentialInvocationFailureDiagnostic(
+        Exception exception,
+        int stateBefore,
+        int? stateAfterFailure,
+        MethodInfo method,
+        Step35ExecutionLoadContext context,
+        int resolverCountBefore,
+        int hostLoadCountBefore,
+        int privateLoadCountBefore,
+        int initializerBearingCountBefore,
+        int rejectedManagedCountBefore,
+        int nativeLoadCountBefore)
+    {
+        var resolverDelta = context.ManagedResolverRequests.Skip(resolverCountBefore).ToArray();
+        var hostLoadDelta = context.HostLoads.Skip(hostLoadCountBefore).ToArray();
+        var privateLoadDelta = context.PrivateLoads.Skip(privateLoadCountBefore).ToArray();
+        var initializerDelta = context.InitializerBearingRequests.Skip(initializerBearingCountBefore).ToArray();
+        var rejectedDelta = context.RejectedManagedRequests.Skip(rejectedManagedCountBefore).ToArray();
+        var nativeDelta = context.NativeLoadAttempts.Skip(nativeLoadCountBefore).ToArray();
+        var sts2Assembly = method.DeclaringType?.Assembly ?? method.Module.Assembly;
+        var sts2ContextSame = ReferenceEquals(AssemblyLoadContext.GetLoadContext(sts2Assembly), context);
+        var godotSharpAssemblies = context.Assemblies.Where(a => string.Equals(a.GetName().Name, "GodotSharp", StringComparison.Ordinal)).ToArray();
+        var godotSharpContextSame = godotSharpAssemblies.Length == 1 && ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotSharpAssemblies[0]), context);
+        var exceptionText = FormatExceptionDiagnostic(exception);
+        var stateText = stateAfterFailure?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "<unreadable>";
+
+        var report =
+            "Exact transformed ExecuteEssential threw. Full diagnostic follows.\n" +
+            $"State before invocation: {stateBefore}\n" +
+            $"State after failed invocation: {stateText}\n" +
+            $"sts2 still in exact Step-35 private load context: {sts2ContextSame}\n" +
+            $"GodotSharp assemblies in private context: {godotSharpAssemblies.Length}\n" +
+            $"GodotSharp still in exact Step-35 private load context: {godotSharpContextSame}\n" +
+            $"Managed resolver delta: {FormatDelta(resolverDelta)}\n" +
+            $"Host-load delta: {FormatDelta(hostLoadDelta)}\n" +
+            $"Private-load delta: {FormatDelta(privateLoadDelta)}\n" +
+            $"Initializer-bearing request delta: {FormatDelta(initializerDelta)}\n" +
+            $"Rejected managed request delta: {FormatDelta(rejectedDelta)}\n" +
+            $"Native-load attempt delta: {FormatDelta(nativeDelta)}\n" +
+            exceptionText;
+
+        var checkpointLines = new List<string>
+        {
+            $"E_C_EXCEPTION_CAPTURED — top={exception.GetType().FullName}; base={exception.GetBaseException().GetType().FullName}; stateBefore={stateBefore}; stateAfterFailure={stateText}.",
+            $"E_C_POST_FAILURE_CONTEXT — sts2ContextSame={sts2ContextSame}; godotSharpCount={godotSharpAssemblies.Length}; godotSharpContextSame={godotSharpContextSame}; resolverDelta={resolverDelta.Length}; hostLoadDelta={hostLoadDelta.Length}; privateLoadDelta={privateLoadDelta.Length}; initializerDelta={initializerDelta.Length}; rejectedDelta={rejectedDelta.Length}; nativeDelta={nativeDelta.Length}.",
+        };
+        var chain = exception;
+        var depth = 0;
+        while (chain is not null)
+        {
+            checkpointLines.Add($"E_C_EXCEPTION_DEPTH — depth={depth}; type={chain.GetType().FullName}; hresult=0x{chain.HResult:X8}; source={SanitizeCheckpoint(chain.Source)}; target={SanitizeCheckpoint(FormatTargetSite(chain.TargetSite))}; message={SanitizeCheckpoint(chain.Message)}; stack={SanitizeCheckpoint(chain.StackTrace)}");
+            if (chain is ReflectionTypeLoadException typeLoad && typeLoad.LoaderExceptions is { Length: > 0 })
+            {
+                for (var i = 0; i < typeLoad.LoaderExceptions.Length; i++)
+                {
+                    var loader = typeLoad.LoaderExceptions[i];
+                    checkpointLines.Add(loader is null
+                        ? $"E_C_LOADER_EXCEPTION — depth={depth}; index={i}; <null>"
+                        : $"E_C_LOADER_EXCEPTION — depth={depth}; index={i}; type={loader.GetType().FullName}; hresult=0x{loader.HResult:X8}; source={SanitizeCheckpoint(loader.Source)}; target={SanitizeCheckpoint(FormatTargetSite(loader.TargetSite))}; message={SanitizeCheckpoint(loader.Message)}; stack={SanitizeCheckpoint(loader.StackTrace)}");
+                }
+            }
+            chain = chain.InnerException;
+            depth++;
+        }
+        var baseException = exception.GetBaseException();
+        checkpointLines.Add($"E_C_BASE_EXCEPTION — type={baseException.GetType().FullName}; hresult=0x{baseException.HResult:X8}; source={SanitizeCheckpoint(baseException.Source)}; target={SanitizeCheckpoint(FormatTargetSite(baseException.TargetSite))}; message={SanitizeCheckpoint(baseException.Message)}; stack={SanitizeCheckpoint(baseException.StackTrace)}");
+        return new EssentialInvocationFailureDiagnostic(report, checkpointLines.ToArray());
+    }
+
+    private static int? TryReadOneTimeInitializationState(FieldInfo stateField)
+    {
+        try
+        {
+            return ReadOneTimeInitializationState(stateField);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static string FormatTargetSite(MethodBase? targetSite)
+        => targetSite is null
+            ? "<null>"
+            : $"{targetSite.DeclaringType?.FullName ?? "<global>"}::{targetSite}";
+
+    private static string IndentMultiline(string value, string indent)
+        => string.Join("\n", value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n').Select(line => indent + line));
+
+    private static string SanitizeCheckpoint(string? value)
+        => (value ?? "<null>")
+            .Replace("\r", "\\r", StringComparison.Ordinal)
+            .Replace("\n", "\\n", StringComparison.Ordinal)
+            .Replace("|", "\\|", StringComparison.Ordinal);
+
+    private static string FormatDelta(IReadOnlyList<string> values)
+        => values.Count == 0 ? "0" : $"{values.Count}: " + string.Join(" | ", values);
+
     private static int ReadOneTimeInitializationState(FieldInfo stateField)
     {
         var value = stateField.GetValue(null) ?? throw new InvalidDataException("OneTimeInitialization._state returned null.");
@@ -699,6 +864,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         long PackLength,
         string ReceiptSha1,
         string LocalizationProbePath);
+
+    private sealed record EssentialInvocationFailureDiagnostic(
+        string ReportText,
+        string[] CheckpointLines);
 
     private sealed record EssentialExecutionSnapshot(
         int MethodToken,

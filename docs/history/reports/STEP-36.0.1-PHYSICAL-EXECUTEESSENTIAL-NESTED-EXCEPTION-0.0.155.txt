@@ -1,0 +1,23 @@
+StS2 Launcher — Step 36.0 Controlled Exact ExecuteEssential
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-05T19:14:33.3504130+00:00
+
+RESULT
+STEP 36.0 ESSENTIAL INITIALIZATION FAIL — 2/4
+
+METADATA
+App version: 0.0.155 (155)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: single exact ExecuteEssential invocation
+InvalidOperationException: Exact transformed ExecuteEssential threw System.Reflection.TargetInvocationException: Arg_TargetInvocationException
+
+END OF REPORT

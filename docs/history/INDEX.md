@@ -306,3 +306,10 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-36.0-PHYSICAL-LOCALIZATION-RESOURCE-PATH-FAILURE-0.0.154.txt` — physical 0.0.154 passes exact Step-36 Gates A/B, then exact ExecuteEssential fails at `res://localization/eng`; deterministic report teardown reaches `RUN_END`.
 - `steps/STEP-36.0.1-EXACT-GAME-RESOURCE-PACK-HANDOFF.md` — 0.0.155 mounts the exact receipt-backed game PCK additively through exact GodotSharp, probes the prior localization directory boundary, then retries unchanged exact ExecuteEssential once.
+
+
+## Step 36.0.1 physical PCK closure / Step 36.0.2 failure-chain capture
+
+- `reports/STEP-36.0.1-PHYSICAL-EXECUTEESSENTIAL-NESTED-EXCEPTION-0.0.155.txt` — physical 0.0.155 is 2/4: PCK mount/localization probe pass and unchanged exact ExecuteEssential throws through a nested TargetInvocationException.
+- `reports/STEP-36.0.1-PHYSICAL-CHECKPOINT-0.0.155.txt` — run-correlated journal proving `LoadResourcePack` returned true, `res://localization/eng` exists, Gate C invoked once, and deterministic teardown reached `RUN_END`.
+- `steps/STEP-36.0.2-EXECUTEESSENTIAL-FAILURE-CHAIN-CAPTURE.md` — 0.0.156 preserves the runtime boundary and adds complete nested/base/loader exception plus post-failure state/context telemetry.

@@ -1,6 +1,10 @@
 # Current status
 
-## Active candidate — Step 35.0.31 / Step 36.0.1 / 0.0.155 (155)
+## Active candidate — Step 35.0.31 / Step 36.0.2 / 0.0.156 (156)
+
+Physical **0.0.155** advances the Step-36 frontier again. Gate B located the exact receipt-backed `SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck`, exact `Godot.ProjectSettings.LoadResourcePack(..., replaceFiles=false, offset=0)` returned true, and `res://localization/eng` was present. Gate C then invoked exact transformed `ExecuteEssential` once and failed through a nested `System.Reflection.TargetInvocationException`; the process recovered normally through `RUN_END`. The PCK/resource handoff is therefore positive, while the first internal essential-initialization failure remains unlocalized because 0.0.155 collapsed the deeper exception chain.
+
+**0.0.156 / Step 36.0.2** retains that exact PCK handoff and exact `0x06007D03` ExecuteEssential boundary unchanged. It adds complete exception-chain/base/loader-exception telemetry, post-failure state capture, resolver/load deltas, and exact sts2/GodotSharp load-context continuity. It performs no retry, no state reset, and no child-method probe. `ExecuteDeferred` and launcher-driven `PrewarmJit` remain forbidden.
 
 Steps 32–34 remain CLOSED POSITIVE. Physical 0.0.152 established positive exact Step-35 core closure under the explicitly defined source-built Godot 4.5.1 bridge prerequisite: exact transformed sts2 and exact prepared GodotSharp were the CLR inputs; exact `ExecuteVeryEarly` returned and awaited `RanToCompletion`; post-await resolver/native confinement passed; OfflineReady re-proved 428/428; exact authority/plan/dependency/context checks passed; and Gate D constructed `passed=True; exactAuthority=True`.
 
