@@ -1,0 +1,57 @@
+StS2 Launcher — Physical Step 35.0.29 exact-authority closure / UIKit return stall
+Release: 0.0.152 (152)
+Run: 20260904T2041048422470Z-pid53870-5804bf53e1c84cdabedf72b08af410c1
+Mode: GodotCoreExactClosure
+
+PHYSICAL RESULT
+===============
+
+The exact-authority runtime objective is POSITIVE through construction of the final Gate-D PASS result.
+The remaining defect is confined to the UIKit await/result-record continuation after the core Gate-D Task begins returning.
+
+Exact authority / Gate B:
+- Exact closed Step-32 transformed sts2 SHA-256 re-hashed immediately before CLR admission:
+  39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef
+- Exact transformed sts2, not the diagnostic sts2 derivative, was the sole sts2 CLR authority.
+- Exact prepared GodotSharp, not its diagnostic derivative, was selected by the strict resolver.
+- MVID remained 518e4758-52d7-47c2-b776-471a0e29e49d.
+
+Bridge prerequisite:
+- Source-built Godot 4.5.1 runtime table: 1,800 bytes / 225 pointers.
+- Complete Godot.Bridge.ManagedCallbacks reverse table: 296 bytes / 37 pointers.
+- Reverse cache adoption and GD_OnCoreApiAssemblyLoaded had already been physically proven and were reproduced for exact mode.
+
+Exact Gate C:
+- C_EXACT_AUTHORITY_PASS: exact transformed sts2 contains no Step-35 diagnostic bridge.
+- Exact transformed ExecuteVeryEarly was invoked once.
+- MethodInfo.Invoke returned.
+- Returned Task status was RanToCompletion.
+- The bounded await returned RanToCompletion.
+- Post-await confinement passed with initializer-bearing=0, rejected=0, native=0.
+- Gate C returned PASS and was recorded PASS.
+
+Gate D:
+- OfflineReady returned success=True, verifiedFiles=428, plannedFiles=428.
+- Receipt-backed original sts2 remained byte-identical.
+- Exact CLR-resident transformed authority remained byte-identical.
+- Final source/selected-primary/plan/dependency/resolver/context isolation passed with exactAuthority=True.
+- D_RESULT_CONSTRUCT_RETURNED recorded passed=True; exactAuthority=True.
+- D_FINAL_PROGRESS_EMITTED returned.
+- Final durable marker:
+  D_TASK_RETURN_START — returning the already-constructed Gate-D result to the UI caller.
+
+No D_TASK_AWAIT_RESUMED marker followed. The app remained responsive and displayed the terminal Gate-D 4/4/finalization UI indefinitely.
+
+INTERPRETATION
+==============
+
+This is not a StS2/Godot compatibility failure. The exact transformed ExecuteVeryEarly authority and final isolation audit completed successfully. The defect is after the completed core audit, at the UIKit-side await/result-record continuation. Step 35 exact core/runtime closure is therefore physically positive; a clean UI 4/4 recording remains desirable for operator-visible closure and is fixed in the next candidate without changing the proven core authority path.
+
+NEXT CANDIDATE
+==============
+
+0.0.153:
+- keeps exact Step-35 core behavior unchanged;
+- places the Gate-D audit behind an outer Task.Run completion boundary, matching the already-reliable Gate-B worker-return pattern;
+- adds durable D_WORKER_SCHEDULE / D_WORKER_RETURN / D_TASK_AWAIT_RESUMED boundaries;
+- advances only after a same-process clean exact Step-35 4/4 to a separately gated Step 36.0 ExecuteEssential boundary.

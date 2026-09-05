@@ -483,3 +483,20 @@ The following contracts are release-blocking for 0.0.144:
 - A true result may continue the unchanged natural CORE-HANDOFF diagnostic path.
 - Physical 0.0.144 GS035 is diagnostic provenance; it does not close exact Step 35.
 
+
+## Step 35.0.30 / Step 36.0 — UI-return correction and controlled ExecuteEssential
+
+0.0.153 must preserve the physical 0.0.152 exact Step-35 core result. The Gate-D UI fix may change only task scheduling/completion plumbing: an outer `Task.Run` boundary must observe the unchanged core `RunFinalIsolationAuditAsync` result before UIKit resumes. It must not alter exact sts2/GodotSharp authority, bridge tables, resolver policy, ExecuteVeryEarly invocation count, or Gate-D isolation checks.
+
+Step 36.0 additionally requires:
+
+- same-process successful exact Step-35 core closure and exact mode;
+- source `ExecuteEssential` token `0x06007D03`, exact static parameterless void signature, exact source/transformed semantic fingerprint equality, and zero Cecil dependency resolution;
+- zero direct ExecuteVeryEarly/ExecuteDeferred/PrewarmJit crossover and zero direct Harmony references from ExecuteEssential;
+- exact transformed sts2 authority continuity and no diagnostic bridge in the CLR authority image;
+- OneTimeInitialization state exactly 1 before Gate C and exactly 2 after successful return;
+- exactly one launcher invocation of ExecuteEssential;
+- only exact planned host bindings + hash-pinned initializer-free prepared private dependencies;
+- zero initializer-bearing, rejected managed, or native resolver escape;
+- final OfflineReady/source/transformed/plan/private-dependency/context reproof;
+- intentional invocation of ExecuteDeferred, PrewarmJit, game entry point, Harmony/MonoMod APIs, or native game loading remains forbidden.

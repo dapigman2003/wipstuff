@@ -22,7 +22,7 @@ namespace StS2Launcher.Core;
 /// the already-proven Step-15 smoke engine and uses that engine's exact source-built Godot 4.5.1 interop callbacks.
 /// GodotCoreCallbackHandoff keeps diagnostic CLR inputs; GodotCoreExactClosure uses exact authority CLR inputs.
 /// </summary>
-public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
+public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDisposable
 {
     public const string LoadContextName = "StS2Launcher-Step35-VeryEarly";
     public const string TargetTypeFullName = "MegaCrit.Sts2.Core.Helpers.OneTimeInitialization";
@@ -114,6 +114,7 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
         _callbackHandoff = null;
         _managedPluginBootstrapResolverBaseline = null;
         _managedPluginReverseBridgePrepared = false;
+        ResetStep36State();
     }
 
     public async Task<TransformedRealStS2VeryEarlyInitializationGateResult> RunVerifiedExecutionPreflightAsync(
@@ -1260,6 +1261,8 @@ public sealed class TransformedRealStS2VeryEarlyInitialization : IDisposable
                     ? "Exact-authority closure meaning: the exact closed Step-32 transformed sts2 image itself entered the CLR, its exact ExecuteVeryEarly returned and awaited successfully, and final isolation reproof passed under the explicitly defined source-built Godot 4.5.1 bridge prerequisite."
                     : "Diagnostic meaning: this derivative result supplies localization evidence only; exact Step 35 remains OPEN."));
             Checkpoint(crashCheckpoint, $"D_RESULT_CONSTRUCT_RETURNED — Gate-D result constructed; passed={gateResult.Passed}; exactAuthority={IsExactAuthorityMode}.");
+            if (IsExactAuthorityMode && gateResult.Passed)
+                MarkExactStep35CoreClosurePassed(context);
 
             progress?.Report(new(gate, 4, 4, IsExactAuthorityMode ? preflight.TransformedPath : preflight.DiagnosticPath,
                 IsExactAuthorityMode

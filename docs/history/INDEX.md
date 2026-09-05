@@ -295,3 +295,7 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-35.0.28-CODEMAGIC-DECLARED-NAMESPACE-FAILURE-0.0.151.txt` — 0.0.151 passes 899/899 static + 214/214 host + native-link preflight, then iOS compile stops on CS0234 because the bootstrap imported `StS2Launcher.Core.Runtime` while `Step35DiagnosticMode` is declared in `StS2Launcher.Core`.
 - `steps/STEP-35.0.29-EXACT-CLOSURE-DECLARED-NAMESPACE-CORRECTION.md` — 0.0.152 changes only that declared-namespace import and preserves exact-closure/bridge/Gate-D runtime behavior.
+
+## Step 35.0.29 physical exact closure / Step 36.0
+- `reports/STEP-35.0.29-PHYSICAL-EXACT-AUTHORITY-CLOSURE-UI-RETURN-STALL-0.0.152.txt` — physical 0.0.152 exact transformed ExecuteVeryEarly and Gate-D core PASS through `D_TASK_RETURN_START`; UIKit continuation stall isolated after the completed core result.
+- `steps/STEP-36.0-CONTROLLED-EXACT-EXECUTEESSENTIAL.md` — 0.0.153 fixes the Step-35 UI-return plumbing and adds the separately gated exact `ExecuteEssential` boundary at source token `0x06007D03`.

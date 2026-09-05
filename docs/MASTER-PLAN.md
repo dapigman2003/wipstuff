@@ -282,3 +282,9 @@ Physical 0.0.143 turns the callback-table hypothesis into positive evidence: the
 
 Physical 0.0.144 separated the interop problem into two directions, and 0.0.145 answered the reverse-state question: managed->native is working while CSharpLanguage exists without the Godot managed callback/cache lifecycle. Physical 0.0.146 then proved that generated bridge contract end-to-end through reverse cache adoption and the standard core-API-loaded callback. Its only stop was the stale pre-bootstrap resolver snapshot. 0.0.147 therefore keeps the bridge unchanged, validates its exact measured framework-resolution delta, seals a post-bootstrap resolver baseline, and resumes natural Gate C. No additional local game-call substitution is introduced.
 
+
+### Physical Step-35 exact core closure / Step-36 essential boundary
+
+Physical 0.0.152 closes the exact Step-35 **core/runtime authority** positively under the explicitly defined source-built Godot 4.5.1 bridge prerequisite: exact transformed sts2 + exact prepared GodotSharp, exact ExecuteVeryEarly RanToCompletion, clean resolver/native confinement, OfflineReady 428/428, and final Gate-D result constructed as passed=true/exactAuthority=true. The remaining 0.0.152 defect is UI plumbing after `D_TASK_RETURN_START`; 0.0.153 fixes that operator-visible return path without changing the core boundary.
+
+Step 36.0 is separately gated. It advances only to exact transformed static parameterless void `OneTimeInitialization::ExecuteEssential()` at exact source token `0x06007D03`, requires same-process Step-35 exact closure and state 1, invokes exactly once, requires state 2, and re-proves isolation. `ExecuteDeferred`, `PrewarmJit`, entry-point execution, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native game loading remain later boundaries.
