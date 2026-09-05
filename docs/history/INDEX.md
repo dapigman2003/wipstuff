@@ -301,3 +301,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-36.0-CONTROLLED-EXACT-EXECUTEESSENTIAL.md` — 0.0.153 fixes the Step-35 UI-return plumbing and adds the separately gated exact `ExecuteEssential` boundary at source token `0x06007D03`.
 - `reports/STEP-35.0.30-PHYSICAL-OUTER-WORKER-RETURN-UI-CONTINUATION-STALL-0.0.153.txt` — physical exact Gate D and outer worker both return PASS, isolating the remaining stall to the captured UIKit continuation.
 - `steps/STEP-35.0.31-EXPLICIT-MAIN-QUEUE-FINALIZATION.md` — 0.0.154 uses a noncapturing Gate-D continuation and explicit main-thread UI finalization; Step 36 consumes durable core closure.
+
+## Step 36.0 physical localization boundary / Step 36.0.1 resource-pack handoff
+
+- `reports/STEP-36.0-PHYSICAL-LOCALIZATION-RESOURCE-PATH-FAILURE-0.0.154.txt` — physical 0.0.154 passes exact Step-36 Gates A/B, then exact ExecuteEssential fails at `res://localization/eng`; deterministic report teardown reaches `RUN_END`.
+- `steps/STEP-36.0.1-EXACT-GAME-RESOURCE-PACK-HANDOFF.md` — 0.0.155 mounts the exact receipt-backed game PCK additively through exact GodotSharp, probes the prior localization directory boundary, then retries unchanged exact ExecuteEssential once.

@@ -46,6 +46,8 @@ public sealed class TransformedRealStS2EssentialInitializationTests
         Assert.AreEqual(0x06007D03u, TransformedRealStS2VeryEarlyInitialization.SourceEssentialTargetMethodToken);
         Assert.AreEqual(1, TransformedRealStS2VeryEarlyInitialization.ExpectedStateAfterVeryEarly);
         Assert.AreEqual(2, TransformedRealStS2VeryEarlyInitialization.ExpectedStateAfterEssential);
+        Assert.AreEqual("SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck", TransformedRealStS2VeryEarlyInitialization.GameResourcePackRelativePath);
+        Assert.AreEqual("res://localization/eng", TransformedRealStS2VeryEarlyInitialization.RequiredLocalizationProbePath);
     }
 
     [TestMethod]

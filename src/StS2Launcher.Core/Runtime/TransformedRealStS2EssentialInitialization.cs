@@ -1,14 +1,15 @@
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text.Json;
 using Mono.Cecil;
 
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 36.0 boundary. This phase is intentionally available only after the exact Step-35 core closure has
+/// Step 36.0.1 boundary. This phase is intentionally available only after the exact Step-35 core closure has
 /// completed in the same process. It preserves the exact closed Step-32 transformed sts2 assembly and exact
 /// prepared GodotSharp bridge established by Step 35, statically re-proves ExecuteEssential against the exact
-/// source/transformed pair, invokes only ExecuteEssential once, and then re-proves isolation. ExecuteDeferred,
+/// source/transformed pair, mounts the exact receipt-backed game PCK into the live Godot resource filesystem, invokes only ExecuteEssential once, and then re-proves isolation. ExecuteDeferred,
 /// PrewarmJit, the game entry point, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native
 /// game loading remain forbidden.
 /// </summary>
@@ -19,11 +20,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const uint SourceEssentialTargetMethodToken = 0x06007D03;
     public const int ExpectedStateAfterVeryEarly = 1;
     public const int ExpectedStateAfterEssential = 2;
+    public const string GameResourcePackRelativePath = "SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck";
+    public const string RequiredLocalizationProbePath = "res://localization/eng";
 
     private bool _exactStep35CoreClosurePassed;
     private Step36BaselineSnapshot? _step36Baseline;
     private EssentialPreflightSnapshot? _essentialPreflight;
     private EssentialBindingSnapshot? _essentialBinding;
+    private EssentialResourcePackHandoffSnapshot? _essentialResourcePackHandoff;
     private EssentialExecutionSnapshot? _essentialExecution;
 
     public bool ExactStep35CoreClosurePassed => _exactStep35CoreClosurePassed;
@@ -38,15 +42,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step36Baseline = null;
         _essentialPreflight = null;
         _essentialBinding = null;
+        _essentialResourcePackHandoff = null;
         _essentialExecution = null;
     }
 
-    private void MarkExactStep35CoreClosurePassed(Step35ExecutionLoadContext context)
+    private void MarkExactStep35CoreClosurePassed(Step35ExecutionLoadContext context, string managedInstallRoot)
     {
         _exactStep35CoreClosurePassed = true;
-        _step36Baseline = CaptureStep36Baseline(context);
+        _step36Baseline = CaptureStep36Baseline(context, managedInstallRoot);
         _essentialPreflight = null;
         _essentialBinding = null;
+        _essentialResourcePackHandoff = null;
         _essentialExecution = null;
     }
 
@@ -148,6 +154,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 staticMap,
                 ComputeSha256Hex(_planPath));
             _essentialBinding = null;
+            _essentialResourcePackHandoff = null;
             _essentialExecution = null;
             Checkpoint(checkpoint, $"E_A_PASS — exact source/transformed ExecuteEssential semantics matched; sourceToken=0x{SourceEssentialTargetMethodToken:X8}; transformedToken=0x{transformedToken:X8}; semanticSha256={semanticSha256}; no ExecuteDeferred/PrewarmJit/Harmony crossover.");
             return EssentialPass(gate,
@@ -165,6 +172,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             Checkpoint(checkpoint, $"E_A_FAIL — stage={stage}; {ex.GetType().FullName}: {ex.Message}");
             _essentialPreflight = null;
             _essentialBinding = null;
+            _essentialResourcePackHandoff = null;
             _essentialExecution = null;
             return EssentialFail(gate, stage, ex);
         }
@@ -211,21 +219,31 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException($"Step 36.0 requires OneTimeInitialization state {ExpectedStateAfterVeryEarly} after exact ExecuteVeryEarly; observed {stateBefore}.");
             RequireStep36BaselineUnchanged(context, "Gate B post-binding");
 
+            stage = "receipt-backed game resource-pack handoff";
+            var resourcePack = ResolveReceiptBackedGameResourcePack(checkpoint);
+            var resourceHandoff = MountExactGameResourcePackAndProbe(resourcePack, context, checkpoint);
+            RequireStep36BaselineUnchanged(context, "Gate B post-resource-pack handoff");
+
             _essentialBinding = new EssentialBindingSnapshot(method, stateField, stateBefore);
+            _essentialResourcePackHandoff = resourceHandoff;
             _essentialExecution = null;
-            Checkpoint(checkpoint, $"E_B_PASS — exact ExecuteEssential MethodInfo bound; token=0x{method.MetadataToken:X8}; stateBefore={stateBefore}; resolver baseline unchanged.");
+            Checkpoint(checkpoint, $"E_B_PASS — exact ExecuteEssential MethodInfo bound; token=0x{method.MetadataToken:X8}; stateBefore={stateBefore}; exact game PCK mounted; localizationProbe={resourceHandoff.LocalizationProbePath}; resolver baseline unchanged.");
             return EssentialPass(gate,
                 $"Exact transformed sts2 authority continuity: PASS\n" +
                 $"ExecuteEssential token: 0x{method.MetadataToken:X8}\n" +
                 $"MVID: {method.Module.ModuleVersionId}\n" +
                 $"OneTimeInitialization state before ExecuteEssential: {stateBefore}\n" +
+                $"Receipt-backed game resource pack: {resourceHandoff.PackRelativePath} ({resourceHandoff.PackLength:N0} bytes; receipt SHA-1 {resourceHandoff.ReceiptSha1})\n" +
+                $"Godot resource-pack mount returned: PASS (replaceFiles=false)\n" +
+                $"Localization directory probe: {resourceHandoff.LocalizationProbePath} => PRESENT\n" +
                 "Diagnostic sts2 bridge present: NO\n" +
-                "Resolver/native state changed during binding: NO");
+                "Resolver/native state changed during binding/resource handoff: NO");
         }
         catch (Exception ex)
         {
             Checkpoint(checkpoint, $"E_B_FAIL — stage={stage}; {ex.GetType().FullName}: {ex.Message}");
             _essentialBinding = null;
+            _essentialResourcePackHandoff = null;
             _essentialExecution = null;
             return EssentialFail(gate, stage, ex);
         }
@@ -241,6 +259,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             RequireExactStep35CoreClosure("Step 36 Gate C entry");
             var binding = RequireEssentialBinding();
+            var resourceHandoff = RequireEssentialResourcePackHandoff();
             var context = RequireLoadContext();
             RequireStep36BaselineUnchanged(context, "Gate C pre-invoke");
             var stateBefore = ReadOneTimeInitializationState(binding.StateField);
@@ -248,7 +267,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException($"Step 36.0 pre-invoke state drifted: expected {ExpectedStateAfterVeryEarly}, observed {stateBefore}.");
 
             stage = "single exact ExecuteEssential invocation";
-            Checkpoint(checkpoint, $"E_C_INVOKE_START — invoking exact transformed ExecuteEssential once on managedThread={Environment.CurrentManagedThreadId}; stateBefore={stateBefore}. This synchronous boundary has no launcher retry in the same process.");
+            Checkpoint(checkpoint, $"E_C_INVOKE_START — invoking exact transformed ExecuteEssential once on managedThread={Environment.CurrentManagedThreadId}; stateBefore={stateBefore}; gamePackMounted={resourceHandoff.PackRelativePath}; localizationProbe={resourceHandoff.LocalizationProbePath}. This synchronous boundary has no launcher retry in the same process.");
             try
             {
                 binding.Method.Invoke(null, null);
@@ -282,6 +301,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             Checkpoint(checkpoint, $"E_C_PASS — exact ExecuteEssential returned; stateAfter={stateAfter}; {context.FormatResolverState()}.");
             return EssentialPass(gate,
                 "Exact transformed ExecuteEssential invocation: PASS\n" +
+                $"Receipt-backed game resource pack mounted before invocation: {resourceHandoff.PackRelativePath}\n" +
+                $"Localization probe before invocation: {resourceHandoff.LocalizationProbePath} => PRESENT\n" +
                 $"State transition: {stateBefore} -> {stateAfter}\n" +
                 $"Managed resolver requests total: {context.ManagedResolverRequests.Count}\n" +
                 $"Host framework loads total: {context.HostLoads.Count}\n" +
@@ -311,6 +332,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             RequireExactStep35CoreClosure("Step 36 Gate D entry");
             var essentialPreflight = RequireEssentialPreflight();
+            var resourceHandoff = RequireEssentialResourcePackHandoff();
             var execution = RequireEssentialExecution();
             var admission = RequireAdmission();
             var context = RequireLoadContext();
@@ -339,6 +361,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException(offline.Error ?? "Step 36.0 final OfflineReady re-verification failed.");
 
             var managedRoot = ResolveChildPath(_launcherDataRoot, offline.ManagedInstallRelativePath, "Step-36 managed install");
+            if (!Path.GetFullPath(managedRoot).Equals(Path.GetFullPath(resourceHandoff.ManagedInstallRoot), StringComparison.Ordinal))
+                throw new InvalidDataException("Step 36.0 managed-install root drifted from the exact Step-35 closure baseline used for the game resource-pack handoff.");
+            VerifyFileLength(resourceHandoff.PackAbsolutePath, resourceHandoff.PackLength, "Step-36 mounted game resource pack");
             var trustedPrimaryPath = ResolveChildPath(managedRoot, TransformedRealStS2AssemblyAdmission.ExactPrimaryRelativePath, "Step-36 trusted primary path");
             var trustedSha256 = ComputeSha256Hex(trustedPrimaryPath);
             if (!trustedSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32SourceSha256, StringComparison.OrdinalIgnoreCase))
@@ -390,6 +415,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
                 $"Exact transformed SHA-256 unchanged: {transformedSha256}\n" +
                 $"Runtime-binding plan SHA-256 unchanged: {planSha256}\n" +
+                $"Receipt-backed game resource pack remained present: {resourceHandoff.PackRelativePath} ({resourceHandoff.PackLength:N0} bytes)\n" +
+                $"Localization resource probe used before ExecuteEssential: {resourceHandoff.LocalizationProbePath}\n" +
                 $"OneTimeInitialization final state: {finalState}\n" +
                 $"Initializer-free private dependencies resident/re-hashed: {verifiedPrivate}\n" +
                 "Initializer-bearing requests: 0\n" +
@@ -410,6 +437,127 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             Checkpoint(checkpoint, $"E_D_FAIL — stage={stage}; {ex.GetType().FullName}: {ex.Message}");
             return EssentialFail(gate, stage, ex);
         }
+    }
+
+    private GameResourcePackSnapshot ResolveReceiptBackedGameResourcePack(Action<string>? checkpoint)
+    {
+        var baseline = _step36Baseline ?? throw new InvalidOperationException("Step 36.0 baseline is absent.");
+        var managedRoot = Path.GetFullPath(baseline.ManagedInstallRoot);
+        var receiptPath = ResolveChildPath(managedRoot, SteamManagedInstallReceipt.FileName, "Step-36 managed-install receipt");
+        Checkpoint(checkpoint, $"E_B_PACK_RECEIPT_START — reading the already-OfflineReady Step-12 receipt to locate the exact game PCK; managedRoot={managedRoot}.");
+        if (!File.Exists(receiptPath))
+            throw new FileNotFoundException("Step 36.0 exact game resource-pack handoff requires the Step-12 managed-install receipt.", receiptPath);
+
+        SteamManagedInstallReceipt? receipt;
+        try
+        {
+            receipt = JsonSerializer.Deserialize(
+                File.ReadAllBytes(receiptPath),
+                SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt);
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidDataException("Step 36.0 could not deserialize the already-verified managed-install receipt while locating the game resource pack.", ex);
+        }
+
+        if (receipt is null || receipt.SchemaVersion != SteamManagedInstallReceipt.CurrentSchemaVersion || receipt.AppId != SteamManagedInstallAttempt.TargetAppId)
+            throw new InvalidDataException("Step 36.0 managed-install receipt identity drifted after exact Step-35 closure.");
+        var expectedDirectoryName = $"Depot-{receipt.DepotId}";
+        if (!string.Equals(new DirectoryInfo(managedRoot).Name, expectedDirectoryName, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException($"Step 36.0 managed-install depot directory drifted: expected {expectedDirectoryName}, observed {new DirectoryInfo(managedRoot).Name}.");
+
+        var packEntries = receipt.Files
+            .Where(file => string.Equals(NormalizeRelative(file.RelativePath), NormalizeRelative(GameResourcePackRelativePath), StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        if (packEntries.Length != 1)
+            throw new InvalidDataException($"Step 36.0 requires exactly one receipt entry for {GameResourcePackRelativePath}; found {packEntries.Length}.");
+        var packEntry = packEntries[0];
+        if (packEntry.Length <= 0 || packEntry.Sha1Hex.Length != 40 || !packEntry.Sha1Hex.All(Uri.IsHexDigit))
+            throw new InvalidDataException("Step 36.0 game PCK receipt entry has an invalid length or SHA-1 shape.");
+        var packPath = ResolveChildPath(managedRoot, packEntry.RelativePath, "Step-36 game resource pack");
+        VerifyFileLength(packPath, packEntry.Length, "Step-36 receipt-backed game resource pack");
+        Checkpoint(checkpoint, $"E_B_PACK_RECEIPT_PASS — exact receipt-backed game PCK located; relative={NormalizeRelative(packEntry.RelativePath)}; bytes={packEntry.Length}; receiptSha1={packEntry.Sha1Hex}; no second full-file hash is performed because exact Step-35 Gate D just re-proved OfflineReady 428/428.");
+        return new GameResourcePackSnapshot(managedRoot, NormalizeRelative(packEntry.RelativePath), packPath, packEntry.Length, packEntry.Sha1Hex.ToLowerInvariant());
+    }
+
+    private EssentialResourcePackHandoffSnapshot MountExactGameResourcePackAndProbe(
+        GameResourcePackSnapshot pack,
+        Step35ExecutionLoadContext context,
+        Action<string>? checkpoint)
+    {
+        if (_essentialResourcePackHandoff is not null)
+            throw new InvalidOperationException("Step 36.0 game resource pack has already been mounted in this process; no same-process retry is permitted.");
+        var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 36.0 game resource-pack handoff requires the exact prepared GodotSharp bridge from Step 35.");
+        var godotAssembly = handoff.GodotSharpAssembly;
+        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotAssembly), context))
+            throw new InvalidDataException("Step 36.0 exact GodotSharp assembly left the dedicated Step-35 context before resource-pack handoff.");
+
+        Checkpoint(checkpoint, $"E_B_PACK_BIND_START — binding exact GodotSharp Godot.ProjectSettings.LoadResourcePack for the receipt-backed PCK; replaceFiles=false; offset=0.");
+        var projectSettings = godotAssembly.GetType("Godot.ProjectSettings", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.ProjectSettings");
+        var loadResourcePack = projectSettings.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(candidate =>
+            {
+                if (!string.Equals(candidate.Name, "LoadResourcePack", StringComparison.Ordinal) || candidate.ReturnType != typeof(bool))
+                    return false;
+                var parameters = candidate.GetParameters();
+                return parameters.Length == 3 &&
+                       parameters[0].ParameterType == typeof(string) &&
+                       parameters[1].ParameterType == typeof(bool) &&
+                       (parameters[2].ParameterType == typeof(int) || parameters[2].ParameterType == typeof(long));
+            })
+            ?? throw new MissingMethodException("Godot.ProjectSettings", "LoadResourcePack(string,bool,int/long)");
+        Checkpoint(checkpoint, $"E_B_PACK_BIND_PASS — exact GodotSharp LoadResourcePack bound; token=0x{loadResourcePack.MetadataToken:X8}; offsetType={loadResourcePack.GetParameters()[2].ParameterType.FullName}.");
+
+        object offsetArgument = loadResourcePack.GetParameters()[2].ParameterType == typeof(long) ? (object)0L : 0;
+        Checkpoint(checkpoint, $"E_B_PACK_LOAD_START — mounting receipt-backed game PCK into the live source-built Godot resource filesystem; path={pack.AbsolutePath}; replaceFiles=false; offset=0.");
+        bool loadReturned;
+        try
+        {
+            loadReturned = loadResourcePack.Invoke(null, new object?[] { pack.AbsolutePath, false, offsetArgument }) is true;
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw new InvalidOperationException($"Exact GodotSharp ProjectSettings.LoadResourcePack threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}", ex.InnerException);
+        }
+        Checkpoint(checkpoint, $"E_B_PACK_LOAD_RETURNED — returned={loadReturned}; replaceFiles=false; path={pack.RelativePath}.");
+        if (!loadReturned)
+            throw new InvalidDataException("Godot.ProjectSettings.LoadResourcePack returned false for the exact receipt-backed Slay the Spire 2 PCK.");
+
+        Checkpoint(checkpoint, $"E_B_LOCALIZATION_DIR_PROBE_START — probing the exact prior failure path {RequiredLocalizationProbePath} through Godot.DirAccess.Open after pack mount.");
+        var dirAccess = godotAssembly.GetType("Godot.DirAccess", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.DirAccess");
+        var open = dirAccess.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(candidate =>
+            {
+                if (!string.Equals(candidate.Name, "Open", StringComparison.Ordinal))
+                    return false;
+                var parameters = candidate.GetParameters();
+                return parameters.Length == 1 && parameters[0].ParameterType == typeof(string);
+            })
+            ?? throw new MissingMethodException("Godot.DirAccess", "Open(string)");
+        object? opened = null;
+        try
+        {
+            opened = open.Invoke(null, new object?[] { RequiredLocalizationProbePath });
+            Checkpoint(checkpoint, $"E_B_LOCALIZATION_DIR_PROBE_RETURNED — exists={opened is not null}; path={RequiredLocalizationProbePath}.");
+            if (opened is null)
+                throw new InvalidDataException($"The receipt-backed game PCK mounted successfully, but Godot still cannot open {RequiredLocalizationProbePath}; refusing ExecuteEssential rather than bypassing localization.");
+        }
+        finally
+        {
+            if (opened is IDisposable disposable)
+                disposable.Dispose();
+        }
+
+        Checkpoint(checkpoint, $"E_B_GAME_RESOURCE_PACK_PASS — exact receipt-backed game PCK is mounted additively in source-built Godot and the prior localization directory boundary is now visible; pack={pack.RelativePath}; localization={RequiredLocalizationProbePath}.");
+        return new EssentialResourcePackHandoffSnapshot(
+            pack.ManagedInstallRoot,
+            pack.RelativePath,
+            pack.AbsolutePath,
+            pack.Length,
+            pack.ReceiptSha1,
+            RequiredLocalizationProbePath);
     }
 
     private void RequireExactStep35CoreClosure(string boundary)
@@ -439,17 +587,21 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private static bool SequenceEqual(IReadOnlyList<string> expected, IReadOnlyList<string> actual)
         => expected.Count == actual.Count && expected.SequenceEqual(actual, StringComparer.Ordinal);
 
-    private static Step36BaselineSnapshot CaptureStep36Baseline(Step35ExecutionLoadContext context)
+    private static Step36BaselineSnapshot CaptureStep36Baseline(Step35ExecutionLoadContext context, string managedInstallRoot)
         => new(
             context.ManagedResolverRequests.ToArray(),
             context.HostLoads.ToArray(),
-            context.PrivateLoads.ToArray());
+            context.PrivateLoads.ToArray(),
+            Path.GetFullPath(managedInstallRoot));
 
     private EssentialPreflightSnapshot RequireEssentialPreflight()
         => _essentialPreflight ?? throw new InvalidOperationException("Step 36.0 Gate A must pass before Gate B.");
 
     private EssentialBindingSnapshot RequireEssentialBinding()
         => _essentialBinding ?? throw new InvalidOperationException("Step 36.0 Gate B must pass before Gate C.");
+
+    private EssentialResourcePackHandoffSnapshot RequireEssentialResourcePackHandoff()
+        => _essentialResourcePackHandoff ?? throw new InvalidOperationException("Step 36.0 Gate B must mount and verify the exact game resource pack before Gate C.");
 
     private EssentialExecutionSnapshot RequireEssentialExecution()
         => _essentialExecution ?? throw new InvalidOperationException("Step 36.0 Gate C must pass before Gate D.");
@@ -515,7 +667,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private sealed record Step36BaselineSnapshot(
         string[] ManagedResolverRequests,
         string[] HostLoads,
-        string[] PrivateLoads);
+        string[] PrivateLoads,
+        string ManagedInstallRoot);
+
+    private sealed record GameResourcePackSnapshot(
+        string ManagedInstallRoot,
+        string RelativePath,
+        string AbsolutePath,
+        long Length,
+        string ReceiptSha1);
 
     private sealed record EssentialPreflightSnapshot(
         string SourcePath,
@@ -531,6 +691,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         MethodInfo Method,
         FieldInfo StateField,
         int StateBefore);
+
+    private sealed record EssentialResourcePackHandoffSnapshot(
+        string ManagedInstallRoot,
+        string PackRelativePath,
+        string PackAbsolutePath,
+        long PackLength,
+        string ReceiptSha1,
+        string LocalizationProbePath);
 
     private sealed record EssentialExecutionSnapshot(
         int MethodToken,

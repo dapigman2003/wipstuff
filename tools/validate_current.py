@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 35.0.31 / Step 36.0 UI Return Fix + Controlled Exact ExecuteEssential validation")
+print("StS2 Launcher — Step 35.0.31 / Step 36.0.1 Exact Game Resource-Pack Handoff + Controlled ExecuteEssential validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>154</ApplicationVersion>" in project_text, "build version is 153")
-require("<ApplicationDisplayVersion>0.0.154</ApplicationDisplayVersion>" in project_text, "display version is 0.0.154")
-require(plist.get("CFBundleVersion") == "154", "Info.plist build version is 154")
-require(plist.get("CFBundleShortVersionString") == "0.0.154", "Info.plist display version is 0.0.154")
+require("<ApplicationVersion>155</ApplicationVersion>" in project_text, "build version is 155")
+require("<ApplicationDisplayVersion>0.0.155</ApplicationDisplayVersion>" in project_text, "display version is 0.0.155")
+require(plist.get("CFBundleVersion") == "155", "Info.plist build version is 155")
+require(plist.get("CFBundleShortVersionString") == "0.0.155", "Info.plist display version is 0.0.155")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 35.0.31 / STEP 36.0 — EXPLICIT MAIN-QUEUE FINALIZATION + CONTROLLED EXACT EXECUTEESSENTIAL" in release_presentation, "top launcher banner identifies active Step 35.0.31 / Step 36.0 combined candidate")
-require(all(marker in release_presentation for marker in ["STEP 32 CLOSED POSITIVE 4/4", "STEP 33 CLOSED POSITIVE 4/4", "STEP 34 CLOSED POSITIVE 4/4", "STEP 35 EXACT CORE CLOSURE POSITIVE", "0.0.146", "37-pointer", "ManagedCallbacks", "GD_OnCoreApiAssemblyLoaded", "0.0.149", "RanToCompletion", "214/214", "0.0.152", "0.0.153", "D_WORKER_RETURN", "ConfigureAwait(false)", "InvokeOnMainThread", "0.0.154", "0x06007D03", "ExecuteEssential"]), "top launcher banner preserves bridge/CI provenance, records physical 0.0.153 worker-return localization, and identifies the Step-36 advance")
+require("STEP 35.0.31 / STEP 36.0.1 — EXACT GAME RESOURCE-PACK HANDOFF + CONTROLLED EXECUTEESSENTIAL" in release_presentation, "top launcher banner identifies active Step 35.0.31 / Step 36.0.1 resource-pack candidate")
+require(all(marker in release_presentation for marker in ["STEP 32 CLOSED POSITIVE 4/4", "STEP 33 CLOSED POSITIVE 4/4", "STEP 34 CLOSED POSITIVE 4/4", "STEP 35 EXACT CORE CLOSURE POSITIVE", "0.0.146", "37-pointer", "ManagedCallbacks", "GD_OnCoreApiAssemblyLoaded", "0.0.149", "RanToCompletion", "214/214", "0.0.152", "0.0.153", "D_WORKER_RETURN", "ConfigureAwait(false)", "InvokeOnMainThread", "0.0.154", "res://localization/eng", "0.0.155", "LoadResourcePack", "0x06007D03", "ExecuteEssential"]), "top launcher banner preserves bridge/UI provenance, records the physical 0.0.154 localization boundary, and identifies the Step-36.0.1 resource-pack handoff")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.154"' in release_presentation and 'ExpectedBuildVersion = "154"' in release_presentation, "Step 35.0.31 / Step 36.0 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.155"' in release_presentation and 'ExpectedBuildVersion = "155"' in release_presentation, "Step 35.0.31 / Step 36.0.1 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -342,8 +342,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-36.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.154",
-    "STS2_BUILD_VERSION": "154",
+    "STS2_DISPLAY_VERSION": "0.0.155",
+    "STS2_BUILD_VERSION": "155",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -696,7 +696,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Step 36.0 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-36 candidate rather than retired Step 27")
+require("Step 36.0.1 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-36.0.1 candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -1127,7 +1127,7 @@ step36_summary = step36_summary_path.read_text() if step36_summary_path.is_file(
 step36_sequence = step36_sequence_path.read_text() if step36_sequence_path.is_file() else ""
 step36_tests = step36_tests_path.read_text() if step36_tests_path.is_file() else ""
 step36_ui = step36_ui_path.read_text() if step36_ui_path.is_file() else ""
-require(all(marker in step35_source for marker in ["partial class TransformedRealStS2VeryEarlyInitialization", "ResetStep36State();", "MarkExactStep35CoreClosurePassed(context);"]), "Step 35 exact core result explicitly hands authority forward to Step 36 without broadening its invocation path")
+require(all(marker in step35_source for marker in ["partial class TransformedRealStS2VeryEarlyInitialization", "ResetStep36State();", "MarkExactStep35CoreClosurePassed(context, managedRoot);"]), "Step 35 exact core result explicitly hands authority and its verified managed-install root forward to Step 36 without broadening its invocation path")
 require(all(marker in step35_ui for marker in ["D_WORKER_SCHEDULE", "Task.Run(async () =>", "D_WORKER_RETURN", "D_THREADPOOL_CONTINUATION", "D_UI_DISPATCH_ENTER", "D_UI_DISPATCH_RETURN", "D_RESULT_RECORD_PASS"]), "Step 35.0.31 routes Gate-D completion through an outer worker, noncapturing continuation, and explicit main-thread finalization")
 require(all(marker in step36_gate for marker in ["ExactStep35ClosureAndStaticPreflight = 1", "ExactAuthorityContinuityAndBinding = 2", "ExecuteEssentialInvocation = 3", "FinalIsolationAudit = 4"]), "Step 36.0 defines exactly four ordered A-D gates")
 require("STEP 36.0 ESSENTIAL INITIALIZATION COMPLETE — 4/4" in step36_summary and "Gates.Count(g => g.Passed)}/4" in step36_summary, "Step 36.0 summary requires ordered four-of-four completion")
@@ -1136,10 +1136,13 @@ require(all(marker in step36_source for marker in ["RequireExactStep35CoreClosur
 require(all(marker in step36_source for marker in ["RejectingAssemblyResolver", "FindMethodByToken", "ComputeMethodSemanticFingerprint", "CountForbiddenEssentialBoundaryCalls", "CountHarmonyMethodReferences", "Cecil dependency resolution"]), "Step 36 Gate A re-proves source/transformed ExecuteEssential semantics with rejecting Cecil resolvers")
 require(all(marker in step36_source for marker in ["ExecuteVeryEarly", "ExecuteDeferred", "PrewarmJit", "forbidden.Contains(reference.Name)"]), "Step 36 Gate A rejects direct crossover into prior/later OneTimeInitialization boundaries")
 require(all(marker in step36_source for marker in ["BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static", "method.MetadataToken", "ClosedStep32Mvid", "DiagnosticBridgeTypeFullName", "stateBefore != ExpectedStateAfterVeryEarly"]), "Step 36 Gate B binds only exact transformed ExecuteEssential and requires state 1 with no diagnostic bridge")
+require(all(marker in step36_source for marker in ["GameResourcePackRelativePath = \"SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck\"", "RequiredLocalizationProbePath = \"res://localization/eng\"", "ResolveReceiptBackedGameResourcePack", "SteamManagedInstallReceipt.FileName", "SteamManagedInstallJsonContext.Default.SteamManagedInstallReceipt", "E_B_PACK_RECEIPT_PASS"]), "Step 36.0.1 locates the exact game PCK only through the verified managed-install receipt inherited from Step 35")
+require(all(marker in step36_source for marker in ["Godot.ProjectSettings", "LoadResourcePack", "pack.AbsolutePath, false, offsetArgument", "E_B_PACK_LOAD_START", "E_B_PACK_LOAD_RETURNED", "Godot.DirAccess", "E_B_LOCALIZATION_DIR_PROBE_RETURNED", "E_B_GAME_RESOURCE_PACK_PASS"]), "Step 36.0.1 mounts the exact PCK additively through exact GodotSharp and proves the prior localization directory boundary before invocation")
+require(all(marker in step36_source for marker in ["RequireEssentialResourcePackHandoff", "gamePackMounted=", "localizationProbe=", "Step-36 mounted game resource pack", "resourceHandoff.PackLength"]), "Step 36 Gates C/D require and re-prove the bounded game resource-pack handoff rather than bypassing localization")
 require(all(marker in step36_source for marker in ["E_C_INVOKE_START", "binding.Method.Invoke(null, null)", "E_C_INVOKE_RETURNED", "stateAfter != ExpectedStateAfterEssential", "InitializerBearingRequests", "RejectedManagedRequests", "NativeLoadAttempts", "E_C_PASS"]), "Step 36 Gate C invokes exact ExecuteEssential once, requires state 2, and fails closed on resolver/native escape")
 require(all(marker in step36_source for marker in ["RunEssentialFinalIsolationAuditAsync", "OfflineReady", "ClosedStep32SourceSha256", "ClosedStep32TransformedSha256", "prepared.Plan.Sha1Hex", "FindLoadedStS2Assemblies", "E_D_FINAL_CHECKS_PASS", "E_D_TASK_RETURN_START"]), "Step 36 Gate D re-proves OfflineReady, authority/plan/dependency hashes, context ownership and final state")
 require(all(marker in step36_source for marker in ["ExecuteDeferred / PrewarmJit / game entry point intentionally invoked by launcher: NO", "Harmony", "Native game resolution/loading: NO"]), "Step 36 explicitly keeps deferred/prewarm/entry/Harmony/native-game boundaries forbidden")
-require(all(marker in step36_ui for marker in ["Step 36.0 — Controlled Exact ExecuteEssential", "ExactStep35CoreClosurePassed", "GodotCoreExactClosure", "RunEssentialStaticPreflight", "RunEssentialAuthorityBinding", "RunExactExecuteEssentialInvocation", "RunEssentialFinalIsolationAuditAsync"]), "Step 36 iOS surface exposes only the separately gated exact ExecuteEssential sequence after Step-35 exact closure")
+require(all(marker in step36_ui for marker in ["Step 36.0.1 — Exact Game Resource-Pack Handoff + Controlled ExecuteEssential", "ExactStep35CoreClosurePassed", "GodotCoreExactClosure", "RunEssentialStaticPreflight", "RunEssentialAuthorityBinding", "RunExactExecuteEssentialInvocation", "RunEssentialFinalIsolationAuditAsync"]), "Step 36 iOS surface exposes only the receipt-backed resource handoff plus separately gated exact ExecuteEssential sequence after Step-35 exact closure")
 require("_transformedRealStS2VeryEarlyInitializationGates.Snapshot().Passed" not in step36_ui and "Step 36 no longer depends on the historical UIKit await/result-record continuation" in step36_ui, "Step 36 prerequisite keys off durable exact Step-35 core closure rather than the stalled UI gate snapshot")
 require(all(marker in step36_ui for marker in ["E_D_WORKER_SCHEDULE", "Task.Run(async () =>", "E_D_WORKER_RETURN", "E_D_THREADPOOL_CONTINUATION", "E_D_UI_DISPATCH_ENTER", "E_D_RESULT_RECORD_PASS", "E_D_UI_DISPATCH_RETURN", "RUN_STEP36_4OF4", "InvokeOnMainThread(FinalizeStep36GateDOnMainThread)"]), "Step 36 Gate D proactively uses the same noncapturing continuation plus explicit-main-thread finalization pattern")
 require(all(marker in step36_ui for marker in ["Step36-CrashCheckpoint-", "Step36-LastCheckpoint.txt", "Step36-ExecuteEssential-StaticMap-", "Step36-TransformedRealStS2EssentialInitialization.txt", "Flush(flushToDisk: true)"]), "Step 36 emits durable run-correlated checkpoint/static-map/final-report evidence")
@@ -1156,6 +1159,8 @@ required_docs = [
     "docs/TESTING.md", "docs/REGRESSION-CONTRACTS.md", "docs/REPORTS.md", "docs/RELEASE-CHECKLIST.md", "docs/history/INDEX.md",
     "docs/history/reports/STEP-35.0.29-PHYSICAL-EXACT-AUTHORITY-CLOSURE-UI-RETURN-STALL-0.0.152.txt",
     "docs/history/steps/STEP-36.0-CONTROLLED-EXACT-EXECUTEESSENTIAL.md",
+    "docs/history/reports/STEP-36.0-PHYSICAL-LOCALIZATION-RESOURCE-PATH-FAILURE-0.0.154.txt",
+    "docs/history/steps/STEP-36.0.1-EXACT-GAME-RESOURCE-PACK-HANDOFF.md",
     "docs/history/steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md",
     "docs/history/steps/STEP-28-AHEAD-OF-LOAD-MANAGED-TRANSFORMATION.md",
     "docs/history/steps/STEP-28.0.1-CALLBACK-PROGRESS-COMPILE-FIX.md",
@@ -1372,10 +1377,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 35.0.31 / Step 36.0 / 0.0.154 (154)", "positive exact Step-35 core closure", "0.0.152", "0.0.153", "D_WORKER_RETURN", "D_THREADPOOL_CONTINUATION", "InvokeOnMainThread", "0x06007D03", "ExecuteEssential", "ExecuteDeferred", "PrewarmJit"]), "current status records physical 0.0.153 worker-return localization, explicit-main-queue fix, and active Step-36 boundary")
+require(all(marker in current_status for marker in ["Active candidate — Step 35.0.31 / Step 36.0.1 / 0.0.155 (155)", "positive exact Step-35 core closure", "0.0.154", "res://localization/eng", "SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck", "LoadResourcePack", "replaceFiles=false", "0x06007D03", "ExecuteEssential", "ExecuteDeferred", "PrewarmJit"]), "current status records the physical 0.0.154 localization-resource boundary and active Step-36.0.1 exact PCK handoff")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.154 (154)" in testing_doc and "0.0.154 (154)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.154 (154) release identity")
+require("0.0.155 (155)" in testing_doc and "0.0.155 (155)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.155 (155) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -1481,7 +1486,7 @@ cm_script = read("scripts/codemagic.sh")
 require(all(marker in cm_script for marker in ["Pinned .NET SDK/workloads", ".sts2launcher-ios-workload-set", "workload list", "Using verified cached iOS workload set", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE=1"]), "Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation")
 require("Step 36 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 36")
 require("LogFileName=step36.trx" in read("scripts/test.sh") and "artifacts/test-results/step36.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 36")
-require("Step 35.0.31 / Step 36.0 Gate-D UI Return Fix + Controlled ExecuteEssential build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the combined Step 35.0.31 / Step 36.0 candidate")
+require("Step 35.0.31 / Step 36.0.1 Exact Game Resource-Pack Handoff + Controlled ExecuteEssential build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the combined Step 35.0.31 / Step 36.0.1 candidate")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1496,7 +1501,7 @@ require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical pr
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEP 35.0.31 / STEP 36.0 — GATE-D UI RETURN FIX + CONTROLLED EXACT EXECUTEESSENTIAL" in verify_ipa and "step36-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active combined Step-36 candidate")
+require("Expected device UI: STEP 35.0.31 / STEP 36.0.1 — EXACT GAME RESOURCE-PACK HANDOFF + CONTROLLED EXECUTEESSENTIAL" in verify_ipa and "step36-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active combined Step-36.0.1 candidate")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
@@ -1668,8 +1673,10 @@ if step36_manifest.is_file():
         "docs/history/reports/STEP-35.0.30-PHYSICAL-OUTER-WORKER-RETURN-UI-CONTINUATION-STALL-0.0.153.txt",
         "docs/history/steps/STEP-35.0.31-EXPLICIT-MAIN-QUEUE-FINALIZATION.md",
         "docs/history/steps/STEP-36.0-CONTROLLED-EXACT-EXECUTEESSENTIAL.md",
+        "docs/history/reports/STEP-36.0-PHYSICAL-LOCALIZATION-RESOURCE-PATH-FAILURE-0.0.154.txt",
+        "docs/history/steps/STEP-36.0.1-EXACT-GAME-RESOURCE-PACK-HANDOFF.md",
     ]
-    require(all(f"  {relative}" in step36_manifest_text for relative in required_step36_manifest_paths), "Step 36 candidate manifest pins the explicit-main-queue fix, exact ExecuteEssential implementation/tests, active release wiring, and physical Step-35 closure provenance")
+    require(all(f"  {relative}" in step36_manifest_text for relative in required_step36_manifest_paths), "Step 36 candidate manifest pins the exact resource-pack handoff, ExecuteEssential implementation/tests, active release wiring, and physical Step-35/36 provenance")
     mismatches=[]
     for line in step36_manifest.read_text().splitlines():
         if not line.strip(): continue

@@ -1,6 +1,6 @@
-# Testing — Step 35.0.31 / Step 36.0
+# Testing — Step 35.0.31 / Step 36.0.1
 
-Active candidate: `0.0.154 (154)`, IPA `StS2-Launcher-Step-36.ipa`, TRX `step36.trx`, workflow `ios-canonical`.
+Active candidate: `0.0.155 (155)`, IPA `StS2-Launcher-Step-36.ipa`, TRX `step36.trx`, workflow `ios-canonical`.
 
 ## CI
 
@@ -10,7 +10,7 @@ Active candidate: `0.0.154 (154)`, IPA `StS2-Launcher-Step-36.ipa`, TRX `step36.
 4. iOS publish/link must pass.
 5. `scripts/verify-ipa.sh` must verify the exact release identity, runtime policy, fixture payloads, and absence of proprietary game payloads.
 
-## Physical 0.0.154 sequence
+## Physical 0.0.155 sequence
 
 Fresh launch:
 
@@ -18,12 +18,15 @@ Fresh launch:
 2. Leave the Step-15 smoke engine alive in the same process.
 3. Run Step 35 EXACT-CLOSURE once.
 4. Require durable `D_WORKER_RETURN`, then `D_THREADPOOL_CONTINUATION`, `D_UI_DISPATCH_ENTER`, `D_RESULT_RECORD_PASS`, `D_UI_DISPATCH_RETURN`, `RUN_EXACT_STEP35_4OF4`, and normal `RUN_END`.
-5. Without force-quitting/backgrounding, press Step 36.0 once.
+5. Without force-quitting/backgrounding, press Step 36.0.1 once.
 
 Expected Step-36 evidence:
 
 - `E_A_PASS` with source token `0x06007D03` and transformed semantic fingerprint equality.
-- `E_B_PASS` with exact transformed MethodInfo and stateBefore=1.
+- `E_B_PACK_RECEIPT_PASS` for the exact receipt-backed `Slay the Spire 2.pck`.
+- `E_B_PACK_BIND_PASS` and `E_B_PACK_LOAD_RETURNED — returned=True` with `replaceFiles=false`.
+- `E_B_LOCALIZATION_DIR_PROBE_RETURNED — exists=True` for `res://localization/eng`, then `E_B_GAME_RESOURCE_PACK_PASS`.
+- `E_B_PASS` with exact transformed MethodInfo, stateBefore=1, and unchanged resolver baseline.
 - `E_C_INVOKE_START` then either a precise failure boundary or `E_C_INVOKE_RETURNED`.
 - On success: `E_C_PASS` with stateAfter=2 and zero initializer-bearing/rejected/native escape.
 - Gate D: OfflineReady, exact authority/plan/dependency/context reproof, then `E_D_THREADPOOL_CONTINUATION`, `E_D_UI_DISPATCH_ENTER`, `E_D_RESULT_RECORD_PASS`, and `RUN_STEP36_4OF4`.

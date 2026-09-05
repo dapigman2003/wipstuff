@@ -22,12 +22,12 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Step 36.0 — Controlled Exact ExecuteEssential (requires same-process exact Step-35 core closure)",
+            "Step 36.0.1 — Exact Game Resource-Pack Handoff + Controlled ExecuteEssential",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
         _step36EssentialButton = SystemButton(
-            "Run Step 36.0 A–D — Reprove ExecuteEssential → Bind Exact Authority → Invoke Once → Final Audit",
+            "Run Step 36.0.1 A–D — Reprove → Mount Receipt-Backed Game PCK → Invoke ExecuteEssential → Final Audit",
             16);
         _step36EssentialButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2EssentialInitializationAsync();
         content.AddArrangedSubview(_step36EssentialButton);
@@ -39,7 +39,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_step36ResultLabel);
 
         _step36DetailLabel = Label(
-            "Step 36.0 is a new boundary after physical exact Step-35 closure. It invokes only exact transformed OneTimeInitialization.ExecuteEssential() once in the already-established exact sts2/GodotSharp bridge context. ExecuteDeferred, PrewarmJit, the game entry point, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native game loading remain forbidden.",
+            "Physical 0.0.154 reached exact ExecuteEssential and failed only because source-built Godot still exposed the Step-15 smoke resource tree: res://localization/eng did not exist. Step 36.0.1 first mounts the exact receipt-backed Slay the Spire 2 PCK into the already-live source-built Godot resource filesystem with replaceFiles=false, proves that res://localization/eng is visible, then invokes only exact transformed OneTimeInitialization.ExecuteEssential() once. ExecuteDeferred, PrewarmJit, the game entry point, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native game loading remain forbidden.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_step36DetailLabel);
@@ -92,7 +92,7 @@ public sealed partial class RootViewController
         _step36ProgressLabel.Hidden = true;
         _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE A RUNNING…";
         _step36ResultLabel.TextColor = UIColor.Label;
-        _statusLabel.Text = $"STEP 36.0 RUN {_step36RunId} — exact Step-35 closure is resident. Gate A statically re-proves source/transformed ExecuteEssential token 0x06007D03 and semantic equality before any new game-member invocation.";
+        _statusLabel.Text = $"STEP 36.0.1 RUN {_step36RunId} — exact Step-35 closure is resident. Gate A statically re-proves source/transformed ExecuteEssential token 0x06007D03 and semantic equality before any new game-member invocation.";
         _statusLabel.TextColor = UIColor.Label;
 
         try
@@ -108,12 +108,12 @@ public sealed partial class RootViewController
             WriteStep36Checkpoint("E_A_STATIC_MAP_WRITE_RETURNED — verified ExecuteEssential static map durably written.");
 
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE B RUNNING…";
-            _statusLabel.Text = "STEP 36.0 GATE B — prove exact CLR authority continuity, bind exact ExecuteEssential, and require OneTimeInitialization state=1 before invocation.";
+            _statusLabel.Text = "STEP 36.0.1 GATE B — prove exact CLR authority continuity, bind ExecuteEssential, mount the receipt-backed game PCK additively through exact GodotSharp, and prove res://localization/eng before invocation.";
             var gateB = _transformedRealStS2VeryEarlyInitialization.RunEssentialAuthorityBinding(WriteStep36Checkpoint);
             if (!RecordStep36Gate(gateB)) return;
 
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE C RUNNING…";
-            _statusLabel.Text = "STEP 36.0 GATE C — invoke exact transformed ExecuteEssential once on the main thread. This is a synchronous one-shot boundary; do not retry in this process if it fails or stalls.";
+            _statusLabel.Text = "STEP 36.0.1 GATE C — invoke exact transformed ExecuteEssential once on the main thread after the game resource-pack handoff. This is a synchronous one-shot boundary; do not retry in this process if it fails or stalls.";
             WriteStep36Checkpoint("E_C_UI_SELECTED — Gate C selected on the UI thread; entering the synchronous exact ExecuteEssential boundary.");
             var gateC = _transformedRealStS2VeryEarlyInitialization.RunExactExecuteEssentialInvocation(WriteStep36Checkpoint);
             if (!RecordStep36Gate(gateC)) return;
@@ -121,7 +121,7 @@ public sealed partial class RootViewController
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE D RUNNING…";
             _step36ProgressLabel.Hidden = false;
             _step36ProgressLabel.Text = "Step 36 Gate D starting final receipt/hash/resolver/context audit…";
-            _statusLabel.Text = "STEP 36.0 GATE D — final OfflineReady + exact transformed/plan/dependency/resolver/context/state reproof.";
+            _statusLabel.Text = "STEP 36.0.1 GATE D — final OfflineReady + mounted-PCK presence + exact transformed/plan/dependency/resolver/context/state reproof.";
             var progress = new Progress<TransformedRealStS2EssentialInitializationProgress>(value =>
             {
                 if (_step36ProgressLabel is null) return;

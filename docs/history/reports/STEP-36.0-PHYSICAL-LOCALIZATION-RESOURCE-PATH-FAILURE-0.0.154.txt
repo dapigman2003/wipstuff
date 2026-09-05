@@ -1,0 +1,38 @@
+StS2 Launcher — Step 36.0 physical ExecuteEssential localization-resource boundary
+Candidate: 0.0.154 (154)
+Run ID: 20260905T0935123963640Z-pid58701-3826393388e64507b190a3445e0a9d8d
+
+PHYSICAL RESULT
+
+Step 36 completed 2/4 gates and then stopped deterministically at the first exact ExecuteEssential invocation.
+
+Gate A PASS
+- exact source ExecuteEssential token: 0x06007D03
+- exact transformed ExecuteEssential token: 0x0600AFE8
+- semantic SHA-256: 1df430b82462cd22c50be2ef0cf56bec66382421a8784620fb4ca015bb1fb832
+- no ExecuteDeferred / PrewarmJit / Harmony crossover
+
+Gate B PASS
+- exact Step-35 transformed sts2 authority/context continuity accepted
+- exact ExecuteEssential MethodInfo bound
+- stateBefore=1
+- resolver baseline unchanged
+
+Gate C
+- E_C_INVOKE_START reached on managedThread=1 with stateBefore=1
+- exact transformed ExecuteEssential threw:
+  MegaCrit.Sts2.Core.Localization.LocException: Path does not exist: res://localization/eng
+- final report: STEP 36.0 ESSENTIAL INITIALIZATION FAIL — 2/4
+
+Completion/UI evidence
+- RUN_FINALLY_ENTER reached on the main thread
+- RUN_NORMAL_REPORT_RETURNED reached
+- RUN_END reached: Step-36 UI operation ended normally after explicit main-thread teardown
+
+INTERPRETATION
+
+This is a deterministic Godot resource-filesystem boundary. The exact transformed game method was reached under the already-proven exact Step-35 authority and bridge, but the live source-built Godot still exposed the Step-15 smoke-project resource tree rather than the game resource pack. The failure is not localized to managed assembly resolution, callback-table installation, reverse binding, or a native-library load.
+
+NEXT ARCHITECTURAL QUESTION
+
+Reproduce the missing main-pack/resource-pack lifecycle narrowly before retrying the exact method in a fresh process: locate the exact receipt-backed Slay the Spire 2 PCK, mount it into the live source-built Godot resource filesystem through exact prepared GodotSharp, prove the prior res://localization/eng boundary is visible, and only then invoke unchanged exact ExecuteEssential once. ExecuteDeferred, PrewarmJit, game entry, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native game loading remain forbidden.

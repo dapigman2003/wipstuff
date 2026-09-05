@@ -1262,7 +1262,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                     : "Diagnostic meaning: this derivative result supplies localization evidence only; exact Step 35 remains OPEN."));
             Checkpoint(crashCheckpoint, $"D_RESULT_CONSTRUCT_RETURNED — Gate-D result constructed; passed={gateResult.Passed}; exactAuthority={IsExactAuthorityMode}.");
             if (IsExactAuthorityMode && gateResult.Passed)
-                MarkExactStep35CoreClosurePassed(context);
+                MarkExactStep35CoreClosurePassed(context, managedRoot);
 
             progress?.Report(new(gate, 4, 4, IsExactAuthorityMode ? preflight.TransformedPath : preflight.DiagnosticPath,
                 IsExactAuthorityMode

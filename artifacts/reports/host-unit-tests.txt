@@ -1,3 +1,3 @@
-StS2 Launcher — Step 36 / 0.0.154 local host tests
+StS2 Launcher — Step 36.0.1 / 0.0.155 local host tests
 ERROR: dotnet is required to run host tests.
-Local host tests were not executed in this environment; Codemagic remains authoritative for the host suite and iOS compile/link.
+Codemagic remains authoritative for the current host regression suite and iOS compile/link/IPA verification.
