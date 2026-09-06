@@ -6,10 +6,11 @@ using Mono.Cecil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 36.0.2 boundary. This phase is intentionally available only after the exact Step-35 core closure has
-/// completed in the same process. It preserves the exact closed Step-32 transformed sts2 assembly and exact
-/// prepared GodotSharp bridge established by Step 35, statically re-proves ExecuteEssential against the exact
-/// source/transformed pair, mounts the exact receipt-backed game PCK into the live Godot resource filesystem, invokes only ExecuteEssential once, and then re-proves isolation. ExecuteDeferred,
+/// Step 36.0.3 boundary. The forward path is intentionally available only after the Step-35 MODEL-BOOTSTRAP
+/// authority has completed in the same process. It preserves the exact closed Step-32 source as immutable authority,
+/// derives and statically verifies a dependency-aware ModelDb bootstrap compatibility image, retains exact prepared
+/// GodotSharp and the physically proven bridge, mounts the exact receipt-backed game PCK, invokes the unchanged
+/// ExecuteEssential once (including every original post-ModelDb initializer), and then re-proves isolation. ExecuteDeferred,
 /// PrewarmJit, the game entry point, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native
 /// game loading remain forbidden.
 /// </summary>
@@ -34,7 +35,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     public string GetVerifiedEssentialStaticInstructionMap()
         => _essentialPreflight?.StaticInstructionMap
-           ?? throw new InvalidOperationException("Step 36.0 Gate A has not produced a verified ExecuteEssential static map.");
+           ?? throw new InvalidOperationException("Step 36.0.3 Gate A has not produced a verified ExecuteEssential static map.");
 
     private void ResetStep36State()
     {
@@ -69,10 +70,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var admission = RequireAdmission();
             var context = RequireLoadContext();
             RequireStep36BaselineUnchanged(context, "Gate A entry");
-            if (!IsExactAuthorityMode)
-                throw new InvalidOperationException("Step 36.0 requires the exact-authority Step-35 mode; diagnostic derivatives are not accepted.");
+            if (!IsExactAuthorityMode && !IsModelBootstrapCompatibilityMode)
+                throw new InvalidOperationException("Step 36.0.3 requires either the exact Step-35 authority or the verified ModelDb bootstrap compatibility authority; legacy diagnostic derivatives are not accepted.");
 
-            Checkpoint(checkpoint, "E_A_ENTRY — exact Step-35 core closure baseline present; beginning read-only ExecuteEssential source/transformed audit.");
+            Checkpoint(checkpoint, IsModelBootstrapCompatibilityMode
+                ? "E_A_ENTRY — Step-35 ModelDb-bootstrap compatibility authority baseline present; beginning read-only ExecuteEssential source/selected-authority audit."
+                : "E_A_ENTRY — exact Step-35 core closure baseline present; beginning read-only ExecuteEssential source/transformed audit.");
             stage = "source/transformed ExecuteEssential semantic audit";
             var sourcePath = Path.Combine(
                 _launcherDataRoot,
@@ -83,12 +86,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var sourceSha256 = ComputeSha256Hex(sourcePath);
             if (!sourceSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32SourceSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step 36.0 exact source SHA-256 drifted from the physically closed Step-32 source.");
-            VerifyFileLength(preflight.TransformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "Step-36 exact transformed primary");
-            var transformedSha256 = ComputeSha256Hex(preflight.TransformedPath);
-            if (!transformedSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step 36.0 exact transformed SHA-256 drifted from the physically closed Step-32 transform.");
+            var selectedAuthorityPath = IsModelBootstrapCompatibilityMode ? preflight.DiagnosticPath : preflight.TransformedPath;
+            var selectedAuthorityBytes = IsModelBootstrapCompatibilityMode ? preflight.DiagnosticLength : TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes;
+            var selectedExpectedSha256 = IsModelBootstrapCompatibilityMode ? preflight.DiagnosticSha256 : TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256;
+            VerifyFileLength(selectedAuthorityPath, selectedAuthorityBytes, IsModelBootstrapCompatibilityMode ? "Step-36 ModelDb bootstrap compatibility authority" : "Step-36 exact transformed primary");
+            var transformedSha256 = ComputeSha256Hex(selectedAuthorityPath);
+            if (!transformedSha256.Equals(selectedExpectedSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException($"Step 36.0 selected authority SHA-256 drifted: expected {selectedExpectedSha256}; observed {transformedSha256}.");
             if (!admission.ImmediateSha256.Equals(transformedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step 36.0 CLR-resident sts2 authority is not the exact closed transformed image.");
+                throw new InvalidDataException("Step 36.0 CLR-resident sts2 authority no longer matches the selected verified authority bytes.");
 
             uint transformedToken;
             string semanticSha256;
@@ -101,7 +107,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                        ReadingMode = ReadingMode.Deferred,
                        AssemblyResolver = sourceResolver,
                    }))
-            using (var transformedModule = ModuleDefinition.ReadModule(preflight.TransformedPath, new ReaderParameters
+            using (var transformedModule = ModuleDefinition.ReadModule(selectedAuthorityPath, new ReaderParameters
                    {
                        ReadSymbols = false,
                        ReadingMode = ReadingMode.Deferred,
@@ -140,6 +146,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
                 transformedToken = transformedMethod.MetadataToken.ToUInt32();
                 staticMap = BuildEssentialStaticInstructionMap(sourceMethod, transformedMethod, semanticSha256);
+                if (IsModelBootstrapCompatibilityMode)
+                    staticMap += "\n\n" + preflight.ModelBootstrapCompatibilityReport;
                 if (sourceResolver.Requests.Count != 0 || transformedResolver.Requests.Count != 0)
                     throw new InvalidDataException("Step 36.0 static ExecuteEssential audit unexpectedly resolved a dependency through Cecil.");
             }
@@ -147,7 +155,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             _essentialPreflight = new EssentialPreflightSnapshot(
                 sourcePath,
                 sourceSha256,
-                preflight.TransformedPath,
+                selectedAuthorityPath,
                 transformedSha256,
                 transformedToken,
                 semanticSha256,
@@ -156,9 +164,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             _essentialBinding = null;
             _essentialResourcePackHandoff = null;
             _essentialExecution = null;
-            Checkpoint(checkpoint, $"E_A_PASS — exact source/transformed ExecuteEssential semantics matched; sourceToken=0x{SourceEssentialTargetMethodToken:X8}; transformedToken=0x{transformedToken:X8}; semanticSha256={semanticSha256}; no ExecuteDeferred/PrewarmJit/Harmony crossover.");
+            Checkpoint(checkpoint, $"E_A_PASS — source/selected-authority ExecuteEssential semantics matched; authorityMode={DiagnosticMode}; sourceToken=0x{SourceEssentialTargetMethodToken:X8}; transformedToken=0x{transformedToken:X8}; semanticSha256={semanticSha256}; no ExecuteDeferred/PrewarmJit/Harmony crossover.");
             return EssentialPass(gate,
-                $"Exact Step-35 core closure prerequisite: PASS\n" +
+                $"Step-35 selected authority prerequisite: PASS\n" +
                 $"Source ExecuteEssential token: 0x{SourceEssentialTargetMethodToken:X8}\n" +
                 $"Transformed ExecuteEssential token: 0x{transformedToken:X8}\n" +
                 $"Signature: {EssentialTargetMethodFullName}\n" +
@@ -191,9 +199,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var admission = RequireAdmission();
             var context = RequireLoadContext();
             RequireStep36BaselineUnchanged(context, "Gate B entry");
-            Checkpoint(checkpoint, "E_B_ENTRY — exact Step-35 authority/context continuity accepted; binding exact ExecuteEssential without invoking it.");
+            Checkpoint(checkpoint, $"E_B_ENTRY — Step-35 authority/context continuity accepted; authorityMode={DiagnosticMode}; binding unchanged ExecuteEssential without invoking it.");
 
-            stage = "exact ExecuteEssential reflection binding";
+            stage = "selected-authority ExecuteEssential reflection binding";
             var targetType = admission.Assembly.GetType(TargetTypeFullName, throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException(TargetTypeFullName);
             var method = targetType.GetMethod(
@@ -210,13 +218,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (method.Module.ModuleVersionId != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
                 throw new InvalidDataException("Step 36.0 reflected ExecuteEssential module MVID drifted from the closed transformed image.");
             if (admission.Assembly.GetType(DiagnosticBridgeTypeFullName, throwOnError: false, ignoreCase: false) is not null)
-                throw new InvalidDataException("Step 36.0 exact sts2 authority unexpectedly contains the Step-35 diagnostic checkpoint bridge.");
+                throw new InvalidDataException("Step 36.0 selected sts2 authority unexpectedly contains the historical Step-35 diagnostic checkpoint bridge.");
 
             var stateField = targetType.GetField("_state", BindingFlags.Static | BindingFlags.NonPublic)
                 ?? throw new MissingFieldException(TargetTypeFullName, "_state");
             var stateBefore = ReadOneTimeInitializationState(stateField);
             if (stateBefore != ExpectedStateAfterVeryEarly)
-                throw new InvalidDataException($"Step 36.0 requires OneTimeInitialization state {ExpectedStateAfterVeryEarly} after exact ExecuteVeryEarly; observed {stateBefore}.");
+                throw new InvalidDataException($"Step 36.0 requires OneTimeInitialization state {ExpectedStateAfterVeryEarly} after Step-35 ExecuteVeryEarly; observed {stateBefore}.");
             RequireStep36BaselineUnchanged(context, "Gate B post-binding");
 
             stage = "receipt-backed game resource-pack handoff";
@@ -227,9 +235,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             _essentialBinding = new EssentialBindingSnapshot(method, stateField, stateBefore);
             _essentialResourcePackHandoff = resourceHandoff;
             _essentialExecution = null;
-            Checkpoint(checkpoint, $"E_B_PASS — exact ExecuteEssential MethodInfo bound; token=0x{method.MetadataToken:X8}; stateBefore={stateBefore}; exact game PCK mounted; localizationProbe={resourceHandoff.LocalizationProbePath}; resolver baseline unchanged.");
+            Checkpoint(checkpoint, $"E_B_PASS — unchanged ExecuteEssential MethodInfo bound from authorityMode={DiagnosticMode}; token=0x{method.MetadataToken:X8}; stateBefore={stateBefore}; exact game PCK mounted; localizationProbe={resourceHandoff.LocalizationProbePath}; resolver baseline unchanged.");
             return EssentialPass(gate,
-                $"Exact transformed sts2 authority continuity: PASS\n" +
+                $"Selected sts2 authority continuity ({DiagnosticMode}): PASS\n" +
                 $"ExecuteEssential token: 0x{method.MetadataToken:X8}\n" +
                 $"MVID: {method.Module.ModuleVersionId}\n" +
                 $"OneTimeInitialization state before ExecuteEssential: {stateBefore}\n" +
@@ -266,8 +274,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (stateBefore != ExpectedStateAfterVeryEarly)
                 throw new InvalidDataException($"Step 36.0 pre-invoke state drifted: expected {ExpectedStateAfterVeryEarly}, observed {stateBefore}.");
 
-            stage = "single exact ExecuteEssential invocation";
-            Checkpoint(checkpoint, $"E_C_INVOKE_START — invoking exact transformed ExecuteEssential once on managedThread={Environment.CurrentManagedThreadId}; stateBefore={stateBefore}; gamePackMounted={resourceHandoff.PackRelativePath}; localizationProbe={resourceHandoff.LocalizationProbePath}. This synchronous boundary has no launcher retry in the same process.");
+            stage = "single unchanged ExecuteEssential invocation";
+            Checkpoint(checkpoint, $"E_C_INVOKE_START — invoking unchanged ExecuteEssential once from the selected sts2 authority on managedThread={Environment.CurrentManagedThreadId}; stateBefore={stateBefore}; gamePackMounted={resourceHandoff.PackRelativePath}; localizationProbe={resourceHandoff.LocalizationProbePath}. This synchronous boundary has no launcher retry in the same process.");
             var resolverCountBefore = context.ManagedResolverRequests.Count;
             var hostLoadCountBefore = context.HostLoads.Count;
             var privateLoadCountBefore = context.PrivateLoads.Count;
@@ -297,7 +305,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                     Checkpoint(checkpoint, line);
                 throw new InvalidOperationException(diagnostic.ReportText, ex);
             }
-            Checkpoint(checkpoint, "E_C_INVOKE_RETURNED — exact transformed ExecuteEssential returned to the launcher.");
+            Checkpoint(checkpoint, "E_C_INVOKE_RETURNED — unchanged ExecuteEssential returned to the launcher after its full original call sequence.");
 
             var stateAfter = ReadOneTimeInitializationState(binding.StateField);
             if (stateAfter != ExpectedStateAfterEssential)
@@ -317,9 +325,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 context.HostLoads.ToArray(),
                 context.PrivateLoads.ToArray(),
                 context.Assemblies.Select(a => a.GetName().FullName ?? a.GetName().Name ?? "<unknown>").OrderBy(x => x, StringComparer.Ordinal).ToArray());
-            Checkpoint(checkpoint, $"E_C_PASS — exact ExecuteEssential returned; stateAfter={stateAfter}; {context.FormatResolverState()}.");
+            Checkpoint(checkpoint, $"E_C_PASS — unchanged full ExecuteEssential returned; stateAfter={stateAfter}; {context.FormatResolverState()}.");
             return EssentialPass(gate,
-                "Exact transformed ExecuteEssential invocation: PASS\n" +
+                "Selected-authority unchanged ExecuteEssential invocation: PASS\n" +
                 $"Receipt-backed game resource pack mounted before invocation: {resourceHandoff.PackRelativePath}\n" +
                 $"Localization probe before invocation: {resourceHandoff.LocalizationProbePath} => PRESENT\n" +
                 $"State transition: {stateBefore} -> {stateAfter}\n" +
@@ -359,7 +367,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             Checkpoint(checkpoint, "E_D_AUDIT_ENTRY — final Step-36 isolation audit entered.");
 
             stage = "post-ExecuteEssential OfflineReady reproof";
-            progress?.Report(new(gate, 0, 4, null, "Re-proving receipt-backed OfflineReady after exact ExecuteEssential."));
+            progress?.Report(new(gate, 0, 4, null, "Re-proving receipt-backed OfflineReady after unchanged ExecuteEssential."));
             IProgress<SteamOfflineInstallProgress>? offlineProgress = progress is null
                 ? null
                 : new CallbackProgress<SteamOfflineInstallProgress>(value =>
@@ -389,15 +397,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException("Step 36.0 receipt-backed original sts2.dll changed after ExecuteEssential.");
             progress?.Report(new(gate, 1, 4, trustedPrimaryPath, "Receipt-backed original remains byte-identical."));
 
-            stage = "exact transformed / plan / dependency reproof";
+            stage = "selected sts2 authority / plan / dependency reproof";
             var transformedSha256 = ComputeSha256Hex(essentialPreflight.TransformedPath);
-            if (!transformedSha256.Equals(TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedSha256, StringComparison.OrdinalIgnoreCase) ||
+            if (!transformedSha256.Equals(essentialPreflight.TransformedSha256, StringComparison.OrdinalIgnoreCase) ||
                 !admission.ImmediateSha256.Equals(transformedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step 36.0 exact transformed authority hash drifted after ExecuteEssential.");
+                throw new InvalidDataException("Step 36.0 selected sts2 authority hash drifted after ExecuteEssential.");
             var planSha256 = ComputeSha256Hex(_planPath);
             if (!planSha256.Equals(essentialPreflight.PlanSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step 36.0 prepared runtime-binding plan changed after ExecuteEssential.");
-            progress?.Report(new(gate, 2, 4, essentialPreflight.TransformedPath, "Exact transformed authority and runtime-binding plan remain byte-identical."));
+            progress?.Report(new(gate, 2, 4, essentialPreflight.TransformedPath, "Selected sts2 authority and runtime-binding plan remain byte-identical."));
 
             var step35Preflight = RequirePreflight();
             var verifiedPrivate = 0;
@@ -419,7 +427,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException("Step 36.0 final resolver/native isolation counters are not clean. " + context.FormatResolverState());
             var matches = FindLoadedStS2Assemblies();
             if (matches.Length != 1 || !ReferenceEquals(matches[0], admission.Assembly) || !ReferenceEquals(AssemblyLoadContext.GetLoadContext(admission.Assembly), context))
-                throw new InvalidDataException("Step 36.0 exact resident sts2 identity/context ownership drifted during final audit.");
+                throw new InvalidDataException("Step 36.0 selected resident sts2 identity/context ownership drifted during final audit.");
             if (execution.MethodToken != unchecked((int)essentialPreflight.TransformedMethodToken))
                 throw new InvalidDataException("Step 36.0 ExecuteEssential execution token drifted during final audit.");
             var finalState = ReadOneTimeInitializationState(RequireEssentialBinding().StateField);
@@ -427,12 +435,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException($"Step 36.0 final OneTimeInitialization state drifted: expected {ExpectedStateAfterEssential}, observed {finalState}.");
             progress?.Report(new(gate, 3, 4, essentialPreflight.TransformedPath, "Resolver/context/state isolation checks passed."));
 
-            Checkpoint(checkpoint, $"E_D_FINAL_CHECKS_PASS — exact authority/plan/dependency/resolver/context/state checks passed; state={finalState}; verifiedPrivate={verifiedPrivate}; {context.FormatResolverState()}.");
+            Checkpoint(checkpoint, $"E_D_FINAL_CHECKS_PASS — selected authority/plan/dependency/resolver/context/state checks passed; state={finalState}; verifiedPrivate={verifiedPrivate}; {context.FormatResolverState()}.");
             var result = EssentialPass(gate,
                 "STEP 36.0 FINAL ISOLATION AUDIT PASSED.\n" +
                 $"OfflineReady: PASS ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
-                $"Exact transformed SHA-256 unchanged: {transformedSha256}\n" +
+                $"Selected sts2 authority ({DiagnosticMode}) SHA-256 unchanged: {transformedSha256}\n" +
                 $"Runtime-binding plan SHA-256 unchanged: {planSha256}\n" +
                 $"Receipt-backed game resource pack remained present: {resourceHandoff.PackRelativePath} ({resourceHandoff.PackLength:N0} bytes)\n" +
                 $"Localization resource probe used before ExecuteEssential: {resourceHandoff.LocalizationProbePath}\n" +
@@ -442,7 +450,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 "Rejected managed requests: 0\n" +
                 "Native game resolution/loading: NO\n" +
                 "ExecuteDeferred / PrewarmJit / game entry point intentionally invoked by launcher: NO");
-            progress?.Report(new(gate, 4, 4, essentialPreflight.TransformedPath, "Step 36.0 final isolation audit complete."));
+            progress?.Report(new(gate, 4, 4, essentialPreflight.TransformedPath, "Step 36.0.3 final isolation audit complete."));
             Checkpoint(checkpoint, "E_D_TASK_RETURN_START — returning completed Step-36 Gate-D result.");
             return result;
         }
@@ -582,9 +590,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private void RequireExactStep35CoreClosure(string boundary)
     {
         if (!_exactStep35CoreClosurePassed || _step36Baseline is null)
-            throw new InvalidOperationException($"{boundary} requires a successful exact Step-35 core closure in this same process. Run Step 15 A-C, then Step 35 EXACT-CLOSURE 4/4 first.");
-        if (!IsExactAuthorityMode)
-            throw new InvalidOperationException($"{boundary} requires Step35DiagnosticMode.GodotCoreExactClosure.");
+            throw new InvalidOperationException($"{boundary} requires a successful Step-35 exact/model-bootstrap authority closure in this same process. Run Step 15 A-C, then Step 35 MODEL-BOOTSTRAP 4/4 (preferred for Step 36.0.3) or EXACT-CLOSURE 4/4 first.");
+        if (!IsExactAuthorityMode && !IsModelBootstrapCompatibilityMode)
+            throw new InvalidOperationException($"{boundary} requires GodotCoreExactClosure or GodotCoreModelBootstrapCompatibility; legacy diagnostic derivatives are not accepted.");
         if (_callbackHandoff is null || !_managedPluginReverseBridgePrepared)
             throw new InvalidOperationException($"{boundary} requires the physically proven Godot managed/native bridge to remain installed.");
     }

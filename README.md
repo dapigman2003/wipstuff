@@ -1,25 +1,20 @@
-# StS2 Launcher — Step 35.0.31 / Step 36.0.2
+# StS2 Launcher — Step 35.0.32 / Step 36.0.3
 
-Active candidate: **0.0.156 (156)** — exact `ExecuteEssential` failure-chain capture with the physically proven receipt-backed game-PCK handoff retained unchanged.
+Active candidate: **0.0.157 (157)** — dependency-aware `ModelDb` bootstrap compatibility plus one full unchanged `ExecuteEssential` attempt.
 
-Physical **0.0.155** closed the Step-36 resource-filesystem boundary: the exact Step-12-receipt-backed `SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck` was located, exact prepared `GodotSharp` bound `ProjectSettings.LoadResourcePack`, the additive mount returned `true`, and `Godot.DirAccess.Open` proved `res://localization/eng` before Gate C. Gate C then invoked the unchanged exact transformed `OneTimeInitialization.ExecuteEssential()` once and failed through a nested `TargetInvocationException` chain. The 0.0.155 formatter exposed only `TargetInvocationException: Arg_TargetInvocationException`, so the first internal essential-initialization failure is still unknown.
+Physical **0.0.156** closed the previous ambiguity. The exact receipt-backed PCK mounted successfully, `res://localization/eng` was visible, and unchanged `ExecuteEssential()` reached `ModelDb.Init()`. `Activator.CreateInstance(BowlbugsNormal)` triggered `BowlbugsNormal..cctor`, which called `ModelDb.Monster<BowlbugEgg>()` before `MONSTER.BOWLBUG_EGG` had reached its generated insertion point. The base failure was `KeyNotFoundException: MONSTER.BOWLBUG_EGG`; resolver/native counters stayed clean and both `sts2` and `GodotSharp` remained in the intended private context.
 
-**Step 36.0.2 changes observation only.** It preserves Gates A/B, the exact transformed method/token/semantic authority, the exact one-call Gate-C invocation, the PCK mount, resolver policy, and all forbidden boundaries. On a Gate-C throw it now durably captures:
+**0.0.157 fixes the ordering class, not one monster.** Gate A derives a verified compatibility copy of the exact Step-32 transformed `sts2` image. It statically extracts the generated canonical model order, scans canonical model static constructors for direct generic `ModelDb<T>` dependencies, finds every dependency edge that points forward in the generated order, computes the dependency closure, and pre-injects that closure in dependency order. During normal `ModelDb.Init` iteration, pre-injected models are removed/re-added with the **same instance** at their original generated-list position. This preserves final ModelDb insertion order and avoids duplicate constructors while satisfying eager static-initializer dependencies.
 
-- every `InnerException` depth with type, message, HResult, source, target method, and stack trace;
-- `ReflectionTypeLoadException.LoaderExceptions`;
-- `GetBaseException()` identity and stack;
-- `OneTimeInitialization._state` immediately after failure;
-- managed resolver, host-load, private-load, initializer-bearing, rejected-managed, and native-load deltas across the invocation;
-- whether exact `sts2` and `GodotSharp` remain owned by the Step-35 private load context.
+The compatibility mode uses the already-proven **exact prepared GodotSharp** and source-built Godot 4.5.1 bridge. `ExecuteVeryEarly` remains unchanged. Step 36 then mounts the same receipt-backed PCK and invokes the **full unchanged `ExecuteEssential` once**. If ModelDb succeeds, `ModelIdSerializationCache.Init`, `ModelDb.InitIds`, `MessageTypes.Initialize`, and `ActionTypes.Initialize` are allowed to run naturally in the original call. Full nested-exception/state/resolver/context telemetry remains active if any later initializer fails.
 
-There is still **one** launcher `MethodInfo.Invoke(null, null)`, no retry, no state reset, and no direct child-initializer probes. `ExecuteDeferred`, launcher-driven `PrewarmJit`, game entry, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native game loading remain forbidden.
+`ExecuteDeferred`, launcher-driven `PrewarmJit`, game entry, native game loading, runtime Harmony/MonoMod patching, arbitrary resolver fallback, retries, and `_state` reset remain forbidden.
 
 ## Physical test sequence
 
 1. Fresh process: run Step 15 Gates A-C.
-2. Without force-quitting/backgrounding, run Step 35 **EXACT-CLOSURE** once.
-3. Run **Step 36.0.2 A-D** once.
-4. Preserve the Step36 checkpoint journal, last checkpoint, static map, and final report.
+2. Without force-quitting/backgrounding, run Step 35 **MODEL-BOOTSTRAP** once and require 4/4.
+3. Run **Step 36.0.3 A-D** once. Do not retry Gate C in the same process.
+4. Preserve the Step35 and Step36 run-correlated checkpoint/static-map/final-report artifacts.
 
-Highest-value new markers: `E_C_EXCEPTION_CAPTURED`, `E_C_POST_FAILURE_CONTEXT`, `E_C_EXCEPTION_DEPTH`, `E_C_LOADER_EXCEPTION`, and `E_C_BASE_EXCEPTION`.
+Codemagic workflow key remains `ios-canonical` so existing workflow-scoped NuGet, .NET, Godot Step-15, and iOS intermediate caches can be reused.

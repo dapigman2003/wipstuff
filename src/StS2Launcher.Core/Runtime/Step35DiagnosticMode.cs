@@ -14,6 +14,9 @@ namespace StS2Launcher.Core;
 /// sts2 bytes and the exact prepared GodotSharp bytes, reproduces the same physically proven bridge bootstrap,
 /// then invokes the exact transformed ExecuteVeryEarly once. It must run in a fresh process after Step 15 and does
 /// not use either diagnostic derivative as CLR input.
+/// GodotCoreModelBootstrapCompatibility is the Step-36 forward candidate: it derives only sts2 from the exact
+/// closed Step-32 transformed image, applies the physically motivated ModelDb bootstrap-order compatibility rewrite,
+/// keeps exact prepared GodotSharp, and otherwise runs the same proven Step-35 Godot bridge/ExecuteVeryEarly path.
 /// </summary>
 public enum Step35DiagnosticMode
 {
@@ -22,4 +25,5 @@ public enum Step35DiagnosticMode
     ManagedCommandLineCompatibility = 2,
     GodotCoreCallbackHandoff = 3,
     GodotCoreExactClosure = 4,
+    GodotCoreModelBootstrapCompatibility = 5,
 }

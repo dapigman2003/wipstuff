@@ -35,6 +35,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
     private const string DiagnosticCloneFileName = "sts2.step35.0.27.instrumented.dll";
+    private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step36.0.3.model-bootstrap.dll";
     private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.27.instrumented.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
@@ -80,9 +81,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     public Step35DiagnosticMode DiagnosticMode { get; set; } = Step35DiagnosticMode.ManagedCommandLineCompatibility;
 
     private bool UsesGodotManagedPluginBootstrap =>
-        DiagnosticMode is Step35DiagnosticMode.GodotCoreCallbackHandoff or Step35DiagnosticMode.GodotCoreExactClosure;
+        DiagnosticMode is Step35DiagnosticMode.GodotCoreCallbackHandoff or Step35DiagnosticMode.GodotCoreExactClosure or Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility;
 
     private bool IsExactAuthorityMode => DiagnosticMode == Step35DiagnosticMode.GodotCoreExactClosure;
+
+    private bool IsModelBootstrapCompatibilityMode => DiagnosticMode == Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility;
+
+    private bool UsesExactPreparedGodotSharp => IsExactAuthorityMode || IsModelBootstrapCompatibilityMode;
+
+    public bool EssentialCompatibilityAuthorityPassed => _exactStep35CoreClosurePassed &&
+        DiagnosticMode is Step35DiagnosticMode.GodotCoreExactClosure or Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility;
 
     public TransformedRealStS2VeryEarlyInitialization(string launcherDataRoot, bool collectibleLoadContext = false)
     {
@@ -242,18 +250,23 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             progress?.Report(new(gate, 5, 8, transformedPath,
                 "Exact source/transformed ExecuteVeryEarly wrapper + async MoveNext semantics requalified; no direct ExecuteEssential/ExecuteDeferred/PrewarmJit or Harmony call crosses this boundary."));
 
-            stage = "Step-35.0.22 diagnostic-clone instrumentation";
+            var diagnosticMode = DiagnosticMode;
+            stage = IsModelBootstrapCompatibilityMode ? "Step-36.0.3 ModelDb bootstrap compatibility clone" : "Step-35.0.22 diagnostic-clone instrumentation";
             var diagnosticRoot = Path.Combine(_launcherDataRoot, "Step35-ExecuteVeryEarlyDiagnostic");
             Directory.CreateDirectory(diagnosticRoot);
-            var diagnosticPath = Path.Combine(diagnosticRoot, DiagnosticCloneFileName);
-            var diagnosticMode = DiagnosticMode;
-            var diagnostic = CreateInstrumentedDiagnosticClone(transformedPath, diagnosticPath, diagnosticMode);
+            var diagnosticPath = Path.Combine(diagnosticRoot, IsModelBootstrapCompatibilityMode ? ModelBootstrapCompatibilityCloneFileName : DiagnosticCloneFileName);
+            var modelBootstrapCompatibilityReport = string.Empty;
+            var diagnostic = IsModelBootstrapCompatibilityMode
+                ? CreateModelBootstrapCompatibilityClone(transformedPath, diagnosticPath, out modelBootstrapCompatibilityReport)
+                : CreateInstrumentedDiagnosticClone(transformedPath, diagnosticPath, diagnosticMode);
             VerifyFileLength(transformedPath, TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes, "exact transformed primary after diagnostic-clone emission");
             var transformedSha256AfterDiagnosticEmission = ComputeSha256Hex(transformedPath);
             if (!transformedSha256AfterDiagnosticEmission.Equals(transformedSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35.0.22 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
             progress?.Report(new(gate, 6, 8, diagnosticPath,
-                $"Exact transformed image requalified, then a Step-35.0.22 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), {diagnostic.CommandLineManagedCommandLineSubstitutionCount:N0} managed command-line provider substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
+                IsModelBootstrapCompatibilityMode
+                    ? $"Exact transformed image requalified, then the Step-36.0.3 ModelDb bootstrap compatibility derivative was emitted and reopened under rejecting resolution. {modelBootstrapCompatibilityReport.Replace('\n', ' ')}"
+                    : $"Exact transformed image requalified, then a Step-35.0.22 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), {diagnostic.CommandLineManagedCommandLineSubstitutionCount:N0} managed command-line provider substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
 
             stage = "Step-21/22 prepared execution-plan preflight";
             var preparedResult = await _preparedPreflight.RunPreparedLoadPreflightAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -324,6 +337,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 diagnostic.MoveNextToken,
                 diagnostic.MarkerCount,
                 diagnosticMode,
+                modelBootstrapCompatibilityReport,
                 godotSharpDiagnostic,
                 godotReconnaissanceReport,
                 transformedMethodToken,
@@ -338,7 +352,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 initializerBearing[0]);
 
             EnsureNoStS2Loaded("Gate A exit");
-            progress?.Report(new(gate, 8, 8, _planPath, "Execution preflight complete; exact transformed source, instrumented diagnostic clone, and all prepared dependencies remain outside the CLR."));
+            progress?.Report(new(gate, 8, 8, _planPath, IsModelBootstrapCompatibilityMode
+                ? "Execution preflight complete; exact transformed source, verified ModelDb-bootstrap derivative, and all prepared dependencies remain outside the CLR."
+                : "Execution preflight complete; exact transformed source, instrumented diagnostic clone, and all prepared dependencies remain outside the CLR."));
 
             return Pass(gate,
                 "EXACT CLOSED TRANSFORMED IMAGE, VERY-EARLY ASYNC STARTUP TARGET, AND EXECUTION RESOLVER PLAN REQUALIFIED; NO STS2 CLR LOAD OR GAME INVOCATION OCCURRED.\n" +
@@ -346,10 +362,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 $"Source SHA-256: {sourceSha256}\n" +
                 $"Transformed SHA-256: {transformedSha256}\n" +
                 $"Transformed bytes: {TransformedRealStS2AssemblyAdmission.ClosedStep32TransformedBytes:N0}\n" +
-                $"Step-35.0.22 diagnostic clone SHA-256: {diagnostic.Sha256}\n" +
-                $"Step-35.0.22 diagnostic clone bytes: {diagnostic.Length:N0}\n" +
+                $"Selected sts2 derivative SHA-256: {diagnostic.Sha256}\n" +
+                $"Selected sts2 derivative bytes: {diagnostic.Length:N0}\n" +
                 $"Injected durable sts2 checkpoint markers: {diagnostic.MarkerCount:N0}\n" +
                 $"Diagnostic mode: {diagnosticMode}\n" +
+                (IsModelBootstrapCompatibilityMode ? $"ModelDb bootstrap compatibility plan: {modelBootstrapCompatibilityReport.Replace('\n', ' ')}\n" : string.Empty) +
                 $"GodotSharp diagnostic clone SHA-256: {godotSharpDiagnostic.Sha256}\n" +
                 $"GodotSharp diagnostic clone bytes: {godotSharpDiagnostic.Length:N0}\n" +
                 $"GodotSharp entry-only checkpoint markers: {godotSharpDiagnostic.MarkerCount:N0}\n" +
@@ -460,7 +477,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             stage = "execution-capable strict AssemblyLoadContext construction";
             Checkpoint(crashCheckpoint, $"B_ALC_CONSTRUCT_START — constructing strict Step-35 execution AssemblyLoadContext; exactAuthority={IsExactAuthorityMode}.");
             IReadOnlyList<PrivateDiagnosticOverride>? overrides = null;
-            if (!IsExactAuthorityMode)
+            if (!UsesExactPreparedGodotSharp)
             {
                 var godotOverride = new PrivateDiagnosticOverride(
                     "GodotSharp",
@@ -486,11 +503,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
 
             var selectedPath = IsExactAuthorityMode ? preflight.TransformedPath : preflight.DiagnosticPath;
             var selectedSha256 = IsExactAuthorityMode ? exactImmediateSha256 : diagnosticImmediateSha256;
-            var selectedLabel = IsExactAuthorityMode ? "exact closed Step-32 transformed sts2 image" : "instrumented diagnostic sts2 clone";
-            stage = IsExactAuthorityMode ? "exact transformed sts2.dll LoadFromStream" : "instrumented diagnostic sts2.dll LoadFromStream";
-            Checkpoint(crashCheckpoint, IsExactAuthorityMode
-                ? "B_LOADPRIMARY_START — entering exact-authority LoadPrimary/LoadFromStream path with the exact closed Step-32 transformed sts2 bytes; diagnostic sts2/GodotSharp derivatives remain outside the CLR."
-                : "B_LOADPRIMARY_START — entering instrumented diagnostic-clone LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched on disk.");
+            var selectedLabel = IsModelBootstrapCompatibilityMode ? "verified ModelDb-bootstrap sts2 compatibility authority" : IsExactAuthorityMode ? "exact closed Step-32 transformed sts2 image" : "instrumented diagnostic sts2 clone";
+            stage = IsModelBootstrapCompatibilityMode ? "ModelDb-bootstrap sts2.dll LoadFromStream" : IsExactAuthorityMode ? "exact transformed sts2.dll LoadFromStream" : "instrumented diagnostic sts2.dll LoadFromStream";
+            Checkpoint(crashCheckpoint, IsModelBootstrapCompatibilityMode
+                ? "B_LOADPRIMARY_START — entering ModelDb-bootstrap compatibility LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched, and exact prepared GodotSharp remains the bridge dependency."
+                : IsExactAuthorityMode
+                    ? "B_LOADPRIMARY_START — entering exact-authority LoadPrimary/LoadFromStream path with the exact closed Step-32 transformed sts2 bytes; diagnostic sts2/GodotSharp derivatives remain outside the CLR."
+                    : "B_LOADPRIMARY_START — entering instrumented diagnostic-clone LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched on disk.");
             var assembly = context.LoadPrimary(selectedPath, selectedSha256);
             Checkpoint(crashCheckpoint, $"B_LOADPRIMARY_PASS — {selectedLabel} returned from LoadPrimary/LoadFromStream.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(assembly), context))
@@ -587,11 +606,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             if (context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
                 throw new InvalidDataException("Step-35 callback handoff entered with dirty forbidden resolver state. " + context.FormatResolverState());
 
-            stage = IsExactAuthorityMode ? "exact prepared GodotSharp load" : "GodotSharp diagnostic derivative load";
+            stage = UsesExactPreparedGodotSharp ? "exact prepared GodotSharp load" : "GodotSharp diagnostic derivative load";
             var godotIdentity = new AssemblyName(preflight.GodotSharpDiagnostic.AssemblyIdentity);
-            Checkpoint(crashCheckpoint, $"CB_GODOTSHARP_LOAD_START — explicitly requesting {godotIdentity.FullName} through the strict Step-35 context; exactAuthority={IsExactAuthorityMode}; {(IsExactAuthorityMode ? "exact prepared GodotSharp bytes will be selected" : "verified diagnostic override and entry bridge will be selected")}.");
+            Checkpoint(crashCheckpoint, $"CB_GODOTSHARP_LOAD_START — explicitly requesting {godotIdentity.FullName} through the strict Step-35 context; exactAuthority={IsExactAuthorityMode}; {(UsesExactPreparedGodotSharp ? "exact prepared GodotSharp bytes will be selected" : "verified diagnostic override and entry bridge will be selected")}.");
             var godotAssembly = context.LoadFromAssemblyName(godotIdentity);
-            Checkpoint(crashCheckpoint, $"CB_GODOTSHARP_LOAD_RETURNED — strict context returned {(IsExactAuthorityMode ? "exact prepared GodotSharp" : "the GodotSharp diagnostic derivative")}.");
+            Checkpoint(crashCheckpoint, $"CB_GODOTSHARP_LOAD_RETURNED — strict context returned {(UsesExactPreparedGodotSharp ? "exact prepared GodotSharp" : "the GodotSharp diagnostic derivative")}.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotAssembly), context))
                 throw new InvalidDataException("Step-35 callback handoff GodotSharp assembly did not belong to the dedicated Step-35 context.");
             if (!string.Equals(godotAssembly.GetName().FullName, preflight.GodotSharpDiagnostic.AssemblyIdentity, StringComparison.Ordinal) ||
@@ -647,7 +666,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 context.InitializerBearingRequests.Count,
                 context.RejectedManagedRequests.Count,
                 context.NativeLoadAttempts.Count);
-            Checkpoint(crashCheckpoint, $"CB_INITIALIZE_PASS — exact callback table copied into {(IsExactAuthorityMode ? "exact prepared GodotSharp" : "the verified GodotSharp derivative")}; initialized=true; {context.FormatResolverState()}.");
+            Checkpoint(crashCheckpoint, $"CB_INITIALIZE_PASS — exact callback table copied into {(UsesExactPreparedGodotSharp ? "exact prepared GodotSharp" : "the verified GodotSharp derivative")}; initialized=true; {context.FormatResolverState()}.");
             return $"Godot runtime callback handoff PASS; table=0x{callbackTable.ToInt64():X}; bytes={callbackTableSizeBytes}; pointers={callbackTableSizeBytes / IntPtr.Size}; GodotSharp MVID={godotAssembly.ManifestModule.ModuleVersionId}.";
         }
         catch (Exception ex)
@@ -944,15 +963,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             var privateLoadsBefore = context.PrivateLoads.Count;
             var nativeAttemptsBefore = context.NativeLoadAttempts.Count;
 
-            stage = IsExactAuthorityMode ? "exact-authority very-early type/member binding" : "instrumented diagnostic very-early type/member binding";
+            stage = IsModelBootstrapCompatibilityMode ? "ModelDb-bootstrap-authority very-early type/member binding" : IsExactAuthorityMode ? "exact-authority very-early type/member binding" : "instrumented diagnostic very-early type/member binding";
             Checkpoint(crashCheckpoint, "C_BIND_TYPE_START — calling Assembly.GetType for exact OneTimeInitialization target.");
             var targetType = admission.Assembly.GetType(TargetTypeFullName, throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException(TargetTypeFullName);
             if (!ReferenceEquals(targetType.Assembly, admission.Assembly))
                 throw new InvalidDataException("Step-35 target type did not bind from the admitted primary assembly.");
-            Checkpoint(crashCheckpoint, IsExactAuthorityMode
-                ? "C_BIND_TYPE_PASS — OneTimeInitialization target type bound from the exact closed transformed sts2 assembly."
-                : "C_BIND_TYPE_PASS — OneTimeInitialization target type bound from the separately verified diagnostic sts2 clone.");
+            Checkpoint(crashCheckpoint, IsModelBootstrapCompatibilityMode
+                ? "C_BIND_TYPE_PASS — OneTimeInitialization target type bound from the verified ModelDb-bootstrap sts2 compatibility authority."
+                : IsExactAuthorityMode
+                    ? "C_BIND_TYPE_PASS — OneTimeInitialization target type bound from the exact closed transformed sts2 assembly."
+                    : "C_BIND_TYPE_PASS — OneTimeInitialization target type bound from the separately verified diagnostic sts2 clone.");
 
             Checkpoint(crashCheckpoint, IsExactAuthorityMode
                 ? "C_BIND_METHOD_START — calling Type.GetMethod for the exact transformed static parameterless ExecuteVeryEarly."
@@ -979,7 +1000,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 throw new InvalidDataException("Step-35 reflected ExecuteVeryEarly module MVID drifted from the closed transformed image.");
             Checkpoint(crashCheckpoint, $"C_MVID_PASS — reflected ExecuteVeryEarly module MVID matched {method.Module.ModuleVersionId}; exactAuthority={IsExactAuthorityMode}.");
 
-            if (!IsExactAuthorityMode)
+            if (!IsExactAuthorityMode && !IsModelBootstrapCompatibilityMode)
             {
                 stage = "Step-35 in-method checkpoint bridge arm";
                 var bridgeType = admission.Assembly.GetType(DiagnosticBridgeTypeFullName, throwOnError: true, ignoreCase: false)
@@ -994,17 +1015,21 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             else
             {
                 if (admission.Assembly.GetType(DiagnosticBridgeTypeFullName, throwOnError: false, ignoreCase: false) is not null)
-                    throw new InvalidDataException("Exact-authority Step-35 CLR input unexpectedly contains the diagnostic checkpoint bridge type.");
-                Checkpoint(crashCheckpoint, "C_EXACT_AUTHORITY_PASS — admitted sts2 assembly is the exact closed transformed artifact and contains no Step-35 diagnostic bridge; invocation will proceed without injected in-method markers.");
+                    throw new InvalidDataException("Step-35 exact/ModelDb-compatibility CLR input unexpectedly contains the diagnostic checkpoint bridge type.");
+                Checkpoint(crashCheckpoint, IsModelBootstrapCompatibilityMode
+                    ? "C_MODEL_BOOTSTRAP_AUTHORITY_PASS — admitted sts2 assembly is the verified ModelDb bootstrap compatibility derivative, contains no Step-35 diagnostic bridge, and ExecuteVeryEarly remains uninjected."
+                    : "C_EXACT_AUTHORITY_PASS — admitted sts2 assembly is the exact closed transformed artifact and contains no Step-35 diagnostic bridge; invocation will proceed without injected in-method markers.");
             }
 
-            stage = IsExactAuthorityMode ? "single exact transformed ExecuteVeryEarly invocation" : "single instrumented diagnostic ExecuteVeryEarly invocation";
+            stage = IsModelBootstrapCompatibilityMode ? "single unchanged ExecuteVeryEarly invocation from ModelDb-bootstrap authority" : IsExactAuthorityMode ? "single exact transformed ExecuteVeryEarly invocation" : "single instrumented diagnostic ExecuteVeryEarly invocation";
             Task task;
             try
             {
-                Checkpoint(crashCheckpoint, IsExactAuthorityMode
-                    ? "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for the exact closed transformed ExecuteVeryEarly authority."
-                    : "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for the instrumented ExecuteVeryEarly diagnostic clone.");
+                Checkpoint(crashCheckpoint, IsModelBootstrapCompatibilityMode
+                    ? "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for unchanged ExecuteVeryEarly on the verified ModelDb-bootstrap sts2 authority."
+                    : IsExactAuthorityMode
+                        ? "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for the exact closed transformed ExecuteVeryEarly authority."
+                        : "C_INVOKE_START — entering the first and only MethodInfo.Invoke(null, null) for the instrumented ExecuteVeryEarly diagnostic clone.");
                 var result = method.Invoke(null, null);
                 Checkpoint(crashCheckpoint, "C_INVOKE_RETURNED — MethodInfo.Invoke returned to the launcher.");
                 task = result as Task
@@ -1015,12 +1040,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             {
                 var target = ex.InnerException ?? ex;
                 throw new InvalidOperationException(
-                    (IsExactAuthorityMode ? "Step-35 exact transformed ExecuteVeryEarly" : "Step-35 instrumented ExecuteVeryEarly") +
+                    (IsModelBootstrapCompatibilityMode ? "Step-35 ModelDb-bootstrap-authority ExecuteVeryEarly" : IsExactAuthorityMode ? "Step-35 exact transformed ExecuteVeryEarly" : "Step-35 instrumented ExecuteVeryEarly") +
                     " threw synchronously during the first controlled invocation. " +
                     DescribeException(target) + "\nResolver state at failure: " + context.FormatResolverState(), target);
             }
 
-            stage = IsExactAuthorityMode ? "await exact transformed ExecuteVeryEarly Task completion" : "await diagnostic-clone ExecuteVeryEarly Task completion";
+            stage = IsModelBootstrapCompatibilityMode ? "await ModelDb-bootstrap-authority ExecuteVeryEarly Task completion" : IsExactAuthorityMode ? "await exact transformed ExecuteVeryEarly Task completion" : "await diagnostic-clone ExecuteVeryEarly Task completion";
             try
             {
                 Checkpoint(crashCheckpoint, IsExactAuthorityMode
@@ -1041,7 +1066,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    (IsExactAuthorityMode ? "Step-35 exact transformed ExecuteVeryEarly Task" : "Step-35 diagnostic-clone ExecuteVeryEarly Task") +
+                    (IsModelBootstrapCompatibilityMode ? "Step-35 ModelDb-bootstrap-authority ExecuteVeryEarly Task" : IsExactAuthorityMode ? "Step-35 exact transformed ExecuteVeryEarly Task" : "Step-35 diagnostic-clone ExecuteVeryEarly Task") +
                     " faulted during the controlled await. " +
                     DescribeException(ex) + "\nResolver state at failure: " + context.FormatResolverState(), ex);
             }
@@ -1181,6 +1206,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                     throw new InvalidDataException("Exact-authority admission snapshot no longer matches the exact closed transformed SHA-256 during final audit.");
                 Checkpoint(crashCheckpoint, $"D_EXACT_PRIMARY_REPROOF_PASS — exact CLR-resident authority hash remained {transformedSha256}; diagnostic derivatives were not CLR inputs.");
             }
+            else if (IsModelBootstrapCompatibilityMode)
+            {
+                diagnosticSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
+                if (!diagnosticSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase) ||
+                    !admission.ImmediateSha256.Equals(diagnosticSha256, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("Step-35 ModelDb-bootstrap sts2 compatibility authority changed during ExecuteVeryEarly execution.");
+                godotDiagnosticSha256 = "NOT CLR-LOADED — EXACT PREPARED GODOTSHARP USED";
+                Checkpoint(crashCheckpoint, $"D_MODEL_BOOTSTRAP_REPROOF_PASS — ModelDb-bootstrap CLR authority hash remained {diagnosticSha256}; exact transformed source and exact prepared GodotSharp remained the immutable source/bridge authorities.");
+            }
             else
             {
                 diagnosticSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
@@ -1229,16 +1263,18 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             stage = "Gate-D result construction";
             Checkpoint(crashCheckpoint, "D_RESULT_CONSTRUCT_START — constructing final Gate-D result before emitting the terminal UI progress event.");
             var gateResult = Pass(gate,
-                (IsExactAuthorityMode
-                    ? "EXACT STEP-35 AUTHORITY FINAL ISOLATION AUDIT PASSED.\n"
-                    : "STEP-35 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n") +
+                (IsModelBootstrapCompatibilityMode
+                    ? "STEP-35 MODELDB-BOOTSTRAP COMPATIBILITY AUTHORITY FINAL ISOLATION AUDIT PASSED; AUTHORIZED FOR STEP 36.0.3.\n"
+                    : IsExactAuthorityMode
+                        ? "EXACT STEP-35 AUTHORITY FINAL ISOLATION AUDIT PASSED.\n"
+                        : "STEP-35 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n") +
                 $"Post-execution OfflineReady: PASS ({offline.VerifiedFiles:N0}/{offline.PlannedFiles:N0} files)\n" +
                 $"Receipt-backed original SHA-256 unchanged: {trustedSha256}\n" +
                 $"Verified exact transformed SHA-256 unchanged: {transformedSha256}\n" +
-                $"Instrumented sts2 diagnostic clone: {diagnosticSha256}\n" +
-                $"Instrumented GodotSharp diagnostic clone: {godotDiagnosticSha256}\n" +
+                $"Selected sts2 derivative/fallback diagnostic SHA-256: {diagnosticSha256}\n" +
+                $"GodotSharp diagnostic status: {godotDiagnosticSha256}\n" +
                 $"Execution mode: {preflight.DiagnosticMode}\n" +
-                $"CLR input authority: {(IsExactAuthorityMode ? "EXACT CLOSED STEP-32 TRANSFORMED STS2 BYTES" : "STEP-35 INSTRUMENTED DIAGNOSTIC DERIVATIVE")}\n" +
+                $"CLR input authority: {(IsModelBootstrapCompatibilityMode ? "VERIFIED MODELDB-BOOTSTRAP STS2 COMPATIBILITY DERIVATIVE" : IsExactAuthorityMode ? "EXACT CLOSED STEP-32 TRANSFORMED STS2 BYTES" : "STEP-35 INSTRUMENTED DIAGNOSTIC DERIVATIVE")}\n" +
                 $"Runtime-binding plan SHA-256 unchanged: {planSha256}\n" +
                 $"Unique resident sts2 identity: {admission.AssemblyFullName}\n" +
                 $"Resident sts2 AssemblyLoadContext: {context.Name ?? LoadContextName}\n" +
@@ -1246,7 +1282,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 $"Managed resolver requests total: {context.ManagedResolverRequests.Count:N0}\n" +
                 $"Exact planned host-framework loads total: {context.HostLoads.Count:N0}\n" +
                 $"Prepared/diagnostic private dependency loads total: {context.PrivateLoads.Count:N0}\n" +
-                $"GodotSharp entry-only marker plan size: {(IsExactAuthorityMode ? 0 : preflight.GodotSharpDiagnostic.MarkerCount):N0}\n" +
+                $"GodotSharp entry-only marker plan size: {(UsesExactPreparedGodotSharp ? 0 : preflight.GodotSharpDiagnostic.MarkerCount):N0}\n" +
                 "Initializer-bearing private dependency requests: 0\n" +
                 "Unplanned managed resolution: NO\n" +
                 "Native game resolution/loading: NO\n" +
@@ -1255,19 +1291,23 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 "Game entry point / ExecuteEssential / ExecuteDeferred intentionally invoked by launcher: NO\n" +
                 "Harmony/MonoMod runtime patching intentionally invoked by launcher: NO\n" +
                 (UsesGodotManagedPluginBootstrap
-                    ? $"Godot prerequisite: project-owned Step-15 smoke engine was intentionally live; {(IsExactAuthorityMode ? "exact prepared GodotSharp" : "GodotSharp diagnostic derivative")} received the exact source-built runtime callback table; native game executable/library loading remained NO.\n"
+                    ? $"Godot prerequisite: project-owned Step-15 smoke engine was intentionally live; {(UsesExactPreparedGodotSharp ? "exact prepared GodotSharp" : "GodotSharp diagnostic derivative")} received the exact source-built runtime callback table; native game executable/library loading remained NO.\n"
                     : "Godot/game startup intentionally requested by launcher: NO\n") +
-                (IsExactAuthorityMode
-                    ? "Exact-authority closure meaning: the exact closed Step-32 transformed sts2 image itself entered the CLR, its exact ExecuteVeryEarly returned and awaited successfully, and final isolation reproof passed under the explicitly defined source-built Godot 4.5.1 bridge prerequisite."
-                    : "Diagnostic meaning: this derivative result supplies localization evidence only; exact Step 35 remains OPEN."));
+                (IsModelBootstrapCompatibilityMode
+                    ? "ModelDb-bootstrap authority meaning: only the statically verified dependency-aware sts2 derivative entered the CLR; exact prepared GodotSharp and the proven source-built bridge were retained; unchanged ExecuteVeryEarly returned; final isolation reproof passed; this same process is authorized for the Step 36.0.3 ExecuteEssential attempt."
+                    : IsExactAuthorityMode
+                        ? "Exact-authority closure meaning: the exact closed Step-32 transformed sts2 image itself entered the CLR, its exact ExecuteVeryEarly returned and awaited successfully, and final isolation reproof passed under the explicitly defined source-built Godot 4.5.1 bridge prerequisite."
+                        : "Diagnostic meaning: this derivative result supplies localization evidence only; exact Step 35 remains OPEN."));
             Checkpoint(crashCheckpoint, $"D_RESULT_CONSTRUCT_RETURNED — Gate-D result constructed; passed={gateResult.Passed}; exactAuthority={IsExactAuthorityMode}.");
-            if (IsExactAuthorityMode && gateResult.Passed)
+            if ((IsExactAuthorityMode || IsModelBootstrapCompatibilityMode) && gateResult.Passed)
                 MarkExactStep35CoreClosurePassed(context, managedRoot);
 
             progress?.Report(new(gate, 4, 4, IsExactAuthorityMode ? preflight.TransformedPath : preflight.DiagnosticPath,
-                IsExactAuthorityMode
-                    ? "Exact-authority final source/plan/dependency/context isolation checks passed; finalizing exact Step-35 closure result."
-                    : "Final source/diagnostic-clone/plan/dependency/context isolation checks passed; finalizing diagnostic result."));
+                IsModelBootstrapCompatibilityMode
+                    ? "ModelDb-bootstrap authority final source/derivative/plan/dependency/context isolation checks passed; authorizing same-process Step 36.0.3."
+                    : IsExactAuthorityMode
+                        ? "Exact-authority final source/plan/dependency/context isolation checks passed; finalizing exact Step-35 closure result."
+                        : "Final source/diagnostic-clone/plan/dependency/context isolation checks passed; finalizing diagnostic result."));
             Checkpoint(crashCheckpoint, "D_FINAL_PROGRESS_EMITTED — terminal Gate-D progress event emitted after result construction.");
             Checkpoint(crashCheckpoint, "D_TASK_RETURN_START — returning the already-constructed Gate-D result to the UI caller.");
             return gateResult;
@@ -1486,6 +1526,382 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         ("MegaCrit.Sts2.Core.Saves.GodotFileIo", "System.Void MegaCrit.Sts2.Core.Saves.GodotFileIo::CreateDirectory(System.String)", "System.Boolean Godot.DirAccess::DirExistsAbsolute(System.String)", "INMETHOD_180 — GodotFileIo.CreateDirectory before Godot.DirAccess.DirExistsAbsolute", "INMETHOD_181 — GodotFileIo.CreateDirectory after Godot.DirAccess.DirExistsAbsolute"),
         ("MegaCrit.Sts2.Core.Saves.GodotFileIo", "System.Void MegaCrit.Sts2.Core.Saves.GodotFileIo::CreateDirectory(System.String)", "Godot.Error Godot.DirAccess::MakeDirRecursiveAbsolute(System.String)", "INMETHOD_182 — GodotFileIo.CreateDirectory before Godot.DirAccess.MakeDirRecursiveAbsolute", "INMETHOD_183 — GodotFileIo.CreateDirectory after Godot.DirAccess.MakeDirRecursiveAbsolute"),
     ];
+
+    private static DiagnosticCloneSnapshot CreateModelBootstrapCompatibilityClone(
+        string exactTransformedPath,
+        string compatibilityPath,
+        out string compatibilityReport)
+    {
+        if (File.Exists(compatibilityPath))
+            File.Delete(compatibilityPath);
+
+        const string modelDbTypeName = "MegaCrit.Sts2.Core.Models.ModelDb";
+        const string abstractModelSubtypesTypeName = "MegaCrit.Sts2.Core.Models.AbstractModelSubtypes";
+        const string bowlbugsNormalTypeName = "MegaCrit.Sts2.Core.Models.Encounters.BowlbugsNormal";
+        const string bowlbugEggTypeName = "MegaCrit.Sts2.Core.Models.Monsters.BowlbugEgg";
+        const string helperName = "StS2LauncherBootstrapInjectOrReorder";
+        const int expectedCanonicalTypeCount = 1624;
+        const int expectedDependencyEdgeCount = 56;
+        const int expectedBackwardDependencyCount = 47;
+        const int expectedPreinjectTypeCount = 41;
+        const int expectedBowlbugsOriginalIndex = 658;
+        const int expectedBowlbugEggOriginalIndex = 846;
+
+        string expectedConstantMetadataSha256;
+        int writeResolutionRequestCount;
+        int syntheticConstantTypeCount;
+        int approvedConstantScopeCount;
+        int approvedConstantRequirementCount;
+        string writeResolutionIdentities;
+        int canonicalTypeCount;
+        int dependencyEdgeCount;
+        int backwardDependencyCount;
+        int preinjectTypeCount;
+        int bowlbugsOriginalIndex;
+        int bowlbugEggOriginalIndex;
+        string preinjectSummary;
+
+        using var resolver = new DiagnosticConstantMetadataWriteResolver();
+        using (var module = ModuleDefinition.ReadModule(exactTransformedPath, new ReaderParameters
+               {
+                   ReadSymbols = false,
+                   ReadingMode = ReadingMode.Deferred,
+                   AssemblyResolver = resolver,
+               }))
+        {
+            if (resolver.Requests.Count != 0)
+                throw new InvalidDataException("Step-36.0.3 model-bootstrap deferred-open unexpectedly resolved a dependency before the bounded writer resolver was configured.");
+
+            var constantPlan = resolver.Configure(module);
+            expectedConstantMetadataSha256 = RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint(module);
+            syntheticConstantTypeCount = constantPlan.SyntheticTypeCount;
+            approvedConstantScopeCount = constantPlan.ApprovedScopeCount;
+            approvedConstantRequirementCount = constantPlan.ApprovedRequirementCount;
+
+            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
+            var modelDb = allTypes.GetValueOrDefault(modelDbTypeName)
+                ?? throw new MissingMemberException(modelDbTypeName);
+            var subtypeTable = allTypes.GetValueOrDefault(abstractModelSubtypesTypeName)
+                ?? throw new MissingMemberException(abstractModelSubtypesTypeName);
+
+            var allGetter = subtypeTable.Methods.SingleOrDefault(method => method.Name == "get_All" && method.IsStatic && method.HasBody && method.Parameters.Count == 0)
+                ?? throw new MissingMethodException(abstractModelSubtypesTypeName, "get_All");
+            var allFieldRef = allGetter.Body.Instructions
+                .Where(instruction => instruction.OpCode == OpCodes.Ldsfld)
+                .Select(instruction => instruction.Operand)
+                .OfType<FieldReference>()
+                .SingleOrDefault()
+                ?? throw new InvalidDataException("Step-36.0.3 could not identify AbstractModelSubtypes.All backing field.");
+            var subtypeCctor = subtypeTable.Methods.SingleOrDefault(method => method.Name == ".cctor" && method.IsStatic && method.HasBody)
+                ?? throw new MissingMethodException(abstractModelSubtypesTypeName, ".cctor");
+
+            var fieldToType = new Dictionary<string, TypeDefinition>(StringComparer.Ordinal);
+            MethodReference? getTypeFromHandle = null;
+            for (var index = 0; index + 2 < subtypeCctor.Body.Instructions.Count; index++)
+            {
+                var loadToken = subtypeCctor.Body.Instructions[index];
+                var call = subtypeCctor.Body.Instructions[index + 1];
+                var store = subtypeCctor.Body.Instructions[index + 2];
+                if (loadToken.OpCode != OpCodes.Ldtoken || loadToken.Operand is not TypeReference typeReference ||
+                    call.OpCode != OpCodes.Call || call.Operand is not MethodReference callReference ||
+                    callReference.DeclaringType.FullName != "System.Type" || callReference.Name != "GetTypeFromHandle" ||
+                    store.OpCode != OpCodes.Stsfld || store.Operand is not FieldReference fieldReference)
+                {
+                    continue;
+                }
+
+                if (allTypes.TryGetValue(typeReference.FullName, out var typeDefinition))
+                    fieldToType[fieldReference.FullName] = typeDefinition;
+                getTypeFromHandle ??= callReference;
+            }
+            if (getTypeFromHandle is null)
+                throw new InvalidDataException("Step-36.0.3 could not reuse the generated System.Type.GetTypeFromHandle reference.");
+
+            var storeAllIndex = subtypeCctor.Body.Instructions
+                .Select((instruction, index) => (instruction, index))
+                .Where(item => item.instruction.OpCode == OpCodes.Stsfld && item.instruction.Operand is FieldReference field && field.FullName == allFieldRef.FullName)
+                .Select(item => item.index)
+                .LastOrDefault(-1);
+            if (storeAllIndex < 0)
+                throw new InvalidDataException("Step-36.0.3 could not find the generated AbstractModelSubtypes.All assignment.");
+            var newArrayIndex = -1;
+            for (var index = storeAllIndex - 1; index >= 0; index--)
+            {
+                var instruction = subtypeCctor.Body.Instructions[index];
+                if (instruction.OpCode == OpCodes.Newarr && instruction.Operand is TypeReference arrayElement && arrayElement.FullName == "System.Type")
+                {
+                    newArrayIndex = index;
+                    break;
+                }
+            }
+            if (newArrayIndex < 0)
+                throw new InvalidDataException("Step-36.0.3 could not find the generated canonical System.Type[] construction.");
+
+            var canonicalOrder = new List<TypeDefinition>();
+            for (var index = newArrayIndex + 1; index < storeAllIndex; index++)
+            {
+                var instruction = subtypeCctor.Body.Instructions[index];
+                if (instruction.OpCode == OpCodes.Ldsfld && instruction.Operand is FieldReference field && fieldToType.TryGetValue(field.FullName, out var modelType))
+                    canonicalOrder.Add(modelType);
+            }
+            canonicalOrder = canonicalOrder.DistinctBy(type => type.FullName).ToList();
+            if (canonicalOrder.Count < 100)
+                throw new InvalidDataException($"Step-36.0.3 canonical model list extraction was implausibly small: {canonicalOrder.Count}.");
+            canonicalTypeCount = canonicalOrder.Count;
+            var originalIndex = canonicalOrder.Select((type, index) => (type.FullName, index)).ToDictionary(item => item.FullName, item => item.index, StringComparer.Ordinal);
+
+            var dependencies = canonicalOrder.ToDictionary(type => type.FullName, _ => new HashSet<string>(StringComparer.Ordinal), StringComparer.Ordinal);
+            foreach (var dependent in canonicalOrder)
+            {
+                var cctor = dependent.Methods.SingleOrDefault(method => method.Name == ".cctor" && method.IsStatic && method.HasBody);
+                if (cctor is null)
+                    continue;
+
+                foreach (var instruction in cctor.Body.Instructions)
+                {
+                    if (instruction.OpCode.Code is not (Code.Call or Code.Callvirt) || instruction.Operand is not GenericInstanceMethod genericCall)
+                        continue;
+                    if (genericCall.ElementMethod.DeclaringType.FullName != modelDbTypeName || genericCall.GenericArguments.Count != 1)
+                        continue;
+                    var dependencyName = genericCall.GenericArguments[0].FullName;
+                    if (originalIndex.ContainsKey(dependencyName) && dependencyName != dependent.FullName)
+                        dependencies[dependent.FullName].Add(dependencyName);
+                }
+            }
+
+            dependencyEdgeCount = dependencies.Sum(pair => pair.Value.Count);
+            var backwardTargets = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var (dependentName, dependencyNames) in dependencies)
+            {
+                foreach (var dependencyName in dependencyNames)
+                {
+                    if (originalIndex[dependentName] < originalIndex[dependencyName])
+                        backwardTargets.Add(dependencyName);
+                }
+            }
+            backwardDependencyCount = dependencies.Sum(pair => pair.Value.Count(dependencyName => originalIndex[pair.Key] < originalIndex[dependencyName]));
+            if (backwardTargets.Count == 0)
+                throw new InvalidDataException("Step-36.0.3 found no backward ModelDb generic dependencies even though physical 0.0.156 proved BowlbugsNormal -> BowlbugEgg.");
+
+            var closure = new HashSet<string>(StringComparer.Ordinal);
+            void AddDependencyClosure(string typeName)
+            {
+                if (!closure.Add(typeName))
+                    return;
+                foreach (var dependency in dependencies[typeName])
+                    AddDependencyClosure(dependency);
+            }
+            foreach (var target in backwardTargets)
+                AddDependencyClosure(target);
+
+            var visitState = new Dictionary<string, byte>(StringComparer.Ordinal);
+            var preinjectNames = new List<string>();
+            void Visit(string typeName)
+            {
+                if (visitState.TryGetValue(typeName, out var state))
+                {
+                    if (state == 1)
+                        throw new InvalidDataException($"Step-36.0.3 detected a static ModelDb dependency cycle containing {typeName}.");
+                    if (state == 2)
+                        return;
+                }
+                visitState[typeName] = 1;
+                foreach (var dependency in dependencies[typeName].Where(closure.Contains).OrderBy(name => originalIndex[name]))
+                    Visit(dependency);
+                visitState[typeName] = 2;
+                preinjectNames.Add(typeName);
+            }
+            foreach (var typeName in closure.OrderBy(name => originalIndex[name]))
+                Visit(typeName);
+
+            preinjectTypeCount = preinjectNames.Count;
+            bowlbugsOriginalIndex = originalIndex.GetValueOrDefault(bowlbugsNormalTypeName, -1);
+            bowlbugEggOriginalIndex = originalIndex.GetValueOrDefault(bowlbugEggTypeName, -1);
+            if (canonicalTypeCount != expectedCanonicalTypeCount ||
+                dependencyEdgeCount != expectedDependencyEdgeCount ||
+                backwardDependencyCount != expectedBackwardDependencyCount ||
+                preinjectTypeCount != expectedPreinjectTypeCount ||
+                bowlbugsOriginalIndex != expectedBowlbugsOriginalIndex ||
+                bowlbugEggOriginalIndex != expectedBowlbugEggOriginalIndex)
+            {
+                throw new InvalidDataException(
+                    $"Step-36.0.3 model graph drifted from the independently audited v0.107.1 authority: canonical={canonicalTypeCount}/{expectedCanonicalTypeCount}; edges={dependencyEdgeCount}/{expectedDependencyEdgeCount}; backward={backwardDependencyCount}/{expectedBackwardDependencyCount}; preinject={preinjectTypeCount}/{expectedPreinjectTypeCount}; BowlbugsNormal={bowlbugsOriginalIndex}/{expectedBowlbugsOriginalIndex}; BowlbugEgg={bowlbugEggOriginalIndex}/{expectedBowlbugEggOriginalIndex}.");
+            }
+            if (!dependencies[bowlbugsNormalTypeName].Contains(bowlbugEggTypeName) || !preinjectNames.Contains(bowlbugEggTypeName, StringComparer.Ordinal))
+            {
+                throw new InvalidDataException(
+                    $"Step-36.0.3 physical BowlbugsNormal/BowlbugEgg proof did not match the static model graph: encounterIndex={bowlbugsOriginalIndex}; eggIndex={bowlbugEggOriginalIndex}; edge={dependencies.GetValueOrDefault(bowlbugsNormalTypeName)?.Contains(bowlbugEggTypeName) == true}; preinjectEgg={preinjectNames.Contains(bowlbugEggTypeName, StringComparer.Ordinal)}.");
+            }
+            preinjectSummary = string.Join(" | ", preinjectNames.Take(32).Select(name => $"{originalIndex[name]}:{name}")) + (preinjectNames.Count > 32 ? $" | … +{preinjectNames.Count - 32} more" : string.Empty);
+
+            var getAllAbstractModelSubtypes = modelDb.Methods.Single(method => method.Name == "get_AllAbstractModelSubtypes" && method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
+            var inject = modelDb.Methods.Single(method => method.Name == "Inject" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
+            var contains = modelDb.Methods.Single(method => method.Name == "Contains" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
+            var getId = modelDb.Methods.Single(method => method.Name == "GetId" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
+            var init = modelDb.Methods.Single(method => method.Name == "Init" && method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
+            if (modelDb.Methods.Any(method => method.Name == helperName))
+                throw new InvalidDataException("Step-36.0.3 helper already exists in the exact transformed source.");
+
+            var dictionaryField = modelDb.Fields.Single(field => field.IsStatic && field.FieldType is GenericInstanceType generic && generic.ElementType.FullName == "System.Collections.Generic.Dictionary`2" && generic.GenericArguments.Count == 2 && generic.GenericArguments[0].FullName.Contains("ModelId", StringComparison.Ordinal) && generic.GenericArguments[1].FullName.Contains("AbstractModel", StringComparison.Ordinal));
+            var dictionaryType = (GenericInstanceType)dictionaryField.FieldType;
+            var modelIdType = dictionaryType.GenericArguments[0];
+            var abstractModelType = dictionaryType.GenericArguments[1];
+
+            MethodReference FindDictionaryCall(MethodDefinition method, string name)
+                => method.Body.Instructions
+                    .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt)
+                    .Select(instruction => instruction.Operand)
+                    .OfType<MethodReference>()
+                    .First(reference => reference.Name == name && reference.DeclaringType.FullName.StartsWith("System.Collections.Generic.Dictionary`2<", StringComparison.Ordinal));
+
+            var addReference = FindDictionaryCall(inject, "Add");
+            var removeMethod = modelDb.Methods.Single(method => method.Name == "Remove" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
+            var removeReference = FindDictionaryCall(removeMethod, "Remove");
+            var genericGet = modelDb.Methods.First(method => method.Name == "Get" && method.HasGenericParameters && method.GenericParameters.Count == 1 && method.Parameters.Count == 0 && method.HasBody);
+            var getItemReference = FindDictionaryCall(genericGet, "get_Item");
+
+            var helper = new MethodDefinition(
+                helperName,
+                Mono.Cecil.MethodAttributes.Private | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+                module.TypeSystem.Void);
+            helper.Parameters.Add(new ParameterDefinition("type", Mono.Cecil.ParameterAttributes.None, inject.Parameters[0].ParameterType));
+            helper.Body.InitLocals = true;
+            helper.Body.Variables.Add(new VariableDefinition(modelIdType));
+            helper.Body.Variables.Add(new VariableDefinition(abstractModelType));
+            var helperIl = helper.Body.GetILProcessor();
+            var existing = Instruction.Create(OpCodes.Nop);
+            helperIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+            helperIl.Append(Instruction.Create(OpCodes.Call, contains));
+            helperIl.Append(Instruction.Create(OpCodes.Brtrue, existing));
+            helperIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+            helperIl.Append(Instruction.Create(OpCodes.Call, inject));
+            helperIl.Append(Instruction.Create(OpCodes.Ret));
+            helperIl.Append(existing);
+            helperIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+            helperIl.Append(Instruction.Create(OpCodes.Call, getId));
+            helperIl.Append(Instruction.Create(OpCodes.Stloc_0));
+            helperIl.Append(Instruction.Create(OpCodes.Ldsfld, dictionaryField));
+            helperIl.Append(Instruction.Create(OpCodes.Ldloc_0));
+            helperIl.Append(Instruction.Create(OpCodes.Callvirt, getItemReference));
+            helperIl.Append(Instruction.Create(OpCodes.Stloc_1));
+            helperIl.Append(Instruction.Create(OpCodes.Ldsfld, dictionaryField));
+            helperIl.Append(Instruction.Create(OpCodes.Ldloc_0));
+            helperIl.Append(Instruction.Create(OpCodes.Callvirt, removeReference));
+            helperIl.Append(Instruction.Create(OpCodes.Pop));
+            helperIl.Append(Instruction.Create(OpCodes.Ldsfld, dictionaryField));
+            helperIl.Append(Instruction.Create(OpCodes.Ldloc_0));
+            helperIl.Append(Instruction.Create(OpCodes.Ldloc_1));
+            helperIl.Append(Instruction.Create(OpCodes.Callvirt, addReference));
+            helperIl.Append(Instruction.Create(OpCodes.Ret));
+            modelDb.Methods.Add(helper);
+
+            init.Body = new Mono.Cecil.Cil.MethodBody(init) { InitLocals = true };
+            init.Body.Variables.Add(new VariableDefinition(getAllAbstractModelSubtypes.ReturnType));
+            init.Body.Variables.Add(new VariableDefinition(module.TypeSystem.Int32));
+            var il = init.Body.GetILProcessor();
+            foreach (var typeName in preinjectNames)
+            {
+                il.Append(Instruction.Create(OpCodes.Ldtoken, allTypes[typeName]));
+                il.Append(Instruction.Create(OpCodes.Call, getTypeFromHandle));
+                il.Append(Instruction.Create(OpCodes.Call, inject));
+            }
+            il.Append(Instruction.Create(OpCodes.Call, getAllAbstractModelSubtypes));
+            il.Append(Instruction.Create(OpCodes.Stloc_0));
+            il.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+            il.Append(Instruction.Create(OpCodes.Stloc_1));
+            var loopCheck = Instruction.Create(OpCodes.Ldloc_1);
+            var loopBody = Instruction.Create(OpCodes.Ldloc_0);
+            il.Append(Instruction.Create(OpCodes.Br, loopCheck));
+            il.Append(loopBody);
+            il.Append(Instruction.Create(OpCodes.Ldloc_1));
+            il.Append(Instruction.Create(OpCodes.Ldelem_Ref));
+            il.Append(Instruction.Create(OpCodes.Call, helper));
+            il.Append(Instruction.Create(OpCodes.Ldloc_1));
+            il.Append(Instruction.Create(OpCodes.Ldc_I4_1));
+            il.Append(Instruction.Create(OpCodes.Add));
+            il.Append(Instruction.Create(OpCodes.Stloc_1));
+            il.Append(loopCheck);
+            il.Append(Instruction.Create(OpCodes.Ldloc_0));
+            il.Append(Instruction.Create(OpCodes.Ldlen));
+            il.Append(Instruction.Create(OpCodes.Conv_I4));
+            il.Append(Instruction.Create(OpCodes.Blt, loopBody));
+            il.Append(Instruction.Create(OpCodes.Ret));
+
+            module.Write(compatibilityPath, new WriterParameters { WriteSymbols = false });
+            writeResolutionRequestCount = resolver.Requests.Count;
+            writeResolutionIdentities = string.Join(" | ", resolver.Requests);
+        }
+
+        var sha256 = ComputeSha256Hex(compatibilityPath);
+        var length = new FileInfo(compatibilityPath).Length;
+        string verifiedConstantMetadataSha256;
+        uint targetToken;
+        uint moveNextToken;
+        using (var verifyResolver = new RejectingAssemblyResolver())
+        using (var verifyModule = ModuleDefinition.ReadModule(compatibilityPath, new ReaderParameters
+               {
+                   ReadSymbols = false,
+                   ReadingMode = ReadingMode.Deferred,
+                   AssemblyResolver = verifyResolver,
+               }))
+        {
+            if (verifyModule.Assembly?.Name.FullName != TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity || verifyModule.Mvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
+                throw new InvalidDataException("Step-36.0.3 compatibility clone identity/MVID drifted from the exact Step-32 transformed authority.");
+            verifiedConstantMetadataSha256 = RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint(verifyModule);
+            if (!verifiedConstantMetadataSha256.Equals(expectedConstantMetadataSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Step-36.0.3 compatibility clone constant metadata drifted during serialization.");
+            var target = RealStS2PrepareMethodRewrite.FindMethodByStableIdentity(verifyModule, TargetTypeFullName, TargetMethodFullName);
+            var moveNext = FindVeryEarlyMoveNext(verifyModule);
+            targetToken = target.MetadataToken.ToUInt32();
+            moveNextToken = moveNext.MetadataToken.ToUInt32();
+            var modelDb = EnumerateTypes(verifyModule.Types).Single(type => type.FullName == modelDbTypeName);
+            var helper = modelDb.Methods.SingleOrDefault(method => method.Name == helperName && method.IsStatic && method.HasBody)
+                ?? throw new MissingMethodException(modelDbTypeName, helperName);
+            var init = modelDb.Methods.Single(method => method.Name == "Init" && method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
+            var preinjectCalls = init.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference method && method.DeclaringType.FullName == modelDbTypeName && method.Name == "Inject");
+            if (preinjectCalls != preinjectTypeCount)
+                throw new InvalidDataException($"Step-36.0.3 serialized pre-inject count drifted: expected {preinjectTypeCount}, observed {preinjectCalls}.");
+            if (init.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference method && method.DeclaringType.FullName == modelDbTypeName && method.Name == helperName) != 1)
+                throw new InvalidDataException("Step-36.0.3 serialized ModelDb.Init loop does not call the order-restoring helper exactly once per iteration site.");
+            if (helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "Remove") != 1 ||
+                helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "Add") != 1)
+                throw new InvalidDataException("Step-36.0.3 serialized order-restoring helper lost its remove/re-add same-instance contract.");
+            if (verifyResolver.Requests.Count != 0)
+                throw new InvalidDataException("Step-36.0.3 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
+        }
+
+        compatibilityReport =
+            "STEP 36.0.3 MODELDB BOOTSTRAP COMPATIBILITY PLAN\n" +
+            $"Canonical generated model types: {canonicalTypeCount:N0}\n" +
+            $"Direct static-cctor ModelDb<T> dependency edges: {dependencyEdgeCount:N0}\n" +
+            $"Backward edges requiring early availability under eager cctor execution: {backwardDependencyCount:N0}\n" +
+            $"Dependency-closure types pre-injected: {preinjectTypeCount:N0}\n" +
+            $"Physical failing edge: {bowlbugsNormalTypeName} index {bowlbugsOriginalIndex} -> {bowlbugEggTypeName} index {bowlbugEggOriginalIndex}; BowlbugEgg pre-injected before normal iteration: YES\n" +
+            "Final ModelDb insertion order: preserved — pre-injected objects are removed/re-added with the same instance when their original generated-list position is reached.\n" +
+            "Model constructors for pre-injected targets: exactly once; normal-loop duplicate construction: NO\n" +
+            $"Pre-inject order sample: {preinjectSummary}\n" +
+            $"Compatibility SHA-256: {sha256}\n" +
+            $"Compatibility bytes: {length:N0}\n" +
+            $"Writer-only constant metadata requests: {writeResolutionRequestCount:N0}; identities={writeResolutionIdentities}";
+
+        return new DiagnosticCloneSnapshot(
+            compatibilityPath,
+            sha256,
+            length,
+            targetToken,
+            moveNextToken,
+            0,
+            0,
+            0,
+            0,
+            0,
+            verifiedConstantMetadataSha256,
+            writeResolutionRequestCount,
+            syntheticConstantTypeCount,
+            approvedConstantScopeCount,
+            approvedConstantRequirementCount,
+            writeResolutionIdentities);
+    }
 
     private static DiagnosticCloneSnapshot CreateInstrumentedDiagnosticClone(string exactTransformedPath, string diagnosticPath, Step35DiagnosticMode diagnosticMode)
     {
@@ -2932,6 +3348,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         uint DiagnosticMoveNextToken,
         int DiagnosticMarkerCount,
         Step35DiagnosticMode DiagnosticMode,
+        string ModelBootstrapCompatibilityReport,
         GodotSharpDiagnosticCloneSnapshot GodotSharpDiagnostic,
         string GodotReconnaissanceReport,
         uint TransformedMethodToken,

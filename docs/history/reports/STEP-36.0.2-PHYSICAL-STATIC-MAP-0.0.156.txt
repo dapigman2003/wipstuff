@@ -1,0 +1,61 @@
+StS2 Launcher — Step 36.0 ExecuteEssential static IL/callsite map
+Read-only evidence from exact source/transformed images; never consumed as trusted runtime input.
+Source method: token=0x06007D03; System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential()
+Transformed method: token=0x0600AFE8; System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential()
+Semantic fingerprint source/transformed: 1df430b82462cd22c50be2ef0cf56bec66382421a8784620fb4ca015bb1fb832
+Transformed instructions=36; handlers=0; locals=1
+Direct method-reference operands=15
+Direct calls/references:
+  - System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::.ctor(System.Int32,System.Int32)
+  - System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendLiteral(System.String)
+  - System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendFormatted<MegaCrit.Sts2.Core.Helpers.OneTimeInitialization/State>(!!0)
+  - System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendLiteral(System.String)
+  - System.String System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::ToStringAndClear()
+  - System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32)
+  - System.Void MegaCrit.Sts2.Core.Assets.AtlasResourceLoader::.ctor()
+  - System.Void Godot.ResourceLoader::AddResourceFormatLoader(Godot.ResourceFormatLoader,System.Boolean)
+  - System.Void MegaCrit.Sts2.Core.Assets.AtlasManager::LoadEssentialAtlases()
+  - System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize()
+  - System.Void MegaCrit.Sts2.Core.Models.ModelDb::Init()
+  - System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::Init()
+  - System.Void MegaCrit.Sts2.Core.Models.ModelDb::InitIds()
+  - System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.MessageTypes::Initialize()
+  - System.Void MegaCrit.Sts2.Core.GameActions.Multiplayer.ActionTypes::Initialize()
+
+[TRANSFORMED EXECUTEESSENTIAL IL]
+IL_0000: ldsfld | field=MegaCrit.Sts2.Core.Helpers.OneTimeInitialization/State MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::_state | token=0x04008B51 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0005: ldc.i4.1
+IL_0006: beq.s | target=IL_0044
+IL_0008: ldloca.s | local=V_0:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler
+IL_000A: ldc.i4.s | operand=63
+IL_000C: ldc.i4.1
+IL_000D: call [CALLSITE#001] | method=System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::.ctor(System.Int32,System.Int32) | token=0x0A00008F | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0012: ldloca.s | local=V_0:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler
+IL_0014: ldstr | string="Tried to call OneTimeInitialization.ExecuteEssential in state "
+IL_0019: call [CALLSITE#002] | method=System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendLiteral(System.String) | token=0x0A0000AE | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_001E: ldloca.s | local=V_0:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler
+IL_0020: ldsfld | field=MegaCrit.Sts2.Core.Helpers.OneTimeInitialization/State MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::_state | token=0x04008B51 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0025: call [CALLSITE#003] | method=System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendFormatted<MegaCrit.Sts2.Core.Helpers.OneTimeInitialization/State>(!!0) | token=0x2B003088 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_002A: ldloca.s | local=V_0:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler
+IL_002C: ldstr | string="!"
+IL_0031: call [CALLSITE#004] | method=System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendLiteral(System.String) | token=0x0A0000AE | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0036: ldloca.s | local=V_0:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler
+IL_0038: call [CALLSITE#005] | method=System.String System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::ToStringAndClear() | token=0x0A000091 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_003D: ldc.i4.2
+IL_003E: call [CALLSITE#006] | method=System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32) | token=0x0600AC07 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0043: ret
+IL_0044: ldc.i4.2
+IL_0045: stsfld | field=MegaCrit.Sts2.Core.Helpers.OneTimeInitialization/State MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::_state | token=0x04008B51 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_004A: newobj [CALLSITE#007] | method=System.Void MegaCrit.Sts2.Core.Assets.AtlasResourceLoader::.ctor() | token=0x0600C106 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_004F: stsfld | field=MegaCrit.Sts2.Core.Assets.AtlasResourceLoader MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::_atlasResourceLoader | token=0x04008B50 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0054: ldsfld | field=MegaCrit.Sts2.Core.Assets.AtlasResourceLoader MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::_atlasResourceLoader | token=0x04008B50 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0059: ldc.i4.1
+IL_005A: call [CALLSITE#008] | method=System.Void Godot.ResourceLoader::AddResourceFormatLoader(Godot.ResourceFormatLoader,System.Boolean) | token=0x0A0026D1 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_005F: call [CALLSITE#009] | method=System.Void MegaCrit.Sts2.Core.Assets.AtlasManager::LoadEssentialAtlases() | token=0x0600C0CB | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0064: call [CALLSITE#010] | method=System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() | token=0x0600AC52 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0069: call [CALLSITE#011] | method=System.Void MegaCrit.Sts2.Core.Models.ModelDb::Init() | token=0x060069FF | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_006E: call [CALLSITE#012] | method=System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::Init() | token=0x06006146 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0073: call [CALLSITE#013] | method=System.Void MegaCrit.Sts2.Core.Models.ModelDb::InitIds() | token=0x06006A02 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0078: call [CALLSITE#014] | method=System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.MessageTypes::Initialize() | token=0x06006136 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_007D: call [CALLSITE#015] | method=System.Void MegaCrit.Sts2.Core.GameActions.Multiplayer.ActionTypes::Initialize() | token=0x0600B15A | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0082: ret

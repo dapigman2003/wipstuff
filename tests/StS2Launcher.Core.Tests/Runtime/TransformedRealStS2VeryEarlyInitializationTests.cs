@@ -22,7 +22,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         var summary = gates.Snapshot();
         Assert.IsTrue(summary.Passed);
         Assert.AreEqual(4, summary.Gates.Count);
-        Assert.AreEqual("STEP 35.0.31 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
+        Assert.AreEqual("STEP 35.0.32 DIAGNOSTIC LOCALIZATION COMPLETE — 4/4 — NOT STEP 35 CLOSURE", summary.Summary);
     }
 
     [TestMethod]
@@ -46,6 +46,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         Assert.IsFalse(checkpoints[0].Contains("CB_INIT_ENTRY", StringComparison.Ordinal), "Invalid metadata must not advance to the callback-handoff entry boundary.");
         Assert.AreEqual(3, (int)Step35DiagnosticMode.GodotCoreCallbackHandoff);
         Assert.AreEqual(4, (int)Step35DiagnosticMode.GodotCoreExactClosure);
+        Assert.AreEqual(5, (int)Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility);
     }
 
     [TestMethod]
@@ -55,6 +56,25 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
         using var subject = new TransformedRealStS2VeryEarlyInitialization(temp.Path, collectibleLoadContext: true)
         {
             DiagnosticMode = Step35DiagnosticMode.GodotCoreExactClosure,
+        };
+        var checkpoints = new List<string>();
+
+        var ex = Assert.ThrowsExactly<ArgumentException>(() =>
+            subject.RunGodotCoreCallbackHandoffInitialization(IntPtr.Zero, 0, checkpoints.Add));
+
+        StringAssert.Contains(ex.Message, "non-null");
+        Assert.AreEqual(1, checkpoints.Count);
+        StringAssert.Contains(checkpoints[0], "CB_INITIALIZE_MANAGED_FAIL");
+        Assert.IsFalse(checkpoints[0].Contains("CB_INIT_ENTRY", StringComparison.Ordinal));
+    }
+
+    [TestMethod]
+    public void GodotCoreModelBootstrapCompatibilityRejectsMissingTableBeforeAnyPreflightOrClrWork()
+    {
+        using var temp = new TempTestDirectory("sts2-step35-model-bootstrap-callback-validation");
+        using var subject = new TransformedRealStS2VeryEarlyInitialization(temp.Path, collectibleLoadContext: true)
+        {
+            DiagnosticMode = Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility,
         };
         var checkpoints = new List<string>();
 

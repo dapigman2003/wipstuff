@@ -8,7 +8,8 @@ public sealed partial class RootViewController
     private void RunStep35ManagedPluginBootstrap()
     {
         var exactAuthorityMode = _transformedRealStS2VeryEarlyInitialization.DiagnosticMode == Step35DiagnosticMode.GodotCoreExactClosure;
-        var bridgeMode = exactAuthorityMode ? "EXACT-CLOSURE" : "CORE-HANDOFF";
+        var modelBootstrapMode = _transformedRealStS2VeryEarlyInitialization.DiagnosticMode == Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility;
+        var bridgeMode = modelBootstrapMode ? "MODEL-BOOTSTRAP" : exactAuthorityMode ? "EXACT-CLOSURE" : "CORE-HANDOFF";
         WriteStep35CrashCheckpoint($"CB_NATIVE_READY_RECHECK — engineStarted={GodotStep15NativeBridge.IsEngineStarted}; setup={GodotStep15NativeBridge.IsSetupFinished}; interopReady={GodotStep15NativeBridge.IsRuntimeInteropReady}; dotnetFeature={GodotStep15NativeBridge.HasDotNetFeature}; godotDotNetInitialized={GodotStep15NativeBridge.IsDotNetRuntimeInitialized}.");
         if (!GodotStep15NativeBridge.IsEngineStarted || !GodotStep15NativeBridge.IsSetupFinished ||
             !GodotStep15NativeBridge.IsRuntimeInteropReady || GodotStep15NativeBridge.HasDotNetFeature || GodotStep15NativeBridge.IsDotNetRuntimeInitialized)
@@ -76,7 +77,7 @@ public sealed partial class RootViewController
         if (!coreApiSignalReturned || !GodotStep15NativeBridge.DidExternalCoreApiSignalReturn)
             throw new InvalidOperationException($"{bridgeMode} GD_OnCoreApiAssemblyLoaded signal failed: " + GodotStep15NativeBridge.LastError);
 
-        WriteStep35CrashCheckpoint($"CB_MANAGED_PLUGIN_BOOTSTRAP_PASS — generated game-plugin managed substeps, complete reverse callback cache adoption, and standard core-API-loaded callback all returned; mode={bridgeMode}; sealing the exact physical 0.0.146 bootstrap resolver delta before {(exactAuthorityMode ? "exact-authority" : "diagnostic natural")} Gate C. Godot GDMono runtime_initialized remains deliberately unclaimed by the launcher.");
+        WriteStep35CrashCheckpoint($"CB_MANAGED_PLUGIN_BOOTSTRAP_PASS — generated game-plugin managed substeps, complete reverse callback cache adoption, and standard core-API-loaded callback all returned; mode={bridgeMode}; sealing the exact physical 0.0.146 bootstrap resolver delta before {(modelBootstrapMode ? "ModelDb-bootstrap authority" : exactAuthorityMode ? "exact-authority" : "diagnostic natural")} Gate C. Godot GDMono runtime_initialized remains deliberately unclaimed by the launcher.");
         var resolverBaselineDetail = _transformedRealStS2VeryEarlyInitialization.SealGodotManagedPluginBootstrapResolverBaseline(WriteStep35CrashCheckpoint);
         WriteStep35CrashCheckpoint("CB_POST_BOOTSTRAP_RESOLVER_BASELINE_RETURNED — " + resolverBaselineDetail);
     }

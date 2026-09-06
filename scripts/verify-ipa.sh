@@ -231,7 +231,7 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
 }
 
 {
-  echo "Step 36.0.2 IPA verification passed."
+  echo "Step 36.0.3 IPA verification passed."
   echo "  Bundle ID: $BUNDLE_ID"
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
@@ -245,5 +245,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 35.0.31 / STEP 36.0.2 — EXACT EXECUTEESSENTIAL FAILURE-CHAIN CAPTURE"
+  echo "  Expected device UI: STEP 35.0.32 / STEP 36.0.3 — MODELDB BOOTSTRAP COMPATIBILITY + FULL EXECUTEESSENTIAL"
 } | tee artifacts/logs/step36-ipa-verification-summary.log

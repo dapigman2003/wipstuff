@@ -11,3 +11,11 @@ Physical 0.0.143 CORE-HANDOFF evidence is the current frontier: the 1,800-byte/2
 Historical 0.0.137 verifier failure, physical 0.0.138 NATURAL/COMPAT evidence, and 0.0.139 Codemagic 209/210 stale-summary failure remain separate provenance records under `docs/history/`.
 
 A final resolver line remains contextual rather than causal. A 0.0.144 4/4 in any mode is diagnostic only; Step 35 remains OPEN.
+
+## Step 36.0.3 current evidence contract
+
+Physical 0.0.156 closes the PCK/localization boundary and identifies the first internal `ExecuteEssential` incompatibility as ModelDb bootstrap ordering: `BowlbugsNormal..cctor` requests `BowlbugEgg` before its generated normal-loop insertion point. The run retained the intended sts2/GodotSharp private context with zero rejected managed requests, zero initializer-bearing requests, and zero native-load attempts.
+
+0.0.157 preserves all four physical outputs under `docs/history/reports/` and adds a pre-CLR MODEL-BOOTSTRAP compatibility-plan report to the Step35 static-map artifact. For a device attempt preserve `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, the normal Step35 result report, `Step36-CrashCheckpoint-<RunId>.txt`, `Step36-LastCheckpoint.txt`, `Step36-ExecuteEssential-StaticMap-<RunId>.txt`, and `Step36-TransformedRealStS2EssentialInitialization.txt`.
+
+Step36 Gate C remains one-shot. A successful unchanged `ExecuteEssential` return also proves its original trailing `ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize` sequence returned. A later failure must be interpreted from the preserved nested exception/base/loader/state/resolver/context telemetry rather than retried in-process.

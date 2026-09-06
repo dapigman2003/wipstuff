@@ -313,3 +313,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-36.0.1-PHYSICAL-EXECUTEESSENTIAL-NESTED-EXCEPTION-0.0.155.txt` — physical 0.0.155 is 2/4: PCK mount/localization probe pass and unchanged exact ExecuteEssential throws through a nested TargetInvocationException.
 - `reports/STEP-36.0.1-PHYSICAL-CHECKPOINT-0.0.155.txt` — run-correlated journal proving `LoadResourcePack` returned true, `res://localization/eng` exists, Gate C invoked once, and deterministic teardown reached `RUN_END`.
 - `steps/STEP-36.0.2-EXECUTEESSENTIAL-FAILURE-CHAIN-CAPTURE.md` — 0.0.156 preserves the runtime boundary and adds complete nested/base/loader exception plus post-failure state/context telemetry.
+
+## Step 36.0.2 physical ModelDb bootstrap failure / Step 36.0.3 compatibility
+
+- `reports/STEP-36.0.2-PHYSICAL-CRASH-CHECKPOINT-0.0.156.txt` — physical 0.0.156 run journal proving the PCK/localization handoff remained positive and localizing unchanged `ExecuteEssential` to `ModelDb.Init -> BowlbugsNormal..cctor -> ModelDb.Monster<BowlbugEgg>() -> KeyNotFound(MONSTER.BOWLBUG_EGG)` with no native/resolver escape.
+- `reports/STEP-36.0.2-PHYSICAL-MODELDB-BOOTSTRAP-FAILURE-0.0.156.txt` — final 0.0.156 report with the complete nested reflection/type-initialization/base-exception chain and post-failure context deltas.
+- `reports/STEP-36.0.2-PHYSICAL-STATIC-MAP-0.0.156.txt` — source/transformed `ExecuteEssential` static map confirming the unchanged call sequence through ModelDb and the remaining serialization/action initializers.
+- `reports/STEP-36.0.2-PHYSICAL-LAST-CHECKPOINT-0.0.156.txt` — final durable run-correlated checkpoint confirming normal report teardown after the managed failure.
+- `steps/STEP-36.0.3-MODELDB-BOOTSTRAP-COMPATIBILITY.md` — 0.0.157 bounded compatibility design: derive canonical generated model order and direct static-cctor `ModelDb<T>` dependencies, pre-inject only dependency closure required by backward edges, restore canonical final dictionary order with the same instances, retain exact GodotSharp, then attempt the full unchanged `ExecuteEssential` once.

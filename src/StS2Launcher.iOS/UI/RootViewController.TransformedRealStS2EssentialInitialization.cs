@@ -22,12 +22,12 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Step 36.0.2 — Exact ExecuteEssential Failure-Chain Capture",
+            "Step 36.0.3 — ModelDb Bootstrap Compatibility + Full ExecuteEssential Attempt",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
         _step36EssentialButton = SystemButton(
-            "Run Step 36.0.2 A–D — Reprove → Mount PCK → Invoke Once → Capture Full Failure Chain",
+            "Run Step 36.0.3 A–D — Reprove Compatibility Plan → Mount PCK → Invoke Full ExecuteEssential Once → Audit",
             16);
         _step36EssentialButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2EssentialInitializationAsync();
         content.AddArrangedSubview(_step36EssentialButton);
@@ -39,7 +39,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_step36ResultLabel);
 
         _step36DetailLabel = Label(
-            "Physical 0.0.155 closes the game-PCK resource boundary: the exact receipt-backed PCK mounts successfully and res://localization/eng is visible before Gate C. The unchanged exact ExecuteEssential invocation then throws through a nested TargetInvocationException chain, but 0.0.155 records only the outer reflection message. Step 36.0.2 preserves the same one-call runtime experiment and adds durable full exception-chain/base-exception/loader-exception, post-failure state, resolver/load delta, and sts2/GodotSharp load-context telemetry. No retry, state reset, child-method probe, ExecuteDeferred, PrewarmJit, game entry, Harmony/MonoMod runtime patching, arbitrary resolver fallback, or native game loading is authorized.",
+            "Physical 0.0.156 proves PCK/localization are closed and localizes the next failure to ModelDb.Init: Activator.CreateInstance(BowlbugsNormal) triggers its static initializer before BowlbugEgg reaches the generated ModelDb insertion point, producing KeyNotFound MONSTER.BOWLBUG_EGG. Step 36.0.3 derives a bounded sts2 compatibility authority from the exact Step-32 image: it statically discovers ModelDb<T> dependencies in generated model static initializers, pre-injects only the dependency closure needed for backward edges, then removes/re-adds the same instances at their original generated-list positions so final ModelDb insertion order is preserved. It then invokes the full unchanged ExecuteEssential once, allowing ModelIdSerializationCache.Init, ModelDb.InitIds, MessageTypes.Initialize, and ActionTypes.Initialize to run naturally if ModelDb succeeds. Full nested failure telemetry remains enabled. ExecuteDeferred, PrewarmJit, game entry, native game loading, runtime Harmony/MonoMod, arbitrary resolver fallback, retry, and state reset remain forbidden.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_step36DetailLabel);
@@ -66,13 +66,13 @@ public sealed partial class RootViewController
             return;
         }
 
-        if (!_transformedRealStS2VeryEarlyInitialization.ExactStep35CoreClosurePassed ||
-            _transformedRealStS2VeryEarlyInitialization.DiagnosticMode != Step35DiagnosticMode.GodotCoreExactClosure)
+        if (!_transformedRealStS2VeryEarlyInitialization.EssentialCompatibilityAuthorityPassed ||
+            _transformedRealStS2VeryEarlyInitialization.DiagnosticMode != Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility)
         {
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: PREREQUISITE NOT MET";
             _step36ResultLabel.TextColor = UIColor.SystemOrange;
-            _step36DetailLabel.Text = "Step 36.0 requires the same-process exact Step-35 core closure. From a fresh launch run Step 15 Gates A-C, then Step 35 EXACT-CLOSURE once. The core Gate-D result must be passed=true/exactAuthority=true; Step 36 no longer depends on the historical UIKit await/result-record continuation.";
-            _statusLabel.Text = "STEP 36 REFUSED — exact Step-35 same-process core closure is not present.";
+            _step36DetailLabel.Text = "Step 36.0.3 requires the same-process MODEL-BOOTSTRAP Step-35 authority. From a fresh launch run Step 15 Gates A-C, then Step 35.0.32 MODEL-BOOTSTRAP once and require 4/4. That mode loads only the verified dependency-aware sts2 derivative with exact prepared GodotSharp; do not run historical EXACT-CLOSURE first because sts2 CLR identity is process-global for this experiment.";
+            _statusLabel.Text = "STEP 36.0.3 REFUSED — same-process MODEL-BOOTSTRAP authority is not present.";
             _statusLabel.TextColor = UIColor.SystemOrange;
             return;
         }
@@ -92,36 +92,36 @@ public sealed partial class RootViewController
         _step36ProgressLabel.Hidden = true;
         _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE A RUNNING…";
         _step36ResultLabel.TextColor = UIColor.Label;
-        _statusLabel.Text = $"STEP 36.0.1 RUN {_step36RunId} — exact Step-35 closure is resident. Gate A statically re-proves source/transformed ExecuteEssential token 0x06007D03 and semantic equality before any new game-member invocation.";
+        _statusLabel.Text = $"STEP 36.0.3 RUN {_step36RunId} — MODEL-BOOTSTRAP authority is resident. Gate A re-proves the exact source ExecuteEssential semantics against the selected compatibility derivative and emits the dependency/order plan before any new game-member invocation.";
         _statusLabel.TextColor = UIColor.Label;
 
         try
         {
-            WriteStep36Checkpoint("RUN_START — Step 36.0 controlled exact ExecuteEssential run started after same-process exact Step-35 closure.");
+            WriteStep36Checkpoint("RUN_START — Step 36.0.3 full ExecuteEssential run started after same-process MODEL-BOOTSTRAP Step-35 authority closure.");
             var token = _operationCts?.Token ?? CancellationToken.None;
 
             var gateA = await Task.Run(() => _transformedRealStS2VeryEarlyInitialization.RunEssentialStaticPreflight(WriteStep36Checkpoint), token);
             WriteStep36Checkpoint($"E_A_TASK_AWAIT_RESUMED — Gate A returned to UI caller; passed={gateA.Passed}.");
             if (!RecordStep36Gate(gateA)) return;
             if (!WriteStep36StaticMap(out var staticMapError))
-                throw new IOException("Step 36.0 verified static map could not be durably written: " + staticMapError);
+                throw new IOException("Step 36.0.3 verified static map could not be durably written: " + staticMapError);
             WriteStep36Checkpoint("E_A_STATIC_MAP_WRITE_RETURNED — verified ExecuteEssential static map durably written.");
 
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE B RUNNING…";
-            _statusLabel.Text = "STEP 36.0.1 GATE B — prove exact CLR authority continuity, bind ExecuteEssential, mount the receipt-backed game PCK additively through exact GodotSharp, and prove res://localization/eng before invocation.";
+            _statusLabel.Text = "STEP 36.0.3 GATE B — prove MODEL-BOOTSTRAP CLR authority continuity, bind unchanged ExecuteEssential, mount the receipt-backed game PCK additively through exact GodotSharp, and prove res://localization/eng before invocation.";
             var gateB = _transformedRealStS2VeryEarlyInitialization.RunEssentialAuthorityBinding(WriteStep36Checkpoint);
             if (!RecordStep36Gate(gateB)) return;
 
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE C RUNNING…";
-            _statusLabel.Text = "STEP 36.0.1 GATE C — invoke exact transformed ExecuteEssential once on the main thread after the game resource-pack handoff. This is a synchronous one-shot boundary; do not retry in this process if it fails or stalls.";
-            WriteStep36Checkpoint("E_C_UI_SELECTED — Gate C selected on the UI thread; entering the synchronous exact ExecuteEssential boundary.");
+            _statusLabel.Text = "STEP 36.0.3 GATE C — invoke unchanged ExecuteEssential once on the main thread from the verified ModelDb-bootstrap authority. If ModelDb succeeds, the remaining serialization/type/action initializers run in their original order in this same call. This is synchronous and one-shot; do not retry in this process if it fails or stalls.";
+            WriteStep36Checkpoint("E_C_UI_SELECTED — Gate C selected on the UI thread; entering the synchronous unchanged ExecuteEssential boundary on the verified ModelDb-bootstrap authority.");
             var gateC = _transformedRealStS2VeryEarlyInitialization.RunExactExecuteEssentialInvocation(WriteStep36Checkpoint);
             if (!RecordStep36Gate(gateC)) return;
 
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE D RUNNING…";
             _step36ProgressLabel.Hidden = false;
             _step36ProgressLabel.Text = "Step 36 Gate D starting final receipt/hash/resolver/context audit…";
-            _statusLabel.Text = "STEP 36.0.1 GATE D — final OfflineReady + mounted-PCK presence + exact transformed/plan/dependency/resolver/context/state reproof.";
+            _statusLabel.Text = "STEP 36.0.3 GATE D — final OfflineReady + mounted-PCK presence + exact-source/compatibility-authority/plan/dependency/resolver/context/state reproof.";
             var progress = new Progress<TransformedRealStS2EssentialInitializationProgress>(value =>
             {
                 if (_step36ProgressLabel is null) return;
@@ -158,11 +158,11 @@ public sealed partial class RootViewController
                     _step36ResultLabel.Text = snapshot.Summary;
                     _step36ResultLabel.TextColor = UIColor.Label;
                     _step36DetailLabel.Text =
-                        "All four Step 36.0 gates passed. Exact transformed ExecuteEssential was statically re-proved, bound from the same exact Step-35 CLR authority, invoked once, returned normally with OneTimeInitialization state 1→2, and final OfflineReady/hash/resolver/context reproof passed. This advances only the essential initialization boundary; ExecuteDeferred, PrewarmJit, game entry, native game loading, and broader startup remain separate future gates.";
-                    _step36ProgressLabel.Text = "Step 36 Gate D COMPLETE — PASS";
-                    _statusLabel.Text = "STEP 36.0 COMPLETE — 4/4. Preserve Step36 run artifacts before advancing to deferred initialization.";
+                        "All four Step 36.0.3 gates passed. The selected dependency-aware ModelDb bootstrap derivative retained source-equivalent ExecuteEssential, the receipt-backed PCK/localization boundary remained positive, unchanged ExecuteEssential returned normally with OneTimeInitialization state 1→2, and the original post-ModelDb sequence (ModelIdSerializationCache.Init → ModelDb.InitIds → MessageTypes.Initialize → ActionTypes.Initialize) therefore also returned in the same call. Final OfflineReady/hash/resolver/context reproof passed. ExecuteDeferred, PrewarmJit, game entry, and native game loading remain separate future gates.";
+                    _step36ProgressLabel.Text = "Step 36.0.3 Gate D COMPLETE — PASS";
+                    _statusLabel.Text = "STEP 36.0.3 COMPLETE — 4/4. Essential initialization is closed under the bounded ModelDb compatibility authority; preserve artifacts before designing deferred initialization.";
                     _statusLabel.TextColor = UIColor.Label;
-                    WriteStep36Checkpoint("RUN_STEP36_4OF4 — exact ExecuteEssential boundary completed all four gates; later initialization remains forbidden.");
+                    WriteStep36Checkpoint("RUN_STEP36_4OF4 — bounded ModelDb compatibility authority completed unchanged ExecuteEssential and all four Step-36 gates; ExecuteDeferred and later startup remain forbidden.");
                 }
                 else
                 {
@@ -198,7 +198,7 @@ public sealed partial class RootViewController
             {
                 _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: EXCEPTION";
                 _step36ResultLabel.TextColor = UIColor.SystemRed;
-                _step36DetailLabel.Text = $"Unhandled Step 36.0 exception: {ex.GetType().Name}: {ex.Message}";
+                _step36DetailLabel.Text = $"Unhandled Step 36.0.3 exception: {ex.GetType().Name}: {ex.Message}";
                 _statusLabel.Text = "STEP 36 FAIL — preserve Step36 artifacts; force-quit before retry if Gate C started.";
                 _statusLabel.TextColor = UIColor.SystemRed;
             }
@@ -209,7 +209,7 @@ public sealed partial class RootViewController
             WriteStep36Checkpoint($"RUN_FINALLY_ENTER — Step-36 managed control reached finally; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}; writing deterministic report without requiring a captured UIKit continuation.");
             await WriteDeviceTestReportFromLabelsAsync(
                 "Step36-TransformedRealStS2EssentialInitialization.txt",
-                "StS2 Launcher — Step 36.0 Controlled Exact ExecuteEssential",
+                "StS2 Launcher — Step 36.0.3 ModelDb Bootstrap Compatibility + Full ExecuteEssential",
                 _step36ResultLabel,
                 _step36DetailLabel,
                 CancellationToken.None).ConfigureAwait(false);
@@ -235,7 +235,7 @@ public sealed partial class RootViewController
         if (!result.Passed && _statusLabel is not null)
         {
             var letter = (char)('A' + (int)result.Gate - 1);
-            _statusLabel.Text = $"STEP 36.0 FAIL at Gate {letter} ({result.Gate}). Stop here; later gates were not run. Preserve Step36 artifacts and force-quit before retry if Gate C began.";
+            _statusLabel.Text = $"STEP 36.0.3 FAIL at Gate {letter} ({result.Gate}). Stop here; later gates were not run. Preserve Step36 artifacts and force-quit before retry if Gate C began.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
         return result.Passed;
@@ -263,14 +263,14 @@ public sealed partial class RootViewController
                 var staticPath = Path.Combine(_deviceTestReportWriter.ReportsRoot, staticName);
                 WriteStep35TextFileDurably(
                     crashPath,
-                    "StS2 Launcher — Step 36.0 controlled exact ExecuteEssential checkpoint\n" +
+                    "StS2 Launcher — Step 36.0.3 ModelDb-bootstrap ExecuteEssential checkpoint\n" +
                     "Output-only diagnostic; never consumed as trusted runtime input.\n" +
                     $"Run ID: {runId}\n" +
                     $"Initialized UTC: {now:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
-                    "Candidate: STEP 36.0 — CONTROLLED EXACT EXECUTEESSENTIAL + STEP35 UI RETURN FIX\n" +
-                    "Prerequisite: same-process physical exact Step-35 core closure; ExecuteDeferred/PrewarmJit/entry/native game load remain forbidden.\n\n");
+                    "Candidate: STEP 36.0.3 — DEPENDENCY-AWARE MODELDB BOOTSTRAP + FULL UNCHANGED EXECUTEESSENTIAL\n" +
+                    "Prerequisite: same-process Step-35.0.32 MODEL-BOOTSTRAP 4/4 authority; ExecuteDeferred/PrewarmJit/entry/native game load remain forbidden.\n\n");
                 _step36RunId = runId;
                 _step36CrashCheckpointPath = crashPath;
                 _step36LastCheckpointPath = lastPath;

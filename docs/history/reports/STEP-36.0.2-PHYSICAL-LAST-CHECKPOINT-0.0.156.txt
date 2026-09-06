@@ -1,0 +1,6 @@
+StS2 Launcher — Step 36 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260906T0233346067850Z-pid64326-cf887d9d85604d7cba5933df147f50c0
+Journal: Step36-CrashCheckpoint-20260906T0233346067850Z-pid64326-cf887d9d85604d7cba5933df147f50c0.txt
+Static map: Step36-ExecuteEssential-StaticMap-20260906T0233346067850Z-pid64326-cf887d9d85604d7cba5933df147f50c0.txt
+2026-09-06T02:33:35.1581800+00:00 | run=20260906T0233346067850Z-pid64326-cf887d9d85604d7cba5933df147f50c0 | pid=64326 | managedThread=16 | RUN_END — Step-36 UI operation ended normally after explicit main-thread teardown.

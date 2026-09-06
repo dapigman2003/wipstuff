@@ -1,20 +1,13 @@
-# Release checklist — Step 35.0.31 / Step 36.0.2 / 0.0.156
+# Release checklist — Step 35.0.32 / Step 36.0.3 / 0.0.157
 
-Release identity: display/build `0.0.156 (156)`, IPA `StS2-Launcher-Step-36.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.157 (157)`, IPA `StS2-Launcher-Step-36.ipa`, workflow `ios-canonical`.
 
-- [ ] static validation passes;
-- [ ] host regression suite passes with Step-36 tests;
-- [ ] Step-15 native-link preflight passes;
-- [ ] iOS compile/link succeeds;
-- [ ] IPA verification succeeds;
-- [ ] no `sts2.dll`, `GodotSharp.dll`, PCK, game executable/app bundle, IPA, credentials or other proprietary runtime payload are shipped in the source archive;
-- [ ] Step-35 Gate-D outer-worker fix retains exact bridge/resolver/core behavior;
-- [ ] Step-36 source token is exactly `0x06007D03`, exact full signature is static parameterless `System.Void`, and source/transformed semantic equality is enforced before invocation;
-- [ ] Step-36 requires same-process exact Step-35 closure and state 1 before invocation;
-- [ ] Gate B locates the exact PCK only through the verified Step-12 receipt, mounts it through exact prepared GodotSharp with `replaceFiles=false`/offset 0, and proves `res://localization/eng` before invocation;
-- [ ] Step-36 requires state 2 after successful `ExecuteEssential` return;
-- [ ] `ExecuteDeferred`, `PrewarmJit`, game entry, Harmony/MonoMod runtime patching, arbitrary resolver fallback, and native game loading remain forbidden.
-
-- [ ] Gate-C failure telemetry records every inner-exception depth, base exception, HResult/source/target/stack and `ReflectionTypeLoadException.LoaderExceptions` when present;
-- [ ] Gate-C failure telemetry records post-failure `_state`, resolver/load deltas, and sts2/GodotSharp load-context continuity;
-- [ ] production source contains exactly one launcher `binding.Method.Invoke(null, null)` for Step 36 and no retry/state-reset/child-probe path.
+- `ios-canonical` workflow key unchanged for cache reuse.
+- Static validator passes with candidate manifests current and protected historical manifests unchanged.
+- Host tests and native-link preflight pass.
+- iOS Release publish/link and IPA verification pass.
+- Bundle identity is exactly `0.0.157 (157)`.
+- Device run uses fresh process: Step 15 A-C -> Step 35 MODEL-BOOTSTRAP 4/4 -> Step 36.0.3 once.
+- Preserve run-correlated Step35 + Step36 artifacts before interpreting a result.
+- Do not retry Step 36 Gate C in-process after it starts.
+- Do not authorize ExecuteDeferred, PrewarmJit, game entry, native game loading, runtime Harmony/MonoMod, arbitrary resolver fallback, or state reset from this release.
