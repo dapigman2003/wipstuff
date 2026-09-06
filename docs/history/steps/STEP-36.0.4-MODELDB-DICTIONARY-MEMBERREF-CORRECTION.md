@@ -1,0 +1,9 @@
+# Step 36.0.4 — ModelDb Dictionary MemberRef correction
+
+Physical 0.0.157 stopped safely at Step-35 Gate A while constructing the Step-36 ModelDb compatibility derivative. No compatibility sts2 assembly was admitted to the CLR and no new game initialization boundary executed. The result was `InvalidOperationException: NoMatch` at stage `Step-36.0.3 ModelDb bootstrap compatibility clone`.
+
+Source review localized the first unmatched LINQ lookup to an incorrect transform assumption that `ModelDb` exposes a private static `Contains(Type)` helper. The authoritative assembly does not expose that member. The graph extraction itself remains unchanged and retains the independently audited 1,624 canonical models, 56 direct static-cctor ModelDb dependency edges, 47 backward edges, 41 dependency-closure preinject targets, and the physical BowlbugsNormal index 658 -> BowlbugEgg index 846 edge.
+
+0.0.158 removes the nonexistent `ModelDb.Contains(Type)` dependency and also stops mining compiler-emitted Dictionary callsites from `Inject`, `Remove`, or generic `Get`. After discovering the exact closed `Dictionary<ModelId,AbstractModel>` field, the transform creates the required `ContainsKey`, `Add`, `Remove`, and `get_Item` MemberRefs directly against that closed generic type. Required ModelDb methods and the dictionary field are selected with explicit cardinality diagnostics so future metadata drift reports the exact shape rather than generic LINQ `NoMatch`.
+
+Runtime authority and safety boundaries are unchanged: exact Step-32 transformed source remains immutable, only the verified compatibility derivative may enter the selected private context in MODEL-BOOTSTRAP mode, exact prepared GodotSharp and the proven source-built bridge remain unchanged, resolver/native confinement remains fail-closed, and Step 36 still invokes the full unchanged `ExecuteEssential` at most once with no retry or state reset.

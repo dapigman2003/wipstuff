@@ -6,7 +6,7 @@ using Mono.Cecil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 36.0.3 boundary. The forward path is intentionally available only after the Step-35 MODEL-BOOTSTRAP
+/// Step 36.0.4 boundary. The forward path is intentionally available only after the Step-35 MODEL-BOOTSTRAP
 /// authority has completed in the same process. It preserves the exact closed Step-32 source as immutable authority,
 /// derives and statically verifies a dependency-aware ModelDb bootstrap compatibility image, retains exact prepared
 /// GodotSharp and the physically proven bridge, mounts the exact receipt-backed game PCK, invokes the unchanged
@@ -35,7 +35,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     public string GetVerifiedEssentialStaticInstructionMap()
         => _essentialPreflight?.StaticInstructionMap
-           ?? throw new InvalidOperationException("Step 36.0.3 Gate A has not produced a verified ExecuteEssential static map.");
+           ?? throw new InvalidOperationException("Step 36.0.4 Gate A has not produced a verified ExecuteEssential static map.");
 
     private void ResetStep36State()
     {
@@ -71,7 +71,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var context = RequireLoadContext();
             RequireStep36BaselineUnchanged(context, "Gate A entry");
             if (!IsExactAuthorityMode && !IsModelBootstrapCompatibilityMode)
-                throw new InvalidOperationException("Step 36.0.3 requires either the exact Step-35 authority or the verified ModelDb bootstrap compatibility authority; legacy diagnostic derivatives are not accepted.");
+                throw new InvalidOperationException("Step 36.0.4 requires either the exact Step-35 authority or the verified ModelDb bootstrap compatibility authority; legacy diagnostic derivatives are not accepted.");
 
             Checkpoint(checkpoint, IsModelBootstrapCompatibilityMode
                 ? "E_A_ENTRY — Step-35 ModelDb-bootstrap compatibility authority baseline present; beginning read-only ExecuteEssential source/selected-authority audit."
@@ -450,7 +450,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 "Rejected managed requests: 0\n" +
                 "Native game resolution/loading: NO\n" +
                 "ExecuteDeferred / PrewarmJit / game entry point intentionally invoked by launcher: NO");
-            progress?.Report(new(gate, 4, 4, essentialPreflight.TransformedPath, "Step 36.0.3 final isolation audit complete."));
+            progress?.Report(new(gate, 4, 4, essentialPreflight.TransformedPath, "Step 36.0.4 final isolation audit complete."));
             Checkpoint(checkpoint, "E_D_TASK_RETURN_START — returning completed Step-36 Gate-D result.");
             return result;
         }
@@ -590,7 +590,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private void RequireExactStep35CoreClosure(string boundary)
     {
         if (!_exactStep35CoreClosurePassed || _step36Baseline is null)
-            throw new InvalidOperationException($"{boundary} requires a successful Step-35 exact/model-bootstrap authority closure in this same process. Run Step 15 A-C, then Step 35 MODEL-BOOTSTRAP 4/4 (preferred for Step 36.0.3) or EXACT-CLOSURE 4/4 first.");
+            throw new InvalidOperationException($"{boundary} requires a successful Step-35 exact/model-bootstrap authority closure in this same process. Run Step 15 A-C, then Step 35 MODEL-BOOTSTRAP 4/4 (preferred for Step 36.0.4) or EXACT-CLOSURE 4/4 first.");
         if (!IsExactAuthorityMode && !IsModelBootstrapCompatibilityMode)
             throw new InvalidOperationException($"{boundary} requires GodotCoreExactClosure or GodotCoreModelBootstrapCompatibility; legacy diagnostic derivatives are not accepted.");
         if (_callbackHandoff is null || !_managedPluginReverseBridgePrepared)

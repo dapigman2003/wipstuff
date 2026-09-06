@@ -1,18 +1,20 @@
 # Current status
 
-## Active candidate — Step 35.0.32 / Step 36.0.3 / 0.0.157 (157)
+## Active candidate — Step 35.0.32 / Step 36.0.4 / 0.0.158 (158)
 
-Physical **0.0.156** closed the Step-36 failure location. Gate B mounted the exact receipt-backed `SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck`, `LoadResourcePack(..., replaceFiles=false, offset=0)` returned true, and `res://localization/eng` was present. Gate C then entered unchanged `ExecuteEssential` and failed in `ModelDb.Init` while `Activator.CreateInstance(BowlbugsNormal)` triggered `BowlbugsNormal..cctor`; that static initializer requested `ModelDb.Monster<BowlbugEgg>()` before `MONSTER.BOWLBUG_EGG` was in the ModelDb dictionary. The base exception was `KeyNotFoundException`. State had moved `1 -> 2`, sts2/GodotSharp private-context ownership remained intact, and there were zero initializer-bearing requests, zero rejected managed requests, and zero native-load attempts.
+Physical **0.0.156** closed PCK/localization and localized the first unchanged `ExecuteEssential` failure to `ModelDb.Init -> BowlbugsNormal..cctor -> ModelDb.Monster<BowlbugEgg>() -> KeyNotFoundException(MONSTER.BOWLBUG_EGG)` with state `1 -> 2`, intact sts2/GodotSharp private-context ownership, and zero initializer-bearing, rejected-managed, or native-load attempts.
 
-**0.0.157 / Step 36.0.3** addresses this as a general generated-model bootstrap-order compatibility problem. A private sts2 derivative is built from the exact Step-32 transformed source before CLR admission. The transform statically derives canonical generated model order and direct generic `ModelDb<T>` dependencies from model static constructors, computes the dependency closure for forward/backward bootstrap edges, pre-injects that closure in dependency order, then preserves canonical final dictionary order by remove/re-adding the same pre-injected instance at its original normal-loop position. It fails closed unless the physical `BowlbugsNormal -> BowlbugEgg` edge is actually present in the static graph.
+Physical **0.0.157** never admitted the compatibility sts2 derivative. Step-35 Gate A stopped in the pre-CLR compatibility clone with `InvalidOperationException: NoMatch`. Review of the clone builder identifies the first brittle lookup as an assumed private `ModelDb.Contains(Type)` method; the real assembly does not expose that member. This is a transform-construction defect, not a retreat of the physically closed Step-35 bridge/runtime or Step-36 resource boundaries.
 
-Step 35.0.32 MODEL-BOOTSTRAP admits only that verified sts2 derivative while retaining exact prepared GodotSharp and the physically proven source-built Godot 4.5.1 bridge. Step 36 re-proves unchanged `ExecuteEssential`, mounts the same PCK, and invokes the full method once. A successful return closes not only ModelDb.Init but also the original trailing `ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize` sequence in that same call. A later failure still emits the full exception chain/base/loader/state/resolver/context evidence.
+**0.0.158 / Step 36.0.4** retains the bootstrap-order compatibility strategy and the independently audited model graph (`1624` canonical types, `56` direct static-cctor ModelDb edges, `47` backward edges, `41` pre-injected dependency-closure types, BowlbugsNormal index `658`, BowlbugEgg index `846`) but removes reliance on that nonexistent helper and on compiler-emitted Dictionary callsite shapes. The transform discovers the closed `Dictionary<ModelId,AbstractModel>` field and constructs exact `ContainsKey`, `Add`, `Remove`, and `get_Item` MemberRefs from its generic arguments. ModelDb method and field lookup failures now produce explicit metadata-shape diagnostics rather than LINQ `NoMatch`.
 
-The Codemagic workflow key remains `ios-canonical` and existing dependency/Godot/.NET/iOS intermediate cache paths remain enabled. `ExecuteDeferred`, launcher-driven `PrewarmJit`, game entry, native game loading, runtime Harmony/MonoMod, arbitrary resolver fallback, retry, and state reset remain forbidden.
+Step 35 MODEL-BOOTSTRAP admits only the verified compatibility derivative, with exact prepared GodotSharp and the proven source-built Godot bridge. Step 36 re-proves unchanged `ExecuteEssential`, mounts `SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck` via `LoadResourcePack`, proves `res://localization/eng`, and invokes the full method once. Success naturally covers `ModelDb.Init -> ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize`; later failure retains full nested exception/state/resolver/context telemetry.
 
-## Physical sequence for 0.0.157
+The workflow remains `ios-canonical` with the existing cache keys/paths. `ExecuteDeferred`, launcher-driven `PrewarmJit`, game entry, native game loading, runtime Harmony/MonoMod, arbitrary resolver fallback, retry, and state reset remain forbidden.
+
+## Physical sequence for 0.0.158
 
 1. Fresh process: Step 15 Gates A-C.
 2. Step 35.0.32 **MODEL-BOOTSTRAP** once; require 4/4.
-3. Step 36.0.3 A-D once; if Gate C starts, do not retry in-process.
-4. Preserve Step35 and Step36 run-correlated checkpoint/static-map/final reports.
+3. Step 36.0.4 A-D once; once Gate C begins, do not retry in-process.
+4. Preserve the Step35 and Step36 run-correlated checkpoint/static-map/final reports.

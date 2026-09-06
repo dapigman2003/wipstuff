@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-06T03:24:42Z
+UTC: 2026-09-06T05:54:46Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,8 +10,8 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 35.0.32 / Step 36.0.3 ModelDb Bootstrap Compatibility + Full ExecuteEssential validation
-Root: /mnt/data/StS2Launcher-Step36-0.0.157
+StS2 Launcher — Step 35.0.32 / Step 36.0.4 ModelDb Bootstrap Compatibility + Full ExecuteEssential validation
+Root: /mnt/data/StS2Launcher-Step36-0.0.158
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 243 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 157
-PASS: display version is 0.0.157
-PASS: Info.plist build version is 157
-PASS: Info.plist display version is 0.0.157
+PASS: build version is 158
+PASS: display version is 0.0.158
+PASS: Info.plist build version is 158
+PASS: Info.plist display version is 0.0.158
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 35.0.32 / Step 36.0.3 ModelDb-bootstrap candidate
-PASS: top launcher banner preserves bridge/UI/resource provenance, records the physical 0.0.156 ModelDb bootstrap failure, and identifies the 0.0.157 compatibility attempt
+PASS: top launcher banner identifies active Step 35.0.32 / Step 36.0.4 ModelDb-bootstrap candidate
+PASS: top launcher banner preserves bridge/UI/resource provenance, records physical 0.0.156 ModelDb failure, physical 0.0.157 pre-CLR metadata failure, and the 0.0.158 correction
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 35.0.32 / Step 36.0.3 source pins expected bundle release identity
+PASS: Step 35.0.32 / Step 36.0.4 source pins expected bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -565,7 +565,8 @@ PASS: Step 35.0.32 iOS surface exposes dedicated Gate-D file/byte progress plus 
 PASS: Step 35.0.32 leaves the physically protected Step-13 OfflineReady verifier implementation unchanged
 PASS: Step 35.0.32 Gate-C PASS wording distinguishes diagnostic from exact authority
 PASS: Step 35.0.32 retains exact-authority closure and adds ModelDb-bootstrap authority inside the same four-gate contract
-PASS: Step 36.0.3 ModelDb bootstrap transform derives canonical/static dependencies, pins the independently audited 1624/56/47/41 graph and physical indices, closes backward edges generally, preserves same-instance canonical order, and verifies the serialized derivative fail-closed
+PASS: Step 36.0.4 ModelDb bootstrap transform derives canonical/static dependencies, pins the independently audited 1624/56/47/41 graph and physical indices, closes backward edges generally, preserves same-instance canonical order, and verifies the serialized derivative fail-closed
+PASS: Step 36.0.4 removes the physical 0.0.157 nonexistent ModelDb.Contains(Type) assumption and constructs closed Dictionary MemberRefs directly
 PASS: Step 35.0.32 host regressions pin exact/model-bootstrap mode values and fail-closed callback metadata
 PASS: Step 35.0.32 core durably localizes Gate-D finalization around result construction/progress/return
 PASS: Step 35.0.32 bypasses captured UIKit await continuation and explicitly finalizes Gate D on the main thread
@@ -585,16 +586,16 @@ PASS: Step 35.0.32 routes Gate-D completion through an outer worker, noncapturin
 PASS: Step 36.0 defines exactly four ordered A-D gates
 PASS: Step 36.0 summary requires ordered four-of-four completion
 PASS: Step 36.0 pins exact ExecuteEssential identity/token and state transition
-PASS: Step 36.0.3 requires same-process verified Step-35 compatibility authority plus the proven bridge before any new boundary
+PASS: Step 36.0.4 requires same-process verified Step-35 compatibility authority plus the proven bridge before any new boundary
 PASS: Step 36 Gate A re-proves source/transformed ExecuteEssential semantics with rejecting Cecil resolvers
 PASS: Step 36 Gate A rejects direct crossover into prior/later OneTimeInitialization boundaries
 PASS: Step 36 Gate B binds only the selected verified sts2 authority ExecuteEssential and requires state 1 with no diagnostic bridge
-PASS: Step 36.0.3 retains the physically proven resource handoff and locates the exact game PCK only through the verified managed-install receipt inherited from Step 35
-PASS: Step 36.0.3 retains the physically proven resource handoff and mounts the exact PCK additively through exact GodotSharp and proves the prior localization directory boundary before invocation
+PASS: Step 36.0.4 retains the physically proven resource handoff and locates the exact game PCK only through the verified managed-install receipt inherited from Step 35
+PASS: Step 36.0.4 retains the physically proven resource handoff and mounts the exact PCK additively through exact GodotSharp and proves the prior localization directory boundary before invocation
 PASS: Step 36 Gates C/D require and re-prove the bounded game resource-pack handoff rather than bypassing localization
 PASS: Step 36 Gate C invokes unchanged ExecuteEssential once from the selected verified authority, requires state 2, and fails closed on resolver/native escape
-PASS: Step 36.0.3 captures complete nested reflection/base/loader exceptions plus post-failure state, resolver/load deltas, and authority-context continuity
-PASS: Step 36.0.3 preserves exactly one launcher ExecuteEssential invocation and adds no state-reset retry path
+PASS: Step 36.0.4 captures complete nested reflection/base/loader exceptions plus post-failure state, resolver/load deltas, and authority-context continuity
+PASS: Step 36.0.4 preserves exactly one launcher ExecuteEssential invocation and adds no state-reset retry path
 PASS: Step 36 Gate D re-proves OfflineReady, authority/plan/dependency hashes, context ownership and final state
 PASS: Step 36 explicitly keeps deferred/prewarm/entry/Harmony/native-game boundaries forbidden
 PASS: Step 36 iOS surface requires the new MODEL-BOOTSTRAP authority and attempts the full unchanged ExecuteEssential sequence once
@@ -802,7 +803,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
 PASS: current status records the physical 0.0.156 ModelDb failure, active general bootstrap compatibility strategy, full ExecuteEssential objective, and stable cache workflow
-PASS: testing and release-checklist docs pin the exact 0.0.157 (157) release identity
+PASS: testing and release-checklist docs pin the exact 0.0.158 (158) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -928,7 +929,7 @@ PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.i
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
 PASS: host-test report heading identifies Step 36
 PASS: host-test TRX artifact identifies Step 36
-PASS: Codemagic build-environment report heading identifies the combined Step 35.0.32 / Step 36.0.3 candidate
+PASS: Codemagic build-environment report heading identifies the combined Step 35.0.32 / Step 36.0.4 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -939,7 +940,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active combined Step-36.0.3 candidate
+PASS: IPA verifier advertises the active combined Step-36.0.4 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -962,4 +963,4 @@ PASS: Step 36 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 948 checks
+VALIDATION PASS: 949 checks

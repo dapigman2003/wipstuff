@@ -66,7 +66,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Step 35.0.32 / Step 36.0.3 ModelDb bootstrap compatibility + full ExecuteEssential boundary..."
+echo "Publishing Step 35.0.32 / Step 36.0.4 ModelDb bootstrap compatibility + full ExecuteEssential boundary..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \

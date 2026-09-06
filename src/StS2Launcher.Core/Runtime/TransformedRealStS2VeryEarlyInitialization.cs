@@ -251,7 +251,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 "Exact source/transformed ExecuteVeryEarly wrapper + async MoveNext semantics requalified; no direct ExecuteEssential/ExecuteDeferred/PrewarmJit or Harmony call crosses this boundary."));
 
             var diagnosticMode = DiagnosticMode;
-            stage = IsModelBootstrapCompatibilityMode ? "Step-36.0.3 ModelDb bootstrap compatibility clone" : "Step-35.0.22 diagnostic-clone instrumentation";
+            stage = IsModelBootstrapCompatibilityMode ? "Step-36.0.4 ModelDb bootstrap compatibility clone" : "Step-35.0.22 diagnostic-clone instrumentation";
             var diagnosticRoot = Path.Combine(_launcherDataRoot, "Step35-ExecuteVeryEarlyDiagnostic");
             Directory.CreateDirectory(diagnosticRoot);
             var diagnosticPath = Path.Combine(diagnosticRoot, IsModelBootstrapCompatibilityMode ? ModelBootstrapCompatibilityCloneFileName : DiagnosticCloneFileName);
@@ -265,7 +265,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 throw new InvalidDataException("Step-35.0.22 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
             progress?.Report(new(gate, 6, 8, diagnosticPath,
                 IsModelBootstrapCompatibilityMode
-                    ? $"Exact transformed image requalified, then the Step-36.0.3 ModelDb bootstrap compatibility derivative was emitted and reopened under rejecting resolution. {modelBootstrapCompatibilityReport.Replace('\n', ' ')}"
+                    ? $"Exact transformed image requalified, then the Step-36.0.4 ModelDb bootstrap compatibility derivative was emitted and reopened under rejecting resolution. {modelBootstrapCompatibilityReport.Replace('\n', ' ')}"
                     : $"Exact transformed image requalified, then a Step-35.0.22 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), {diagnostic.CommandLineManagedCommandLineSubstitutionCount:N0} managed command-line provider substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
 
             stage = "Step-21/22 prepared execution-plan preflight";
@@ -1264,7 +1264,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             Checkpoint(crashCheckpoint, "D_RESULT_CONSTRUCT_START — constructing final Gate-D result before emitting the terminal UI progress event.");
             var gateResult = Pass(gate,
                 (IsModelBootstrapCompatibilityMode
-                    ? "STEP-35 MODELDB-BOOTSTRAP COMPATIBILITY AUTHORITY FINAL ISOLATION AUDIT PASSED; AUTHORIZED FOR STEP 36.0.3.\n"
+                    ? "STEP-35 MODELDB-BOOTSTRAP COMPATIBILITY AUTHORITY FINAL ISOLATION AUDIT PASSED; AUTHORIZED FOR STEP 36.0.4.\n"
                     : IsExactAuthorityMode
                         ? "EXACT STEP-35 AUTHORITY FINAL ISOLATION AUDIT PASSED.\n"
                         : "STEP-35 DIAGNOSTIC-CLONE FINAL ISOLATION AUDIT PASSED; THIS DOES NOT CLOSE EXACT STEP 35.\n") +
@@ -1294,7 +1294,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                     ? $"Godot prerequisite: project-owned Step-15 smoke engine was intentionally live; {(UsesExactPreparedGodotSharp ? "exact prepared GodotSharp" : "GodotSharp diagnostic derivative")} received the exact source-built runtime callback table; native game executable/library loading remained NO.\n"
                     : "Godot/game startup intentionally requested by launcher: NO\n") +
                 (IsModelBootstrapCompatibilityMode
-                    ? "ModelDb-bootstrap authority meaning: only the statically verified dependency-aware sts2 derivative entered the CLR; exact prepared GodotSharp and the proven source-built bridge were retained; unchanged ExecuteVeryEarly returned; final isolation reproof passed; this same process is authorized for the Step 36.0.3 ExecuteEssential attempt."
+                    ? "ModelDb-bootstrap authority meaning: only the statically verified dependency-aware sts2 derivative entered the CLR; exact prepared GodotSharp and the proven source-built bridge were retained; unchanged ExecuteVeryEarly returned; final isolation reproof passed; this same process is authorized for the Step 36.0.4 ExecuteEssential attempt."
                     : IsExactAuthorityMode
                         ? "Exact-authority closure meaning: the exact closed Step-32 transformed sts2 image itself entered the CLR, its exact ExecuteVeryEarly returned and awaited successfully, and final isolation reproof passed under the explicitly defined source-built Godot 4.5.1 bridge prerequisite."
                         : "Diagnostic meaning: this derivative result supplies localization evidence only; exact Step 35 remains OPEN."));
@@ -1304,7 +1304,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
 
             progress?.Report(new(gate, 4, 4, IsExactAuthorityMode ? preflight.TransformedPath : preflight.DiagnosticPath,
                 IsModelBootstrapCompatibilityMode
-                    ? "ModelDb-bootstrap authority final source/derivative/plan/dependency/context isolation checks passed; authorizing same-process Step 36.0.3."
+                    ? "ModelDb-bootstrap authority final source/derivative/plan/dependency/context isolation checks passed; authorizing same-process Step 36.0.4."
                     : IsExactAuthorityMode
                         ? "Exact-authority final source/plan/dependency/context isolation checks passed; finalizing exact Step-35 closure result."
                         : "Final source/diagnostic-clone/plan/dependency/context isolation checks passed; finalizing diagnostic result."));
@@ -1570,7 +1570,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                }))
         {
             if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step-36.0.3 model-bootstrap deferred-open unexpectedly resolved a dependency before the bounded writer resolver was configured.");
+                throw new InvalidDataException("Step-36.0.4 model-bootstrap deferred-open unexpectedly resolved a dependency before the bounded writer resolver was configured.");
 
             var constantPlan = resolver.Configure(module);
             expectedConstantMetadataSha256 = RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint(module);
@@ -1591,7 +1591,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 .Select(instruction => instruction.Operand)
                 .OfType<FieldReference>()
                 .SingleOrDefault()
-                ?? throw new InvalidDataException("Step-36.0.3 could not identify AbstractModelSubtypes.All backing field.");
+                ?? throw new InvalidDataException("Step-36.0.4 could not identify AbstractModelSubtypes.All backing field.");
             var subtypeCctor = subtypeTable.Methods.SingleOrDefault(method => method.Name == ".cctor" && method.IsStatic && method.HasBody)
                 ?? throw new MissingMethodException(abstractModelSubtypesTypeName, ".cctor");
 
@@ -1615,7 +1615,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 getTypeFromHandle ??= callReference;
             }
             if (getTypeFromHandle is null)
-                throw new InvalidDataException("Step-36.0.3 could not reuse the generated System.Type.GetTypeFromHandle reference.");
+                throw new InvalidDataException("Step-36.0.4 could not reuse the generated System.Type.GetTypeFromHandle reference.");
 
             var storeAllIndex = subtypeCctor.Body.Instructions
                 .Select((instruction, index) => (instruction, index))
@@ -1623,7 +1623,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 .Select(item => item.index)
                 .LastOrDefault(-1);
             if (storeAllIndex < 0)
-                throw new InvalidDataException("Step-36.0.3 could not find the generated AbstractModelSubtypes.All assignment.");
+                throw new InvalidDataException("Step-36.0.4 could not find the generated AbstractModelSubtypes.All assignment.");
             var newArrayIndex = -1;
             for (var index = storeAllIndex - 1; index >= 0; index--)
             {
@@ -1635,7 +1635,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 }
             }
             if (newArrayIndex < 0)
-                throw new InvalidDataException("Step-36.0.3 could not find the generated canonical System.Type[] construction.");
+                throw new InvalidDataException("Step-36.0.4 could not find the generated canonical System.Type[] construction.");
 
             var canonicalOrder = new List<TypeDefinition>();
             for (var index = newArrayIndex + 1; index < storeAllIndex; index++)
@@ -1646,7 +1646,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             }
             canonicalOrder = canonicalOrder.DistinctBy(type => type.FullName).ToList();
             if (canonicalOrder.Count < 100)
-                throw new InvalidDataException($"Step-36.0.3 canonical model list extraction was implausibly small: {canonicalOrder.Count}.");
+                throw new InvalidDataException($"Step-36.0.4 canonical model list extraction was implausibly small: {canonicalOrder.Count}.");
             canonicalTypeCount = canonicalOrder.Count;
             var originalIndex = canonicalOrder.Select((type, index) => (type.FullName, index)).ToDictionary(item => item.FullName, item => item.index, StringComparer.Ordinal);
 
@@ -1681,7 +1681,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             }
             backwardDependencyCount = dependencies.Sum(pair => pair.Value.Count(dependencyName => originalIndex[pair.Key] < originalIndex[dependencyName]));
             if (backwardTargets.Count == 0)
-                throw new InvalidDataException("Step-36.0.3 found no backward ModelDb generic dependencies even though physical 0.0.156 proved BowlbugsNormal -> BowlbugEgg.");
+                throw new InvalidDataException("Step-36.0.4 found no backward ModelDb generic dependencies even though physical 0.0.156 proved BowlbugsNormal -> BowlbugEgg.");
 
             var closure = new HashSet<string>(StringComparer.Ordinal);
             void AddDependencyClosure(string typeName)
@@ -1701,7 +1701,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 if (visitState.TryGetValue(typeName, out var state))
                 {
                     if (state == 1)
-                        throw new InvalidDataException($"Step-36.0.3 detected a static ModelDb dependency cycle containing {typeName}.");
+                        throw new InvalidDataException($"Step-36.0.4 detected a static ModelDb dependency cycle containing {typeName}.");
                     if (state == 2)
                         return;
                 }
@@ -1725,40 +1725,62 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 bowlbugEggOriginalIndex != expectedBowlbugEggOriginalIndex)
             {
                 throw new InvalidDataException(
-                    $"Step-36.0.3 model graph drifted from the independently audited v0.107.1 authority: canonical={canonicalTypeCount}/{expectedCanonicalTypeCount}; edges={dependencyEdgeCount}/{expectedDependencyEdgeCount}; backward={backwardDependencyCount}/{expectedBackwardDependencyCount}; preinject={preinjectTypeCount}/{expectedPreinjectTypeCount}; BowlbugsNormal={bowlbugsOriginalIndex}/{expectedBowlbugsOriginalIndex}; BowlbugEgg={bowlbugEggOriginalIndex}/{expectedBowlbugEggOriginalIndex}.");
+                    $"Step-36.0.4 model graph drifted from the independently audited v0.107.1 authority: canonical={canonicalTypeCount}/{expectedCanonicalTypeCount}; edges={dependencyEdgeCount}/{expectedDependencyEdgeCount}; backward={backwardDependencyCount}/{expectedBackwardDependencyCount}; preinject={preinjectTypeCount}/{expectedPreinjectTypeCount}; BowlbugsNormal={bowlbugsOriginalIndex}/{expectedBowlbugsOriginalIndex}; BowlbugEgg={bowlbugEggOriginalIndex}/{expectedBowlbugEggOriginalIndex}.");
             }
             if (!dependencies[bowlbugsNormalTypeName].Contains(bowlbugEggTypeName) || !preinjectNames.Contains(bowlbugEggTypeName, StringComparer.Ordinal))
             {
                 throw new InvalidDataException(
-                    $"Step-36.0.3 physical BowlbugsNormal/BowlbugEgg proof did not match the static model graph: encounterIndex={bowlbugsOriginalIndex}; eggIndex={bowlbugEggOriginalIndex}; edge={dependencies.GetValueOrDefault(bowlbugsNormalTypeName)?.Contains(bowlbugEggTypeName) == true}; preinjectEgg={preinjectNames.Contains(bowlbugEggTypeName, StringComparer.Ordinal)}.");
+                    $"Step-36.0.4 physical BowlbugsNormal/BowlbugEgg proof did not match the static model graph: encounterIndex={bowlbugsOriginalIndex}; eggIndex={bowlbugEggOriginalIndex}; edge={dependencies.GetValueOrDefault(bowlbugsNormalTypeName)?.Contains(bowlbugEggTypeName) == true}; preinjectEgg={preinjectNames.Contains(bowlbugEggTypeName, StringComparer.Ordinal)}.");
             }
             preinjectSummary = string.Join(" | ", preinjectNames.Take(32).Select(name => $"{originalIndex[name]}:{name}")) + (preinjectNames.Count > 32 ? $" | … +{preinjectNames.Count - 32} more" : string.Empty);
 
-            var getAllAbstractModelSubtypes = modelDb.Methods.Single(method => method.Name == "get_AllAbstractModelSubtypes" && method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
-            var inject = modelDb.Methods.Single(method => method.Name == "Inject" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
-            var contains = modelDb.Methods.Single(method => method.Name == "Contains" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
-            var getId = modelDb.Methods.Single(method => method.Name == "GetId" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
-            var init = modelDb.Methods.Single(method => method.Name == "Init" && method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
-            if (modelDb.Methods.Any(method => method.Name == helperName))
-                throw new InvalidDataException("Step-36.0.3 helper already exists in the exact transformed source.");
+            MethodDefinition RequireModelDbMethod(string name, Func<MethodDefinition, bool> predicate)
+            {
+                var matches = modelDb.Methods.Where(method => method.Name == name && predicate(method)).ToArray();
+                if (matches.Length != 1)
+                {
+                    var observed = string.Join(" | ", modelDb.Methods.Where(method => method.Name == name).Select(method => method.FullName));
+                    throw new InvalidDataException($"Step-36.0.4 expected exactly one ModelDb.{name} metadata shape; found {matches.Length}. Observed same-name methods: {observed}");
+                }
+                return matches[0];
+            }
 
-            var dictionaryField = modelDb.Fields.Single(field => field.IsStatic && field.FieldType is GenericInstanceType generic && generic.ElementType.FullName == "System.Collections.Generic.Dictionary`2" && generic.GenericArguments.Count == 2 && generic.GenericArguments[0].FullName.Contains("ModelId", StringComparison.Ordinal) && generic.GenericArguments[1].FullName.Contains("AbstractModel", StringComparison.Ordinal));
+            var getAllAbstractModelSubtypes = RequireModelDbMethod("get_AllAbstractModelSubtypes", method => method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
+            var inject = RequireModelDbMethod("Inject", method => method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
+            var getId = RequireModelDbMethod("GetId", method => method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
+            var init = RequireModelDbMethod("Init", method => method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
+            if (modelDb.Methods.Any(method => method.Name == helperName))
+                throw new InvalidDataException("Step-36.0.4 helper already exists in the exact transformed source.");
+
+            var dictionaryFields = modelDb.Fields.Where(field => field.IsStatic && field.FieldType is GenericInstanceType generic && generic.ElementType.FullName == "System.Collections.Generic.Dictionary`2" && generic.GenericArguments.Count == 2 && generic.GenericArguments[0].FullName.Contains("ModelId", StringComparison.Ordinal) && generic.GenericArguments[1].FullName.Contains("AbstractModel", StringComparison.Ordinal)).ToArray();
+            if (dictionaryFields.Length != 1)
+                throw new InvalidDataException($"Step-36.0.4 expected exactly one ModelDb ModelId->AbstractModel dictionary field; found {dictionaryFields.Length}.");
+            var dictionaryField = dictionaryFields[0];
             var dictionaryType = (GenericInstanceType)dictionaryField.FieldType;
             var modelIdType = dictionaryType.GenericArguments[0];
             var abstractModelType = dictionaryType.GenericArguments[1];
 
-            MethodReference FindDictionaryCall(MethodDefinition method, string name)
-                => method.Body.Instructions
-                    .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt)
-                    .Select(instruction => instruction.Operand)
-                    .OfType<MethodReference>()
-                    .First(reference => reference.Name == name && reference.DeclaringType.FullName.StartsWith("System.Collections.Generic.Dictionary`2<", StringComparison.Ordinal));
+            MethodReference DictionaryMethod(string name, TypeReference returnType, params TypeReference[] parameterTypes)
+            {
+                var reference = new MethodReference(name, returnType, dictionaryType)
+                {
+                    HasThis = true,
+                    ExplicitThis = false,
+                    CallingConvention = MethodCallingConvention.Default,
+                };
+                foreach (var parameterType in parameterTypes)
+                    reference.Parameters.Add(new ParameterDefinition(parameterType));
+                return reference;
+            }
 
-            var addReference = FindDictionaryCall(inject, "Add");
-            var removeMethod = modelDb.Methods.Single(method => method.Name == "Remove" && method.IsStatic && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == "System.Type" && method.HasBody);
-            var removeReference = FindDictionaryCall(removeMethod, "Remove");
-            var genericGet = modelDb.Methods.First(method => method.Name == "Get" && method.HasGenericParameters && method.GenericParameters.Count == 1 && method.Parameters.Count == 0 && method.HasBody);
-            var getItemReference = FindDictionaryCall(genericGet, "get_Item");
+            // Do not depend on private ModelDb.Contains(Type), or on a particular compiler-emitted
+            // Dictionary callsite existing in Inject/Remove/Get. Physical 0.0.157 failed Gate A
+            // because ModelDb has no Contains(Type) member. Build the exact BCL dictionary MemberRefs
+            // from the already-discovered closed generic field type instead.
+            var containsKeyReference = DictionaryMethod("ContainsKey", module.TypeSystem.Boolean, modelIdType);
+            var addReference = DictionaryMethod("Add", module.TypeSystem.Void, modelIdType, abstractModelType);
+            var removeReference = DictionaryMethod("Remove", module.TypeSystem.Boolean, modelIdType);
+            var getItemReference = DictionaryMethod("get_Item", abstractModelType, modelIdType);
 
             var helper = new MethodDefinition(
                 helperName,
@@ -1771,15 +1793,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             var helperIl = helper.Body.GetILProcessor();
             var existing = Instruction.Create(OpCodes.Nop);
             helperIl.Append(Instruction.Create(OpCodes.Ldarg_0));
-            helperIl.Append(Instruction.Create(OpCodes.Call, contains));
+            helperIl.Append(Instruction.Create(OpCodes.Call, getId));
+            helperIl.Append(Instruction.Create(OpCodes.Stloc_0));
+            helperIl.Append(Instruction.Create(OpCodes.Ldsfld, dictionaryField));
+            helperIl.Append(Instruction.Create(OpCodes.Ldloc_0));
+            helperIl.Append(Instruction.Create(OpCodes.Callvirt, containsKeyReference));
             helperIl.Append(Instruction.Create(OpCodes.Brtrue, existing));
             helperIl.Append(Instruction.Create(OpCodes.Ldarg_0));
             helperIl.Append(Instruction.Create(OpCodes.Call, inject));
             helperIl.Append(Instruction.Create(OpCodes.Ret));
             helperIl.Append(existing);
-            helperIl.Append(Instruction.Create(OpCodes.Ldarg_0));
-            helperIl.Append(Instruction.Create(OpCodes.Call, getId));
-            helperIl.Append(Instruction.Create(OpCodes.Stloc_0));
             helperIl.Append(Instruction.Create(OpCodes.Ldsfld, dictionaryField));
             helperIl.Append(Instruction.Create(OpCodes.Ldloc_0));
             helperIl.Append(Instruction.Create(OpCodes.Callvirt, getItemReference));
@@ -1846,10 +1869,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                }))
         {
             if (verifyModule.Assembly?.Name.FullName != TransformedRealStS2AssemblyAdmission.ClosedStep32AssemblyIdentity || verifyModule.Mvid != TransformedRealStS2AssemblyAdmission.ClosedStep32Mvid)
-                throw new InvalidDataException("Step-36.0.3 compatibility clone identity/MVID drifted from the exact Step-32 transformed authority.");
+                throw new InvalidDataException("Step-36.0.4 compatibility clone identity/MVID drifted from the exact Step-32 transformed authority.");
             verifiedConstantMetadataSha256 = RealStS2PrepareMethodRewrite.ComputeConstantMetadataFingerprint(verifyModule);
             if (!verifiedConstantMetadataSha256.Equals(expectedConstantMetadataSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-36.0.3 compatibility clone constant metadata drifted during serialization.");
+                throw new InvalidDataException("Step-36.0.4 compatibility clone constant metadata drifted during serialization.");
             var target = RealStS2PrepareMethodRewrite.FindMethodByStableIdentity(verifyModule, TargetTypeFullName, TargetMethodFullName);
             var moveNext = FindVeryEarlyMoveNext(verifyModule);
             targetToken = target.MetadataToken.ToUInt32();
@@ -1860,18 +1883,20 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             var init = modelDb.Methods.Single(method => method.Name == "Init" && method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
             var preinjectCalls = init.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference method && method.DeclaringType.FullName == modelDbTypeName && method.Name == "Inject");
             if (preinjectCalls != preinjectTypeCount)
-                throw new InvalidDataException($"Step-36.0.3 serialized pre-inject count drifted: expected {preinjectTypeCount}, observed {preinjectCalls}.");
+                throw new InvalidDataException($"Step-36.0.4 serialized pre-inject count drifted: expected {preinjectTypeCount}, observed {preinjectCalls}.");
             if (init.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference method && method.DeclaringType.FullName == modelDbTypeName && method.Name == helperName) != 1)
-                throw new InvalidDataException("Step-36.0.3 serialized ModelDb.Init loop does not call the order-restoring helper exactly once per iteration site.");
-            if (helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "Remove") != 1 ||
-                helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "Add") != 1)
-                throw new InvalidDataException("Step-36.0.3 serialized order-restoring helper lost its remove/re-add same-instance contract.");
+                throw new InvalidDataException("Step-36.0.4 serialized ModelDb.Init loop does not call the order-restoring helper exactly once per iteration site.");
+            if (helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "ContainsKey" && method.DeclaringType.FullName.StartsWith("System.Collections.Generic.Dictionary`2<", StringComparison.Ordinal)) != 1 ||
+                helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "get_Item" && method.DeclaringType.FullName.StartsWith("System.Collections.Generic.Dictionary`2<", StringComparison.Ordinal)) != 1 ||
+                helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "Remove" && method.DeclaringType.FullName.StartsWith("System.Collections.Generic.Dictionary`2<", StringComparison.Ordinal)) != 1 ||
+                helper.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method && method.Name == "Add" && method.DeclaringType.FullName.StartsWith("System.Collections.Generic.Dictionary`2<", StringComparison.Ordinal)) != 1)
+                throw new InvalidDataException("Step-36.0.4 serialized order-restoring helper lost its direct closed-Dictionary ContainsKey/get_Item/remove/re-add same-instance contract.");
             if (verifyResolver.Requests.Count != 0)
-                throw new InvalidDataException("Step-36.0.3 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
+                throw new InvalidDataException("Step-36.0.4 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
         }
 
         compatibilityReport =
-            "STEP 36.0.3 MODELDB BOOTSTRAP COMPATIBILITY PLAN\n" +
+            "STEP 36.0.4 MODELDB BOOTSTRAP COMPATIBILITY PLAN\n" +
             $"Canonical generated model types: {canonicalTypeCount:N0}\n" +
             $"Direct static-cctor ModelDb<T> dependency edges: {dependencyEdgeCount:N0}\n" +
             $"Backward edges requiring early availability under eager cctor execution: {backwardDependencyCount:N0}\n" +

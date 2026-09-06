@@ -321,3 +321,9 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-36.0.2-PHYSICAL-STATIC-MAP-0.0.156.txt` — source/transformed `ExecuteEssential` static map confirming the unchanged call sequence through ModelDb and the remaining serialization/action initializers.
 - `reports/STEP-36.0.2-PHYSICAL-LAST-CHECKPOINT-0.0.156.txt` — final durable run-correlated checkpoint confirming normal report teardown after the managed failure.
 - `steps/STEP-36.0.3-MODELDB-BOOTSTRAP-COMPATIBILITY.md` — 0.0.157 bounded compatibility design: derive canonical generated model order and direct static-cctor `ModelDb<T>` dependencies, pre-inject only dependency closure required by backward edges, restore canonical final dictionary order with the same instances, retain exact GodotSharp, then attempt the full unchanged `ExecuteEssential` once.
+
+## Step 36.0.3 physical pre-CLR clone stop / Step 36.0.4 Dictionary MemberRef correction
+
+- `reports/STEP-35.0.32-PHYSICAL-MODEL-BOOTSTRAP-GATE-A-0.0.157-CHECKPOINT.txt` — physical 0.0.157 stops at Step-35 Gate A before CLR admission while constructing the ModelDb compatibility derivative; the journal reaches normal `RUN_END` and reports no later boundary execution.
+- `reports/STEP-35.0.32-PHYSICAL-MODEL-BOOTSTRAP-GATE-A-0.0.157-REPORT.txt` — final 0.0.157 report: `Step-36.0.3 ModelDb bootstrap compatibility clone` failed with `InvalidOperationException: NoMatch` at 0/4.
+- `steps/STEP-36.0.4-MODELDB-DICTIONARY-MEMBERREF-CORRECTION.md` — 0.0.158 removes the nonexistent private `ModelDb.Contains(Type)` assumption and synthesizes the exact closed `Dictionary<ModelId,AbstractModel>` `ContainsKey/Add/Remove/get_Item` MemberRefs directly while retaining the audited dependency graph and same-instance canonical-order contract.
