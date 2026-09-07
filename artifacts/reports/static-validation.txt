@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-07T01:01:13Z
+UTC: 2026-09-07T05:34:41Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 35.0.32 / Step 36.0.5 ModelDb Bootstrap Compatibility + Full ExecuteEssential validation
-Root: /mnt/data/work159/StS2Launcher-Step36-0.0.159
+StS2 Launcher — Step 37.0 Controlled Game-Scene Admission validation
+Root: /mnt/data/StS2Launcher-Step37-0.0.160
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 243 C# files
+PASS: lexical delimiter scan passes for 251 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 159
-PASS: display version is 0.0.159
-PASS: Info.plist build version is 159
-PASS: Info.plist display version is 0.0.159
+PASS: build version is 160
+PASS: display version is 0.0.160
+PASS: Info.plist build version is 160
+PASS: Info.plist display version is 0.0.160
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 35.0.32 / Step 36.0.5 ModelDb-bootstrap candidate
-PASS: top launcher banner preserves bridge/UI/resource provenance through physical 0.0.158 and identifies the 0.0.159 ECMA generic MemberRef correction
+PASS: top launcher banner identifies active Step 37.0 controlled game-scene admission candidate
+PASS: top launcher banner records physical Step-36 closure and the sealed Step-37 scene boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 35.0.32 / Step 36.0.5 source pins expected bundle release identity
+PASS: Step 37 source pins expected bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -287,7 +287,7 @@ PASS: active CI/IPA/project graph has no retired Step-27 dependency: STEP27_INTE
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: Step27InterpretedPatchFixture
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: host-step27
 PASS: host tests no longer perform the retired Harmony release network acquisition
-PASS: IPA verification summary identifies the active Step-36.0.2 candidate rather than retired Step 27
+PASS: IPA verification summary identifies the active Step-37 candidate rather than retired Step 27
 PASS: retired Step-27 fixture is absent from iOS and host-test project graphs
 PASS: active regression contracts preserve the decisive Step-27 negative architecture result
 PASS: master plan continues to retire runtime Harmony/MonoMod replacement
@@ -606,6 +606,32 @@ PASS: Step 36 host regressions pin gate order and exact ExecuteEssential authori
 PASS: Step 36 MSTest v4 regressions avoid removed ThrowsException APIs
 PASS: RootViewController wires Step 36 controls into the active device surface
 PASS: release presentation pins the Step-36 ModelDb-bootstrap compatibility boundary and unchanged full ExecuteEssential objective
+PASS: Step 37 game-scene core exists
+PASS: Step 37 gate enum exists
+PASS: Step 37 gate result exists
+PASS: Step 37 progress model exists
+PASS: Step 37 summary exists
+PASS: Step 37 gate sequence exists
+PASS: Step 37 host regressions exists
+PASS: Step 37 iOS surface exists
+PASS: Step 37 pins and re-verifies the exact receipt-backed game.tscn/PCK authority
+PASS: Step 37 derivative is bounded to the three exact FMOD-neutral copied-scene edits
+PASS: Step 37 Gate C performs only cache-ignore PackedScene loading before instantiation
+PASS: Step 37 Gate D instantiates only off-tree and audits the exact managed hierarchy plus inert FMOD nodes
+PASS: Step 37 core contains no direct SceneTree/startup/main-menu/deferred invocation
+PASS: Step 37 telemetry explicitly keeps later startup/native boundaries forbidden
+PASS: successful Step-36 Gate D explicitly hands same-process authority to Step 37
+PASS: Step-35/36 resets invalidate Step-37 authority rather than allowing stale reuse
+PASS: Step 37 defines exactly four ordered A-D gates
+PASS: Step 37 summary closes only at four-of-four
+PASS: Step 37 iOS surface requires same-process Step-36 closure and emits all four-gate telemetry artifacts
+PASS: Step 37 host regressions pin gate order and exact sealed scene/PCK constants using MSTest v4 APIs
+PASS: RootViewController wires Step 37 controls into the active device surface
+PASS: release presentation pins the physical Step-36 closure and bounded Step-37 scene objective
+PASS: analysis-only native reference is absent from project: libfmod.dylib
+PASS: analysis-only native reference is absent from project: libfmodstudio.dylib
+PASS: analysis-only native reference is absent from project: libGodotFmod.macos.template_release
+PASS: analysis-only native reference is absent from project: libspine_godot.macos.template_release
 PASS: authoritative documentation exists: README.md
 PASS: authoritative documentation exists: docs/README.md
 PASS: authoritative documentation exists: docs/MASTER-PLAN.md
@@ -627,6 +653,9 @@ PASS: authoritative documentation exists: docs/history/reports/STEP-36.0.2-PHYSI
 PASS: authoritative documentation exists: docs/history/reports/STEP-36.0.2-PHYSICAL-STATIC-MAP-0.0.156.txt
 PASS: authoritative documentation exists: docs/history/reports/STEP-36.0.2-PHYSICAL-LAST-CHECKPOINT-0.0.156.txt
 PASS: authoritative documentation exists: docs/history/steps/STEP-36.0.3-MODELDB-BOOTSTRAP-COMPATIBILITY.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-REPORT.txt
+PASS: authoritative documentation exists: docs/history/steps/STEP-37.0-CONTROLLED-GAME-SCENE-ADMISSION.md
+PASS: authoritative documentation exists: docs/history/reports/STEP-37.0-NATIVE-REFERENCE-ABI-AUDIT.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-27.0.24-PHYSICAL-NEGATIVE-CLOSURE.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-28-AHEAD-OF-LOAD-MANAGED-TRANSFORMATION.md
 PASS: authoritative documentation exists: docs/history/steps/STEP-28.0.1-CALLBACK-PROGRESS-COMPILE-FIX.md
@@ -802,8 +831,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status records physical 0.0.158 generic MemberRef failure, active ECMA correction, full ExecuteEssential objective, and stable cache workflow
-PASS: testing and release-checklist docs pin the exact 0.0.159 (159) release identity
+PASS: current status records physical Step-36 closure and the active sealed Step-37 off-tree scene boundary
+PASS: testing and release-checklist docs pin the exact 0.0.160 (160) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -927,9 +956,9 @@ PASS: Codemagic preserves canonical cache path: $HOME/.cache/sts2launcher/godot-
 PASS: Codemagic preserves canonical cache path: $HOME/.dotnet
 PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
-PASS: host-test report heading identifies Step 36
-PASS: host-test TRX artifact identifies Step 36
-PASS: Codemagic build-environment report heading identifies the combined Step 35.0.32 / Step 36.0.5 candidate
+PASS: host-test report heading identifies Step 37
+PASS: host-test TRX artifact identifies Step 37
+PASS: Codemagic build-environment report heading identifies the Step 37.0 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -940,7 +969,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active combined Step-36.0.5 candidate
+PASS: IPA verifier advertises the active Step-37.0 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -960,7 +989,10 @@ PASS: Step 35 implementation, active release wiring, and design/evidence docs ar
 PASS: Step 36 active candidate hash manifest exists
 PASS: Step 36 candidate manifest pins the physically proven resource-pack handoff, 0.0.155 nested-exception evidence, 0.0.156 failure-chain implementation/tests, and active release wiring
 PASS: Step 36 active implementation/release/provenance files are hash-pinned
+PASS: Step 37 active candidate hash manifest exists
+PASS: Step 37 candidate manifest pins implementation/tests, active release wiring, physical Step-36 closure, and native-reference ABI provenance
+PASS: Step 37 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 949 checks
+VALIDATION PASS: 981 checks

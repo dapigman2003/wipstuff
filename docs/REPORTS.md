@@ -1,9 +1,9 @@
 # Reports
 
-## Step 36.0.5 current evidence contract
+## Step 37.0 current evidence contract
 
-Physical 0.0.156 remains the authority for the `ModelDb.Init / BowlbugsNormal / BowlbugEgg` runtime failure. Physical 0.0.157 is preserved under `docs/history/reports/` and proves the first compatibility attempt failed safely in Step-35 Gate A before CLR admission with stage `Step-36.0.3 ModelDb bootstrap compatibility clone` and `InvalidOperationException: NoMatch`.
+Physical 0.0.159 is the authority closing Step 36.0.5: full unchanged `ExecuteEssential()` returned, state advanced 1->2, all four Step-36 gates passed, OfflineReady 428/428 reproof passed, and initializer-bearing/rejected/native deltas stayed zero.
 
-0.0.159 retains the compatibility-plan evidence and additionally verifies the serialized Dictionary MemberRefs use declaring-type VAR(0)/VAR(1) signatures after reopen; physical 0.0.158 evidence records the concrete-signature MissingMethodException that motivated this correction.
+Step 37.0 requires that same-process closure before Gate A. Preserve `Step37-CrashCheckpoint-<RunId>.txt`, `Step37-GameScene-StaticMap-<RunId>.txt`, `Step37-LastCheckpoint.txt`, and `Step37-TransformedRealStS2GameSceneAdmission.txt`, along with the prerequisite Step35/Step36 reports.
 
-For a device attempt preserve `Step35-CurrentRun.txt`, `Step35-CrashCheckpoint-<RunId>.txt`, `Step35-ExecuteVeryEarly-StaticMap-<RunId>.txt`, `Step35-GodotNativeReconnaissance-<RunId>.txt`, `Step35-LastCheckpoint.txt`, the normal Step35 result report, `Step36-CrashCheckpoint-<RunId>.txt`, `Step36-LastCheckpoint.txt`, `Step36-ExecuteEssential-StaticMap-<RunId>.txt`, and `Step36-TransformedRealStS2EssentialInitialization.txt`.
+The Step37 static map records the sealed receipt-backed game.tscn authority and the three permitted FMOD-neutral compatibility edits. Gate C/D telemetry must record resolver/host/private-load deltas and fail on initializer-bearing, rejected-managed, or native-load escape.

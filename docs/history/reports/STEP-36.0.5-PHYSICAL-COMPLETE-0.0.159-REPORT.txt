@@ -1,0 +1,22 @@
+StS2 Launcher — Step 36.0.5 ModelDb Bootstrap Compatibility + Full ExecuteEssential
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-07T05:04:51.3349260+00:00
+
+RESULT
+STEP 36.0 ESSENTIAL INITIALIZATION COMPLETE — 4/4
+
+METADATA
+App version: 0.0.159 (159)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+All four Step 36.0.5 gates passed. The selected dependency-aware ModelDb bootstrap derivative retained source-equivalent ExecuteEssential, the receipt-backed PCK/localization boundary remained positive, unchanged ExecuteEssential returned normally with OneTimeInitialization state 1→2, and the original post-ModelDb sequence (ModelIdSerializationCache.Init → ModelDb.InitIds → MessageTypes.Initialize → ActionTypes.Initialize) therefore also returned in the same call. Final OfflineReady/hash/resolver/context reproof passed. ExecuteDeferred, PrewarmJit, game entry, and native game loading remain separate future gates.
+
+END OF REPORT

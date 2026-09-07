@@ -1,7 +1,9 @@
 # Testing
 
-Active candidate: `0.0.159 (159)`, IPA `StS2-Launcher-Step-36.ipa`, TRX `step36.trx`, workflow `ios-canonical`.
+Active candidate: `0.0.160 (160)`, IPA `StS2-Launcher-Step-37.ipa`, TRX `step37.trx`, workflow `ios-canonical`.
 
-Run the canonical validation/test/build pipeline. The stable workflow/cache lineage is intentionally unchanged. Static validation must prove the corrected Step-36.0.5 metadata strategy, release identity, protected historical boundaries, and absence of proprietary game payloads. Host tests and native-link preflight must pass before iOS publish/IPA verification.
+Canonical validation must prove the physical Step-36.0.5 closure is preserved, the Step-37 exact PCK scene seal is pinned, only the three authorized FMOD-neutral scene edits exist, trusted Step-12 content is never mutated, and the scene boundary cannot call `AddChild`, `GameStartup`, `LaunchMainMenu`, `ExecuteDeferred`, Steam initialization, or native GDExtension code.
 
-Physical sequence: fresh process -> Step 15 A-C -> Step 35 MODEL-BOOTSTRAP 4/4 -> Step 36.0.5 A-D once. Do not retry Step 35 after Gate B or Step 36 after Gate C in the same process.
+Codemagic remains the first actual C# compile in this environment. The stable workflow/cache lineage is intentionally unchanged.
+
+Physical sequence: fresh process -> Step 15 A-C -> Step 35 MODEL-BOOTSTRAP 4/4 -> Step 36.0.5 4/4 -> Step 37.0 A-D once. Use a fresh process after any Gate C/D failure.

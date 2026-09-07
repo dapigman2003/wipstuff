@@ -1,20 +1,23 @@
 # Current status
 
-## Active candidate — Step 35.0.32 / Step 36.0.5 / 0.0.159 (159)
+## Active candidate — Step 37.0 / 0.0.160 (160)
 
-Physical **0.0.158** closed Step 35 MODEL-BOOTSTRAP and reached unchanged `ExecuteEssential`. Gate A/B passed, the receipt-backed PCK mounted, and `res://localization/eng` remained visible. Gate C then failed in `ModelDb.Init()` with `MissingMethodException: bool Dictionary<ModelId,AbstractModel>.ContainsKey(ModelId)`. Context stayed confined: no initializer-bearing request, rejected managed request, or native-load attempt occurred.
+Physical **0.0.159 / Step 36.0.5** is closed positive **4/4**. The exact dependency-aware ModelDb derivative completed unchanged `ExecuteEssential()`, state `1 -> 2`, and the full post-ModelDb sequence `ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize`. Final isolation re-proved OfflineReady `428/428`; initializer-bearing requests, rejected managed requests, and native-load attempts remained zero.
 
-The dependency graph itself was generated successfully: `1624` canonical model types, `56` direct static-cctor ModelDb dependencies, `47` backward dependencies, `41` preinject targets, and the physical `BowlbugsNormal[658] -> BowlbugEgg[846]` edge. The failure is therefore the serialized generic MemberRef encoding introduced by 0.0.158.
+The physically validated ModelDb derivative is now frozen at SHA-256 `e9eea7be01d1c7bc77371b43c24b7c60e599c660c6541bde65772ff8c400092d` with the audited `1624/56/47/41` model graph and same-instance canonical-order strategy.
 
-**0.0.159 / Step 36.0.5** preserves that graph and same-instance canonical-order strategy, but reconstructs `Dictionary<TKey,TValue>` explicitly and emits `ContainsKey`, `get_Item`, `Remove`, and `Add` with declaring-type `VAR(0)`/`VAR(1)` signatures. This mirrors the Step-35 Action/Dictionary generic MemberRef pattern that already worked physically on iOS. The serialized derivative is reopened and the VAR positions are verified fail-closed before CLR admission.
+**0.0.160 / Step 37.0** opens the next boundary without invoking deferred/game startup. The exact PCK `res://scenes/game.tscn` is sealed at 10,414 bytes, SHA-256 `aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8`, PCK MD5 `dc9a89798eb1bb38e23563866e746ac5`. A private copy receives exactly three edits: neutralize `FmodBankLoader`, remove its desktop `bank_paths`, and neutralize `FmodListener2D`.
 
-Step 36 still invokes the full unchanged `ExecuteEssential` once. Success naturally continues through `ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize`. Later failure retains full nested exception/state/resolver/context telemetry.
+Step 37 then loads the copy as `Godot.PackedScene` and, only after that succeeds without resolver/native escape, instantiates it off-tree. The expected root is `MegaCrit.Sts2.Core.Nodes.NGame`; the audit requires the expected managed AudioManager/SceneContainer/AssetLoader hierarchy, inert FMOD placeholders, `IsInsideTree == false`, unchanged OneTimeInitialization state 2, and no initializer-bearing/rejected/native escape.
 
-The `ios-canonical` workflow and existing cache paths are unchanged. ExecuteDeferred, launcher-driven PrewarmJit, game entry, native game loading, runtime Harmony/MonoMod, arbitrary resolver fallback, retry, and state reset remain forbidden.
+The macOS app inventory contains desktop FMOD/Sentry/Spine frameworks only; no iOS/iphone/XCFramework payload is shipped in this app. Those binaries remain analysis-only and are not part of the launcher archive.
 
-## Physical sequence for 0.0.159
+ExecuteDeferred, `NGame.GameStartup`, `LaunchMainMenu`, SceneTree insertion, Steam initialization, native GDExtension loading, gameplay, runtime Harmony/MonoMod, retry, and state reset remain forbidden.
+
+## Physical sequence for 0.0.160
 
 1. Fresh process: Step 15 Gates A-C.
 2. Step 35.0.32 MODEL-BOOTSTRAP once; require 4/4.
-3. Step 36.0.5 A-D once; once Gate C begins, do not retry in-process.
-4. Preserve Step35/Step36 run-correlated reports.
+3. Step 36.0.5 once; require 4/4.
+4. Step 37.0 A-D once; if Gate C/D begins and fails, do not retry in-process.
+5. Preserve Step35/Step36/Step37 run-correlated reports.

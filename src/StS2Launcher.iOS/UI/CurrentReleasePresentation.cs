@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 35.0.32 / STEP 36.0.5 — MODELDB BOOTSTRAP COMPATIBILITY + FULL EXECUTEESSENTIAL";
+        "STEP 37.0 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEP 28 CLOSED POSITIVE 5/5 • STEP 29 CLOSED POSITIVE 4/4 • STEP 30 CLOSED POSITIVE 4/4 • STEP 31 CLOSED POSITIVE 4/4 • STEP 32 CLOSED POSITIVE 4/4 • STEP 33 CLOSED POSITIVE 4/4 • STEP 34 CLOSED POSITIVE 4/4 • STEP 35 EXACT CORE CLOSURE POSITIVE • STEP 36 OPEN — MODELDB BOOTSTRAP ORDER COMPATIBILITY";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 28–34 CLOSED POSITIVE • STEP 35 CLOSED POSITIVE • STEP 36 CLOSED POSITIVE 4/4 • STEP 37 OPEN — CONTROLLED OFF-TREE GAME-SCENE ADMISSION";
 
     public const string Summary =
-        "Physical 0.0.156 localized unchanged ExecuteEssential to ModelDb.Init / BowlbugsNormal..cctor / missing MONSTER.BOWLBUG_EGG. Physical 0.0.157 then failed safely before CLR admission on a nonexistent ModelDb.Contains(Type) transform assumption (`NoMatch`). Physical 0.0.158 closed Step-35 MODEL-BOOTSTRAP and reached unchanged ExecuteEssential, but ModelDb.Init failed with MissingMethodException because the synthesized Dictionary<ModelId,AbstractModel>.ContainsKey MemberRef encoded a concrete ModelId parameter. 0.0.159 preserves the audited 1,624/56/47/41 dependency-aware bootstrap and same-instance canonical-order strategy, but encodes Dictionary members with ECMA-335 declaring-type VAR(0)/VAR(1), exactly matching the physically proven Step-35 generic MemberRef correction pattern.";
+        "Physical 0.0.159 closed Step 36.0.5 at 4/4: the dependency-aware ModelDb authority completed unchanged ExecuteEssential state 1→2, including ModelIdSerializationCache.Init, ModelDb.InitIds, MessageTypes.Initialize, and ActionTypes.Initialize, with final OfflineReady 428/428 and zero initializer-bearing/rejected/native escape. Step 37.0 freezes that authority and admits only a sealed game.tscn copy. The exact PCK scene is pinned at 10,414 bytes / SHA-256 aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8 / MD5 dc9a89798eb1bb38e23563866e746ac5. Exactly three copied-scene compatibility edits neutralize FmodBankLoader/FmodListener2D before PackedScene load and off-tree instantiation.";
 
     public const string InitialStatus =
-        "Status: exact Step-35 bridge/runtime closure and Step-36 game-PCK/localization are physically positive. Step 36.0.5 retains the general eager static-initializer/model insertion ordering correction and fixes the physical 0.0.158 concrete-generic MemberRef defect; it still does not special-case BowlbugEgg. If ModelDb succeeds, unchanged ExecuteEssential continues through ModelIdSerializationCache.Init, ModelDb.InitIds, MessageTypes.Initialize, and ActionTypes.Initialize in the same paid device attempt. ExecuteDeferred/PrewarmJit/game entry/native game loading/runtime Harmony/MonoMod/arbitrary resolver fallback/retry/state reset remain forbidden.";
+        "Status: Step 36.0.5 is physically closed 4/4 on 0.0.159. For 0.0.160 use a fresh process: Step 15 A-C → Step 35.0.32 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0 once. Step 37 extracts and seals game.tscn from the already verified PCK, prepares a private three-edit FMOD-neutral copy, loads it as PackedScene, and instantiates it off-tree only. SceneTree insertion, NGame.GameStartup, LaunchMainMenu, ExecuteDeferred, Steam initialization, FMOD/Spine/Sentry native GDExtensions, and gameplay remain forbidden.";
 
-    public const string ExpectedDisplayVersion = "0.0.159";
-    public const string ExpectedBuildVersion = "159";
+    public const string ExpectedDisplayVersion = "0.0.160";
+    public const string ExpectedBuildVersion = "160";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -42,6 +42,10 @@ internal static class CurrentReleasePresentation
 
     public const string Step36ImplementationMarker =
         "physical 0.0.156 exact PCK + localization PASS -> unchanged ExecuteEssential -> ModelDb.Init -> Activator.CreateInstance(BowlbugsNormal) -> BowlbugsNormal..cctor -> ModelDb.Monster<BowlbugEgg>() -> KeyNotFound MONSTER.BOWLBUG_EGG with state 1->2 and zero rejected/initializer-bearing/native loads -> derive canonical AbstractModelSubtypes order -> scan direct static-cctor generic ModelDb<T> dependencies -> compute backward-edge dependency closure -> preinject dependency order -> normal ModelDb iteration reuses and remove/re-adds same instances at canonical positions using VAR(0)/VAR(1) Dictionary MemberRefs -> exact prepared GodotSharp bridge retained -> full unchanged ExecuteEssential one-shot -> complete nested failure telemetry retained -> final selected-authority/OfflineReady/context audit; ExecuteDeferred/PrewarmJit/entry remain forbidden";
+
+
+    public const string Step37ImplementationMarker =
+        "physical 0.0.159 Step-36.0.5 4/4 closure -> exact receipt-backed PCK game.tscn 10,414-byte SHA-256/MD5 seal -> copied three-edit FMOD-neutral derivative only -> exact GodotSharp ResourceLoader.Load PackedScene cache-ignore -> off-tree Instantiate GenEditState.Disabled -> require NGame + expected managed hierarchy + inert FmodBankLoader/FmodListener2D Node types -> IsInsideTree=false -> immediate release -> zero initializer-bearing/rejected/native escape; AddChild/GameStartup/LaunchMainMenu/ExecuteDeferred/Steam/native GDExtensions remain forbidden";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

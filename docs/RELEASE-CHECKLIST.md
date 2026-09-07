@@ -1,14 +1,16 @@
-# Release checklist — Step 35.0.32 / Step 36.0.5 / 0.0.159
+# Release checklist — Step 37.0 / 0.0.160
 
-Release identity: display/build `0.0.159 (159)`, IPA `StS2-Launcher-Step-36.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.160 (160)`, IPA `StS2-Launcher-Step-37.ipa`, workflow `ios-canonical`.
 
 - Static validator passes completely.
-- Host test suite passes under the pinned .NET SDK in Codemagic.
+- Codemagic host tests compile/pass under the pinned .NET SDK.
 - Native-link preflight passes before iOS publish.
-- IPA verifier passes and reports the Step 35.0.32 / Step 36.0.5 UI identity.
-- Bundle identity is exactly `0.0.159 (159)`.
+- IPA verifier reports the Step 37.0 UI identity.
 - Existing `ios-canonical` NuGet/.NET/Godot/iOS caches remain enabled and unchanged.
-- Device run uses a fresh process: Step 15 A-C -> Step 35 MODEL-BOOTSTRAP 4/4 -> Step 36.0.5 once.
-- No retry after Step-36 Gate C begins; no `_state` reset.
-- No ExecuteDeferred, launcher PrewarmJit, game entry, native game image, runtime Harmony/MonoMod, or arbitrary resolver fallback.
-- Preserve all run-correlated Step35/Step36 telemetry.
+- Physical 0.0.159 Step-36.0.5 4/4 evidence is preserved in history.
+- Step37 pins exact game.tscn bytes/SHA-256/PCK-MD5/layout before any derivative work.
+- Only a private copy is modified; Step-12 managed install/PCK are read-only.
+- Only three FMOD-neutral scene edits are authorized.
+- Gate C loads PackedScene only; Gate D instantiates off-tree and requires `IsInsideTree=false`.
+- No AddChild, GameStartup, LaunchMainMenu, ExecuteDeferred, Steam init, native GDExtension load, gameplay, retry, or state reset.
+- No proprietary game/native payload is present in the source ZIP.

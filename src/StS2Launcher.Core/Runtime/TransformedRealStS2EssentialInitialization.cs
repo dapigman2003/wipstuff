@@ -45,6 +45,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _essentialBinding = null;
         _essentialResourcePackHandoff = null;
         _essentialExecution = null;
+        ResetStep37State();
     }
 
     private void MarkExactStep35CoreClosurePassed(Step35ExecutionLoadContext context, string managedInstallRoot)
@@ -55,6 +56,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _essentialBinding = null;
         _essentialResourcePackHandoff = null;
         _essentialExecution = null;
+        ResetStep37State();
     }
 
     public TransformedRealStS2EssentialInitializationGateResult RunEssentialStaticPreflight(
@@ -451,6 +453,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 "Native game resolution/loading: NO\n" +
                 "ExecuteDeferred / PrewarmJit / game entry point intentionally invoked by launcher: NO");
             progress?.Report(new(gate, 4, 4, essentialPreflight.TransformedPath, "Step 36.0.5 final isolation audit complete."));
+            MarkExactStep36ClosurePassed(context);
+            Checkpoint(checkpoint, "E_D_STEP37_AUTHORITY_READY — Step-36.0.5 4/4 closure sealed as same-process Step-37 authority; no Step-37 scene work has run yet.");
             Checkpoint(checkpoint, "E_D_TASK_RETURN_START — returning completed Step-36 Gate-D result.");
             return result;
         }

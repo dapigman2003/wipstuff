@@ -329,3 +329,18 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-36.0.4-MODELDB-DICTIONARY-MEMBERREF-CORRECTION.md` — 0.0.158 removes the nonexistent private `ModelDb.Contains(Type)` assumption and synthesizes the exact closed `Dictionary<ModelId,AbstractModel>` `ContainsKey/Add/Remove/get_Item` MemberRefs directly while retaining the audited dependency graph and same-instance canonical-order contract.
 
 - `steps/STEP-36.0.5-ECMA-GENERIC-DICTIONARY-MEMBERREF-CORRECTION.md` — 0.0.159 ECMA VAR(0)/VAR(1) Dictionary MemberRef correction after physical 0.0.158 MissingMethodException.
+
+## Step 36.0.4 physical generic-MemberRef stop / Step 36.0.5 physical closure
+
+- `reports/STEP-36.0.4-PHYSICAL-MISSING-GENERIC-MEMBERREF-0.0.158-CHECKPOINT.txt` — physical 0.0.158 reaches unchanged ExecuteEssential and localizes the remaining ModelDb failure to the concrete-parameter `Dictionary<ModelId,AbstractModel>.ContainsKey(ModelId)` MemberRef.
+- `reports/STEP-36.0.4-PHYSICAL-MISSING-GENERIC-MEMBERREF-0.0.158-REPORT.txt` — final 0.0.158 MissingMethodException report with clean context/native telemetry.
+- `steps/STEP-36.0.5-ECMA-GENERIC-DICTIONARY-MEMBERREF-CORRECTION.md` — 0.0.159 preserves the 1624/56/47/41 graph and re-encodes the four Dictionary members with declaring-type VAR(0)/VAR(1).
+- `reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-CHECKPOINT.txt` — physical 0.0.159 journal: unchanged ExecuteEssential returns, Step-36 Gate D passes, and the run ends normally.
+- `reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-STATIC-MAP.txt` — exact unchanged ExecuteEssential callsite map and physically validated ModelDb plan.
+- `reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-LAST-CHECKPOINT.txt` — final durable 0.0.159 Step-36 checkpoint.
+- `reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-REPORT.txt` — **Step 36.0.5 COMPLETE 4/4**: state 1->2, all post-ModelDb initializers return, OfflineReady 428/428 and context isolation reproof pass.
+
+## Step 37.0 controlled game-scene admission
+
+- `reports/STEP-37.0-NATIVE-REFERENCE-ABI-AUDIT.md` — analysis-only hashes/platforms/class-surface findings for user-provided macOS FMOD/Spine reference binaries; no native binary is included or authorized for iOS loading.
+- `steps/STEP-37.0-CONTROLLED-GAME-SCENE-ADMISSION.md` — 0.0.160 freezes physical Step-36 closure, seals exact `res://scenes/game.tscn`, prepares exactly one three-edit FMOD-neutral private copy, loads it as PackedScene, and instantiates it off-tree only.

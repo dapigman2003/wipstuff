@@ -507,3 +507,13 @@ Step 36.0 additionally requires:
 Physical 0.0.155 proves the Step-36 game-resource handoff: exact receipt-backed PCK lookup, additive exact-GodotSharp `LoadResourcePack`, and `res://localization/eng` probe all pass before the unchanged exact ExecuteEssential invocation. The active defect is diagnostic loss: the physical failure is reported only as nested `TargetInvocationException: Arg_TargetInvocationException`.
 
 0.0.156 may change **observation only**. Gate C must retain exactly one `binding.Method.Invoke(null, null)` and must not retry, reset `OneTimeInitialization._state`, directly invoke ExecuteEssential child methods, authorize deferred/prewarm/entry execution, or broaden resolver/native policy. On failure it must preserve every `InnerException`, `GetBaseException()`, loader exceptions for `ReflectionTypeLoadException`, HResult/source/target/stack, post-failure state, resolver/load deltas, and sts2/GodotSharp private-load-context continuity.
+
+## Step 37.0 game-scene admission contracts
+
+- Physical 0.0.159 Step-36.0.5 4/4 is prerequisite authority and must not be weakened or silently rerun/reset.
+- `res://scenes/game.tscn` authority is exactly 10,414 bytes, SHA-256 `aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8`, PCK MD5 `dc9a89798eb1bb38e23563866e746ac5`.
+- Trusted Step-12 content remains read-only; compatibility writes only to launcher-owned storage.
+- Exactly three scene edits are allowed: FmodBankLoader type->Node, remove bank_paths, FmodListener2D type->Node.
+- Gate C may load only the copied PackedScene; Gate D may instantiate only off-tree and must require `IsInsideTree=false` before release.
+- AddChild, GameStartup, LaunchMainMenu, ExecuteDeferred, Steam initialization, and native FMOD/Spine/Sentry loading remain forbidden.
+- Proprietary native reference binaries must never be copied into the source/release archive.
