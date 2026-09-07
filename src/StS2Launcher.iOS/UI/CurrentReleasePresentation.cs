@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 37.0.1 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE";
+        "STEP 38.0 — CONTROLLED NGAME _ENTERTREE AFTER PHYSICAL STEP-37 CLOSURE";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 28–34 CLOSED POSITIVE • STEP 35 CLOSED POSITIVE • STEP 36 CLOSED POSITIVE 4/4 • STEP 37 OPEN — CONTROLLED OFF-TREE GAME-SCENE ADMISSION";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 28–34 CLOSED POSITIVE • STEP 35 CLOSED POSITIVE • STEP 36 CLOSED POSITIVE 4/4 • STEP 37 CLOSED POSITIVE 4/4 • STEP 38 OPEN — CONTROLLED OFF-TREE NGAME _ENTERTREE";
 
     public const string Summary =
-        "Physical 0.0.159 closed Step 36.0.5 at 4/4: the dependency-aware ModelDb authority completed unchanged ExecuteEssential state 1→2, including ModelIdSerializationCache.Init, ModelDb.InitIds, MessageTypes.Initialize, and ActionTypes.Initialize, with final OfflineReady 428/428 and zero initializer-bearing/rejected/native escape. Codemagic 0.0.160 stopped before iOS publish on one Gate-D C# interpolation parser error; 0.0.161 corrects only that syntax. Step 37.0.1 freezes the proven authority and admits only a sealed game.tscn copy. The exact PCK scene is pinned at 10,414 bytes / SHA-256 aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8 / MD5 dc9a89798eb1bb38e23563866e746ac5. Exactly three copied-scene compatibility edits neutralize FmodBankLoader/FmodListener2D before PackedScene load and off-tree instantiation.";
+        "Physical 0.0.161 closed Step 37.0.1 at 4/4: the exact 10,414-byte receipt-backed game.tscn was sealed, a private three-edit FMOD-neutral derivative loaded as PackedScene, and the real managed NGame hierarchy instantiated off-tree with IsInsideTree=false and zero resolver/native escape. Step 38.0 keeps that successful scene authority frozen. Gate A maps NGame._EnterTree/_Ready/GameStartupWrapper/GameStartup/InitializePlatform/LaunchMainMenu/LoadDeferredStartupAssetsAsync IL from the exact selected compatibility image and refuses execution if _EnterTree reaches a later startup/deferred boundary in its same-NGame call closure. Gate B re-instantiates the proven scene off-tree; Gate C invokes only exact NGame._EnterTree once; Gate D proves confinement/state=2 and releases the node. No SceneTree AddChild, _Ready, _ExitTree, GameStartup, platform startup, main-menu, ExecuteDeferred, Steam, or native GDExtension loading is authorized.";
 
     public const string InitialStatus =
-        "Status: Step 36.0.5 is physically closed 4/4 on 0.0.159. For 0.0.161 use a fresh process: Step 15 A-C → Step 35.0.32 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 once. Step 37 extracts and seals game.tscn from the already verified PCK, prepares a private three-edit FMOD-neutral copy, loads it as PackedScene, and instantiates it off-tree only. SceneTree insertion, NGame.GameStartup, LaunchMainMenu, ExecuteDeferred, Steam initialization, FMOD/Spine/Sentry native GDExtensions, and gameplay remain forbidden.";
+        "Status: Step 37.0.1 is physically closed 4/4 on 0.0.161. For 0.0.162 use a fresh process: Step 15 A-C → Step 35.0.32 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → Step 38.0 once. Step 38 first emits an exact NGame lifecycle IL/callsite map, then directly invokes only _EnterTree on a fresh off-tree NGame instance. AddChild/_Ready/_ExitTree/GameStartup/InitializePlatform/LaunchMainMenu/ExecuteDeferred/Steam/native GDExtensions/gameplay remain forbidden.";
 
-    public const string ExpectedDisplayVersion = "0.0.161";
-    public const string ExpectedBuildVersion = "161";
+    public const string ExpectedDisplayVersion = "0.0.162";
+    public const string ExpectedBuildVersion = "162";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -45,7 +45,10 @@ internal static class CurrentReleasePresentation
 
 
     public const string Step37ImplementationMarker =
-        "physical 0.0.159 Step-36.0.5 4/4 closure -> exact receipt-backed PCK game.tscn 10,414-byte SHA-256/MD5 seal -> copied three-edit FMOD-neutral derivative only -> exact GodotSharp ResourceLoader.Load PackedScene cache-ignore -> off-tree Instantiate GenEditState.Disabled -> require NGame + expected managed hierarchy + inert FmodBankLoader/FmodListener2D Node types -> IsInsideTree=false -> immediate release -> zero initializer-bearing/rejected/native escape; AddChild/GameStartup/LaunchMainMenu/ExecuteDeferred/Steam/native GDExtensions remain forbidden";
+        "physical 0.0.159 Step-36.0.5 4/4 closure -> exact receipt-backed PCK game.tscn 10,414-byte SHA-256/MD5 seal -> copied three-edit FMOD-neutral derivative only -> exact GodotSharp ResourceLoader.Load PackedScene cache-ignore -> off-tree Instantiate GenEditState.Disabled -> require NGame + expected managed hierarchy + inert FmodBankLoader/FmodListener2D Node types -> IsInsideTree=false -> immediate release -> zero initializer-bearing/rejected/native escape -> physical 0.0.161 Step-37.0.1 4/4 closure with resolverDelta=0/hostDelta=0/privateDelta=0/nativeDelta=0 and normal RUN_END; AddChild/GameStartup/LaunchMainMenu/ExecuteDeferred/Steam/native GDExtensions remain forbidden";
+
+    public const string Step38ImplementationMarker =
+        "physical 0.0.161 Step-37.0.1 4/4 closure -> exact selected ModelDb-bootstrap sts2 compatibility image Cecil lifecycle map -> require NGame._EnterTree instance void IL body -> map _Ready/GameStartupWrapper/GameStartup/InitializePlatform/LaunchMainMenu/LoadDeferredStartupAssetsAsync -> reject same-NGame _EnterTree call closure reaching later startup/deferred or OneTimeInitialization re-entry -> reinstantiate already proven FMOD-neutral PackedScene off-tree -> bind exact _EnterTree token -> invoke _EnterTree once by MethodInfo while IsInsideTree=false -> require state=2 and zero initializer-bearing/rejected/native escape -> post-entry off-tree confinement -> release temporary node without _ExitTree; AddChild/_Ready/GameStartup/platform/main-menu/ExecuteDeferred/Steam/native GDExtensions remain forbidden";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

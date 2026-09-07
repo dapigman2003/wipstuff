@@ -1,0 +1,22 @@
+StS2 Launcher — Step 37.0.1 Controlled FMOD-neutral Game-Scene Admission
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-07T20:58:21.7312530+00:00
+
+RESULT
+STEP 37.0.1 CONTROLLED GAME-SCENE ADMISSION COMPLETE — 4/4
+
+METADATA
+App version: 0.0.161 (161)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+All four Step 37.0.1 gates passed. The exact PCK game.tscn authority matched its sealed 10,414-byte SHA-256/MD5/layout; only a private copied derivative was modified; exact GodotSharp loaded it as PackedScene without native escape; and an NGame hierarchy was instantiated off-tree with FmodBankLoader/FmodListener2D replaced by inert Godot.Node instances. The root never entered the SceneTree and was released immediately. ExecuteDeferred, NGame.GameStartup, main-menu launch, Steam initialization, FMOD/Spine/Sentry GDExtension loading, and gameplay remain separate future boundaries.
+
+END OF REPORT

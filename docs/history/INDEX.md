@@ -350,3 +350,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-37.0.1-CSHARP-INTERPOLATION-COMPILE-CORRECTION.md` — 0.0.161 fixes the single Gate-D `string.Join` interpolation syntax error that stopped 0.0.160 during Codemagic host compilation; Step-37 runtime semantics are unchanged.
 - `reports/STEP-37.0-CODEMAGIC-COMPILE-FAILURE-0.0.160.txt` — authoritative Codemagic compiler output for the pre-iOS-publish 0.0.160 failure.
 - `reports/STEP-37.0-CODEMAGIC-CACHE-STATE-0.0.160.txt` — cache evidence showing NuGet, Godot, pinned .NET/workloads, and iOS arm64 obj caches were restored/present.
+
+## Step 37.0.1 physical closure / Step 38.0 lifecycle entry
+
+- `reports/STEP-37.0.1-PHYSICAL-COMPLETE-0.0.161-CHECKPOINT.txt` — physical 0.0.161 journal proving sealed scene Gate A, exact three-edit derivative Gate B, PackedScene Gate C, off-tree real NGame Gate D, zero resolver/native deltas, and normal `RUN_END`.
+- `reports/STEP-37.0.1-PHYSICAL-COMPLETE-0.0.161-STATIC-MAP.txt` — exact receipt-backed `game.tscn` authority and node/resource map used by the successful run.
+- `reports/STEP-37.0.1-PHYSICAL-COMPLETE-0.0.161-LAST-CHECKPOINT.txt` — final durable Step-37 checkpoint confirming normal teardown.
+- `reports/STEP-37.0.1-PHYSICAL-COMPLETE-0.0.161-REPORT.txt` — **Step 37.0.1 COMPLETE 4/4**: real `NGame` hierarchy instantiated off-tree with inert FMOD placeholders and no native escape.
+- `steps/STEP-38.0-CONTROLLED-NGAME-ENTERTREE.md` — 0.0.162 maps the exact NGame lifecycle call graph and, only if `_EnterTree` is isolated from later startup/deferred methods, invokes `_EnterTree` once on a fresh off-tree NGame before confinement/release.

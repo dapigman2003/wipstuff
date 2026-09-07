@@ -1,16 +1,16 @@
-# Release checklist — Step 37.0.1 / 0.0.161
+# Release checklist — Step 38.0 / 0.0.162
 
-Release identity: display/build `0.0.161 (161)`, IPA `StS2-Launcher-Step-37.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.162 (162)`, IPA `StS2-Launcher-Step-38.ipa`, workflow `ios-canonical`.
 
-- Static validator passes completely.
+- Static validator passes completely in the working tree and a fresh extraction of the final ZIP.
 - Codemagic host tests compile/pass under the pinned .NET SDK.
 - Native-link preflight passes before iOS publish.
-- IPA verifier reports the Step 37.0.1 UI identity.
+- IPA verifier reports the Step 38.0 UI identity.
 - Existing `ios-canonical` NuGet/.NET/Godot/iOS caches remain enabled and unchanged.
-- Physical 0.0.159 Step-36.0.5 4/4 evidence is preserved in history.
-- Step37 pins exact game.tscn bytes/SHA-256/PCK-MD5/layout before any derivative work.
-- Only a private copy is modified; Step-12 managed install/PCK are read-only.
-- Only three FMOD-neutral scene edits are authorized.
-- Gate C loads PackedScene only; Gate D instantiates off-tree and requires `IsInsideTree=false`.
-- No AddChild, GameStartup, LaunchMainMenu, ExecuteDeferred, Steam init, native GDExtension load, gameplay, retry, or state reset.
+- Physical 0.0.159 Step-36.0.5 4/4 evidence and physical 0.0.161 Step-37.0.1 4/4 evidence are preserved in history.
+- Step38 Gate A uses read-only Cecil against the exact selected compatibility image and rejects `_EnterTree` reachability into later startup/deferred boundaries.
+- Gate B instantiates only the already-proven private FMOD-neutral PackedScene and keeps it off-tree.
+- Gate C directly invokes only exact `NGame._EnterTree()` once; no `AddChild` or `_Ready` invocation exists in Step38 code.
+- Gate D requires off-tree/state-2/native confinement before releasing the temporary node without `_ExitTree`.
+- No GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam init, native GDExtension load, gameplay, retry, or state reset.
 - No proprietary game/native payload is present in the source ZIP.

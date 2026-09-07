@@ -46,6 +46,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _gameScenePreflight = null;
         _gameSceneDerivative = null;
         _gameScenePackedResource = null;
+        ResetStep38State();
     }
 
     private void MarkExactStep36ClosurePassed(Step35ExecutionLoadContext context)
@@ -423,7 +424,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var state = ReadOneTimeInitializationState(RequireEssentialBinding().StateField);
             if (state != ExpectedStateAfterEssential)
                 throw new InvalidDataException($"Step 37.0.1 OneTimeInitialization state drifted during off-tree instantiation: expected {ExpectedStateAfterEssential}; observed {state}.");
+            MarkExactStep37ClosurePassed();
 
+            Checkpoint(checkpoint, $"G_D_STEP38_AUTHORITY_READY — same-process Step-37.0.1 4/4 authority marked for the next bounded NGame lifecycle-entry experiment.");
             Checkpoint(checkpoint, $"G_D_PASS — off-tree NGame instantiated; rootType={rootType}; insideTree=False; children={string.Join(",", observedChildren)}; resolverDelta={context.ManagedResolverRequests.Count - resolverBefore}; hostDelta={context.HostLoads.Count - hostBefore}; privateDelta={context.PrivateLoads.Count - privateBefore}; initializerDelta=0; rejectedDelta=0; nativeDelta=0; state={state}; AddChild/GameStartup/main-menu/ExecuteDeferred not invoked.");
             return GameScenePass(gate,
                 "STEP 37.0.1 OFF-TREE GAME-SCENE INSTANTIATION PASSED.\n" +

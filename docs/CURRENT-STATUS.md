@@ -1,25 +1,22 @@
 # Current status
 
-## Active candidate — Step 37.0.1 / 0.0.161 (161)
+## Active candidate — Step 38.0 / 0.0.162 (162)
 
-Physical **0.0.159 / Step 36.0.5** is closed positive **4/4**. The exact dependency-aware ModelDb derivative completed unchanged `ExecuteEssential()`, state `1 -> 2`, and the full post-ModelDb sequence `ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize`. Final isolation re-proved OfflineReady `428/428`; initializer-bearing requests, rejected managed requests, and native-load attempts remained zero.
+Physical **0.0.159** closed unchanged `ExecuteEssential()` at Step 36.0.5 4/4. The physically validated ModelDb derivative remains frozen at SHA-256 `e9eea7be01d1c7bc77371b43c24b7c60e599c660c6541bde65772ff8c400092d` with the audited `1624/56/47/41` model graph.
 
-The physically validated ModelDb derivative is now frozen at SHA-256 `e9eea7be01d1c7bc77371b43c24b7c60e599c660c6541bde65772ff8c400092d` with the audited `1624/56/47/41` model graph and same-instance canonical-order strategy.
+Physical **0.0.161** now closes Step 37.0.1 at **4/4**. The exact `game.tscn` authority matched 10,414 bytes / SHA-256 `aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8` / PCK MD5 `dc9a89798eb1bb38e23563866e746ac5`; the copied FMOD-neutral derivative loaded as `PackedScene`; and a real `NGame` hierarchy instantiated off-tree with `FmodBankLoader`/`FmodListener2D` as inert `Godot.Node`. Gate C/D had resolver/host/private/initializer/rejected/native deltas of zero and the run ended normally.
 
-**0.0.160 never reached iOS publish or device execution.** Codemagic host compilation stopped on one Step-37 source-syntax error: `string.Join(\",\", observedChildren)` inside an interpolated expression. 0.0.161 / Step 37.0.1 changes only that expression to `string.Join(",", observedChildren)`; all Step-37 runtime semantics and cache paths are unchanged.
+**0.0.162 / Step 38.0** advances only `NGame._EnterTree`. Before execution, Gate A Cecil-maps `_EnterTree`, `_Ready`, `GameStartupWrapper`, `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, and `LoadDeferredStartupAssetsAsync` from the exact selected compatibility image and rejects a same-`NGame` `_EnterTree` call closure that reaches later startup/deferred or OneTimeInitialization re-entry.
 
-**0.0.161 / Step 37.0.1** opens the next boundary without invoking deferred/game startup. The exact PCK `res://scenes/game.tscn` is sealed at 10,414 bytes, SHA-256 `aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8`, PCK MD5 `dc9a89798eb1bb38e23563866e746ac5`. A private copy receives exactly three edits: neutralize `FmodBankLoader`, remove its desktop `bank_paths`, and neutralize `FmodListener2D`.
+Gate B re-instantiates the physically proven scene off-tree. Gate C invokes `_EnterTree()` exactly once by reflection while `IsInsideTree == false`; no `AddChild` occurs. Gate D re-proves off-tree/state-2 confinement and zero initializer/rejected/native escape, then frees the node without invoking `_ExitTree`.
 
-Step 37 then loads the copy as `Godot.PackedScene` and, only after that succeeds without resolver/native escape, instantiates it off-tree. The expected root is `MegaCrit.Sts2.Core.Nodes.NGame`; the audit requires the expected managed AudioManager/SceneContainer/AssetLoader hierarchy, inert FMOD placeholders, `IsInsideTree == false`, unchanged OneTimeInitialization state 2, and no initializer-bearing/rejected/native escape.
+## Physical sequence for 0.0.162
 
-The macOS app inventory contains desktop FMOD/Sentry/Spine frameworks only; no iOS/iphone/XCFramework payload is shipped in this app. Those binaries remain analysis-only and are not part of the launcher archive.
+1. Fresh process → Step 15 A-C.
+2. Step 35.0.32 MODEL-BOOTSTRAP → 4/4.
+3. Step 36.0.5 → 4/4.
+4. Step 37.0.1 → 4/4.
+5. Step 38.0 A-D once. Do not retry in-process after Gate C starts.
+6. Preserve Step35/Step36/Step37/Step38 run-correlated reports.
 
-ExecuteDeferred, `NGame.GameStartup`, `LaunchMainMenu`, SceneTree insertion, Steam initialization, native GDExtension loading, gameplay, runtime Harmony/MonoMod, retry, and state reset remain forbidden.
-
-## Physical sequence for 0.0.161
-
-1. Fresh process: Step 15 Gates A-C.
-2. Step 35.0.32 MODEL-BOOTSTRAP once; require 4/4.
-3. Step 36.0.5 once; require 4/4.
-4. Step 37.0.1 A-D once; if Gate C/D begins and fails, do not retry in-process.
-5. Preserve Step35/Step36/Step37 run-correlated reports.
+Still forbidden: SceneTree insertion, `_Ready`, `_ExitTree`, `GameStartup`, `InitializePlatform`, main-menu launch, `ExecuteDeferred`, Steam initialization, native FMOD/Spine/Sentry extensions, gameplay, broad native compatibility, and mutation of the trusted Step-12 install.
