@@ -1,20 +1,20 @@
 # Current status
 
-## Active candidate — Step 35.0.32 / Step 36.0.4 / 0.0.158 (158)
+## Active candidate — Step 35.0.32 / Step 36.0.5 / 0.0.159 (159)
 
-Physical **0.0.156** closed PCK/localization and localized the first unchanged `ExecuteEssential` failure to `ModelDb.Init -> BowlbugsNormal..cctor -> ModelDb.Monster<BowlbugEgg>() -> KeyNotFoundException(MONSTER.BOWLBUG_EGG)` with state `1 -> 2`, intact sts2/GodotSharp private-context ownership, and zero initializer-bearing, rejected-managed, or native-load attempts.
+Physical **0.0.158** closed Step 35 MODEL-BOOTSTRAP and reached unchanged `ExecuteEssential`. Gate A/B passed, the receipt-backed PCK mounted, and `res://localization/eng` remained visible. Gate C then failed in `ModelDb.Init()` with `MissingMethodException: bool Dictionary<ModelId,AbstractModel>.ContainsKey(ModelId)`. Context stayed confined: no initializer-bearing request, rejected managed request, or native-load attempt occurred.
 
-Physical **0.0.157** never admitted the compatibility sts2 derivative. Step-35 Gate A stopped in the pre-CLR compatibility clone with `InvalidOperationException: NoMatch`. Review of the clone builder identifies the first brittle lookup as an assumed private `ModelDb.Contains(Type)` method; the real assembly does not expose that member. This is a transform-construction defect, not a retreat of the physically closed Step-35 bridge/runtime or Step-36 resource boundaries.
+The dependency graph itself was generated successfully: `1624` canonical model types, `56` direct static-cctor ModelDb dependencies, `47` backward dependencies, `41` preinject targets, and the physical `BowlbugsNormal[658] -> BowlbugEgg[846]` edge. The failure is therefore the serialized generic MemberRef encoding introduced by 0.0.158.
 
-**0.0.158 / Step 36.0.4** retains the bootstrap-order compatibility strategy and the independently audited model graph (`1624` canonical types, `56` direct static-cctor ModelDb edges, `47` backward edges, `41` pre-injected dependency-closure types, BowlbugsNormal index `658`, BowlbugEgg index `846`) but removes reliance on that nonexistent helper and on compiler-emitted Dictionary callsite shapes. The transform discovers the closed `Dictionary<ModelId,AbstractModel>` field and constructs exact `ContainsKey`, `Add`, `Remove`, and `get_Item` MemberRefs from its generic arguments. ModelDb method and field lookup failures now produce explicit metadata-shape diagnostics rather than LINQ `NoMatch`.
+**0.0.159 / Step 36.0.5** preserves that graph and same-instance canonical-order strategy, but reconstructs `Dictionary<TKey,TValue>` explicitly and emits `ContainsKey`, `get_Item`, `Remove`, and `Add` with declaring-type `VAR(0)`/`VAR(1)` signatures. This mirrors the Step-35 Action/Dictionary generic MemberRef pattern that already worked physically on iOS. The serialized derivative is reopened and the VAR positions are verified fail-closed before CLR admission.
 
-Step 35 MODEL-BOOTSTRAP admits only the verified compatibility derivative, with exact prepared GodotSharp and the proven source-built Godot bridge. Step 36 re-proves unchanged `ExecuteEssential`, mounts `SlayTheSpire2.app/Contents/Resources/Slay the Spire 2.pck` via `LoadResourcePack`, proves `res://localization/eng`, and invokes the full method once. Success naturally covers `ModelDb.Init -> ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize`; later failure retains full nested exception/state/resolver/context telemetry.
+Step 36 still invokes the full unchanged `ExecuteEssential` once. Success naturally continues through `ModelIdSerializationCache.Init -> ModelDb.InitIds -> MessageTypes.Initialize -> ActionTypes.Initialize`. Later failure retains full nested exception/state/resolver/context telemetry.
 
-The workflow remains `ios-canonical` with the existing cache keys/paths. `ExecuteDeferred`, launcher-driven `PrewarmJit`, game entry, native game loading, runtime Harmony/MonoMod, arbitrary resolver fallback, retry, and state reset remain forbidden.
+The `ios-canonical` workflow and existing cache paths are unchanged. ExecuteDeferred, launcher-driven PrewarmJit, game entry, native game loading, runtime Harmony/MonoMod, arbitrary resolver fallback, retry, and state reset remain forbidden.
 
-## Physical sequence for 0.0.158
+## Physical sequence for 0.0.159
 
 1. Fresh process: Step 15 Gates A-C.
-2. Step 35.0.32 **MODEL-BOOTSTRAP** once; require 4/4.
-3. Step 36.0.4 A-D once; once Gate C begins, do not retry in-process.
-4. Preserve the Step35 and Step36 run-correlated checkpoint/static-map/final reports.
+2. Step 35.0.32 MODEL-BOOTSTRAP once; require 4/4.
+3. Step 36.0.5 A-D once; once Gate C begins, do not retry in-process.
+4. Preserve Step35/Step36 run-correlated reports.

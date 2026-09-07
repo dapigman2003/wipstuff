@@ -290,8 +290,8 @@ public sealed partial class RootViewController
                     {
                         _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "STEP 36 MODEL-BOOTSTRAP AUTHORITY: READY — 4/4";
                         _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
-                            "All four compatibility-authority gates completed. Gate B admitted the statically verified dependency-aware ModelDb bootstrap derivative while preserving the exact Step-32 source; exact prepared GodotSharp received the physically proven source-built Godot 4.5.1 bridge; unchanged ExecuteVeryEarly returned successfully; Gate D re-proved OfflineReady, hashes, resolver/native confinement, and CLR ownership. Proceed directly to Step 36.0.4 in this same process.");
-                        _statusLabel.Text = "MODEL-BOOTSTRAP AUTHORITY READY — 4/4. Run Step 36.0.4 once now; do not re-run Step 35 in this process.";
+                            "All four compatibility-authority gates completed. Gate B admitted the statically verified dependency-aware ModelDb bootstrap derivative while preserving the exact Step-32 source; exact prepared GodotSharp received the physically proven source-built Godot 4.5.1 bridge; unchanged ExecuteVeryEarly returned successfully; Gate D re-proved OfflineReady, hashes, resolver/native confinement, and CLR ownership. Proceed directly to Step 36.0.5 in this same process.");
+                        _statusLabel.Text = "MODEL-BOOTSTRAP AUTHORITY READY — 4/4. Run Step 36.0.5 once now; do not re-run Step 35 in this process.";
                         WriteStep35CrashCheckpoint("RUN_MODEL_BOOTSTRAP_4OF4 — verified dependency-aware ModelDb-bootstrap sts2 authority completed Gates A-D with exact prepared GodotSharp and the proven source-built bridge.");
                     }
                     else

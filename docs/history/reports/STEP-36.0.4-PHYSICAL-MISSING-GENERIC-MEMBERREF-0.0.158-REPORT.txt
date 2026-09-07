@@ -1,0 +1,63 @@
+StS2 Launcher — Step 36.0.4 ModelDb Bootstrap Compatibility + Full ExecuteEssential
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-07T00:52:48.5082480+00:00
+
+RESULT
+STEP 36.0 ESSENTIAL INITIALIZATION FAIL — 2/4
+
+METADATA
+App version: 0.0.158 (158)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: single unchanged ExecuteEssential invocation
+InvalidOperationException: Exact transformed ExecuteEssential threw. Full diagnostic follows.
+State before invocation: 1
+State after failed invocation: 2
+sts2 still in exact Step-35 private load context: True
+GodotSharp assemblies in private context: 1
+GodotSharp still in exact Step-35 private load context: True
+Managed resolver delta: 8: System.Text.RegularExpressions, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | SmartFormat, Version=3.0.0.0, Culture=neutral, PublicKeyToken=568866805651201f | netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 | Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0 | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | SmartFormat.ZString, Version=3.0.0.0, Culture=neutral, PublicKeyToken=568866805651201f | netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 | System.Memory, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+Host-load delta: 5: System.Text.RegularExpressions, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a => System.Text.RegularExpressions, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 => netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a => System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 => netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 | System.Memory, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 => System.Memory, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+Private-load delta: 3: SmartFormat, Version=3.0.0.0, Culture=neutral, PublicKeyToken=568866805651201f => SmartFormat, Version=3.0.0.0, Culture=neutral, PublicKeyToken=568866805651201f | Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0 => Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0 | SmartFormat.ZString, Version=3.0.0.0, Culture=neutral, PublicKeyToken=568866805651201f => SmartFormat.ZString, Version=3.0.0.0, Culture=neutral, PublicKeyToken=568866805651201f
+Initializer-bearing request delta: 0
+Rejected managed request delta: 0
+Native-load attempt delta: 0
+Exception depth 0: System.Reflection.TargetInvocationException
+  Message: Arg_TargetInvocationException
+  HResult: 0x80131604
+  Source: System.Private.CoreLib
+  TargetSite: System.Reflection.MethodBaseInvoker::System.Object InvokeWithNoArgs(System.Object, System.Reflection.BindingFlags)
+  StackTrace:
+       at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+       at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+       at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunExactExecuteEssentialInvocation(Action`1 checkpoint)
+Exception depth 1: System.MissingMethodException
+  Message: Method not found: bool System.Collections.Generic.Dictionary`2.ContainsKey(MegaCrit.Sts2.Core.Models.ModelId)
+  HResult: 0x80131513
+  Source: sts2
+  TargetSite: MegaCrit.Sts2.Core.Models.ModelDb::Void Init()
+  StackTrace:
+       at MegaCrit.Sts2.Core.Models.ModelDb.Init()
+       at MegaCrit.Sts2.Core.Helpers.OneTimeInitialization.ExecuteEssential()
+       at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+       at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+Base exception: System.MissingMethodException: Method not found: bool System.Collections.Generic.Dictionary`2.ContainsKey(MegaCrit.Sts2.Core.Models.ModelId)
+Base HResult: 0x80131513
+Base Source: sts2
+Base TargetSite: MegaCrit.Sts2.Core.Models.ModelDb::Void Init()
+Base StackTrace:
+     at MegaCrit.Sts2.Core.Models.ModelDb.Init()
+     at MegaCrit.Sts2.Core.Helpers.OneTimeInitialization.ExecuteEssential()
+     at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+     at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+END OF REPORT

@@ -327,3 +327,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-35.0.32-PHYSICAL-MODEL-BOOTSTRAP-GATE-A-0.0.157-CHECKPOINT.txt` — physical 0.0.157 stops at Step-35 Gate A before CLR admission while constructing the ModelDb compatibility derivative; the journal reaches normal `RUN_END` and reports no later boundary execution.
 - `reports/STEP-35.0.32-PHYSICAL-MODEL-BOOTSTRAP-GATE-A-0.0.157-REPORT.txt` — final 0.0.157 report: `Step-36.0.3 ModelDb bootstrap compatibility clone` failed with `InvalidOperationException: NoMatch` at 0/4.
 - `steps/STEP-36.0.4-MODELDB-DICTIONARY-MEMBERREF-CORRECTION.md` — 0.0.158 removes the nonexistent private `ModelDb.Contains(Type)` assumption and synthesizes the exact closed `Dictionary<ModelId,AbstractModel>` `ContainsKey/Add/Remove/get_Item` MemberRefs directly while retaining the audited dependency graph and same-instance canonical-order contract.
+
+- `steps/STEP-36.0.5-ECMA-GENERIC-DICTIONARY-MEMBERREF-CORRECTION.md` — 0.0.159 ECMA VAR(0)/VAR(1) Dictionary MemberRef correction after physical 0.0.158 MissingMethodException.
