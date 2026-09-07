@@ -21,12 +21,12 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Step 38.0 — Controlled NGame._EnterTree entry (still off-tree)",
+            "Step 38.0.1 — Controlled NGame._EnterTree entry (still off-tree)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
         _step38LifecycleButton = SystemButton(
-            "Run Step 38.0 A–D — Map lifecycle → Reinstantiate NGame → Invoke _EnterTree once → Confinement/release",
+            "Run Step 38.0.1 A–D — Map lifecycle → Reinstantiate NGame → Invoke _EnterTree once → Confinement/release",
             16);
         _step38LifecycleButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2GameLifecycleEntryAsync();
         content.AddArrangedSubview(_step38LifecycleButton);
@@ -62,8 +62,8 @@ public sealed partial class RootViewController
         {
             _step38ResultLabel.Text = "CONTROLLED NGAME _ENTERTREE ENTRY: PREREQUISITE NOT MET";
             _step38ResultLabel.TextColor = UIColor.SystemOrange;
-            _step38DetailLabel.Text = "Step 38.0 requires the same-process physical Step-37.0.1 4/4 closure. From a fresh launch run Step 15 A-C, Step 35.0.32 MODEL-BOOTSTRAP 4/4, Step 36.0.5 4/4, then Step 37.0.1 4/4 before running Step 38 once.";
-            _statusLabel.Text = "STEP 38.0 REFUSED — same-process Step-37.0.1 4/4 authority is not present.";
+            _step38DetailLabel.Text = "Step 38.0.1 requires the same-process physical Step-37.0.1 4/4 closure. From a fresh launch run Step 15 A-C, Step 35.0.32 MODEL-BOOTSTRAP 4/4, Step 36.0.5 4/4, then Step 37.0.1 4/4 before running Step 38 once.";
+            _statusLabel.Text = "STEP 38.0.1 REFUSED — same-process Step-37.0.1 4/4 authority is not present.";
             _statusLabel.TextColor = UIColor.SystemOrange;
             return;
         }
@@ -82,36 +82,36 @@ public sealed partial class RootViewController
         _step38Gates.Reset();
         _step38ResultLabel.Text = "CONTROLLED NGAME _ENTERTREE ENTRY: GATE A RUNNING…";
         _step38ResultLabel.TextColor = UIColor.Label;
-        _statusLabel.Text = $"STEP 38.0 RUN {_step38RunId} — Step 37 is closed. Gate A reads only exact selected sts2 metadata/IL; no lifecycle method is invoked.";
+        _statusLabel.Text = $"STEP 38.0.1 RUN {_step38RunId} — Step 37 is closed. Gate A reads only exact selected sts2 metadata/IL; no lifecycle method is invoked.";
         _statusLabel.TextColor = UIColor.Label;
 
         try
         {
-            WriteStep38Checkpoint("RUN_START — Step 38.0 controlled NGame._EnterTree experiment started after same-process Step-37.0.1 4/4 closure.");
+            WriteStep38Checkpoint("RUN_START — Step 38.0.1 controlled NGame._EnterTree experiment started after same-process Step-37.0.1 4/4 closure.");
 
             var gateA = _transformedRealStS2VeryEarlyInitialization.RunNGameLifecycleStaticAudit(WriteStep38Checkpoint);
             if (!RecordStep38Gate(gateA))
                 return;
             if (!WriteStep38StaticMap(out var staticMapError))
-                throw new IOException("Step 38.0 verified lifecycle static map could not be durably written: " + staticMapError);
+                throw new IOException("Step 38.0.1 verified lifecycle static map could not be durably written: " + staticMapError);
             WriteStep38Checkpoint("H_A_STATIC_MAP_WRITE_RETURNED — verified NGame lifecycle static map durably written.");
 
             _step38ResultLabel.Text = "CONTROLLED NGAME _ENTERTREE ENTRY: GATE B RUNNING…";
-            _statusLabel.Text = "STEP 38.0 GATE B — reinstantiate the physically proven FMOD-neutral PackedScene off-tree and bind exact NGame._EnterTree. No lifecycle call yet.";
+            _statusLabel.Text = "STEP 38.0.1 GATE B — reinstantiate the physically proven FMOD-neutral PackedScene off-tree and bind exact NGame._EnterTree. No lifecycle call yet.";
             WriteStep38Checkpoint($"H_B_UI_SELECTED — Gate B selected on UI thread; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}.");
             var gateB = _transformedRealStS2VeryEarlyInitialization.RunNGameOffTreeReinstantiation(WriteStep38Checkpoint);
             if (!RecordStep38Gate(gateB))
                 return;
 
             _step38ResultLabel.Text = "CONTROLLED NGAME _ENTERTREE ENTRY: GATE C RUNNING…";
-            _statusLabel.Text = "STEP 38.0 GATE C — invoke NGame._EnterTree exactly once on the off-tree instance. No AddChild/_Ready/GameStartup/platform/main-menu/deferred authorization.";
+            _statusLabel.Text = "STEP 38.0.1 GATE C — invoke NGame._EnterTree exactly once on the off-tree instance. No AddChild/_Ready/GameStartup/platform/main-menu/deferred authorization.";
             WriteStep38Checkpoint($"H_C_UI_SELECTED — Gate C selected on UI thread; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}.");
             var gateC = _transformedRealStS2VeryEarlyInitialization.RunNGameDirectEnterTreeInvocation(WriteStep38Checkpoint);
             if (!RecordStep38Gate(gateC))
                 return;
 
             _step38ResultLabel.Text = "CONTROLLED NGAME _ENTERTREE ENTRY: GATE D RUNNING…";
-            _statusLabel.Text = "STEP 38.0 GATE D — prove post-_EnterTree confinement while still off-tree, then free the temporary node without invoking _ExitTree.";
+            _statusLabel.Text = "STEP 38.0.1 GATE D — prove post-_EnterTree confinement while still off-tree, then free the temporary node without invoking _ExitTree.";
             var gateD = _transformedRealStS2VeryEarlyInitialization.RunNGamePostEnterTreeConfinementAndRelease(WriteStep38Checkpoint);
             if (!RecordStep38Gate(gateD))
                 return;
@@ -120,8 +120,8 @@ public sealed partial class RootViewController
             _step38ResultLabel.Text = snapshot.Summary;
             _step38ResultLabel.TextColor = UIColor.Label;
             _step38DetailLabel.Text =
-                "All four Step 38.0 gates passed. Exact lifecycle IL/callsites were mapped from the physically selected compatibility authority; _EnterTree's same-NGame closure contained no later startup/deferred boundary; a fresh real NGame hierarchy was instantiated off-tree; exact NGame._EnterTree returned once while IsInsideTree remained false; and final state/native/resolver confinement held before the node was released. SceneTree insertion, _Ready, _ExitTree, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam/native extensions, and gameplay remain future boundaries.";
-            _statusLabel.Text = "STEP 38.0 COMPLETE — 4/4. Controlled NGame._EnterTree is physically closed; preserve Step38 artifacts before authorizing any real SceneTree/_Ready boundary.";
+                "All four Step 38.0.1 gates passed. Exact lifecycle IL/callsites were mapped from the physically selected compatibility authority; _EnterTree's same-NGame closure contained no later startup/deferred boundary; a fresh real NGame hierarchy was instantiated off-tree; exact NGame._EnterTree returned once while IsInsideTree remained false; and final state/native/resolver confinement held before the node was released. SceneTree insertion, _Ready, _ExitTree, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam/native extensions, and gameplay remain future boundaries.";
+            _statusLabel.Text = "STEP 38.0.1 COMPLETE — 4/4. Controlled NGame._EnterTree is physically closed; preserve Step38 artifacts before authorizing any real SceneTree/_Ready boundary.";
             _statusLabel.TextColor = UIColor.Label;
             WriteStep38Checkpoint("RUN_STEP38_4OF4 — exact NGame._EnterTree returned once on an off-tree instance and confinement/release completed; no _Ready/GameStartup/platform/main-menu/deferred/native boundary crossed.");
         }
@@ -130,7 +130,7 @@ public sealed partial class RootViewController
             WriteStep38Checkpoint($"RUN_MANAGED_EXCEPTION — {ex.GetType().FullName}: {ex.Message}");
             _step38ResultLabel.Text = "CONTROLLED NGAME _ENTERTREE ENTRY: EXCEPTION";
             _step38ResultLabel.TextColor = UIColor.SystemRed;
-            _step38DetailLabel.Text = $"Unhandled Step 38.0 exception: {ex.GetType().Name}: {ex.Message}";
+            _step38DetailLabel.Text = $"Unhandled Step 38.0.1 exception: {ex.GetType().Name}: {ex.Message}";
             _statusLabel.Text = "STEP 38 FAIL — preserve Step38 artifacts and use a fresh process before retry after Gate C begins.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
@@ -139,7 +139,7 @@ public sealed partial class RootViewController
             WriteStep38Checkpoint($"RUN_FINALLY_ENTER — Step-38 managed control reached finally; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}.");
             await WriteDeviceTestReportFromLabelsAsync(
                 "Step38-TransformedRealStS2NGameLifecycleEntry.txt",
-                "StS2 Launcher — Step 38.0 Controlled NGame _EnterTree Entry",
+                "StS2 Launcher — Step 38.0.1 Controlled NGame _EnterTree Entry",
                 _step38ResultLabel,
                 _step38DetailLabel,
                 CancellationToken.None).ConfigureAwait(false);
@@ -165,7 +165,7 @@ public sealed partial class RootViewController
         if (!result.Passed && _statusLabel is not null)
         {
             var letter = (char)('A' + (int)result.Gate - 1);
-            _statusLabel.Text = $"STEP 38.0 FAIL at Gate {letter} ({result.Gate}). Stop here; later gates were not run. Preserve Step38 artifacts and use a fresh process before retry after Gate C begins.";
+            _statusLabel.Text = $"STEP 38.0.1 FAIL at Gate {letter} ({result.Gate}). Stop here; later gates were not run. Preserve Step38 artifacts and use a fresh process before retry after Gate C begins.";
             _statusLabel.TextColor = UIColor.SystemRed;
         }
         return result.Passed;
@@ -193,13 +193,13 @@ public sealed partial class RootViewController
                 var staticPath = Path.Combine(_deviceTestReportWriter.ReportsRoot, staticName);
                 WriteStep35TextFileDurably(
                     crashPath,
-                    "StS2 Launcher — Step 38.0 controlled NGame._EnterTree checkpoint\n" +
+                    "StS2 Launcher — Step 38.0.1 controlled NGame._EnterTree checkpoint\n" +
                     "Output-only diagnostic; never consumed as trusted runtime input.\n" +
                     $"Run ID: {runId}\n" +
                     $"Initialized UTC: {now:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
-                    "Candidate: STEP 38.0 — LIFECYCLE STATIC MAP + OFF-TREE NGAME REINSTANTIATION + DIRECT _ENTERTREE ONCE + CONFINEMENT/RELEASE\n" +
+                    "Candidate: STEP 38.0.1 — LIFECYCLE STATIC MAP + OFF-TREE NGAME REINSTANTIATION + DIRECT _ENTERTREE ONCE + CONFINEMENT/RELEASE\n" +
                     "Prerequisite: same-process Step-37.0.1 4/4 authority; AddChild/_Ready/_ExitTree/GameStartup/InitializePlatform/main-menu/ExecuteDeferred/Steam/native GDExtensions remain forbidden.\n\n");
                 _step38RunId = runId;
                 _step38CrashCheckpointPath = crashPath;

@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-07T21:13:49Z
+UTC: 2026-09-07T22:55:15Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,8 +10,8 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 38.0 Controlled NGame _EnterTree Entry validation
-Root: /mnt/data/StS2Launcher-Step38-0.0.162
+StS2 Launcher — Step 38.0.1 Controlled NGame _EnterTree Entry validation
+Root: /mnt/data/StS2Launcher-Step38-0.0.163
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 259 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 162
-PASS: display version is 0.0.162
-PASS: Info.plist build version is 162
-PASS: Info.plist display version is 0.0.162
+PASS: build version is 163
+PASS: display version is 0.0.163
+PASS: Info.plist build version is 163
+PASS: Info.plist display version is 0.0.163
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,7 +32,7 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 38.0 controlled NGame _EnterTree candidate
+PASS: top launcher banner identifies active Step 38.0.1 controlled NGame _EnterTree candidate
 PASS: top launcher banner records physical Step-37 closure and the bounded Step-38 lifecycle boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: Step 38 source pins expected bundle release identity
@@ -642,6 +642,7 @@ PASS: Step 38 host regressions exists
 PASS: Step 38 iOS surface exists
 PASS: Step 38 pins the exact NGame lifecycle/startup method names under audit
 PASS: Step 38 Gate A reads the physically proven compatibility image with Cecil and fail-closes on forbidden lifecycle/OneTimeInitialization reachability
+PASS: Step 38.0.1 Gate A no longer uses Cecil immediate/default resolution
 PASS: Step 38 Gate B recreates the physically proven NGame only off-tree and binds the exact _EnterTree token without invoking it
 PASS: Step 38 Gate C invokes exact NGame._EnterTree once and captures nested failures while requiring state/native confinement
 PASS: Step 38 contains exactly one launcher-authorized _EnterTree invocation
@@ -863,7 +864,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
 PASS: current status records physical Step-37 closure and the active controlled Step-38 lifecycle boundary
-PASS: testing and release-checklist docs pin the exact 0.0.162 (162) release identity
+PASS: testing and release-checklist docs pin the exact 0.0.163 (163) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -989,7 +990,7 @@ PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.i
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
 PASS: host-test report heading identifies Step 38
 PASS: host-test TRX artifact identifies Step 38
-PASS: Codemagic build-environment report heading identifies the Step 38.0 candidate
+PASS: Codemagic build-environment report heading identifies the Step 38.0.1 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -1000,7 +1001,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step-38.0 candidate
+PASS: IPA verifier advertises the active Step-38.0.1 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -1029,4 +1030,4 @@ PASS: Step 38 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1015 checks
+VALIDATION PASS: 1016 checks

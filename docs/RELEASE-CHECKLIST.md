@@ -1,11 +1,11 @@
-# Release checklist — Step 38.0 / 0.0.162
+# Release checklist — Step 38.0.1 / 0.0.163
 
-Release identity: display/build `0.0.162 (162)`, IPA `StS2-Launcher-Step-38.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.163 (163)`, IPA `StS2-Launcher-Step-38.ipa`, workflow `ios-canonical`.
 
 - Static validator passes completely in the working tree and a fresh extraction of the final ZIP.
 - Codemagic host tests compile/pass under the pinned .NET SDK.
 - Native-link preflight passes before iOS publish.
-- IPA verifier reports the Step 38.0 UI identity.
+- IPA verifier reports the Step 38.0.1 UI identity.
 - Existing `ios-canonical` NuGet/.NET/Godot/iOS caches remain enabled and unchanged.
 - Physical 0.0.159 Step-36.0.5 4/4 evidence and physical 0.0.161 Step-37.0.1 4/4 evidence are preserved in history.
 - Step38 Gate A uses read-only Cecil against the exact selected compatibility image and rejects `_EnterTree` reachability into later startup/deferred boundaries.

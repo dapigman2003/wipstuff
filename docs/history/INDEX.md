@@ -358,3 +358,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-37.0.1-PHYSICAL-COMPLETE-0.0.161-LAST-CHECKPOINT.txt` — final durable Step-37 checkpoint confirming normal teardown.
 - `reports/STEP-37.0.1-PHYSICAL-COMPLETE-0.0.161-REPORT.txt` — **Step 37.0.1 COMPLETE 4/4**: real `NGame` hierarchy instantiated off-tree with inert FMOD placeholders and no native escape.
 - `steps/STEP-38.0-CONTROLLED-NGAME-ENTERTREE.md` — 0.0.162 maps the exact NGame lifecycle call graph and, only if `_EnterTree` is isolated from later startup/deferred methods, invokes `_EnterTree` once on a fresh off-tree NGame before confinement/release.
+
+## Step 38.0 Gate-A resolver failure / Step 38.0.1 correction
+
+- `reports/STEP-38.0-PHYSICAL-GATE-A-CECIL-GODOTSHARP-RESOLUTION-FAILURE-0.0.162-CHECKPOINT.txt` — physical 0.0.162 stopped in Gate A before lifecycle execution because Cecil's immediate/default reader attempted to resolve GodotSharp.
+- `reports/STEP-38.0-PHYSICAL-GATE-A-CECIL-GODOTSHARP-RESOLUTION-FAILURE-0.0.162-REPORT.txt` — final 0/4 report for that pre-runtime failure.
+- `reports/STEP-38.0-PHYSICAL-GATE-A-CECIL-GODOTSHARP-RESOLUTION-FAILURE-0.0.162-LAST-CHECKPOINT.txt` — normal Step-38 teardown after the safe Gate-A stop.
+- `steps/STEP-38.0.1-DEFERRED-CECIL-METADATA-READ-CORRECTION.md` — 0.0.163 switches only the lifecycle audit to deferred metadata-only Cecil reading with a rejecting resolver and requires zero external resolution requests.

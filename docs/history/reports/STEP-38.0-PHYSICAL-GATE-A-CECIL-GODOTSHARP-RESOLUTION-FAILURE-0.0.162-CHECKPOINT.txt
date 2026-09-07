@@ -1,0 +1,16 @@
+StS2 Launcher — Step 38.0 controlled NGame._EnterTree checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3
+Initialized UTC: 2026-09-07T22:49:28.1188140+00:00
+Process ID: 79952
+App version: 0.0.162 (162)
+Candidate: STEP 38.0 — LIFECYCLE STATIC MAP + OFF-TREE NGAME REINSTANTIATION + DIRECT _ENTERTREE ONCE + CONFINEMENT/RELEASE
+Prerequisite: same-process Step-37.0.1 4/4 authority; AddChild/_Ready/_ExitTree/GameStartup/InitializePlatform/main-menu/ExecuteDeferred/Steam/native GDExtensions remain forbidden.
+
+2026-09-07T22:49:28.1267900+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=1 | RUN_TELEMETRY_READY — Step38 run journal created and durably flushed before Gate A.
+2026-09-07T22:49:28.1297560+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=1 | RUN_START — Step 38.0 controlled NGame._EnterTree experiment started after same-process Step-37.0.1 4/4 closure.
+2026-09-07T22:49:28.1422380+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=1 | H_A_ENTRY — Step-37.0.1 4/4 same-process authority present; opening exact selected sts2 compatibility image read-only with Cecil; path=/var/mobile/Containers/Data/Application/2316E991-EC05-4E29-AAD8-E947B56E3177/Documents/StS2Launcher/Step35-ExecuteVeryEarlyDiagnostic/sts2.step36.0.3.model-bootstrap.dll; sha256=e9eea7be01d1c7bc77371b43c24b7c60e599c660c6541bde65772ff8c400092d. No lifecycle method is invoked in Gate A.
+2026-09-07T22:49:28.1991670+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=1 | H_A_FAIL — stage=NGame lifecycle Cecil map; Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null'
+2026-09-07T22:49:28.2005580+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=1 | RUN_FINALLY_ENTER — Step-38 managed control reached finally; managedThread=1; isMain=True.
+2026-09-07T22:49:28.2015980+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=16 | RUN_NORMAL_REPORT_RETURNED — Step38 report writer returned.
+2026-09-07T22:49:28.2032830+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=16 | RUN_END — Step-38 UI operation ended normally after explicit teardown.

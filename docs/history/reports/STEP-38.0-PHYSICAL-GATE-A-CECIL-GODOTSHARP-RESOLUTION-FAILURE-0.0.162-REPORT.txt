@@ -1,0 +1,23 @@
+StS2 Launcher — Step 38.0 Controlled NGame _EnterTree Entry
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-07T22:49:28.2009120+00:00
+
+RESULT
+STEP 38.0 CONTROLLED NGAME _ENTERTREE ENTRY FAIL — 0/4
+
+METADATA
+App version: 0.0.162 (162)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: NGame lifecycle Cecil map
+AssemblyResolutionException: Failed to resolve assembly: 'GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null'
+
+END OF REPORT

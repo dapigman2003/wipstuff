@@ -17,7 +17,7 @@ public sealed class TransformedRealStS2GameLifecycleEntryTests
 
         var snapshot = gates.Snapshot();
         Assert.IsTrue(snapshot.Passed);
-        Assert.AreEqual("STEP 38.0 CONTROLLED NGAME _ENTERTREE ENTRY COMPLETE — 4/4", snapshot.Summary);
+        Assert.AreEqual("STEP 38.0.1 CONTROLLED NGAME _ENTERTREE ENTRY COMPLETE — 4/4", snapshot.Summary);
         Assert.AreEqual(4, snapshot.Gates.Count);
     }
 

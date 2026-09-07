@@ -1,0 +1,6 @@
+StS2 Launcher — Step 38 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3
+Journal: Step38-CrashCheckpoint-20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3.txt
+Static map: Step38-NGameLifecycle-StaticMap-20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3.txt
+2026-09-07T22:49:28.2032830+00:00 | run=20260907T2249281188140Z-pid79952-94612d4964104da7b5ad8ff53a3721c3 | pid=79952 | managedThread=16 | RUN_END — Step-38 UI operation ended normally after explicit teardown.

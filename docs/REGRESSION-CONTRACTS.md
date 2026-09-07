@@ -518,7 +518,7 @@ Physical 0.0.155 proves the Step-36 game-resource handoff: exact receipt-backed 
 - AddChild, GameStartup, LaunchMainMenu, ExecuteDeferred, Steam initialization, and native FMOD/Spine/Sentry loading remain forbidden.
 - Proprietary native reference binaries must never be copied into the source/release archive.
 
-## Step 38.0 controlled NGame `_EnterTree` contracts
+## Step 38.0.1 controlled NGame `_EnterTree` contracts
 
 - Physical Step 37.0.1 / 0.0.161 4/4 is prerequisite authority; historical reports cannot substitute for same-process closure.
 - Gate A re-verifies the exact selected ModelDb-bootstrap compatibility image and Cecil-maps `NGame._EnterTree`, `_Ready`, `GameStartupWrapper`, `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, and `LoadDeferredStartupAssetsAsync` before any lifecycle execution.
