@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 37.0 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE";
+        "STEP 37.0.1 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE";
 
     public const string MilestoneLine =
         "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 28–34 CLOSED POSITIVE • STEP 35 CLOSED POSITIVE • STEP 36 CLOSED POSITIVE 4/4 • STEP 37 OPEN — CONTROLLED OFF-TREE GAME-SCENE ADMISSION";
 
     public const string Summary =
-        "Physical 0.0.159 closed Step 36.0.5 at 4/4: the dependency-aware ModelDb authority completed unchanged ExecuteEssential state 1→2, including ModelIdSerializationCache.Init, ModelDb.InitIds, MessageTypes.Initialize, and ActionTypes.Initialize, with final OfflineReady 428/428 and zero initializer-bearing/rejected/native escape. Step 37.0 freezes that authority and admits only a sealed game.tscn copy. The exact PCK scene is pinned at 10,414 bytes / SHA-256 aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8 / MD5 dc9a89798eb1bb38e23563866e746ac5. Exactly three copied-scene compatibility edits neutralize FmodBankLoader/FmodListener2D before PackedScene load and off-tree instantiation.";
+        "Physical 0.0.159 closed Step 36.0.5 at 4/4: the dependency-aware ModelDb authority completed unchanged ExecuteEssential state 1→2, including ModelIdSerializationCache.Init, ModelDb.InitIds, MessageTypes.Initialize, and ActionTypes.Initialize, with final OfflineReady 428/428 and zero initializer-bearing/rejected/native escape. Codemagic 0.0.160 stopped before iOS publish on one Gate-D C# interpolation parser error; 0.0.161 corrects only that syntax. Step 37.0.1 freezes the proven authority and admits only a sealed game.tscn copy. The exact PCK scene is pinned at 10,414 bytes / SHA-256 aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8 / MD5 dc9a89798eb1bb38e23563866e746ac5. Exactly three copied-scene compatibility edits neutralize FmodBankLoader/FmodListener2D before PackedScene load and off-tree instantiation.";
 
     public const string InitialStatus =
-        "Status: Step 36.0.5 is physically closed 4/4 on 0.0.159. For 0.0.160 use a fresh process: Step 15 A-C → Step 35.0.32 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0 once. Step 37 extracts and seals game.tscn from the already verified PCK, prepares a private three-edit FMOD-neutral copy, loads it as PackedScene, and instantiates it off-tree only. SceneTree insertion, NGame.GameStartup, LaunchMainMenu, ExecuteDeferred, Steam initialization, FMOD/Spine/Sentry native GDExtensions, and gameplay remain forbidden.";
+        "Status: Step 36.0.5 is physically closed 4/4 on 0.0.159. For 0.0.161 use a fresh process: Step 15 A-C → Step 35.0.32 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 once. Step 37 extracts and seals game.tscn from the already verified PCK, prepares a private three-edit FMOD-neutral copy, loads it as PackedScene, and instantiates it off-tree only. SceneTree insertion, NGame.GameStartup, LaunchMainMenu, ExecuteDeferred, Steam initialization, FMOD/Spine/Sentry native GDExtensions, and gameplay remain forbidden.";
 
-    public const string ExpectedDisplayVersion = "0.0.160";
-    public const string ExpectedBuildVersion = "160";
+    public const string ExpectedDisplayVersion = "0.0.161";
+    public const string ExpectedBuildVersion = "161";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =

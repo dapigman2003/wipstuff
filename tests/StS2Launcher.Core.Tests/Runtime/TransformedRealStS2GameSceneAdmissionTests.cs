@@ -17,7 +17,7 @@ public sealed class TransformedRealStS2GameSceneAdmissionTests
 
         var snapshot = gates.Snapshot();
         Assert.IsTrue(snapshot.Passed);
-        Assert.AreEqual("STEP 37.0 CONTROLLED GAME-SCENE ADMISSION COMPLETE — 4/4", snapshot.Summary);
+        Assert.AreEqual("STEP 37.0.1 CONTROLLED GAME-SCENE ADMISSION COMPLETE — 4/4", snapshot.Summary);
         Assert.AreEqual(4, snapshot.Gates.Count);
     }
 

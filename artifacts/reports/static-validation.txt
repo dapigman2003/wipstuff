@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-07T05:34:41Z
+UTC: 2026-09-07T19:17:29Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,8 +10,8 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 37.0 Controlled Game-Scene Admission validation
-Root: /mnt/data/StS2Launcher-Step37-0.0.160
+StS2 Launcher — Step 37.0.1 Controlled Game-Scene Admission validation
+Root: /mnt/data/StS2Launcher-Step37-0.0.161
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 251 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 160
-PASS: display version is 0.0.160
-PASS: Info.plist build version is 160
-PASS: Info.plist display version is 0.0.160
+PASS: build version is 161
+PASS: display version is 0.0.161
+PASS: Info.plist build version is 161
+PASS: Info.plist display version is 0.0.161
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,7 +32,7 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 37.0 controlled game-scene admission candidate
+PASS: top launcher banner identifies active Step 37.0.1 controlled game-scene admission candidate
 PASS: top launcher banner records physical Step-36 closure and the sealed Step-37 scene boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: Step 37 source pins expected bundle release identity
@@ -606,6 +606,8 @@ PASS: Step 36 host regressions pin gate order and exact ExecuteEssential authori
 PASS: Step 36 MSTest v4 regressions avoid removed ThrowsException APIs
 PASS: RootViewController wires Step 36 controls into the active device surface
 PASS: release presentation pins the Step-36 ModelDb-bootstrap compatibility boundary and unchanged full ExecuteEssential objective
+PASS: Step 37.0.1 uses valid C# string.Join syntax in Gate-D checkpoint interpolation
+PASS: Step 37.0.1 removes the 0.0.160 escaped-quote interpolation compile failure
 PASS: Step 37 game-scene core exists
 PASS: Step 37 gate enum exists
 PASS: Step 37 gate result exists
@@ -831,8 +833,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status records physical Step-36 closure and the active sealed Step-37 off-tree scene boundary
-PASS: testing and release-checklist docs pin the exact 0.0.160 (160) release identity
+PASS: current status records physical Step-36 closure, the 0.0.160 pre-publish compile stop, and the active sealed Step-37 off-tree scene boundary
+PASS: testing and release-checklist docs pin the exact 0.0.161 (161) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -958,7 +960,7 @@ PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.i
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
 PASS: host-test report heading identifies Step 37
 PASS: host-test TRX artifact identifies Step 37
-PASS: Codemagic build-environment report heading identifies the Step 37.0 candidate
+PASS: Codemagic build-environment report heading identifies the Step 37.0.1 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -969,7 +971,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step-37.0 candidate
+PASS: IPA verifier advertises the active Step-37.0.1 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -995,4 +997,4 @@ PASS: Step 37 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 981 checks
+VALIDATION PASS: 983 checks

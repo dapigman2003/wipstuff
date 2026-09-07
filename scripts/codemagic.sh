@@ -46,7 +46,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 37.0 Controlled Game-Scene Admission build environment"
+  echo "StS2 Launcher — Step 37.0.1 Controlled Game-Scene Admission build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -125,7 +125,7 @@ IPA_VERIFY_SECONDS="$(elapsed_seconds "$IPA_VERIFY_START_EPOCH")"
 TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
 
 {
-  echo "StS2 Launcher iOS — Step 37.0 Controlled Game-Scene Admission"
+  echo "StS2 Launcher iOS — Step 37.0.1 Controlled Game-Scene Admission"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"

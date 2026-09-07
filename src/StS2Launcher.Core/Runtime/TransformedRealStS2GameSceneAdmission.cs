@@ -6,7 +6,7 @@ using System.Text;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 37.0 boundary. Requires a same-process Step-36.0.5 4/4 closure, reuses the exact mounted PCK and
+/// Step 37.0.1 boundary. Requires a same-process Step-36.0.5 4/4 closure, reuses the exact mounted PCK and
 /// physically proven private sts2/GodotSharp authority, extracts the sealed game.tscn bytes directly from
 /// the receipt-backed PCK, prepares a copied FMOD-neutral scene derivative, then loads and instantiates that
 /// derivative off-tree. It intentionally does not add the instance to the SceneTree, call NGame.GameStartup,
@@ -37,7 +37,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     public string GetVerifiedGameSceneStaticMap()
         => _gameScenePreflight?.StaticMap
-           ?? throw new InvalidOperationException("Step 37.0 Gate A has not produced a verified game-scene static map.");
+           ?? throw new InvalidOperationException("Step 37.0.1 Gate A has not produced a verified game-scene static map.");
 
     private void ResetStep37State()
     {
@@ -87,7 +87,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 !sourceMd5.Equals(ClosedGameSceneMd5, StringComparison.OrdinalIgnoreCase))
             {
                 throw new InvalidDataException(
-                    $"Step 37.0 sealed game.tscn drifted. bytes={extracted.Bytes.Length}; sha256={sourceSha256}; md5={sourceMd5}.");
+                    $"Step 37.0.1 sealed game.tscn drifted. bytes={extracted.Bytes.Length}; sha256={sourceSha256}; md5={sourceMd5}.");
             }
 
             stage = "sealed game.tscn structural audit";
@@ -101,7 +101,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (sourceText.Contains("SpineSprite", StringComparison.Ordinal) ||
                 sourceText.Contains(".gdextension", StringComparison.Ordinal))
             {
-                throw new InvalidDataException("Step 37.0 sealed game.tscn unexpectedly contains a direct SpineSprite or GDExtension declaration.");
+                throw new InvalidDataException("Step 37.0.1 sealed game.tscn unexpectedly contains a direct SpineSprite or GDExtension declaration.");
             }
 
             var staticMap = BuildGameSceneStaticMap(extracted, sourceSha256, sourceMd5, sourceText);
@@ -172,7 +172,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 derivativeText.Contains("type=\"FmodListener2D\"", StringComparison.Ordinal) ||
                 derivativeText.Contains("bank_paths =", StringComparison.Ordinal))
             {
-                throw new InvalidDataException("Step 37.0 FMOD-neutral derivative retained a forbidden custom FMOD node type or bank_paths property.");
+                throw new InvalidDataException("Step 37.0.1 FMOD-neutral derivative retained a forbidden custom FMOD node type or bank_paths property.");
             }
 
             foreach (var preserved in new[]
@@ -196,7 +196,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             File.WriteAllBytes(derivativePath, derivativeBytes);
             var immediate = File.ReadAllBytes(derivativePath);
             if (!immediate.AsSpan().SequenceEqual(derivativeBytes))
-                throw new IOException("Step 37.0 derivative immediate readback did not match the bytes just written.");
+                throw new IOException("Step 37.0.1 derivative immediate readback did not match the bytes just written.");
             var derivativeSha256 = Convert.ToHexString(SHA256.HashData(immediate)).ToLowerInvariant();
 
             _gameSceneDerivative = new GameSceneDerivativeSnapshot(
@@ -237,10 +237,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep37Prerequisite("Step 37 Gate C entry");
             var derivative = RequireGameSceneDerivative();
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0 requires the exact prepared GodotSharp bridge.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0.1 requires the exact prepared GodotSharp bridge.");
             var godotAssembly = handoff.GodotSharpAssembly;
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotAssembly), context))
-                throw new InvalidDataException("Step 37.0 GodotSharp left the exact Step-35/36 private context before scene loading.");
+                throw new InvalidDataException("Step 37.0.1 GodotSharp left the exact Step-35/36 private context before scene loading.");
 
             var initializerBefore = context.InitializerBearingRequests.Count;
             var rejectedBefore = context.RejectedManagedRequests.Count;
@@ -281,18 +281,18 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
                 throw new InvalidOperationException(
-                    $"Step 37.0 ResourceLoader.Load threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
+                    $"Step 37.0.1 ResourceLoader.Load threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
                     ex.InnerException);
             }
 
             if (loaded is null || !packedSceneType.IsInstanceOfType(loaded))
-                throw new InvalidDataException($"Step 37.0 ResourceLoader.Load did not return Godot.PackedScene; observed {loaded?.GetType().FullName ?? "<null>"}.");
+                throw new InvalidDataException($"Step 37.0.1 ResourceLoader.Load did not return Godot.PackedScene; observed {loaded?.GetType().FullName ?? "<null>"}.");
 
             var canInstantiate = packedSceneType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .SingleOrDefault(method => method.Name == "CanInstantiate" && method.GetParameters().Length == 0 && method.ReturnType == typeof(bool))
                 ?? throw new MissingMethodException("Godot.PackedScene", "CanInstantiate()");
             if (canInstantiate.Invoke(loaded, null) is not true)
-                throw new InvalidDataException("Step 37.0 loaded PackedScene reports CanInstantiate=false.");
+                throw new InvalidDataException("Step 37.0.1 loaded PackedScene reports CanInstantiate=false.");
 
             RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Gate C");
             _gameScenePackedResource = new GameScenePackedResourceSnapshot(
@@ -333,7 +333,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep37Prerequisite("Step 37 Gate D entry");
             var packed = RequireGameScenePackedResource();
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0 exact GodotSharp handoff disappeared.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0.1 exact GodotSharp handoff disappeared.");
             var godotAssembly = handoff.GodotSharpAssembly;
             var packedSceneType = godotAssembly.GetType("Godot.PackedScene", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.PackedScene");
@@ -366,25 +366,25 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
                 throw new InvalidOperationException(
-                    $"Step 37.0 PackedScene.Instantiate threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
+                    $"Step 37.0.1 PackedScene.Instantiate threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
                     ex.InnerException);
             }
 
             if (instance is null || !nodeType.IsInstanceOfType(instance))
-                throw new InvalidDataException($"Step 37.0 PackedScene.Instantiate did not return Godot.Node; observed {instance?.GetType().FullName ?? "<null>"}.");
+                throw new InvalidDataException($"Step 37.0.1 PackedScene.Instantiate did not return Godot.Node; observed {instance?.GetType().FullName ?? "<null>"}.");
 
             stage = "off-tree root identity and hierarchy audit";
             var rootType = instance.GetType().FullName ?? "<unknown>";
             if (!string.Equals(rootType, "MegaCrit.Sts2.Core.Nodes.NGame", StringComparison.Ordinal))
-                throw new InvalidDataException($"Step 37.0 expected managed root type MegaCrit.Sts2.Core.Nodes.NGame; observed {rootType}.");
+                throw new InvalidDataException($"Step 37.0.1 expected managed root type MegaCrit.Sts2.Core.Nodes.NGame; observed {rootType}.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(instance.GetType().Assembly), context))
-                throw new InvalidDataException("Step 37.0 NGame instance is not owned by the exact Step-35/36 private load context.");
+                throw new InvalidDataException("Step 37.0.1 NGame instance is not owned by the exact Step-35/36 private load context.");
 
             var isInsideTree = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .SingleOrDefault(method => method.Name == "IsInsideTree" && method.GetParameters().Length == 0 && method.ReturnType == typeof(bool))
                 ?? throw new MissingMethodException(rootType, "IsInsideTree()");
             if (isInsideTree.Invoke(instance, null) is not false)
-                throw new InvalidDataException("Step 37.0 off-tree NGame instance unexpectedly reports IsInsideTree=true.");
+                throw new InvalidDataException("Step 37.0.1 off-tree NGame instance unexpectedly reports IsInsideTree=true.");
 
             var children = new[]
             {
@@ -412,21 +412,21 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             foreach (var (name, expectedType) in children)
             {
                 var child = findChild.Invoke(instance, new object?[] { name, true, false })
-                    ?? throw new InvalidDataException($"Step 37.0 off-tree NGame did not contain expected child {name}.");
+                    ?? throw new InvalidDataException($"Step 37.0.1 off-tree NGame did not contain expected child {name}.");
                 var childType = child.GetType().FullName ?? "<unknown>";
                 observedChildren.Add($"{name}={childType}");
                 if (!string.Equals(childType, expectedType, StringComparison.Ordinal))
-                    throw new InvalidDataException($"Step 37.0 child {name} type drifted: expected {expectedType}; observed {childType}.");
+                    throw new InvalidDataException($"Step 37.0.1 child {name} type drifted: expected {expectedType}; observed {childType}.");
             }
 
             RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Gate D");
             var state = ReadOneTimeInitializationState(RequireEssentialBinding().StateField);
             if (state != ExpectedStateAfterEssential)
-                throw new InvalidDataException($"Step 37.0 OneTimeInitialization state drifted during off-tree instantiation: expected {ExpectedStateAfterEssential}; observed {state}.");
+                throw new InvalidDataException($"Step 37.0.1 OneTimeInitialization state drifted during off-tree instantiation: expected {ExpectedStateAfterEssential}; observed {state}.");
 
-            Checkpoint(checkpoint, $"G_D_PASS — off-tree NGame instantiated; rootType={rootType}; insideTree=False; children={string.Join(\",\", observedChildren)}; resolverDelta={context.ManagedResolverRequests.Count - resolverBefore}; hostDelta={context.HostLoads.Count - hostBefore}; privateDelta={context.PrivateLoads.Count - privateBefore}; initializerDelta=0; rejectedDelta=0; nativeDelta=0; state={state}; AddChild/GameStartup/main-menu/ExecuteDeferred not invoked.");
+            Checkpoint(checkpoint, $"G_D_PASS — off-tree NGame instantiated; rootType={rootType}; insideTree=False; children={string.Join(",", observedChildren)}; resolverDelta={context.ManagedResolverRequests.Count - resolverBefore}; hostDelta={context.HostLoads.Count - hostBefore}; privateDelta={context.PrivateLoads.Count - privateBefore}; initializerDelta=0; rejectedDelta=0; nativeDelta=0; state={state}; AddChild/GameStartup/main-menu/ExecuteDeferred not invoked.");
             return GameScenePass(gate,
-                "STEP 37.0 OFF-TREE GAME-SCENE INSTANTIATION PASSED.\n" +
+                "STEP 37.0.1 OFF-TREE GAME-SCENE INSTANTIATION PASSED.\n" +
                 $"Root managed type: {rootType}\n" +
                 "Root inside SceneTree: FALSE\n" +
                 $"Expected hierarchy: {string.Join(" | ", observedChildren)}\n" +
@@ -484,16 +484,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
 
     private Step37BaselineSnapshot RequireStep37Baseline()
-        => _step37Baseline ?? throw new InvalidOperationException("Step 37.0 baseline is absent.");
+        => _step37Baseline ?? throw new InvalidOperationException("Step 37.0.1 baseline is absent.");
 
     private GameScenePreflightSnapshot RequireGameScenePreflight()
-        => _gameScenePreflight ?? throw new InvalidOperationException("Step 37.0 Gate A must pass before Gate B.");
+        => _gameScenePreflight ?? throw new InvalidOperationException("Step 37.0.1 Gate A must pass before Gate B.");
 
     private GameSceneDerivativeSnapshot RequireGameSceneDerivative()
-        => _gameSceneDerivative ?? throw new InvalidOperationException("Step 37.0 Gate B must pass before Gate C.");
+        => _gameSceneDerivative ?? throw new InvalidOperationException("Step 37.0.1 Gate B must pass before Gate C.");
 
     private GameScenePackedResourceSnapshot RequireGameScenePackedResource()
-        => _gameScenePackedResource ?? throw new InvalidOperationException("Step 37.0 Gate C must pass before Gate D.");
+        => _gameScenePackedResource ?? throw new InvalidOperationException("Step 37.0.1 Gate C must pass before Gate D.");
 
     private void RequireStep37BaselineUnchanged(Step35ExecutionLoadContext context, string boundary)
     {
@@ -505,7 +505,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             context.RejectedManagedRequests.Count != 0 ||
             context.NativeLoadAttempts.Count != 0)
         {
-            throw new InvalidDataException($"Step 37.0 Step-36 closure baseline changed before authorized scene work at {boundary}. {context.FormatResolverState()}");
+            throw new InvalidDataException($"Step 37.0.1 Step-36 closure baseline changed before authorized scene work at {boundary}. {context.FormatResolverState()}");
         }
 
         VerifyFileLength(baseline.PackAbsolutePath, baseline.PackLength, "Step-37 receipt-backed game PCK");
@@ -532,7 +532,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
         var magic = reader.ReadUInt32();
         if (magic != 0x43504447)
-            throw new InvalidDataException($"Step 37.0 expected standalone Godot PCK magic 0x43504447; observed 0x{magic:X8}.");
+            throw new InvalidDataException($"Step 37.0.1 expected standalone Godot PCK magic 0x43504447; observed 0x{magic:X8}.");
         var format = reader.ReadUInt32();
         var major = reader.ReadUInt32();
         var minor = reader.ReadUInt32();
@@ -540,22 +540,22 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         var flags = reader.ReadUInt32();
         var fileBase = reader.ReadUInt64();
         if (format != ClosedPckFormat || major != ClosedPckEngineMajor || minor != ClosedPckEngineMinor || patch != ClosedPckEnginePatch || flags != ClosedPckFlags)
-            throw new InvalidDataException($"Step 37.0 PCK header drifted: format={format}; engine={major}.{minor}.{patch}; flags=0x{flags:X8}.");
+            throw new InvalidDataException($"Step 37.0.1 PCK header drifted: format={format}; engine={major}.{minor}.{patch}; flags=0x{flags:X8}.");
 
         var directoryOffset = reader.ReadUInt64();
         if (directoryOffset >= (ulong)stream.Length)
-            throw new InvalidDataException($"Step 37.0 PCK directory offset {directoryOffset} exceeds file length {stream.Length}.");
+            throw new InvalidDataException($"Step 37.0.1 PCK directory offset {directoryOffset} exceeds file length {stream.Length}.");
         stream.Seek(checked((long)directoryOffset), SeekOrigin.Begin);
         var count = reader.ReadUInt32();
         if (count != ClosedPckDirectoryEntries)
-            throw new InvalidDataException($"Step 37.0 PCK directory entry count drifted: expected {ClosedPckDirectoryEntries}; observed {count}.");
+            throw new InvalidDataException($"Step 37.0.1 PCK directory entry count drifted: expected {ClosedPckDirectoryEntries}; observed {count}.");
 
         PckDirectoryEntry? match = null;
         for (var i = 0u; i < count; i++)
         {
             var pathLength = reader.ReadUInt32();
             if (pathLength == 0 || pathLength > 1_048_576)
-                throw new InvalidDataException($"Step 37.0 PCK directory path length is invalid at entry {i}: {pathLength}.");
+                throw new InvalidDataException($"Step 37.0.1 PCK directory path length is invalid at entry {i}: {pathLength}.");
             var pathBytes = ReadExactlyStep37(reader, checked((int)pathLength));
             var storedPath = Encoding.UTF8.GetString(pathBytes).TrimEnd('\0').Replace('\\', '/');
             var offset = reader.ReadUInt64();
@@ -566,26 +566,26 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (string.Equals(normalized, GameSceneResourcePath, StringComparison.Ordinal))
             {
                 if (match is not null)
-                    throw new InvalidDataException($"Step 37.0 found duplicate PCK entries for {GameSceneResourcePath}.");
+                    throw new InvalidDataException($"Step 37.0.1 found duplicate PCK entries for {GameSceneResourcePath}.");
                 match = new PckDirectoryEntry(normalized, offset, size, md5, entryFlags);
             }
         }
 
-        var entry = match ?? throw new FileNotFoundException($"Step 37.0 did not find {GameSceneResourcePath} in the exact receipt-backed PCK.");
+        var entry = match ?? throw new FileNotFoundException($"Step 37.0.1 did not find {GameSceneResourcePath} in the exact receipt-backed PCK.");
         if ((entry.Flags & 1u) != 0)
-            throw new InvalidDataException("Step 37.0 sealed game.tscn PCK entry is encrypted; refusing to treat ciphertext as scene authority.");
+            throw new InvalidDataException("Step 37.0.1 sealed game.tscn PCK entry is encrypted; refusing to treat ciphertext as scene authority.");
         if (entry.Size != ClosedGameSceneBytes)
-            throw new InvalidDataException($"Step 37.0 game.tscn PCK entry size drifted: expected {ClosedGameSceneBytes}; observed {entry.Size}.");
+            throw new InvalidDataException($"Step 37.0.1 game.tscn PCK entry size drifted: expected {ClosedGameSceneBytes}; observed {entry.Size}.");
 
         var absoluteOffset = checked(fileBase + entry.Offset);
         if (absoluteOffset + entry.Size > (ulong)stream.Length)
-            throw new InvalidDataException("Step 37.0 game.tscn PCK entry points beyond the receipt-backed PCK.");
+            throw new InvalidDataException("Step 37.0.1 game.tscn PCK entry points beyond the receipt-backed PCK.");
         stream.Seek(checked((long)absoluteOffset), SeekOrigin.Begin);
         var bytes = ReadExactlyStep37(reader, checked((int)entry.Size));
         var pckMd5 = Convert.ToHexString(entry.Md5).ToLowerInvariant();
         var actualMd5 = Convert.ToHexString(MD5.HashData(bytes)).ToLowerInvariant();
         if (!pckMd5.Equals(actualMd5, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException($"Step 37.0 game.tscn PCK MD5 verification failed: directory={pckMd5}; actual={actualMd5}.");
+            throw new InvalidDataException($"Step 37.0.1 game.tscn PCK MD5 verification failed: directory={pckMd5}; actual={actualMd5}.");
         return new ExtractedPckEntry(bytes, entry.Offset, entry.Size, pckMd5, entry.Flags, directoryOffset, fileBase, count);
     }
 
@@ -593,7 +593,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     {
         var bytes = reader.ReadBytes(count);
         if (bytes.Length != count)
-            throw new EndOfStreamException($"Step 37.0 unexpected end of PCK while reading {count} bytes.");
+            throw new EndOfStreamException($"Step 37.0.1 unexpected end of PCK while reading {count} bytes.");
         return bytes;
     }
 
@@ -610,7 +610,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                            line.StartsWith("[ext_resource ", StringComparison.Ordinal))
             .ToArray();
         return
-            "StS2 Launcher — Step 37.0 sealed game-scene static map\n" +
+            "StS2 Launcher — Step 37.0.1 sealed game-scene static map\n" +
             "Read-only evidence from exact receipt-backed PCK bytes; never consumed as trusted runtime input.\n" +
             $"Resource: {GameSceneResourcePath}\n" +
             $"Bytes: {extracted.Bytes.Length}\n" +
@@ -635,7 +635,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             index += value.Length;
         }
         if (count != expected)
-            throw new InvalidDataException($"Step 37.0 expected {expected} occurrence(s) of {label}; observed {count}.");
+            throw new InvalidDataException($"Step 37.0.1 expected {expected} occurrence(s) of {label}; observed {count}.");
     }
 
     private static string ReplaceExactlyOnce(string text, string oldValue, string newValue, string label)
@@ -653,7 +653,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             return normalized.Replace(withLf, string.Empty, StringComparison.Ordinal);
         if (normalized.EndsWith(line, StringComparison.Ordinal))
             return normalized[..^line.Length];
-        throw new InvalidDataException($"Step 37.0 could not remove the exact {label} line.");
+        throw new InvalidDataException($"Step 37.0.1 could not remove the exact {label} line.");
     }
 
     private static TransformedRealStS2GameSceneAdmissionGateResult GameScenePass(

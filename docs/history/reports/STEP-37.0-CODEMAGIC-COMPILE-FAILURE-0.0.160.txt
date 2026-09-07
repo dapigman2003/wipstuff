@@ -1,0 +1,53 @@
+StS2 Launcher — Step 37 canonical host regression tests
+UTC: 2026-09-07T05:52:16Z
+.NET: 9.0.314
+Building active external managed fixtures once for host tests and later IPA packaging...
+  Determining projects to restore...
+  Restored /Users/builder/clone/fixtures/StS2Launcher.Step20.DynamicFixture/StS2Launcher.Step20.DynamicFixture.csproj (in 40 ms).
+  StS2Launcher.Step20.DynamicFixture -> /Users/builder/clone/fixtures/StS2Launcher.Step20.DynamicFixture/bin/Release/net9.0/StS2Launcher.Step20.DynamicFixture.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.24
+  Determining projects to restore...
+  Restored /Users/builder/clone/fixtures/StS2Launcher.Step20.DependencyFixture/StS2Launcher.Step20.DependencyFixture.csproj (in 32 ms).
+  StS2Launcher.Step20.DependencyFixture -> /Users/builder/clone/fixtures/StS2Launcher.Step20.DependencyFixture/bin/Release/net9.0/StS2Launcher.Step20.DependencyFixture.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.66
+  Determining projects to restore...
+  Restored /Users/builder/clone/fixtures/StS2Launcher.Step20.RootFixture/StS2Launcher.Step20.RootFixture.csproj (in 62 ms).
+  1 of 2 projects are up-to-date for restore.
+  StS2Launcher.Step20.DependencyFixture -> /Users/builder/clone/fixtures/StS2Launcher.Step20.DependencyFixture/bin/Release/net9.0/StS2Launcher.Step20.DependencyFixture.dll
+  StS2Launcher.Step20.RootFixture -> /Users/builder/clone/fixtures/StS2Launcher.Step20.RootFixture/bin/Release/net9.0/StS2Launcher.Step20.RootFixture.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.01
+  Determining projects to restore...
+  Restored /Users/builder/clone/fixtures/StS2Launcher.Step28.AheadOfLoadFixture/StS2Launcher.Step28.AheadOfLoadFixture.csproj (in 45 ms).
+  StS2Launcher.Step28.AheadOfLoadFixture -> /Users/builder/clone/fixtures/StS2Launcher.Step28.AheadOfLoadFixture/bin/Release/net9.0/StS2Launcher.Step28.AheadOfLoadFixture.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.89
+  Determining projects to restore...
+  Restored /Users/builder/clone/fixtures/StS2Launcher.Step16.Fixture/StS2Launcher.Step16.Fixture.csproj (in 52 ms).
+  Restored /Users/builder/clone/src/StS2Launcher.Core/StS2Launcher.Core.csproj (in 389 ms).
+  Restored /Users/builder/clone/tests/StS2Launcher.Core.Tests/StS2Launcher.Core.Tests.csproj (in 403 ms).
+  StS2Launcher.Step16.Fixture -> /Users/builder/clone/fixtures/StS2Launcher.Step16.Fixture/bin/Release/net9.0/StS2Launcher.Step16.Fixture.dll
+/Users/builder/clone/src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs(443,9): error CS1039: Unterminated string literal [/Users/builder/clone/src/StS2Launcher.Core/StS2Launcher.Core.csproj]
+/Users/builder/clone/src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs(427,127): error CS1073: Unexpected token ';' [/Users/builder/clone/src/StS2Launcher.Core/StS2Launcher.Core.csproj]
+/Users/builder/clone/src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs(427,139): error CS1056: Unexpected character '\' [/Users/builder/clone/src/StS2Launcher.Core/StS2Launcher.Core.csproj]
+/Users/builder/clone/src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs(443,10): error CS1026: ) expected [/Users/builder/clone/src/StS2Launcher.Core/StS2Launcher.Core.csproj]
+/Users/builder/clone/src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs(443,10): error CS1002: ; expected [/Users/builder/clone/src/StS2Launcher.Core/StS2Launcher.Core.csproj]
+/Users/builder/clone/src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs(443,10): error CS1513: } expected [/Users/builder/clone/src/StS2Launcher.Core/StS2Launcher.Core.csproj]

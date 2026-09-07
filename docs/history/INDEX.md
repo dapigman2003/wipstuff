@@ -344,3 +344,9 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-37.0-NATIVE-REFERENCE-ABI-AUDIT.md` — analysis-only hashes/platforms/class-surface findings for user-provided macOS FMOD/Spine reference binaries; no native binary is included or authorized for iOS loading.
 - `steps/STEP-37.0-CONTROLLED-GAME-SCENE-ADMISSION.md` — 0.0.160 freezes physical Step-36 closure, seals exact `res://scenes/game.tscn`, prepares exactly one three-edit FMOD-neutral private copy, loads it as PackedScene, and instantiates it off-tree only.
+
+## Step 37.0.1 C# interpolation compile correction
+
+- `steps/STEP-37.0.1-CSHARP-INTERPOLATION-COMPILE-CORRECTION.md` — 0.0.161 fixes the single Gate-D `string.Join` interpolation syntax error that stopped 0.0.160 during Codemagic host compilation; Step-37 runtime semantics are unchanged.
+- `reports/STEP-37.0-CODEMAGIC-COMPILE-FAILURE-0.0.160.txt` — authoritative Codemagic compiler output for the pre-iOS-publish 0.0.160 failure.
+- `reports/STEP-37.0-CODEMAGIC-CACHE-STATE-0.0.160.txt` — cache evidence showing NuGet, Godot, pinned .NET/workloads, and iOS arm64 obj caches were restored/present.

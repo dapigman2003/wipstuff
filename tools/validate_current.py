@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 37.0 Controlled Game-Scene Admission validation")
+print("StS2 Launcher — Step 37.0.1 Controlled Game-Scene Admission validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>160</ApplicationVersion>" in project_text, "build version is 160")
-require("<ApplicationDisplayVersion>0.0.160</ApplicationDisplayVersion>" in project_text, "display version is 0.0.160")
-require(plist.get("CFBundleVersion") == "160", "Info.plist build version is 160")
-require(plist.get("CFBundleShortVersionString") == "0.0.160", "Info.plist display version is 0.0.160")
+require("<ApplicationVersion>161</ApplicationVersion>" in project_text, "build version is 161")
+require("<ApplicationDisplayVersion>0.0.161</ApplicationDisplayVersion>" in project_text, "display version is 0.0.161")
+require(plist.get("CFBundleVersion") == "161", "Info.plist build version is 161")
+require(plist.get("CFBundleShortVersionString") == "0.0.161", "Info.plist display version is 0.0.161")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 37.0 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE" in release_presentation, "top launcher banner identifies active Step 37.0 controlled game-scene admission candidate")
+require("STEP 37.0.1 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE" in release_presentation, "top launcher banner identifies active Step 37.0.1 controlled game-scene admission candidate")
 require(all(marker in release_presentation for marker in ["STEP 36 CLOSED POSITIVE 4/4", "0.0.159", "ModelIdSerializationCache.Init", "ActionTypes.Initialize", "428/428", "Step37ImplementationMarker", "10,414", "aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8", "dc9a89798eb1bb38e23563866e746ac5", "FMOD-neutral", "off-tree", "ExecuteDeferred"]), "top launcher banner records physical Step-36 closure and the sealed Step-37 scene boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.160"' in release_presentation and 'ExpectedBuildVersion = "160"' in release_presentation, "Step 37 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.161"' in release_presentation and 'ExpectedBuildVersion = "161"' in release_presentation, "Step 37 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -342,8 +342,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-37.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.160",
-    "STS2_BUILD_VERSION": "160",
+    "STS2_DISPLAY_VERSION": "0.0.161",
+    "STS2_BUILD_VERSION": "161",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -696,7 +696,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Step 37.0 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-37 candidate rather than retired Step 27")
+require("Step 37.0.1 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-37 candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -1156,7 +1156,10 @@ require("AddTransformedRealStS2EssentialInitializationControls(content)" in root
 require("Step36ImplementationMarker" in release_presentation and all(marker in release_presentation for marker in ["BowlbugsNormal", "BowlbugEgg", "ModelDb", "full unchanged ExecuteEssential one-shot", "ExecuteDeferred/PrewarmJit/entry remain forbidden"]), "release presentation pins the Step-36 ModelDb-bootstrap compatibility boundary and unchanged full ExecuteEssential objective")
 
 # ---------------------------------------------------------------------------
-# Step 37.0 — controlled sealed game.tscn admission, load, and off-tree instantiate.
+# Step 37.0.1 — controlled sealed game.tscn admission, load, and off-tree instantiate.
+step37_source_text = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs")
+require('string.Join(",", observedChildren)' in step37_source_text, "Step 37.0.1 uses valid C# string.Join syntax in Gate-D checkpoint interpolation")
+require('string.Join(\\",\\", observedChildren)' not in step37_source_text, "Step 37.0.1 removes the 0.0.160 escaped-quote interpolation compile failure")
 # ---------------------------------------------------------------------------
 step37_source_path = ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmission.cs"
 step37_gate_path = ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameSceneAdmissionGate.cs"
@@ -1217,7 +1220,7 @@ require(all(marker in step37_source for marker in ['AddChild/GameStartup/main-me
 require('MarkExactStep36ClosurePassed(context)' in step36_source and 'E_D_STEP37_AUTHORITY_READY' in step36_source, "successful Step-36 Gate D explicitly hands same-process authority to Step 37")
 require(step36_source.count('ResetStep37State();') >= 2 and 'ResetStep36State();' in step35_source, "Step-35/36 resets invalidate Step-37 authority rather than allowing stale reuse")
 require(all(marker in step37_gate for marker in ['ClosedEssentialAndSealedScenePreflight = 1', 'FmodNeutralDerivativePreparation = 2', 'PackedSceneLoad = 3', 'OffTreeInstantiationAudit = 4']), "Step 37 defines exactly four ordered A-D gates")
-require('STEP 37.0 CONTROLLED GAME-SCENE ADMISSION COMPLETE — 4/4' in step37_summary, "Step 37 summary closes only at four-of-four")
+require('STEP 37.0.1 CONTROLLED GAME-SCENE ADMISSION COMPLETE — 4/4' in step37_summary, "Step 37 summary closes only at four-of-four")
 require(all(marker in step37_ui for marker in ['ExactStep36ClosurePassed', 'RunGameSceneSealedPreflight', 'RunGameSceneDerivativePreparation', 'RunGameScenePackedLoad', 'RunGameSceneOffTreeInstantiationAudit', 'Step37-CrashCheckpoint-', 'Step37-GameScene-StaticMap-', 'Step37-LastCheckpoint.txt', 'Step37-TransformedRealStS2GameSceneAdmission.txt', 'RUN_STEP37_4OF4']), "Step 37 iOS surface requires same-process Step-36 closure and emits all four-gate telemetry artifacts")
 require(all(marker in step37_tests for marker in ['GateSequenceCompletesFourOfFourInOrder', 'GateSequenceRejectsOutOfOrderAdvance', 'SealedGameSceneAuthorityConstantsArePinned', 'Step37GateOrdinalsAreStable', 'Assert.ThrowsExactly<InvalidOperationException>']), "Step 37 host regressions pin gate order and exact sealed scene/PCK constants using MSTest v4 APIs")
 require('AddTransformedRealStS2GameSceneAdmissionControls(content)' in root_ui_text, "RootViewController wires Step 37 controls into the active device surface")
@@ -1466,10 +1469,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 37.0 / 0.0.160 (160)", "Physical **0.0.159 / Step 36.0.5**", "4/4", "ModelIdSerializationCache.Init", "ActionTypes.Initialize", "e9eea7be01d1c7bc77371b43c24b7c60e599c660c6541bde65772ff8c400092d", "aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8", "FMOD", "PackedScene", "off-tree", "ExecuteDeferred"]), "current status records physical Step-36 closure and the active sealed Step-37 off-tree scene boundary")
+require(all(marker in current_status for marker in ["Active candidate — Step 37.0.1 / 0.0.161 (161)", "Physical **0.0.159 / Step 36.0.5**", "4/4", "ModelIdSerializationCache.Init", "ActionTypes.Initialize", "e9eea7be01d1c7bc77371b43c24b7c60e599c660c6541bde65772ff8c400092d", "aaec1e04f689122fd812b83fee09ea6e30e2991cf5851dc599b01b7802320ad8", "FMOD", "PackedScene", "off-tree", "ExecuteDeferred", "0.0.160 never reached iOS publish", "string.Join"]), "current status records physical Step-36 closure, the 0.0.160 pre-publish compile stop, and the active sealed Step-37 off-tree scene boundary")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.160 (160)" in testing_doc and "0.0.160 (160)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.160 (160) release identity")
+require("0.0.161 (161)" in testing_doc and "0.0.161 (161)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.161 (161) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -1575,7 +1578,7 @@ cm_script = read("scripts/codemagic.sh")
 require(all(marker in cm_script for marker in ["Pinned .NET SDK/workloads", ".sts2launcher-ios-workload-set", "workload list", "Using verified cached iOS workload set", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE=1"]), "Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation")
 require("Step 37 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 37")
 require("LogFileName=step37.trx" in read("scripts/test.sh") and "artifacts/test-results/step37.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 37")
-require("Step 37.0 Controlled Game-Scene Admission build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Step 37.0 candidate")
+require("Step 37.0.1 Controlled Game-Scene Admission build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Step 37.0.1 candidate")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1590,7 +1593,7 @@ require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical pr
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEP 37.0 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE" in verify_ipa and "step37-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step-37.0 candidate")
+require("Expected device UI: STEP 37.0.1 — CONTROLLED GAME.TSCN ADMISSION AFTER PHYSICAL STEP-36 CLOSURE" in verify_ipa and "step37-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step-37.0.1 candidate")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
@@ -1821,6 +1824,9 @@ if step37_manifest.is_file():
         "docs/history/reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-STATIC-MAP.txt",
         "docs/history/reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-LAST-CHECKPOINT.txt",
         "docs/history/reports/STEP-36.0.5-PHYSICAL-COMPLETE-0.0.159-REPORT.txt",
+        "docs/history/reports/STEP-37.0-CODEMAGIC-COMPILE-FAILURE-0.0.160.txt",
+        "docs/history/reports/STEP-37.0-CODEMAGIC-CACHE-STATE-0.0.160.txt",
+        "docs/history/steps/STEP-37.0.1-CSHARP-INTERPOLATION-COMPILE-CORRECTION.md",
     ]
     require(all(f"  {relative}" in step37_manifest_text for relative in required_step37_manifest_paths), "Step 37 candidate manifest pins implementation/tests, active release wiring, physical Step-36 closure, and native-reference ABI provenance")
     mismatches=[]

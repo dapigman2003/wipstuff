@@ -1,0 +1,8 @@
+StS2 Launcher — Codemagic cache state before Step 37 build
+UTC: 2026-09-07T05:51:54Z
+Home NuGet: RESTORED/PRESENT size=151M path=/Users/builder/.nuget/packages
+Isolated iOS NuGet: RESTORED/PRESENT size=41M path=/Users/builder/clone/.nuget/packages
+Godot Step 15: RESTORED/PRESENT size=184M path=/Users/builder/.cache/sts2launcher/godot-step15
+Pinned .NET SDK/workloads: RESTORED/PRESENT size=2.7G path=/Users/builder/.dotnet
+iOS arm64 obj: RESTORED/PRESENT size=2.9G path=/Users/builder/clone/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
+AOT output files before build: 1092
