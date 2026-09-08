@@ -1,17 +1,5 @@
-StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-08T17:07:15Z
-Checking active shell syntax...
-PASS: shell syntax — scripts/build-godot.sh
-PASS: shell syntax — scripts/build-ios.sh
-PASS: shell syntax — scripts/codemagic.sh
-PASS: shell syntax — scripts/lib/current-release.sh
-PASS: shell syntax — scripts/preflight-godot-link.sh
-PASS: shell syntax — scripts/test.sh
-PASS: shell syntax — scripts/validate.sh
-PASS: shell syntax — scripts/verify-ipa.sh
-PASS: Python validator compiles
 StS2 Launcher — Step 39.1 Gate-B lifecycle compatibility validation
-Root: /mnt/data/sts2work/StS2Launcher-Step39-0.0.167
+Root: /mnt/data/StS2Launcher-Step39-1-0.0.169
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 266 C# files
@@ -22,9 +10,9 @@ PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
 PASS: build version is 168
-PASS: display version is 0.0.168
+PASS: display version is 0.0.169
 PASS: Info.plist build version is 168
-PASS: Info.plist display version is 0.0.168
+PASS: Info.plist display version is 0.0.169
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -893,7 +881,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
 PASS: current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary
-PASS: testing and release-checklist docs pin the exact 0.0.168 (168) release identity
+PASS: testing and release-checklist docs pin the exact 0.0.169 (169) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1063,10 +1051,12 @@ PASS: physical 0.0.165 preserves Step-38.2 four-of-four off-tree lifecycle closu
 PASS: physical 0.0.165 static map preserves the exact Step-38.2 iOS/off-tree compatibility shape
 PASS: physical 0.0.165 final report preserves Step-38.2 4/4 result
 PASS: physical 0.0.166 compile evidence preserves the Step-39 namespace-only stop before runtime
+PASS: Step 39 forbidden fragment list does not substring-match generic Sentry type arguments
+PASS: Step 39 classifies actual Sentry declaring namespaces while preserving the physical 0.0.168 generic-delegate regression guard
 PASS: Step 39 active candidate hash manifest exists
 PASS: Step 39 candidate manifest pins SceneTree implementation/tests, exact preflight provenance, physical Step-36/37/38 authority, and active release wiring
 PASS: Step 39 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1055 checks
+VALIDATION PASS: 1057 checks

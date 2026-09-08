@@ -48,7 +48,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         "Fmod",
         "FMOD",
         "Spine",
-        "Sentry",
         "Steamworks",
         "SteamService",
     ];
@@ -753,10 +752,27 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         // SentryService boundary as already transformed to inert default-return bodies in the selected
         // private compatibility image. Any surviving external Sentry reference (Sentry.*), or any
         // Sentry-named type outside this exact wrapper, remains forbidden.
-        if (reference.DeclaringType.FullName == "MegaCrit.Sts2.Core.Debug.SentryService")
+        const string sentryServiceTypeName = "MegaCrit.Sts2.Core.Debug.SentryService";
+        var declaringTypeFullName = reference.DeclaringType.FullName;
+        if (declaringTypeFullName == sentryServiceTypeName ||
+            declaringTypeFullName.StartsWith(sentryServiceTypeName + "/", StringComparison.Ordinal))
             return false;
+
+        // 0.0.168 proved that substring matching the rendered Cecil FullName is too broad: a
+        // perfectly ordinary System.Action<Sentry.Scope> constructor renders the generic argument
+        // inside FullName and was therefore misclassified as an external Sentry call. Classify the
+        // declaring type itself instead. This keeps Sentry.* and any other game-owned Sentry-named
+        // wrapper forbidden while allowing BCL generic containers/delegates parameterized by a
+        // Sentry type to remain in the closure. The delegate target itself was already inerted and
+        // serialized-verified by the Step-39.1 compatibility transform.
+        if (reference.DeclaringType.Namespace.Equals("Sentry", StringComparison.Ordinal) ||
+            reference.DeclaringType.Namespace.StartsWith("Sentry.", StringComparison.Ordinal) ||
+            (declaringTypeFullName.Contains("Sentry", StringComparison.OrdinalIgnoreCase) &&
+             reference.DeclaringType.Namespace.StartsWith("MegaCrit.Sts2", StringComparison.Ordinal)))
+            return true;
+
         return Step39ForbiddenLifecycleReferenceFragments.Any(fragment =>
-            reference.DeclaringType.FullName.Contains(fragment, StringComparison.OrdinalIgnoreCase));
+            declaringTypeFullName.Contains(fragment, StringComparison.OrdinalIgnoreCase));
     }
 
     private static string BuildStep39StaticMap(

@@ -1,0 +1,6 @@
+StS2 Launcher — Step 39 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260908T1827211854120Z-pid89068-ad9cf93da3ae4b3eb59c4927c8c7846d
+Journal: Step39-CrashCheckpoint-20260908T1827211854120Z-pid89068-ad9cf93da3ae4b3eb59c4927c8c7846d.txt
+Static map: Step39-SceneTreeAdmission-StaticMap-20260908T1827211854120Z-pid89068-ad9cf93da3ae4b3eb59c4927c8c7846d.txt
+2026-09-08T18:27:21.4011000+00:00 | run=20260908T1827211854120Z-pid89068-ad9cf93da3ae4b3eb59c4927c8c7846d | pid=89068 | managedThread=16 | RUN_END — Step-39 UI operation ended normally after explicit teardown; Step 39 never restarts Godot rendering.

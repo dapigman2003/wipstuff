@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>168</ApplicationVersion>" in project_text, "build version is 168")
-require("<ApplicationDisplayVersion>0.0.168</ApplicationDisplayVersion>" in project_text, "display version is 0.0.168")
-require(plist.get("CFBundleVersion") == "168", "Info.plist build version is 168")
-require(plist.get("CFBundleShortVersionString") == "0.0.168", "Info.plist display version is 0.0.168")
+require("<ApplicationVersion>169</ApplicationVersion>" in project_text, "build version is 168")
+require("<ApplicationDisplayVersion>0.0.169</ApplicationDisplayVersion>" in project_text, "display version is 0.0.169")
+require(plist.get("CFBundleVersion") == "169", "Info.plist build version is 168")
+require(plist.get("CFBundleShortVersionString") == "0.0.169", "Info.plist display version is 0.0.169")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -201,7 +201,7 @@ release_presentation = release_presentation_path.read_text() if release_presenta
 require("STEP 39.1 — GATE-B LIFECYCLE COMPATIBILITY" in release_presentation, "top launcher banner identifies active Step 39.0 real SceneTree admission candidate")
 require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "NGame._EnterTree", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred"]), "top launcher banner records physical Step-37/38 closure and the bounded Step-39 SceneTree boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.168"' in release_presentation and 'ExpectedBuildVersion = "168"' in release_presentation, "Step 39 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.169"' in release_presentation and 'ExpectedBuildVersion = "169"' in release_presentation, "Step 39 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -342,8 +342,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-39.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.168",
-    "STS2_BUILD_VERSION": "168",
+    "STS2_DISPLAY_VERSION": "0.0.169",
+    "STS2_BUILD_VERSION": "169",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1394,7 +1394,8 @@ require(all(marker in step35_source for marker in [
     'Step-39.1 SentryService inert boundary', 'Step-39.1 external Sentry delegate helper',
     'serialized SaveManager.ConstructDefault still contains', 'serialized SentryService inert boundary drifted',
 ]), "Step 39.1 selected compatibility derivative seals the exact physical Gate-B Steam-cloud and Sentry blockers with serialized verification")
-require('reference.DeclaringType.FullName == "MegaCrit.Sts2.Core.Debug.SentryService"' in step39_source and
+require('const string sentryServiceTypeName = "MegaCrit.Sts2.Core.Debug.SentryService"' in step39_source and
+        'reference.DeclaringType.Namespace.Equals("Sentry", StringComparison.Ordinal)' in step39_source and
         'Any surviving external Sentry reference' in step39_source,
         "Step 39.1 Gate B permits only the sealed game-owned SentryService wrapper while retaining fail-closed external Sentry policy")
 require(all(marker in step39_gate for marker in [
@@ -1673,10 +1674,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 39.1 / 0.0.168 (168)", "Physical **0.0.165 / Step 38.2**", "closed **4/4**", "Step 37.0.1", "NGame.Instance", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred", "Skip Step 38"]), "current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary")
+require(all(marker in current_status for marker in ["Active candidate — Step 39.1 / 0.0.169 (169)", "Physical **0.0.165 / Step 38.2**", "closed **4/4**", "Step 37.0.1", "NGame.Instance", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred", "Skip Step 38"]), "current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.168 (168)" in testing_doc and "0.0.168 (168)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.168 (168) release identity")
+require("0.0.169 (169)" in testing_doc and "0.0.169 (169)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.169 (169) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -2112,6 +2113,10 @@ require("STEP 38.2 IOS/OFFTREE-COMPAT NGAME _ENTERTREE ENTRY COMPLETE — 4/4" i
 
 step39_compile_166 = read("docs/history/reports/STEP-39.0-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.166.txt")
 require(all(value in step39_compile_166 for value in ["0.0.166 (166)", "1051 checks", "233/233", "CS0103", "GodotStep15NativeBridge", "No Step-39 runtime boundary"]), "physical 0.0.166 compile evidence preserves the Step-39 namespace-only stop before runtime")
+
+step39_scene_source = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2SceneTreeAdmission.cs")
+require('"Sentry",' not in step39_scene_source.split("Step39ForbiddenLifecycleReferenceFragments",1)[1].split("];",1)[0], "Step 39 forbidden fragment list does not substring-match generic Sentry type arguments")
+require('reference.DeclaringType.Namespace.Equals("Sentry", StringComparison.Ordinal)' in step39_scene_source and 'System.Action<Sentry.Scope>' in step39_scene_source, "Step 39 classifies actual Sentry declaring namespaces while preserving the physical 0.0.168 generic-delegate regression guard")
 
 step39_manifest = ROOT / "tools/validation/candidate-step39-real-scenetree-admission.sha256"
 require(step39_manifest.is_file(), "Step 39 active candidate hash manifest exists")

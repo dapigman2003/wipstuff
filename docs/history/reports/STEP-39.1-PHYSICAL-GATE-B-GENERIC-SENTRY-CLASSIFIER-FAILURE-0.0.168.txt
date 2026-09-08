@@ -1,0 +1,36 @@
+StS2 Launcher — Step 39.0 Real SceneTree Admission
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-08T18:27:21.3847880+00:00
+
+RESULT
+STEP 39.0 REAL SCENETREE ADMISSION FAIL — 1/4
+
+METADATA
+App version: 0.0.168 (168)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: actual hierarchy managed-lifecycle static audit
+InvalidDataException: Step 39.0 managed lifecycle closure reaches forbidden startup/native/platform references: System.Void MegaCrit.Sts2.Core.Nodes.NGame::_Notification(System.Int32) -> System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>) -> System.Void System.Action`1<Sentry.Scope>::.ctor(System.Object,System.IntPtr)
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 39.0 managed lifecycle closure reaches forbidden startup/native/platform references: System.Void MegaCrit.Sts2.Core.Nodes.NGame::_Notification(System.Int32) -> System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>) -> System.Void System.Action`1<Sentry.Scope>::.ctor(System.Object,System.IntPtr)
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2SceneTreeAdmissionGateResult RunStep39OffTreeHierarchyAndLifecycleSurfaceAudit(System.Action`1[System.String])
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep39OffTreeHierarchyAndLifecycleSurfaceAudit(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 39.0 managed lifecycle closure reaches forbidden startup/native/platform references: System.Void MegaCrit.Sts2.Core.Nodes.NGame::_Notification(System.Int32) -> System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>) -> System.Void System.Action`1<Sentry.Scope>::.ctor(System.Object,System.IntPtr)
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2SceneTreeAdmissionGateResult RunStep39OffTreeHierarchyAndLifecycleSurfaceAudit(System.Action`1[System.String])
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep39OffTreeHierarchyAndLifecycleSurfaceAudit(Action`1 checkpoint)
+
+END OF REPORT

@@ -1,6 +1,6 @@
-# Release checklist — Step 39.1 / 0.0.168
+# Release checklist — Step 39.1 / 0.0.169
 
-Release identity: display/build `0.0.168 (168)`, IPA `StS2-Launcher-Step-39.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.169 (169)`, IPA `StS2-Launcher-Step-39.ipa`, workflow `ios-canonical`.
 
 - Static validator passes completely in the working tree and a fresh extraction of the final ZIP.
 - Codemagic host tests compile/pass under the pinned .NET SDK; native-link preflight passes before iOS publish.
