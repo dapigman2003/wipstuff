@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-08T01:16:08Z
+UTC: 2026-09-08T02:29:54Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,8 +10,8 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 38.1 Inert GameStartupWrapper + Controlled NGame _EnterTree validation
-Root: /mnt/data/work164/StS2Launcher-Step38-0.0.164
+StS2 Launcher — Step 38.2 iOS/off-tree-compatible NGame _EnterTree validation
+Root: /mnt/data/StS2Launcher-Step38-0.0.165
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 259 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 164
-PASS: display version is 0.0.164
-PASS: Info.plist build version is 164
-PASS: Info.plist display version is 0.0.164
+PASS: build version is 165
+PASS: display version is 0.0.165
+PASS: Info.plist build version is 165
+PASS: Info.plist display version is 0.0.165
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,7 +32,7 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 38.1 inert-startup-wrapper NGame _EnterTree candidate
+PASS: top launcher banner identifies active Step 38.2 iOS/off-tree-compatible NGame _EnterTree candidate
 PASS: top launcher banner records physical Step-37 closure and the bounded Step-38 lifecycle boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: Step 38 source pins expected bundle release identity
@@ -641,12 +641,12 @@ PASS: Step 38 gate sequence exists
 PASS: Step 38 host regressions exists
 PASS: Step 38 iOS surface exists
 PASS: Step 38 pins the exact NGame lifecycle/startup method names under audit
-PASS: Step 38 Gate A requires the exact inert GameStartupWrapper, reads the selected compatibility image with deferred rejecting Cecil, and fail-closes on later lifecycle/OneTimeInitialization reachability
-PASS: Step 38.1 Gate A no longer uses Cecil immediate/default resolution
-PASS: Step 38.1 does not reject the verified inert wrapper by name while later startup methods remain forbidden
-PASS: selected pre-load compatibility derivative preserves ModelDb bootstrap and adds only the serialized inert GameStartupWrapper seam with unchanged _EnterTree edge
+PASS: Step 38 Gate A requires the inert wrapper plus exact Sentry/window suppressions, reads the selected compatibility image with deferred rejecting Cecil, and fail-closes on later lifecycle/OneTimeInitialization reachability
+PASS: Step 38.2 Gate A uses only deferred rejecting Cecil resolution
+PASS: Step 38.2 does not reject the verified inert wrapper by name while later startup methods remain forbidden
+PASS: selected pre-load compatibility derivative preserves ModelDb + inert startup wrapper and adds only exact Sentry/file-drop-window NOP suppressions with serialized verification
 PASS: Step 38 Gate B recreates the physically proven NGame only off-tree and binds the exact _EnterTree token without invoking it
-PASS: Step 38 Gate C invokes exact NGame._EnterTree once and captures nested failures while requiring state/native confinement
+PASS: Step 38 Gate C invokes the verified compatibility NGame._EnterTree once and captures nested failures while requiring state/native confinement
 PASS: Step 38 contains exactly one launcher-authorized _EnterTree invocation
 PASS: Step 38 core contains no direct SceneTree/later-startup/deferred invocation
 PASS: Step 38 release path does not synthesize an _ExitTree lifecycle call
@@ -656,7 +656,7 @@ PASS: Step 38 summary closes only at four-of-four
 PASS: Step 38 host regressions pin gate order and lifecycle boundary names using MSTest v4 APIs
 PASS: Step 38 iOS surface requires same-process Step-37 closure and emits all four-gate telemetry artifacts
 PASS: RootViewController wires Step 38 controls into the active device surface
-PASS: release presentation pins the controlled Step-38 _EnterTree boundary and later forbidden startup stages
+PASS: release presentation pins the physical 0.0.164 NRE, exact Step-38.2 compatibility suppressions, and later forbidden startup stages
 PASS: analysis-only native reference is absent from project: libfmod.dylib
 PASS: analysis-only native reference is absent from project: libfmodstudio.dylib
 PASS: analysis-only native reference is absent from project: libGodotFmod.macos.template_release
@@ -866,7 +866,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
 PASS: current status records physical Step-37 closure and the active controlled Step-38 lifecycle boundary
-PASS: testing and release-checklist docs pin the exact 0.0.164 (164) release identity
+PASS: testing and release-checklist docs pin the exact 0.0.165 (165) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -992,7 +992,7 @@ PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.i
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
 PASS: host-test report heading identifies Step 38
 PASS: host-test TRX artifact identifies Step 38
-PASS: Codemagic build-environment report heading identifies the Step 38.1 candidate
+PASS: Codemagic build-environment report heading identifies the Step 38.2 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -1003,7 +1003,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step-38.1 candidate
+PASS: IPA verifier advertises the active Step-38.2 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -1026,10 +1026,13 @@ PASS: Step 36 active implementation/release/provenance files are hash-pinned
 PASS: Step 37 closed-boundary hash manifest exists
 PASS: Step 37 closed-boundary manifest pins implementation/tests, physical Step-36/37 evidence, Step-38 handoff, and native-reference ABI provenance
 PASS: Step 37 closed implementation/release/provenance files are hash-pinned
+PASS: physical 0.0.164 preserves first real off-tree _EnterTree execution and managed NRE confinement evidence
+PASS: physical 0.0.164 static map preserves the exact Sentry/window/file-drop and inert-wrapper callsites
+PASS: physical 0.0.164 final report preserves Step-38.1 2/4 result
 PASS: Step 38 active candidate hash manifest exists
 PASS: Step 38 candidate manifest pins lifecycle-bootstrap transform, lifecycle implementation/tests, active release wiring, and physical Step-36/37/38 authority
 PASS: Step 38 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1018 checks
+VALIDATION PASS: 1021 checks

@@ -529,3 +529,13 @@ Physical 0.0.155 proves the Step-36 game-resource handoff: exact receipt-backed 
 - Gate C invokes only exact unchanged `NGame._EnterTree()` once by reflection. Step38 source must contain no `AddChild(`, direct `_Ready`, direct `GameStartup`, direct `InitializePlatform`, direct `LaunchMainMenu`, or direct `ExecuteDeferred` call.
 - Gate C/D require `IsInsideTree=false`, OneTimeInitialization state `2`, and zero initializer-bearing/rejected/native escape.
 - Gate D releases the temporary off-tree node without invoking `_ExitTree`. Any failure after Gate C begins requires a fresh process before retry.
+
+
+## Step 38.2 iOS/off-tree `_EnterTree` compatibility contracts
+
+- Physical 0.0.164 is preserved as the authority that Gate A/B pass and direct off-tree `_EnterTree` physically reaches a managed NullReferenceException at 2/4 with zero initializer/rejected/native delta.
+- The pre-load derivative must preserve the proven ModelDb rewrite and exact two-instruction inert `GameStartupWrapper`.
+- `_EnterTree` compatibility is limited to exactly one original SentryService.Initialize call and one bounded GetWindow/FilesDropped/Connect block; both are stack-neutral NOP substitutions.
+- The transform must reject any external branch entering the bounded window block.
+- Serialized verification must preserve `_EnterTree` instruction count, require the exact NOP delta, zero remaining Sentry/GetWindow/FilesDropped/Connect references, and exactly one inert-wrapper call.
+- Step 38.2 still contains no launcher-authorized AddChild, `_Ready`, `_ExitTree`, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam init, or native GDExtension load.

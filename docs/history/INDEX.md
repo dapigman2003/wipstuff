@@ -372,3 +372,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-38.0.1-PHYSICAL-GATE-A-ENTERTREE-REACHES-GAMESTARTUPWRAPPER-0.0.163-REPORT.txt` — final 0/4 report identifying `GameStartupWrapper` as the exact later-startup boundary.
 - `reports/STEP-38.0.1-PHYSICAL-GATE-A-ENTERTREE-REACHES-GAMESTARTUPWRAPPER-0.0.163-LAST.txt` — final durable checkpoint for the safe 0.0.163 stop.
 - `steps/STEP-38.1-INERT-GAMESTARTUPWRAPPER-COMPATIBILITY.md` — 0.0.164 preserves unchanged `_EnterTree` and the physically proven ModelDb compatibility while rewriting only `GameStartupWrapper` to `Task.CompletedTask` ahead of load, with serialized exact-shape verification before controlled `_EnterTree` execution.
+
+## Step 38.1 physical `_EnterTree` NRE / Step 38.2 iOS-off-tree compatibility
+
+- `reports/STEP-38.1-PHYSICAL-DIRECT-ENTERTREE-NRE-0.0.164-CHECKPOINT.txt` — physical 0.0.164 Gate A/B PASS and first real `_EnterTree` invocation, ending in an off-tree managed `NullReferenceException` with zero initializer/rejected/native delta.
+- `reports/STEP-38.1-PHYSICAL-DIRECT-ENTERTREE-NRE-0.0.164-STATIC-MAP.txt` — exact selected lifecycle IL proving inert `GameStartupWrapper`, one Sentry initialization call, and the `GetWindow`/`FilesDropped`/`Connect` block.
+- `reports/STEP-38.1-PHYSICAL-DIRECT-ENTERTREE-NRE-0.0.164-REPORT.txt` — 2/4 final physical result.
+- `reports/STEP-38.1-PHYSICAL-DIRECT-ENTERTREE-NRE-0.0.164-LAST-CHECKPOINT.txt` — normal launcher teardown after the failed one-shot Gate C.
+- `steps/STEP-38.2-IOS-OFFTREE-ENTERTREE-COMPATIBILITY.md` — 0.0.165 exact stack-neutral Sentry/file-drop-window suppressions layered on the proven ModelDb + inert-startup-wrapper derivative.

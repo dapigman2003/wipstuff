@@ -6,14 +6,15 @@ using Mono.Cecil.Cil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 38.1 boundary. Requires the same-process physically closed Step-37.0.1 4/4 authority.
-/// Physical 0.0.163 proved exact NGame._EnterTree directly calls GameStartupWrapper. The selected
-/// ahead-of-load compatibility image now keeps _EnterTree unchanged while rewriting only GameStartupWrapper
-/// to return Task.CompletedTask. Gate A verifies that exact inert body, maps NGame lifecycle IL/callsites,
-/// and refuses execution if the same-NGame call closure reaches _Ready/GameStartup/platform/main-menu/
-/// deferred initialization beyond the verified inert wrapper. It then re-instantiates the already verified
-/// FMOD-neutral game scene off-tree and invokes only NGame._EnterTree() directly once. The node is never inserted into a SceneTree, so Godot
-/// cannot automatically invoke _Ready. GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred,
+/// Step 38.2 boundary. Requires the same-process physically closed Step-37.0.1 4/4 authority.
+/// Physical 0.0.164 passed the inert-startup-wrapper lifecycle audit and off-tree re-instantiation, then
+/// physically entered NGame._EnterTree and failed with a managed NullReferenceException while the node was
+/// deliberately outside the SceneTree. The exact static map leaves two platform/environment-sensitive edges:
+/// the early SentryService.Initialize call and the GetWindow/FilesDropped signal hookup. The selected ahead-of-load
+/// compatibility image preserves all NGame singleton/property/GetNode setup and the verified inert GameStartupWrapper,
+/// while replacing only that Sentry call and the bounded window/file-drop hookup with stack-neutral NOPs. Gate A
+/// re-verifies that exact shape, then Gate C invokes the remaining _EnterTree body once on a fresh off-tree NGame.
+/// SceneTree insertion, _Ready, _ExitTree, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred,
 /// Steam initialization, native GDExtension loading, and gameplay remain forbidden.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
@@ -47,7 +48,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     public string GetVerifiedNGameLifecycleStaticMap()
         => _step38LifecycleStaticAudit?.StaticMap
-           ?? throw new InvalidOperationException("Step 38.1 Gate A has not produced a verified NGame lifecycle static map.");
+           ?? throw new InvalidOperationException("Step 38.2 Gate A has not produced a verified NGame lifecycle static map.");
 
     private void ResetStep38State()
     {
@@ -78,16 +79,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         {
             ThrowIfDisposed();
             var context = RequireStep38Prerequisite("Step 38 Gate A entry");
-            var preflight = _preflight ?? throw new InvalidOperationException("Step 38.1 exact selected-authority preflight is absent.");
+            var preflight = _preflight ?? throw new InvalidOperationException("Step 38.2 exact selected-authority preflight is absent.");
             if (!IsModelBootstrapCompatibilityMode)
-                throw new InvalidOperationException("Step 38.1 requires the physically proven ModelDb-bootstrap selected authority.");
+                throw new InvalidOperationException("Step 38.2 requires the physically proven ModelDb-bootstrap selected authority.");
 
             var selectedPath = preflight.DiagnosticPath;
             stage = "selected compatibility image re-verification";
             VerifyFileLength(selectedPath, preflight.DiagnosticLength, "Step-38 selected sts2 compatibility image");
             var selectedSha256 = ComputeSha256Hex(selectedPath);
             if (!selectedSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException($"Step 38.1 selected sts2 compatibility image hash drifted. expected={preflight.DiagnosticSha256}; actual={selectedSha256}.");
+                throw new InvalidDataException($"Step 38.2 selected sts2 compatibility image hash drifted. expected={preflight.DiagnosticSha256}; actual={selectedSha256}.");
 
             Checkpoint(checkpoint, $"H_A_ENTRY — Step-37.0.1 4/4 same-process authority present; opening exact selected sts2 compatibility image read-only with Cecil; path={selectedPath}; sha256={selectedSha256}. No lifecycle method is invoked in Gate A.");
             stage = "NGame lifecycle Cecil map";
@@ -101,7 +102,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 MetadataResolver = new MetadataResolver(resolver),
             });
             var nGame = module.Types.SingleOrDefault(type => type.FullName == NGameTypeFullName)
-                ?? throw new InvalidDataException($"Step 38.1 could not locate exact type {NGameTypeFullName}.");
+                ?? throw new InvalidDataException($"Step 38.2 could not locate exact type {NGameTypeFullName}.");
 
             var enterTree = RequireLifecycleMethod(nGame, NGameEnterTreeMethodName, 0, "System.Void");
             var ready = RequireLifecycleMethod(nGame, NGameReadyMethodName, 0, "System.Void");
@@ -112,6 +113,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var deferred = RequireLifecycleMethodByName(nGame, NGameLoadDeferredStartupAssetsMethodName, 0);
 
             RequireInertGameStartupWrapper(gameStartupWrapper);
+            RequireStep38OffTreeCompatibility(enterTree);
             var enterTreeWrapperCalls = enterTree.Body.Instructions.Count(instruction =>
                 instruction.OpCode.Code is Code.Call or Code.Callvirt &&
                 instruction.Operand is MethodReference method &&
@@ -120,11 +122,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 method.Parameters.Count == 0 &&
                 method.ReturnType.FullName == "System.Threading.Tasks.Task");
             if (enterTreeWrapperCalls != 1)
-                throw new InvalidDataException($"Step 38.1 requires exact NGame._EnterTree to preserve one direct call to the verified inert GameStartupWrapper; observed {enterTreeWrapperCalls}.");
+                throw new InvalidDataException($"Step 38.2 requires the Step-38.2 compatibility NGame._EnterTree to preserve one direct call to the verified inert GameStartupWrapper; observed {enterTreeWrapperCalls}.");
 
             var reachable = ComputeSameNGameReachableMethods(nGame, enterTree, out var forbiddenRefs);
             if (forbiddenRefs.Count != 0)
-                throw new InvalidDataException("Step 38.1 _EnterTree same-NGame call closure reaches forbidden later-startup boundary/boundaries: " + string.Join(" | ", forbiddenRefs));
+                throw new InvalidDataException("Step 38.2 _EnterTree same-NGame call closure reaches forbidden later-startup boundary/boundaries: " + string.Join(" | ", forbiddenRefs));
 
             var oneTimeForbidden = reachable
                 .SelectMany(method => method.Body.Instructions)
@@ -136,10 +138,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 .Distinct(StringComparer.Ordinal)
                 .ToArray();
             if (oneTimeForbidden.Length != 0)
-                throw new InvalidDataException("Step 38.1 _EnterTree same-NGame call closure reaches a forbidden OneTimeInitialization method: " + string.Join(" | ", oneTimeForbidden));
+                throw new InvalidDataException("Step 38.2 _EnterTree same-NGame call closure reaches a forbidden OneTimeInitialization method: " + string.Join(" | ", oneTimeForbidden));
 
             if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 38.1 lifecycle static audit unexpectedly attempted external assembly resolution: " + string.Join(" | ", resolver.Requests));
+                throw new InvalidDataException("Step 38.2 lifecycle static audit unexpectedly attempted external assembly resolution: " + string.Join(" | ", resolver.Requests));
 
             var staticMap = BuildNGameLifecycleStaticMap(
                 selectedPath,
@@ -160,13 +162,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 reachable.Select(method => method.FullName).ToArray());
 
             RequireNoForbiddenStep37Escape(context, 0, 0, 0, "Step 38 Gate A");
-            Checkpoint(checkpoint, $"H_A_PASS — NGame lifecycle map sealed under deferred metadata-only Cecil read; externalResolutionRequests=0; enterTreeToken=0x{enterTree.MetadataToken.ToUInt32():X8}; sameNGameReachable={reachable.Count}; verifiedInertStartupWrapper=YES; forbiddenLaterStartupReachable=0; no lifecycle execution/native escape.");
+            Checkpoint(checkpoint, $"H_A_PASS — NGame lifecycle map sealed under deferred metadata-only Cecil read; verifiedInertStartupWrapper=YES; sentryInitializeCalls=0; getWindowCalls=0; filesDroppedRefs=0; connectCalls=0; externalResolutionRequests=0; enterTreeToken=0x{enterTree.MetadataToken.ToUInt32():X8}; sameNGameReachable={reachable.Count}; forbiddenLaterStartupReachable=0; no lifecycle execution/native escape.");
             return LifecyclePass(gate,
-                "STEP 38.1 NGAME LIFECYCLE STATIC AUDIT PASSED.\n" +
+                "STEP 38.2 NGAME LIFECYCLE STATIC AUDIT PASSED.\n" +
                 $"Selected authority SHA-256: {selectedSha256}\n" +
                 $"_EnterTree token: 0x{enterTree.MetadataToken.ToUInt32():X8}\n" +
                 $"Same-NGame methods reachable from _EnterTree: {reachable.Count}\n" +
                 "Reachable GameStartupWrapper: 1 (verified exact inert Task.CompletedTask body)\n" +
+                "Suppressed compatibility edges: SentryService.Initialize=0 remaining; GetWindow/FilesDropped/Connect=0 remaining\n" +
                 "Reachable _Ready/GameStartup/InitializePlatform/LaunchMainMenu/LoadDeferredStartupAssetsAsync: 0\n" +
                 "Reachable OneTimeInitialization ExecuteVeryEarly/ExecuteEssential/ExecuteDeferred/PrewarmJit: 0\n" +
                 "Lifecycle execution: NO");
@@ -190,7 +193,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var context = RequireStep38Prerequisite("Step 38 Gate B entry");
             _ = RequireStep38StaticAudit();
             var packed = RequireGameScenePackedResource();
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 38.1 exact GodotSharp handoff disappeared.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 38.2 exact GodotSharp handoff disappeared.");
             var godotAssembly = handoff.GodotSharpAssembly;
             var packedSceneType = godotAssembly.GetType("Godot.PackedScene", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.PackedScene");
@@ -223,27 +226,27 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
                 throw new InvalidOperationException(
-                    $"Step 38.1 PackedScene.Instantiate threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
+                    $"Step 38.2 PackedScene.Instantiate threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
                     ex.InnerException);
             }
 
             if (instance is null || !nodeType.IsInstanceOfType(instance))
-                throw new InvalidDataException($"Step 38.1 PackedScene.Instantiate did not return Godot.Node; observed {instance?.GetType().FullName ?? "<null>"}.");
+                throw new InvalidDataException($"Step 38.2 PackedScene.Instantiate did not return Godot.Node; observed {instance?.GetType().FullName ?? "<null>"}.");
             var rootType = instance.GetType();
             if (!string.Equals(rootType.FullName, NGameTypeFullName, StringComparison.Ordinal))
-                throw new InvalidDataException($"Step 38.1 expected root {NGameTypeFullName}; observed {rootType.FullName ?? "<unknown>"}.");
+                throw new InvalidDataException($"Step 38.2 expected root {NGameTypeFullName}; observed {rootType.FullName ?? "<unknown>"}.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(rootType.Assembly), context))
-                throw new InvalidDataException("Step 38.1 NGame instance is not owned by the exact Step-35/36/37 private load context.");
+                throw new InvalidDataException("Step 38.2 NGame instance is not owned by the exact Step-35/36/37 private load context.");
 
             var isInsideTree = RequireZeroArgBoolMethod(rootType, "IsInsideTree");
             if (isInsideTree.Invoke(instance, null) is not false)
-                throw new InvalidDataException("Step 38.1 fresh NGame unexpectedly reports IsInsideTree=true before _EnterTree direct invocation.");
+                throw new InvalidDataException("Step 38.2 fresh NGame unexpectedly reports IsInsideTree=true before _EnterTree direct invocation.");
 
             var enterTree = rootType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
                 .SingleOrDefault(method => method.Name == NGameEnterTreeMethodName && method.GetParameters().Length == 0 && method.ReturnType == typeof(void))
                 ?? throw new MissingMethodException(NGameTypeFullName, "_EnterTree()");
             if ((uint)enterTree.MetadataToken != RequireStep38StaticAudit().EnterTreeToken)
-                throw new InvalidDataException($"Step 38.1 reflection _EnterTree token drifted: Cecil=0x{RequireStep38StaticAudit().EnterTreeToken:X8}; reflection=0x{enterTree.MetadataToken:X8}.");
+                throw new InvalidDataException($"Step 38.2 reflection _EnterTree token drifted: Cecil=0x{RequireStep38StaticAudit().EnterTreeToken:X8}; reflection=0x{enterTree.MetadataToken:X8}.");
 
             RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 38 Gate B");
             _step38NGameInstance = instance;
@@ -251,7 +254,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             instance = null;
             Checkpoint(checkpoint, $"H_B_PASS — fresh off-tree NGame prepared; enterTreeToken=0x{enterTree.MetadataToken:X8}; insideTree=False; resolverDelta={context.ManagedResolverRequests.Count - resolverBefore}; hostDelta={context.HostLoads.Count - hostBefore}; privateDelta={context.PrivateLoads.Count - privateBefore}; initializerDelta=0; rejectedDelta=0; nativeDelta=0; lifecycleCalls=0.");
             return LifecyclePass(gate,
-                "STEP 38.1 OFF-TREE NGAME REINSTANTIATION PASSED.\n" +
+                "STEP 38.2 OFF-TREE NGAME REINSTANTIATION PASSED.\n" +
                 $"Root type: {rootType.FullName}\n" +
                 $"_EnterTree token: 0x{enterTree.MetadataToken:X8}\n" +
                 "IsInsideTree before invocation: FALSE\n" +
@@ -280,14 +283,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep38Prerequisite("Step 38 Gate C entry");
             _ = RequireStep38StaticAudit();
-            var instance = _step38NGameInstance ?? throw new InvalidOperationException("Step 38.1 Gate B must retain a fresh off-tree NGame instance before Gate C.");
-            var enterTree = _step38EnterTreeMethod ?? throw new InvalidOperationException("Step 38.1 Gate B must bind NGame._EnterTree before Gate C.");
+            var instance = _step38NGameInstance ?? throw new InvalidOperationException("Step 38.2 Gate B must retain a fresh off-tree NGame instance before Gate C.");
+            var enterTree = _step38EnterTreeMethod ?? throw new InvalidOperationException("Step 38.2 Gate B must bind NGame._EnterTree before Gate C.");
             if (_step38EnterTreeInvocationStarted)
-                throw new InvalidOperationException("Step 38.1 _EnterTree is one-shot in this process; retry is forbidden after invocation begins.");
+                throw new InvalidOperationException("Step 38.2 _EnterTree is one-shot in this process; retry is forbidden after invocation begins.");
 
             var isInsideTree = RequireZeroArgBoolMethod(instance.GetType(), "IsInsideTree");
             if (isInsideTree.Invoke(instance, null) is not false)
-                throw new InvalidDataException("Step 38.1 NGame unexpectedly entered the SceneTree before the direct _EnterTree boundary.");
+                throw new InvalidDataException("Step 38.2 NGame unexpectedly entered the SceneTree before the direct _EnterTree boundary.");
 
             var initializerBefore = context.InitializerBearingRequests.Count;
             var rejectedBefore = context.RejectedManagedRequests.Count;
@@ -297,7 +300,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var privateBefore = context.PrivateLoads.Count;
             _step38EnterTreeInvocationStarted = true;
 
-            Checkpoint(checkpoint, $"H_C_INVOKE_START — invoking exact NGame._EnterTree once by MethodInfo on the off-tree instance; token=0x{enterTree.MetadataToken:X8}; insideTreeBefore=False. No AddChild is performed, so Godot automatic _Ready is not authorized.");
+            Checkpoint(checkpoint, $"H_C_INVOKE_START — invoking verified Step-38.2 compatibility NGame._EnterTree once by MethodInfo on the off-tree instance; token=0x{enterTree.MetadataToken:X8}; insideTreeBefore=False. No AddChild is performed, so Godot automatic _Ready is not authorized.");
             stage = "direct NGame._EnterTree invocation";
             try
             {
@@ -306,24 +309,27 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
                 var insideAfterFailure = TryReadIsInsideTree(instance);
-                Checkpoint(checkpoint, $"H_C_EXCEPTION_CAPTURED — top={ex.GetType().FullName}; base={ex.InnerException.GetBaseException().GetType().FullName}; insideTreeAfterFailure={insideAfterFailure}; resolverDelta={context.ManagedResolverRequests.Count - resolverBefore}; hostDelta={context.HostLoads.Count - hostBefore}; privateDelta={context.PrivateLoads.Count - privateBefore}; initializerDelta={context.InitializerBearingRequests.Count - initializerBefore}; rejectedDelta={context.RejectedManagedRequests.Count - rejectedBefore}; nativeDelta={context.NativeLoadAttempts.Count - nativeBefore}.");
+                var resolverDeltaValues = context.ManagedResolverRequests.Skip(resolverBefore).ToArray();
+                var hostDeltaValues = context.HostLoads.Skip(hostBefore).ToArray();
+                var privateDeltaValues = context.PrivateLoads.Skip(privateBefore).ToArray();
+                Checkpoint(checkpoint, $"H_C_EXCEPTION_CAPTURED — top={ex.GetType().FullName}; base={ex.InnerException.GetBaseException().GetType().FullName}; insideTreeAfterFailure={insideAfterFailure}; resolverDelta={resolverDeltaValues.Length}; hostDelta={hostDeltaValues.Length}; privateDelta={privateDeltaValues.Length}; initializerDelta={context.InitializerBearingRequests.Count - initializerBefore}; rejectedDelta={context.RejectedManagedRequests.Count - rejectedBefore}; nativeDelta={context.NativeLoadAttempts.Count - nativeBefore}; resolverRequests=[{string.Join(" | ", resolverDeltaValues)}]; hostLoads=[{string.Join(" | ", hostDeltaValues)}]; privateLoads=[{string.Join(" | ", privateDeltaValues)}].");
                 Checkpoint(checkpoint, $"H_C_EXCEPTION_DETAIL — {SanitizeCheckpoint(FormatExceptionDiagnostic(ex.InnerException))}");
                 throw new InvalidOperationException(
-                    $"Step 38.1 NGame._EnterTree threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
+                    $"Step 38.2 NGame._EnterTree threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}\n{FormatExceptionDiagnostic(ex.InnerException)}",
                     ex.InnerException);
             }
 
             if (isInsideTree.Invoke(instance, null) is not false)
-                throw new InvalidDataException("Step 38.1 direct _EnterTree invocation unexpectedly changed Godot IsInsideTree=true without SceneTree insertion.");
+                throw new InvalidDataException("Step 38.2 direct _EnterTree invocation unexpectedly changed Godot IsInsideTree=true without SceneTree insertion.");
             RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 38 Gate C");
             var state = ReadOneTimeInitializationState(RequireEssentialBinding().StateField);
             if (state != ExpectedStateAfterEssential)
-                throw new InvalidDataException($"Step 38.1 OneTimeInitialization state drifted during _EnterTree: expected {ExpectedStateAfterEssential}; observed {state}.");
+                throw new InvalidDataException($"Step 38.2 OneTimeInitialization state drifted during _EnterTree: expected {ExpectedStateAfterEssential}; observed {state}.");
 
             _step38EnterTreeInvocationPassed = true;
-            Checkpoint(checkpoint, $"H_C_PASS — exact NGame._EnterTree returned; insideTreeAfter=False; state={state}; resolverDelta={context.ManagedResolverRequests.Count - resolverBefore}; hostDelta={context.HostLoads.Count - hostBefore}; privateDelta={context.PrivateLoads.Count - privateBefore}; initializerDelta=0; rejectedDelta=0; nativeDelta=0; _Ready/GameStartup/InitializePlatform/main-menu/ExecuteDeferred remain uninvoked by Step-38 authority.");
+            Checkpoint(checkpoint, $"H_C_PASS — verified Step-38.2 compatibility NGame._EnterTree returned; insideTreeAfter=False; state={state}; resolverDelta={context.ManagedResolverRequests.Count - resolverBefore}; hostDelta={context.HostLoads.Count - hostBefore}; privateDelta={context.PrivateLoads.Count - privateBefore}; initializerDelta=0; rejectedDelta=0; nativeDelta=0; _Ready/GameStartup/InitializePlatform/main-menu/ExecuteDeferred remain uninvoked by Step-38 authority.");
             return LifecyclePass(gate,
-                "STEP 38.1 DIRECT NGAME._ENTERTREE INVOCATION PASSED.\n" +
+                "STEP 38.2 IOS/OFFTREE-COMPAT NGAME._ENTERTREE INVOCATION PASSED.\n" +
                 "Invocation count: exactly one\n" +
                 "SceneTree AddChild: NO\n" +
                 "IsInsideTree after direct invocation: FALSE\n" +
@@ -359,18 +365,18 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep38Prerequisite("Step 38 Gate D entry");
             if (!_step38EnterTreeInvocationStarted || !_step38EnterTreeInvocationPassed)
-                throw new InvalidOperationException("Step 38.1 Gate C must return successfully before Gate D.");
-            var instance = _step38NGameInstance ?? throw new InvalidOperationException("Step 38.1 retained NGame instance disappeared before Gate D.");
+                throw new InvalidOperationException("Step 38.2 Gate C must return successfully before Gate D.");
+            var instance = _step38NGameInstance ?? throw new InvalidOperationException("Step 38.2 retained NGame instance disappeared before Gate D.");
 
             Checkpoint(checkpoint, "H_D_ENTRY — performing post-_EnterTree confinement audit while NGame remains off-tree; _ExitTree/_Ready/GameStartup are not called. The temporary node will then be freed.");
             stage = "post-_EnterTree confinement audit";
             if (TryReadIsInsideTree(instance) != "False")
-                throw new InvalidDataException($"Step 38.1 post-_EnterTree instance is no longer off-tree; observed IsInsideTree={TryReadIsInsideTree(instance)}.");
+                throw new InvalidDataException($"Step 38.2 post-_EnterTree instance is no longer off-tree; observed IsInsideTree={TryReadIsInsideTree(instance)}.");
             if (context.InitializerBearingRequests.Count != 0 || context.RejectedManagedRequests.Count != 0 || context.NativeLoadAttempts.Count != 0)
-                throw new InvalidDataException("Step 38.1 post-_EnterTree confinement detected forbidden initializer-bearing/rejected/native activity. " + context.FormatResolverState());
+                throw new InvalidDataException("Step 38.2 post-_EnterTree confinement detected forbidden initializer-bearing/rejected/native activity. " + context.FormatResolverState());
             var state = ReadOneTimeInitializationState(RequireEssentialBinding().StateField);
             if (state != ExpectedStateAfterEssential)
-                throw new InvalidDataException($"Step 38.1 post-_EnterTree state drifted: expected {ExpectedStateAfterEssential}; observed {state}.");
+                throw new InvalidDataException($"Step 38.2 post-_EnterTree state drifted: expected {ExpectedStateAfterEssential}; observed {state}.");
 
             stage = "off-tree instance release";
             TryReleaseStep38Instance(instance, checkpoint, "Gate-D success");
@@ -378,7 +384,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             _step38EnterTreeMethod = null;
             Checkpoint(checkpoint, $"H_D_PASS — post-_EnterTree confinement held; insideTree=False; state={state}; initializer=0; rejected=0; native=0; temporary instance released. _ExitTree/_Ready/GameStartup/InitializePlatform/main-menu/ExecuteDeferred/Steam were not invoked by Step 38.");
             return LifecyclePass(gate,
-                "STEP 38.1 POST-_ENTERTREE CONFINEMENT PASSED.\n" +
+                "STEP 38.2 POST-_ENTERTREE CONFINEMENT PASSED.\n" +
                 "NGame remained off-tree: TRUE\n" +
                 $"OneTimeInitialization state: {state}\n" +
                 "Initializer-bearing requests: 0\n" +
@@ -411,13 +417,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
 
     private Step38LifecycleStaticAuditSnapshot RequireStep38StaticAudit()
-        => _step38LifecycleStaticAudit ?? throw new InvalidOperationException("Step 38.1 Gate A must pass before later gates.");
+        => _step38LifecycleStaticAudit ?? throw new InvalidOperationException("Step 38.2 Gate A must pass before later gates.");
 
     private static MethodDefinition RequireLifecycleMethod(TypeDefinition type, string name, int parameterCount, string returnType)
     {
         var matches = type.Methods.Where(method => method.Name == name && method.Parameters.Count == parameterCount && method.ReturnType.FullName == returnType).ToArray();
         if (matches.Length != 1 || !matches[0].HasBody || matches[0].IsStatic)
-            throw new InvalidDataException($"Step 38.1 expected exactly one instance {type.FullName}::{name} with {parameterCount} parameter(s), return {returnType}, and managed IL body; found {matches.Length}.");
+            throw new InvalidDataException($"Step 38.2 expected exactly one instance {type.FullName}::{name} with {parameterCount} parameter(s), return {returnType}, and managed IL body; found {matches.Length}.");
         return matches[0];
     }
 
@@ -425,8 +431,34 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     {
         var matches = type.Methods.Where(method => method.Name == name && method.Parameters.Count == parameterCount).ToArray();
         if (matches.Length != 1 || !matches[0].HasBody || matches[0].IsStatic)
-            throw new InvalidDataException($"Step 38.1 expected exactly one instance {type.FullName}::{name} with {parameterCount} parameter(s) and managed IL body; found {matches.Length}.");
+            throw new InvalidDataException($"Step 38.2 expected exactly one instance {type.FullName}::{name} with {parameterCount} parameter(s) and managed IL body; found {matches.Length}.");
         return matches[0];
+    }
+
+    private static void RequireStep38OffTreeCompatibility(MethodDefinition enterTree)
+    {
+        var sentryInitializeCalls = enterTree.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code is Code.Call or Code.Callvirt && instruction.Operand is MethodReference method &&
+            method.DeclaringType.FullName == "MegaCrit.Sts2.Core.Debug.SentryService" && method.Name == "Initialize" &&
+            !method.HasThis && method.Parameters.Count == 0 && method.ReturnType.FullName == "System.Void");
+        var getWindowCalls = enterTree.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code is Code.Call or Code.Callvirt && instruction.Operand is MethodReference method &&
+            method.DeclaringType.FullName == "Godot.Node" && method.Name == "GetWindow" && method.HasThis &&
+            method.Parameters.Count == 0 && method.ReturnType.FullName == "Godot.Window");
+        var filesDroppedFields = enterTree.Body.Instructions
+            .Select(instruction => instruction.Operand).OfType<FieldReference>()
+            .Count(field => field.DeclaringType.FullName == "Godot.Window/SignalName" && field.Name == "FilesDropped");
+        var connectCalls = enterTree.Body.Instructions.Count(instruction =>
+            instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method &&
+            method.DeclaringType.FullName == "Godot.GodotObject" && method.Name == "Connect" && method.HasThis &&
+            method.Parameters.Count == 3 && method.ReturnType.FullName == "Godot.Error");
+
+        if (sentryInitializeCalls != 0 || getWindowCalls != 0 || filesDroppedFields != 0 || connectCalls != 0)
+        {
+            throw new InvalidDataException(
+                $"Step 38.2 selected authority is missing the exact iOS/off-tree _EnterTree compatibility shape: " +
+                $"SentryInitialize={sentryInitializeCalls}; GetWindow={getWindowCalls}; FilesDropped={filesDroppedFields}; Connect={connectCalls}; expected all zero.");
+        }
     }
 
     private static void RequireInertGameStartupWrapper(MethodDefinition method)
@@ -447,7 +479,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             completedTask.ReturnType.FullName != "System.Threading.Tasks.Task" ||
             method.Body.Instructions[1].OpCode != OpCodes.Ret)
         {
-            throw new InvalidDataException("Step 38.1 selected authority GameStartupWrapper is not the exact verified inert body: call Task.get_CompletedTask; ret.");
+            throw new InvalidDataException("Step 38.2 selected authority GameStartupWrapper is not the exact verified inert body: call Task.get_CompletedTask; ret.");
         }
     }
 
@@ -508,7 +540,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     {
         var lines = new List<string>
         {
-            "StS2 Launcher — Step 38.1 inert-startup-wrapper NGame lifecycle static IL/callsite map",
+            "StS2 Launcher — Step 38.2 iOS/off-tree-compatible NGame lifecycle static IL/callsite map",
             "Read-only Cecil evidence from the exact selected ModelDb + lifecycle-bootstrap compatibility authority; never consumed as trusted runtime input.",
             $"Selected path: {selectedPath}",
             $"Selected SHA-256: {selectedSha256}",
@@ -522,6 +554,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             $"LoadDeferredStartupAssetsAsync: token=0x{deferred.MetadataToken.ToUInt32():X8}; {deferred.FullName}",
             $"Same-NGame methods reachable from _EnterTree: {reachable.Count}",
             "Verified inert GameStartupWrapper reachable from _EnterTree: YES — exact body is call Task.get_CompletedTask; ret",
+            "SentryService.Initialize calls remaining in _EnterTree: 0 (single original call NOP-substituted)",
+            "Godot GetWindow/FilesDropped/Connect references remaining in _EnterTree: 0 (single bounded original block NOP-substituted)",
             "Forbidden later-startup methods reachable from _EnterTree same-NGame closure: 0",
             "Cecil external assembly resolution requests during Step 38 Gate A: 0",
             "SceneTree AddChild performed by Step 38: NO",

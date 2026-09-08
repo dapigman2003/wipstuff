@@ -1,0 +1,81 @@
+StS2 Launcher — Step 38.1 Controlled NGame _EnterTree Entry
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-08T02:13:44.9803230+00:00
+
+RESULT
+STEP 38.1 INERT-STARTUP-WRAPPER NGAME _ENTERTREE ENTRY FAIL — 2/4
+
+METADATA
+App version: 0.0.164 (164)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: direct NGame._EnterTree invocation
+InvalidOperationException: Step 38.1 NGame._EnterTree threw System.NullReferenceException: Arg_NullReferenceException
+Exception depth 0: System.NullReferenceException
+  Message: Arg_NullReferenceException
+  HResult: 0x80004003
+  Source: sts2
+  TargetSite: MegaCrit.Sts2.Core.Nodes.NGame::Void _EnterTree()
+  StackTrace:
+       at MegaCrit.Sts2.Core.Nodes.NGame._EnterTree()
+       at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+       at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+Base exception: System.NullReferenceException: Arg_NullReferenceException
+Base HResult: 0x80004003
+Base Source: sts2
+Base TargetSite: MegaCrit.Sts2.Core.Nodes.NGame::Void _EnterTree()
+Base StackTrace:
+     at MegaCrit.Sts2.Core.Nodes.NGame._EnterTree()
+     at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+     at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+Exception depth 0: System.InvalidOperationException
+  Message: Step 38.1 NGame._EnterTree threw System.NullReferenceException: Arg_NullReferenceException
+Exception depth 0: System.NullReferenceException
+  Message: Arg_NullReferenceException
+  HResult: 0x80004003
+  Source: sts2
+  TargetSite: MegaCrit.Sts2.Core.Nodes.NGame::Void _EnterTree()
+  StackTrace:
+       at MegaCrit.Sts2.Core.Nodes.NGame._EnterTree()
+       at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+       at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+Base exception: System.NullReferenceException: Arg_NullReferenceException
+Base HResult: 0x80004003
+Base Source: sts2
+Base TargetSite: MegaCrit.Sts2.Core.Nodes.NGame::Void _EnterTree()
+Base StackTrace:
+     at MegaCrit.Sts2.Core.Nodes.NGame._EnterTree()
+     at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+     at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  HResult: 0x80131509
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2GameLifecycleEntryGateResult RunNGameDirectEnterTreeInvocation(System.Action`1[System.String])
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunNGameDirectEnterTreeInvocation(Action`1 checkpoint)
+Exception depth 1: System.NullReferenceException
+  Message: Arg_NullReferenceException
+  HResult: 0x80004003
+  Source: sts2
+  TargetSite: MegaCrit.Sts2.Core.Nodes.NGame::Void _EnterTree()
+  StackTrace:
+       at MegaCrit.Sts2.Core.Nodes.NGame._EnterTree()
+       at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+       at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+Base exception: System.NullReferenceException: Arg_NullReferenceException
+Base HResult: 0x80004003
+Base Source: sts2
+Base TargetSite: MegaCrit.Sts2.Core.Nodes.NGame::Void _EnterTree()
+Base StackTrace:
+     at MegaCrit.Sts2.Core.Nodes.NGame._EnterTree()
+     at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+     at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+END OF REPORT

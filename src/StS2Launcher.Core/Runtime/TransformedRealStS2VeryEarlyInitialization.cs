@@ -35,7 +35,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
     private const string DiagnosticCloneFileName = "sts2.step35.0.27.instrumented.dll";
-    private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step38.1.lifecycle-bootstrap.dll";
+    private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step38.2.lifecycle-bootstrap.dll";
     private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.27.instrumented.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
@@ -251,7 +251,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 "Exact source/transformed ExecuteVeryEarly wrapper + async MoveNext semantics requalified; no direct ExecuteEssential/ExecuteDeferred/PrewarmJit or Harmony call crosses this boundary."));
 
             var diagnosticMode = DiagnosticMode;
-            stage = IsModelBootstrapCompatibilityMode ? "Step-38.1 ModelDb + lifecycle-bootstrap compatibility clone" : "Step-35.0.22 diagnostic-clone instrumentation";
+            stage = IsModelBootstrapCompatibilityMode ? "Step-38.2 ModelDb + lifecycle-bootstrap compatibility clone" : "Step-35.0.22 diagnostic-clone instrumentation";
             var diagnosticRoot = Path.Combine(_launcherDataRoot, "Step35-ExecuteVeryEarlyDiagnostic");
             Directory.CreateDirectory(diagnosticRoot);
             var diagnosticPath = Path.Combine(diagnosticRoot, IsModelBootstrapCompatibilityMode ? ModelBootstrapCompatibilityCloneFileName : DiagnosticCloneFileName);
@@ -265,7 +265,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 throw new InvalidDataException("Step-35.0.22 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
             progress?.Report(new(gate, 6, 8, diagnosticPath,
                 IsModelBootstrapCompatibilityMode
-                    ? $"Exact transformed image requalified, then the Step-38.1 ModelDb + lifecycle-bootstrap compatibility derivative was emitted and reopened under rejecting resolution. {modelBootstrapCompatibilityReport.Replace('\n', ' ')}"
+                    ? $"Exact transformed image requalified, then the Step-38.2 ModelDb + lifecycle-bootstrap compatibility derivative was emitted and reopened under rejecting resolution. {modelBootstrapCompatibilityReport.Replace('\n', ' ')}"
                     : $"Exact transformed image requalified, then a Step-35.0.22 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), {diagnostic.CommandLineManagedCommandLineSubstitutionCount:N0} managed command-line provider substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
 
             stage = "Step-21/22 prepared execution-plan preflight";
@@ -1017,7 +1017,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 if (admission.Assembly.GetType(DiagnosticBridgeTypeFullName, throwOnError: false, ignoreCase: false) is not null)
                     throw new InvalidDataException("Step-35 exact/ModelDb-compatibility CLR input unexpectedly contains the diagnostic checkpoint bridge type.");
                 Checkpoint(crashCheckpoint, IsModelBootstrapCompatibilityMode
-                    ? "C_MODEL_BOOTSTRAP_AUTHORITY_PASS — admitted sts2 assembly is the verified ModelDb + lifecycle-bootstrap compatibility derivative, contains no Step-35 diagnostic bridge, ExecuteVeryEarly remains uninjected, and only NGame.GameStartupWrapper is additionally inert."
+                    ? "C_MODEL_BOOTSTRAP_AUTHORITY_PASS — admitted sts2 assembly is the verified ModelDb + lifecycle-bootstrap compatibility derivative, contains no Step-35 diagnostic bridge, ExecuteVeryEarly remains uninjected, and the only lifecycle compatibility deltas are inert NGame.GameStartupWrapper plus exact _EnterTree Sentry/file-drop-window NOP suppressions."
                     : "C_EXACT_AUTHORITY_PASS — admitted sts2 assembly is the exact closed transformed artifact and contains no Step-35 diagnostic bridge; invocation will proceed without injected in-method markers.");
             }
 
@@ -1563,6 +1563,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         int originalGameStartupWrapperInstructionCount;
         uint gameStartupWrapperToken;
         string completedTaskGetterFullName;
+        int originalEnterTreeInstructionCount;
+        int originalEnterTreeNopCount;
+        int offTreeWindowBlockInstructionCount;
+        uint sentryInitializeToken;
 
         using var resolver = new DiagnosticConstantMetadataWriteResolver();
         using (var module = ModuleDefinition.ReadModule(exactTransformedPath, new ReaderParameters
@@ -1911,12 +1915,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 method.Parameters.Count == 0 &&
                 method.ReturnType.FullName == "System.Threading.Tasks.Task");
             if (enterTreeWrapperCalls != 1)
-                throw new InvalidDataException($"Step-38.1 expected exact NGame._EnterTree to call GameStartupWrapper exactly once before compatibility rewrite; observed {enterTreeWrapperCalls}.");
+                throw new InvalidDataException($"Step-38.2 expected exact NGame._EnterTree to call GameStartupWrapper exactly once before compatibility rewrite; observed {enterTreeWrapperCalls}.");
 
             originalGameStartupWrapperInstructionCount = gameStartupWrapper.Body.Instructions.Count;
             gameStartupWrapperToken = gameStartupWrapper.MetadataToken.ToUInt32();
             if (originalGameStartupWrapperInstructionCount < 2)
-                throw new InvalidDataException($"Step-38.1 original GameStartupWrapper IL was implausibly small: {originalGameStartupWrapperInstructionCount} instruction(s).");
+                throw new InvalidDataException($"Step-38.2 original GameStartupWrapper IL was implausibly small: {originalGameStartupWrapperInstructionCount} instruction(s).");
 
             var completedTaskGetters = EnumerateTypes(module.Types)
                 .SelectMany(type => type.Methods)
@@ -1933,13 +1937,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                     method.ReturnType.FullName == "System.Threading.Tasks.Task")
                 .ToArray();
             if (completedTaskGetters.Length == 0)
-                throw new InvalidDataException("Step-38.1 could not reuse an existing System.Threading.Tasks.Task.get_CompletedTask MemberRef from the exact sts2 authority.");
+                throw new InvalidDataException("Step-38.2 could not reuse an existing System.Threading.Tasks.Task.get_CompletedTask MemberRef from the exact sts2 authority.");
             var completedTaskGetter = completedTaskGetters[0];
             if (completedTaskGetters.Any(method =>
                     method.FullName != completedTaskGetter.FullName ||
                     method.DeclaringType.Scope?.ToString() != completedTaskGetter.DeclaringType.Scope?.ToString()))
             {
-                throw new InvalidDataException("Step-38.1 observed inconsistent Task.get_CompletedTask MemberRef metadata in the exact sts2 authority.");
+                throw new InvalidDataException("Step-38.2 observed inconsistent Task.get_CompletedTask MemberRef metadata in the exact sts2 authority.");
             }
             completedTaskGetterFullName = completedTaskGetter.FullName;
 
@@ -1950,6 +1954,80 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             var startupIl = gameStartupWrapper.Body.GetILProcessor();
             startupIl.Append(Instruction.Create(OpCodes.Call, completedTaskGetter));
             startupIl.Append(Instruction.Create(OpCodes.Ret));
+
+            // Step 38.2 iOS/off-tree lifecycle compatibility extension. Physical 0.0.164
+            // entered the otherwise unchanged NGame._EnterTree and failed with a managed NRE
+            // while the experimental instance was deliberately still outside the SceneTree.
+            // Keep all NGame singleton/property/GetNode setup intact, but neutralize only:
+            //   (1) the early desktop telemetry SentryService.Initialize call, because Sentry is
+            //       intentionally disabled in the iOS compatibility host; and
+            //   (2) the file-drop window signal hookup, which requires a containing Window and
+            //       therefore cannot be exercised faithfully on an off-tree diagnostic instance.
+            // Both edits are stack-neutral NOP substitutions. No call target is redirected.
+            originalEnterTreeInstructionCount = enterTree.Body.Instructions.Count;
+            originalEnterTreeNopCount = enterTree.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Nop);
+
+            var sentryInitializeCalls = enterTree.Body.Instructions
+                .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt && instruction.Operand is MethodReference method &&
+                    method.DeclaringType.FullName == "MegaCrit.Sts2.Core.Debug.SentryService" &&
+                    method.Name == "Initialize" && !method.HasThis && method.Parameters.Count == 0 &&
+                    method.ReturnType.FullName == "System.Void")
+                .ToArray();
+            if (sentryInitializeCalls.Length != 1 || sentryInitializeCalls[0].Operand is not MethodReference sentryInitialize)
+                throw new InvalidDataException($"Step-38.2 expected exactly one NGame._EnterTree SentryService.Initialize call before compatibility rewrite; observed {sentryInitializeCalls.Length}.");
+            sentryInitializeToken = sentryInitialize.MetadataToken.ToUInt32();
+            sentryInitializeCalls[0].OpCode = OpCodes.Nop;
+            sentryInitializeCalls[0].Operand = null;
+
+            var enterTreeInstructions = enterTree.Body.Instructions;
+            var getWindowCalls = enterTreeInstructions
+                .Select((instruction, index) => (instruction, index))
+                .Where(item => item.instruction.OpCode.Code is Code.Call or Code.Callvirt && item.instruction.Operand is MethodReference method &&
+                    method.DeclaringType.FullName == "Godot.Node" && method.Name == "GetWindow" && method.HasThis &&
+                    method.Parameters.Count == 0 && method.ReturnType.FullName == "Godot.Window")
+                .ToArray();
+            if (getWindowCalls.Length != 1)
+                throw new InvalidDataException($"Step-38.2 expected exactly one NGame._EnterTree Godot.Node.GetWindow call; observed {getWindowCalls.Length}.");
+            var getWindowIndex = getWindowCalls[0].index;
+            if (getWindowIndex == 0 || enterTreeInstructions[getWindowIndex - 1].OpCode != OpCodes.Ldarg_0)
+                throw new InvalidDataException("Step-38.2 expected NGame._EnterTree GetWindow to be immediately preceded by ldarg.0.");
+
+            var connectCandidates = enterTreeInstructions
+                .Select((instruction, index) => (instruction, index))
+                .Where(item => item.index > getWindowIndex && item.instruction.OpCode == OpCodes.Callvirt && item.instruction.Operand is MethodReference method &&
+                    method.DeclaringType.FullName == "Godot.GodotObject" && method.Name == "Connect" && method.HasThis &&
+                    method.Parameters.Count == 3 && method.ReturnType.FullName == "Godot.Error")
+                .ToArray();
+            if (connectCandidates.Length != 1)
+                throw new InvalidDataException($"Step-38.2 expected exactly one post-GetWindow GodotObject.Connect call in NGame._EnterTree; observed {connectCandidates.Length}.");
+            var connectIndex = connectCandidates[0].index;
+            if (connectIndex + 1 >= enterTreeInstructions.Count || enterTreeInstructions[connectIndex + 1].OpCode != OpCodes.Pop)
+                throw new InvalidDataException("Step-38.2 expected the NGame._EnterTree FilesDropped Connect result to be immediately popped.");
+
+            // Require the exact FilesDropped signal field inside the bounded block before nopping it.
+            var boundedWindowBlock = enterTreeInstructions.Skip(getWindowIndex - 1).Take(connectIndex - (getWindowIndex - 1) + 2).ToArray();
+            var filesDroppedFields = boundedWindowBlock
+                .Select(instruction => instruction.Operand)
+                .OfType<FieldReference>()
+                .Count(field => field.DeclaringType.FullName == "Godot.Window/SignalName" && field.Name == "FilesDropped");
+            if (filesDroppedFields != 1)
+                throw new InvalidDataException($"Step-38.2 expected exactly one Godot.Window.SignalName.FilesDropped field in the bounded GetWindow/Connect block; observed {filesDroppedFields}.");
+            offTreeWindowBlockInstructionCount = boundedWindowBlock.Length;
+            if (offTreeWindowBlockInstructionCount < 8 || offTreeWindowBlockInstructionCount > 32)
+                throw new InvalidDataException($"Step-38.2 bounded GetWindow/FilesDropped/Connect block instruction count was implausible: {offTreeWindowBlockInstructionCount}.");
+            var boundedWindowBlockSet = boundedWindowBlock.ToHashSet();
+            var externalBranchIntoWindowBlock = enterTreeInstructions
+                .Where(instruction => !boundedWindowBlockSet.Contains(instruction))
+                .Any(instruction =>
+                    (instruction.Operand is Instruction target && boundedWindowBlockSet.Contains(target)) ||
+                    (instruction.Operand is Instruction[] targets && targets.Any(boundedWindowBlockSet.Contains)));
+            if (externalBranchIntoWindowBlock)
+                throw new InvalidDataException("Step-38.2 refuses to neutralize the GetWindow/FilesDropped block because an external branch targets an instruction inside it.");
+            foreach (var instruction in boundedWindowBlock)
+            {
+                instruction.OpCode = OpCodes.Nop;
+                instruction.Operand = null;
+            }
 
             module.Write(compatibilityPath, new WriterParameters { WriteSymbols = false });
             writeResolutionRequestCount = resolver.Requests.Count;
@@ -2046,7 +2124,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 method.HasBody)
                 ?? throw new MissingMethodException(NGameTypeFullName, NGameGameStartupWrapperMethodName);
             if (serializedStartupWrapper.MetadataToken.ToUInt32() != gameStartupWrapperToken)
-                throw new InvalidDataException($"Step-38.1 serialized GameStartupWrapper token drifted: expected=0x{gameStartupWrapperToken:X8}; actual=0x{serializedStartupWrapper.MetadataToken.ToUInt32():X8}.");
+                throw new InvalidDataException($"Step-38.2 serialized GameStartupWrapper token drifted: expected=0x{gameStartupWrapperToken:X8}; actual=0x{serializedStartupWrapper.MetadataToken.ToUInt32():X8}.");
             if (serializedStartupWrapper.Body.Variables.Count != 0 ||
                 serializedStartupWrapper.Body.ExceptionHandlers.Count != 0 ||
                 serializedStartupWrapper.Body.Instructions.Count != 2 ||
@@ -2059,10 +2137,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 serializedCompletedTask.ReturnType.FullName != "System.Threading.Tasks.Task" ||
                 serializedStartupWrapper.Body.Instructions[1].OpCode != OpCodes.Ret)
             {
-                throw new InvalidDataException("Step-38.1 serialized GameStartupWrapper is not the exact two-instruction Task.CompletedTask compatibility body.");
+                throw new InvalidDataException("Step-38.2 serialized GameStartupWrapper is not the exact two-instruction Task.CompletedTask compatibility body.");
             }
             if (serializedCompletedTask.FullName != completedTaskGetterFullName)
-                throw new InvalidDataException($"Step-38.1 serialized Task.CompletedTask MemberRef drifted: expected={completedTaskGetterFullName}; actual={serializedCompletedTask.FullName}.");
+                throw new InvalidDataException($"Step-38.2 serialized Task.CompletedTask MemberRef drifted: expected={completedTaskGetterFullName}; actual={serializedCompletedTask.FullName}.");
             var serializedEnterTreeWrapperCalls = serializedEnterTree.Body.Instructions.Count(instruction =>
                 instruction.OpCode.Code is Code.Call or Code.Callvirt &&
                 instruction.Operand is MethodReference method &&
@@ -2071,10 +2149,40 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 method.Parameters.Count == 0 &&
                 method.ReturnType.FullName == "System.Threading.Tasks.Task");
             if (serializedEnterTreeWrapperCalls != 1)
-                throw new InvalidDataException($"Step-38.1 serialized NGame._EnterTree must still call GameStartupWrapper exactly once; observed {serializedEnterTreeWrapperCalls}.");
+                throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree must still call GameStartupWrapper exactly once; observed {serializedEnterTreeWrapperCalls}.");
+
+            if (serializedEnterTree.Body.Instructions.Count != originalEnterTreeInstructionCount)
+                throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree instruction count drifted: expected {originalEnterTreeInstructionCount}; observed {serializedEnterTree.Body.Instructions.Count}.");
+            var serializedEnterTreeNopCount = serializedEnterTree.Body.Instructions.Count(instruction => instruction.OpCode == OpCodes.Nop);
+            var expectedEnterTreeNopCount = checked(originalEnterTreeNopCount + 1 + offTreeWindowBlockInstructionCount);
+            if (serializedEnterTreeNopCount != expectedEnterTreeNopCount)
+                throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree NOP count drifted: expected {expectedEnterTreeNopCount}; observed {serializedEnterTreeNopCount}.");
+            var serializedSentryInitializeCalls = serializedEnterTree.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code is Code.Call or Code.Callvirt && instruction.Operand is MethodReference method &&
+                method.DeclaringType.FullName == "MegaCrit.Sts2.Core.Debug.SentryService" && method.Name == "Initialize" &&
+                !method.HasThis && method.Parameters.Count == 0 && method.ReturnType.FullName == "System.Void");
+            if (serializedSentryInitializeCalls != 0)
+                throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree still contains {serializedSentryInitializeCalls} SentryService.Initialize call(s); expected zero.");
+            var serializedGetWindowCalls = serializedEnterTree.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code is Code.Call or Code.Callvirt && instruction.Operand is MethodReference method &&
+                method.DeclaringType.FullName == "Godot.Node" && method.Name == "GetWindow" && method.HasThis &&
+                method.Parameters.Count == 0 && method.ReturnType.FullName == "Godot.Window");
+            if (serializedGetWindowCalls != 0)
+                throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree still contains {serializedGetWindowCalls} Godot.Node.GetWindow call(s); expected zero.");
+            var serializedFilesDroppedFields = serializedEnterTree.Body.Instructions
+                .Select(instruction => instruction.Operand).OfType<FieldReference>()
+                .Count(field => field.DeclaringType.FullName == "Godot.Window/SignalName" && field.Name == "FilesDropped");
+            if (serializedFilesDroppedFields != 0)
+                throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree still references Godot.Window.SignalName.FilesDropped {serializedFilesDroppedFields} time(s); expected zero.");
+            var serializedGodotConnectCalls = serializedEnterTree.Body.Instructions.Count(instruction =>
+                instruction.OpCode == OpCodes.Callvirt && instruction.Operand is MethodReference method &&
+                method.DeclaringType.FullName == "Godot.GodotObject" && method.Name == "Connect" && method.HasThis &&
+                method.Parameters.Count == 3 && method.ReturnType.FullName == "Godot.Error");
+            if (serializedGodotConnectCalls != 0)
+                throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree still contains {serializedGodotConnectCalls} GodotObject.Connect call(s); expected zero after removing only the FilesDropped hookup.");
 
             if (verifyResolver.Requests.Count != 0)
-                throw new InvalidDataException("Step-36.0.5/Step-38.1 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
+                throw new InvalidDataException("Step-36.0.5/Step-38.2 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
         }
 
         compatibilityReport =
@@ -2090,12 +2198,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             $"Compatibility SHA-256: {sha256}\n" +
             $"Compatibility bytes: {length:N0}\n" +
             $"Writer-only constant metadata requests: {writeResolutionRequestCount:N0}; identities={writeResolutionIdentities}\n" +
-            "STEP 38.1 LIFECYCLE-BOOTSTRAP COMPATIBILITY PLAN\n" +
+            "STEP 38.2 IOS/OFFTREE LIFECYCLE-BOOTSTRAP COMPATIBILITY PLAN\n" +
             $"NGame.GameStartupWrapper token: 0x{gameStartupWrapperToken:X8}\n" +
             $"Original GameStartupWrapper instructions: {originalGameStartupWrapperInstructionCount:N0}\n" +
             "Serialized GameStartupWrapper instructions: 2 (call Task.get_CompletedTask; ret)\n" +
             $"Reused completed-task MemberRef: {completedTaskGetterFullName}\n" +
-            "NGame._EnterTree body: unchanged; exact direct GameStartupWrapper call count preserved at 1\n" +
+            $"NGame._EnterTree original instructions/NOPs: {originalEnterTreeInstructionCount:N0}/{originalEnterTreeNopCount:N0}\n" +
+            $"Suppressed SentryService.Initialize MemberRef token: 0x{sentryInitializeToken:X8}; substitutions=1\n" +
+            $"Suppressed off-tree GetWindow/FilesDropped/Connect block instructions: {offTreeWindowBlockInstructionCount:N0}\n" +
+            "NGame._EnterTree exact direct GameStartupWrapper call count preserved at 1; all non-authorized lifecycle IL remains in place\n" +
             "GameStartup/InitializePlatform/LaunchMainMenu/ExecuteDeferred: not rewritten and not invoked by this compatibility transform";
 
         return new DiagnosticCloneSnapshot(

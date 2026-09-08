@@ -17,7 +17,7 @@ public sealed class TransformedRealStS2GameLifecycleEntryTests
 
         var snapshot = gates.Snapshot();
         Assert.IsTrue(snapshot.Passed);
-        Assert.AreEqual("STEP 38.1 INERT-STARTUP-WRAPPER NGAME _ENTERTREE ENTRY COMPLETE — 4/4", snapshot.Summary);
+        Assert.AreEqual("STEP 38.2 IOS/OFFTREE-COMPAT NGAME _ENTERTREE ENTRY COMPLETE — 4/4", snapshot.Summary);
         Assert.AreEqual(4, snapshot.Gates.Count);
     }
 
