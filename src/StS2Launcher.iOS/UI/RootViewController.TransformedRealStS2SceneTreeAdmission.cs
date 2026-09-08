@@ -1,5 +1,6 @@
 using Foundation;
 using StS2Launcher.Core;
+using StS2Launcher.iOS.Platform;
 using System.Text;
 
 namespace StS2Launcher.iOS;

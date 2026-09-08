@@ -1,0 +1,21 @@
+StS2 Launcher — Step 39.0 Codemagic iOS compile integration failure
+Candidate: 0.0.166 (166)
+Artifact: wipstuff_13_artifacts.zip
+
+RESULT
+- Canonical static validation: PASS, 1051 checks.
+- Host unit tests: PASS, 233/233.
+- Step 15 standalone native-link preflight: PASS.
+- Godot Step 15 cache: restored/present.
+- Pinned .NET SDK/workloads cache: restored/present.
+- iOS arm64 obj cache: restored/present, ~2.9 GiB, 1092 AOT output files before build.
+- StS2Launcher.Core compiled successfully.
+- StS2Launcher.iOS compile failed before publish/device execution.
+
+FIRST FAILURE
+RootViewController.TransformedRealStS2SceneTreeAdmission.cs referenced GodotStep15NativeBridge at four call sites but the partial file did not import StS2Launcher.iOS.Platform.
+Compiler diagnostics were CS0103: The name 'GodotStep15NativeBridge' does not exist in the current context.
+Affected source lines in the Codemagic checkout: 118, 121, 122, 162.
+
+INTERPRETATION
+GodotStep15NativeBridge.cs was present and its native symbols had already passed the standalone link preflight. This is a C# partial-file namespace/import integration defect only. No Step-39 runtime boundary, SceneTree AddChild, automatic lifecycle callback, render freeze, or game/native execution was reached.

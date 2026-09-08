@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>166</ApplicationVersion>" in project_text, "build version is 166")
-require("<ApplicationDisplayVersion>0.0.166</ApplicationDisplayVersion>" in project_text, "display version is 0.0.166")
-require(plist.get("CFBundleVersion") == "166", "Info.plist build version is 166")
-require(plist.get("CFBundleShortVersionString") == "0.0.166", "Info.plist display version is 0.0.166")
+require("<ApplicationVersion>167</ApplicationVersion>" in project_text, "build version is 166")
+require("<ApplicationDisplayVersion>0.0.167</ApplicationDisplayVersion>" in project_text, "display version is 0.0.167")
+require(plist.get("CFBundleVersion") == "167", "Info.plist build version is 166")
+require(plist.get("CFBundleShortVersionString") == "0.0.167", "Info.plist display version is 0.0.167")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -201,7 +201,7 @@ release_presentation = release_presentation_path.read_text() if release_presenta
 require("STEP 39.0 — REAL SCENETREE ADMISSION" in release_presentation, "top launcher banner identifies active Step 39.0 real SceneTree admission candidate")
 require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "NGame._EnterTree", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred"]), "top launcher banner records physical Step-37/38 closure and the bounded Step-39 SceneTree boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.166"' in release_presentation and 'ExpectedBuildVersion = "166"' in release_presentation, "Step 39 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.167"' in release_presentation and 'ExpectedBuildVersion = "167"' in release_presentation, "Step 39 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -342,8 +342,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-39.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.166",
-    "STS2_BUILD_VERSION": "166",
+    "STS2_DISPLAY_VERSION": "0.0.167",
+    "STS2_BUILD_VERSION": "167",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1405,6 +1405,7 @@ require(all(marker in step39_ui for marker in [
     'RunStep39FrozenPostInsertionConfinement', 'Step39-CrashCheckpoint-', 'Step39-SceneTreeAdmission-StaticMap-',
     'Step39-LastCheckpoint.txt', 'Step39-TransformedRealStS2SceneTreeAdmission.txt', 'RUN_STEP39_4OF4',
 ]), "Step 39 iOS surface enforces the fresh-process branch, immediate render freeze, and complete telemetry contract")
+require("using StS2Launcher.iOS.Platform;" in step39_ui and "GodotStep15NativeBridge" in step39_ui, "Step 39.0.1 Step-39 iOS partial explicitly imports the Platform namespace required to resolve GodotStep15NativeBridge and protects the 0.0.166 CS0103 compile regression")
 if step39_ui:
     idx_gate_c = step39_ui.find('RunStep39RealSceneTreeInsertion')
     idx_stop = step39_ui.find('GodotStep15NativeBridge.StopRendering()', idx_gate_c)
@@ -1664,10 +1665,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 39.0 / 0.0.166 (166)", "Physical **0.0.165 / Step 38.2**", "closed **4/4**", "Step 37.0.1", "NGame.Instance", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred", "Skip Step 38"]), "current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary")
+require(all(marker in current_status for marker in ["Active candidate — Step 39.0 / 0.0.167 (167)", "Physical **0.0.165 / Step 38.2**", "closed **4/4**", "Step 37.0.1", "NGame.Instance", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred", "Skip Step 38"]), "current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.166 (166)" in testing_doc and "0.0.166 (166)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.166 (166) release identity")
+require("0.0.167 (167)" in testing_doc and "0.0.167 (167)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.167 (167) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -2101,6 +2102,9 @@ require(all(value in step38_physical_165 for value in ["App version: 0.0.165 (16
 require(all(value in step38_static_165 for value in ["Verified inert GameStartupWrapper", "SentryService.Initialize calls remaining in _EnterTree: 0", "GetWindow/FilesDropped/Connect references remaining in _EnterTree: 0", "SceneTree AddChild performed by Step 38: NO"]), "physical 0.0.165 static map preserves the exact Step-38.2 iOS/off-tree compatibility shape")
 require("STEP 38.2 IOS/OFFTREE-COMPAT NGAME _ENTERTREE ENTRY COMPLETE — 4/4" in step38_report_165, "physical 0.0.165 final report preserves Step-38.2 4/4 result")
 
+step39_compile_166 = read("docs/history/reports/STEP-39.0-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.166.txt")
+require(all(value in step39_compile_166 for value in ["0.0.166 (166)", "1051 checks", "233/233", "CS0103", "GodotStep15NativeBridge", "No Step-39 runtime boundary"]), "physical 0.0.166 compile evidence preserves the Step-39 namespace-only stop before runtime")
+
 step39_manifest = ROOT / "tools/validation/candidate-step39-real-scenetree-admission.sha256"
 require(step39_manifest.is_file(), "Step 39 active candidate hash manifest exists")
 if step39_manifest.is_file():
@@ -2123,6 +2127,8 @@ if step39_manifest.is_file():
         "README.md", "docs/README.md", "docs/CURRENT-STATUS.md", "docs/MASTER-PLAN.md", "docs/ARCHITECTURE.md",
         "docs/TESTING.md", "docs/REGRESSION-CONTRACTS.md", "docs/REPORTS.md", "docs/RELEASE-CHECKLIST.md", "docs/history/INDEX.md",
         "docs/history/steps/STEP-39.0-PREFLIGHT-RESOURCE-AUDIT.md", "docs/history/steps/STEP-39.0-REAL-SCENETREE-ADMISSION.md",
+        "docs/history/steps/STEP-39.0.1-IOS-NAMESPACE-COMPILE-CORRECTION.md",
+        "docs/history/reports/STEP-39.0-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.166.txt",
         "docs/history/reports/STEP-38.2-PHYSICAL-COMPLETE-0.0.165-CHECKPOINT.txt",
         "docs/history/reports/STEP-38.2-PHYSICAL-COMPLETE-0.0.165-STATIC-MAP.txt",
         "docs/history/reports/STEP-38.2-PHYSICAL-COMPLETE-0.0.165-LAST-CHECKPOINT.txt",

@@ -388,3 +388,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-38.2-PHYSICAL-COMPLETE-0.0.165-STATIC-MAP.txt` — exact compatibility `_EnterTree`/startup IL map.
 - `steps/STEP-39.0-PREFLIGHT-RESOURCE-AUDIT.md` — hash-only targeted PCK preflight and tokenized GDScript findings; no proprietary bytes retained.
 - `steps/STEP-39.0-REAL-SCENETREE-ADMISSION.md` — 0.0.166 real SceneTree AddChild + immediate render-freeze design.
+
+## Step 39.0 compile integration / Step 39.0.1 correction
+
+- `reports/STEP-39.0-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.166.txt` — 0.0.166 passed static/host/native-link gates but iOS compile stopped with CS0103 because the Step-39 UI partial omitted the Platform namespace import; no runtime boundary was reached.
+- `steps/STEP-39.0.1-IOS-NAMESPACE-COMPILE-CORRECTION.md` — 0.0.167 compile-only correction adding the missing `StS2Launcher.iOS.Platform` import and regression guard while preserving Step-39 runtime semantics.

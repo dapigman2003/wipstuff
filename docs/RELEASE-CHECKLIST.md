@@ -1,6 +1,6 @@
-# Release checklist — Step 39.0 / 0.0.166
+# Release checklist — Step 39.0 / 0.0.167
 
-Release identity: display/build `0.0.166 (166)`, IPA `StS2-Launcher-Step-39.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.167 (167)`, IPA `StS2-Launcher-Step-39.ipa`, workflow `ios-canonical`.
 
 - Static validator passes completely in the working tree and a fresh extraction of the final ZIP.
 - Codemagic host tests compile/pass under the pinned .NET SDK; native-link preflight passes before iOS publish.
@@ -16,3 +16,7 @@ Release identity: display/build `0.0.166 (166)`, IPA `StS2-Launcher-Step-39.ipa`
 - No GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam init, native GDExtension load, gameplay, retry, or state reset.
 - Fresh-process test chain explicitly skips Step 38 before Step 39.
 - No proprietary game/native payload is present in the source ZIP.
+
+## 0.0.167 compile correction
+
+Physical Codemagic 0.0.166 passed 1051/1051 static checks, 233/233 host tests, and the Step-15 native-link preflight, then failed before publish/device execution with CS0103 because the Step-39 UI partial omitted `using StS2Launcher.iOS.Platform;`. 0.0.167 changes only that import and release provenance.

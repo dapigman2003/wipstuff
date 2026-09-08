@@ -1,6 +1,8 @@
 # StS2 Launcher — Step 39.0
 
-Active candidate: **0.0.166 (166)** — first real Godot `SceneTree` admission.
+Active candidate: **0.0.167 (167)** — first real Godot `SceneTree` admission.
+
+Physical Codemagic **0.0.166** passed 1051/1051 static checks, 233/233 host tests, and Step-15 native-link preflight, then stopped at iOS C# compile because the Step-39 UI partial omitted `using StS2Launcher.iOS.Platform;`. No SceneTree/runtime boundary was reached. **0.0.167** is a compile-only correction with unchanged Step-39 runtime semantics.
 
 Physical **0.0.159** closed Step 36.0.5 at 4/4 with unchanged full `ExecuteEssential()`. Physical **0.0.161** closed Step 37.0.1 at 4/4 with sealed FMOD-neutral `game.tscn` load and real off-tree `NGame` construction. Physical **0.0.165** closed Step 38.2 at 4/4: the verified iOS/off-tree-compatible `NGame._EnterTree()` returned once while `IsInsideTree == false`, state remained `2`, and resolver/initializer/rejected/native deltas were all zero.
 
