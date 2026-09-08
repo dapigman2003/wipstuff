@@ -1,11 +1,11 @@
-# StS2 Launcher — Step 39.1
+# StS2 Launcher — Step 39.2
 
-Active candidate: **0.0.169 (168)** — Gate-B lifecycle compatibility before the first real Godot `SceneTree` insertion.
+Active candidate: **0.0.170 (170)** — Gate-D frozen inserted-tree confinement correction.
 
-Physical **0.0.167** passed Step-39 Gate A and failed closed in the actual-hierarchy Gate-B lifecycle audit before `AddChild`. The observed blockers were the exact two `SteamRemoteStorage` cloud-capability probes reached through `SaveManager.ConstructDefault()` and Sentry wrapper/callback paths reached from automatic `_Ready` / `_Notification` closure.
+Physical **0.0.169 / Step 39.1** closed the unknown real-insertion question: Gate B passed on the actual 69-node hierarchy, and `SceneTree.Root.AddChild(NGame)` returned successfully on-device with exact singleton/parent/window/state authority and zero rejected/initializer/native escape. Rendering then stopped synchronously as designed.
 
-0.0.169 preserves the existing Step-36/37/38 compatibility work and adds only a launcher-private Step-39.1 lifecycle-admission extension: force those two Steam cloud probes false, seal the already-disabled game-owned `SentryService` and nested helpers inert, and inert compiler-generated void helpers that directly call external `Sentry.*` methods. The derivative is reopened and verified before Gate B.
+The only failure was after that successful insertion/freeze, inside Gate-D launcher bookkeeping: reflection selected zero-argument `GetParent` with `Single(...)`, but Godot exposes more than one matching method shape. **0.0.170 changes only that selector** to require a non-generic, closed method whose return type can represent the live `SceneTree.Root`.
 
-Gate B remains fail-closed for surviving external Sentry, Steamworks/SteamService, FMOD, Spine, later startup/platform/native, unresolved same-sts2, or Cecil external-resolution edges. Gate C/D semantics are unchanged: one real `SceneTree.Root.AddChild(NGame)`, immediate synchronous render freeze on return, then frozen in-tree confinement.
+No compatibility-image semantics are changed from the physically proven 0.0.169 run. Gate B remains fail-closed; GameStartup, platform initialization, main-menu/deferred startup, Steam/native GDExtensions, explicit `_ExitTree`, RemoveChild/Free, and render restart remain unauthorized.
 
-Authoritative status: `CURRENT-STATUS.md`. Historical design/evidence: `history/steps/STEP-39.1-GATE-B-LIFECYCLE-COMPATIBILITY.md` and the 0.0.167 Step-39 physical Gate-B reports under `history/reports/`.
+Authoritative status: `CURRENT-STATUS.md`. Historical design/evidence remains under `history/`.

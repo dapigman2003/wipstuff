@@ -510,8 +510,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 .Single(method => method.Name == "get_Instance" && method.GetParameters().Length == 0 && method.ReturnType == instance.GetType());
             if (!ReferenceEquals(instanceGetter.Invoke(null, null), instance))
                 throw new InvalidDataException("Step 39.0 NGame.Instance no longer points to the inserted object.");
-            var getParent = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Single(method => method.Name == "GetParent" && method.GetParameters().Length == 0);
+            var getParentCandidates = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(method => method.Name == "GetParent" && method.GetParameters().Length == 0)
+                .ToArray();
+            var getParent = getParentCandidates.SingleOrDefault(method =>
+                    !method.IsGenericMethodDefinition &&
+                    !method.ContainsGenericParameters &&
+                    method.ReturnType.IsAssignableFrom(sceneTreeRoot.GetType()))
+                ?? throw new MissingMethodException(
+                    instance.GetType().FullName,
+                    $"GetParent() exact non-generic SceneTree-root-compatible overload; candidates={string.Join(",", getParentCandidates.Select(method => method.ToString()))}");
             if (!ReferenceEquals(getParent.Invoke(instance, null), sceneTreeRoot))
                 throw new InvalidDataException("Step 39.0 inserted NGame parent drifted from SceneTree.Root.");
             var windowField = instance.GetType().GetField("_window", BindingFlags.Static | BindingFlags.NonPublic)

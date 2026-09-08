@@ -393,3 +393,12 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `reports/STEP-39.0-CODEMAGIC-IOS-COMPILE-NAMESPACE-FAILURE-0.0.166.txt` — 0.0.166 passed static/host/native-link gates but iOS compile stopped with CS0103 because the Step-39 UI partial omitted the Platform namespace import; no runtime boundary was reached.
 - `steps/STEP-39.0.1-IOS-NAMESPACE-COMPILE-CORRECTION.md` — 0.0.167 compile-only correction adding the missing `StS2Launcher.iOS.Platform` import and regression guard while preserving Step-39 runtime semantics.
+
+
+## Step 39.2 Gate-D reflection correction
+
+- `steps/STEP-39.2-GATE-D-GETPARENT-REFLECTION-CORRECTION.md` — 0.0.170 corrects only the Gate-D zero-argument `GetParent` reflection selector after physical 0.0.169 passed Gates A/B/C and the first real `SceneTree.Root.AddChild(NGame)`.
+- `reports/STEP-39.1-PHYSICAL-0.0.169-REPORT.txt` — physical final result: 3/4, failing only in frozen confinement with `MoreThanOneMatch`.
+- `reports/STEP-39.1-PHYSICAL-0.0.169-CHECKPOINT.txt` — run-correlated proof of Gate-B PASS, first real AddChild PASS, synchronous render freeze, then Gate-D reflection-only failure.
+- `reports/STEP-39.1-PHYSICAL-0.0.169-STATIC-MAP.txt` — exact 69-node hierarchy / 23 managed types / 26 immediate callbacks / 557-method closure with zero forbidden or unresolved references.
+- `reports/STEP-39.1-PHYSICAL-0.0.169-LAST-CHECKPOINT.txt` — normal run end with Step 39 not restarting rendering.

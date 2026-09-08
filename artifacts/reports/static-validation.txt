@@ -1,5 +1,5 @@
 StS2 Launcher — Step 39.1 Gate-B lifecycle compatibility validation
-Root: /mnt/data/StS2Launcher-Step39-1-0.0.169
+Root: /mnt/data/StS2Launcher-Step39-2-0.0.170
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 266 C# files
@@ -9,10 +9,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 168
-PASS: display version is 0.0.169
-PASS: Info.plist build version is 168
-PASS: Info.plist display version is 0.0.169
+PASS: build version is 170
+PASS: display version is 0.0.170
+PASS: Info.plist build version is 170
+PASS: Info.plist display version is 0.0.170
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -20,7 +20,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 39.0 real SceneTree admission candidate
+PASS: top launcher banner identifies the active Step 39.2 Gate-D confinement correction
+PASS: top launcher presentation records the physical 0.0.169 Gate-A/B/C closure and the narrow 0.0.170 Gate-D correction
+PASS: root and docs READMEs pin the exact 0.0.170 (170) release identity
+PASS: master plan points to the active 0.0.170 / Step 39.2 frontier
 PASS: top launcher banner records physical Step-37/38 closure and the bounded Step-39 SceneTree boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: Step 39 source pins expected bundle release identity
@@ -881,7 +884,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
 PASS: current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary
-PASS: testing and release-checklist docs pin the exact 0.0.169 (169) release identity
+PASS: testing and release-checklist docs pin the exact 0.0.170 (170) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1018,7 +1021,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step-39.0 candidate
+PASS: IPA verifier advertises the active Step-39.2 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -1051,12 +1054,16 @@ PASS: physical 0.0.165 preserves Step-38.2 four-of-four off-tree lifecycle closu
 PASS: physical 0.0.165 static map preserves the exact Step-38.2 iOS/off-tree compatibility shape
 PASS: physical 0.0.165 final report preserves Step-38.2 4/4 result
 PASS: physical 0.0.166 compile evidence preserves the Step-39 namespace-only stop before runtime
+PASS: physical 0.0.169 preserves Gate-B PASS, first real AddChild PASS, render freeze, and Gate-D reflection-only failure
+PASS: physical 0.0.169 static map preserves the exact clean lifecycle admission authority
+PASS: physical 0.0.169 final report localizes the remaining failure to Gate-D reflection bookkeeping
 PASS: Step 39 forbidden fragment list does not substring-match generic Sentry type arguments
 PASS: Step 39 classifies actual Sentry declaring namespaces while preserving the physical 0.0.168 generic-delegate regression guard
+PASS: Step 39 Gate D selects the exact non-generic root-compatible GetParent overload after physical 0.0.169 MoreThanOneMatch
 PASS: Step 39 active candidate hash manifest exists
 PASS: Step 39 candidate manifest pins SceneTree implementation/tests, exact preflight provenance, physical Step-36/37/38 authority, and active release wiring
 PASS: Step 39 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1057 checks
+VALIDATION PASS: 1064 checks

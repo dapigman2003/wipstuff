@@ -1,13 +1,9 @@
-# StS2 Launcher — Step 39.1
+# StS2 Launcher — Step 39.2
 
-Active candidate: **0.0.169 (168)** — Gate-B lifecycle compatibility for the first real Godot `SceneTree` admission.
+Active candidate: **0.0.170 (170)** — Gate-D frozen-confinement reflection correction after the first successful real Godot `SceneTree` insertion.
 
-Physical **0.0.167 / Step 39.0** passed Gate A on-device, instantiated a fresh FMOD-neutral real `NGame` hierarchy off-tree, resolved the live `SceneTree.Root`, and then failed closed in Gate B before `AddChild`. The actual hierarchy's automatic lifecycle closure reached the two Steam Cloud capability probes in `SaveManager.ConstructDefault()` and game-owned Sentry/error-capture paths. The off-tree instance was released and no real SceneTree insertion occurred.
+Physical **0.0.169 / Step 39.1** passed Gates A and B, produced the full 69-node lifecycle map with zero forbidden/unresolved/native-facing audit escapes, and then physically passed Gate C: the first real `SceneTree.Root.AddChild(NGame)` returned with `IsInsideTree=True`, exact `NGame.Instance`, non-null `_window`, exact root parent, OneTimeInitialization state 2, and zero rejected/initializer/native deltas. Rendering was synchronously stopped immediately afterward.
 
-0.0.169 keeps Gate B fail-closed. In the launcher-private compatibility derivative only, the exact `SteamRemoteStorage.IsCloudEnabledForAccount()` and `IsCloudEnabledForApp()` probes in `SaveManager.ConstructDefault()` are forced to `false`; Steam initialization/native Steam remains deferred. The already-disabled game-owned `SentryService` surface and its nested helpers are replaced by inert default-return bodies, and compiler-generated void helpers that directly call external `Sentry.*` methods are inerted. The serialized image is reopened and verified before use.
+Gate D then failed only in launcher reflection bookkeeping: `Enumerable.Single(...)` saw more than one zero-argument `GetParent` method shape and threw `MoreThanOneMatch`. **0.0.170 changes only that Gate-D selector** to choose the non-generic, closed, SceneTree-root-compatible `GetParent()` overload. The Step-39.1 compatibility image, Gate A/B audit policy, Gate C AddChild semantics, inert GameStartupWrapper, Steam/Sentry/FM0D/Spine/native boundaries, and immediate render freeze are unchanged.
 
-Gate B then reruns against the real off-tree hierarchy. The exact sealed game-owned `SentryService` wrapper is permitted, while surviving external Sentry, Steamworks/SteamService, FMOD, Spine, later startup/platform, unresolved same-sts2, or Cecil external-resolution edges still fail before insertion.
-
-Gate C remains exactly one `SceneTree.Root.AddChild(NGame)`. If it returns, the iOS caller synchronously stops rendering before recording/advancing. Gate D verifies frozen in-tree confinement. `RemoveChild`, `Free`, explicit `_ExitTree`, render restart, `GameStartup`, platform initialization, main-menu launch, `ExecuteDeferred`, Steam initialization/native calls, native FMOD/Spine/Sentry extensions, and gameplay remain forbidden.
-
-See `docs/CURRENT-STATUS.md` for the exact physical sequence and `docs/history/steps/STEP-39.1-GATE-B-LIFECYCLE-COMPATIBILITY.md` for the candidate rationale.
+Authoritative status: `docs/CURRENT-STATUS.md`. The exact 0.0.169 physical report, checkpoint journal, last checkpoint, and full static map are preserved under `docs/history/reports/`.

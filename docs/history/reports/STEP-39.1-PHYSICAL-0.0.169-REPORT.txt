@@ -1,0 +1,40 @@
+StS2 Launcher — Step 39.0 Real SceneTree Admission
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-08T20:26:42.3521420+00:00
+
+RESULT
+STEP 39.0 REAL SCENETREE ADMISSION FAIL — 3/4
+
+METADATA
+App version: 0.0.169 (169)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: frozen inserted-tree confinement
+InvalidOperationException: MoreThanOneMatch
+Exception depth 0: System.InvalidOperationException
+  Message: MoreThanOneMatch
+  HResult: 0x80131509
+  Source: System.Linq
+  TargetSite: System.Linq.Enumerable::System.Reflection.MethodInfo TryGetSingle[MethodInfo](System.Collections.Generic.IEnumerable`1[System.Reflection.MethodInfo], System.Func`2[System.Reflection.MethodInfo,System.Boolean], Boolean ByRef)
+  StackTrace:
+       at System.Linq.Enumerable.TryGetSingle[MethodInfo](IEnumerable`1 source, Func`2 predicate, Boolean& found)
+       at System.Linq.Enumerable.Single[MethodInfo](IEnumerable`1 source, Func`2 predicate)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep39FrozenPostInsertionConfinement(Boolean renderingStopped, Action`1 checkpoint)
+Base exception: System.InvalidOperationException: MoreThanOneMatch
+Base HResult: 0x80131509
+Base Source: System.Linq
+Base TargetSite: System.Linq.Enumerable::System.Reflection.MethodInfo TryGetSingle[MethodInfo](System.Collections.Generic.IEnumerable`1[System.Reflection.MethodInfo], System.Func`2[System.Reflection.MethodInfo,System.Boolean], Boolean ByRef)
+Base StackTrace:
+     at System.Linq.Enumerable.TryGetSingle[MethodInfo](IEnumerable`1 source, Func`2 predicate, Boolean& found)
+     at System.Linq.Enumerable.Single[MethodInfo](IEnumerable`1 source, Func`2 predicate)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep39FrozenPostInsertionConfinement(Boolean renderingStopped, Action`1 checkpoint)
+
+END OF REPORT
