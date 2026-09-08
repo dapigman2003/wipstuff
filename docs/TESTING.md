@@ -1,9 +1,9 @@
 # Testing
 
-Active candidate: `0.0.165 (165)`, IPA `StS2-Launcher-Step-38.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.166 (166)`, IPA `StS2-Launcher-Step-39.ipa`, workflow `ios-canonical`.
 
-Canonical validation must preserve the physical Step-36 and Step-37 closures; preserve the exact ModelDb compatibility transform; require the serialized `GameStartupWrapper` body to remain only `call Task.get_CompletedTask; ret`; require Step 38.2 to suppress exactly one `_EnterTree` Sentry initialization call and exactly one bounded GetWindow/FilesDropped/Connect block using stack-neutral NOPs; preserve `_EnterTree` instruction count and exact NOP delta; require zero remaining Sentry/GetWindow/FilesDropped/Connect references in `_EnterTree`; retain one direct inert-wrapper call; prove Step38 core contains no SceneTree `AddChild` or direct later-startup invocation; preserve resolver/native fail-closed policy; and keep proprietary game/native payloads out of the archive.
+Canonical validation must preserve the physical Step-36/37/38 closures and the exact ModelDb + inert-startup-wrapper + Step-38.2 compatibility transform. Step 39 must pin the four targeted PCK preflight resources; require a fresh process in which Step 38 was not invoked; require `NGame.Instance == null` before insertion; resolve the live `Engine.GetMainLoop()` / `SceneTree.Root`; enumerate the actual hierarchy; audit selected-sts2 `_EnterTree`, `_Ready`, and `_Notification` methods including in-module managed base chains; reject direct OneTimeInitialization/GameStartup/platform/main-menu/deferred/FMOD/Spine/Sentry/Steam references; perform exactly one `SceneTree.Root.AddChild(NGame)`; verify `IsInsideTree`, singleton, parent, `_window`, state 2, and zero initializer/rejected/native escape; call `StopRendering()` immediately after Gate C returns; never restart rendering or RemoveChild/Free/explicitly invoke `_ExitTree`; and keep proprietary game/native payloads out of the archive.
 
-Host tests cover Step38 gate ordering and pinned lifecycle names. Codemagic remains the first actual C# compiler for the new iOS/core source in this environment.
+Host tests cover Step39 gate ordering, stable ordinals, failure sequencing, summary text, and pinned preflight authorities. Codemagic remains the first actual C# compiler for the new Step-39 iOS/core source in this environment.
 
-Physical sequence: fresh process -> Step 15 A-C -> Step 35 MODEL-BOOTSTRAP 4/4 -> Step 36.0.5 4/4 -> Step 37.0.1 4/4 -> Step 38.2 A-D once. Use a fresh process after any Gate-C-started failure.
+Physical sequence: fresh process → Step 15 A-C → Step 35 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → **skip Step 38** → Step 39.0 A-D once. Relaunch after any Gate-C-started attempt.

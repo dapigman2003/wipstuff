@@ -539,3 +539,16 @@ Physical 0.0.155 proves the Step-36 game-resource handoff: exact receipt-backed 
 - The transform must reject any external branch entering the bounded window block.
 - Serialized verification must preserve `_EnterTree` instruction count, require the exact NOP delta, zero remaining Sentry/GetWindow/FilesDropped/Connect references, and exactly one inert-wrapper call.
 - Step 38.2 still contains no launcher-authorized AddChild, `_Ready`, `_ExitTree`, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam init, or native GDExtension load.
+
+## Step 39.0 real SceneTree admission contracts
+
+- Physical 0.0.165 Step 38.2 4/4 is immutable prior evidence. Step 39 must not require rerunning Step 38 in the same process.
+- Step 39 requires same-process Step-37.0.1 4/4 and `NGame.Instance == null`; UI refuses when any Step38 gate result exists and core refuses when Step38 synthetic lifecycle/reinstantiation state exists.
+- Four exact PCK resources are hash/size/MD5 pinned. The source repository stores no proprietary resource bytes.
+- `audio_manager_proxy.gdc` remains exact Godot tokenizer-buffer version 101 / decompressed size 9,828 / offline-audited identifier count 69. Because the exact bytes are hash-pinned, the prior identifier audit remains authoritative; the script exposes FMOD command-proxy methods but no automatic `_enter_tree`, `_ready`, or `_process` identifier.
+- Gate B resolves `Engine.GetMainLoop()` as `SceneTree`, requires an in-tree root, traverses the actual NGame hierarchy, and Cecil-audits selected-sts2 `_EnterTree`, `_Ready`, `_Notification` methods on actual node types plus in-module managed base chains with rejecting resolution.
+- Mapped immediate lifecycle methods must have zero direct OneTimeInitialization, GameStartup/InitializePlatform/LaunchMainMenu/LoadDeferredStartupAssetsAsync, FMOD, Spine, Sentry, or Steam references.
+- Gate C contains exactly one launcher-authorized real `SceneTree.Root.AddChild(NGame)` boundary. It does not directly invoke `_EnterTree` or `_Ready`.
+- Successful Gate C requires `IsInsideTree=true`, exact `NGame.Instance`, exact SceneTree-root parent, non-null static `_window` as NGame `_Ready` evidence, state 2, and zero initializer-bearing/rejected/native escape.
+- The iOS caller invokes `GodotStep15NativeBridge.StopRendering()` immediately after Gate C returns, before recording the Gate-C result or entering Gate D. Step39 source must contain no `StartRendering()`.
+- Gate D requires the render loop to be stopped and intentionally retains the inserted NGame. Step 39 must not RemoveChild, Free the inserted instance, directly invoke `_ExitTree`, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam initialization, native GDExtensions, or gameplay.

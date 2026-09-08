@@ -1,12 +1,12 @@
-# StS2 Launcher — Step 38.2
+# StS2 Launcher — Step 39.0
 
-Active candidate: **0.0.165 (165)** — iOS/off-tree-compatible `NGame._EnterTree()` execution.
+Active candidate: **0.0.166 (165)** — iOS/off-tree-compatible `NGame._EnterTree()` execution.
 
 Physical **0.0.159** closed Step 36.0.5 at 4/4, including unchanged full `ExecuteEssential()`. Physical **0.0.161** closed Step 37.0.1 at 4/4: the sealed FMOD-neutral `game.tscn` loaded as `PackedScene` and the real managed `NGame` hierarchy instantiated off-tree with zero resolver/native escape.
 
 Physical **0.0.164 / Step 38.1** passed the inert-wrapper static audit and off-tree recreation, then physically entered `NGame._EnterTree()` and failed with a managed `NullReferenceException` while `IsInsideTree == false`. The exact IL map leaves two environment-sensitive edges before the inert startup wrapper: `SentryService.Initialize()` and the `GetWindow()` / `FilesDropped` / `Connect(...)` block.
 
-Step 38.2 preserves the proven ModelDb bootstrap, FMOD-neutral scene, and exact inert `GameStartupWrapper` body:
+Step 39.0 preserves the proven ModelDb bootstrap, FMOD-neutral scene, and exact inert `GameStartupWrapper` body:
 
 ```text
 call System.Threading.Tasks.Task::get_CompletedTask()
@@ -25,7 +25,7 @@ Gate A verifies that shape and maps lifecycle reachability. Gate B re-instantiat
 2. Step 35.0.32 **MODEL-BOOTSTRAP** once; require 4/4.
 3. Step 36.0.5 once; require 4/4.
 4. Step 37.0.1 once; require 4/4.
-5. Step 38.2 Gates A-D once. If Gate C begins and fails, use a fresh process before retry.
+5. Step 39.0 Gates A-D once. If Gate C begins and fails, use a fresh process before retry.
 6. Preserve Step35/Step36/Step37/Step38 run-correlated reports.
 
 Codemagic workflow key remains `ios-canonical`; existing NuGet, .NET, Godot Step-15, and iOS intermediate cache paths are unchanged.

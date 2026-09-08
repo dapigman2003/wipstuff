@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-08T02:29:54Z
+UTC: 2026-09-08T07:55:11Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 38.2 iOS/off-tree-compatible NGame _EnterTree validation
-Root: /mnt/data/StS2Launcher-Step38-0.0.165
+StS2 Launcher — Step 39.0 real SceneTree admission validation
+Root: /mnt/data/StS2Launcher-Step39-0.0.166
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 259 C# files
+PASS: lexical delimiter scan passes for 266 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 165
-PASS: display version is 0.0.165
-PASS: Info.plist build version is 165
-PASS: Info.plist display version is 0.0.165
+PASS: build version is 166
+PASS: display version is 0.0.166
+PASS: Info.plist build version is 166
+PASS: Info.plist display version is 0.0.166
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,10 +32,10 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies active Step 38.2 iOS/off-tree-compatible NGame _EnterTree candidate
-PASS: top launcher banner records physical Step-37 closure and the bounded Step-38 lifecycle boundary
+PASS: top launcher banner identifies active Step 39.0 real SceneTree admission candidate
+PASS: top launcher banner records physical Step-37/38 closure and the bounded Step-39 SceneTree boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 38 source pins expected bundle release identity
+PASS: Step 39 source pins expected bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -287,7 +287,7 @@ PASS: active CI/IPA/project graph has no retired Step-27 dependency: STEP27_INTE
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: Step27InterpretedPatchFixture
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: host-step27
 PASS: host tests no longer perform the retired Harmony release network acquisition
-PASS: IPA verification summary identifies the active Step-38 candidate rather than retired Step 27
+PASS: IPA verification summary identifies the active Step-39 candidate rather than retired Step 27
 PASS: retired Step-27 fixture is absent from iOS and host-test project graphs
 PASS: active regression contracts preserve the decisive Step-27 negative architecture result
 PASS: master plan continues to retire runtime Harmony/MonoMod replacement
@@ -656,7 +656,31 @@ PASS: Step 38 summary closes only at four-of-four
 PASS: Step 38 host regressions pin gate order and lifecycle boundary names using MSTest v4 APIs
 PASS: Step 38 iOS surface requires same-process Step-37 closure and emits all four-gate telemetry artifacts
 PASS: RootViewController wires Step 38 controls into the active device surface
-PASS: release presentation pins the physical 0.0.164 NRE, exact Step-38.2 compatibility suppressions, and later forbidden startup stages
+PASS: release presentation pins the physical Step-38.2 4/4 closure and its exact compatibility history
+PASS: Step 39 SceneTree core exists
+PASS: Step 39 gate enum exists
+PASS: Step 39 gate result exists
+PASS: Step 39 summary exists
+PASS: Step 39 gate sequence exists
+PASS: Step 39 host regressions exists
+PASS: Step 39 iOS surface exists
+PASS: Step 39 pins all four exact PCK preflight authorities and the audited Godot tokenizer facts
+PASS: Step 39 Gate A re-verifies the exact Step-38.2 compatibility image and sealed PCK preflight without inserting a scene
+PASS: Step 39 Gate B requires singleton cleanliness, resolves the live SceneTree root, and audits actual managed lifecycle callbacks including game-owned base chains
+PASS: Step 39 Gate C contains one reflection-bounded real AddChild boundary and proves automatic NGame enter/ready authority
+PASS: Step 39 contains exactly one launcher-authorized SceneTree AddChild invocation
+PASS: Step 39 Gate D requires a frozen renderer and retains the inserted hierarchy without explicit exit/cleanup
+PASS: Step 39 never restarts Godot rendering
+PASS: Step 39 core has no explicit RemoveChild or synthetic _ExitTree boundary
+PASS: Step 39 lifecycle policy fail-closes on later startup and native/platform service references
+PASS: Step 39 defines exactly four ordered A-D gates
+PASS: Step 39 summary closes only at four-of-four
+PASS: Step 39 host regressions pin gate order, failure sequencing, and exact preflight authorities
+PASS: Step 39 iOS surface enforces the fresh-process branch, immediate render freeze, and complete telemetry contract
+PASS: Step 39 UI freezes rendering immediately after Gate C returns and before recording/advancing
+PASS: RootViewController wires Step 39 controls into the active device surface
+PASS: Step-37/38 authority resets invalidate Step-39 state rather than allowing stale reuse
+PASS: release presentation pins the physical Step-38.2 closure and bounded Step-39 SceneTree admission design
 PASS: analysis-only native reference is absent from project: libfmod.dylib
 PASS: analysis-only native reference is absent from project: libfmodstudio.dylib
 PASS: analysis-only native reference is absent from project: libGodotFmod.macos.template_release
@@ -865,8 +889,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status records physical Step-37 closure and the active controlled Step-38 lifecycle boundary
-PASS: testing and release-checklist docs pin the exact 0.0.165 (165) release identity
+PASS: current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary
+PASS: testing and release-checklist docs pin the exact 0.0.166 (166) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -990,9 +1014,9 @@ PASS: Codemagic preserves canonical cache path: $HOME/.cache/sts2launcher/godot-
 PASS: Codemagic preserves canonical cache path: $HOME/.dotnet
 PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
-PASS: host-test report heading identifies Step 38
-PASS: host-test TRX artifact identifies Step 38
-PASS: Codemagic build-environment report heading identifies the Step 38.2 candidate
+PASS: host-test report heading identifies Step 39
+PASS: host-test TRX artifact identifies Step 39
+PASS: Codemagic build-environment report heading identifies the Step 39.0 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -1003,7 +1027,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step-38.2 candidate
+PASS: IPA verifier advertises the active Step-39.0 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -1032,7 +1056,13 @@ PASS: physical 0.0.164 final report preserves Step-38.1 2/4 result
 PASS: Step 38 active candidate hash manifest exists
 PASS: Step 38 candidate manifest pins lifecycle-bootstrap transform, lifecycle implementation/tests, active release wiring, and physical Step-36/37/38 authority
 PASS: Step 38 active implementation/release/provenance files are hash-pinned
+PASS: physical 0.0.165 preserves Step-38.2 four-of-four off-tree lifecycle closure
+PASS: physical 0.0.165 static map preserves the exact Step-38.2 iOS/off-tree compatibility shape
+PASS: physical 0.0.165 final report preserves Step-38.2 4/4 result
+PASS: Step 39 active candidate hash manifest exists
+PASS: Step 39 candidate manifest pins SceneTree implementation/tests, exact preflight provenance, physical Step-36/37/38 authority, and active release wiring
+PASS: Step 39 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1021 checks
+VALIDATION PASS: 1051 checks

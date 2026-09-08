@@ -696,6 +696,7 @@ public sealed partial class RootViewController : UIViewController
         AddTransformedRealStS2EssentialInitializationControls(content);
         AddTransformedRealStS2GameSceneAdmissionControls(content);
         AddTransformedRealStS2GameLifecycleEntryControls(content);
+        AddTransformedRealStS2SceneTreeAdmissionControls(content);
 
         _signOutButton = SystemButton("Sign Out / Clear Saved Session", 16);
         _signOutButton.TouchUpInside += (_, _) => ClearSavedSession();

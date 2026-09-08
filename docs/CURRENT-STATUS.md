@@ -1,31 +1,23 @@
 # Current status
 
-## Active candidate — Step 38.2 / 0.0.165 (165)
+## Active candidate — Step 39.0 / 0.0.166 (166)
 
-Physical **0.0.159** closed unchanged `ExecuteEssential()` at Step 36.0.5 4/4. Its proven ModelDb compatibility plan remains the `1624/56/47/41` graph.
+Physical **0.0.159** closed Step 36.0.5 unchanged `ExecuteEssential()` at 4/4. Physical **0.0.161** closed Step 37.0.1 at 4/4: the exact 10,414-byte `game.tscn` authority loaded through the three-edit FMOD-neutral copy and a real managed `NGame` hierarchy instantiated off-tree with zero resolver/native escape.
 
-Physical **0.0.161** closed Step 37.0.1 at **4/4**. The exact 10,414-byte `game.tscn` authority loaded through the copied FMOD-neutral derivative and a real managed `NGame` hierarchy instantiated off-tree with zero resolver/native escape.
+Physical **0.0.165 / Step 38.2** is now closed **4/4**. The selected derivative retained the proven ModelDb bootstrap, exact inert `GameStartupWrapper`, and exact Sentry/file-drop-window `_EnterTree` suppressions. Gate A verified zero remaining Sentry/GetWindow/FilesDropped/Connect refs; Gate B recreated the real NGame off-tree; Gate C returned from the verified `_EnterTree()` with `IsInsideTree=false`, state `2`, and all resolver/host/private/initializer/rejected/native deltas zero; Gate D released the node without `_ExitTree`.
 
-Physical **0.0.162** stopped safely in Step 38 Gate A because Cecil tried to resolve GodotSharp. Physical **0.0.163** corrected that to deferred rejecting-resolver reading and proved exact `NGame._EnterTree()` directly reaches `GameStartupWrapper()`.
+A targeted no-install Step-39 PCK preflight then sealed four small resources: `audio_manager_proxy.gd.remap`, `audio_manager_proxy.gdc`, `reaction_wheel.tscn`, and `multiplayer_timeout_overlay.tscn`. The Godot 4.5.1 tokenized GDScript is exact tokenizer version 101 with a 9,828-byte decompressed token buffer and 69 audited identifiers. Those identifiers are FMOD command-proxy surface but contain no `_enter_tree`, `_ready`, or `_process` lifecycle callback identifier. The two nested scenes contain no FMOD/Spine/Sentry/Steam/GDExtension declaration.
 
-Physical **0.0.164 / Step 38.1** then proved the inert-startup-wrapper derivative itself is valid. Gate A passed with the wrapper serialized as exact `call Task.get_CompletedTask; ret`; Gate B recreated the real FMOD-neutral `NGame` off-tree; Gate C physically entered `_EnterTree()` and failed with a managed `NullReferenceException`. At failure `IsInsideTree` was still false and initializer-bearing/rejected/native deltas remained zero. The static map shows the two remaining environment-sensitive edges in the off-tree body: early `SentryService.Initialize()` and the later `GetWindow()` / `Window.SignalName.FilesDropped` / `GodotObject.Connect(...)` hookup.
+**0.0.166 / Step 39.0** therefore advances to one real `SceneTree.Root.AddChild(NGame)` after a pre-insertion audit of the actual hierarchy. Gate B requires `NGame.Instance == null`, then maps selected-sts2 `_EnterTree`, `_Ready`, and `_Notification` methods for actual node types and their in-module managed base classes; any direct later-startup/native/platform edge fails closed. Gate C authorizes only the real AddChild/automatic audited lifecycle and requires exact singleton/parent/window/state authority with zero initializer/rejected/native escape. The caller immediately invokes `StopRendering()` when Gate C returns. Gate D verifies the attached hierarchy while frozen and intentionally leaves it in-tree.
 
-**0.0.165 / Step 38.2** keeps the proven ModelDb rewrite, FMOD-neutral scene, and inert `GameStartupWrapper`. It adds only two exact stack-neutral `_EnterTree` compatibility suppressions before CLR admission:
-
-1. replace the single `_EnterTree -> SentryService.Initialize()` call with `nop` because Sentry is intentionally disabled in the iOS compatibility host;
-2. replace only the bounded `GetWindow -> FilesDropped -> Connect -> pop` block with `nop` instructions because the diagnostic instance is deliberately off-tree and therefore has no containing SceneTree Window.
-
-The transform requires exactly one original Sentry call, exactly one original window/file-drop block, one `FilesDropped` signal field, and no external branch into the bounded block. Serialized verification requires the original `_EnterTree` instruction count to be preserved, the exact expected NOP delta, zero remaining Sentry/GetWindow/FilesDropped/Connect references, and one preserved direct call to the verified inert `GameStartupWrapper`.
-
-Gate A re-verifies all of that with deferred rejecting Cecil. Gate B recreates the proven scene off-tree. Gate C invokes the verified Step-38.2 `_EnterTree` body once. Gate D re-proves off-tree/state-2 confinement and zero initializer-bearing/rejected/native escape, then releases the node without `_ExitTree`.
-
-## Physical sequence for 0.0.165
+## Physical sequence for 0.0.166
 
 1. Fresh process → Step 15 A-C.
-2. Step 35.0.32 MODEL-BOOTSTRAP → 4/4. This run creates the ModelDb + inert-wrapper + Step-38.2 iOS/off-tree lifecycle derivative.
+2. Step 35.0.32 MODEL-BOOTSTRAP → 4/4.
 3. Step 36.0.5 → 4/4.
 4. Step 37.0.1 → 4/4.
-5. Step 38.2 A-D once. Do not retry in-process after Gate C starts.
-6. Preserve Step35/Step36/Step37/Step38 run-correlated reports.
+5. **Skip Step 38 in this process.**
+6. Step 39.0 A-D once. If Gate C starts, do not retry in-process.
+7. Preserve Step35/Step36/Step37/Step39 reports and relaunch before unrelated testing.
 
-Still forbidden: real SceneTree insertion, `_Ready`, `_ExitTree`, `GameStartup`, `InitializePlatform`, main-menu launch, `ExecuteDeferred`, Steam initialization, native FMOD/Spine/Sentry extensions, gameplay, broad native compatibility, state reset, and mutation of the trusted Step-12 install.
+Still forbidden: explicit `_ExitTree`, RemoveChild/Free, render restart, `GameStartup`, `InitializePlatform`, main-menu launch, `ExecuteDeferred`, Steam initialization, native FMOD/Spine/Sentry extensions, gameplay, state reset, and mutation of the trusted Step-12 install.

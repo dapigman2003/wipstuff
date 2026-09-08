@@ -17,7 +17,7 @@ STEP28_AHEAD_OF_LOAD_DIR="artifacts/host-step28-ahead-of-load-fixture"
 
 command -v dotnet >/dev/null 2>&1 || { echo "ERROR: dotnet is required to run host tests."; exit 2; }
 
-echo "StS2 Launcher — Step 38 canonical host regression tests"
+echo "StS2 Launcher — Step 39 canonical host regression tests"
 echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo ".NET: $(dotnet --version)"
 
@@ -53,9 +53,9 @@ dotnet test "$TEST_PROJECT" \
   -c Release \
   --nologo \
   --results-directory artifacts/test-results \
-  --logger "trx;LogFileName=step38.trx" \
+  --logger "trx;LogFileName=step39.trx" \
   --logger "console;verbosity=normal"
 
 echo "HOST UNIT TESTS: PASS"
-echo "TRX: artifacts/test-results/step38.trx"
+echo "TRX: artifacts/test-results/step39.trx"
 echo "Text report: $REPORT"

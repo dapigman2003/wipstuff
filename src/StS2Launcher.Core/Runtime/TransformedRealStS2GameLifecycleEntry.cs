@@ -52,6 +52,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private void ResetStep38State()
     {
+        ResetStep39State();
         _exactStep37ClosurePassed = false;
         _step38LifecycleStaticAudit = null;
         _step38NGameInstance = null;
@@ -62,6 +63,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private void MarkExactStep37ClosurePassed()
     {
+        ResetStep39State();
         _exactStep37ClosurePassed = true;
         _step38LifecycleStaticAudit = null;
         _step38NGameInstance = null;

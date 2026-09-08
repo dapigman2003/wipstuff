@@ -1,0 +1,22 @@
+StS2 Launcher — Step 38.2 iOS/off-tree-compatible NGame _EnterTree Entry
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-08T06:07:12.7870080+00:00
+
+RESULT
+STEP 38.2 IOS/OFFTREE-COMPAT NGAME _ENTERTREE ENTRY COMPLETE — 4/4
+
+METADATA
+App version: 0.0.165 (165)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+All four Step 38.2 gates passed. The selected compatibility authority contained the exact inert GameStartupWrapper, zero remaining SentryService.Initialize call, and zero remaining GetWindow/FilesDropped/Connect references in NGame._EnterTree; all singleton/property/GetNode setup remained admitted; the same-NGame closure contained no _Ready/GameStartup/platform/main-menu/deferred boundary; a fresh real NGame hierarchy was instantiated off-tree; the verified compatibility _EnterTree body returned once while IsInsideTree remained false; and final state/native/resolver confinement held before the node was released. SceneTree insertion, _Ready, _ExitTree, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam/native extensions, and gameplay remain future boundaries.
+
+END OF REPORT

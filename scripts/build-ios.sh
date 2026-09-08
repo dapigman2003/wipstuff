@@ -66,7 +66,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Step 38.2 iOS/off-tree-compatible NGame _EnterTree boundary..."
+echo "Publishing Step 39.0 real SceneTree admission boundary..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \

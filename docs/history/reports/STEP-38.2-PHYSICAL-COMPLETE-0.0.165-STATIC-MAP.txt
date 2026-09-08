@@ -1,0 +1,276 @@
+StS2 Launcher — Step 38.2 iOS/off-tree-compatible NGame lifecycle static IL/callsite map
+Read-only Cecil evidence from the exact selected ModelDb + lifecycle-bootstrap compatibility authority; never consumed as trusted runtime input.
+Selected path: /var/mobile/Containers/Data/Application/357B073A-D9C6-48AA-A4A7-19FD959E039C/Documents/StS2Launcher/Step35-ExecuteVeryEarlyDiagnostic/sts2.step38.2.lifecycle-bootstrap.dll
+Selected SHA-256: 2bc7daeb395114aecb8f05770ee65f3a632803f6ade6967227b00112e59d2f67
+NGame type: MegaCrit.Sts2.Core.Nodes.NGame
+_EnterTree: token=0x06001BCC; System.Void MegaCrit.Sts2.Core.Nodes.NGame::_EnterTree()
+_Ready: token=0x06001BCD; System.Void MegaCrit.Sts2.Core.Nodes.NGame::_Ready()
+GameStartupWrapper: token=0x06001BCE; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::GameStartupWrapper()
+GameStartup: token=0x06001BD1; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::GameStartup()
+InitializePlatform: token=0x06001BFE; System.Threading.Tasks.Task`1<System.Boolean> MegaCrit.Sts2.Core.Nodes.NGame::InitializePlatform()
+LaunchMainMenu: token=0x06001BDF; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::LaunchMainMenu(System.Boolean)
+LoadDeferredStartupAssetsAsync: token=0x06001BE0; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::LoadDeferredStartupAssetsAsync()
+Same-NGame methods reachable from _EnterTree: 18
+Verified inert GameStartupWrapper reachable from _EnterTree: YES — exact body is call Task.get_CompletedTask; ret
+SentryService.Initialize calls remaining in _EnterTree: 0 (single original call NOP-substituted)
+Godot GetWindow/FilesDropped/Connect references remaining in _EnterTree: 0 (single bounded original block NOP-substituted)
+Forbidden later-startup methods reachable from _EnterTree same-NGame closure: 0
+Cecil external assembly resolution requests during Step 38 Gate A: 0
+SceneTree AddChild performed by Step 38: NO
+
+[SAME-NGAME _ENTERTREE REACHABLE METHODS]
+  - token=0x06001BCC; System.Void MegaCrit.Sts2.Core.Nodes.NGame::_EnterTree()
+  - token=0x06001B98; MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance()
+  - token=0x06001B99; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_Instance(MegaCrit.Sts2.Core.Nodes.NGame)
+  - token=0x06001B9B; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_RootSceneContainer(MegaCrit.Sts2.Core.Nodes.NSceneContainer)
+  - token=0x06001B9D; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HoverTipsContainer(Godot.Node)
+  - token=0x06001BB6; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_DebugAudio(MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager)
+  - token=0x06001BA6; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_AudioManager(MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager)
+  - token=0x06001BA8; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_RemoteCursorContainer(MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer)
+  - token=0x06001BAA; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_InputManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager)
+  - token=0x06001BB4; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_CursorManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager)
+  - token=0x06001BB0; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_ReactionWheel(MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel)
+  - token=0x06001BB2; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_ReactionContainer(MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer)
+  - token=0x06001BA4; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_TimeoutOverlay(MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay)
+  - token=0x06001BC9; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_WorldEnvironment(Godot.WorldEnvironment)
+  - token=0x06001BAC; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HotkeyManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager)
+  - token=0x06001BCB; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HitStop(MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop)
+  - token=0x06001BA2; System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_Transition(MegaCrit.Sts2.Core.Nodes.NTransition)
+  - token=0x06001BCE; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::GameStartupWrapper()
+
+[NGAME _ENTERTREE IL]
+IL_0000: call [CALLSITE#001] | method=System.Globalization.CultureInfo System.Globalization.CultureInfo::get_InvariantCulture() | token=0x0A00132D | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0005: call [CALLSITE#002] | method=System.Void System.Globalization.CultureInfo::set_DefaultThreadCurrentCulture(System.Globalization.CultureInfo) | token=0x0A00132E | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_000A: call [CALLSITE#003] | method=System.Globalization.CultureInfo System.Globalization.CultureInfo::get_InvariantCulture() | token=0x0A00132D | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_000F: call [CALLSITE#004] | method=System.Void System.Globalization.CultureInfo::set_DefaultThreadCurrentUICulture(System.Globalization.CultureInfo) | token=0x0A00132F | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0014: call [CALLSITE#005] | method=MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance() | token=0x06001B98 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0019: brfalse.s | target=IL_002D
+IL_001B: ldstr | string="NGame already exists."
+IL_0020: ldc.i4.2
+IL_0021: call [CALLSITE#006] | method=System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32) | token=0x0600AC08 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0026: ldarg.0
+IL_0027: call [CALLSITE#007] | method=System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::QueueFreeSafely(Godot.Node) | token=0x0600AFBF | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_002C: ret
+IL_002D: ldarg.0
+IL_002E: call [CALLSITE#008] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_Instance(MegaCrit.Sts2.Core.Nodes.NGame) | token=0x06001B99 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0033: nop
+IL_0034: ldarg.0
+IL_0035: ldarg.0
+IL_0036: ldstr | string="%RootSceneContainer"
+IL_003B: call [CALLSITE#009] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0040: call [CALLSITE#010] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.NSceneContainer>(Godot.NodePath) | token=0x2B000692 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0045: call [CALLSITE#011] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_RootSceneContainer(MegaCrit.Sts2.Core.Nodes.NSceneContainer) | token=0x06001B9B | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_004A: ldarg.0
+IL_004B: ldarg.0
+IL_004C: ldstr | string="%HoverTipsContainer"
+IL_0051: call [CALLSITE#012] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0056: call [CALLSITE#013] | method=!!0 Godot.Node::GetNode<Godot.Node>(Godot.NodePath) | token=0x2B000693 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_005B: call [CALLSITE#014] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HoverTipsContainer(Godot.Node) | token=0x06001B9D | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0060: ldarg.0
+IL_0061: ldarg.0
+IL_0062: ldstr | string="%DebugAudioManager"
+IL_0067: call [CALLSITE#015] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_006C: call [CALLSITE#016] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager>(Godot.NodePath) | token=0x2B000694 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0071: call [CALLSITE#017] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_DebugAudio(MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager) | token=0x06001BB6 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0076: ldarg.0
+IL_0077: ldarg.0
+IL_0078: ldstr | string="%AudioManager"
+IL_007D: call [CALLSITE#018] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0082: call [CALLSITE#019] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager>(Godot.NodePath) | token=0x2B000695 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0087: call [CALLSITE#020] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_AudioManager(MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager) | token=0x06001BA6 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_008C: ldarg.0
+IL_008D: ldarg.0
+IL_008E: ldstr | string="%RemoteCursorContainer"
+IL_0093: call [CALLSITE#021] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0098: call [CALLSITE#022] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer>(Godot.NodePath) | token=0x2B000696 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_009D: call [CALLSITE#023] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_RemoteCursorContainer(MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer) | token=0x06001BA8 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_00A2: ldarg.0
+IL_00A3: ldarg.0
+IL_00A4: ldstr | string="%InputManager"
+IL_00A9: call [CALLSITE#024] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00AE: call [CALLSITE#025] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager>(Godot.NodePath) | token=0x2B000697 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00B3: call [CALLSITE#026] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_InputManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager) | token=0x06001BAA | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_00B8: ldarg.0
+IL_00B9: ldarg.0
+IL_00BA: ldstr | string="%CursorManager"
+IL_00BF: call [CALLSITE#027] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00C4: call [CALLSITE#028] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager>(Godot.NodePath) | token=0x2B000698 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00C9: call [CALLSITE#029] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_CursorManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager) | token=0x06001BB4 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_00CE: ldarg.0
+IL_00CF: ldarg.0
+IL_00D0: ldstr | string="%ReactionWheel"
+IL_00D5: call [CALLSITE#030] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00DA: call [CALLSITE#031] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel>(Godot.NodePath) | token=0x2B000699 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00DF: call [CALLSITE#032] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_ReactionWheel(MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel) | token=0x06001BB0 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_00E4: ldarg.0
+IL_00E5: ldarg.0
+IL_00E6: ldstr | string="%ReactionContainer"
+IL_00EB: call [CALLSITE#033] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00F0: call [CALLSITE#034] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer>(Godot.NodePath) | token=0x2B00069A | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_00F5: call [CALLSITE#035] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_ReactionContainer(MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer) | token=0x06001BB2 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_00FA: ldarg.0
+IL_00FB: ldarg.0
+IL_00FC: ldstr | string="%MultiplayerTimeoutOverlay"
+IL_0101: call [CALLSITE#036] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0106: call [CALLSITE#037] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay>(Godot.NodePath) | token=0x2B00069B | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_010B: call [CALLSITE#038] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_TimeoutOverlay(MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay) | token=0x06001BA4 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0110: ldarg.0
+IL_0111: ldarg.0
+IL_0112: ldstr | string="%WorldEnvironment"
+IL_0117: call [CALLSITE#039] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_011C: call [CALLSITE#040] | method=!!0 Godot.Node::GetNode<Godot.WorldEnvironment>(Godot.NodePath) | token=0x2B00069C | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0121: call [CALLSITE#041] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_WorldEnvironment(Godot.WorldEnvironment) | token=0x06001BC9 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0126: ldarg.0
+IL_0127: ldarg.0
+IL_0128: ldstr | string="%HotkeyManager"
+IL_012D: call [CALLSITE#042] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0132: call [CALLSITE#043] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager>(Godot.NodePath) | token=0x2B00069D | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0137: call [CALLSITE#044] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HotkeyManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager) | token=0x06001BAC | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_013C: ldarg.0
+IL_013D: ldarg.0
+IL_013E: ldstr | string="%InspectionContainer"
+IL_0143: call [CALLSITE#045] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0148: call [CALLSITE#046] | method=!!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath) | token=0x2B00069E | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_014D: stfld | field=Godot.Control MegaCrit.Sts2.Core.Nodes.NGame::_inspectionContainer | token=0x0400114A | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0152: ldarg.0
+IL_0153: ldarg.0
+IL_0154: ldstr | string="ScreenShake"
+IL_0159: call [CALLSITE#047] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_015E: call [CALLSITE#048] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake>(Godot.NodePath) | token=0x2B00069F | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0163: stfld | field=MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake MegaCrit.Sts2.Core.Nodes.NGame::_screenShake | token=0x0400114B | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0168: ldarg.0
+IL_0169: ldarg.0
+IL_016A: ldstr | string="HitStop"
+IL_016F: call [CALLSITE#049] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0174: call [CALLSITE#050] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop>(Godot.NodePath) | token=0x2B0006A0 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0179: call [CALLSITE#051] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HitStop(MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop) | token=0x06001BCB | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_017E: ldarg.0
+IL_017F: ldarg.0
+IL_0180: ldstr | string="%GameTransitionRect"
+IL_0185: call [CALLSITE#052] | method=Godot.NodePath Godot.NodePath::op_Implicit(System.String) | token=0x0A000012 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_018A: call [CALLSITE#053] | method=!!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.NTransition>(Godot.NodePath) | token=0x2B0006A1 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_018F: call [CALLSITE#054] | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_Transition(MegaCrit.Sts2.Core.Nodes.NTransition) | token=0x06001BA2 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0194: call [CALLSITE#055] | method=System.Int32 System.Environment::get_CurrentManagedThreadId() | token=0x0A000275 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0199: newobj [CALLSITE#056] | method=System.Void System.Nullable`1<System.Int32>::.ctor(!0) | token=0x0A000D7D | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_019E: stsfld | field=System.Nullable`1<System.Int32> MegaCrit.Sts2.Core.Nodes.NGame::_mainThreadId | token=0x0400114C | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_01A3: nop
+IL_01A4: nop
+IL_01A5: nop
+IL_01A6: nop
+IL_01A7: nop
+IL_01A8: nop
+IL_01A9: nop
+IL_01AA: nop
+IL_01AB: nop
+IL_01AC: nop
+IL_01AD: nop
+IL_01AE: nop
+IL_01AF: nop
+IL_01B0: nop
+IL_01B1: nop
+IL_01B2: nop
+IL_01B3: ldarg.0
+IL_01B4: call [CALLSITE#057] | method=System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::GameStartupWrapper() | token=0x06001BCE | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_01B9: call [CALLSITE#058] | method=System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::RunSafely(System.Threading.Tasks.Task) | token=0x0600B01B | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_01BE: pop
+IL_01BF: ret
+
+[NGAME _READY IL]
+IL_0000: ldarg.0
+IL_0001: call [CALLSITE#001] | method=Godot.SceneTree Godot.Node::GetTree() | token=0x0A001330 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0006: callvirt [CALLSITE#002] | method=Godot.Window Godot.SceneTree::get_Root() | token=0x0A001331 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_000B: stsfld | field=Godot.Window MegaCrit.Sts2.Core.Nodes.NGame::_window | token=0x0400114D | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0010: ldsfld | field=Godot.Window MegaCrit.Sts2.Core.Nodes.NGame::_window | token=0x0400114D | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0015: ldsfld | field=Godot.StringName Godot.Viewport/SignalName::SizeChanged | token=0x0A001332 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_001A: ldarg.0
+IL_001B: ldftn | method=System.Void MegaCrit.Sts2.Core.Nodes.NGame::OnWindowChange() | token=0x06001BD3 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0021: newobj [CALLSITE#003] | method=System.Void System.Action::.ctor(System.Object,System.IntPtr) | token=0x0A000074 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0026: call [CALLSITE#004] | method=Godot.Callable Godot.Callable::From(System.Action) | token=0x0A001333 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_002B: ldc.i4.0
+IL_002C: callvirt [CALLSITE#005] | method=Godot.Error Godot.GodotObject::Connect(Godot.StringName,Godot.Callable,System.UInt32) | token=0x0A001334 | scope=GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null
+IL_0031: pop
+IL_0032: ldarg.0
+IL_0033: ldarg.0
+IL_0034: call [CALLSITE#006] | method=Godot.WorldEnvironment MegaCrit.Sts2.Core.Nodes.NGame::get_WorldEnvironment() | token=0x06001BC8 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0039: call [CALLSITE#007] | method=System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::RemoveChildSafely(Godot.Node,Godot.Node) | token=0x0600AFBE | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_003E: ret
+
+[NGAME GAMESTARTUPWRAPPER IL]
+IL_0000: call [CALLSITE#001] | method=System.Threading.Tasks.Task System.Threading.Tasks.Task::get_CompletedTask() | token=0x0A000DD0 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0005: ret
+
+[NGAME GAMESTARTUP IL]
+IL_0000: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+IL_0002: call [CALLSITE#001] | method=System.Runtime.CompilerServices.AsyncTaskMethodBuilder System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Create() | token=0x0A000092 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0007: stfld | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder | token=0x0400119E | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_000C: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+IL_000E: ldarg.0
+IL_000F: stfld | field=MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>4__this | token=0x0400119F | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0014: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+IL_0016: ldc.i4.m1
+IL_0017: stfld | field=System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state | token=0x0400119D | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_001C: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+IL_001E: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder | token=0x0400119E | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0023: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+IL_0025: call [CALLSITE#002] | method=System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Start<MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117>(!!0&) | token=0x2B0006A4 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_002A: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+IL_002C: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder | token=0x0400119E | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0031: call [CALLSITE#003] | method=System.Threading.Tasks.Task System.Runtime.CompilerServices.AsyncTaskMethodBuilder::get_Task() | token=0x0A000094 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0036: ret
+
+[NGAME INITIALIZEPLATFORM IL]
+IL_0000: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162
+IL_0002: call [CALLSITE#001] | method=System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<!0> System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<System.Boolean>::Create() | token=0x0A0011BF | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0007: stfld | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<System.Boolean> MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162::<>t__builder | token=0x040011B9 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_000C: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162
+IL_000E: ldarg.0
+IL_000F: stfld | field=MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162::<>4__this | token=0x040011BA | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0014: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162
+IL_0016: ldc.i4.m1
+IL_0017: stfld | field=System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162::<>1__state | token=0x040011B8 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_001C: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162
+IL_001E: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<System.Boolean> MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162::<>t__builder | token=0x040011B9 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0023: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162
+IL_0025: call [CALLSITE#002] | method=System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<System.Boolean>::Start<MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162>(!!0&) | token=0x2B0006BE | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_002A: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162
+IL_002C: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<System.Boolean> MegaCrit.Sts2.Core.Nodes.NGame/<InitializePlatform>d__162::<>t__builder | token=0x040011B9 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0031: call [CALLSITE#003] | method=System.Threading.Tasks.Task`1<!0> System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<System.Boolean>::get_Task() | token=0x0A0011C1 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0036: ret
+
+[NGAME LAUNCHMAINMENU IL]
+IL_0000: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131
+IL_0002: call [CALLSITE#001] | method=System.Runtime.CompilerServices.AsyncTaskMethodBuilder System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Create() | token=0x0A000092 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0007: stfld | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131::<>t__builder | token=0x040011BF | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_000C: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131
+IL_000E: ldarg.0
+IL_000F: stfld | field=MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131::<>4__this | token=0x040011C1 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0014: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131
+IL_0016: ldarg.1
+IL_0017: stfld | field=System.Boolean MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131::skipLogo | token=0x040011C0 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_001C: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131
+IL_001E: ldc.i4.m1
+IL_001F: stfld | field=System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131::<>1__state | token=0x040011BE | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0024: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131
+IL_0026: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131::<>t__builder | token=0x040011BF | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_002B: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131
+IL_002D: call [CALLSITE#002] | method=System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Start<MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131>(!!0&) | token=0x2B0006AB | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0032: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131
+IL_0034: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<LaunchMainMenu>d__131::<>t__builder | token=0x040011BF | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0039: call [CALLSITE#003] | method=System.Threading.Tasks.Task System.Runtime.CompilerServices.AsyncTaskMethodBuilder::get_Task() | token=0x0A000094 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_003E: ret
+
+[NGAME LOADDEFERREDSTARTUPASSETSASYNC IL]
+IL_0000: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132
+IL_0002: call [CALLSITE#001] | method=System.Runtime.CompilerServices.AsyncTaskMethodBuilder System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Create() | token=0x0A000092 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0007: stfld | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132::<>t__builder | token=0x040011C5 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_000C: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132
+IL_000E: ldc.i4.m1
+IL_000F: stfld | field=System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132::<>1__state | token=0x040011C4 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0014: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132
+IL_0016: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132::<>t__builder | token=0x040011C5 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_001B: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132
+IL_001D: call [CALLSITE#002] | method=System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Start<MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132>(!!0&) | token=0x2B0006AC | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_0022: ldloca.s | local=V_0:MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132
+IL_0024: ldflda | field=System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<LoadDeferredStartupAssetsAsync>d__132::<>t__builder | token=0x040011C5 | scope=sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+IL_0029: call [CALLSITE#003] | method=System.Threading.Tasks.Task System.Runtime.CompilerServices.AsyncTaskMethodBuilder::get_Task() | token=0x0A000094 | scope=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+IL_002E: ret

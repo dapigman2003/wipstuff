@@ -380,3 +380,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-38.1-PHYSICAL-DIRECT-ENTERTREE-NRE-0.0.164-REPORT.txt` — 2/4 final physical result.
 - `reports/STEP-38.1-PHYSICAL-DIRECT-ENTERTREE-NRE-0.0.164-LAST-CHECKPOINT.txt` — normal launcher teardown after the failed one-shot Gate C.
 - `steps/STEP-38.2-IOS-OFFTREE-ENTERTREE-COMPATIBILITY.md` — 0.0.165 exact stack-neutral Sentry/file-drop-window suppressions layered on the proven ModelDb + inert-startup-wrapper derivative.
+
+## Step 38.2 physical closure / Step 39.0 real SceneTree admission
+
+- `reports/STEP-38.2-PHYSICAL-COMPLETE-0.0.165-REPORT.txt` — physical 4/4 final report.
+- `reports/STEP-38.2-PHYSICAL-COMPLETE-0.0.165-CHECKPOINT.txt` — run-correlated Gate A-D evidence showing `_EnterTree` return and zero confinement deltas.
+- `reports/STEP-38.2-PHYSICAL-COMPLETE-0.0.165-STATIC-MAP.txt` — exact compatibility `_EnterTree`/startup IL map.
+- `steps/STEP-39.0-PREFLIGHT-RESOURCE-AUDIT.md` — hash-only targeted PCK preflight and tokenized GDScript findings; no proprietary bytes retained.
+- `steps/STEP-39.0-REAL-SCENETREE-ADMISSION.md` — 0.0.166 real SceneTree AddChild + immediate render-freeze design.
