@@ -1,25 +1,13 @@
-# StS2 Launcher — Step 39.0
+# StS2 Launcher — Step 39.1
 
-Active candidate: **0.0.167 (167)** — first real Godot `SceneTree` admission.
+Active candidate: **0.0.168 (168)** — Gate-B lifecycle compatibility for the first real Godot `SceneTree` admission.
 
-Physical Codemagic **0.0.166** passed 1051/1051 static checks, 233/233 host tests, and Step-15 native-link preflight, then stopped at iOS C# compile because the Step-39 UI partial omitted `using StS2Launcher.iOS.Platform;`. No SceneTree/runtime boundary was reached. **0.0.167** is a compile-only correction with unchanged Step-39 runtime semantics.
+Physical **0.0.167 / Step 39.0** passed Gate A on-device, instantiated a fresh FMOD-neutral real `NGame` hierarchy off-tree, resolved the live `SceneTree.Root`, and then failed closed in Gate B before `AddChild`. The actual hierarchy's automatic lifecycle closure reached the two Steam Cloud capability probes in `SaveManager.ConstructDefault()` and game-owned Sentry/error-capture paths. The off-tree instance was released and no real SceneTree insertion occurred.
 
-Physical **0.0.159** closed Step 36.0.5 at 4/4 with unchanged full `ExecuteEssential()`. Physical **0.0.161** closed Step 37.0.1 at 4/4 with sealed FMOD-neutral `game.tscn` load and real off-tree `NGame` construction. Physical **0.0.165** closed Step 38.2 at 4/4: the verified iOS/off-tree-compatible `NGame._EnterTree()` returned once while `IsInsideTree == false`, state remained `2`, and resolver/initializer/rejected/native deltas were all zero.
+0.0.168 keeps Gate B fail-closed. In the launcher-private compatibility derivative only, the exact `SteamRemoteStorage.IsCloudEnabledForAccount()` and `IsCloudEnabledForApp()` probes in `SaveManager.ConstructDefault()` are forced to `false`; Steam initialization/native Steam remains deferred. The already-disabled game-owned `SentryService` surface and its nested helpers are replaced by inert default-return bodies, and compiler-generated void helpers that directly call external `Sentry.*` methods are inerted. The serialized image is reopened and verified before use.
 
-Step 39.0 moves to the first **real** Godot lifecycle boundary. It re-verifies the Step-38.2 selected compatibility image and four exact PCK preflight resources, creates a fresh real `NGame` with `NGame.Instance == null`, resolves the live `SceneTree.Root`, enumerates the actual instantiated hierarchy, and Cecil-audits the selected-sts2 `_EnterTree`, `_Ready`, and `_Notification` implementations for every actual node type plus its in-module managed base chain. Any direct OneTimeInitialization, GameStartup/platform/main-menu/deferred, FMOD, Spine, Sentry, or Steam lifecycle edge is rejected before insertion.
+Gate B then reruns against the real off-tree hierarchy. The exact sealed game-owned `SentryService` wrapper is permitted, while surviving external Sentry, Steamworks/SteamService, FMOD, Spine, later startup/platform, unresolved same-sts2, or Cecil external-resolution edges still fail before insertion.
 
-Gate C performs exactly one `SceneTree.Root.AddChild(NGame)`. This admits Godot automatic enter/ready callbacks for the audited hierarchy while the proven `GameStartupWrapper` remains inert (`Task.CompletedTask`). The gate requires `IsInsideTree == true`, exact `NGame.Instance`, parent `SceneTree.Root`, a non-null `NGame._window` as `_Ready` evidence, state `2`, and zero initializer/rejected/native escape.
+Gate C remains exactly one `SceneTree.Root.AddChild(NGame)`. If it returns, the iOS caller synchronously stops rendering before recording/advancing. Gate D verifies frozen in-tree confinement. `RemoveChild`, `Free`, explicit `_ExitTree`, render restart, `GameStartup`, platform initialization, main-menu launch, `ExecuteDeferred`, Steam initialization/native calls, native FMOD/Spine/Sentry extensions, and gameplay remain forbidden.
 
-Immediately when Gate C returns, the iOS caller synchronously stops the Godot render loop and never restarts it in Step 39. Gate D verifies the inserted hierarchy while rendering is frozen. `RemoveChild`, `Free`, explicit `_ExitTree`, render restart, `GameStartup`, `InitializePlatform`, main-menu launch, `ExecuteDeferred`, Steam initialization, native FMOD/Spine/Sentry GDExtensions, and gameplay remain forbidden.
-
-## Physical test sequence
-
-1. Fresh process: Step 15 Gates A-C.
-2. Step 35.0.32 **MODEL-BOOTSTRAP** once; require 4/4.
-3. Step 36.0.5 once; require 4/4.
-4. Step 37.0.1 once; require 4/4.
-5. **Skip Step 38 in this process.** It is prior physical evidence and its synthetic `_EnterTree()` intentionally leaves the singleton established without `_ExitTree`.
-6. Step 39.0 Gates A-D once. After Gate C starts, preserve reports and relaunch rather than retrying.
-7. Preserve Step35/Step36/Step37/Step39 run-correlated reports.
-
-Codemagic workflow key remains `ios-canonical`; existing NuGet, .NET, Godot Step-15, and iOS intermediate cache paths are unchanged.
+See `docs/CURRENT-STATUS.md` for the exact physical sequence and `docs/history/steps/STEP-39.1-GATE-B-LIFECYCLE-COMPATIBILITY.md` for the candidate rationale.

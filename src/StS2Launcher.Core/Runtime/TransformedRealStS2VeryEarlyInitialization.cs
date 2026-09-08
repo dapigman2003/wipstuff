@@ -35,7 +35,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
     private const string DiagnosticCloneFileName = "sts2.step35.0.27.instrumented.dll";
-    private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step38.2.lifecycle-bootstrap.dll";
+    private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step39.1.lifecycle-admission.dll";
     private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.27.instrumented.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
@@ -1567,6 +1567,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         int originalEnterTreeNopCount;
         int offTreeWindowBlockInstructionCount;
         uint sentryInitializeToken;
+        int step39SteamCloudProbeSubstitutionCount;
+        int step39SentryServiceStubCount;
+        int step39SentryNestedStubCount;
+        int step39ExternalSentryDelegateStubCount;
 
         using var resolver = new DiagnosticConstantMetadataWriteResolver();
         using (var module = ModuleDefinition.ReadModule(exactTransformedPath, new ReaderParameters
@@ -2029,6 +2033,109 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 instruction.Operand = null;
             }
 
+            // Step 39.1 lifecycle-admission compatibility extension. Physical 0.0.167 reached the
+            // actual-hierarchy Gate-B audit and correctly failed closed before AddChild because
+            // automatic _Ready/_Notification closure could reach (a) the two Steam Cloud capability
+            // probes in SaveManager.ConstructDefault and (b) the desktop Sentry wrapper/callback
+            // surface. Preserve Gate B and remove those exact iOS-inapplicable edges in the selected
+            // private compatibility image instead. Steam itself remains deferred; this transform does
+            // not initialize Steam, redirect a native symbol, or mutate the trusted Step-12 install.
+            const string saveManagerTypeName = "MegaCrit.Sts2.Core.Saves.SaveManager";
+            const string sentryServiceTypeName = "MegaCrit.Sts2.Core.Debug.SentryService";
+            var saveManager = allTypes.GetValueOrDefault(saveManagerTypeName)
+                ?? throw new MissingMemberException(saveManagerTypeName);
+            var constructDefault = saveManager.Methods.SingleOrDefault(method =>
+                method.Name == "ConstructDefault" && method.IsStatic && method.Parameters.Count == 0 &&
+                method.ReturnType.FullName == saveManagerTypeName && method.HasBody)
+                ?? throw new MissingMethodException(saveManagerTypeName, "ConstructDefault()");
+            var steamCloudProbeNames = new HashSet<string>(StringComparer.Ordinal)
+            {
+                "IsCloudEnabledForAccount",
+                "IsCloudEnabledForApp",
+            };
+            var steamCloudProbeCalls = constructDefault.Body.Instructions
+                .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt &&
+                    instruction.Operand is MethodReference method &&
+                    method.DeclaringType.FullName == "Steamworks.SteamRemoteStorage" &&
+                    steamCloudProbeNames.Contains(method.Name))
+                .ToArray();
+            if (steamCloudProbeCalls.Length != 2 ||
+                steamCloudProbeCalls.Select(instruction => ((MethodReference)instruction.Operand).Name).ToHashSet(StringComparer.Ordinal).SetEquals(steamCloudProbeNames) is false)
+            {
+                throw new InvalidDataException($"Step-39.1 expected exactly the two physical Gate-B SteamRemoteStorage cloud capability probes in SaveManager.ConstructDefault; observed {steamCloudProbeCalls.Length}: {string.Join(" | ", steamCloudProbeCalls.Select(instruction => ((MethodReference)instruction.Operand).FullName))}");
+            }
+            foreach (var instruction in steamCloudProbeCalls)
+            {
+                var method = (MethodReference)instruction.Operand;
+                if (method.HasThis || method.Parameters.Count != 0 || method.ReturnType.FullName != "System.Boolean")
+                    throw new InvalidDataException($"Step-39.1 refuses non-zero-arg/non-bool Steam cloud capability probe shape: {method.FullName}.");
+                instruction.OpCode = OpCodes.Ldc_I4_0;
+                instruction.Operand = null;
+            }
+            step39SteamCloudProbeSubstitutionCount = steamCloudProbeCalls.Length;
+
+            static void ReplaceMethodWithInertDefaultBody(MethodDefinition method, string boundary)
+            {
+                if (method.ReturnType is ByReferenceType or PointerType or FunctionPointerType || method.ReturnType is GenericParameter)
+                    throw new InvalidDataException($"{boundary} refuses unsupported return shape {method.ReturnType.FullName} on {method.FullName}.");
+                method.Body = new Mono.Cecil.Cil.MethodBody(method) { InitLocals = true };
+                var il = method.Body.GetILProcessor();
+                if (method.ReturnType.FullName == "System.Void")
+                {
+                    il.Append(Instruction.Create(OpCodes.Ret));
+                    return;
+                }
+                if (!method.ReturnType.IsValueType)
+                {
+                    il.Append(Instruction.Create(OpCodes.Ldnull));
+                    il.Append(Instruction.Create(OpCodes.Ret));
+                    return;
+                }
+                var defaultValue = new VariableDefinition(method.ReturnType);
+                method.Body.Variables.Add(defaultValue);
+                il.Append(Instruction.Create(OpCodes.Ldloc, defaultValue));
+                il.Append(Instruction.Create(OpCodes.Ret));
+            }
+
+            var sentryService = allTypes.GetValueOrDefault(sentryServiceTypeName)
+                ?? throw new MissingMemberException(sentryServiceTypeName);
+            var sentryServiceMethods = sentryService.Methods.Where(method => method.HasBody).ToArray();
+            if (sentryServiceMethods.Length < 8)
+                throw new InvalidDataException($"Step-39.1 SentryService surface was implausibly small: {sentryServiceMethods.Length} methods with bodies.");
+            foreach (var method in sentryServiceMethods)
+                ReplaceMethodWithInertDefaultBody(method, "Step-39.1 SentryService inert boundary");
+            step39SentryServiceStubCount = sentryServiceMethods.Length;
+
+            var sentryNestedTypes = EnumerateTypes(sentryService.NestedTypes).ToArray();
+            var sentryNestedMethods = sentryNestedTypes.SelectMany(type => type.Methods).Where(method => method.HasBody).ToArray();
+            foreach (var method in sentryNestedMethods)
+                ReplaceMethodWithInertDefaultBody(method, "Step-39.1 SentryService nested inert boundary");
+            step39SentryNestedStubCount = sentryNestedMethods.Length;
+
+            static bool DirectlyReferencesExternalSentry(MethodDefinition method)
+                => method.HasBody && method.Body.Instructions
+                    .Select(instruction => instruction.Operand)
+                    .OfType<MethodReference>()
+                    .Any(reference => reference.DeclaringType.FullName.StartsWith("Sentry.", StringComparison.Ordinal));
+
+            var externalSentryDelegateHelpers = EnumerateTypes(module.Types)
+                .Where(type => !type.FullName.Equals(sentryServiceTypeName, StringComparison.Ordinal) &&
+                               !type.FullName.StartsWith(sentryServiceTypeName + "/", StringComparison.Ordinal))
+                .SelectMany(type => type.Methods)
+                .Where(method => method.HasBody &&
+                                 (method.Name.Contains("<", StringComparison.Ordinal) || method.DeclaringType.Name.Contains("<", StringComparison.Ordinal)) &&
+                                 DirectlyReferencesExternalSentry(method))
+                .ToArray();
+            if (externalSentryDelegateHelpers.Length == 0)
+                throw new InvalidDataException("Step-39.1 expected at least one compiler-generated external-Sentry callback from the physical 0.0.167 Gate-B closure.");
+            foreach (var method in externalSentryDelegateHelpers)
+            {
+                if (method.ReturnType.FullName != "System.Void")
+                    throw new InvalidDataException($"Step-39.1 refuses to inert a non-void compiler-generated Sentry delegate helper: {method.FullName}.");
+                ReplaceMethodWithInertDefaultBody(method, "Step-39.1 external Sentry delegate helper");
+            }
+            step39ExternalSentryDelegateStubCount = externalSentryDelegateHelpers.Length;
+
             module.Write(compatibilityPath, new WriterParameters { WriteSymbols = false });
             writeResolutionRequestCount = resolver.Requests.Count;
             writeResolutionIdentities = string.Join(" | ", resolver.Requests);
@@ -2181,6 +2288,41 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             if (serializedGodotConnectCalls != 0)
                 throw new InvalidDataException($"Step-38.2 serialized NGame._EnterTree still contains {serializedGodotConnectCalls} GodotObject.Connect call(s); expected zero after removing only the FilesDropped hookup.");
 
+            var serializedSaveManager = EnumerateTypes(verifyModule.Types).Single(type => type.FullName == "MegaCrit.Sts2.Core.Saves.SaveManager");
+            var serializedConstructDefault = serializedSaveManager.Methods.Single(method => method.Name == "ConstructDefault" && method.IsStatic && method.Parameters.Count == 0 && method.HasBody);
+            var serializedSteamCloudCalls = serializedConstructDefault.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code is Code.Call or Code.Callvirt && instruction.Operand is MethodReference method &&
+                method.DeclaringType.FullName == "Steamworks.SteamRemoteStorage" && method.Name is "IsCloudEnabledForAccount" or "IsCloudEnabledForApp");
+            if (serializedSteamCloudCalls != 0)
+                throw new InvalidDataException($"Step-39.1 serialized SaveManager.ConstructDefault still contains {serializedSteamCloudCalls} SteamRemoteStorage cloud capability probe(s); expected zero.");
+            var serializedSentryService = EnumerateTypes(verifyModule.Types).Single(type => type.FullName == "MegaCrit.Sts2.Core.Debug.SentryService");
+            static bool IsSerializedInertDefaultBody(MethodDefinition method)
+            {
+                if (!method.HasBody || method.Body.ExceptionHandlers.Count != 0)
+                    return false;
+                if (method.ReturnType.FullName == "System.Void")
+                    return method.Body.Instructions.Count == 1 && method.Body.Instructions[0].OpCode == OpCodes.Ret;
+                if (!method.ReturnType.IsValueType)
+                    return method.Body.Instructions.Count == 2 && method.Body.Instructions[0].OpCode == OpCodes.Ldnull && method.Body.Instructions[1].OpCode == OpCodes.Ret;
+                return method.Body.Variables.Count == 1 && method.Body.InitLocals && method.Body.Instructions.Count == 2 &&
+                       method.Body.Instructions[0].OpCode.Code is Code.Ldloc or Code.Ldloc_S or Code.Ldloc_0 && method.Body.Instructions[1].OpCode == OpCodes.Ret;
+            }
+            var serializedSentryServiceMethods = serializedSentryService.Methods.Where(method => method.HasBody).ToArray();
+            if (serializedSentryServiceMethods.Length != step39SentryServiceStubCount || serializedSentryServiceMethods.Any(method => !IsSerializedInertDefaultBody(method)))
+                throw new InvalidDataException("Step-39.1 serialized SentryService inert boundary drifted.");
+            var serializedSentryNestedMethods = EnumerateTypes(serializedSentryService.NestedTypes).SelectMany(type => type.Methods).Where(method => method.HasBody).ToArray();
+            if (serializedSentryNestedMethods.Length != step39SentryNestedStubCount || serializedSentryNestedMethods.Any(method => !IsSerializedInertDefaultBody(method)))
+                throw new InvalidDataException("Step-39.1 serialized SentryService nested inert boundary drifted.");
+            var serializedExternalSentryDelegateHelpers = EnumerateTypes(verifyModule.Types)
+                .Where(type => !type.FullName.Equals("MegaCrit.Sts2.Core.Debug.SentryService", StringComparison.Ordinal) &&
+                               !type.FullName.StartsWith("MegaCrit.Sts2.Core.Debug.SentryService/", StringComparison.Ordinal))
+                .SelectMany(type => type.Methods)
+                .Where(method => method.HasBody && (method.Name.Contains("<", StringComparison.Ordinal) || method.DeclaringType.Name.Contains("<", StringComparison.Ordinal)) &&
+                    method.Body.Instructions.Select(instruction => instruction.Operand).OfType<MethodReference>().Any(reference => reference.DeclaringType.FullName.StartsWith("Sentry.", StringComparison.Ordinal)))
+                .ToArray();
+            if (serializedExternalSentryDelegateHelpers.Length != 0)
+                throw new InvalidDataException("Step-39.1 serialized compiler-generated Sentry delegate helpers still contain external Sentry method references: " + string.Join(" | ", serializedExternalSentryDelegateHelpers.Select(method => method.FullName)));
+
             if (verifyResolver.Requests.Count != 0)
                 throw new InvalidDataException("Step-36.0.5/Step-38.2 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
         }
@@ -2207,7 +2349,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             $"Suppressed SentryService.Initialize MemberRef token: 0x{sentryInitializeToken:X8}; substitutions=1\n" +
             $"Suppressed off-tree GetWindow/FilesDropped/Connect block instructions: {offTreeWindowBlockInstructionCount:N0}\n" +
             "NGame._EnterTree exact direct GameStartupWrapper call count preserved at 1; all non-authorized lifecycle IL remains in place\n" +
-            "GameStartup/InitializePlatform/LaunchMainMenu/ExecuteDeferred: not rewritten and not invoked by this compatibility transform";
+            "GameStartup/InitializePlatform/LaunchMainMenu/ExecuteDeferred: not rewritten and not invoked by this compatibility transform\n" +
+            "STEP 39.1 GATE-B LIFECYCLE-ADMISSION COMPATIBILITY PLAN\n" +
+            $"SaveManager.ConstructDefault SteamRemoteStorage cloud probes forced unavailable: {step39SteamCloudProbeSubstitutionCount:N0} (exact IsCloudEnabledForAccount + IsCloudEnabledForApp)\n" +
+            $"SentryService methods replaced by inert default-return bodies: {step39SentryServiceStubCount:N0}\n" +
+            $"SentryService nested/compiler-helper methods replaced by inert default-return bodies: {step39SentryNestedStubCount:N0}\n" +
+            $"External-Sentry compiler-generated delegate helpers outside SentryService inerted: {step39ExternalSentryDelegateStubCount:N0}\n" +
+            "Sentry policy: disabled at the game-owned wrapper boundary; Gate B still rejects surviving external Sentry references outside the sealed inert surface\n" +
+            "Steam policy: cloud capability only forced FALSE; Steam initialization/native API remain forbidden and deferred";
 
         return new DiagnosticCloneSnapshot(
             compatibilityPath,

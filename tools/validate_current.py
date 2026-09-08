@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 39.0 real SceneTree admission validation")
+print("StS2 Launcher — Step 39.1 Gate-B lifecycle compatibility validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>167</ApplicationVersion>" in project_text, "build version is 166")
-require("<ApplicationDisplayVersion>0.0.167</ApplicationDisplayVersion>" in project_text, "display version is 0.0.167")
-require(plist.get("CFBundleVersion") == "167", "Info.plist build version is 166")
-require(plist.get("CFBundleShortVersionString") == "0.0.167", "Info.plist display version is 0.0.167")
+require("<ApplicationVersion>168</ApplicationVersion>" in project_text, "build version is 168")
+require("<ApplicationDisplayVersion>0.0.168</ApplicationDisplayVersion>" in project_text, "display version is 0.0.168")
+require(plist.get("CFBundleVersion") == "168", "Info.plist build version is 168")
+require(plist.get("CFBundleShortVersionString") == "0.0.168", "Info.plist display version is 0.0.168")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,10 +198,10 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 39.0 — REAL SCENETREE ADMISSION" in release_presentation, "top launcher banner identifies active Step 39.0 real SceneTree admission candidate")
+require("STEP 39.1 — GATE-B LIFECYCLE COMPATIBILITY" in release_presentation, "top launcher banner identifies active Step 39.0 real SceneTree admission candidate")
 require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "NGame._EnterTree", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred"]), "top launcher banner records physical Step-37/38 closure and the bounded Step-39 SceneTree boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.167"' in release_presentation and 'ExpectedBuildVersion = "167"' in release_presentation, "Step 39 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.168"' in release_presentation and 'ExpectedBuildVersion = "168"' in release_presentation, "Step 39 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -342,8 +342,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-39.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.167",
-    "STS2_BUILD_VERSION": "167",
+    "STS2_DISPLAY_VERSION": "0.0.168",
+    "STS2_BUILD_VERSION": "168",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1272,7 +1272,7 @@ require(all(marker in step38_source for marker in [
 require('ReadingMode = ReadingMode.Immediate' not in step38_source, "Step 38.2 Gate A uses only deferred rejecting Cecil resolution")
 require('NGameGameStartupWrapperMethodName,' not in step38_source.split('private static readonly HashSet<string> Step38ForbiddenNGameReachableMethods',1)[1].split('};',1)[0], "Step 38.2 does not reject the verified inert wrapper by name while later startup methods remain forbidden")
 require(all(marker in step35_source for marker in [
-    'sts2.step38.2.lifecycle-bootstrap.dll',
+    'sts2.step39.1.lifecycle-admission.dll',
     'Physical 0.0.163 proved that exact NGame._EnterTree directly reaches',
     'gameStartupWrapper.Body = new Mono.Cecil.Cil.MethodBody(gameStartupWrapper)',
     'Instruction.Create(OpCodes.Call, completedTaskGetter)',
@@ -1291,7 +1291,7 @@ require(all(marker in step35_source for marker in [
     'serializedFilesDroppedFields != 0',
     'serializedGodotConnectCalls != 0',
     'STEP 38.2 IOS/OFFTREE LIFECYCLE-BOOTSTRAP COMPATIBILITY PLAN',
-]), "selected pre-load compatibility derivative preserves ModelDb + inert startup wrapper and adds only exact Sentry/file-drop-window NOP suppressions with serialized verification")
+]), "selected pre-load compatibility derivative preserves Step-38.2 behavior and extends it only with sealed Step-39.1 Steam-cloud/Sentry compatibility plus serialized verification")
 require(all(marker in step38_source for marker in [
     'RequireGameScenePackedResource()', 'Instantiate(GenEditState)', 'IsInsideTree', 'AssemblyLoadContext.GetLoadContext',
     'NGameTypeFullName', 'enterTree.MetadataToken', 'H_B_PASS', '_EnterTree invoked: NO',
@@ -1389,6 +1389,14 @@ require(all(marker in step39_source for marker in [
     'NGameGameStartupMethodName', 'NGameInitializePlatformMethodName', 'NGameLaunchMainMenuMethodName', 'NGameLoadDeferredStartupAssetsMethodName',
     '"Fmod"', '"Spine"', '"Sentry"', '"Steamworks"',
 ]), "Step 39 lifecycle policy fail-closes on later startup and native/platform service references")
+require(all(marker in step35_source for marker in [
+    'sts2.step39.1.lifecycle-admission.dll', 'IsCloudEnabledForAccount', 'IsCloudEnabledForApp',
+    'Step-39.1 SentryService inert boundary', 'Step-39.1 external Sentry delegate helper',
+    'serialized SaveManager.ConstructDefault still contains', 'serialized SentryService inert boundary drifted',
+]), "Step 39.1 selected compatibility derivative seals the exact physical Gate-B Steam-cloud and Sentry blockers with serialized verification")
+require('reference.DeclaringType.FullName == "MegaCrit.Sts2.Core.Debug.SentryService"' in step39_source and
+        'Any surviving external Sentry reference' in step39_source,
+        "Step 39.1 Gate B permits only the sealed game-owned SentryService wrapper while retaining fail-closed external Sentry policy")
 require(all(marker in step39_gate for marker in [
     'PreInsertionAuthorityAndResourceAudit = 1', 'OffTreeHierarchyAndLifecycleSurfaceAudit = 2',
     'RealSceneTreeInsertion = 3', 'FrozenPostInsertionConfinement = 4',
@@ -1414,7 +1422,7 @@ if step39_ui:
 require('AddTransformedRealStS2SceneTreeAdmissionControls(content)' in root_ui_text, "RootViewController wires Step 39 controls into the active device surface")
 require('ResetStep39State();' in step38_source, "Step-37/38 authority resets invalidate Step-39 state rather than allowing stale reuse")
 require('Step39ImplementationMarker' in release_presentation and all(marker in release_presentation for marker in [
-    'physical Step-38.2 4/4', 'NGame.Instance=null', 'SceneTree.Root.AddChild', 'StopRendering', 'RemoveChild/Free/_ExitTree', 'GameStartup', 'ExecuteDeferred'
+    'physical 0.0.167 Gate-B failure before AddChild', 'NGame.Instance=null', 'SceneTree.Root.AddChild', 'StopRendering', 'RemoveChild/Free/_ExitTree', 'GameStartup', 'ExecuteDeferred'
 ]), "release presentation pins the physical Step-38.2 closure and bounded Step-39 SceneTree admission design")
 
 # The native references supplied for ABI analysis must never enter the source archive.
@@ -1665,10 +1673,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 39.0 / 0.0.167 (167)", "Physical **0.0.165 / Step 38.2**", "closed **4/4**", "Step 37.0.1", "NGame.Instance", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred", "Skip Step 38"]), "current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary")
+require(all(marker in current_status for marker in ["Active candidate — Step 39.1 / 0.0.168 (168)", "Physical **0.0.165 / Step 38.2**", "closed **4/4**", "Step 37.0.1", "NGame.Instance", "SceneTree.Root.AddChild", "StopRendering", "GameStartup", "ExecuteDeferred", "Skip Step 38"]), "current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.167 (167)" in testing_doc and "0.0.167 (167)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.167 (167) release identity")
+require("0.0.168 (168)" in testing_doc and "0.0.168 (168)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.168 (168) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -1774,7 +1782,7 @@ cm_script = read("scripts/codemagic.sh")
 require(all(marker in cm_script for marker in ["Pinned .NET SDK/workloads", ".sts2launcher-ios-workload-set", "workload list", "Using verified cached iOS workload set", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE=1"]), "Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation")
 require("Step 39 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 39")
 require("LogFileName=step39.trx" in read("scripts/test.sh") and "artifacts/test-results/step39.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 39")
-require("Step 39.0 real SceneTree admission build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Step 39.0 candidate")
+require("Step 39.1 Gate-B lifecycle compatibility build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Step 39.0 candidate")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1789,7 +1797,7 @@ require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical pr
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEP 39.0 — REAL SCENETREE ADMISSION" in verify_ipa and "step39-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step-39.0 candidate")
+require("Expected device UI: STEP 39.1 — GATE-B LIFECYCLE COMPATIBILITY" in verify_ipa and "step39-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step-39.0 candidate")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")

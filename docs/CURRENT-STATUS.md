@@ -1,25 +1,23 @@
 # Current status
 
-## Active candidate — Step 39.0 / 0.0.167 (167)
+## Active candidate — Step 39.1 / 0.0.168 (168)
 
-**0.0.166 compile-only stop:** Codemagic passed 1051/1051 static checks, 233/233 host tests, and Step-15 native-link preflight, then the iOS UI project failed with CS0103 because `RootViewController.TransformedRealStS2SceneTreeAdmission.cs` referenced `GodotStep15NativeBridge` without importing `StS2Launcher.iOS.Platform`. No Step-39 runtime boundary was reached. 0.0.167 adds only that namespace import plus regression/provenance guards; SceneTree semantics are unchanged.
+Physical **0.0.167 / Step 39.0** reached the real on-device Gate-B hierarchy audit and failed closed **before `SceneTree.Root.AddChild(NGame)`**. Gate A passed: the selected Step-38.2 compatibility authority and all four exact Step-39 PCK preflight resources reverified with zero resolver/native delta. Gate B instantiated a fresh FMOD-neutral real `NGame` hierarchy off-tree with `NGame.Instance == null`, resolved the live `SceneTree.Root`, and then rejected the transitive managed lifecycle closure because automatic `_Ready` / `_Notification` paths reached two deferred desktop/platform surfaces: `SaveManager.ConstructDefault()` referenced `Steamworks.SteamRemoteStorage.IsCloudEnabledForAccount()` / `IsCloudEnabledForApp()`, and save/localization error paths reached the game-owned `SentryService` wrapper plus compiler-generated Sentry callbacks. The off-tree instance was released; Gate C never started; no real SceneTree insertion evidence exists yet.
 
-Physical **0.0.159** closed Step 36.0.5 unchanged `ExecuteEssential()` at 4/4. Physical **0.0.161** closed Step 37.0.1 at 4/4: the exact 10,414-byte `game.tscn` authority loaded through the three-edit FMOD-neutral copy and a real managed `NGame` hierarchy instantiated off-tree with zero resolver/native escape.
+Physical **0.0.159** remains the Step 36.0.5 4/4 authority. Physical **0.0.161** remains the Step 37.0.1 4/4 authority. Physical **0.0.165 / Step 38.2** remains closed **4/4**: the exact compatibility `_EnterTree()` returned off-tree with `IsInsideTree=false`, state `2`, and zero resolver/initializer/rejected/native escape after the inert `GameStartupWrapper`, Sentry initialize suppression, and bounded GetWindow/FilesDropped/Connect suppression.
 
-Physical **0.0.165 / Step 38.2** is now closed **4/4**. The selected derivative retained the proven ModelDb bootstrap, exact inert `GameStartupWrapper`, and exact Sentry/file-drop-window `_EnterTree` suppressions. Gate A verified zero remaining Sentry/GetWindow/FilesDropped/Connect refs; Gate B recreated the real NGame off-tree; Gate C returned from the verified `_EnterTree()` with `IsInsideTree=false`, state `2`, and all resolver/host/private/initializer/rejected/native deltas zero; Gate D released the node without `_ExitTree`.
+**0.0.168 / Step 39.1** keeps the Step-39 Gate-B policy fail-closed and changes only the selected private compatibility image needed to remove the exact 0.0.167 blockers. `SaveManager.ConstructDefault()` must contain exactly the two observed zero-argument `SteamRemoteStorage` cloud-capability probes; the transform substitutes those calls with `false`, preserving local save/settings construction while keeping Steam initialization and native Steam API use deferred. The game-owned `MegaCrit.Sts2.Core.Debug.SentryService` method surface and its nested helpers are replaced with inert default-return bodies because Sentry is already intentionally disabled on iOS. Compiler-generated helper methods outside `SentryService` that directly reference external `Sentry.*` methods are inerted only when they are compiler-generated and return `void`. Serialization is reopened and verified: the two Steam probes must be absent, the Sentry wrapper/helper bodies must remain inert, and external compiler-generated Sentry callbacks must have no surviving external Sentry method reference.
 
-A targeted no-install Step-39 PCK preflight then sealed four small resources: `audio_manager_proxy.gd.remap`, `audio_manager_proxy.gdc`, `reaction_wheel.tscn`, and `multiplayer_timeout_overlay.tscn`. The Godot 4.5.1 tokenized GDScript is exact tokenizer version 101 with a 9,828-byte decompressed token buffer and 69 audited identifiers. Those identifiers are FMOD command-proxy surface but contain no `_enter_tree`, `_ready`, or `_process` lifecycle callback identifier. The two nested scenes contain no FMOD/Spine/Sentry/Steam/GDExtension declaration.
+Gate B then reruns against the actual instantiated hierarchy. The exact `SentryService` wrapper reference is permitted only because the selected compatibility image seals that wrapper inert; any surviving external `Sentry.*`, Steamworks, SteamService, FMOD, Spine, later startup, or platform/native reference still fails closed. Gate C remains exactly one launcher-authorized `SceneTree.Root.AddChild(NGame)`. If Gate C returns, the iOS caller immediately calls `StopRendering()` before recording/advancing. Gate D requires the inserted hierarchy to remain authoritative and in-tree while rendering is frozen.
 
-**0.0.167 / Step 39.0** therefore advances to one real `SceneTree.Root.AddChild(NGame)` after a pre-insertion audit of the actual hierarchy. Gate B requires `NGame.Instance == null`, then maps selected-sts2 `_EnterTree`, `_Ready`, and `_Notification` methods for actual node types and their in-module managed base classes; any direct later-startup/native/platform edge fails closed. Gate C authorizes only the real AddChild/automatic audited lifecycle and requires exact singleton/parent/window/state authority with zero initializer/rejected/native escape. The caller immediately invokes `StopRendering()` when Gate C returns. Gate D verifies the attached hierarchy while frozen and intentionally leaves it in-tree.
-
-## Physical sequence for 0.0.167
+## Physical sequence for 0.0.168
 
 1. Fresh process → Step 15 A-C.
-2. Step 35.0.32 MODEL-BOOTSTRAP → 4/4.
-3. Step 36.0.5 → 4/4.
-4. Step 37.0.1 → 4/4.
-5. **Skip Step 38 in this process.**
-6. Step 39.0 A-D once. If Gate C starts, do not retry in-process.
-7. Preserve Step35/Step36/Step37/Step39 reports and relaunch before unrelated testing.
+2. Step 35.0.32 MODEL-BOOTSTRAP → require 4/4.
+3. Step 36.0.5 → require 4/4.
+4. Step 37.0.1 → require 4/4.
+5. **Skip Step 38 in this process.** Physical Step 38.2 is prior evidence only.
+6. Step 39.1 A-D once.
+7. If Gate C starts, preserve all reports and relaunch; never retry Step 39 in-process.
 
-Still forbidden: explicit `_ExitTree`, RemoveChild/Free, render restart, `GameStartup`, `InitializePlatform`, main-menu launch, `ExecuteDeferred`, Steam initialization, native FMOD/Spine/Sentry extensions, gameplay, state reset, and mutation of the trusted Step-12 install.
+Still forbidden: explicit `_ExitTree`, RemoveChild/Free after insertion, render restart, `GameStartup`, `InitializePlatform`, main-menu launch, `ExecuteDeferred`, Steam initialization/native Steam API loading, FMOD/Spine/native Sentry extensions, gameplay, state reset, and mutation of the trusted Step-12 install.

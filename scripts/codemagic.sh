@@ -46,7 +46,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 39.0 real SceneTree admission build environment"
+  echo "StS2 Launcher — Step 39.1 Gate-B lifecycle compatibility build environment"
   date -u
   uname -a
   xcodebuild -version

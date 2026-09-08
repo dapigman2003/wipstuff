@@ -749,6 +749,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         if (reference.DeclaringType.FullName == NGameTypeFullName &&
             reference.Name is NGameGameStartupMethodName or NGameInitializePlatformMethodName or NGameLaunchMainMenuMethodName or NGameLoadDeferredStartupAssetsMethodName)
             return true;
+        // Step 39.1 preserves the fail-closed Sentry policy while recognizing the exact game-owned
+        // SentryService boundary as already transformed to inert default-return bodies in the selected
+        // private compatibility image. Any surviving external Sentry reference (Sentry.*), or any
+        // Sentry-named type outside this exact wrapper, remains forbidden.
+        if (reference.DeclaringType.FullName == "MegaCrit.Sts2.Core.Debug.SentryService")
+            return false;
         return Step39ForbiddenLifecycleReferenceFragments.Any(fragment =>
             reference.DeclaringType.FullName.Contains(fragment, StringComparison.OrdinalIgnoreCase));
     }

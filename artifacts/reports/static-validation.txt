@@ -1,5 +1,17 @@
-StS2 Launcher — Step 39.0 real SceneTree admission validation
-Root: /mnt/data/StS2Launcher-Step39-0.0.167
+StS2 Launcher — canonical static validation entry point
+UTC: 2026-09-08T17:07:15Z
+Checking active shell syntax...
+PASS: shell syntax — scripts/build-godot.sh
+PASS: shell syntax — scripts/build-ios.sh
+PASS: shell syntax — scripts/codemagic.sh
+PASS: shell syntax — scripts/lib/current-release.sh
+PASS: shell syntax — scripts/preflight-godot-link.sh
+PASS: shell syntax — scripts/test.sh
+PASS: shell syntax — scripts/validate.sh
+PASS: shell syntax — scripts/verify-ipa.sh
+PASS: Python validator compiles
+StS2 Launcher — Step 39.1 Gate-B lifecycle compatibility validation
+Root: /mnt/data/sts2work/StS2Launcher-Step39-0.0.167
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 266 C# files
@@ -9,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 166
-PASS: display version is 0.0.167
-PASS: Info.plist build version is 166
-PASS: Info.plist display version is 0.0.167
+PASS: build version is 168
+PASS: display version is 0.0.168
+PASS: Info.plist build version is 168
+PASS: Info.plist display version is 0.0.168
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -632,7 +644,7 @@ PASS: Step 38 pins the exact NGame lifecycle/startup method names under audit
 PASS: Step 38 Gate A requires the inert wrapper plus exact Sentry/window suppressions, reads the selected compatibility image with deferred rejecting Cecil, and fail-closes on later lifecycle/OneTimeInitialization reachability
 PASS: Step 38.2 Gate A uses only deferred rejecting Cecil resolution
 PASS: Step 38.2 does not reject the verified inert wrapper by name while later startup methods remain forbidden
-PASS: selected pre-load compatibility derivative preserves ModelDb + inert startup wrapper and adds only exact Sentry/file-drop-window NOP suppressions with serialized verification
+PASS: selected pre-load compatibility derivative preserves Step-38.2 behavior and extends it only with sealed Step-39.1 Steam-cloud/Sentry compatibility plus serialized verification
 PASS: Step 38 Gate B recreates the physically proven NGame only off-tree and binds the exact _EnterTree token without invoking it
 PASS: Step 38 Gate C invokes the verified compatibility NGame._EnterTree once and captures nested failures while requiring state/native confinement
 PASS: Step 38 contains exactly one launcher-authorized _EnterTree invocation
@@ -661,6 +673,8 @@ PASS: Step 39 Gate D requires a frozen renderer and retains the inserted hierarc
 PASS: Step 39 never restarts Godot rendering
 PASS: Step 39 core has no explicit RemoveChild or synthetic _ExitTree boundary
 PASS: Step 39 lifecycle policy fail-closes on later startup and native/platform service references
+PASS: Step 39.1 selected compatibility derivative seals the exact physical Gate-B Steam-cloud and Sentry blockers with serialized verification
+PASS: Step 39.1 Gate B permits only the sealed game-owned SentryService wrapper while retaining fail-closed external Sentry policy
 PASS: Step 39 defines exactly four ordered A-D gates
 PASS: Step 39 summary closes only at four-of-four
 PASS: Step 39 host regressions pin gate order, failure sequencing, and exact preflight authorities
@@ -879,7 +893,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
 PASS: current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary
-PASS: testing and release-checklist docs pin the exact 0.0.167 (167) release identity
+PASS: testing and release-checklist docs pin the exact 0.0.168 (168) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1055,4 +1069,4 @@ PASS: Step 39 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1053 checks
+VALIDATION PASS: 1055 checks
