@@ -35,7 +35,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     public const string DiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.ExecuteVeryEarlyCheckpointBridge";
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
     private const string DiagnosticCloneFileName = "sts2.step35.0.27.instrumented.dll";
-    private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step36.0.3.model-bootstrap.dll";
+    private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step38.1.lifecycle-bootstrap.dll";
     private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.27.instrumented.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
@@ -251,7 +251,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 "Exact source/transformed ExecuteVeryEarly wrapper + async MoveNext semantics requalified; no direct ExecuteEssential/ExecuteDeferred/PrewarmJit or Harmony call crosses this boundary."));
 
             var diagnosticMode = DiagnosticMode;
-            stage = IsModelBootstrapCompatibilityMode ? "Step-36.0.5 ModelDb bootstrap compatibility clone" : "Step-35.0.22 diagnostic-clone instrumentation";
+            stage = IsModelBootstrapCompatibilityMode ? "Step-38.1 ModelDb + lifecycle-bootstrap compatibility clone" : "Step-35.0.22 diagnostic-clone instrumentation";
             var diagnosticRoot = Path.Combine(_launcherDataRoot, "Step35-ExecuteVeryEarlyDiagnostic");
             Directory.CreateDirectory(diagnosticRoot);
             var diagnosticPath = Path.Combine(diagnosticRoot, IsModelBootstrapCompatibilityMode ? ModelBootstrapCompatibilityCloneFileName : DiagnosticCloneFileName);
@@ -265,7 +265,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 throw new InvalidDataException("Step-35.0.22 diagnostic-clone emission changed the exact closed transformed source; refusing to continue.");
             progress?.Report(new(gate, 6, 8, diagnosticPath,
                 IsModelBootstrapCompatibilityMode
-                    ? $"Exact transformed image requalified, then the Step-36.0.5 ModelDb bootstrap compatibility derivative was emitted and reopened under rejecting resolution. {modelBootstrapCompatibilityReport.Replace('\n', ' ')}"
+                    ? $"Exact transformed image requalified, then the Step-38.1 ModelDb + lifecycle-bootstrap compatibility derivative was emitted and reopened under rejecting resolution. {modelBootstrapCompatibilityReport.Replace('\n', ' ')}"
                     : $"Exact transformed image requalified, then a Step-35.0.22 diagnostic-only clone was emitted for mode {diagnosticMode} with {diagnostic.MarkerCount:N0} durable in-method markers, critical stack-neutral CommandLine boundaries, {diagnostic.CommandLineManagedDictionarySubstitutionCount:N0} managed Dictionary<string,string> compatibility substitution(s), {diagnostic.CommandLineManagedCommandLineSubstitutionCount:N0} managed command-line provider substitution(s), and unchanged serialized cctor MaxStack. Cecil serialization used {diagnostic.WriteResolutionRequestCount:N0} bounded writer-only constant-metadata resolution request(s) across {diagnostic.ApprovedConstantScopeCount:N0} audited scope(s), then the clone reopened under rejecting resolution; the exact transformed source was immediately re-hashed unchanged."));
 
             stage = "Step-21/22 prepared execution-plan preflight";
@@ -353,7 +353,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
 
             EnsureNoStS2Loaded("Gate A exit");
             progress?.Report(new(gate, 8, 8, _planPath, IsModelBootstrapCompatibilityMode
-                ? "Execution preflight complete; exact transformed source, verified ModelDb-bootstrap derivative, and all prepared dependencies remain outside the CLR."
+                ? "Execution preflight complete; exact transformed source, verified ModelDb + lifecycle-bootstrap derivative, and all prepared dependencies remain outside the CLR."
                 : "Execution preflight complete; exact transformed source, instrumented diagnostic clone, and all prepared dependencies remain outside the CLR."));
 
             return Pass(gate,
@@ -1017,7 +1017,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 if (admission.Assembly.GetType(DiagnosticBridgeTypeFullName, throwOnError: false, ignoreCase: false) is not null)
                     throw new InvalidDataException("Step-35 exact/ModelDb-compatibility CLR input unexpectedly contains the diagnostic checkpoint bridge type.");
                 Checkpoint(crashCheckpoint, IsModelBootstrapCompatibilityMode
-                    ? "C_MODEL_BOOTSTRAP_AUTHORITY_PASS — admitted sts2 assembly is the verified ModelDb bootstrap compatibility derivative, contains no Step-35 diagnostic bridge, and ExecuteVeryEarly remains uninjected."
+                    ? "C_MODEL_BOOTSTRAP_AUTHORITY_PASS — admitted sts2 assembly is the verified ModelDb + lifecycle-bootstrap compatibility derivative, contains no Step-35 diagnostic bridge, ExecuteVeryEarly remains uninjected, and only NGame.GameStartupWrapper is additionally inert."
                     : "C_EXACT_AUTHORITY_PASS — admitted sts2 assembly is the exact closed transformed artifact and contains no Step-35 diagnostic bridge; invocation will proceed without injected in-method markers.");
             }
 
@@ -1560,6 +1560,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         int bowlbugsOriginalIndex;
         int bowlbugEggOriginalIndex;
         string preinjectSummary;
+        int originalGameStartupWrapperInstructionCount;
+        uint gameStartupWrapperToken;
+        string completedTaskGetterFullName;
 
         using var resolver = new DiagnosticConstantMetadataWriteResolver();
         using (var module = ModuleDefinition.ReadModule(exactTransformedPath, new ReaderParameters
@@ -1874,6 +1877,80 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             il.Append(Instruction.Create(OpCodes.Blt, loopBody));
             il.Append(Instruction.Create(OpCodes.Ret));
 
+            // Step 38.1 lifecycle-bootstrap compatibility extension.
+            // Physical 0.0.163 proved that exact NGame._EnterTree directly reaches
+            // NGame.GameStartupWrapper. Keep _EnterTree itself unchanged and neutralize only
+            // the async startup edge by replacing GameStartupWrapper with:
+            //     call System.Threading.Tasks.Task::get_CompletedTask()
+            //     ret
+            // Reuse an existing MemberRef from this exact module so no new external type/member
+            // metadata shape is invented and the writer remains within the already-audited
+            // constant-metadata resolution envelope.
+            var nGame = allTypes.GetValueOrDefault(NGameTypeFullName)
+                ?? throw new MissingMemberException(NGameTypeFullName);
+            var enterTree = nGame.Methods.SingleOrDefault(method =>
+                method.Name == NGameEnterTreeMethodName &&
+                !method.IsStatic &&
+                method.Parameters.Count == 0 &&
+                method.ReturnType.FullName == "System.Void" &&
+                method.HasBody)
+                ?? throw new MissingMethodException(NGameTypeFullName, NGameEnterTreeMethodName);
+            var gameStartupWrapper = nGame.Methods.SingleOrDefault(method =>
+                method.Name == NGameGameStartupWrapperMethodName &&
+                !method.IsStatic &&
+                method.Parameters.Count == 0 &&
+                method.ReturnType.FullName == "System.Threading.Tasks.Task" &&
+                method.HasBody)
+                ?? throw new MissingMethodException(NGameTypeFullName, NGameGameStartupWrapperMethodName);
+
+            var enterTreeWrapperCalls = enterTree.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code is Code.Call or Code.Callvirt &&
+                instruction.Operand is MethodReference method &&
+                method.DeclaringType.FullName == NGameTypeFullName &&
+                method.Name == NGameGameStartupWrapperMethodName &&
+                method.Parameters.Count == 0 &&
+                method.ReturnType.FullName == "System.Threading.Tasks.Task");
+            if (enterTreeWrapperCalls != 1)
+                throw new InvalidDataException($"Step-38.1 expected exact NGame._EnterTree to call GameStartupWrapper exactly once before compatibility rewrite; observed {enterTreeWrapperCalls}.");
+
+            originalGameStartupWrapperInstructionCount = gameStartupWrapper.Body.Instructions.Count;
+            gameStartupWrapperToken = gameStartupWrapper.MetadataToken.ToUInt32();
+            if (originalGameStartupWrapperInstructionCount < 2)
+                throw new InvalidDataException($"Step-38.1 original GameStartupWrapper IL was implausibly small: {originalGameStartupWrapperInstructionCount} instruction(s).");
+
+            var completedTaskGetters = EnumerateTypes(module.Types)
+                .SelectMany(type => type.Methods)
+                .Where(method => method.HasBody)
+                .SelectMany(method => method.Body.Instructions)
+                .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt)
+                .Select(instruction => instruction.Operand)
+                .OfType<MethodReference>()
+                .Where(method =>
+                    method.DeclaringType.FullName == "System.Threading.Tasks.Task" &&
+                    method.Name == "get_CompletedTask" &&
+                    !method.HasThis &&
+                    method.Parameters.Count == 0 &&
+                    method.ReturnType.FullName == "System.Threading.Tasks.Task")
+                .ToArray();
+            if (completedTaskGetters.Length == 0)
+                throw new InvalidDataException("Step-38.1 could not reuse an existing System.Threading.Tasks.Task.get_CompletedTask MemberRef from the exact sts2 authority.");
+            var completedTaskGetter = completedTaskGetters[0];
+            if (completedTaskGetters.Any(method =>
+                    method.FullName != completedTaskGetter.FullName ||
+                    method.DeclaringType.Scope?.ToString() != completedTaskGetter.DeclaringType.Scope?.ToString()))
+            {
+                throw new InvalidDataException("Step-38.1 observed inconsistent Task.get_CompletedTask MemberRef metadata in the exact sts2 authority.");
+            }
+            completedTaskGetterFullName = completedTaskGetter.FullName;
+
+            gameStartupWrapper.Body = new Mono.Cecil.Cil.MethodBody(gameStartupWrapper)
+            {
+                InitLocals = false,
+            };
+            var startupIl = gameStartupWrapper.Body.GetILProcessor();
+            startupIl.Append(Instruction.Create(OpCodes.Call, completedTaskGetter));
+            startupIl.Append(Instruction.Create(OpCodes.Ret));
+
             module.Write(compatibilityPath, new WriterParameters { WriteSymbols = false });
             writeResolutionRequestCount = resolver.Requests.Count;
             writeResolutionIdentities = string.Join(" | ", resolver.Requests);
@@ -1952,8 +2029,52 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             RequireTypeVar(serializedRemove.Parameters[0].ParameterType, 0, "Remove key");
             RequireTypeVar(serializedAdd.Parameters[0].ParameterType, 0, "Add key");
             RequireTypeVar(serializedAdd.Parameters[1].ParameterType, 1, "Add value");
+            var serializedNGame = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == NGameTypeFullName)
+                ?? throw new MissingMemberException(NGameTypeFullName);
+            var serializedEnterTree = serializedNGame.Methods.SingleOrDefault(method =>
+                method.Name == NGameEnterTreeMethodName &&
+                !method.IsStatic &&
+                method.Parameters.Count == 0 &&
+                method.ReturnType.FullName == "System.Void" &&
+                method.HasBody)
+                ?? throw new MissingMethodException(NGameTypeFullName, NGameEnterTreeMethodName);
+            var serializedStartupWrapper = serializedNGame.Methods.SingleOrDefault(method =>
+                method.Name == NGameGameStartupWrapperMethodName &&
+                !method.IsStatic &&
+                method.Parameters.Count == 0 &&
+                method.ReturnType.FullName == "System.Threading.Tasks.Task" &&
+                method.HasBody)
+                ?? throw new MissingMethodException(NGameTypeFullName, NGameGameStartupWrapperMethodName);
+            if (serializedStartupWrapper.MetadataToken.ToUInt32() != gameStartupWrapperToken)
+                throw new InvalidDataException($"Step-38.1 serialized GameStartupWrapper token drifted: expected=0x{gameStartupWrapperToken:X8}; actual=0x{serializedStartupWrapper.MetadataToken.ToUInt32():X8}.");
+            if (serializedStartupWrapper.Body.Variables.Count != 0 ||
+                serializedStartupWrapper.Body.ExceptionHandlers.Count != 0 ||
+                serializedStartupWrapper.Body.Instructions.Count != 2 ||
+                serializedStartupWrapper.Body.Instructions[0].OpCode != OpCodes.Call ||
+                serializedStartupWrapper.Body.Instructions[0].Operand is not MethodReference serializedCompletedTask ||
+                serializedCompletedTask.DeclaringType.FullName != "System.Threading.Tasks.Task" ||
+                serializedCompletedTask.Name != "get_CompletedTask" ||
+                serializedCompletedTask.HasThis ||
+                serializedCompletedTask.Parameters.Count != 0 ||
+                serializedCompletedTask.ReturnType.FullName != "System.Threading.Tasks.Task" ||
+                serializedStartupWrapper.Body.Instructions[1].OpCode != OpCodes.Ret)
+            {
+                throw new InvalidDataException("Step-38.1 serialized GameStartupWrapper is not the exact two-instruction Task.CompletedTask compatibility body.");
+            }
+            if (serializedCompletedTask.FullName != completedTaskGetterFullName)
+                throw new InvalidDataException($"Step-38.1 serialized Task.CompletedTask MemberRef drifted: expected={completedTaskGetterFullName}; actual={serializedCompletedTask.FullName}.");
+            var serializedEnterTreeWrapperCalls = serializedEnterTree.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code is Code.Call or Code.Callvirt &&
+                instruction.Operand is MethodReference method &&
+                method.DeclaringType.FullName == NGameTypeFullName &&
+                method.Name == NGameGameStartupWrapperMethodName &&
+                method.Parameters.Count == 0 &&
+                method.ReturnType.FullName == "System.Threading.Tasks.Task");
+            if (serializedEnterTreeWrapperCalls != 1)
+                throw new InvalidDataException($"Step-38.1 serialized NGame._EnterTree must still call GameStartupWrapper exactly once; observed {serializedEnterTreeWrapperCalls}.");
+
             if (verifyResolver.Requests.Count != 0)
-                throw new InvalidDataException("Step-36.0.5 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
+                throw new InvalidDataException("Step-36.0.5/Step-38.1 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
         }
 
         compatibilityReport =
@@ -1968,7 +2089,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             $"Pre-inject order sample: {preinjectSummary}\n" +
             $"Compatibility SHA-256: {sha256}\n" +
             $"Compatibility bytes: {length:N0}\n" +
-            $"Writer-only constant metadata requests: {writeResolutionRequestCount:N0}; identities={writeResolutionIdentities}";
+            $"Writer-only constant metadata requests: {writeResolutionRequestCount:N0}; identities={writeResolutionIdentities}\n" +
+            "STEP 38.1 LIFECYCLE-BOOTSTRAP COMPATIBILITY PLAN\n" +
+            $"NGame.GameStartupWrapper token: 0x{gameStartupWrapperToken:X8}\n" +
+            $"Original GameStartupWrapper instructions: {originalGameStartupWrapperInstructionCount:N0}\n" +
+            "Serialized GameStartupWrapper instructions: 2 (call Task.get_CompletedTask; ret)\n" +
+            $"Reused completed-task MemberRef: {completedTaskGetterFullName}\n" +
+            "NGame._EnterTree body: unchanged; exact direct GameStartupWrapper call count preserved at 1\n" +
+            "GameStartup/InitializePlatform/LaunchMainMenu/ExecuteDeferred: not rewritten and not invoked by this compatibility transform";
 
         return new DiagnosticCloneSnapshot(
             compatibilityPath,

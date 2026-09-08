@@ -365,3 +365,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-38.0-PHYSICAL-GATE-A-CECIL-GODOTSHARP-RESOLUTION-FAILURE-0.0.162-REPORT.txt` — final 0/4 report for that pre-runtime failure.
 - `reports/STEP-38.0-PHYSICAL-GATE-A-CECIL-GODOTSHARP-RESOLUTION-FAILURE-0.0.162-LAST-CHECKPOINT.txt` — normal Step-38 teardown after the safe Gate-A stop.
 - `steps/STEP-38.0.1-DEFERRED-CECIL-METADATA-READ-CORRECTION.md` — 0.0.163 switches only the lifecycle audit to deferred metadata-only Cecil reading with a rejecting resolver and requires zero external resolution requests.
+
+## Step 38.0.1 physical startup-wrapper boundary / Step 38.1 compatibility
+
+- `reports/STEP-38.0.1-PHYSICAL-GATE-A-ENTERTREE-REACHES-GAMESTARTUPWRAPPER-0.0.163-CHECKPOINT.txt` — physical 0.0.163 deferred Cecil audit proves exact `_EnterTree -> GameStartupWrapper` reachability and stops before any lifecycle invocation; normal `RUN_END` follows.
+- `reports/STEP-38.0.1-PHYSICAL-GATE-A-ENTERTREE-REACHES-GAMESTARTUPWRAPPER-0.0.163-REPORT.txt` — final 0/4 report identifying `GameStartupWrapper` as the exact later-startup boundary.
+- `reports/STEP-38.0.1-PHYSICAL-GATE-A-ENTERTREE-REACHES-GAMESTARTUPWRAPPER-0.0.163-LAST.txt` — final durable checkpoint for the safe 0.0.163 stop.
+- `steps/STEP-38.1-INERT-GAMESTARTUPWRAPPER-COMPATIBILITY.md` — 0.0.164 preserves unchanged `_EnterTree` and the physically proven ModelDb compatibility while rewriting only `GameStartupWrapper` to `Task.CompletedTask` ahead of load, with serialized exact-shape verification before controlled `_EnterTree` execution.

@@ -518,12 +518,14 @@ Physical 0.0.155 proves the Step-36 game-resource handoff: exact receipt-backed 
 - AddChild, GameStartup, LaunchMainMenu, ExecuteDeferred, Steam initialization, and native FMOD/Spine/Sentry loading remain forbidden.
 - Proprietary native reference binaries must never be copied into the source/release archive.
 
-## Step 38.0.1 controlled NGame `_EnterTree` contracts
+## Step 38.1 inert-startup-wrapper controlled NGame `_EnterTree` contracts
 
 - Physical Step 37.0.1 / 0.0.161 4/4 is prerequisite authority; historical reports cannot substitute for same-process closure.
-- Gate A re-verifies the exact selected ModelDb-bootstrap compatibility image and Cecil-maps `NGame._EnterTree`, `_Ready`, `GameStartupWrapper`, `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, and `LoadDeferredStartupAssetsAsync` before any lifecycle execution.
-- `_EnterTree` must be an instance, parameterless, managed-IL `void` method. Its same-NGame call closure must not reach `_Ready`, startup/platform/main-menu/deferred methods; the reachable closure must not call OneTimeInitialization `ExecuteVeryEarly`, `ExecuteEssential`, `ExecuteDeferred`, or `PrewarmJit`.
+- Physical 0.0.163 proves exact `_EnterTree` directly calls `GameStartupWrapper`; Step 38.1 must preserve this report and must not weaken the fail-closed closure audit to ignore an unmodified startup wrapper.
+- The selected pre-load derivative preserves the proven ModelDb rewrite and changes only `NGame.GameStartupWrapper()` to the exact body `call Task.get_CompletedTask; ret`, reusing an existing exact sts2 MemberRef.
+- Serialized verification requires the same wrapper metadata token, exactly two instructions, no locals/handlers, and unchanged `_EnterTree` retaining exactly one direct wrapper call.
+- Gate A Cecil-maps `NGame._EnterTree`, `_Ready`, `GameStartupWrapper`, `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, and `LoadDeferredStartupAssetsAsync` before lifecycle execution. It may traverse only the verified inert wrapper; `_Ready`, `GameStartup`, platform/main-menu/deferred methods remain forbidden, and the reachable closure must not call OneTimeInitialization `ExecuteVeryEarly`, `ExecuteEssential`, `ExecuteDeferred`, or `PrewarmJit`.
 - Gate B reuses only the Step-37 FMOD-neutral PackedScene and requires a fresh exact private-context `NGame` with `IsInsideTree=false`.
-- Gate C invokes only exact `NGame._EnterTree()` once by reflection. Step38 source must contain no `AddChild(`, direct `_Ready`, direct `GameStartup`, direct `InitializePlatform`, direct `LaunchMainMenu`, or direct `ExecuteDeferred` call.
+- Gate C invokes only exact unchanged `NGame._EnterTree()` once by reflection. Step38 source must contain no `AddChild(`, direct `_Ready`, direct `GameStartup`, direct `InitializePlatform`, direct `LaunchMainMenu`, or direct `ExecuteDeferred` call.
 - Gate C/D require `IsInsideTree=false`, OneTimeInitialization state `2`, and zero initializer-bearing/rejected/native escape.
 - Gate D releases the temporary off-tree node without invoking `_ExitTree`. Any failure after Gate C begins requires a fresh process before retry.

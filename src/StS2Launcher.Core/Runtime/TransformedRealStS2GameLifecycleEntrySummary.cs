@@ -6,6 +6,6 @@ public sealed record TransformedRealStS2GameLifecycleEntrySummary(
     public bool Passed => Gates.Count == 4 && Gates.All(g => g.Passed);
     public TransformedRealStS2GameLifecycleEntryGate? FirstFailingGate => Gates.FirstOrDefault(g => !g.Passed)?.Gate;
     public string Summary => Passed
-        ? "STEP 38.0.1 CONTROLLED NGAME _ENTERTREE ENTRY COMPLETE — 4/4"
-        : $"STEP 38.0.1 CONTROLLED NGAME _ENTERTREE ENTRY {(FirstFailingGate is null ? "INCOMPLETE" : "FAIL")} — {Gates.Count(g => g.Passed)}/4";
+        ? "STEP 38.1 INERT-STARTUP-WRAPPER NGAME _ENTERTREE ENTRY COMPLETE — 4/4"
+        : $"STEP 38.1 INERT-STARTUP-WRAPPER NGAME _ENTERTREE ENTRY {(FirstFailingGate is null ? "INCOMPLETE" : "FAIL")} — {Gates.Count(g => g.Passed)}/4";
 }
