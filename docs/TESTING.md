@@ -1,21 +1,11 @@
 # Testing
 
-Active candidate: `0.0.170 (170)`, IPA `StS2-Launcher-Step-39.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.171 (171)`, IPA `StS2-Launcher-Step-40.ipa`, workflow `ios-canonical`.
 
-Canonical validation must preserve the physical Step-36/37/38 closures and the exact ModelDb + inert-startup-wrapper + Step-38.2 compatibility transform. Step 39 must pin the four targeted PCK preflight resources; require a fresh process in which Step 38 was not invoked; require `NGame.Instance == null` before insertion; resolve the live `Engine.GetMainLoop()` / `SceneTree.Root`; enumerate the actual hierarchy; audit selected-sts2 `_EnterTree`, `_Ready`, and `_Notification` methods including in-module managed base chains; reject direct OneTimeInitialization/GameStartup/platform/main-menu/deferred/FMOD/Spine/Sentry/Steam references; perform exactly one `SceneTree.Root.AddChild(NGame)`; verify `IsInsideTree`, singleton, parent, `_window`, state 2, and zero initializer/rejected/native escape; call `StopRendering()` immediately after Gate C returns; never restart rendering or RemoveChild/Free/explicitly invoke `_ExitTree`; and keep proprietary game/native payloads out of the archive.
+Canonical validation must preserve physical Step-36/37/38/39 closures and the exact Step-39.1 compatibility image. Step 40 must require same-process Step-39 4/4 with the retained real NGame in-tree and rendering stopped; reverify the selected image and inert GameStartupWrapper; audit actual in-tree `_Process`, `_PhysicsProcess`, `_Draw`, `_Input`, `_ShortcutInput`, `_UnhandledInput`, `_UnhandledKeyInput`, and `_GuiInput` methods through in-module base chains with deferred/rejecting Cecil; reject surviving startup/platform/FM0D/Spine/Sentry/Steam forbidden edges or unresolved same-sts2 references; permit exactly one `StartRendering()` call; target a 100 ms pulse; call `StopRendering()` on the first continuation before any other Step-40 work; require observed elapsed <=500 ms and rendering inactive afterward; and re-prove singleton/parent/`_window`/state 2 plus zero initializer-bearing/rejected/native escape.
 
-Host tests cover Step39 gate ordering, stable ordinals, failure sequencing, summary text, and pinned preflight authorities. Codemagic remains the first actual C# compiler for the new Step-39 iOS/core source in this environment.
+Host regressions cover Step40 gate ordering, stable ordinals, failure sequencing, summary text, and pinned pulse bounds. Static validation also asserts the one-Start/one-Stop UI shape, no Step40 native-host changes, no GameStartup enabling, and exact physical 0.0.170 provenance. Codemagic remains the first actual C# compiler/AOT/link/package authority for this new source.
 
-Physical sequence: fresh process → Step 15 A-C → Step 35 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → **skip Step 38** → Step 39.0 A-D once. Relaunch after any Gate-C-started attempt.
+Physical sequence: fresh process → Step 15 A-C → Step 35 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → **skip Step 38** → Step 39.0 4/4 → **same process** Step 40.0 A-D once. Once Gate C is armed, never retry Step40 in-process.
 
-## 0.0.170 Gate-D confinement correction
-
-Physical 0.0.169 passed Gates A/B/C. Gate B mapped 69 nodes, 23 selected managed node types, 26 immediate callbacks, and 557 transitive same-sts2 methods with zero forbidden/unresolved references. Gate C then completed the first real `SceneTree.Root.AddChild(NGame)` and verified inside-tree/singleton/window/parent/state authority with zero rejected/initializer/native escape before the caller synchronously stopped rendering. Gate D failed only because reflection used `Single(...)` for zero-argument `GetParent` and Godot exposes more than one matching method shape.
-
-0.0.170 changes only Gate-D reflection selection: require a non-generic, closed `GetParent()` whose return type is compatible with the live `SceneTree.Root`. Gate A/B/C and the selected compatibility derivative are unchanged.
-
-Device sequence remains fresh process: Step 15 A-C → Step 35.0.32 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → skip Step 38 → Step 39.1 once. If Gate C starts, never retry in-process.
-
-## 0.0.167 compile correction
-
-Physical Codemagic 0.0.166 passed 1051/1051 static checks, 233/233 host tests, and the Step-15 native-link preflight, then failed before publish/device execution with CS0103 because the Step-39 UI partial omitted `using StS2Launcher.iOS.Platform;`. 0.0.167 changes only that import and release provenance.
+Expected Step40 device evidence on success: Gate B static map written before restart; `J_C_START_RENDERING_CALL`; `J_C_START_RENDERING_RETURNED` with active true; `J_C_STOP_RENDERING_CALL`; `J_C_STOP_RENDERING_RETURNED` with active false and elapsed <=500 ms; Gate C pass with zero initializer/rejected/native delta; Gate D pass; `RUN_STEP40_4OF4`; normal report return with rendering still inactive.

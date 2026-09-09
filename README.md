@@ -1,9 +1,9 @@
-# StS2 Launcher — Step 39.2
+# StS2 Launcher — Step 40.0
 
-Active candidate: **0.0.170 (170)** — Gate-D frozen-confinement reflection correction after the first successful real Godot `SceneTree` insertion.
+Active candidate: **0.0.171 (171)** — controlled real-game render pulse after physical Step 39 closure.
 
-Physical **0.0.169 / Step 39.1** passed Gates A and B, produced the full 69-node lifecycle map with zero forbidden/unresolved/native-facing audit escapes, and then physically passed Gate C: the first real `SceneTree.Root.AddChild(NGame)` returned with `IsInsideTree=True`, exact `NGame.Instance`, non-null `_window`, exact root parent, OneTimeInitialization state 2, and zero rejected/initializer/native deltas. Rendering was synchronously stopped immediately afterward.
+Physical **0.0.170 / Step 39.2** closed real SceneTree admission **4/4** on iPhone. The exact 69-node hierarchy passed its lifecycle audit, `SceneTree.Root.AddChild(NGame)` returned, `NGame.Instance`/`_window`/parent/state authority held, rendering stopped synchronously, and frozen Gate-D confinement passed with zero initializer-bearing/rejected/native escape.
 
-Gate D then failed only in launcher reflection bookkeeping: `Enumerable.Single(...)` saw more than one zero-argument `GetParent` method shape and threw `MoreThanOneMatch`. **0.0.170 changes only that Gate-D selector** to choose the non-generic, closed, SceneTree-root-compatible `GetParent()` overload. The Step-39.1 compatibility image, Gate A/B audit policy, Gate C AddChild semantics, inert GameStartupWrapper, Steam/Sentry/FM0D/Spine/native boundaries, and immediate render freeze are unchanged.
+**Step 40.0 does not enable GameStartup.** It keeps the physically proven Step-39.1 compatibility image and inert `GameStartupWrapper`, statically audits the retained in-tree hierarchy for frame/input callbacks, then permits one short `StartRendering()` pulse targeted at 100 ms. The first continuation immediately calls `StopRendering()` and requires the observed pulse to remain <=500 ms before final frozen confinement is accepted. There is no in-process retry once the pulse is armed.
 
-Authoritative status: `docs/CURRENT-STATUS.md`. The exact 0.0.169 physical report, checkpoint journal, last checkpoint, and full static map are preserved under `docs/history/reports/`.
+Authoritative status and exact device sequence: `docs/CURRENT-STATUS.md`. The complete 0.0.170 Step-39 report, checkpoint, last checkpoint, and static map are preserved under `docs/history/reports/`.

@@ -1,0 +1,22 @@
+StS2 Launcher — Step 39.0 Real SceneTree Admission
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-09T01:11:02.1551880+00:00
+
+RESULT
+STEP 39.0 REAL SCENETREE ADMISSION COMPLETE — 4/4
+
+METADATA
+App version: 0.0.170 (170)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+All four Step 39.0 gates passed. The exact Step-38.2 compatibility authority and four sealed PCK preflight resources were reverified; a fresh real NGame hierarchy was instantiated with NGame.Instance=null; the actual hierarchy's immediate managed lifecycle surface was Cecil-mapped without a direct startup/native/platform escape; the real NGame was added once to the live SceneTree root; automatic NGame._EnterTree/_Ready established the singleton and non-null window authority while GameStartup remained inert; the Godot render loop was synchronously stopped immediately afterward; and final state/native confinement held while the inserted NGame remained in-tree. RemoveChild/Free/_ExitTree/render restart/GameStartup/platform/main-menu/ExecuteDeferred/Steam/native GDExtensions/gameplay remain future boundaries.
+
+END OF REPORT

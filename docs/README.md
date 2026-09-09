@@ -1,11 +1,11 @@
-# StS2 Launcher — Step 39.2
+# StS2 Launcher — Step 40.0
 
-Active candidate: **0.0.170 (170)** — Gate-D frozen inserted-tree confinement correction.
+Active candidate: **0.0.171 (171)** — first controlled render-loop resumption against the physically admitted real StS2 hierarchy.
 
-Physical **0.0.169 / Step 39.1** closed the unknown real-insertion question: Gate B passed on the actual 69-node hierarchy, and `SceneTree.Root.AddChild(NGame)` returned successfully on-device with exact singleton/parent/window/state authority and zero rejected/initializer/native escape. Rendering then stopped synchronously as designed.
+Physical **0.0.170 / Step 39.2** is closed positive 4/4. The real NGame hierarchy is physically proven in the live SceneTree with exact singleton/window/parent authority, OneTimeInitialization state 2, and rendering frozen with zero initializer-bearing/rejected/native escape.
 
-The only failure was after that successful insertion/freeze, inside Gate-D launcher bookkeeping: reflection selected zero-argument `GetParent` with `Single(...)`, but Godot exposes more than one matching method shape. **0.0.170 changes only that selector** to require a non-generic, closed method whose return type can represent the live `SceneTree.Root`.
+Step 40 preserves that exact compatibility image and keeps `GameStartupWrapper` inert. Gate A requires the same-process frozen Step-39 authority. Gate B maps actual in-tree `_Process`, `_PhysicsProcess`, `_Draw`, and Godot input callbacks with deferred/rejecting Cecil before any restart. Gate C authorizes exactly one `StartRendering()` pulse targeted at 100 ms and immediately refreezes on the first continuation; observed elapsed must be <=500 ms. Gate D requires the same in-tree authority and zero forbidden escape with rendering stopped again.
 
-No compatibility-image semantics are changed from the physically proven 0.0.169 run. Gate B remains fail-closed; GameStartup, platform initialization, main-menu/deferred startup, Steam/native GDExtensions, explicit `_ExitTree`, RemoveChild/Free, and render restart remain unauthorized.
+Still closed: GameStartup/platform/main-menu/deferred startup, Steam/native Steam, native game GDExtensions, explicit `_ExitTree`, RemoveChild/Free, gameplay startup, and leaving rendering active.
 
 Authoritative status: `CURRENT-STATUS.md`. Historical design/evidence remains under `history/`.

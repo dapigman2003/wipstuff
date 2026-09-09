@@ -1,0 +1,9 @@
+# Step 40.0 — Controlled real-game render pulse
+
+Physical 0.0.170 closed Step 39 at 4/4. The real 69-node NGame hierarchy is now proven attached to the live `SceneTree.Root`; `NGame.Instance`, `_window`, exact parent, and OneTimeInitialization state 2 remain authoritative; rendering is frozen; and initializer-bearing/rejected/native deltas are zero.
+
+Step 40 opens only the next isolated boundary: a short render-loop resumption while `GameStartupWrapper` remains inert. Gate A requires the same-process Step-39 4/4 retained hierarchy with rendering stopped and re-verifies the selected compatibility image plus inert startup wrapper. Gate B keeps rendering stopped while mapping actual in-tree sts2 `_Process`, `_PhysicsProcess`, `_Draw`, `_Input`, `_ShortcutInput`, `_UnhandledInput`, `_UnhandledKeyInput`, and `_GuiInput` methods through in-module base chains with deferred/rejecting Cecil. The already-proven branch-insensitive Step-39 `_Notification` closure remains prerequisite authority.
+
+Gate C arms one render pulse only. The iOS caller invokes the existing `StartRendering()` once, targets 100 ms, and the first continuation immediately invokes `StopRendering()`. A successful run requires `StartRendering` to establish active rendering, `StopRendering` to synchronously refreeze it, observed elapsed time no greater than 500 ms, the retained NGame authority/state to survive, and zero initializer-bearing/rejected/native escape. There is no in-process retry once the pulse is armed. Gate D then proves frozen post-pulse confinement.
+
+Still closed: `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, `ExecuteDeferred`, Steam initialization/native Steam, native game GDExtensions, explicit `_ExitTree`, `RemoveChild`/`Free`, gameplay startup, and leaving rendering active after the pulse.

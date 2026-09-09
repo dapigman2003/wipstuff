@@ -402,3 +402,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-39.1-PHYSICAL-0.0.169-CHECKPOINT.txt` — run-correlated proof of Gate-B PASS, first real AddChild PASS, synchronous render freeze, then Gate-D reflection-only failure.
 - `reports/STEP-39.1-PHYSICAL-0.0.169-STATIC-MAP.txt` — exact 69-node hierarchy / 23 managed types / 26 immediate callbacks / 557-method closure with zero forbidden or unresolved references.
 - `reports/STEP-39.1-PHYSICAL-0.0.169-LAST-CHECKPOINT.txt` — normal run end with Step 39 not restarting rendering.
+
+## Step 39.2 physical closure / Step 40.0 controlled render pulse
+
+- `reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-REPORT.txt` — authoritative physical 0.0.170 final report: Step 39 real SceneTree admission COMPLETE 4/4.
+- `reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-CHECKPOINT.txt` — run-correlated journal proving Gate B clean, real AddChild PASS, immediate render freeze, Gate D PASS, and normal run end.
+- `reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-STATIC-MAP.txt` — exact 69-node / 23-managed-type / 26-callback / 557-method lifecycle map with zero forbidden/unresolved references.
+- `reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-LAST-CHECKPOINT.txt` — final durable normal-run endpoint with rendering not restarted.
+- `steps/STEP-40.0-CONTROLLED-REAL-GAME-RENDER-PULSE.md` — first bounded render-loop resumption design after physical Step-39 closure; GameStartup remains inert.

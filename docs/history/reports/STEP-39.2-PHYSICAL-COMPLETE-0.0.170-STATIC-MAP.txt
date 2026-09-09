@@ -1,0 +1,287 @@
+StS2 Launcher — Step 39.0 real SceneTree admission pre-insertion map
+Read-only evidence from the exact selected compatibility image, exact receipt-backed PCK resources, and a fresh off-tree instantiated hierarchy; never consumed as trusted runtime input.
+Selected compatibility path: /var/mobile/Containers/Data/Application/2B4C3DC0-B615-40E7-AB33-9DAFDA8AA185/Documents/StS2Launcher/Step35-ExecuteVeryEarlyDiagnostic/sts2.step39.1.lifecycle-admission.dll
+Selected compatibility SHA-256: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a
+Live SceneTree root type: Godot.Window
+Actual off-tree game hierarchy nodes: 69
+Selected sts2 managed node types: 23
+Immediate managed lifecycle callbacks mapped including in-module base chains (_EnterTree/_Ready/_Notification): 26
+Transitive same-sts2 lifecycle closure methods mapped: 557
+Forbidden startup/native/platform references from transitive lifecycle closure: 0
+Unresolved same-sts2 references from transitive lifecycle closure: 0
+Audio proxy exact GDScript authority: 2799 bytes; SHA-256=4fc30d10a67bd68d1ba57bc4bf214218fb8b6375e2df60341b86f960f094f1bb; tokenizerVersion=101; decompressedBytes=9828
+Audio proxy offline exact-byte identifier audit: 69; lifecycle callback identifiers: 0
+Reaction wheel exact SHA-256: 0927e9debca56fe6726b682debe2037928be34f1d363b04ea6f18d97430028d5
+Multiplayer timeout overlay exact SHA-256: f32ce3ff57698802566ff36ee3c11e84f586bdfa72e5e13a467a148117bb6dee
+Step 39 insertion policy: one SceneTree.Root.AddChild(NGame), then caller synchronously freezes rendering before Gate D.
+Step 39 forbidden: explicit _Ready/_ExitTree, RemoveChild/Free, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam init, native GDExtension loading.
+
+[ACTUAL NODE GRAPH]
+  - /Game | MegaCrit.Sts2.Core.Nodes.NGame
+  - /Game/FmodBankLoader | Godot.Node
+  - /Game/AudioManager | MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager
+  - /Game/DebugAudioManager | MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager
+  - /Game/ScreenShake | MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake
+  - /Game/HitStop | MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop
+  - /Game/FeedbackOpener | MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NFeedbackScreenOpener
+  - /Game/InputManager | MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager
+  - /Game/HotkeyManager | MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager
+  - /Game/CursorManager | MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager
+  - /Game/RootSceneContainer | MegaCrit.Sts2.Core.Nodes.NSceneContainer
+  - /Game/InspectionContainer | Godot.Control
+  - /Game/RemoteCursorContainer | MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer
+  - /Game/ReactionWheel | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel
+  - /Game/ReactionContainer | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer
+  - /Game/HoverTipsContainer | Godot.Control
+  - /Game/ModalContainer | MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer
+  - /Game/GameTransitionRect | MegaCrit.Sts2.Core.Nodes.NTransition
+  - /Game/MultiplayerTimeoutOverlay | MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay
+  - /Game/WorldEnvironment | Godot.WorldEnvironment
+  - /Game/MuteInBackgroundHandler | MegaCrit.Sts2.Core.Nodes.NMuteInBackgroundHandler
+  - /Game/BackgroundModeHandler | MegaCrit.Sts2.Core.Nodes.NBackgroundModeHandler
+  - /Game/AssetLoader | MegaCrit.Sts2.Core.Nodes.NAssetLoader
+  - /Game/AudioManager/Proxy | Godot.Node
+  - /Game/AudioManager/FmodListener2D | Godot.Node
+  - /Game/DebugAudioManager/AudioStreamPlayer | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer2 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer3 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer4 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer5 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer6 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer7 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer8 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer9 | Godot.AudioStreamPlayer
+  - /Game/DebugAudioManager/AudioStreamPlayer10 | Godot.AudioStreamPlayer
+  - /Game/InputManager/ControllerManager | MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager
+  - /Game/ReactionWheel/RightWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/DownRightWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/DownWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/DownLeftWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/LeftWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/UpLeftWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/UpWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/UpRightWedge | MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - /Game/ReactionWheel/Marker | Godot.TextureRect
+  - /Game/ModalContainer/Backstop | Godot.ColorRect
+  - /Game/GameTransitionRect/GradientTransition | Godot.TextureRect
+  - /Game/GameTransitionRect/SimpleTransition | Godot.ColorRect
+  - /Game/MultiplayerTimeoutOverlay/ColorRect | Godot.ColorRect
+  - /Game/MultiplayerTimeoutOverlay/Title | MegaCrit.Sts2.addons.mega_text.MegaLabel
+  - /Game/MultiplayerTimeoutOverlay/Icon | Godot.TextureRect
+  - /Game/MultiplayerTimeoutOverlay/Description | MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel
+  - /Game/InputManager/ControllerManager/Label | MegaCrit.Sts2.addons.mega_text.MegaLabel
+  - /Game/ReactionWheel/RightWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/RightWedge/Shadow | Godot.TextureRect
+  - /Game/ReactionWheel/DownRightWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/DownRightWedge/Shadow | Godot.TextureRect
+  - /Game/ReactionWheel/DownWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/DownWedge/Shadow | Godot.TextureRect
+  - /Game/ReactionWheel/DownLeftWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/DownLeftWedge/Shadow | Godot.TextureRect
+  - /Game/ReactionWheel/LeftWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/LeftWedge/Shadow | Godot.TextureRect
+  - /Game/ReactionWheel/UpLeftWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/UpLeftWedge/Shadow | Godot.TextureRect
+  - /Game/ReactionWheel/UpWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/UpWedge/Shadow | Godot.TextureRect
+  - /Game/ReactionWheel/UpRightWedge/TextureRect | Godot.TextureRect
+  - /Game/ReactionWheel/UpRightWedge/Shadow | Godot.TextureRect
+
+[SELECTED STS2 MANAGED NODE TYPES]
+  - MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager
+  - MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager
+  - MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager
+  - MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager
+  - MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager
+  - MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager
+  - MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer
+  - MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay
+  - MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer
+  - MegaCrit.Sts2.Core.Nodes.NAssetLoader
+  - MegaCrit.Sts2.Core.Nodes.NBackgroundModeHandler
+  - MegaCrit.Sts2.Core.Nodes.NGame
+  - MegaCrit.Sts2.Core.Nodes.NMuteInBackgroundHandler
+  - MegaCrit.Sts2.Core.Nodes.NSceneContainer
+  - MegaCrit.Sts2.Core.Nodes.NTransition
+  - MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer
+  - MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel
+  - MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge
+  - MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NFeedbackScreenOpener
+  - MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop
+  - MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake
+  - MegaCrit.Sts2.addons.mega_text.MegaLabel
+  - MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel
+
+[IMMEDIATE MANAGED LIFECYCLE CALLBACKS]
+  - token=0x0600C078; MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::_Ready
+      callref: Godot.Collections.Array`1<Godot.Node> Godot.Node::GetChildren(System.Boolean)
+      callref: System.Collections.Generic.IEnumerable`1<!!0> System.Linq.Enumerable::OfType<Godot.AudioStreamPlayer>(System.Collections.IEnumerable)
+      callref: System.Void System.Collections.Generic.List`1<Godot.AudioStreamPlayer>::AddRange(System.Collections.Generic.IEnumerable`1<!0>)
+  - token=0x06005F8A; MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::_EnterTree
+      callref: !!0 Godot.Node::GetNode<Godot.Node>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  - token=0x0600551D; MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager::_EnterTree
+      callref: System.Void Godot.Input::SetCustomMouseCursor(Godot.Resource,Godot.Input/CursorShape,System.Nullable`1<Godot.Vector2>)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager::UpdateCursor()
+      callref: System.Void System.Nullable`1<Godot.Vector2>::.ctor(!0)
+  - token=0x0600551E; MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager::_Ready
+      callref: Godot.Callable Godot.Callable::From(System.Action)
+      callref: Godot.Error Godot.GodotObject::Connect(Godot.StringName,Godot.Callable,System.UInt32)
+      callref: MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager::get_Instance()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager::<_Ready>b__19_0()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager::<_Ready>b__19_1()
+      callref: System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  - token=0x06005629; MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::_EnterTree
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::set_ControllerManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager)
+  - token=0x0600562A; MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::_Ready
+      callref: Godot.Callable Godot.Callable::From(System.Action)
+      callref: Godot.Error Godot.GodotObject::Connect(Godot.StringName,Godot.Callable,System.UInt32)
+      callref: MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::get_ControllerManager()
+      callref: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::RunSafely(System.Threading.Tasks.Task)
+      callref: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::Init()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::OnControllerTypeChanged()
+      callref: System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  - token=0x060056A0; MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::_Ready
+      callref: !!0 Godot.Node::GetNode<Godot.ColorRect>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+      callref: MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::get_Instance()
+      callref: System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::QueueFreeSafely(Godot.Node)
+      callref: System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::set_Instance(MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer)
+  - token=0x06004E33; MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay::_Ready
+      callref: !!0 Godot.Node::GetNode<Godot.TextureRect>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  - token=0x06004EC6; MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer::_Ready
+      callref: Godot.Callable Godot.Callable::From<Godot.Control>(System.Action`1<!!0>)
+      callref: Godot.Error Godot.GodotObject::Connect(Godot.StringName,Godot.Callable,System.UInt32)
+      callref: Godot.Viewport Godot.Node::GetViewport()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer::OnGuiFocusChanged(Godot.Control)
+      callref: System.Void System.Action`1<Godot.Control>::.ctor(System.Object,System.IntPtr)
+  - token=0x06001B78; MegaCrit.Sts2.Core.Nodes.NAssetLoader::_Ready
+  - token=0x06001B87; MegaCrit.Sts2.Core.Nodes.NBackgroundModeHandler::_Notification
+      callref: System.Boolean MegaCrit.Sts2.Core.Helpers.NonInteractiveMode::get_IsActive()
+      callref: System.Boolean MegaCrit.Sts2.Core.Nodes.NBackgroundModeHandler::get_IsEditor()
+      callref: System.Boolean MegaCrit.Sts2.Core.Nodes.NBackgroundModeHandler::get_IsHeadless()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NBackgroundModeHandler::EnterBackgroundMode()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NBackgroundModeHandler::ExitBackgroundMode()
+  - token=0x06001BCC; MegaCrit.Sts2.Core.Nodes.NGame::_EnterTree
+      callref: !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<Godot.Node>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<Godot.WorldEnvironment>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.NSceneContainer>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.NTransition>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+      callref: MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance()
+      callref: System.Globalization.CultureInfo System.Globalization.CultureInfo::get_InvariantCulture()
+      callref: System.Int32 System.Environment::get_CurrentManagedThreadId()
+      callref: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::RunSafely(System.Threading.Tasks.Task)
+      callref: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::GameStartupWrapper()
+      callref: System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::QueueFreeSafely(Godot.Node)
+      callref: System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_AudioManager(MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_CursorManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_DebugAudio(MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HitStop(MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HotkeyManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_HoverTipsContainer(Godot.Node)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_InputManager(MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_Instance(MegaCrit.Sts2.Core.Nodes.NGame)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_ReactionContainer(MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_ReactionWheel(MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_RemoteCursorContainer(MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_RootSceneContainer(MegaCrit.Sts2.Core.Nodes.NSceneContainer)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_TimeoutOverlay(MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_Transition(MegaCrit.Sts2.Core.Nodes.NTransition)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::set_WorldEnvironment(Godot.WorldEnvironment)
+      callref: System.Void System.Globalization.CultureInfo::set_DefaultThreadCurrentCulture(System.Globalization.CultureInfo)
+      callref: System.Void System.Globalization.CultureInfo::set_DefaultThreadCurrentUICulture(System.Globalization.CultureInfo)
+      callref: System.Void System.Nullable`1<System.Int32>::.ctor(!0)
+  - token=0x06001BDD; MegaCrit.Sts2.Core.Nodes.NGame::_Notification
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::Quit()
+  - token=0x06001BCD; MegaCrit.Sts2.Core.Nodes.NGame::_Ready
+      callref: Godot.Callable Godot.Callable::From(System.Action)
+      callref: Godot.Error Godot.GodotObject::Connect(Godot.StringName,Godot.Callable,System.UInt32)
+      callref: Godot.SceneTree Godot.Node::GetTree()
+      callref: Godot.Window Godot.SceneTree::get_Root()
+      callref: Godot.WorldEnvironment MegaCrit.Sts2.Core.Nodes.NGame::get_WorldEnvironment()
+      callref: System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::RemoveChildSafely(Godot.Node,Godot.Node)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NGame::OnWindowChange()
+      callref: System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  - token=0x06001C53; MegaCrit.Sts2.Core.Nodes.NMuteInBackgroundHandler::_Notification
+      callref: Godot.Window Godot.Node::GetWindow()
+      callref: System.Boolean Godot.Window::HasFocus()
+      callref: System.String Godot.DisplayServer::GetName()
+      callref: System.String Godot.OS::GetName()
+      callref: System.String System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::ToStringAndClear()
+      callref: System.UInt64 Godot.Time::GetTicksMsec()
+      callref: System.Void MegaCrit.Sts2.Core.Logging.Log::Info(System.String,System.Int32)
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NMuteInBackgroundHandler::Mute()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.NMuteInBackgroundHandler::Unmute()
+      callref: System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::.ctor(System.Int32,System.Int32)
+      callref: System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendFormatted(System.String)
+      callref: System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendFormatted<System.Boolean>(!!0)
+      callref: System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendFormatted<System.UInt64>(!!0)
+      callref: System.Void System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendLiteral(System.String)
+  - token=0x06001C9B; MegaCrit.Sts2.Core.Nodes.NTransition::_Ready
+      callref: !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+      callref: Godot.Vector2 Godot.Control::get_Position()
+  - token=0x06004BAB; MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel::_EnterTree
+      callref: MegaCrit.Sts2.Core.Runs.RunManager MegaCrit.Sts2.Core.Runs.RunManager::get_Instance()
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel::OnRunStarted(MegaCrit.Sts2.Core.Runs.RunState)
+      callref: System.Void MegaCrit.Sts2.Core.Runs.RunManager::add_RunStarted(System.Action`1<MegaCrit.Sts2.Core.Runs.RunState>)
+      callref: System.Void System.Action`1<MegaCrit.Sts2.Core.Runs.RunState>::.ctor(System.Object,System.IntPtr)
+  - token=0x06004BAD; MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel::_Notification
+      callref: System.Boolean Godot.CanvasItem::get_Visible()
+      callref: System.Void Godot.CanvasItem::set_Visible(System.Boolean)
+  - token=0x06004BAA; MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel::_Ready
+      callref: !!0 Godot.Node::GetNode<Godot.TextureRect>(Godot.NodePath)
+      callref: !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+      callref: System.Void Godot.CanvasItem::set_Visible(System.Boolean)
+  - token=0x06004BC5; MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheelWedge::_Ready
+      callref: !!0 Godot.Node::GetNode<Godot.TextureRect>(Godot.NodePath)
+      callref: Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+      callref: Godot.Vector2 Godot.Control::get_Position()
+  - token=0x06004131; MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NFeedbackScreenOpener::_EnterTree
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NFeedbackScreenOpener::set_Instance(MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NFeedbackScreenOpener)
+  - token=0x060029A4; MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake::_Ready
+      callref: System.Void MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ScreenTraumaRumble::.ctor()
+      callref: System.Void System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeDuration,System.Double>::Add(!0,!1)
+      callref: System.Void System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeStrength,System.Single>::Add(!0,!1)
+  - token=0x0600C19B; MegaCrit.Sts2.addons.mega_text.MegaLabel::_Notification
+      callref: Godot.Vector2 Godot.Control::get_Size()
+      callref: System.Single Godot.Vector2::DistanceSquaredTo(Godot.Vector2)
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::AdjustFontSize()
+  - token=0x0600C199; MegaCrit.Sts2.addons.mega_text.MegaLabel::_Ready
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::AdjustFontSize()
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::RefreshFont()
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaLabelHelper::AssertThemeFontOverride(Godot.Control,Godot.StringName)
+  - token=0x0600C1C3; MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::_Notification
+      callref: Godot.Collections.Array Godot.RichTextLabel::get_CustomEffects()
+      callref: Godot.Vector2 Godot.Control::get_Size()
+      callref: System.Boolean MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::get_AutoSizeEnabled()
+      callref: System.Single Godot.Vector2::DistanceSquaredTo(Godot.Vector2)
+      callref: System.Void Godot.Collections.Array::Clear()
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::AdjustFontSize()
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::InstallEffectsIfNeeded()
+  - token=0x0600C1C1; MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::_Ready
+      callref: System.String MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::get_Text()
+      callref: System.Void Godot.RichTextLabel::ParseBbcode(System.String)
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaLabelHelper::AssertThemeFontOverride(Godot.Control,Godot.StringName)
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::AdjustFontSize()
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::InstallEffectsIfNeeded()
+      callref: System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::RefreshFont()

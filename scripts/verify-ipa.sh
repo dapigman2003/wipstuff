@@ -231,7 +231,7 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
 }
 
 {
-  echo "Step 39.0 IPA verification passed."
+  echo "Step 40.0 IPA verification passed."
   echo "  Bundle ID: $BUNDLE_ID"
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
@@ -245,5 +245,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEP 39.2 — GATE-D CONFINEMENT CORRECTION"
-} | tee artifacts/logs/step39-ipa-verification-summary.log
+  echo "  Expected device UI: STEP 40.0 — CONTROLLED REAL-GAME RENDER PULSE"
+} | tee artifacts/logs/step40-ipa-verification-summary.log

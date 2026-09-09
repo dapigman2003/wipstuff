@@ -2,7 +2,7 @@
 # Sourced by active scripts; do not execute directly.
 STS2_IOS_PROJECT="src/StS2Launcher.iOS/StS2Launcher.iOS.csproj"
 STS2_APP_BUNDLE_NAME="StS2Launcher.iOS.app"
-STS2_IPA_REL="artifacts/StS2-Launcher-Step-39.ipa"
-STS2_DISPLAY_VERSION="0.0.170"
-STS2_BUILD_VERSION="170"
+STS2_IPA_REL="artifacts/StS2-Launcher-Step-40.ipa"
+STS2_DISPLAY_VERSION="0.0.171"
+STS2_BUILD_VERSION="171"
 STS2_RUNTIME_POLICY_MARKER="STEP35 RUNTIME POLICY:"

@@ -1,24 +1,17 @@
-# Release checklist — Step 39.2 / 0.0.170
+# Release checklist — Step 40.0 / 0.0.171
 
-Release identity: display/build `0.0.170 (170)`, IPA `StS2-Launcher-Step-39.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.171 (171)`, IPA `StS2-Launcher-Step-40.ipa`, workflow `ios-canonical`.
 
-- Static validator passes completely in the working tree and a fresh extraction of the final ZIP.
-- Codemagic host tests compile/pass under the pinned .NET SDK; native-link preflight passes before iOS publish.
-- IPA verifier reports the Step 39.2 UI identity.
-- Existing `ios-canonical` NuGet/.NET/Godot/iOS caches remain enabled and unchanged.
-- Physical Step-36.0.5, Step-37.0.1, and Step-38.2 4/4 evidence is preserved in history.
-- No proprietary game resource/native bytes from the Step-39 preflight are stored in source; only hashes/derived audit notes are retained.
-- Gate A re-verifies the selected compatibility derivative and exact four-resource PCK authority.
-- The selected private derivative must force exactly the two physical 0.0.167 Steam cloud capability probes false and verify the game-owned Sentry wrapper/helper inert boundary after serialization.
-- Gate B requires fresh NGame / `NGame.Instance == null`, resolves live SceneTree root, traverses the actual hierarchy, and audits immediate selected-sts2 lifecycle callbacks including in-module base types; surviving external Sentry/Steam/native/startup edges still fail closed.
-- Gate C performs exactly one real `SceneTree.Root.AddChild(NGame)` and requires `IsInsideTree=true`, singleton exactness, parent exactness, `_window != null`, state 2, and zero initializer/rejected/native escape.
-- The UI calls `GodotStep15NativeBridge.StopRendering()` immediately after Gate C returns, before recording/advancing; Step 39 never calls `StartRendering()`.
-- Gate D requires rendering stopped and retains the inserted NGame in-tree; no RemoveChild, Free, or explicit `_ExitTree`.
-- Gate D selects only the non-generic, closed, SceneTree-root-compatible zero-argument `GetParent()` overload; the physical 0.0.169 `MoreThanOneMatch` reflection bug must not recur.
-- No GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam init, native GDExtension load, gameplay, retry, or state reset.
-- Fresh-process test chain explicitly skips Step 38 before Step 39.
-- No proprietary game/native payload is present in the source ZIP.
-
-## 0.0.167 compile correction
-
-Physical Codemagic 0.0.166 passed 1051/1051 static checks, 233/233 host tests, and the Step-15 native-link preflight, then failed before publish/device execution with CS0103 because the Step-39 UI partial omitted `using StS2Launcher.iOS.Platform;`. 0.0.167 changes only that import and release provenance.
+Before publishing:
+- canonical static validator passes from the release tree and a clean extracted archive;
+- host tests compile/pass under the pinned Codemagic toolchain;
+- native-link preflight remains unchanged and passes;
+- IPA verifier reports Step 40.0 UI identity and no proprietary StS2 payload;
+- Step39 compatibility and SceneTree code remains hash-pinned, with physical 0.0.170 4/4 reports sealed in history;
+- Step40 has exactly one launcher `StartRendering()` call and one mandatory `StopRendering()` call, with no restart after stop;
+- Step40 Gate B uses deferred/rejecting Cecil and fail-closes before render restart on forbidden/unresolved frame/input closure edges;
+- target pulse is 100 ms and maximum accepted elapsed is 500 ms;
+- GameStartup/platform/main-menu/ExecuteDeferred/Steam/native GDExtensions/explicit `_ExitTree`/RemoveChild/Free remain unauthorized;
+- source archive contains no proprietary game payload, Steam secrets, Apple signing secrets, or proprietary game-native binaries;
+- `history.zip` is resealed from `docs/history/` after the final source edits;
+- final ZIP hash is recorded after clean-extraction validation.

@@ -1,18 +1,30 @@
-StS2 Launcher — Step 39.1 Gate-B lifecycle compatibility validation
-Root: /mnt/data/StS2Launcher-Step39-2-0.0.170
+StS2 Launcher — canonical static validation entry point
+UTC: 2026-09-09T01:27:01Z
+Checking active shell syntax...
+PASS: shell syntax — scripts/build-godot.sh
+PASS: shell syntax — scripts/build-ios.sh
+PASS: shell syntax — scripts/codemagic.sh
+PASS: shell syntax — scripts/lib/current-release.sh
+PASS: shell syntax — scripts/preflight-godot-link.sh
+PASS: shell syntax — scripts/test.sh
+PASS: shell syntax — scripts/validate.sh
+PASS: shell syntax — scripts/verify-ipa.sh
+PASS: Python validator compiles
+StS2 Launcher — Step 40.0 controlled real-game render-pulse validation
+Root: /mnt/data/StS2Launcher-Step40-0.0.171
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 266 C# files
+PASS: lexical delimiter scan passes for 273 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 170
-PASS: display version is 0.0.170
-PASS: Info.plist build version is 170
-PASS: Info.plist display version is 0.0.170
+PASS: build version is 171
+PASS: display version is 0.0.171
+PASS: Info.plist build version is 171
+PASS: Info.plist display version is 0.0.171
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -20,13 +32,13 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies the active Step 39.2 Gate-D confinement correction
-PASS: top launcher presentation records the physical 0.0.169 Gate-A/B/C closure and the narrow 0.0.170 Gate-D correction
-PASS: root and docs READMEs pin the exact 0.0.170 (170) release identity
-PASS: master plan points to the active 0.0.170 / Step 39.2 frontier
-PASS: top launcher banner records physical Step-37/38 closure and the bounded Step-39 SceneTree boundary
+PASS: top launcher banner identifies the active Step 40.0 controlled render pulse
+PASS: top launcher presentation records physical Step-39 closure and the isolated Step-40 render-pulse boundary
+PASS: root and docs READMEs pin the exact 0.0.171 (171) release identity
+PASS: master plan points to the active 0.0.171 / Step 40.0 frontier
+PASS: top launcher banner records closed Step-37/38/39 authority and the bounded Step-40 render-pulse boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 39 source pins expected bundle release identity
+PASS: Step 40 source pins expected bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -278,7 +290,7 @@ PASS: active CI/IPA/project graph has no retired Step-27 dependency: STEP27_INTE
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: Step27InterpretedPatchFixture
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: host-step27
 PASS: host tests no longer perform the retired Harmony release network acquisition
-PASS: IPA verification summary identifies the active Step-39 candidate rather than retired Step 27
+PASS: IPA verification summary identifies the active Step-40 candidate rather than retired Step 27
 PASS: retired Step-27 fixture is absent from iOS and host-test project graphs
 PASS: active regression contracts preserve the decisive Step-27 negative architecture result
 PASS: master plan continues to retire runtime Harmony/MonoMod replacement
@@ -883,8 +895,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status records physical Step-38 closure and the active controlled Step-39 SceneTree boundary
-PASS: testing and release-checklist docs pin the exact 0.0.170 (170) release identity
+PASS: current status records physical Step-39 closure and the active controlled Step-40 render-pulse boundary
+PASS: testing and release-checklist docs pin the exact 0.0.171 (171) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1008,9 +1020,9 @@ PASS: Codemagic preserves canonical cache path: $HOME/.cache/sts2launcher/godot-
 PASS: Codemagic preserves canonical cache path: $HOME/.dotnet
 PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
-PASS: host-test report heading identifies Step 39
-PASS: host-test TRX artifact identifies Step 39
-PASS: Codemagic build-environment report heading identifies the Step 39.0 candidate
+PASS: host-test report heading identifies Step 40
+PASS: host-test TRX artifact identifies Step 40
+PASS: Codemagic build-environment report heading identifies the Step 40.0 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -1021,7 +1033,7 @@ PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step-39.2 candidate
+PASS: IPA verifier advertises the active Step-40.0 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -1063,7 +1075,33 @@ PASS: Step 39 Gate D selects the exact non-generic root-compatible GetParent ove
 PASS: Step 39 active candidate hash manifest exists
 PASS: Step 39 candidate manifest pins SceneTree implementation/tests, exact preflight provenance, physical Step-36/37/38 authority, and active release wiring
 PASS: Step 39 active implementation/release/provenance files are hash-pinned
+PASS: Step 40 implementation, sequence, summary, tests, and iOS UI surfaces exist
+PASS: Step 40 gate ordinals pin closed-Step39 authority, frame audit, bounded pulse/refreeze, and frozen confinement
+PASS: Step 40 summary requires exact four-of-four closure
+PASS: Step 40 render pulse target and accepted maximum are pinned to 100 ms / 500 ms
+PASS: Step 40 audits the planned managed frame/draw/input callback family
+PASS: Step 40 Gate A requires exact same-process Step-39 4/4 inserted authority and re-verifies inert GameStartupWrapper
+PASS: Step 40 does not use a tautological selected-image length check
+PASS: Step 40 Gate B reuses deferred rejecting-resolver fail-closed lifecycle-closure auditing
+PASS: Step 40 frame/input preflight fails closed on external resolution, forbidden edges, and unresolved same-sts2 edges
+PASS: Step 40 Core never starts or stops rendering; native render control remains iOS-UI confined
+PASS: Step 40 iOS UI has exactly one static StartRendering call site
+PASS: Step 40 iOS UI has exactly one static StopRendering call site
+PASS: Step 40 writes the verified map before StartRendering, delays only after start, checkpoints before the synchronous stop helper, and refreezes before evaluating Gate C
+PASS: Step 40 UI enforces one-shot pulse semantics and durable run-correlated telemetry
+PASS: Step 39 reset clears Step 40 state and RootViewController exposes the Step 40 control
+PASS: active release presentation pins physical Step-39 closure and the Step-40 / 0.0.171 identity
+PASS: Step 40 Core does not directly invoke forbidden game startup/platform/main-menu/deferred methods
+PASS: Step 40 UI does not directly invoke forbidden game startup/platform/main-menu/deferred methods
+PASS: Step 40 host regression tests pin gate sequencing and the bounded pulse window with MSTest-v4-compatible assertions
+PASS: physical 0.0.170 final report seals Step 39 at 4/4
+PASS: physical 0.0.170 checkpoint seals clean Gate-B/C/D authority, immediate render freeze, and zero forbidden deltas
+PASS: physical 0.0.170 static map pins the 69/23/26/557 clean SceneTree lifecycle authority
+PASS: physical 0.0.170 last checkpoint proves normal Step-39 return with rendering not restarted
+PASS: Step 40 active candidate hash manifest exists
+PASS: Step 40 candidate manifest pins render-pulse implementation/tests/UI, active release wiring/docs, and physical Step-39 closure authority
+PASS: Step 40 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1064 checks
+VALIDATION PASS: 1090 checks

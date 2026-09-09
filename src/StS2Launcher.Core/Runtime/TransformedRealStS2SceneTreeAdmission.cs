@@ -67,6 +67,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private void ResetStep39State()
     {
+        ResetStep40State();
         _step39Preflight = null;
         _step39NGameInstance = null;
         _step39SceneTreeRoot = null;

@@ -35,3 +35,7 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-35.0.14-CODEMAGIC-HOST-REGRESSION-FAILURE-0.0.137.txt` — 0.0.137 pre-device Codemagic result: static validation passed, host tests 208/209, sole failure traced to the GodotSharp entry-marker verifier hard-coding the sts2 bridge type; pipeline stopped before IPA construction.
 
 - `STEP-35.0.16-CODEMAGIC-STALE-SUMMARY-ASSERTION-FAILURE-0.0.139.txt` — 0.0.139 pre-device Codemagic result: static 837/837 PASS, host 209/210; the sole failure was a stale Step-35.0.15 diagnostic-summary assertion, so no IPA/device evidence was produced.
+- `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-REPORT.txt` — authoritative physical Step 39.2 / 0.0.170 4/4 completion report.
+- `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-CHECKPOINT.txt` — physical 0.0.170 run journal through Gate B/C/D PASS and normal report return.
+- `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-STATIC-MAP.txt` — physical 0.0.170 pre-insertion lifecycle map: 69 nodes, 23 managed types, 26 immediate callbacks, 557 same-sts2 closure methods, zero forbidden/unresolved references.
+- `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-LAST-CHECKPOINT.txt` — physical 0.0.170 final durable checkpoint with Step 39 normal run end and no render restart.

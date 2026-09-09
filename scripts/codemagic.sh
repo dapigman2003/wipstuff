@@ -25,7 +25,7 @@ cache_path_line() {
   fi
 }
 {
-  echo "StS2 Launcher — Codemagic cache state before Step 39 build"
+  echo "StS2 Launcher — Codemagic cache state before Step 40 build"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   cache_path_line "Home NuGet" "$HOME/.nuget/packages"
   cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
@@ -46,7 +46,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 39.1 Gate-B lifecycle compatibility build environment"
+  echo "StS2 Launcher — Step 40.0 controlled real-game render-pulse build environment"
   date -u
   uname -a
   xcodebuild -version
