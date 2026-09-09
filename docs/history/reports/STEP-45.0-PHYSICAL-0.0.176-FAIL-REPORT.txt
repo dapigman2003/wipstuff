@@ -1,0 +1,35 @@
+StS2 Launcher — Step 45.0 Local Save Initialization
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-09T17:04:16.9090810+00:00
+
+RESULT
+STEP 45.0 LOCAL SAVE INITIALIZATION FAIL — 1/4
+
+METADATA
+App version: 0.0.176 (176)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: local SaveManager initialization closure audit
+Exception depth 0: System.MissingFieldException
+  Message: MissingField_Name, MegaCrit.Sts2.Core.Saves.SaveManager, <Instance>k__BackingField
+  HResult: 0x80131511
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep45SaveInitializationStaticAudit(System.Action`1[System.String])
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep45SaveInitializationStaticAudit(Action`1 checkpoint)
+Base exception: System.MissingFieldException: MissingField_Name, MegaCrit.Sts2.Core.Saves.SaveManager, <Instance>k__BackingField
+Base HResult: 0x80131511
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep45SaveInitializationStaticAudit(System.Action`1[System.String])
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep45SaveInitializationStaticAudit(Action`1 checkpoint)
+
+END OF REPORT

@@ -1,10 +1,12 @@
 # StS2 Launcher — Steps 43–47 startup ladder
 
-Active candidate: **0.0.176 (176)** — five independently gated startup rungs in one IPA; stop on the first failure.
+Active candidate: **0.0.177 (177)** — five independently gated startup rungs in one IPA; stop on the first failure.
 
 Physical **0.0.175 / Step 42** is closed positive **4/4**: exact `NGame.InitPools()` mapped to a 22-method zero-boundary closure, executed once on the real in-tree `NGame`, and returned with state 2, frozen rendering, and zero resolver/host/private/initializer/rejected/native deltas.
 
-0.0.176 keeps that safety model but reduces rebuild cycles. After Step 42 4/4, the same process may advance through: **Step 43 Null-platform authority → Step 44 read-only legacy-data guard → Step 45 one-shot local SaveManager initialization → Step 46 exact `LaunchMainMenu(bool)` async state-machine/closure map → Step 47 conditional one-shot live `LaunchMainMenu(skipIntro=true)`**. Every rung has its own four-gate result and run-correlated reports; later rungs stay locked until the prior rung is 4/4.
+Physical **0.0.176** then proved the ladder can advance through same-process Step 44 authority, but Step 45 Gate B failed safely before mutation on a wrong singleton-field assumption: `SaveManager` uses `_mockInstance` and `_instance`, not `<Instance>k__BackingField`. **0.0.177 is a narrow metadata-authority correction**: Gate B verifies the exact serialized getter/field relationship, while Gate C/D require `_mockInstance == null` and existing production `_instance != null` without invoking `get_Instance()` or `ConstructDefault()`.
+
+0.0.177 keeps that safety model but reduces rebuild cycles. After Step 42 4/4, the same process may advance through: **Step 43 Null-platform authority → Step 44 read-only legacy-data guard → Step 45 one-shot local SaveManager initialization → Step 46 exact `LaunchMainMenu(bool)` async state-machine/closure map → Step 47 conditional one-shot live `LaunchMainMenu(skipIntro=true)`**. Every rung has its own four-gate result and run-correlated reports; later rungs stay locked until the prior rung is 4/4.
 
 Steps 43–46 keep rendering frozen. Step 47 can start rendering only after Step 46's complete map is admissible and durably written. Step 47 refreezes rendering on normal failure/incomplete return and leaves rendering active only after 4/4 success with a new `RootSceneContainer` child scene.
 

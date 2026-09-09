@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-09T15:24:05Z
+UTC: 2026-09-09T17:15:13Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,7 +11,7 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Steps 43–47 sequential startup ladder validation
-Root: /mnt/data/work176/StS2Launcher-Step42-0.0.175
+Root: /mnt/data/StS2Launcher-Steps43-47-0.0.177
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 294 C# files
@@ -21,10 +21,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 176
-PASS: display version is 0.0.176
-PASS: Info.plist build version is 176
-PASS: Info.plist display version is 0.0.176
+PASS: build version is 177
+PASS: display version is 0.0.177
+PASS: Info.plist build version is 177
+PASS: Info.plist display version is 0.0.177
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -34,8 +34,8 @@ PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
 PASS: top launcher banner identifies the active Steps 43–47 sequential startup ladder
 PASS: top launcher presentation records physical Step-42 closure and the multi-rung startup ladder
-PASS: root and docs READMEs pin the exact 0.0.176 (176) release identity
-PASS: master plan points to the active 0.0.176 / Steps 43–47 frontier
+PASS: root and docs READMEs pin the exact 0.0.177 (177) release identity
+PASS: master plan points to the active 0.0.177 / Steps 43–47 frontier
 PASS: top launcher banner records closed Step-37 through Step-42 authority and the active startup ladder
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: startup-ladder source pins expected bundle release identity
@@ -895,8 +895,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status records physical Step-42 closure and the active five-rung startup ladder
-PASS: testing and release-checklist docs pin the exact 0.0.176 (176) release identity
+PASS: current status records physical Step-42 closure, the 0.0.176 Step-45 safe stop, and corrected five-rung startup ladder
+PASS: testing and release-checklist docs pin the exact 0.0.177 (177) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1126,7 +1126,7 @@ PASS: Step 41 Core never directly invokes startup/platform/main-menu/deferred me
 PASS: Step 41 UI never directly invokes startup/platform/main-menu/deferred methods
 PASS: Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts
 PASS: RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state
-PASS: active release presentation preserves physical Step-42 closure while Steps 43–47 become active
+PASS: active release presentation preserves Step-42 closure and records the physical 0.0.176 Step-45 singleton-metadata safe stop
 PASS: Step 41 host regressions pin gate sequencing and stable ordinals
 PASS: current status pins physical Step-41 no-invocation closure authority
 PASS: Step 41 historical candidate hash manifest exists
@@ -1147,7 +1147,7 @@ PASS: Step 42 Core does not directly invoke GameStartup, cloud, platform, main-m
 PASS: Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering
 PASS: Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports
 PASS: RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state
-PASS: active release presentation pins physical Step-42 closure and Steps-43–47 / 0.0.176 identity
+PASS: active release presentation pins physical Step-42 closure and Steps-43–47 / 0.0.177 identity
 PASS: Step 42 host regressions pin gate sequencing and stable ordinals
 PASS: current status pins Step-42 one-shot InitPools boundary and report contract
 PASS: Step 42 design/provenance record is present
@@ -1178,8 +1178,10 @@ PASS: Step 43 probes only the exact read-only platform surface and requires conc
 PASS: Step 43 keeps external Steam/native game boundaries closed
 PASS: Step 44 maps and invokes only read-only legacy-data guards and fail-stops if migration is needed
 PASS: Step 44 explicitly rejects migration/archive reachability before the read-only probes
-PASS: Step 45 binds the existing SaveManager backing field and exact local initialization methods
-PASS: Step 45 cannot trigger SaveManager.get_Instance/ConstructDefault while acquiring the singleton
+PASS: Step 45 binds exact _mockInstance/_instance singleton metadata and exact local initialization methods
+PASS: Step 45 verifies serialized getter fallback shape and requires production _instance without invoking the getter/fallback
+PASS: Step 45 getter metadata audit uses explicit compile-stable tuple element naming
+PASS: Step 45 rejects the disproven 0.0.176 auto-property singleton-field assumption
 PASS: Step 45 is one-shot and proves settings/prefs/progress authority after return
 PASS: Step 46 maps exact LaunchMainMenu plus recursively expanded nested compiler state machines and requires a durable map
 PASS: Step 46 classifier distinguishes forbidden startup edges from explicitly admitted inert/read-only edges
@@ -1194,10 +1196,14 @@ PASS: startup ladder UI does not directly invoke whole GameStartup, cloud sync, 
 PASS: each ladder rung has distinct run-correlated evidence/report surfaces
 PASS: current status documents independent rung reports and stop-on-first-failure policy
 PASS: Steps 43-47 ladder design/provenance record is present
+PASS: physical 0.0.176 Step-45 report pins the Gate-B singleton-field failure
+PASS: physical 0.0.176 Step-45 checkpoint proves safe pre-mutation stop after same-process Step-44 authority
+PASS: physical 0.0.176 Step-45 last checkpoint proves normal frozen teardown
+PASS: Step-45 singleton-field correction provenance record is present
 PASS: Steps 43-47 active candidate hash manifest exists
-PASS: Steps 43-47 candidate manifest pins implementation/tests/UI, release wiring/docs, design provenance, and physical Step-42 authority
+PASS: Steps 43-47 candidate manifest pins implementation/tests/UI, release wiring/docs, Step-45 correction provenance, and physical Step-42/0.0.176 authority
 PASS: Steps 43-47 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1186 checks
+VALIDATION PASS: 1192 checks

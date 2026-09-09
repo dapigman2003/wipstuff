@@ -449,3 +449,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-42.0-PHYSICAL-0.0.175-STATIC-MAP.txt` — exact `InitPools` token `0x06001BFA`, 3 direct IL instructions, and 22-method transitive same-sts2 zero-boundary closure.
 - `reports/STEP-42.0-PHYSICAL-0.0.175-LAST-CHECKPOINT.txt` — normal Step-42 run end with rendering never restarted.
 - `steps/STEP-43-47-SEQUENTIAL-STARTUP-LADDER.md` — 0.0.176 multi-rung packaging strategy and exact Step 43–47 safety boundaries.
+
+- `steps/STEP-45.0-0.0.176-SINGLETON-FIELD-CORRECTION.md` — physical 0.0.176 Step-45 Gate-B singleton-field failure and 0.0.177 exact `_mockInstance`/`_instance` correction.

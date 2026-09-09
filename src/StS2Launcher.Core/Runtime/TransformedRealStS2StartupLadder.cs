@@ -23,7 +23,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string AccountScopeMigratorTypeFullName = "MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator";
     private const string ProfileScopeMigratorTypeFullName = "MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator";
     private const string SaveManagerTypeFullName = "MegaCrit.Sts2.Core.Saves.SaveManager";
-    private const string SaveManagerInstanceBackingFieldName = "<Instance>k__BackingField";
+    private const string SaveManagerMockInstanceFieldName = "_mockInstance";
+    private const string SaveManagerInstanceFieldName = "_instance";
     private const string Step46AsyncStateMachineAttributeFullName = "System.Runtime.CompilerServices.AsyncStateMachineAttribute";
     private static readonly string[] StartupLadderCompilerStateMachineAttributes =
     [
@@ -397,21 +398,44 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
             var allMethods = BuildStartupLadderMethodMap(allTypes);
             var saveManager = RequireStartupLadderType(allTypes, SaveManagerTypeFullName, step);
-            var instanceField = saveManager.Fields.SingleOrDefault(field => field.Name == SaveManagerInstanceBackingFieldName && field.IsStatic && field.FieldType.FullName == SaveManagerTypeFullName)
-                ?? throw new MissingFieldException(SaveManagerTypeFullName, SaveManagerInstanceBackingFieldName);
+            var mockInstanceField = saveManager.Fields.SingleOrDefault(field => field.Name == SaveManagerMockInstanceFieldName && field.IsStatic && field.FieldType.FullName == SaveManagerTypeFullName)
+                ?? throw new MissingFieldException(SaveManagerTypeFullName, SaveManagerMockInstanceFieldName);
+            var instanceField = saveManager.Fields.SingleOrDefault(field => field.Name == SaveManagerInstanceFieldName && field.IsStatic && field.FieldType.FullName == SaveManagerTypeFullName)
+                ?? throw new MissingFieldException(SaveManagerTypeFullName, SaveManagerInstanceFieldName);
+            var getInstance = RequireStartupLadderMethod(saveManager, "get_Instance", 0, true, step);
+            var constructDefault = RequireStartupLadderMethod(saveManager, "ConstructDefault", 0, true, step);
+            var getterFieldRefs = getInstance.Body.Instructions
+                .Where(instruction => instruction.Operand is FieldReference)
+                .Select(instruction => (OpCode: instruction.OpCode.Name, Field: (FieldReference)instruction.Operand))
+                .Where(item => item.Field.DeclaringType.FullName == SaveManagerTypeFullName)
+                .ToArray();
+            var mockLoads = getterFieldRefs.Count(item => item.OpCode == "ldsfld" && item.Field.Name == SaveManagerMockInstanceFieldName);
+            var instanceLoads = getterFieldRefs.Count(item => item.OpCode == "ldsfld" && item.Field.Name == SaveManagerInstanceFieldName);
+            var instanceStores = getterFieldRefs.Count(item => item.OpCode == "stsfld" && item.Field.Name == SaveManagerInstanceFieldName);
+            var constructCalls = getInstance.Body.Instructions.Count(instruction =>
+                (instruction.OpCode.Name is "call" or "callvirt") &&
+                instruction.Operand is MethodReference method &&
+                method.DeclaringType.FullName == SaveManagerTypeFullName &&
+                method.Name == constructDefault.Name &&
+                method.Parameters.Count == 0);
+            if (mockLoads != 2 || instanceLoads != 2 || instanceStores != 1 || constructCalls != 1)
+                throw new InvalidDataException($"Step 45.0 SaveManager.get_Instance serialized singleton pattern drifted: mockLoads={mockLoads}; instanceLoads={instanceLoads}; instanceStores={instanceStores}; constructDefaultCalls={constructCalls}.");
             var initProfile = RequireStartupLadderMethod(saveManager, "InitProfileId", 1, false, step);
             var initProgress = RequireStartupLadderMethod(saveManager, "InitProgressData", 0, false, step);
             var initPrefs = RequireStartupLadderMethod(saveManager, "InitPrefsData", 0, false, step);
             if (initProfile.ReturnType.FullName != "System.Void" || initProfile.Parameters[0].ParameterType.FullName != "System.Nullable`1<System.Int32>")
                 throw new InvalidDataException("Step 45.0 InitProfileId signature drifted from void InitProfileId(Nullable<int>).");
-            _ = instanceField; // Serialized authority: Step 45 will access the existing singleton backing field directly, never SaveManager.get_Instance/ConstructDefault.
+            _ = mockInstanceField;
+            _ = instanceField; // Serialized authority: get_Instance is verified to use _mockInstance -> _instance -> ConstructDefault fallback; Step 45 requires production _mockInstance null and reads _instance directly, never invoking the getter/fallback.
             var roots = new[] { initProfile, initProgress, initPrefs };
             var audit = AuditStartupLadderRoots(roots, allTypes, allMethods);
             RequireStartupLadderAuditAdmissible(audit, "Step 45.0 local save initialization");
             if (resolver.Requests.Count != 0)
                 throw new InvalidDataException("Step 45.0 static audit unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             _step45StaticMap = BuildStartupLadderStaticMap(step, Step45Name, baseline, roots, audit,
-                "Exact local SaveManager profile/progress/prefs initialization; cloud sync and migration methods remain uninvoked.");
+                "Exact local SaveManager profile/progress/prefs initialization; cloud sync and migration methods remain uninvoked.")
+                + Environment.NewLine
+                + $"SaveManager singleton metadata: mockField={SaveManagerMockInstanceFieldName}; instanceField={SaveManagerInstanceFieldName}; get_Instance mockLoads={mockLoads}; instanceLoads={instanceLoads}; instanceStores={instanceStores}; ConstructDefaultCalls={constructCalls}. Step 45 reads _instance directly and never invokes get_Instance/ConstructDefault.";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 45 Gate B");
             Checkpoint(checkpoint, $"M45_B_PASS — roots=3; closureMethods={audit.ClosureMethods.Length}; classifiedBoundaryRefs={audit.Boundaries.Length}; forbiddenBoundaryRefs=0; unresolvedSameSts2Refs=0; externalResolutionRequests=0; invocation=NO.");
             return StartupLadderPass(step, Step45Name, gate,
@@ -1231,12 +1255,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private static object RequireExistingStartupLadderSaveManagerInstance(Type saveType, int step)
     {
-        var field = saveType.GetField(SaveManagerInstanceBackingFieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-            ?? throw new MissingFieldException(SaveManagerTypeFullName, SaveManagerInstanceBackingFieldName);
-        if (field.FieldType != saveType)
-            throw new InvalidDataException($"Step {step}.0 SaveManager singleton backing-field type drifted: {field.FieldType.FullName}.");
-        return field.GetValue(null)
-            ?? throw new InvalidDataException($"Step {step}.0 requires the already-created SaveManager singleton; backing field {SaveManagerInstanceBackingFieldName} is null. ConstructDefault is intentionally not called by this rung.");
+        var mockField = saveType.GetField(SaveManagerMockInstanceFieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+            ?? throw new MissingFieldException(SaveManagerTypeFullName, SaveManagerMockInstanceFieldName);
+        var instanceField = saveType.GetField(SaveManagerInstanceFieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+            ?? throw new MissingFieldException(SaveManagerTypeFullName, SaveManagerInstanceFieldName);
+        if (mockField.FieldType != saveType || instanceField.FieldType != saveType)
+            throw new InvalidDataException($"Step {step}.0 SaveManager singleton field type drifted: mock={mockField.FieldType.FullName}; instance={instanceField.FieldType.FullName}.");
+        if (mockField.GetValue(null) is not null)
+            throw new InvalidDataException($"Step {step}.0 refuses SaveManager test/mock authority: {SaveManagerMockInstanceFieldName} is non-null.");
+        return instanceField.GetValue(null)
+            ?? throw new InvalidDataException($"Step {step}.0 requires the already-created production SaveManager singleton; field {SaveManagerInstanceFieldName} is null. get_Instance/ConstructDefault are intentionally not called by this rung.");
     }
 
     private static string DescribeStartupLadderReadSaveResult(object result)
