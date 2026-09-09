@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-09T07:54:17Z
+UTC: 2026-09-09T15:24:05Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -10,21 +10,21 @@ PASS: shell syntax — scripts/test.sh
 PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
-StS2 Launcher — Step 42.0 controlled GameStartup InitPools validation
-Root: /mnt/data/work175/StS2Launcher-Step42-0.0.175
+StS2 Launcher — Steps 43–47 sequential startup ladder validation
+Root: /mnt/data/work176/StS2Launcher-Step42-0.0.175
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 287 C# files
+PASS: lexical delimiter scan passes for 294 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 175
-PASS: display version is 0.0.175
-PASS: Info.plist build version is 175
-PASS: Info.plist display version is 0.0.175
+PASS: build version is 176
+PASS: display version is 0.0.176
+PASS: Info.plist build version is 176
+PASS: Info.plist display version is 0.0.176
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -32,13 +32,13 @@ PASS: canonical iOS assembly name is explicit
 PASS: live iOS source contains no legacy Step05 namespace
 PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
-PASS: top launcher banner identifies the active Step 42.0 controlled InitPools boundary
-PASS: top launcher presentation records physical Step-41 closure and the controlled Step-42 InitPools boundary
-PASS: root and docs READMEs pin the exact 0.0.175 (175) release identity
-PASS: master plan points to the active 0.0.175 / Step 42.0 frontier
-PASS: top launcher banner records closed Step-37 through Step-41 authority and the controlled Step-42 InitPools boundary
+PASS: top launcher banner identifies the active Steps 43–47 sequential startup ladder
+PASS: top launcher presentation records physical Step-42 closure and the multi-rung startup ladder
+PASS: root and docs READMEs pin the exact 0.0.176 (176) release identity
+PASS: master plan points to the active 0.0.176 / Steps 43–47 frontier
+PASS: top launcher banner records closed Step-37 through Step-42 authority and the active startup ladder
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: Step 42.0 source pins expected bundle release identity
+PASS: startup-ladder source pins expected bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -290,7 +290,7 @@ PASS: active CI/IPA/project graph has no retired Step-27 dependency: STEP27_INTE
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: Step27InterpretedPatchFixture
 PASS: active CI/IPA/project graph has no retired Step-27 dependency: host-step27
 PASS: host tests no longer perform the retired Harmony release network acquisition
-PASS: IPA verification summary identifies the active Step-42.0 candidate rather than retired Step 27
+PASS: IPA verification summary identifies the active Steps-43–47 candidate rather than retired Step 27
 PASS: retired Step-27 fixture is absent from iOS and host-test project graphs
 PASS: active regression contracts preserve the decisive Step-27 negative architecture result
 PASS: master plan continues to retire runtime Harmony/MonoMod replacement
@@ -895,8 +895,8 @@ PASS: regression contracts pin the Step-32.0.1 serialization fingerprint correct
 PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table resolution boundary
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
-PASS: current status records physical Step-41 closure and the active Step-42 controlled InitPools frontier
-PASS: testing and release-checklist docs pin the exact 0.0.175 (175) release identity
+PASS: current status records physical Step-42 closure and the active five-rung startup ladder
+PASS: testing and release-checklist docs pin the exact 0.0.176 (176) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1020,9 +1020,9 @@ PASS: Codemagic preserves canonical cache path: $HOME/.cache/sts2launcher/godot-
 PASS: Codemagic preserves canonical cache path: $HOME/.dotnet
 PASS: Codemagic preserves canonical cache path: $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 PASS: Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation
-PASS: host-test report heading identifies Step 42
-PASS: host-test TRX artifact identifies Step 42
-PASS: Codemagic build-environment report heading identifies the Step 42.0 candidate
+PASS: host-test report heading identifies the Steps 43–47 ladder
+PASS: host-test TRX artifact identifies Steps 43–47
+PASS: Codemagic build-environment report heading identifies the Steps 43–47 candidate
 PASS: Codemagic contains one active launcher workflow
 PASS: Codemagic calls the consolidated build entry point
 PASS: maintenance Codemagic summary records per-stage and total elapsed time
@@ -1031,9 +1031,13 @@ PASS: Codemagic workflow has no history dependency
 PASS: iOS build sources canonical release configuration
 PASS: iOS build uses canonical project variable
 PASS: iOS build uses canonical Godot wrapper
+PASS: iOS publish presentation identifies the active Steps 43–47 ladder
+PASS: Codemagic workflow presentation identifies the active Steps 43–47 ladder
+PASS: Codemagic report headings identify the active Steps 43–47 ladder
+PASS: master plan contains no stale Step-41 active-candidate claim
 PASS: IPA verifier enforces release-config version
 PASS: IPA verifier reads native bridge from canonical project path
-PASS: IPA verifier advertises the active Step-42.0 candidate
+PASS: IPA verifier advertises the active Steps-43–47 candidate
 PASS: Step 20 dynamic fixtures remain absent from iOS build inputs
 PASS: physically closed Step 29 implementation/evidence hash manifest exists
 PASS: physically closed Step-29 implementation, tests, and closure evidence remain hash-pinned
@@ -1122,7 +1126,7 @@ PASS: Step 41 Core never directly invokes startup/platform/main-menu/deferred me
 PASS: Step 41 UI never directly invokes startup/platform/main-menu/deferred methods
 PASS: Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts
 PASS: RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state
-PASS: active release presentation preserves physical Step-41 closure while Step 42 becomes active
+PASS: active release presentation preserves physical Step-42 closure while Steps 43–47 become active
 PASS: Step 41 host regressions pin gate sequencing and stable ordinals
 PASS: current status pins physical Step-41 no-invocation closure authority
 PASS: Step 41 historical candidate hash manifest exists
@@ -1143,7 +1147,7 @@ PASS: Step 42 Core does not directly invoke GameStartup, cloud, platform, main-m
 PASS: Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering
 PASS: Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports
 PASS: RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state
-PASS: active release presentation pins physical Step-41 closure and Step-42 / 0.0.175 identity
+PASS: active release presentation pins physical Step-42 closure and Steps-43–47 / 0.0.176 identity
 PASS: Step 42 host regressions pin gate sequencing and stable ordinals
 PASS: current status pins Step-42 one-shot InitPools boundary and report contract
 PASS: Step 42 design/provenance record is present
@@ -1153,7 +1157,47 @@ PASS: 0.0.174 Codemagic static/environment/cache provenance is sealed
 PASS: Step 42 active candidate hash manifest exists
 PASS: Step 42 candidate manifest pins implementation/tests/UI, release wiring/docs, design provenance, and physical Step-41 closure
 PASS: Step 42 active implementation/release/provenance files are hash-pinned
+PASS: physical Step-42 static map seals exact InitPools token/IL/22-method zero-boundary closure
+PASS: physical Step-42 checkpoint proves one exact InitPools return and zero runtime escape
+PASS: physical Step-42 final report closes 4/4 without crossing later startup boundaries
+PASS: physical Step-42 run ended normally with renderer still frozen
+PASS: Steps 43-47 Core gate/result/sequence/summary/tests and iOS UI surfaces exist
+PASS: startup-ladder gate ordinals retain exact four-gate diagnosability
+PASS: startup-ladder sequence binds every gate to one exact rung and stops after failure
+PASS: startup-ladder summary closes only exact four-of-four rungs
+PASS: startup-ladder host regressions pin sequencing, identity, fail-stop behavior, and summary
+PASS: RootViewController exposes the Steps 43-47 ladder after the closed Step-42 surface
+PASS: rerunning/resetting Step 42 invalidates all later ladder authority
+PASS: Step-42 success UI advances into the same-process ladder without permitting Step-42 retry
+PASS: startup ladder uses existing proven load-context counters and shared exception formatter
+PASS: startup ladder contains none of the non-existent shorthand identifiers that broke 0.0.174
+PASS: startup ladder cross-partial Step41 closure types are declared in the same partial class
+PASS: startup ladder cross-partial helper references resolve to established runtime surfaces
+PASS: Step 43 implements four gates around exact Null-platform authority
+PASS: Step 43 probes only the exact read-only platform surface and requires concrete NullPlatformUtilStrategy
+PASS: Step 43 keeps external Steam/native game boundaries closed
+PASS: Step 44 maps and invokes only read-only legacy-data guards and fail-stops if migration is needed
+PASS: Step 44 explicitly rejects migration/archive reachability before the read-only probes
+PASS: Step 45 binds the existing SaveManager backing field and exact local initialization methods
+PASS: Step 45 cannot trigger SaveManager.get_Instance/ConstructDefault while acquiring the singleton
+PASS: Step 45 is one-shot and proves settings/prefs/progress authority after return
+PASS: Step 46 maps exact LaunchMainMenu plus recursively expanded nested compiler state machines and requires a durable map
+PASS: Step 46 classifier distinguishes forbidden startup edges from explicitly admitted inert/read-only edges
+PASS: Step 46 remains non-invoking and frozen
+PASS: Step 46 UI writes and marks the complete map durable before Gate D/Step 47
+PASS: Step 47 binds exact LaunchMainMenu token, invokes skipIntro=true once without abandoning an uncancelable Task, and requires a new root-scene child
+PASS: Step 47 cannot run/retry without exact durable Step-46 authority
+PASS: Step 47 UI has exactly one static StartRendering and one failure-refreeze StopRendering call site
+PASS: Step 47 UI is one-shot, refreezes normal failures, and leaves rendering active only on 4/4 success
+PASS: startup ladder Core does not directly invoke whole GameStartup, cloud sync, platform init, or deferred startup
+PASS: startup ladder UI does not directly invoke whole GameStartup, cloud sync, platform init, or deferred startup
+PASS: each ladder rung has distinct run-correlated evidence/report surfaces
+PASS: current status documents independent rung reports and stop-on-first-failure policy
+PASS: Steps 43-47 ladder design/provenance record is present
+PASS: Steps 43-47 active candidate hash manifest exists
+PASS: Steps 43-47 candidate manifest pins implementation/tests/UI, release wiring/docs, design provenance, and physical Step-42 authority
+PASS: Steps 43-47 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1142 checks
+VALIDATION PASS: 1186 checks

@@ -30,6 +30,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private void ResetStep42State()
     {
+        ResetStartupLadderState();
         _step42Preflight = null;
         _step42InitPoolsAudited = false;
         _step42InvocationStarted = false;

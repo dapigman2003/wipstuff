@@ -1,0 +1,22 @@
+StS2 Launcher — Step 42.0 Controlled GameStartup InitPools
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-09T14:21:59.4900870+00:00
+
+RESULT
+STEP 42.0 CONTROLLED GAMESTARTUP INITPOOLS COMPLETE — 4/4
+
+METADATA
+App version: 0.0.175 (175)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+All four Step 42.0 gates passed. Same-process Step-41 frozen authority was reverified; exact NGame.InitPools and its transitive same-sts2 closure were mapped with zero classified/unresolved/external Cecil boundaries; the verified map was durably written before execution; exact InitPools returned once on the retained real NGame; and final frozen singleton/parent/_window/state plus resolver/initializer/rejected/native confinement held. GameStartup itself, migrations/cloud/platform/Steam/main-menu/deferred/render restart remain future separately authorized boundaries.
+
+END OF REPORT

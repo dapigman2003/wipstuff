@@ -1,11 +1,13 @@
-# StS2 Launcher — Step 42.0
+# StS2 Launcher — Steps 43–47 startup ladder
 
-Active candidate: **0.0.175 (175)** — controlled GameStartup `NGame.InitPools()` boundary; Codemagic compile-only correction of 0.0.174.
+Active candidate: **0.0.176 (176)** — five independently gated startup rungs in one IPA; stop on the first failure.
 
-Physical **0.0.173 / Step 41** closed the non-invoking GameStartup async frontier map **4/4**: exact `GameStartup` and compiler `MoveNext` were mapped, 691 transitive same-sts2 methods and 46 classified startup/platform boundaries were recorded, unresolved same-sts2 and external Cecil resolution stayed zero, and GameStartup was never invoked.
+Physical **0.0.175 / Step 42** is closed positive **4/4**: exact `NGame.InitPools()` mapped to a 22-method zero-boundary closure, executed once on the real in-tree `NGame`, and returned with state 2, frozen rendering, and zero resolver/host/private/initializer/rejected/native deltas.
 
-**Step 42.0 still does not invoke GameStartup.** It keeps rendering frozen and `GameStartupWrapper` inert, maps exact `NGame.InitPools()` plus its own transitive same-sts2 closure, requires zero classified/unresolved boundaries, writes the verified map durably, then invokes exact `InitPools()` once on the retained real in-tree `NGame`. Final confinement requires state 2 and zero resolver/host/private/initializer/rejected/native deltas. Migrations, cloud sync, platform, Steam, main-menu, deferred startup and render restart remain unopened. Once Gate C is armed, do not retry Step 42 in-process.
+0.0.176 keeps that safety model but reduces rebuild cycles. After Step 42 4/4, the same process may advance through: **Step 43 Null-platform authority → Step 44 read-only legacy-data guard → Step 45 one-shot local SaveManager initialization → Step 46 exact `LaunchMainMenu(bool)` async state-machine/closure map → Step 47 conditional one-shot live `LaunchMainMenu(skipIntro=true)`**. Every rung has its own four-gate result and run-correlated reports; later rungs stay locked until the prior rung is 4/4.
 
-Authoritative status and exact device sequence: `docs/CURRENT-STATUS.md`.
+Steps 43–46 keep rendering frozen. Step 47 can start rendering only after Step 46's complete map is admissible and durably written. Step 47 refreezes rendering on normal failure/incomplete return and leaves rendering active only after 4/4 success with a new `RootSceneContainer` child scene.
+
+Authoritative status, exact boundaries and device sequence: `docs/CURRENT-STATUS.md`.
 
 0.0.174 never reached device runtime: Codemagic Core compilation failed because the Step-42 source used three non-existent shorthand load-context property names and one non-existent diagnostic helper name. 0.0.175 substitutes only the existing proven members `InitializerBearingRequests`, `RejectedManagedRequests`, `NativeLoadAttempts`, and `FormatExceptionDiagnostic`; Step-42 runtime semantics are otherwise unchanged.

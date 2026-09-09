@@ -1,0 +1,6 @@
+StS2 Launcher — Step 42 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260909T1421586841850Z-pid99125-e270cc1a72b44e888afc6859a1c5962a
+Journal: Step42-CrashCheckpoint-20260909T1421586841850Z-pid99125-e270cc1a72b44e888afc6859a1c5962a.txt
+Static map: Step42-InitPools-StaticMap-20260909T1421586841850Z-pid99125-e270cc1a72b44e888afc6859a1c5962a.txt
+2026-09-09T14:21:59.4964710+00:00 | run=20260909T1421586841850Z-pid99125-e270cc1a72b44e888afc6859a1c5962a | pid=99125 | managedThread=14 | RUN_END — Step-42 UI operation ended normally; rendering was never restarted. If the InitPools boundary was armed, this process must not retry Step 42.

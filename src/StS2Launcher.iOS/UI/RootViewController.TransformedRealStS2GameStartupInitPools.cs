@@ -148,7 +148,7 @@ public sealed partial class RootViewController
             _step42ResultLabel.TextColor = UIColor.Label;
             _step42DetailLabel.Text =
                 "All four Step 42.0 gates passed. Same-process Step-41 frozen authority was reverified; exact NGame.InitPools and its transitive same-sts2 closure were mapped with zero classified/unresolved/external Cecil boundaries; the verified map was durably written before execution; exact InitPools returned once on the retained real NGame; and final frozen singleton/parent/_window/state plus resolver/initializer/rejected/native confinement held. GameStartup itself, migrations/cloud/platform/Steam/main-menu/deferred/render restart remain future separately authorized boundaries.";
-            _statusLabel.Text = "STEP 42.0 COMPLETE — 4/4. Exact audited InitPools executed once with frozen zero-native confinement. Preserve Step42 artifacts; relaunch before any further candidate.";
+            _statusLabel.Text = "STEP 42.0 COMPLETE — 4/4. Exact audited InitPools executed once with frozen zero-native confinement. Step 43 is now unlocked in this same process; do not retry Step 42.";
             _statusLabel.TextColor = UIColor.Label;
             WriteStep42Checkpoint("RUN_STEP42_4OF4 — exact audited NGame.InitPools executed once and returned; renderer remained frozen; inserted NGame retained; GameStartup/migrations/cloud/platform/Steam/main-menu/deferred/native boundaries remain unopened.");
         }

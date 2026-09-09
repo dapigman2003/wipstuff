@@ -1,17 +1,19 @@
-## 0.0.175 / Step 42.0 controlled InitPools
+# Testing — Steps 43–47 startup ladder / 0.0.176
 
-0.0.174 compile failure: no runtime conclusion. Codemagic rejected four identifier families in the new Step-42 source. 0.0.175 corrects only those identifiers to the existing `Step35ExecutionLoadContext` counters and shared exception formatter; the Step-42 device contract is unchanged.
+Active candidate: `0.0.176 (176)`, IPA `StS2-Launcher-Steps-43-47.ipa`, workflow `ios-canonical`.
 
-Physical prerequisite: same-process Step 41.0 4/4 with rendering frozen. Gate B must write `Step42-InitPools-StaticMap-<RunId>.txt` before Gate C. Gate C invokes exact audited `NGame.InitPools()` once; after Gate C is armed never retry in-process. Success requires state 2, rendering stopped, and resolver/host/private/initializer/rejected/native deltas all zero. GameStartup/migrations/cloud/platform/Steam/main-menu/deferred remain forbidden.
+Physical prerequisite authority: Step 42.0 / 0.0.175 is closed 4/4. Exact `NGame.InitPools()` token `0x06001BFA`, 3 direct IL instructions, 22-method transitive same-sts2 closure, zero classified/unresolved/external Cecil boundaries, one exact invocation returned, state 2 preserved, renderer frozen, and resolver/host/private/initializer/rejected/native deltas all zero.
 
-# Testing — Step 42.0
+The new packaging strategy does not auto-run rungs. The device operator runs Step 43, then 44, then 45, then 46, then 47 only after the immediately preceding rung shows 4/4. Stop on the first failure. Each rung has a separate crash checkpoint, last checkpoint, final report, and (Steps 43–46) static map.
 
-Active candidate: `0.0.175 (175)`, IPA `StS2-Launcher-Step-42.ipa`, workflow `ios-canonical`.
+Step 43 requirements: same-process Step42 4/4; frozen rendering; complete `PlatformUtil` + concrete `NullPlatformUtilStrategy` static map written before the read probe; runtime `PrimaryPlatform` dispatch must return exact concrete Null strategy; read-only local player/branch/language/window-mode probes only; state/context/native deltas zero.
 
-Canonical validation must preserve physical Step-36/37/38/39 closures and the physical Step-40 4/4 render-pulse closure. Step 41.0 requires same-process Step-40 4/4 with rendering stopped, maps exact `NGame.GameStartup` plus its `AsyncStateMachineAttribute` and compiler-generated `MoveNext` body, then maps the transitive same-sts2 startup closure with deferred/rejecting Cecil. No GameStartup invocation or render restart is permitted.
+Step 44 requirements: Step43 4/4; map only the two `HasLegacyData()` methods; no migration/archive method invocation. If either probe returns true, this is an expected fail-closed stop requiring a dedicated migration/backup iteration. If both false, frozen confinement closes 4/4.
 
-Host regressions cover four-gate ordering/ordinals. Static validation must assert the Step41 UI exposes no StartRendering/StopRendering/GameStartup invocation call site, full direct IL/state-machine mapping exists, closure classification exists, durable static-map/checkpoint reports are wired, and physical 0.0.171 Step-40 success provenance is sealed. Codemagic remains the first actual C# compiler/AOT/link/package authority.
+Step 45 requirements: Step44 4/4/no legacy data; map `InitProfileId(Nullable<int>)`, `InitProgressData()`, `InitPrefsData()` and write the map before Gate C; one-shot invoke `InitProfileId(null) -> InitProgressData -> InitPrefsData`; never retry after arm; require SaveManager `SettingsSave`, `PrefsSave`, `Progress` non-null plus state/context/native confinement.
 
-Physical sequence: fresh process → Step 15 A-C → Step 35 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → **skip Step 38** → Step 39.0 4/4 → same-process Step 40.1 4/4 → same-process Step 41.0 A-D once.
+Step 46 requirements: Step45 4/4; map exact `NGame.LaunchMainMenu(bool)` wrapper, `AsyncStateMachineAttribute`, compiler state-machine fields, full `MoveNext` IL, then its transitive same-sts2 closure. Only proven Null-platform read helpers and inert `SentryService` wrappers may be classified. `OneTimeInitialization`, `InitializePlatform`, `LoadDeferredStartupAssets`, external Steamworks, FMOD, Spine, external Sentry and native-extension edges fail before invocation. The complete map must be durably written and marked before Gate D; LaunchMainMenu remains uninvoked and rendering frozen.
 
-Expected Step41 success evidence: Gate A frozen Step40 authority; Gate B exact GameStartup token + async state-machine type + MoveNext token with zero external resolution; Gate C static map written with closure count and boundary-category/path evidence plus zero unresolved/external resolution; Gate D frozen no-invocation confinement; `RUN_STEP41_4OF4`; normal report return with rendering inactive.
+Step 47 requirements: Step46 4/4/admissible/durable; exact runtime `LaunchMainMenu(bool)` token equals Step46 token and returns `Task`; UI starts rendering exactly once immediately before Gate C; invoke `LaunchMainMenu(skipIntro=true)` exactly once; await the un-cancelable Task to completion with **no abandonment timeout**; state/context/native deltas zero; Gate D requires `RootSceneContainer` child count to increase. A hard hang is localized by the durable pre-invocation/start-render checkpoint and requires process relaunch. On any normal managed failure return, rendering must be refrozen at the first managed opportunity. On 4/4 success, rendering intentionally remains active for visual observation.
+
+Codemagic remains compile/unit-test/iOS-AOT/native-link/IPA authority. Physical iPhone remains runtime authority. A later rung cannot close or be attempted if an earlier rung failed in that process.

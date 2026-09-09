@@ -41,3 +41,4 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-LAST-CHECKPOINT.txt` — physical 0.0.170 final durable checkpoint with Step 39 normal run end and no render restart.
 
 Physical 0.0.171 Step-40 Gate-A/B + successful Start/Stop timing localization is preserved in the STEP-40.0-PHYSICAL-0.0.171-* report set.
+- `STEP-42.0-PHYSICAL-0.0.175-*` — physical 0.0.175 Step-42 4/4 exact InitPools closure/invocation authority.

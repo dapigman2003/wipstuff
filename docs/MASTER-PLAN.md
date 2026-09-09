@@ -1,8 +1,8 @@
-## Current frontier — Step 42.0 / 0.0.175
+## Current frontier — Steps 43–47 / 0.0.176
 
-The active candidate is **0.0.175 / Step 42.0**. 0.0.174 did not compile in Codemagic and therefore has no runtime authority; 0.0.175 changes only the exact load-context/diagnostic identifiers needed to compile the already-designed Step-42 boundary.
+The active candidate is **0.0.176 / sequential startup ladder Steps 43–47**. Physical 0.0.175 closed Step 42 at 4/4: exact `NGame.InitPools()` mapped to a 22-method zero-boundary closure, executed once, and returned with frozen state/native confinement.
 
-Step 41 physically closed the non-invoking GameStartup async frontier at 4/4. Step 42 isolates the first newly executed startup primitive: exact `NGame.InitPools()`. It is audited independently before one-shot invocation while rendering remains frozen. Platform identity, migration, cloud sync, Steam, main-menu and deferred startup remain later gates.
+The packaging strategy now batches multiple independently gated rungs per IPA while preserving one-boundary-at-a-time authority. Step 43 proves concrete Null-platform runtime strategy; Step 44 detects legacy data without mutation; Step 45 initializes local profile/progress/prefs once; Step 46 maps the inner async `LaunchMainMenu(bool)` state machine/closure without invocation; Step 47 is conditionally unlocked for a one-shot live main-menu attempt only if Step 46 is admissible and durable. Any failure stops the ladder and later rungs remain locked.
 
 # StS2 Launcher iOS — Master Plan
 
@@ -297,6 +297,6 @@ Step 36.0 is separately gated. It advances only to exact transformed static para
 
 ## Current frontier — Step 41.0
 
-Physical 0.0.170 closed Step 39 at 4/4. Physical 0.0.171 then closed Step 40 at 4/4 on a successful second run: the real in-tree hierarchy passed its frame/input audit, the Godot renderer started, stopped again at 103.3 ms, and frozen NGame/state/native confinement held. The active candidate is **0.0.173 / Step 41.0**.
+Physical 0.0.170 closed Step 39 at 4/4. Physical 0.0.171 then closed Step 40 at 4/4 on a successful second run: the real in-tree hierarchy passed its frame/input audit, the Godot renderer started, stopped again at 103.3 ms, and frozen NGame/state/native confinement held. That result advanced the project to Step 41; Step 41 and Step 42 have since physically closed 4/4, and the current frontier is the 0.0.176 Steps 43–47 sequential startup ladder described at the top of this plan.
 
 Step 41.0 is the mandatory map-before-enable GameStartup step. Rendering stays frozen and the existing inert `GameStartupWrapper` is preserved. The launcher maps exact `NGame.GameStartup`, its compiler-generated async state machine and `MoveNext` IL, then traverses the same-sts2 closure and records path-qualified platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native-facing boundaries. No GameStartup execution, platform initialization, Steam initialization, main-menu launch, deferred startup, or render restart is authorized. The resulting physical static map will define the next narrow partial-startup boundary.

@@ -66,7 +66,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Step 39.0 real SceneTree admission boundary..."
+echo "Publishing Steps 43–47 sequential startup ladder..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \

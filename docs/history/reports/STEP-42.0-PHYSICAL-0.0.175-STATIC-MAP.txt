@@ -1,0 +1,46 @@
+StS2 Launcher — Step 42.0 controlled GameStartup InitPools pre-invocation map
+Read-only Cecil evidence from the exact selected compatibility image; this map is durably written before InitPools is invoked.
+Selected compatibility path: /var/mobile/Containers/Data/Application/E2B2D456-B9EC-4549-B7D7-B3FA52E57A6C/Documents/StS2Launcher/Step35-ExecuteVeryEarlyDiagnostic/sts2.step39.1.lifecycle-admission.dll
+Selected compatibility SHA-256: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a
+InitPools full name: System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitPools()
+InitPools token: 0x06001BFA
+InitPools IL instructions: 3
+Transitive same-sts2 InitPools closure methods mapped: 22
+Classified startup/platform/native boundary references: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+InitPools invoked while this map was built: NO
+Rendering restarted: NO
+Step 42 policy: only a zero-boundary/zero-unresolved exact InitPools closure may be invoked once; GameStartup/migrations/cloud/platform/Steam/main-menu/deferred remain unopened.
+
+[INITPOOLS METHOD]
+  token=0x06001BFA
+  fullname=System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitPools()
+  IL instructions=3
+    IL_0000: call System.Void MegaCrit.Sts2.Core.Nodes.Cards.NCard::InitPool()
+    IL_0005: call System.Void MegaCrit.Sts2.Core.Nodes.Cards.Holders.NGridCardHolder::InitPool()
+    IL_000A: ret
+
+[TRANSITIVE SAME-STS2 INITPOOLS CLOSURE METHODS]
+  - token=0x06001BFA; System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitPools()
+  - token=0x06004CB1; System.Void MegaCrit.Sts2.Core.Nodes.Pooling.IPoolable::OnInstantiated()
+  - token=0x06004CB4; MegaCrit.Sts2.Core.Nodes.Pooling.NodePool`1<T> MegaCrit.Sts2.Core.Nodes.Pooling.NodePool::Init(System.String,System.Int32)
+  - token=0x06004CBE; System.Void MegaCrit.Sts2.Core.Nodes.Pooling.NodePool`1::.ctor(System.String,System.Int32)
+  - token=0x06004CC3; T MegaCrit.Sts2.Core.Nodes.Pooling.NodePool`1::Instantiate()
+  - token=0x06005D4F; System.Void MegaCrit.Sts2.Core.Nodes.Cards.NCard::InitPool()
+  - token=0x06005EE3; System.String MegaCrit.Sts2.Core.Nodes.Cards.Holders.NGridCardHolder::get_ScenePath()
+  - token=0x06005EE9; System.Void MegaCrit.Sts2.Core.Nodes.Cards.Holders.NGridCardHolder::InitPool()
+  - token=0x0600ABFE; System.Void MegaCrit.Sts2.Core.Logging.ILogPrinter::Print(MegaCrit.Sts2.Core.Logging.LogLevel,System.String,System.Int32)
+  - token=0x0600AC07; System.Void MegaCrit.Sts2.Core.Logging.Log::Warn(System.String,System.Int32)
+  - token=0x0600AC0B; MegaCrit.Sts2.Core.Logging.LogLevel MegaCrit.Sts2.Core.Logging.Logger::get_GlobalLogLevel()
+  - token=0x0600AC0E; System.String MegaCrit.Sts2.Core.Logging.Logger::get_Context()
+  - token=0x0600AC14; System.Boolean MegaCrit.Sts2.Core.Logging.Logger::WillLog(MegaCrit.Sts2.Core.Logging.LogLevel)
+  - token=0x0600AC15; System.Void MegaCrit.Sts2.Core.Logging.Logger::LogMessage(MegaCrit.Sts2.Core.Logging.LogLevel,System.String,System.Int32)
+  - token=0x0600AC16; System.Void MegaCrit.Sts2.Core.Logging.Logger::LogMessage(MegaCrit.Sts2.Core.Logging.LogLevel,MegaCrit.Sts2.Core.Logging.LogType,System.String,System.Int32)
+  - token=0x0600AC1B; System.Void MegaCrit.Sts2.Core.Logging.Logger::Warn(System.String,System.Int32)
+  - token=0x0600AFFE; System.String MegaCrit.Sts2.Core.Helpers.SceneHelper::GetScenePath(System.String)
+  - token=0x0600C09A; Godot.Resource MegaCrit.Sts2.Core.Assets.AssetCache::GetAsset(System.String)
+  - token=0x0600C09C; Godot.Resource MegaCrit.Sts2.Core.Assets.AssetCache::LoadAsset(System.String)
+  - token=0x0600C0A4; Godot.PackedScene MegaCrit.Sts2.Core.Assets.AssetCache::GetScene(System.String)
+  - token=0x0600C0AB; System.Void MegaCrit.Sts2.Core.Assets.AssetLoadException::.ctor(System.String)
+  - token=0x0600C10D; MegaCrit.Sts2.Core.Assets.AssetCache MegaCrit.Sts2.Core.Assets.PreloadManager::get_Cache()

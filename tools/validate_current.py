@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 42.0 controlled GameStartup InitPools validation")
+print("StS2 Launcher — Steps 43–47 sequential startup ladder validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>175</ApplicationVersion>" in project_text, "build version is 175")
-require("<ApplicationDisplayVersion>0.0.175</ApplicationDisplayVersion>" in project_text, "display version is 0.0.175")
-require(plist.get("CFBundleVersion") == "175", "Info.plist build version is 175")
-require(plist.get("CFBundleShortVersionString") == "0.0.175", "Info.plist display version is 0.0.175")
+require("<ApplicationVersion>176</ApplicationVersion>" in project_text, "build version is 176")
+require("<ApplicationDisplayVersion>0.0.176</ApplicationDisplayVersion>" in project_text, "display version is 0.0.176")
+require(plist.get("CFBundleVersion") == "176", "Info.plist build version is 176")
+require(plist.get("CFBundleShortVersionString") == "0.0.176", "Info.plist display version is 0.0.176")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,13 +198,13 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 42.0 — CONTROLLED GAMESTARTUP INITPOOLS" in release_presentation, "top launcher banner identifies the active Step 42.0 controlled InitPools boundary")
-require("Physical 0.0.173 closed Step 41 at 4/4" in release_presentation and "Step 42.0 isolates exact NGame.InitPools()" in release_presentation, "top launcher presentation records physical Step-41 closure and the controlled Step-42 InitPools boundary")
-require("Active candidate: **0.0.175 (175)**" in read("README.md") and "Active candidate: **0.0.175 (175)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.175 (175) release identity")
-require("active candidate is **0.0.175 / Step 42.0**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.175 / Step 42.0 frontier")
-require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "STEP 39 CLOSED POSITIVE 4/4", "STEP 40 CLOSED POSITIVE 4/4", "STEP 41 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "GameStartup", "InitPools", "Steam"]), "top launcher banner records closed Step-37 through Step-41 authority and the controlled Step-42 InitPools boundary")
+require("STEPS 43–47 — SEQUENTIAL STARTUP LADDER" in release_presentation, "top launcher banner identifies the active Steps 43–47 sequential startup ladder")
+require("Physical 0.0.175 closed Step 42 at 4/4" in release_presentation and "Steps 43–47" in release_presentation, "top launcher presentation records physical Step-42 closure and the multi-rung startup ladder")
+require("Active candidate: **0.0.176 (176)**" in read("README.md") and "Active candidate: **0.0.176 (176)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.176 (176) release identity")
+require("active candidate is **0.0.176 / sequential startup ladder Steps 43–47**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.176 / Steps 43–47 frontier")
+require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "STEP 39 CLOSED POSITIVE 4/4", "STEP 40 CLOSED POSITIVE 4/4", "STEP 41 CLOSED POSITIVE 4/4", "STEP 42 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "InitPools", "Steam"]), "top launcher banner records closed Step-37 through Step-42 authority and the active startup ladder")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.175"' in release_presentation and 'ExpectedBuildVersion = "175"' in release_presentation, "Step 42.0 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.176"' in release_presentation and 'ExpectedBuildVersion = "176"' in release_presentation, "startup-ladder source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -344,9 +344,9 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-42.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.175",
-    "STS2_BUILD_VERSION": "175",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-43-47.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.176",
+    "STS2_BUILD_VERSION": "176",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -699,7 +699,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Step 42.0 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-42.0 candidate rather than retired Step 27")
+require("Steps 43–47 startup-ladder IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Steps-43–47 candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -1677,10 +1677,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 42.0 / 0.0.175 (175)", "Physical 0.0.173 / Step 41 — CLOSED POSITIVE 4/4", "Step 42.0 boundary", "NGame.InitPools()", "never calls GameStartup", "Skip Step 38"]), "current status records physical Step-41 closure and the active Step-42 controlled InitPools frontier")
+require(all(marker in current_status for marker in ["Active candidate — Steps 43–47 startup ladder / 0.0.176 (176)", "Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "Step 43.0", "Step 47.0", "Stop immediately on the first failure", "Step 38 must still be skipped"]), "current status records physical Step-42 closure and the active five-rung startup ladder")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.175 (175)" in testing_doc and "0.0.175 (175)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.175 (175) release identity")
+require("0.0.176 (176)" in testing_doc and "0.0.176 (176)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.176 (176) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -1784,9 +1784,9 @@ for cache_path in [
     require(cache_path in codemagic, f"Codemagic preserves canonical cache path: {cache_path}")
 cm_script = read("scripts/codemagic.sh")
 require(all(marker in cm_script for marker in ["Pinned .NET SDK/workloads", ".sts2launcher-ios-workload-set", "workload list", "Using verified cached iOS workload set", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE=1"]), "Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation")
-require("Step 42 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 42")
-require("LogFileName=step42.trx" in read("scripts/test.sh") and "artifacts/test-results/step42.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 42")
-require("Step 42.0 controlled GameStartup InitPools build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Step 42.0 candidate")
+require("Steps 43–47 startup-ladder host regression tests" in read("scripts/test.sh"), "host-test report heading identifies the Steps 43–47 ladder")
+require("LogFileName=steps43-47.trx" in read("scripts/test.sh") and "artifacts/test-results/steps43-47.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Steps 43–47")
+require("Steps 43–47 sequential startup ladder build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Steps 43–47 candidate")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1799,9 +1799,14 @@ verify_ipa = read("scripts/verify-ipa.sh")
 require('source scripts/lib/current-release.sh' in build_ios, "iOS build sources canonical release configuration")
 require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical project variable")
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
+require("Publishing Steps 43–47 sequential startup ladder..." in build_ios, "iOS publish presentation identifies the active Steps 43–47 ladder")
+require(all(value in codemagic for value in ["name: Steps 43-47 - sequential startup ladder", "name: Validate, test, build, and verify Steps 43-47 sequential startup ladder"]), "Codemagic workflow presentation identifies the active Steps 43–47 ladder")
+codemagic_script = read("scripts/codemagic.sh")
+require(all(value in codemagic_script for value in ["Codemagic cache state before Steps 43–47 startup-ladder build", "StS2 Launcher iOS — Steps 43–47 sequential startup ladder"]), "Codemagic report headings identify the active Steps 43–47 ladder")
+require("The active candidate is **0.0.173 / Step 41.0**" not in read("docs/MASTER-PLAN.md"), "master plan contains no stale Step-41 active-candidate claim")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEP 42.0 — CONTROLLED GAMESTARTUP INITPOOLS" in verify_ipa and "step42-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step-42.0 candidate")
+require("Expected device UI: STEPS 43–47 — SEQUENTIAL STARTUP LADDER" in verify_ipa and "steps43-47-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Steps-43–47 candidate")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
@@ -2275,7 +2280,7 @@ require(not any(call in step41_core for call in [".GameStartup(", ".InitializePl
 require(not any(call in step41_ui for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 41 UI never directly invokes startup/platform/main-menu/deferred methods")
 require(all(value in step41_ui for value in ["Step41-CrashCheckpoint-", "Step41-GameStartupFrontier-StaticMap-", "Step41-LastCheckpoint.txt", "Step41-TransformedRealStS2GameStartupFrontier.txt", "K_C_STATIC_MAP_WRITE_RETURNED"]), "Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts")
 require("AddTransformedRealStS2GameStartupFrontierControls(content);" in step41_root_ui and "ResetStep41State();" in step40_core, "RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state")
-require(all(value in release_presentation for value in ["STEP 41 CLOSED POSITIVE 4/4", "Physical 0.0.173 closed Step 41 at 4/4", "Step41ImplementationMarker", "Step42ImplementationMarker"]), "active release presentation preserves physical Step-41 closure while Step 42 becomes active")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Physical 0.0.175 closed Step 42 at 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker"]), "active release presentation preserves physical Step-42 closure while Steps 43–47 become active")
 require(all(value in step41_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "GameStartupAsyncStateMachineMap", "FrozenNoInvocationConfinement"]), "Step 41 host regressions pin gate sequencing and stable ordinals")
 require("Physical 0.0.173 / Step 41 — CLOSED POSITIVE 4/4" in current_status and "GameStartup remained uninvoked" in current_status, "current status pins physical Step-41 no-invocation closure authority")
 
@@ -2340,7 +2345,7 @@ require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42.0 — CONTROLLED GAMESTARTUP INITPOOLS", "STEP 41 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "ExpectedDisplayVersion = \"0.0.175\"", "ExpectedBuildVersion = \"175\""]), "active release presentation pins physical Step-41 closure and Step-42 / 0.0.175 identity")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.176\"", "ExpectedBuildVersion = \"176\""]), "active release presentation pins physical Step-42 closure and Steps-43–47 / 0.0.176 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Step 42.0 boundary", "Step42-InitPools-StaticMap-<RunId>.txt", "never calls GameStartup", "Once Gate C is armed"]), "current status pins Step-42 one-shot InitPools boundary and report contract")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
@@ -2385,6 +2390,111 @@ if step42_manifest.is_file():
         digest, relative = line.split("  ",1); path=ROOT/relative
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
     require(not mismatches, "Step 42 active implementation/release/provenance files are hash-pinned", ", ".join(mismatches))
+
+
+# ---------------------------------------------------------------------------
+# Physical Step 42 closure and active Steps 43-47 sequential startup ladder
+# ---------------------------------------------------------------------------
+step42_physical_checkpoint = read("docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-CHECKPOINT.txt")
+step42_physical_map = read("docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-STATIC-MAP.txt")
+step42_physical_report = read("docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-REPORT.txt")
+step42_physical_last = read("docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-LAST-CHECKPOINT.txt")
+require(all(value in step42_physical_map for value in ["InitPools token: 0x06001BFA", "InitPools IL instructions: 3", "Transitive same-sts2 InitPools closure methods mapped: 22", "Classified startup/platform/native boundary references: 0", "Unresolved same-sts2 references: 0", "External Cecil resolution requests: 0"]), "physical Step-42 static map seals exact InitPools token/IL/22-method zero-boundary closure")
+require(all(value in step42_physical_checkpoint for value in ["App version: 0.0.175 (175)", "L_C_INVOKE_RETURNED", "L_C_PASS", "initializerDelta=0", "rejectedDelta=0", "nativeDelta=0", "RUN_STEP42_4OF4"]), "physical Step-42 checkpoint proves one exact InitPools return and zero runtime escape")
+require("STEP 42.0 CONTROLLED GAMESTARTUP INITPOOLS COMPLETE — 4/4" in step42_physical_report and "GameStartup itself, migrations/cloud/platform/Steam/main-menu/deferred/render restart remain future separately authorized boundaries" in step42_physical_report, "physical Step-42 final report closes 4/4 without crossing later startup boundaries")
+require("RUN_END" in step42_physical_last and "rendering was never restarted" in step42_physical_last, "physical Step-42 run ended normally with renderer still frozen")
+
+startup_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadder.cs")
+startup_gate = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderGate.cs")
+startup_result = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderGateResult.cs")
+startup_sequence = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderGateSequence.cs")
+startup_summary = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderSummary.cs")
+startup_tests = read("tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2StartupLadderTests.cs")
+startup_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2StartupLadder.cs")
+require(all(text for text in [startup_core, startup_gate, startup_result, startup_sequence, startup_summary, startup_tests, startup_ui]), "Steps 43-47 Core gate/result/sequence/summary/tests and iOS UI surfaces exist")
+require(all(value in startup_gate for value in ["PrerequisiteAuthority = 1", "StaticAuditOrBinding = 2", "ControlledAction = 3", "PostActionConfinement = 4"]), "startup-ladder gate ordinals retain exact four-gate diagnosability")
+require(all(value in startup_sequence for value in ["result.Step != _step", "result.StepName, _stepName", "var expected =", "cannot advance after a failed gate"]), "startup-ladder sequence binds every gate to one exact rung and stops after failure")
+require(all(value in startup_summary for value in ["Gates.Count == 4", "Gates.All(gate => gate.Passed)", "COMPLETE — 4/4"]), "startup-ladder summary closes only exact four-of-four rungs")
+require(all(value in startup_tests for value in ["GateOrdinalsAreStable", "GateSequenceRejectsOutOfOrderAdvance", "GateSequenceRejectsWrongStepOrName", "GateSequenceRejectsAdvanceAfterFailure", "STEP 46.0 LAUNCHMAINMENU ASYNC MAP COMPLETE — 4/4"]), "startup-ladder host regressions pin sequencing, identity, fail-stop behavior, and summary")
+require("AddTransformedRealStS2StartupLadderControls(content);" in root_ui_text, "RootViewController exposes the Steps 43-47 ladder after the closed Step-42 surface")
+require("ResetStartupLadderState();" in step42_core, "rerunning/resetting Step 42 invalidates all later ladder authority")
+require("Step 43 is now unlocked in this same process; do not retry Step 42." in step42_ui, "Step-42 success UI advances into the same-process ladder without permitting Step-42 retry")
+
+# Compile-surface regression after the 0.0.174 identifier failure.
+require(all(value in startup_core for value in ["Step35ExecutionLoadContext", "InitializerBearingRequests", "RejectedManagedRequests", "NativeLoadAttempts", "FormatExceptionDiagnostic(ex)"]), "startup ladder uses existing proven load-context counters and shared exception formatter")
+require(not any(value in startup_core for value in ["context.InitializerLoads", "context.RejectedLoads", "context.NativeLoads", "BuildFailureDiagnostic(ex)"]), "startup ladder contains none of the non-existent shorthand identifiers that broke 0.0.174")
+frontier_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontier.cs")
+require(all(value in frontier_core for value in ["private sealed record Step41ClosureMethod", "private sealed record Step41BoundaryObservation", "private sealed record Step41ClosureAudit"]), "startup ladder cross-partial Step41 closure types are declared in the same partial class")
+require(all(value in startup_core for value in ["Step41ClosureMethod", "Step41BoundaryObservation", "AuditStep41StartupClosure", "GetStep41DefinitionTypeName", "RequireAdmission()", "RequireStep42Prerequisite"]), "startup ladder cross-partial helper references resolve to established runtime surfaces")
+
+# Step 43: concrete Null platform, read-only.
+require(all(value in startup_core for value in ["RunStep43ClosedStep42Authority", "RunStep43NullPlatformStaticAudit", "RunStep43NullPlatformReadProbe", "RunStep43FrozenConfinement", "NullPlatformTypeFullName", "PlatformUtilInterfaceTypeFullName"]), "Step 43 implements four gates around exact Null-platform authority")
+require(all(value in startup_core for value in ["GetLocalPlayerId", "GetPlatformBranch", "GetThreeLetterLanguageCode", "GetRawLanguage", "GetSupportedWindowMode", "strategy.GetType() != nullStrategyType"]), "Step 43 probes only the exact read-only platform surface and requires concrete NullPlatformUtilStrategy")
+require("external Steamworks/native/FMOD/Spine/Sentry-external remain forbidden" in startup_core and "Steamworks.SteamUserStats" not in startup_core, "Step 43 keeps external Steam/native game boundaries closed")
+
+# Step 44: legacy guard is read-only and fail-stops before mutation.
+require(all(value in startup_core for value in ["RunStep44LegacyGuardStaticAudit", "RunStep44LegacyGuardProbe", "AccountScopeMigratorTypeFullName", "ProfileScopeMigratorTypeFullName", '"HasLegacyData"', "detected legacy save data and intentionally stopped before mutation"]), "Step 44 maps and invokes only read-only legacy-data guards and fail-stops if migration is needed")
+require(all(value in startup_core for value in ["MigrateTo*/ArchiveLegacyData are not invoked by Step 44", "mutationPerformed=NO", "mutationReachability", "read-only HasLegacyData closure unexpectedly reaches migration/archive mutation"]), "Step 44 explicitly rejects migration/archive reachability before the read-only probes")
+
+# Step 45: local save initialization uses an already-created singleton, never its lazy getter/ConstructDefault.
+require(all(value in startup_core for value in ["RunStep45SaveInitializationStaticAudit", "RunStep45ControlledSaveInitialization", "RunStep45FrozenSaveConfinement", 'SaveManagerInstanceBackingFieldName = "<Instance>k__BackingField"', "RequireExistingStartupLadderSaveManagerInstance", '"InitProfileId"', '"InitProgressData"', '"InitPrefsData"']), "Step 45 binds the existing SaveManager backing field and exact local initialization methods")
+require("ConstructDefault is intentionally not called by this rung" in startup_core and 'GetProperty("Instance"' not in startup_core, "Step 45 cannot trigger SaveManager.get_Instance/ConstructDefault while acquiring the singleton")
+require(all(value in startup_core for value in ["_step45InvocationStarted", "local save initialization is one-shot", "SettingsSave", "PrefsSave", "Progress"]), "Step 45 is one-shot and proves settings/prefs/progress authority after return")
+
+# Step 46: map the inner LaunchMainMenu async state machine completely before any launch.
+require(all(value in startup_core for value in ["RunStep46LaunchMainMenuStateMachineMap", "RunStep46LaunchMainMenuClosureAudit", "RunStep46FrozenNoInvocationConfinement", "AsyncStateMachineAttribute", "IteratorStateMachineAttribute", "AsyncIteratorStateMachineAttribute", "StateMachineExpansions", "pendingRoots", "MoveNext", "AuditStep41StartupClosure", "MarkStep46StaticMapDurablyWritten", "_step46StaticMapDurablyWritten"]), "Step 46 maps exact LaunchMainMenu plus recursively expanded nested compiler state machines and requires a durable map")
+require(all(value in startup_core for value in ["ONE_TIME_INITIALIZATION", "INITIALIZE_PLATFORM", "LAUNCH_MAIN_MENU", "LOAD_DEFERRED_STARTUP_ASSETS", "STEAM", "FMOD", "SPINE", "SENTRY_EXTERNAL", "NATIVE_EXTENSION", "SENTRY_INERT_WRAPPER", "SteamInitializer::get_Initialized()"]), "Step 46 classifier distinguishes forbidden startup edges from explicitly admitted inert/read-only edges")
+require("LaunchMainMenu invoked=NO" in startup_core and "Rendering restarted: NO" in startup_core, "Step 46 remains non-invoking and frozen")
+step46_ui_start = startup_ui.find("private async Task RunStep46StartupLadderAsync()")
+step46_ui_end = startup_ui.find("private async Task RunStep47StartupLadderAsync()", step46_ui_start)
+step46_ui_method = startup_ui[step46_ui_start:step46_ui_end] if step46_ui_start >= 0 and step46_ui_end > step46_ui_start else ""
+require(step46_ui_method.find("RunStep46LaunchMainMenuClosureAudit") < step46_ui_method.find("WriteStartupLadderStaticMap(step") < step46_ui_method.find("MarkStep46StaticMapDurablyWritten") < step46_ui_method.find("RunStep46FrozenNoInvocationConfinement") and all(step46_ui_method.find(value) >= 0 for value in ["RunStep46LaunchMainMenuClosureAudit", "WriteStartupLadderStaticMap(step", "MarkStep46StaticMapDurablyWritten", "RunStep46FrozenNoInvocationConfinement"]), "Step 46 UI writes and marks the complete map durable before Gate D/Step 47")
+
+# Step 47: one-shot conditional live launch, failure refreeze, success observation.
+require(all(value in startup_core for value in ["RunStep47ClosedStep46Authority", "RunStep47ExactRuntimeBinding", "RunStep47ControlledLaunchMainMenuInvocationAsync", "RunStep47LivePostLaunchConfinement", "new object?[] { true }", "await launchTask;", "will not abandon an un-cancelable LaunchMainMenu Task", "RootSceneContainer", "childrenAfter <= _step47RootSceneChildrenBefore"]) and "Task.WhenAny(launchTask" not in startup_core and "Step47LaunchTimeout" not in startup_core, "Step 47 binds exact LaunchMainMenu token, invokes skipIntro=true once without abandoning an uncancelable Task, and requires a new root-scene child")
+require(all(value in startup_core for value in ["_step47InvocationStarted", "one-shot and cannot be retried in-process", "_step46LaunchAdmissible", "_step46StaticMapDurablyWritten"]), "Step 47 cannot run/retry without exact durable Step-46 authority")
+require(startup_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and startup_ui.count("GodotStep15NativeBridge.StopRendering()") == 1, "Step 47 UI has exactly one static StartRendering and one failure-refreeze StopRendering call site")
+require(all(value in startup_ui for value in ["_step47InvocationUiStarted", "RefreezeStep47AfterFailure", "Step 47 failed/was incomplete; launcher refroze rendering", "Step 47 succeeded; rendering intentionally remains active", "RUN_STEP47_4OF4"]), "Step 47 UI is one-shot, refreezes normal failures, and leaves rendering active only on 4/4 success")
+
+# No whole-GameStartup/cloud/platform-init/deferred/migration/native API is directly executed by the ladder.
+require(not any(call in startup_core for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".ExecuteDeferred(", ".LoadDeferredStartupAssets("]), "startup ladder Core does not directly invoke whole GameStartup, cloud sync, platform init, or deferred startup")
+require(not any(call in startup_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".ExecuteDeferred(", ".LoadDeferredStartupAssets("]), "startup ladder UI does not directly invoke whole GameStartup, cloud sync, platform init, or deferred startup")
+require(all(name in startup_ui for name in ["$\"Step{step}-CrashCheckpoint-{runId}.txt\"", "$\"Step{step}-LastCheckpoint.txt\"", "Step43-Platform-StaticMap", "Step43-TransformedRealStS2NullPlatformAuthority.txt", "Step44-LegacyGuard-StaticMap", "Step44-TransformedRealStS2LegacyMigrationGuard.txt", "Step45-LocalSave-StaticMap", "Step45-TransformedRealStS2LocalSaveInitialization.txt", "Step46-LaunchMainMenu-StaticMap", "Step46-TransformedRealStS2LaunchMainMenuMap.txt", "Step47-TransformedRealStS2ControlledLaunchMainMenu.txt"]), "each ladder rung has distinct run-correlated evidence/report surfaces")
+require(all(value in current_status for value in ["Step43-CrashCheckpoint-<RunId>.txt", "Step44-CrashCheckpoint-<RunId>.txt", "Step45-CrashCheckpoint-<RunId>.txt", "Step46-CrashCheckpoint-<RunId>.txt", "Step47-CrashCheckpoint-<RunId>.txt", "Stop immediately on the first failure"]), "current status documents independent rung reports and stop-on-first-failure policy")
+require((ROOT / "docs/history/steps/STEP-43-47-SEQUENTIAL-STARTUP-LADDER.md").is_file(), "Steps 43-47 ladder design/provenance record is present")
+
+startup_manifest = ROOT / "tools/validation/candidate-steps43-47-sequential-startup-ladder.sha256"
+require(startup_manifest.is_file(), "Steps 43-47 active candidate hash manifest exists")
+if startup_manifest.is_file():
+    startup_manifest_text = startup_manifest.read_text()
+    required_startup_manifest_paths = [
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadder.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderGate.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderGateResult.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderGateSequence.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadderSummary.cs",
+        "tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2StartupLadderTests.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2StartupLadder.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2GameStartupInitPools.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupInitPools.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontier.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.cs", "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs",
+        "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj", "src/StS2Launcher.iOS/Info.plist",
+        "scripts/lib/current-release.sh", "scripts/build-ios.sh", "scripts/test.sh", "scripts/codemagic.sh", "scripts/verify-ipa.sh", "codemagic.yaml", "tools/validate_current.py",
+        "README.md", "docs/README.md", "docs/CURRENT-STATUS.md", "docs/MASTER-PLAN.md", "docs/TESTING.md", "docs/RELEASE-CHECKLIST.md",
+        "docs/history/INDEX.md", "docs/history/steps/STEP-43-47-SEQUENTIAL-STARTUP-LADDER.md",
+        "docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-CHECKPOINT.txt",
+        "docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-STATIC-MAP.txt",
+        "docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-LAST-CHECKPOINT.txt",
+        "docs/history/reports/STEP-42.0-PHYSICAL-0.0.175-REPORT.txt",
+    ]
+    require(all(f"  {relative}" in startup_manifest_text for relative in required_startup_manifest_paths), "Steps 43-47 candidate manifest pins implementation/tests/UI, release wiring/docs, design provenance, and physical Step-42 authority")
+    mismatches=[]
+    for line in startup_manifest.read_text().splitlines():
+        if not line.strip(): continue
+        digest, relative = line.split("  ",1); path=ROOT/relative
+        if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
+    require(not mismatches, "Steps 43-47 active implementation/release/provenance files are hash-pinned", ", ".join(mismatches))
 
 # ---------------------------------------------------------------------------
 # Source archive cleanliness/security

@@ -1,13 +1,9 @@
-# Documentation index — active Step 42.0 / 0.0.175
+# Documentation index — active Steps 43–47 / 0.0.176
 
-Physical Step 41 is closed 4/4. Active Step 42 keeps rendering frozen, audits exact `NGame.InitPools()` to a zero-boundary same-sts2 closure, writes the map before execution, invokes `InitPools()` exactly once, and proves post-invocation frozen state/native confinement. See `CURRENT-STATUS.md`.
+Physical Step 42 / 0.0.175 is closed positive 4/4: exact `NGame.InitPools()` returned once from a 22-method zero-boundary closure with frozen state/native confinement.
 
-Active candidate: **0.0.175 (175)** — controlled GameStartup `NGame.InitPools()` boundary.
+Active candidate: **0.0.176 (176)** — sequential startup ladder. After the normal fresh-process sequence through Step 42 4/4, run Steps 43 → 44 → 45 → 46 → 47 in order and stop on the first failure. Step 43 proves the concrete Null platform strategy, Step 44 checks legacy migration need without mutation, Step 45 initializes local SaveManager profile/progress/prefs once, Step 46 maps `LaunchMainMenu(bool)`'s own async state machine and transitive closure without invocation, and Step 47 is a conditional one-shot live main-menu attempt only after an admissible durable Step-46 map.
 
-Physical **0.0.171 / Step 40** is now closed positive 4/4: a successful run completed the real render pulse at 103.3 ms, refroze rendering, retained the real NGame authority/state, and produced zero initializer/rejected/native deltas.
-
-Physical Step 41.0 keeps the Step-39.1 compatibility image and inert `GameStartupWrapper` unchanged and is closed 4/4. Active Step 42.0 reuses that authority to audit and invoke only exact `NGame.InitPools()` once while rendering remains frozen.
-
-Still closed: GameStartup execution as a whole, migrations/cloud sync, InitializePlatform/platform identity, Steam/native Steam, main-menu launch, ExecuteDeferred, native game GDExtensions, gameplay startup, explicit `_ExitTree`, RemoveChild/Free.
+Each rung has separate run-correlated reports. Steps 43–46 keep rendering frozen. Step 47 refreezes on normal failure and leaves rendering active only after 4/4 success.
 
 Authoritative status: `CURRENT-STATUS.md`.

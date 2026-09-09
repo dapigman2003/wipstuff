@@ -441,3 +441,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-42.0-CODEMAGIC-BUILD-ENVIRONMENT-0.0.174.txt` — pinned Codemagic/Xcode environment for the failed compile.
 - `reports/STEP-42.0-CODEMAGIC-CACHE-STATE-0.0.174.txt` — cache state for the failed compile.
 - `steps/STEP-42.0.1-CODEMAGIC-COMPILE-CORRECTION.md` — 0.0.175 compile-only identifier correction; Step-42 runtime semantics unchanged.
+
+## Step 42.0 physical closure / Steps 43–47 startup ladder
+
+- `reports/STEP-42.0-PHYSICAL-0.0.175-REPORT.txt` — authoritative physical 0.0.175 final report: exact audited `NGame.InitPools()` COMPLETE 4/4.
+- `reports/STEP-42.0-PHYSICAL-0.0.175-CHECKPOINT.txt` — run-correlated proof that the 22-method zero-boundary closure was mapped, `InitPools()` returned once, and all resolver/initializer/rejected/native deltas stayed zero with rendering frozen.
+- `reports/STEP-42.0-PHYSICAL-0.0.175-STATIC-MAP.txt` — exact `InitPools` token `0x06001BFA`, 3 direct IL instructions, and 22-method transitive same-sts2 zero-boundary closure.
+- `reports/STEP-42.0-PHYSICAL-0.0.175-LAST-CHECKPOINT.txt` — normal Step-42 run end with rendering never restarted.
+- `steps/STEP-43-47-SEQUENTIAL-STARTUP-LADDER.md` — 0.0.176 multi-rung packaging strategy and exact Step 43–47 safety boundaries.

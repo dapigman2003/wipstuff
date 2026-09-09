@@ -25,7 +25,7 @@ cache_path_line() {
   fi
 }
 {
-  echo "StS2 Launcher — Codemagic cache state before Step 40 build"
+  echo "StS2 Launcher — Codemagic cache state before Steps 43–47 startup-ladder build"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   cache_path_line "Home NuGet" "$HOME/.nuget/packages"
   cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
@@ -46,7 +46,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 42.0 controlled GameStartup InitPools build environment"
+  echo "StS2 Launcher — Steps 43–47 sequential startup ladder build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -125,7 +125,7 @@ IPA_VERIFY_SECONDS="$(elapsed_seconds "$IPA_VERIFY_START_EPOCH")"
 TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
 
 {
-  echo "StS2 Launcher iOS — Step 39.0 real SceneTree admission"
+  echo "StS2 Launcher iOS — Steps 43–47 sequential startup ladder"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
