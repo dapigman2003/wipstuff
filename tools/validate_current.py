@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>174</ApplicationVersion>" in project_text, "build version is 174")
-require("<ApplicationDisplayVersion>0.0.174</ApplicationDisplayVersion>" in project_text, "display version is 0.0.174")
-require(plist.get("CFBundleVersion") == "174", "Info.plist build version is 174")
-require(plist.get("CFBundleShortVersionString") == "0.0.174", "Info.plist display version is 0.0.174")
+require("<ApplicationVersion>175</ApplicationVersion>" in project_text, "build version is 175")
+require("<ApplicationDisplayVersion>0.0.175</ApplicationDisplayVersion>" in project_text, "display version is 0.0.175")
+require(plist.get("CFBundleVersion") == "175", "Info.plist build version is 175")
+require(plist.get("CFBundleShortVersionString") == "0.0.175", "Info.plist display version is 0.0.175")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -200,11 +200,11 @@ require(release_presentation_path.is_file(), "current release presentation has o
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
 require("STEP 42.0 — CONTROLLED GAMESTARTUP INITPOOLS" in release_presentation, "top launcher banner identifies the active Step 42.0 controlled InitPools boundary")
 require("Physical 0.0.173 closed Step 41 at 4/4" in release_presentation and "Step 42.0 isolates exact NGame.InitPools()" in release_presentation, "top launcher presentation records physical Step-41 closure and the controlled Step-42 InitPools boundary")
-require("Active candidate: **0.0.174 (174)**" in read("README.md") and "Active candidate: **0.0.174 (174)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.174 (174) release identity")
-require("active candidate is **0.0.174 / Step 42.0**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.174 / Step 42.0 frontier")
+require("Active candidate: **0.0.175 (175)**" in read("README.md") and "Active candidate: **0.0.175 (175)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.175 (175) release identity")
+require("active candidate is **0.0.175 / Step 42.0**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.175 / Step 42.0 frontier")
 require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "STEP 39 CLOSED POSITIVE 4/4", "STEP 40 CLOSED POSITIVE 4/4", "STEP 41 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "GameStartup", "InitPools", "Steam"]), "top launcher banner records closed Step-37 through Step-41 authority and the controlled Step-42 InitPools boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.174"' in release_presentation and 'ExpectedBuildVersion = "174"' in release_presentation, "Step 42.0 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.175"' in release_presentation and 'ExpectedBuildVersion = "175"' in release_presentation, "Step 42.0 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -345,8 +345,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-42.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.174",
-    "STS2_BUILD_VERSION": "174",
+    "STS2_DISPLAY_VERSION": "0.0.175",
+    "STS2_BUILD_VERSION": "175",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1677,10 +1677,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 42.0 / 0.0.174 (174)", "Physical 0.0.173 / Step 41 — CLOSED POSITIVE 4/4", "Step 42.0 boundary", "NGame.InitPools()", "never calls GameStartup", "Skip Step 38"]), "current status records physical Step-41 closure and the active Step-42 controlled InitPools frontier")
+require(all(marker in current_status for marker in ["Active candidate — Step 42.0 / 0.0.175 (175)", "Physical 0.0.173 / Step 41 — CLOSED POSITIVE 4/4", "Step 42.0 boundary", "NGame.InitPools()", "never calls GameStartup", "Skip Step 38"]), "current status records physical Step-41 closure and the active Step-42 controlled InitPools frontier")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.174 (174)" in testing_doc and "0.0.174 (174)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.174 (174) release identity")
+require("0.0.175 (175)" in testing_doc and "0.0.175 (175)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.175 (175) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -2334,14 +2334,20 @@ require(all(value in step42_gate for value in ["ClosedStep41FrozenAuthority = 1"
 require("STEP 42.0 CONTROLLED GAMESTARTUP INITPOOLS COMPLETE — 4/4" in step42_summary and "Gates.Count == 4" in step42_summary, "Step 42 summary requires exact four-of-four closure")
 require(all(value in step42_core for value in ["Step42InitPoolsMethodName = \"InitPools\"", "AuditStep41StartupClosure", "BuildStep42DirectMethodMap", "BuildStep42StaticMap", "ReadingMode = ReadingMode.Deferred", "RejectingAssemblyResolver", "method.Invoke(instance, null)", "TargetInvocationException"]), "Step 42 audits exact InitPools with deferred rejecting-resolver Cecil and invokes the exact reflected method once")
 require(all(value in step42_core for value in ["Classified boundary refs: 0", "Unresolved same-sts2 refs: 0", "External Cecil resolution: 0", "Invocation: NO", "resolverDelta=0", "initializerDelta=0", "nativeDelta=0"]), "Step 42 fail-closed audit and execution confinement require zero classified/unresolved/external and zero runtime escape deltas")
+require(all(value in step42_core for value in ["InitializerBearingRequests", "RejectedManagedRequests", "NativeLoadAttempts", "FormatExceptionDiagnostic(ex)"]), "Step 42 compile correction uses the actual Step35ExecutionLoadContext counters and shared exception formatter")
+require(not any(value in step42_core for value in ["context.InitializerLoads", "context.RejectedLoads", "context.NativeLoads", "BuildFailureDiagnostic(ex)"]), "Step 42 compile correction removes all non-existent shorthand load-context/diagnostic identifiers")
 require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "MigrateToUserScopedDirectories(", "MigrateToProfileScopedDirectories("]), "Step 42 Core does not directly invoke GameStartup, cloud, platform, main-menu, deferred, or migration work")
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42.0 — CONTROLLED GAMESTARTUP INITPOOLS", "STEP 41 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "ExpectedDisplayVersion = \"0.0.174\"", "ExpectedBuildVersion = \"174\""]), "active release presentation pins physical Step-41 closure and Step-42 / 0.0.174 identity")
+require(all(value in release_presentation for value in ["STEP 42.0 — CONTROLLED GAMESTARTUP INITPOOLS", "STEP 41 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "ExpectedDisplayVersion = \"0.0.175\"", "ExpectedBuildVersion = \"175\""]), "active release presentation pins physical Step-41 closure and Step-42 / 0.0.175 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Step 42.0 boundary", "Step42-InitPools-StaticMap-<RunId>.txt", "never calls GameStartup", "Once Gate C is armed"]), "current status pins Step-42 one-shot InitPools boundary and report contract")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
+require((ROOT / "docs/history/steps/STEP-42.0.1-CODEMAGIC-COMPILE-CORRECTION.md").is_file(), "Step 42 compile-correction design/provenance record is present")
+step42_compile_failure = read("docs/history/reports/STEP-42.0-CODEMAGIC-HOST-COMPILE-FAILURE-0.0.174.txt")
+require(all(value in step42_compile_failure for value in ["error CS1061", "InitializerLoads", "RejectedLoads", "NativeLoads", "error CS0103", "BuildFailureDiagnostic"]), "0.0.174 Codemagic report seals the exact Step-42 compile-only failure surface")
+require(all((ROOT / path).is_file() for path in ["docs/history/reports/STEP-42.0-CODEMAGIC-STATIC-VALIDATION-0.0.174.txt", "docs/history/reports/STEP-42.0-CODEMAGIC-BUILD-ENVIRONMENT-0.0.174.txt", "docs/history/reports/STEP-42.0-CODEMAGIC-CACHE-STATE-0.0.174.txt"]), "0.0.174 Codemagic static/environment/cache provenance is sealed")
 
 step42_manifest = ROOT / "tools/validation/candidate-step42-controlled-gamestartup-initpools.sha256"
 require(step42_manifest.is_file(), "Step 42 active candidate hash manifest exists")
@@ -2362,6 +2368,11 @@ if step42_manifest.is_file():
         "scripts/lib/current-release.sh", "scripts/test.sh", "scripts/codemagic.sh", "scripts/verify-ipa.sh", "codemagic.yaml", "tools/validate_current.py",
         "README.md", "docs/README.md", "docs/CURRENT-STATUS.md", "docs/MASTER-PLAN.md", "docs/TESTING.md", "docs/RELEASE-CHECKLIST.md",
         "docs/history/INDEX.md", "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md",
+        "docs/history/steps/STEP-42.0.1-CODEMAGIC-COMPILE-CORRECTION.md",
+        "docs/history/reports/STEP-42.0-CODEMAGIC-HOST-COMPILE-FAILURE-0.0.174.txt",
+        "docs/history/reports/STEP-42.0-CODEMAGIC-STATIC-VALIDATION-0.0.174.txt",
+        "docs/history/reports/STEP-42.0-CODEMAGIC-BUILD-ENVIRONMENT-0.0.174.txt",
+        "docs/history/reports/STEP-42.0-CODEMAGIC-CACHE-STATE-0.0.174.txt",
         "docs/history/reports/STEP-41.0-PHYSICAL-0.0.173-CHECKPOINT.txt",
         "docs/history/reports/STEP-41.0-PHYSICAL-0.0.173-STATIC-MAP.txt",
         "docs/history/reports/STEP-41.0-PHYSICAL-0.0.173-LAST-CHECKPOINT.txt",

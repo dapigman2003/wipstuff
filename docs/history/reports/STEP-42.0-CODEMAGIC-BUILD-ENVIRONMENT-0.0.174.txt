@@ -1,0 +1,10 @@
+StS2 Launcher — Step 42.0 controlled GameStartup InitPools build environment
+Wed Sep  9 07:36:59 UTC 2026
+Darwin builders-Virtual-Machine.local 25.5.0 Darwin Kernel Version 25.5.0: Mon Apr 27 20:39:32 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_VMAPPLE arm64
+Xcode 26.5
+Build version 17F42
+26.5
+ProductName:		macOS
+ProductVersion:		26.5
+BuildVersion:		25F71
+Python 3.12.7

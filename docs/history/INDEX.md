@@ -433,3 +433,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-41.0-PHYSICAL-0.0.173-STATIC-MAP.txt` — full GameStartup + MoveNext IL, state-machine fields, closure and path-qualified boundary authority.
 - `reports/STEP-41.0-PHYSICAL-0.0.173-LAST-CHECKPOINT.txt` — normal run end with GameStartup uninvoked and rendering not restarted.
 - `steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md` — 0.0.174 one-shot exact `NGame.InitPools()` audit/invocation design while rendering remains frozen and GameStartup itself remains unopened.
+
+## Step 42.0 Codemagic compile correction
+
+- `reports/STEP-42.0-CODEMAGIC-HOST-COMPILE-FAILURE-0.0.174.txt` — authoritative 0.0.174 Core compile failure; no device runtime conclusion.
+- `reports/STEP-42.0-CODEMAGIC-STATIC-VALIDATION-0.0.174.txt` — 0.0.174 lexical validator passed despite the compiler-detected identifier errors.
+- `reports/STEP-42.0-CODEMAGIC-BUILD-ENVIRONMENT-0.0.174.txt` — pinned Codemagic/Xcode environment for the failed compile.
+- `reports/STEP-42.0-CODEMAGIC-CACHE-STATE-0.0.174.txt` — cache state for the failed compile.
+- `steps/STEP-42.0.1-CODEMAGIC-COMPILE-CORRECTION.md` — 0.0.175 compile-only identifier correction; Step-42 runtime semantics unchanged.

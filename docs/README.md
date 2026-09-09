@@ -1,8 +1,8 @@
-# Documentation index — active Step 42.0 / 0.0.174
+# Documentation index — active Step 42.0 / 0.0.175
 
 Physical Step 41 is closed 4/4. Active Step 42 keeps rendering frozen, audits exact `NGame.InitPools()` to a zero-boundary same-sts2 closure, writes the map before execution, invokes `InitPools()` exactly once, and proves post-invocation frozen state/native confinement. See `CURRENT-STATUS.md`.
 
-Active candidate: **0.0.174 (174)** — controlled GameStartup `NGame.InitPools()` boundary.
+Active candidate: **0.0.175 (175)** — controlled GameStartup `NGame.InitPools()` boundary.
 
 Physical **0.0.171 / Step 40** is now closed positive 4/4: a successful run completed the real render pulse at 103.3 ms, refroze rendering, retained the real NGame authority/state, and produced zero initializer/rejected/native deltas.
 

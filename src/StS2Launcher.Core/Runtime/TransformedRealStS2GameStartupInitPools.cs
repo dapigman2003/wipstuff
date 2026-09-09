@@ -87,9 +87,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 context.ManagedResolverRequests.Count,
                 context.HostLoads.Count,
                 context.PrivateLoads.Count,
-                context.InitializerLoads.Count,
-                context.RejectedLoads.Count,
-                context.NativeLoads.Count);
+                context.InitializerBearingRequests.Count,
+                context.RejectedManagedRequests.Count,
+                context.NativeLoadAttempts.Count);
 
             Checkpoint(checkpoint, $"L_A_PASS — Step-41 4/4 retained in same process; renderingStopped=True; NGame authority/state={state}; selectedSha256={selectedSha256}; GameStartupWrapper inert; Step41 mappedClosureMethods={_step41Preflight.ClosureMethodCount}; mappedBoundaryRefs={_step41Preflight.Boundaries.Length}; resolver/native deltas=0; InitPools invoked=NO.");
             return Step42Pass(gate,
@@ -207,9 +207,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var resolverBefore = context.ManagedResolverRequests.Count;
             var hostBefore = context.HostLoads.Count;
             var privateBefore = context.PrivateLoads.Count;
-            var initializerBefore = context.InitializerLoads.Count;
-            var rejectedBefore = context.RejectedLoads.Count;
-            var nativeBefore = context.NativeLoads.Count;
+            var initializerBefore = context.InitializerBearingRequests.Count;
+            var rejectedBefore = context.RejectedManagedRequests.Count;
+            var nativeBefore = context.NativeLoadAttempts.Count;
 
             _step42InvocationStarted = true;
             Checkpoint(checkpoint, $"L_C_INVOKE_START — invoking exact audited NGame.InitPools() once on the retained real in-tree NGame; token=0x{preflight.InitPoolsToken:X8}; renderingStopped=True; stateBefore={stateBefore}. No GameStartup/migrations/cloud/platform/Steam/main-menu/deferred call is authorized.");
@@ -228,9 +228,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var resolverDelta = context.ManagedResolverRequests.Count - resolverBefore;
             var hostDelta = context.HostLoads.Count - hostBefore;
             var privateDelta = context.PrivateLoads.Count - privateBefore;
-            var initializerDelta = context.InitializerLoads.Count - initializerBefore;
-            var rejectedDelta = context.RejectedLoads.Count - rejectedBefore;
-            var nativeDelta = context.NativeLoads.Count - nativeBefore;
+            var initializerDelta = context.InitializerBearingRequests.Count - initializerBefore;
+            var rejectedDelta = context.RejectedManagedRequests.Count - rejectedBefore;
+            var nativeDelta = context.NativeLoadAttempts.Count - nativeBefore;
             if (resolverDelta != 0 || hostDelta != 0 || privateDelta != 0 || initializerDelta != 0 || rejectedDelta != 0 || nativeDelta != 0)
                 throw new InvalidDataException($"Step 42.0 InitPools escaped the sealed execution context. resolverDelta={resolverDelta}; hostDelta={hostDelta}; privateDelta={privateDelta}; initializerDelta={initializerDelta}; rejectedDelta={rejectedDelta}; nativeDelta={nativeDelta}.");
             if (stateAfter != ExpectedStateAfterEssential)
@@ -292,11 +292,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (context.ManagedResolverRequests.Count != preflight.ResolverCount ||
                 context.HostLoads.Count != preflight.HostCount ||
                 context.PrivateLoads.Count != preflight.PrivateCount ||
-                context.InitializerLoads.Count != preflight.InitializerCount ||
-                context.RejectedLoads.Count != preflight.RejectedCount ||
-                context.NativeLoads.Count != preflight.NativeCount)
+                context.InitializerBearingRequests.Count != preflight.InitializerCount ||
+                context.RejectedManagedRequests.Count != preflight.RejectedCount ||
+                context.NativeLoadAttempts.Count != preflight.NativeCount)
             {
-                throw new InvalidDataException($"Step 42.0 post-InitPools context drifted from Gate-A baseline. resolver={context.ManagedResolverRequests.Count - preflight.ResolverCount}; host={context.HostLoads.Count - preflight.HostCount}; private={context.PrivateLoads.Count - preflight.PrivateCount}; initializer={context.InitializerLoads.Count - preflight.InitializerCount}; rejected={context.RejectedLoads.Count - preflight.RejectedCount}; native={context.NativeLoads.Count - preflight.NativeCount}.");
+                throw new InvalidDataException($"Step 42.0 post-InitPools context drifted from Gate-A baseline. resolver={context.ManagedResolverRequests.Count - preflight.ResolverCount}; host={context.HostLoads.Count - preflight.HostCount}; private={context.PrivateLoads.Count - preflight.PrivateCount}; initializer={context.InitializerBearingRequests.Count - preflight.InitializerCount}; rejected={context.RejectedManagedRequests.Count - preflight.RejectedCount}; native={context.NativeLoadAttempts.Count - preflight.NativeCount}.");
             }
 
             _exactStep42ClosurePassed = true;
@@ -378,7 +378,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         Exception ex,
         bool includeDiagnostic)
         => new(gate, false, includeDiagnostic
-            ? $"Stage: {stage}\n{BuildFailureDiagnostic(ex)}"
+            ? $"Stage: {stage}\n{FormatExceptionDiagnostic(ex)}"
             : $"Stage: {stage}\n{ex.GetType().Name}: {ex.Message}");
 
     private sealed record Step42PreflightSnapshot(

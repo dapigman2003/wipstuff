@@ -1,6 +1,8 @@
 # Current status
 
-## Active candidate — Step 42.0 / 0.0.174 (174)
+## Active candidate — Step 42.0 / 0.0.175 (175)
+
+**Codemagic 0.0.174 compile failure — NO RUNTIME CONCLUSION.** Host compilation failed in `TransformedRealStS2GameStartupInitPools.cs` because the new Step-42 code referenced non-existent `Step35ExecutionLoadContext` members `InitializerLoads`, `RejectedLoads`, and `NativeLoads`, plus a non-existent `BuildFailureDiagnostic` helper. 0.0.175 is a compile-only correction: those references are replaced with the existing proven members `InitializerBearingRequests`, `RejectedManagedRequests`, `NativeLoadAttempts`, and `FormatExceptionDiagnostic`. Gate semantics, exact `InitPools()` audit/invocation, one-shot behavior, frozen rendering, and all forbidden boundaries are unchanged. 0.0.174 produced no device evidence and must not be treated as a Step-42 runtime result.
 
 **Physical 0.0.173 / Step 41 — CLOSED POSITIVE 4/4.** Exact `NGame.GameStartup()` token `0x06001BD1` and compiler state-machine `<GameStartup>d__117::MoveNext()` token `0x06001C31` were mapped without invocation. The device map recorded 691 transitive same-sts2 startup methods and 46 classified boundary references: `LAUNCH_MAIN_MENU=1`, `ONE_TIME_INITIALIZATION=2`, `PLATFORM=36`, `SENTRY_INERT_WRAPPER=5`, `STEAM=2`; unresolved same-sts2 references and external Cecil resolution were both zero. Gate D preserved frozen real-NGame/state-2 authority with zero resolver/host/private/initializer/rejected/native deltas. GameStartup remained uninvoked and rendering remained stopped.
 
@@ -16,7 +18,7 @@ Gate C is the first and only newly executed startup primitive. It binds exact `I
 
 Gate D keeps rendering frozen and proves retained NGame singleton/parent/`_window`/state authority, exact compatibility bytes, inert `GameStartupWrapper`, and unchanged resolver/host/private/initializer/rejected/native counters. Step 42 never calls GameStartup itself.
 
-## Physical sequence for 0.0.174
+## Physical sequence for 0.0.175
 
 1. Fresh process → Step 15 A-C.
 2. Step 35.0.32 MODEL-BOOTSTRAP → require 4/4.

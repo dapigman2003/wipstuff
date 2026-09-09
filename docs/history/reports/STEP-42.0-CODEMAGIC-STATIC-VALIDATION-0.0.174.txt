@@ -1,5 +1,5 @@
 StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-09T07:54:17Z
+UTC: 2026-09-09T07:37:02Z
 Checking active shell syntax...
 PASS: shell syntax — scripts/build-godot.sh
 PASS: shell syntax — scripts/build-ios.sh
@@ -11,20 +11,20 @@ PASS: shell syntax — scripts/validate.sh
 PASS: shell syntax — scripts/verify-ipa.sh
 PASS: Python validator compiles
 StS2 Launcher — Step 42.0 controlled GameStartup InitPools validation
-Root: /mnt/data/work175/StS2Launcher-Step42-0.0.175
-PASS: all 9 project/props/targets XML files parse
+Root: /Users/builder/clone
+PASS: all 23 project/props/targets XML files parse
 PASS: global.json parses
-PASS: lexical delimiter scan passes for 287 C# files
+PASS: lexical delimiter scan passes for 291 C# files
 PASS: canonical iOS project exists
 PASS: canonical iOS Info.plist exists
 PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 175
-PASS: display version is 0.0.175
-PASS: Info.plist build version is 175
-PASS: Info.plist display version is 0.0.175
+PASS: build version is 174
+PASS: display version is 0.0.174
+PASS: Info.plist build version is 174
+PASS: Info.plist display version is 0.0.174
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -34,8 +34,8 @@ PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
 PASS: top launcher banner identifies the active Step 42.0 controlled InitPools boundary
 PASS: top launcher presentation records physical Step-41 closure and the controlled Step-42 InitPools boundary
-PASS: root and docs READMEs pin the exact 0.0.175 (175) release identity
-PASS: master plan points to the active 0.0.175 / Step 42.0 frontier
+PASS: root and docs READMEs pin the exact 0.0.174 (174) release identity
+PASS: master plan points to the active 0.0.174 / Step 42.0 frontier
 PASS: top launcher banner records closed Step-37 through Step-41 authority and the controlled Step-42 InitPools boundary
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
 PASS: Step 42.0 source pins expected bundle release identity
@@ -896,7 +896,7 @@ PASS: raw physical 0.0.116 report preserves the Gate-B Cecil Constant-table reso
 PASS: regression contracts pin the Step-32.0.2 bounded serialization resolver correction
 PASS: raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary
 PASS: current status records physical Step-41 closure and the active Step-42 controlled InitPools frontier
-PASS: testing and release-checklist docs pin the exact 0.0.175 (175) release identity
+PASS: testing and release-checklist docs pin the exact 0.0.174 (174) release identity
 PASS: release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug
 PASS: master plan contains durable section: Product objective
 PASS: master plan contains durable section: Non-negotiable security and content boundaries
@@ -1137,23 +1137,18 @@ PASS: Step 42 gate ordinals pin Step41 authority, exact closure audit, one-shot 
 PASS: Step 42 summary requires exact four-of-four closure
 PASS: Step 42 audits exact InitPools with deferred rejecting-resolver Cecil and invokes the exact reflected method once
 PASS: Step 42 fail-closed audit and execution confinement require zero classified/unresolved/external and zero runtime escape deltas
-PASS: Step 42 compile correction uses the actual Step35ExecutionLoadContext counters and shared exception formatter
-PASS: Step 42 compile correction removes all non-existent shorthand load-context/diagnostic identifiers
 PASS: Step 42 Core does not directly invoke GameStartup, cloud, platform, main-menu, deferred, or migration work
 PASS: Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering
 PASS: Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports
 PASS: RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state
-PASS: active release presentation pins physical Step-41 closure and Step-42 / 0.0.175 identity
+PASS: active release presentation pins physical Step-41 closure and Step-42 / 0.0.174 identity
 PASS: Step 42 host regressions pin gate sequencing and stable ordinals
 PASS: current status pins Step-42 one-shot InitPools boundary and report contract
 PASS: Step 42 design/provenance record is present
-PASS: Step 42 compile-correction design/provenance record is present
-PASS: 0.0.174 Codemagic report seals the exact Step-42 compile-only failure surface
-PASS: 0.0.174 Codemagic static/environment/cache provenance is sealed
 PASS: Step 42 active candidate hash manifest exists
 PASS: Step 42 candidate manifest pins implementation/tests/UI, release wiring/docs, design provenance, and physical Step-41 closure
 PASS: Step 42 active implementation/release/provenance files are hash-pinned
 PASS: authoritative source tree contains no StS2/proprietary runtime payload
 PASS: authoritative source/docs contain no obvious embedded credential/signing secrets
 
-VALIDATION PASS: 1142 checks
+VALIDATION PASS: 1137 checks

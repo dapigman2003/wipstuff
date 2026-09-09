@@ -1,6 +1,6 @@
-## Current frontier — Step 42.0 / 0.0.174
+## Current frontier — Step 42.0 / 0.0.175
 
-The active candidate is **0.0.174 / Step 42.0**.
+The active candidate is **0.0.175 / Step 42.0**. 0.0.174 did not compile in Codemagic and therefore has no runtime authority; 0.0.175 changes only the exact load-context/diagnostic identifiers needed to compile the already-designed Step-42 boundary.
 
 Step 41 physically closed the non-invoking GameStartup async frontier at 4/4. Step 42 isolates the first newly executed startup primitive: exact `NGame.InitPools()`. It is audited independently before one-shot invocation while rendering remains frozen. Platform identity, migration, cloud sync, Steam, main-menu and deferred startup remain later gates.
 
