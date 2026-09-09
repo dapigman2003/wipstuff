@@ -1,0 +1,37 @@
+StS2 Launcher — Step 45.0 Local Save Initialization
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-09T18:32:44.0111790+00:00
+
+RESULT
+STEP 45.0 LOCAL SAVE INITIALIZATION FAIL — 2/4
+
+METADATA
+App version: 0.0.177 (177)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: controlled local SaveManager initialization
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 45 Gate C context drifted. resolver=1; host=1; private=0; initializer=0; rejected=0; native=0.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::Void RequireStartupLadderBaselineUnchanged(Step35ExecutionLoadContext, StartupLadderBaseline, System.String)
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireStartupLadderBaselineUnchanged(Step35ExecutionLoadContext context, StartupLadderBaseline baseline, String boundary)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep45ControlledSaveInitialization(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 45 Gate C context drifted. resolver=1; host=1; private=0; initializer=0; rejected=0; native=0.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::Void RequireStartupLadderBaselineUnchanged(Step35ExecutionLoadContext, StartupLadderBaseline, System.String)
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireStartupLadderBaselineUnchanged(Step35ExecutionLoadContext context, StartupLadderBaseline baseline, String boundary)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep45ControlledSaveInitialization(Action`1 checkpoint)
+
+END OF REPORT

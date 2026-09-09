@@ -1,0 +1,6 @@
+StS2 Launcher — Step 45 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179
+Journal: Step45-CrashCheckpoint-20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179.txt
+Static map: Step45-LocalSave-StaticMap-20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179.txt
+2026-09-09T18:32:44.0226740+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=4 | RUN_END — Step-45 UI operation ended normally; If the one-shot boundary was armed, never retry Step 45 in-process.

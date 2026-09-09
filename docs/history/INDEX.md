@@ -451,3 +451,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-43-47-SEQUENTIAL-STARTUP-LADDER.md` — 0.0.176 multi-rung packaging strategy and exact Step 43–47 safety boundaries.
 
 - `steps/STEP-45.0-0.0.176-SINGLETON-FIELD-CORRECTION.md` — physical 0.0.176 Step-45 Gate-B singleton-field failure and 0.0.177 exact `_mockInstance`/`_instance` correction.
+- `steps/STEP-45.0.1-PLANNED-HOST-BINDING-ACCOUNTING-CORRECTION.md` — physical 0.0.177 Step-45 Gate-C +1 resolver/+1 exact host-framework observation and 0.0.178 fail-closed host-binding accounting correction.
+- `reports/STEP-45.0-PHYSICAL-0.0.177-STATIC-MAP.txt` / `...-CHECKPOINT.txt` / `...-FAIL-REPORT.txt` / `...-LAST-CHECKPOINT.txt` — physical 0.0.177 authority: Gate B 331/6/0/0 clean, Gate C armed, only resolver=1/host=1 drift, private/initializer/rejected/native all zero, normal frozen teardown.

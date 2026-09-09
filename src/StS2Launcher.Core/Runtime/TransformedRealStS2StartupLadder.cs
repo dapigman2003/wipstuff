@@ -36,6 +36,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private StartupLadderBaseline? _step43Baseline;
     private StartupLadderBaseline? _step44Baseline;
     private StartupLadderBaseline? _step45Baseline;
+    private StartupLadderBaseline? _step45PostActionBaseline;
     private StartupLadderBaseline? _step46Baseline;
     private StartupLadderBaseline? _step47Baseline;
 
@@ -46,6 +47,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step43Observation = string.Empty;
     private string _step44Observation = string.Empty;
     private string _step45Observation = string.Empty;
+    private string _step45AcceptedHostBinding = string.Empty;
     private string _step47Observation = string.Empty;
 
     private bool _step43ActionPassed;
@@ -100,6 +102,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step43Baseline = null;
         _step44Baseline = null;
         _step45Baseline = null;
+        _step45PostActionBaseline = null;
         _step46Baseline = null;
         _step47Baseline = null;
         _step43StaticMap = string.Empty;
@@ -109,6 +112,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step43Observation = string.Empty;
         _step44Observation = string.Empty;
         _step45Observation = string.Empty;
+        _step45AcceptedHostBinding = string.Empty;
         _step47Observation = string.Empty;
         _step43ActionPassed = false;
         _step44NoLegacyDataPassed = false;
@@ -488,14 +492,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException("Step 45.0 local save initialization returned a null ReadSaveResult.");
 
             var stateAfter = RequireStep40InsertedAuthority();
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 45 Gate C");
+            var hostDelta = RequireStep45PlannedHostOnlyDelta(context, baseline, "Step 45 Gate C");
             if (stateAfter != stateBefore)
                 throw new InvalidDataException($"Step 45.0 local save initialization changed OneTimeInitialization state: {stateBefore} -> {stateAfter}.");
-            _step45Observation = "progress={" + DescribeStartupLadderReadSaveResult(progressResult) + "}; prefs={" + DescribeStartupLadderReadSaveResult(prefsResult) + "}";
+            _step45AcceptedHostBinding = hostDelta.HostEntry ?? "<none>";
+            _step45PostActionBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
+            _step45Observation = "progress={" + DescribeStartupLadderReadSaveResult(progressResult) + "}; prefs={" + DescribeStartupLadderReadSaveResult(prefsResult) + "}; plannedHostBinding={" + _step45AcceptedHostBinding + "}";
             _step45SaveInitPassed = true;
-            Checkpoint(checkpoint, "M45_C_PASS — local SaveManager sequence returned; " + _step45Observation + "; state=2; resolver/host/private/initializer/rejected/native deltas=0; rendering remains stopped.");
+            Checkpoint(checkpoint, $"M45_C_PASS — local SaveManager sequence returned; {_step45Observation}; state=2; resolverDelta={hostDelta.ResolverDelta}; hostDelta={hostDelta.HostDelta}; privateDelta=0; initializerDelta=0; rejectedDelta=0; nativeDelta=0; rendering remains stopped.");
             return StartupLadderPass(step, Step45Name, gate,
-                "Exact local SaveManager initialization returned once in original profile/progress/prefs order. " + _step45Observation + ". Context/native deltas remain zero.");
+                "Exact local SaveManager initialization returned once in original profile/progress/prefs order. " + _step45Observation + ". Only zero-or-one exact planned host-framework binding is admissible; private/initializer/rejected/native deltas remain zero.");
         }
         catch (Exception ex)
         {
@@ -514,6 +520,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep45Prerequisite("Step 45 Gate D entry");
             var baseline = _step45Baseline ?? throw new InvalidOperationException("Step 45.0 baseline is absent.");
+            var postActionBaseline = _step45PostActionBaseline ?? throw new InvalidOperationException("Step 45.0 post-action baseline is absent.");
             if (!_step45InvocationStarted || !_step45SaveInitPassed)
                 throw new InvalidOperationException("Step 45.0 Gate D requires the one-shot local save initialization to have returned successfully.");
             if (!renderingStopped)
@@ -527,11 +534,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var settings = RequireStartupLadderPropertyValue(instance, "SettingsSave", step);
             var prefs = RequireStartupLadderPropertyValue(instance, "PrefsSave", step);
             var progress = RequireStartupLadderPropertyValue(instance, "Progress", step);
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 45 Gate D");
+            RequireStep45PlannedHostOnlyDelta(context, baseline, "Step 45 Gate D cumulative");
+            RequireStartupLadderBaselineUnchanged(context, postActionBaseline, "Step 45 Gate D post-action");
             _exactStep45ClosurePassed = true;
-            Checkpoint(checkpoint, $"M45_D_PASS — renderingStopped=True; state={state}; SettingsSave={settings.GetType().FullName}; PrefsSave={prefs.GetType().FullName}; Progress={progress.GetType().FullName}; resolver/host/private/initializer/rejected/native deltas=0.");
+            Checkpoint(checkpoint, $"M45_D_PASS — renderingStopped=True; state={state}; SettingsSave={settings.GetType().FullName}; PrefsSave={prefs.GetType().FullName}; Progress={progress.GetType().FullName}; acceptedHostBinding={SanitizeCheckpoint(_step45AcceptedHostBinding)}; no further resolver/host/private/initializer/rejected/native drift after Gate C.");
             return StartupLadderPass(step, Step45Name, gate,
-                $"Frozen save confinement passed. SettingsSave={settings.GetType().Name}; PrefsSave={prefs.GetType().Name}; Progress={progress.GetType().Name}; NGame/state/context remain authoritative.");
+                $"Frozen save confinement passed. SettingsSave={settings.GetType().Name}; PrefsSave={prefs.GetType().Name}; Progress={progress.GetType().Name}; accepted planned host binding={_step45AcceptedHostBinding}; NGame/state/context remain authoritative with no post-action drift.");
         }
         catch (Exception ex)
         {
@@ -862,6 +870,40 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private static StartupLadderBaseline CaptureStartupLadderBaseline(string selectedPath, string selectedSha256, Step35ExecutionLoadContext context)
         => new(selectedPath, selectedSha256, context.ManagedResolverRequests.Count, context.HostLoads.Count, context.PrivateLoads.Count,
             context.InitializerBearingRequests.Count, context.RejectedManagedRequests.Count, context.NativeLoadAttempts.Count);
+
+    private static StartupLadderHostDelta RequireStep45PlannedHostOnlyDelta(Step35ExecutionLoadContext context, StartupLadderBaseline baseline, string boundary)
+    {
+        var resolverDelta = context.ManagedResolverRequests.Skip(baseline.ResolverCount).ToArray();
+        var hostDelta = context.HostLoads.Skip(baseline.HostCount).ToArray();
+        var privateDelta = context.PrivateLoads.Skip(baseline.PrivateCount).ToArray();
+        var initializerDelta = context.InitializerBearingRequests.Skip(baseline.InitializerCount).ToArray();
+        var rejectedDelta = context.RejectedManagedRequests.Skip(baseline.RejectedCount).ToArray();
+        var nativeDelta = context.NativeLoadAttempts.Skip(baseline.NativeCount).ToArray();
+
+        if (privateDelta.Length != 0 || initializerDelta.Length != 0 || rejectedDelta.Length != 0 || nativeDelta.Length != 0)
+            throw new InvalidDataException($"{boundary} crossed a forbidden resolver boundary. resolver={resolverDelta.Length}; host={hostDelta.Length}; private={privateDelta.Length}; initializer={initializerDelta.Length}; rejected={rejectedDelta.Length}; native={nativeDelta.Length}; hostEntries={FormatDelta(hostDelta)}.");
+        if (resolverDelta.Length != hostDelta.Length || hostDelta.Length > 1)
+            throw new InvalidDataException($"{boundary} permits only zero-or-one paired exact planned host-framework binding. resolver={resolverDelta.Length}; host={hostDelta.Length}; resolverEntries={FormatDelta(resolverDelta)}; hostEntries={FormatDelta(hostDelta)}.");
+        if (hostDelta.Length == 0)
+            return new StartupLadderHostDelta(0, 0, null);
+
+        const string separator = " => ";
+        var split = hostDelta[0].IndexOf(separator, StringComparison.Ordinal);
+        if (split <= 0 || split + separator.Length >= hostDelta[0].Length)
+            throw new InvalidDataException($"{boundary} host-load diagnostic shape drifted: {hostDelta[0]}");
+        var requested = hostDelta[0][..split];
+        if (!requested.Equals(resolverDelta[0], StringComparison.Ordinal))
+            throw new InvalidDataException($"{boundary} resolver/host request mismatch. resolver={resolverDelta[0]}; hostRequested={requested}.");
+        var requestedName = new AssemblyName(requested).Name
+            ?? throw new InvalidDataException($"{boundary} host request has no simple assembly name: {requested}");
+        if (!IsHostFrameworkContractName(requestedName))
+            throw new InvalidDataException($"{boundary} observed a non-framework host binding: {hostDelta[0]}");
+
+        // Step35ExecutionLoadContext records HostLoads only after exact persisted host-binding identity
+        // matching and exact planned actual-identity verification. Therefore this single entry is not
+        // an arbitrary fallback: it is an already fail-closed host-framework admission.
+        return new StartupLadderHostDelta(1, 1, hostDelta[0]);
+    }
 
     private static void RequireStartupLadderBaselineUnchanged(Step35ExecutionLoadContext context, StartupLadderBaseline baseline, string boundary)
     {
@@ -1311,6 +1353,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         string stage,
         Exception ex)
         => new(step, stepName, gate, false, $"Stage: {stage}\n{FormatExceptionDiagnostic(ex)}");
+
+    private sealed record StartupLadderHostDelta(
+        int ResolverDelta,
+        int HostDelta,
+        string? HostEntry);
 
     private sealed record StartupLadderBaseline(
         string SelectedPath,

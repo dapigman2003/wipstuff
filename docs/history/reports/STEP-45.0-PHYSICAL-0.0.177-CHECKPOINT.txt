@@ -1,0 +1,22 @@
+StS2 Launcher — Step 45.0 Local save initialization checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179
+Initialized UTC: 2026-09-09T18:32:43.8079420+00:00
+Process ID: 1364
+App version: 0.0.177 (177)
+Candidate: STEPS 43–47 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; LATER RUNGS REQUIRE SAME-PROCESS PRIOR 4/4 AUTHORITY.
+Global policy: Steps 43–46 keep rendering frozen. GameStartup itself, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, FMOD/Spine/native game extensions remain unopened unless a rung explicitly says otherwise. Step 47 alone may start rendering and invoke exact admissible LaunchMainMenu once.
+
+2026-09-09T18:32:43.8161780+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-09T18:32:43.8185090+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | RUN_START — Step 45.0 local SaveManager initialization started; cloud/migration/Steam/main-menu remain unopened.
+2026-09-09T18:32:43.8192290+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_A_ENTRY — requiring same-process Step-44 4/4 no-legacy-data authority, retained real NGame/state=2, frozen rendering, and unchanged selected compatibility/context authority.
+2026-09-09T18:32:43.8324390+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_A_PASS — prerequisite retained; renderingStopped=True; state=2; selectedSha256=89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a; resolver/host/private/initializer/rejected/native deltas=0.
+2026-09-09T18:32:43.8355030+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_B_ENTRY — mapping SaveManager.InitProfileId(null), InitProgressData(), and InitPrefsData() in original GameStartup order. Null-platform reads and already-inert SentryService wrappers are admissible; external Steamworks/native/FMOD/Spine/later-startup boundaries are not.
+2026-09-09T18:32:43.9706500+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_B_PASS — roots=3; closureMethods=331; classifiedBoundaryRefs=6; forbiddenBoundaryRefs=0; unresolvedSameSts2Refs=0; externalResolutionRequests=0; invocation=NO.
+2026-09-09T18:32:43.9779220+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_B_STATIC_MAP_WRITE_RETURNED — verified local-save map durably written before one-shot initialization.
+2026-09-09T18:32:43.9780990+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_C_UI_ARMED — Step-45 one-shot local SaveManager initialization armed; no in-process retry after this checkpoint.
+2026-09-09T18:32:43.9782560+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_C_ARMED — first and only Step-45 local save initialization authorized. Invoking InitProfileId(null) -> InitProgressData() -> InitPrefsData() exactly once; cloud/migration/Steam/main-menu work remains unopened.
+2026-09-09T18:32:44.0017090+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | M45_C_FAIL — stage=controlled local SaveManager initialization; System.IO.InvalidDataException: Step 45 Gate C context drifted. resolver=1; host=1; private=0; initializer=0; rejected=0; native=0.
+2026-09-09T18:32:44.0108860+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. If the one-shot boundary was armed, never retry Step 45 in-process.
+2026-09-09T18:32:44.0116790+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=4 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-09T18:32:44.0226740+00:00 | run=20260909T1832438079420Z-pid1364-83d63a55029b4b3aa7ea6c1247fe5179 | pid=1364 | managedThread=4 | RUN_END — Step-45 UI operation ended normally; If the one-shot boundary was armed, never retry Step 45 in-process.

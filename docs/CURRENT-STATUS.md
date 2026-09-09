@@ -1,17 +1,19 @@
 # Current status
 
-## Active candidate — Steps 43–47 startup ladder / 0.0.177 (177)
+## Active candidate — Steps 43–47 startup ladder / 0.0.178 (178)
 
 **Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4.** Exact `NGame.InitPools()` token `0x06001BFA` mapped to 3 direct IL instructions and a 22-method transitive same-sts2 closure with zero classified startup/platform/native boundaries, zero unresolved same-sts2 references, and zero external Cecil resolution. Exact `InitPools()` was invoked once and returned on the retained real in-tree `NGame`; OneTimeInitialization stayed at state 2, rendering stayed frozen, and resolver/host/private/initializer/rejected/native deltas all remained zero. This physically closes the first isolated real GameStartup primitive.
 
 **Physical 0.0.176 / Steps 43–45 — Step 45 Gate-B safe stop.** The Step-45 checkpoint proves same-process Step-44 4/4/no-legacy-data authority was retained: Gate A passed with rendering stopped, NGame state 2, selected compatibility SHA unchanged, and zero resolver/host/private/initializer/rejected/native deltas. Gate B then failed before any mutation with `MissingFieldException` because 0.0.176 expected `SaveManager.<Instance>k__BackingField`. The process ended normally with rendering still stopped. Reference-image metadata confirms the real static singleton fields are `_mockInstance` and `_instance`, and exact `get_Instance()` calls `ConstructDefault()` only when production `_instance` is null.
+
+**Physical 0.0.177 / Steps 43–45 — Step 45 Gate-C planned-host safe stop.** Corrected singleton metadata physically passed. Gate B mapped the exact three local-save roots to a 331-method same-sts2 closure with 6 classified references, all approved; unapproved boundaries, unresolved same-sts2 references, and external Cecil resolution were all zero. The durable map also verified exact `_mockInstance`/`_instance` getter authority. Gate C armed the one-shot `InitProfileId(null) -> InitProgressData() -> InitPrefsData()` sequence and then stopped only because the Step-45 baseline classifier required zero resolver/host drift while the controlled Step35 load context observed one managed resolver request paired with one host-framework load. Private loads, initializer-bearing requests, rejected managed requests, and native attempts all remained zero; rendering stayed frozen and the process ended normally.
 
 
 **Physical 0.0.173 / Step 41 — CLOSED POSITIVE 4/4.** Exact `GameStartup`/compiler-`MoveNext` mapping closed with 691 same-sts2 methods, 46 classified boundary references, zero unresolved/external Cecil resolution; GameStartup remained uninvoked. **Physical 0.0.171 / Step 40 — CLOSED POSITIVE 4/4.** **Physical 0.0.170 / Step 39 — CLOSED POSITIVE 4/4.** Physical **0.0.159**, **0.0.161**, and **0.0.165** remain Step 36/37/38 authorities. Step 38 must still be skipped in the process used for Steps 39 onward.
 
 The closed **Step 42.0 boundary** remains one-shot authority: Step 42.0 never calls GameStartup. Its durable pre-invocation map is `Step42-InitPools-StaticMap-<RunId>.txt`. Once Gate C is armed, Step 42 must never be retried in-process.
 
-0.0.176 introduced the **iteration packaging strategy**. 0.0.177 preserves that strategy and corrects only Step-45 singleton metadata; one IPA contains five independently gated rungs. Each rung has its own run-correlated checkpoint, static map where applicable, final report, exact prior-rung prerequisite, and four-gate summary. Later rungs stay locked until the prior rung is 4/4 in the same process. Stop immediately on the first failure and preserve/share that rung's artifacts; do not attempt later rungs. This preserves diagnosability while reducing rebuild/install cycles.
+0.0.176 introduced the **iteration packaging strategy**. 0.0.177 corrected Step-45 singleton metadata and physically reached armed Gate C. 0.0.178 preserves the five-rung strategy and corrects only Step-45 planned-host accounting; one IPA contains five independently gated rungs. Each rung has its own run-correlated checkpoint, static map where applicable, final report, exact prior-rung prerequisite, and four-gate summary. Later rungs stay locked until the prior rung is 4/4 in the same process. Stop immediately on the first failure and preserve/share that rung's artifacts; do not attempt later rungs. This preserves diagnosability while reducing rebuild/install cycles.
 
 ## Step 43.0 — concrete Null platform authority
 
@@ -33,9 +35,9 @@ Step 44 never invokes `MigrateToUserScopedDirectories`, `ArchiveLegacyData`, `Mi
 
 Gate A requires Step 44 4/4/no legacy data. Gate B first requires exact static `SaveManager._mockInstance` and `SaveManager._instance` fields and verifies serialized `get_Instance()` authority: two `_mockInstance` loads, two `_instance` loads, one `_instance` store, and one exact zero-argument `ConstructDefault()` fallback call. It then maps exact `SaveManager.InitProfileId(Nullable<int>)`, `InitProgressData()`, and `InitPrefsData()` closures. Proven Null-platform read helpers and already-inert `SentryService` wrappers are admissible; external Steamworks, native extensions, GameStartup, cloud sync, migration mutation, and later startup boundaries remain forbidden. The complete map is durably written before Gate C.
 
-Gate C first requires runtime `_mockInstance == null` and existing production `_instance != null`, reading those fields directly so `get_Instance()`/`ConstructDefault()` cannot run. It is then one-shot: invoke `InitProfileId(null)` → `InitProgressData()` → `InitPrefsData()` exactly once in original GameStartup order. Returned progress/prefs `ReadSaveResult` metadata is reported. OneTimeInitialization must remain state 2 and resolver/host/private/initializer/rejected/native deltas must remain zero. Never retry Step 45 in-process after Gate C is armed.
+Gate C first requires runtime `_mockInstance == null` and existing production `_instance != null`, reading those fields directly so `get_Instance()`/`ConstructDefault()` cannot run. It is then one-shot: invoke `InitProfileId(null)` → `InitProgressData()` → `InitPrefsData()` exactly once in original GameStartup order. Returned progress/prefs `ReadSaveResult` metadata is reported. OneTimeInitialization must remain state 2. The runtime may materialize **zero or one** host-framework assembly only if the resolver request and `HostLoads` entry are exactly paired, the requested simple name is framework-shaped under the existing host-contract classifier, and the Step35 load context has already admitted the request through its persisted exact host-binding plan. Private loads, initializer-bearing requests, rejected managed requests, and native attempts must remain zero. The exact requested→actual host binding is reported and a post-action baseline is captured. Never retry Step 45 in-process after Gate C is armed.
 
-Gate D requires `SaveManager.SettingsSave`, `PrefsSave`, and `Progress` to be non-null while NGame/render/context authority remains confined.
+Gate D requires `SaveManager.SettingsSave`, `PrefsSave`, and `Progress` to be non-null, re-validates the cumulative Step-45 host delta, and then requires **zero additional** resolver/host/private/initializer/rejected/native drift from the Gate-C post-action baseline while NGame/render/state authority remains confined.
 
 ## Step 46.0 — exact LaunchMainMenu async map, no invocation
 
@@ -55,7 +57,7 @@ Gate C is one-shot. The iOS caller starts Godot rendering exactly once immediate
 
 Gate D requires the real NGame singleton/parent/`_window` authority to remain intact **and** requires `RootSceneContainer` to gain at least one child scene compared with the pre-launch count. On 4/4 success rendering intentionally remains active so the resulting real menu scene can be observed. On any failure/incomplete result, the launcher refreezes rendering and later work remains locked.
 
-## Physical sequence for 0.0.177
+## Physical sequence for 0.0.178
 
 1. Fresh process → Step 15 A-C.
 2. Step 35.0.32 MODEL-BOOTSTRAP → require 4/4.
@@ -79,4 +81,4 @@ Reports:
 - Step 46: `Step46-CrashCheckpoint-<RunId>.txt`, `Step46-LaunchMainMenu-StaticMap-<RunId>.txt`, `Step46-LastCheckpoint.txt`, `Step46-TransformedRealStS2LaunchMainMenuMap.txt`
 - Step 47: `Step47-CrashCheckpoint-<RunId>.txt`, `Step47-LastCheckpoint.txt`, `Step47-TransformedRealStS2ControlledLaunchMainMenu.txt` (Step 47 consumes the durable Step-46 map authority rather than writing a second static map)
 
-Still globally forbidden in 0.0.177 unless explicitly stated above: invoking `GameStartup` as a whole, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `ExecuteDeferred`, `LoadDeferredStartupAssets`, FMOD/Spine/native game extensions, explicit `_ExitTree`, RemoveChild/Free, state reset, or mutation of the trusted Step-12 install. Step 47 is the only rung that may restart rendering, and only after Step 46 has physically established an admissible LaunchMainMenu closure.
+Still globally forbidden in 0.0.178 unless explicitly stated above: invoking `GameStartup` as a whole, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `ExecuteDeferred`, `LoadDeferredStartupAssets`, FMOD/Spine/native game extensions, explicit `_ExitTree`, RemoveChild/Free, state reset, or mutation of the trusted Step-12 install. Step 47 is the only rung that may restart rendering, and only after Step 46 has physically established an admissible LaunchMainMenu closure.
