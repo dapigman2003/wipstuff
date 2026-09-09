@@ -1,25 +1,12 @@
-## Current frontier — Steps 43–47 / 0.0.178
+## Current frontier — Steps 43–50 / 0.0.179
 
-The active candidate is **0.0.178 / sequential startup ladder Steps 43–47**. Physical 0.0.175 closed Step 42 at 4/4. Physical 0.0.176 advanced through same-process Step-44 authority and stopped safely in Step-45 Gate B before mutation on the incorrect `SaveManager.<Instance>k__BackingField` assumption. Physical 0.0.177 corrected exact `_mockInstance`/`_instance` authority, passed the full Step-45 3-root/331-method/6-approved-boundary Gate-B audit, and armed Gate C. The intended local-save sequence then produced only one managed resolver request paired with one exact planned host-framework load; private/initializer/rejected/native deltas remained zero. 0.0.178 therefore keeps the runtime calls unchanged and corrects only confinement accounting to admit zero-or-one exactly paired framework-shaped host binding already admitted by the persisted Step35 host plan, record the exact identity, and require no subsequent drift.
+The active candidate is **0.0.179 / sequential startup ladder Steps 43–50**. Physical 0.0.175 closed Step 42 at 4/4. Physical 0.0.176 localized the Step-45 singleton-field assumption; physical 0.0.177 corrected exact `_mockInstance`/`_instance` authority and reached the real save call sequence; physical **0.0.178 closes Step 45 4/4** because Step 46 Gate A accepted same-process local-save authority with frozen rendering/state 2 and zero post-Step-45 drift. That run then mapped exact `LaunchMainMenu(bool)` and its async `MoveNext` but safely stopped in the old over-broad recursive audit before invocation.
 
-The packaging strategy batches multiple independently gated rungs per IPA while preserving one-boundary-at-a-time authority. Step 43 proves concrete Null-platform runtime strategy; Step 44 detects legacy data without mutation; Step 45 initializes local profile/progress/prefs once; Step 46 maps the inner async `LaunchMainMenu(bool)` state machine/closure without invocation; Step 47 is conditionally unlocked for a one-shot live main-menu attempt only if Step 46 is admissible and durable. Any failure stops the ladder and later rungs remain locked.
+The packaging strategy batches multiple independently gated rungs per IPA while preserving one-boundary-at-a-time authority. Step 43 proves concrete Null-platform runtime strategy; Step 44 detects legacy data without mutation; Step 45 initializes local profile/progress/prefs once; Step 46.1 records an execution-opcode-qualified immediate/deferred `LaunchMainMenu` frontier without authorizing or invoking it; Step 47 prepares exact PCK menu resources plus a private Spine-neutral background derivative; Step 48 instantiates exact real `NMainMenu` off-tree once and audits the actual hierarchy/lifecycle frontier; Step 49 admits that retained menu once under exact `NGame.RootSceneContainer` while rendering remains frozen; Step 50 audits the actual in-tree frame/input frontier and performs one bounded render pulse that is synchronously stopped before success evaluation. Any failure stops the ladder and later rungs remain locked.
 
-# StS2 Launcher iOS — Master Plan
+Original whole `GameStartup`, original `LaunchMainMenu`, cloud/platform initialization, deferred startup, external Steamworks/native Steam, and FMOD/Spine native game extensions remain separate future boundaries.
 
-## Purpose
-
-This is the long-lived technical plan for the project. It is intentionally written to remain useful across many releases and should change only when architecture, scope, safety rules, or the major roadmap changes.
-
-A new engineer or a new ChatGPT session should be able to resume the project without a bespoke handoff by reading, in order:
-
-1. `docs/MASTER-PLAN.md` — architecture, invariants, roadmap, and engineering rules.
-2. `docs/CURRENT-STATUS.md` — the current physically proven boundary and active candidate.
-3. `docs/ARCHITECTURE.md` — canonical source/runtime structure.
-4. `docs/REGRESSION-CONTRACTS.md` — current capability-level regression semantics when later steps intentionally change an earlier intermediate runtime state.
-5. `docs/TESTING.md` and `docs/REPORTS.md` — authoritative validation loop and diagnostics.
-6. `docs/history/INDEX.md` — chronological evidence and step-specific records when deeper context is needed.
-
-A handoff document may still be generated for convenience, but it is not an authoritative project dependency.
+Resumption sources: `docs/CURRENT-STATUS.md` is the runtime frontier authority, `docs/REGRESSION-CONTRACTS.md` preserves protected historical contracts, and `docs/history/INDEX.md` indexes design/evidence provenance.
 
 ## Product objective
 
@@ -297,6 +284,6 @@ Step 36.0 is separately gated. It advances only to exact transformed static para
 
 ## Current frontier — Step 41.0
 
-Physical 0.0.170 closed Step 39 at 4/4. Physical 0.0.171 then closed Step 40 at 4/4 on a successful second run: the real in-tree hierarchy passed its frame/input audit, the Godot renderer started, stopped again at 103.3 ms, and frozen NGame/state/native confinement held. That result advanced the project to Step 41; Step 41 and Step 42 have since physically closed 4/4, and the current frontier is the 0.0.178 Steps 43–47 sequential startup ladder described at the top of this plan.
+Physical 0.0.170 closed Step 39 at 4/4. Physical 0.0.171 then closed Step 40 at 4/4 on a successful second run: the real in-tree hierarchy passed its frame/input audit, the Godot renderer started, stopped again at 103.3 ms, and frozen NGame/state/native confinement held. That result advanced the project to Step 41; Step 41 and Step 42 have since physically closed 4/4, and the current frontier is the 0.0.179 Steps 43–50 sequential startup ladder described at the top of this plan.
 
 Step 41.0 is the mandatory map-before-enable GameStartup step. Rendering stays frozen and the existing inert `GameStartupWrapper` is preserved. The launcher maps exact `NGame.GameStartup`, its compiler-generated async state machine and `MoveNext` IL, then traverses the same-sts2 closure and records path-qualified platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native-facing boundaries. No GameStartup execution, platform initialization, Steam initialization, main-menu launch, deferred startup, or render restart is authorized. The resulting physical static map will define the next narrow partial-startup boundary.

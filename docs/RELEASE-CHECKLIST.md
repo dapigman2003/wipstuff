@@ -1,13 +1,23 @@
-# Release checklist — Steps 43–47 / 0.0.178
+# Release checklist — Steps 43–50 direct main-menu ladder / 0.0.179
 
-Release identity: display/build `0.0.178 (178)`, IPA `StS2-Launcher-Steps-43-47.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.179 (179)`, IPA `StS2-Launcher-Steps-43-50.ipa`, workflow `ios-canonical`.
 
-Physical 0.0.177 is the immediate runtime authority for this correction: Step 45 Gate B passed at 3 roots / 331 closure methods / 6 approved classified references / 0 forbidden / 0 unresolved / 0 external Cecil, then armed Gate C and observed only resolver=1 + host=1 with private/initializer/rejected/native all zero. 0.0.178 must preserve the exact local-save call sequence, admit at most one exactly paired framework-shaped persisted-plan host binding, record its exact identity, and forbid all additional post-action drift.
+Require physical Step-42 4/4 provenance sealed: exact InitPools token/22-method zero-boundary map and one-shot return with frozen zero-native/context confinement.
 
-Require physical Step-42 4/4 provenance to be sealed, including exact InitPools token/22-method closure/zero-boundary map and one-shot return with zero context/native deltas.
+Require physical 0.0.178 Step-46 evidence sealed and interpreted correctly: Step46 Gate A proves Step45 4/4 authority; Gate B proves exact `LaunchMainMenu(bool)` token/state-machine/MoveNext metadata; old Gate C stops safely before invocation on the over-broad recursive MethodReference audit; `LaunchMainMenu` never invoked and rendering never restarted.
 
-Require the startup-ladder Core/UI/test surfaces: generic four-gate sequence with stable ordinals; five separately exposed rungs 43–47; same-process prior-rung authority checks; separate reports/checkpoints; Steps 43–46 frozen at entry; corrected Step45 exact `_mockInstance`/`_instance` + serialized getter-pattern verification with no lazy getter/fallback invocation; Step45 and Step47 one-shot lockout; Step46 complete async state-machine/MoveNext map durability before Step47; and Step47 refreeze-on-failure / leave-rendering-active-only-on-4/4 semantics.
+Require generic four-gate sequence with stable ordinals and separately exposed rungs 43–50. Same-process prior-rung authority and fail-stop behavior are mandatory. Steps 43–49 must be frozen; Step45/48/49/50 mutation boundaries must be one-shot where applicable.
 
-Require no direct `GameStartup()` invocation, no `DoCloudSync`, no migration/archive mutation, no `InitializePlatform`, no external Steamworks/native Steam invocation, no `ExecuteDeferred`, no `LoadDeferredStartupAssets`, and no FMOD/Spine/native game-extension execution in the new ladder source. Step47 may invoke only exact audited `LaunchMainMenu(skipIntro=true)` after Step46 admissibility.
+Require Step46.1 to map immediate execution opcodes separately from deferred/function-pointer references and never authorize original `LaunchMainMenu`.
 
-Require exact version/build 0.0.178/177 in csproj/plist/release presentation/current-release shell constants; Codemagic/host-test/IPA-verifier headings and filenames updated to Steps 43–47; active manifests regenerated; no proprietary StS2/native payload; final ZIP integrity clean; and canonical validator green again from a completely fresh extraction.
+Require Step47 exact PCK hashes and deterministic private Spine-neutral derivative; no trusted install mutation; durable map before a UI/Core one-shot Godot cache-takeover/load boundary; no instantiation/rendering.
+
+Require Step48 one-shot exact off-tree NMainMenu instantiation, private-load-context ownership, `IsInsideTree=false`, actual hierarchy/lifecycle immediate-frontier audit, and durable map before Step49.
+
+Require Step49 one-shot exact frozen `RootSceneContainer.AddChild(NMainMenu)` with exact parent/child-count/in-tree/state/native confinement.
+
+Require Step50 actual in-tree frame/input immediate-frontier audit, durable map before `StartRendering`, exactly one start call, bounded 100 ms request, synchronous `StopRendering` before post-stop telemetry/file I/O, no abandonment timeout, and frozen post-pulse authority. Step50 must always leave rendering stopped.
+
+Require no direct whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, external Steamworks/native Steam, or FMOD/Spine native game-extension execution in the active ladder UI/control path.
+
+Require exact version/build `0.0.179/179` in csproj/plist/release presentation/current-release shell constants; Codemagic/build/test/IPA-verifier headings and filenames updated to Steps 43–50; active candidate manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload; exact `history.zip`; final ZIP integrity clean; canonical validator green from both the release tree and a completely fresh extraction.

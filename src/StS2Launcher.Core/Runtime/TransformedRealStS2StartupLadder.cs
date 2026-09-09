@@ -1,22 +1,26 @@
 using System.Reflection;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Steps 43-47 are packaged together as an explicitly sequential startup ladder. Every rung keeps
+/// Steps 43-50 are packaged together as an explicitly sequential startup ladder. Every rung keeps
 /// its own four-gate authority and later rungs require the exact same-process closure of the prior
-/// rung. Steps 43-46 keep rendering frozen. Step 47 is the first conditional live LaunchMainMenu
-/// attempt and is exposed only after Step 46 has fully mapped its compiler-generated async MoveNext
-/// closure and found no unapproved startup/native/platform boundary.
+/// rung. Step 46 maps the real LaunchMainMenu immediate/deferred frontier without invoking it;
+/// Steps 47-50 use a separate direct main-menu resource/scene path so original GameStartup,
+/// LaunchMainMenu, ExecuteDeferred, Steam startup, and native game extensions remain unopened.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
 {
     private const string Step43Name = "NULL PLATFORM AUTHORITY";
     private const string Step44Name = "LEGACY MIGRATION GUARD";
     private const string Step45Name = "LOCAL SAVE INITIALIZATION";
-    private const string Step46Name = "LAUNCHMAINMENU ASYNC MAP";
-    private const string Step47Name = "CONTROLLED LAUNCHMAINMENU";
+    private const string Step46Name = "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP";
+    private const string Step47Name = "MAIN MENU RESOURCE PREPARATION";
+    private const string Step48Name = "MAIN MENU OFF-TREE INSTANTIATION";
+    private const string Step49Name = "MAIN MENU FROZEN SCENETREE ADMISSION";
+    private const string Step50Name = "MAIN MENU CONTROLLED RENDER PULSE";
 
     private const string PlatformUtilTypeFullName = "MegaCrit.Sts2.Core.Platform.PlatformUtil";
     private const string PlatformUtilInterfaceTypeFullName = "MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy";
@@ -48,7 +52,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step44Observation = string.Empty;
     private string _step45Observation = string.Empty;
     private string _step45AcceptedHostBinding = string.Empty;
-    private string _step47Observation = string.Empty;
 
     private bool _step43ActionPassed;
     private bool _step44NoLegacyDataPassed;
@@ -56,15 +59,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private bool _step45SaveInitPassed;
     private bool _step46StateMachineMapped;
     private bool _step46ClosureMapped;
-    private bool _step46LaunchAdmissible;
+    private bool _step46LaunchAdmissible; // retained only as a diagnostic compatibility flag; original LaunchMainMenu remains forbidden.
     private bool _step46StaticMapDurablyWritten;
     private uint _step46LaunchMethodToken;
     private uint _step46MoveNextToken;
     private string _step46StateMachineTypeName = string.Empty;
-    private MethodInfo? _step47LaunchMethod;
-    private bool _step47InvocationStarted;
-    private bool _step47LaunchPassed;
-    private int _step47RootSceneChildrenBefore;
 
     private bool _exactStep43ClosurePassed;
     private bool _exactStep44ClosurePassed;
@@ -77,8 +76,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public bool ExactStep45ClosurePassed => _exactStep45ClosurePassed;
     public bool ExactStep46ClosurePassed => _exactStep46ClosurePassed;
     public bool ExactStep47ClosurePassed => _exactStep47ClosurePassed;
-    public bool Step46LaunchMainMenuAdmissible => _step46LaunchAdmissible;
-    public bool Step47InvocationStarted => _step47InvocationStarted;
+    public bool Step46LaunchMainMenuAdmissible => false;
 
     public string GetVerifiedStartupLadderStaticMap(int step)
         => step switch
@@ -87,13 +85,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             44 when !string.IsNullOrWhiteSpace(_step44StaticMap) => _step44StaticMap,
             45 when !string.IsNullOrWhiteSpace(_step45StaticMap) => _step45StaticMap,
             46 when !string.IsNullOrWhiteSpace(_step46StaticMap) => _step46StaticMap,
+            47 when !string.IsNullOrWhiteSpace(_step47DirectStaticMap) => _step47DirectStaticMap,
+            48 when !string.IsNullOrWhiteSpace(_step48DirectStaticMap) => _step48DirectStaticMap,
+            49 when !string.IsNullOrWhiteSpace(_step49DirectStaticMap) => _step49DirectStaticMap,
+            50 when !string.IsNullOrWhiteSpace(_step50DirectStaticMap) => _step50DirectStaticMap,
             _ => throw new InvalidOperationException($"Step {step}.0 has not produced a verified startup-ladder static map."),
         };
 
     public void MarkStep46StaticMapDurablyWritten()
     {
-        if (!_step46ClosureMapped || !_step46LaunchAdmissible || string.IsNullOrWhiteSpace(_step46StaticMap))
-            throw new InvalidOperationException("Step 46.0 static map cannot be marked durable before the exact admissible LaunchMainMenu closure is complete.");
+        if (!_step46StateMachineMapped || !_step46ClosureMapped || string.IsNullOrWhiteSpace(_step46StaticMap))
+            throw new InvalidOperationException("Step 46.0 static map cannot be marked durable before the exact immediate/deferred LaunchMainMenu frontier map is complete.");
         _step46StaticMapDurablyWritten = true;
     }
 
@@ -113,7 +115,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step44Observation = string.Empty;
         _step45Observation = string.Empty;
         _step45AcceptedHostBinding = string.Empty;
-        _step47Observation = string.Empty;
         _step43ActionPassed = false;
         _step44NoLegacyDataPassed = false;
         _step45InvocationStarted = false;
@@ -125,15 +126,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step46LaunchMethodToken = 0;
         _step46MoveNextToken = 0;
         _step46StateMachineTypeName = string.Empty;
-        _step47LaunchMethod = null;
-        _step47InvocationStarted = false;
-        _step47LaunchPassed = false;
-        _step47RootSceneChildrenBefore = 0;
         _exactStep43ClosurePassed = false;
         _exactStep44ClosurePassed = false;
         _exactStep45ClosurePassed = false;
         _exactStep46ClosurePassed = false;
         _exactStep47ClosurePassed = false;
+        ResetDirectMainMenuLadderState();
     }
 
     // STEP 43 — NULL PLATFORM AUTHORITY
@@ -612,8 +610,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var baseline = _step46Baseline ?? throw new InvalidOperationException("Step 46.0 baseline is absent.");
             if (!_step46StateMachineMapped || _step46MoveNextToken == 0 || string.IsNullOrWhiteSpace(_step46StaticMap))
                 throw new InvalidOperationException("Step 46.0 Gate B state-machine map must pass before Gate C.");
-            Checkpoint(checkpoint, "M46_C_ENTRY — traversing exact LaunchMainMenu.MoveNext same-sts2 closure. Proven Null-platform read helpers and inert SentryService wrappers are allowed; OneTimeInitialization/InitializePlatform/deferred-startup/external Steamworks/FMOD/Spine/external Sentry/native-extension boundaries fail before any launch invocation.");
-            stage = "LaunchMainMenu transitive admissibility audit";
+            Checkpoint(checkpoint, "M46_C_ENTRY — mapping LaunchMainMenu.MoveNext with execution-opcode-qualified traversal. call/callvirt/newobj/jmp edges are traversed; ldftn/ldvirtftn/ldtoken method references are recorded as deferred frontiers and never promoted into the immediate execution closure. Original LaunchMainMenu remains uninvoked regardless of mapped boundaries.");
+            stage = "LaunchMainMenu immediate/deferred frontier map";
             using var resolver = new RejectingAssemblyResolver();
             using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
             var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
@@ -621,18 +619,19 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var moveNext = allTypes.Values.SelectMany(type => type.Methods)
                 .SingleOrDefault(method => method.MetadataToken.ToUInt32() == _step46MoveNextToken)
                 ?? throw new InvalidDataException($"Step 46.0 could not relocate MoveNext token 0x{_step46MoveNextToken:X8}.");
-            var audit = AuditStartupLadderRoots(new[] { moveNext }, allTypes, allMethods);
-            RequireStartupLadderAuditAdmissible(audit, "Step 46.0 LaunchMainMenu closure with recursive compiler state-machine expansion");
+            var audit = AuditStartupLadderInvocationFrontier(new[] { moveNext }, allTypes, allMethods);
+            if (audit.UnresolvedSameAssemblyReferences.Length != 0)
+                throw new InvalidDataException("Step 46.0 immediate/deferred frontier map has unresolved same-sts2 references: " + string.Join(" | ", audit.UnresolvedSameAssemblyReferences));
             if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 46.0 closure audit unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+                throw new InvalidDataException("Step 46.0 frontier map unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
 
-            _step46StaticMap += BuildStartupLadderClosureAppendix(audit, "LAUNCHMAINMENU TRANSITIVE + COMPILER STATE-MACHINE CLOSURE");
+            _step46StaticMap += BuildStartupLadderInvocationFrontierAppendix(audit);
             _step46ClosureMapped = true;
-            _step46LaunchAdmissible = true;
+            _step46LaunchAdmissible = false;
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 46 Gate C");
-            Checkpoint(checkpoint, $"M46_C_PASS — transitiveSameSts2LaunchClosureMethods={audit.ClosureMethods.Length}; compilerStateMachineExpansions={audit.StateMachineExpansions.Length}; classifiedBoundaryRefs={audit.Boundaries.Length}; forbiddenBoundaryRefs=0; unresolvedSameSts2Refs=0; externalResolutionRequests=0; LaunchMainMenu invoked=NO; rendering remains stopped.");
+            Checkpoint(checkpoint, $"M46_C_PASS — immediateClosureMethods={audit.ImmediateClosureMethods.Length}; compilerStateMachineExpansions={audit.StateMachineExpansions.Length}; immediateBoundaryRefs={audit.ImmediateBoundaries.Length}; deferredMethodFrontiers={audit.DeferredMethodFrontiers.Length}; unresolvedSameSts2Refs=0; externalResolutionRequests=0; LaunchMainMenu invoked=NO; rendering remains stopped.");
             return StartupLadderPass(step, Step46Name, gate,
-                $"LaunchMainMenu closure including nested compiler state machines is admissible for a controlled attempt: methods={audit.ClosureMethods.Length}; state-machine expansions={audit.StateMachineExpansions.Length}; classified refs={audit.Boundaries.Length}; forbidden/unresolved/external resolution=0. LaunchMainMenu remains uninvoked.");
+                $"Execution-opcode-qualified LaunchMainMenu frontier mapped without invocation: immediate methods={audit.ImmediateClosureMethods.Length}; state-machine expansions={audit.StateMachineExpansions.Length}; immediate classified boundaries={audit.ImmediateBoundaries.Length}; deferred method frontiers={audit.DeferredMethodFrontiers.Length}; unresolved/external resolution=0. This map is evidence only and does not authorize original LaunchMainMenu.");
         }
         catch (Exception ex)
         {
@@ -652,8 +651,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep46Prerequisite("Step 46 Gate D entry");
             var baseline = _step46Baseline ?? throw new InvalidOperationException("Step 46.0 baseline is absent.");
-            if (!_step46StateMachineMapped || !_step46ClosureMapped || !_step46LaunchAdmissible)
-                throw new InvalidOperationException("Step 46.0 Gate D requires a complete admissible LaunchMainMenu map.");
+            if (!_step46StateMachineMapped || !_step46ClosureMapped)
+                throw new InvalidOperationException("Step 46.0 Gate D requires a complete immediate/deferred LaunchMainMenu frontier map.");
             if (!_step46StaticMapDurablyWritten)
                 throw new InvalidOperationException("Step 46.0 Gate D requires the complete LaunchMainMenu static map to be durably written before closure.");
             if (!renderingStopped)
@@ -663,156 +662,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var state = RequireStep40InsertedAuthority();
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 46 Gate D");
             _exactStep46ClosurePassed = true;
-            Checkpoint(checkpoint, $"M46_D_PASS — renderingStopped=True; state={state}; LaunchMainMenu invoked=NO; launchAdmissible=True; staticMapDurable=True; resolver/host/private/initializer/rejected/native deltas=0.");
+            Checkpoint(checkpoint, $"M46_D_PASS — renderingStopped=True; state={state}; LaunchMainMenu invoked=NO; launchAuthorized=NO; staticMapDurable=True; resolver/host/private/initializer/rejected/native deltas=0.");
             return StartupLadderPass(step, Step46Name, gate,
-                "Complete LaunchMainMenu async map is durable and admissible. Rendering stayed frozen, LaunchMainMenu was not invoked, and context/native authority is unchanged.");
+                "Complete execution-opcode-qualified LaunchMainMenu frontier map is durable. Rendering stayed frozen, original LaunchMainMenu was not invoked or authorized, and context/native authority is unchanged.");
         }
         catch (Exception ex)
         {
             Checkpoint(checkpoint, $"M46_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
             return StartupLadderFail(step, Step46Name, gate, stage, ex);
-        }
-    }
-
-    // STEP 47 — CONTROLLED LAUNCHMAINMENU
-
-    public TransformedRealStS2StartupLadderGateResult RunStep47ClosedStep46Authority(bool renderingStopped, Action<string>? checkpoint = null)
-    {
-        const int step = 47;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep47Prerequisite("Step 47 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 47.0 requires rendering to be frozen before the controlled launch is armed.");
-            if (!_step46LaunchAdmissible || !_step46StaticMapDurablyWritten)
-                throw new InvalidOperationException("Step 47.0 requires Step 46 admissible + durable LaunchMainMenu authority.");
-            Checkpoint(checkpoint, "M47_A_ENTRY — requiring Step-46 4/4 admissible LaunchMainMenu async map, frozen rendering, local-save authority, Null platform authority, and retained real NGame before the first live menu attempt.");
-            stage = "closed Step-46 launch-map authority";
-            var state = RequireStep40InsertedAuthority();
-            var selected = RequireStartupLadderSelectedAuthority(step);
-            _step47Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            _step47RootSceneChildrenBefore = GetStartupLadderRootSceneChildCount();
-            Checkpoint(checkpoint, $"M47_A_PASS — Step-46 4/4 retained; renderingStopped=True; state={state}; rootSceneChildrenBefore={_step47RootSceneChildrenBefore}; selectedSha256={selected.Sha256}; launchAdmissible=True.");
-            return StartupLadderPass(step, Step47Name, gate,
-                $"Controlled launch prerequisite passed. RootSceneContainer children before launch={_step47RootSceneChildrenBefore}; rendering frozen; exact Step-46 admissible map retained.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M47_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step47Name, gate, stage, ex);
-        }
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep47ExactRuntimeBinding(Action<string>? checkpoint = null)
-    {
-        const int step = 47;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep47Prerequisite("Step 47 Gate B entry");
-            var baseline = _step47Baseline ?? throw new InvalidOperationException("Step 47.0 Gate A must pass before Gate B.");
-            Checkpoint(checkpoint, "M47_B_ENTRY — binding exact runtime NGame.LaunchMainMenu(bool) from the already-admitted selected assembly; token must equal Step-46 Cecil authority and return Task. No invocation yet.");
-            stage = "exact LaunchMainMenu runtime binding";
-            var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 47.0 retained real NGame instance is absent.");
-            var candidates = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
-                .Where(method => method.Name == NGameLaunchMainMenuMethodName && method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == typeof(bool) && typeof(Task).IsAssignableFrom(method.ReturnType) && !method.IsGenericMethod)
-                .ToArray();
-            var method = candidates.SingleOrDefault()
-                ?? throw new MissingMethodException(instance.GetType().FullName, $"LaunchMainMenu(bool) exact declared Task-returning overload; candidates={string.Join(",", candidates.Select(item => item.ToString()))}");
-            if ((uint)method.MetadataToken != _step46LaunchMethodToken)
-                throw new InvalidDataException($"Step 47.0 LaunchMainMenu runtime token drifted. expected=0x{_step46LaunchMethodToken:X8}; actual=0x{method.MetadataToken:X8}.");
-            _step47LaunchMethod = method;
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 47 Gate B");
-            Checkpoint(checkpoint, $"M47_B_PASS — exact runtime LaunchMainMenu(bool) bound; token=0x{method.MetadataToken:X8}; returnType={method.ReturnType.FullName}; invocation=NO; rendering remains stopped.");
-            return StartupLadderPass(step, Step47Name, gate,
-                $"Exact LaunchMainMenu(bool) runtime binding passed. Token=0x{method.MetadataToken:X8}; return type={method.ReturnType.FullName}; no invocation yet.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M47_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step47Name, gate, stage, ex);
-        }
-    }
-
-    public async Task<TransformedRealStS2StartupLadderGateResult> RunStep47ControlledLaunchMainMenuInvocationAsync(
-        bool renderingActive,
-        Action<string>? checkpoint = null)
-    {
-        const int step = 47;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep47Prerequisite("Step 47 Gate C entry");
-            var baseline = _step47Baseline ?? throw new InvalidOperationException("Step 47.0 baseline is absent.");
-            var method = _step47LaunchMethod ?? throw new InvalidOperationException("Step 47.0 Gate B exact runtime binding is absent.");
-            if (!renderingActive)
-                throw new InvalidOperationException("Step 47.0 Gate C requires the caller to start Godot rendering immediately before invocation.");
-            if (_step47InvocationStarted)
-                throw new InvalidOperationException("Step 47.0 LaunchMainMenu invocation is one-shot and cannot be retried in-process.");
-            _step47InvocationStarted = true;
-            var stateBefore = RequireStep40InsertedAuthority();
-            Checkpoint(checkpoint, $"M47_C_INVOKE_START — rendering is active; invoking exact audited NGame.LaunchMainMenu(skipIntro=True) once; token=0x{method.MetadataToken:X8}; stateBefore={stateBefore}. No GameStartup/Steam/native-extension call is authorized. The launcher will not abandon an un-cancelable LaunchMainMenu Task; a hard hang must be diagnosed from this durable checkpoint and terminated by relaunch.");
-            stage = "one-shot live LaunchMainMenu invocation";
-            var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 47.0 retained NGame instance is absent.");
-            var taskObject = InvokeStartupLadderMethod(method, instance, new object?[] { true }, "Step 47 LaunchMainMenu");
-            if (taskObject is not Task launchTask)
-                throw new InvalidDataException("Step 47.0 LaunchMainMenu reflection did not return a Task.");
-            await launchTask;
-            Checkpoint(checkpoint, "M47_C_INVOKE_RETURNED — LaunchMainMenu Task completed successfully while rendering remained active.");
-            var stateAfter = RequireStep40InsertedAuthority();
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 47 Gate C");
-            if (stateAfter != stateBefore)
-                throw new InvalidDataException($"Step 47.0 LaunchMainMenu changed OneTimeInitialization state: {stateBefore} -> {stateAfter}.");
-            _step47LaunchPassed = true;
-            Checkpoint(checkpoint, "M47_C_PASS — exact LaunchMainMenu(skipIntro=True) completed once; state=2; resolver/host/private/initializer/rejected/native deltas=0; rendering remains active for Gate D observation.");
-            return StartupLadderPass(step, Step47Name, gate,
-                "Exact audited LaunchMainMenu(skipIntro=true) completed once under live rendering. OneTimeInitialization state and resolver/native context remain unchanged.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M47_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step47Name, gate, stage, ex);
-        }
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep47LivePostLaunchConfinement(bool renderingActive, Action<string>? checkpoint = null)
-    {
-        const int step = 47;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep47Prerequisite("Step 47 Gate D entry");
-            var baseline = _step47Baseline ?? throw new InvalidOperationException("Step 47.0 baseline is absent.");
-            if (!_step47InvocationStarted || !_step47LaunchPassed)
-                throw new InvalidOperationException("Step 47.0 Gate D requires the one-shot LaunchMainMenu Task to have completed successfully.");
-            if (!renderingActive)
-                throw new InvalidOperationException("Step 47.0 Gate D expects rendering to remain active after a successful main-menu launch.");
-            Checkpoint(checkpoint, "M47_D_ENTRY — proving live post-launch NGame/state/context confinement and requiring RootSceneContainer to contain a real launched child scene. Rendering stays active on success so the menu can be observed.");
-            stage = "live post-LaunchMainMenu confinement";
-            var state = RequireStep40InsertedAuthority();
-            var childrenAfter = GetStartupLadderRootSceneChildCount();
-            if (childrenAfter <= 0 || childrenAfter <= _step47RootSceneChildrenBefore)
-                throw new InvalidDataException($"Step 47.0 LaunchMainMenu completed but RootSceneContainer did not gain a child scene. before={_step47RootSceneChildrenBefore}; after={childrenAfter}.");
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 47 Gate D");
-            _step47Observation = $"rootSceneChildren={_step47RootSceneChildrenBefore}->{childrenAfter}; renderingActive=True; state={state}";
-            _exactStep47ClosurePassed = true;
-            Checkpoint(checkpoint, "M47_D_PASS — " + _step47Observation + "; exact NGame singleton/parent/_window authority preserved; resolver/host/private/initializer/rejected/native deltas=0. Rendering intentionally remains active.");
-            return StartupLadderPass(step, Step47Name, gate,
-                "Live post-launch confinement passed. " + _step47Observation + ". A real child scene is present and rendering intentionally remains active for observation.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M47_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step47Name, gate, stage, ex);
         }
     }
 
@@ -853,8 +710,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private Step35ExecutionLoadContext RequireStep47Prerequisite(string boundary)
     {
         var context = RequireStep46Prerequisite(boundary);
-        if (!_exactStep46ClosurePassed || !_step46ClosureMapped || !_step46LaunchAdmissible || !_step46StaticMapDurablyWritten)
-            throw new InvalidOperationException($"{boundary} requires same-process Step-46 4/4 admissible/durable LaunchMainMenu async-map authority.");
+        if (!_exactStep46ClosurePassed || !_step46ClosureMapped || !_step46StaticMapDurablyWritten)
+            throw new InvalidOperationException($"{boundary} requires same-process Step-46 4/4 durable immediate/deferred LaunchMainMenu frontier-map authority.");
         return context;
     }
 

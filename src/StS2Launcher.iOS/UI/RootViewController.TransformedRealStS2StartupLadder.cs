@@ -2,6 +2,7 @@ using Foundation;
 using StS2Launcher.Core;
 using StS2Launcher.iOS.Platform;
 using System.Text;
+using System.Diagnostics;
 
 namespace StS2Launcher.iOS;
 
@@ -10,8 +11,11 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step43Gates = new(43, "NULL PLATFORM AUTHORITY");
     private readonly TransformedRealStS2StartupLadderGateSequence _step44Gates = new(44, "LEGACY MIGRATION GUARD");
     private readonly TransformedRealStS2StartupLadderGateSequence _step45Gates = new(45, "LOCAL SAVE INITIALIZATION");
-    private readonly TransformedRealStS2StartupLadderGateSequence _step46Gates = new(46, "LAUNCHMAINMENU ASYNC MAP");
-    private readonly TransformedRealStS2StartupLadderGateSequence _step47Gates = new(47, "CONTROLLED LAUNCHMAINMENU");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step46Gates = new(46, "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step47Gates = new(47, "MAIN MENU RESOURCE PREPARATION");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step48Gates = new(48, "MAIN MENU OFF-TREE INSTANTIATION");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step49Gates = new(49, "MAIN MENU FROZEN SCENETREE ADMISSION");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step50Gates = new(50, "MAIN MENU CONTROLLED RENDER PULSE");
 
     private readonly Dictionary<int, StartupLadderTelemetryState> _startupLadderTelemetry = [];
     private readonly object _startupLadderCheckpointSync = new();
@@ -21,29 +25,40 @@ public sealed partial class RootViewController
     private UIButton? _step45Button;
     private UIButton? _step46Button;
     private UIButton? _step47Button;
+    private UIButton? _step48Button;
+    private UIButton? _step49Button;
+    private UIButton? _step50Button;
     private UILabel? _step43ResultLabel;
     private UILabel? _step44ResultLabel;
     private UILabel? _step45ResultLabel;
     private UILabel? _step46ResultLabel;
     private UILabel? _step47ResultLabel;
+    private UILabel? _step48ResultLabel;
+    private UILabel? _step49ResultLabel;
+    private UILabel? _step50ResultLabel;
     private UILabel? _step43DetailLabel;
     private UILabel? _step44DetailLabel;
     private UILabel? _step45DetailLabel;
     private UILabel? _step46DetailLabel;
     private UILabel? _step47DetailLabel;
+    private UILabel? _step48DetailLabel;
+    private UILabel? _step49DetailLabel;
+    private UILabel? _step50DetailLabel;
     private bool _step45InvocationUiStarted;
-    private bool _step47InvocationUiStarted;
-    private bool _step47RunPassed;
+    private bool _step47ResourceLoadUiStarted;
+    private bool _step48InstantiationUiStarted;
+    private bool _step49AdmissionUiStarted;
+    private bool _step50PulseUiStarted;
 
     private void AddTransformedRealStS2StartupLadderControls(UIStackView content)
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Steps 43–47 — sequential startup ladder (stop on first failure)",
+            "Steps 43–50 — sequential startup ladder (stop on first failure)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Steps 43–46 keep rendering frozen. Step 47 is exposed only after a complete admissible LaunchMainMenu async map and is one-shot; it starts rendering immediately before exact LaunchMainMenu(skipIntro=true), then leaves rendering active only on a full 4/4 pass.",
+            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Steps 43–49 keep rendering frozen. Step 46 maps original LaunchMainMenu without invoking or authorizing it. Steps 47–49 use a separate exact PCK direct-menu path with a private Spine-neutral background derivative. Step 50 alone performs one short render pulse and synchronously refreezes.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel));
 
@@ -73,19 +88,43 @@ public sealed partial class RootViewController
 
         (_step46Button, _step46ResultLabel, _step46DetailLabel) = AddStartupLadderStepControls(
             content,
-            "Step 46.0 — exact LaunchMainMenu async state-machine + closure map",
+            "Step 46.0 — execution-aware original LaunchMainMenu frontier map (NO invocation)",
             "Run Step 46.0 A–D",
-            "LAUNCHMAINMENU ASYNC MAP: LOCKED",
-            "Requires Step 45.0 4/4. Resolves LaunchMainMenu(bool)'s own compiler state machine and maps MoveNext transitively. Null-platform reads and inert Sentry wrappers are allowed; OneTimeInitialization, InitializePlatform, deferred-startup, external Steamworks, FMOD, Spine, external Sentry, and native-extension edges fail before launch.");
+            "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP: LOCKED",
+            "Requires Step 45.0 4/4. Resolves LaunchMainMenu(bool)'s compiler state machine, then traverses only executing IL method edges (call/callvirt/newobj/jmp). ldftn/ldvirtftn/ldtoken targets are recorded as deferred frontiers instead of recursively treated as immediate execution. The map may contain unsafe immediate boundaries; it is evidence only and never authorizes original LaunchMainMenu.");
         _step46Button.TouchUpInside += async (_, _) => await RunStep46StartupLadderAsync();
 
         (_step47Button, _step47ResultLabel, _step47DetailLabel) = AddStartupLadderStepControls(
             content,
-            "Step 47.0 — one-shot controlled live LaunchMainMenu",
-            "Run Step 47.0 A–D — LIVE MAIN MENU ATTEMPT",
-            "CONTROLLED LAUNCHMAINMENU: LOCKED",
-            "Requires Step 46.0 4/4 plus a recursively expanded durable admissible map. Binds exact runtime token, starts rendering once, invokes LaunchMainMenu(skipIntro=true) once, and awaits the un-cancelable Task to completion with no abandonment timeout. A hard hang is diagnosed from the durable pre-invocation checkpoint and requires relaunch; normal managed failures refreeze rendering. On 4/4 success RootSceneContainer must gain a real child scene and rendering intentionally remains active for observation.");
+            "Step 47.0 — exact main-menu resource prep + Spine-neutral cache authority",
+            "Run Step 47.0 A–D",
+            "MAIN MENU RESOURCE PREPARATION: LOCKED",
+            "Requires Step 46.0 4/4 map authority. Extracts exact main_menu.tscn + main_menu_bg.tscn from the receipt-backed PCK, prepares a private deterministic Spine-neutral background derivative, writes the static map before loading, then loads the derivative and original menu as PackedScenes without instantiation. Trusted PCK/install bytes stay immutable; original LaunchMainMenu/ExecuteDeferred/Steam remain unopened.");
         _step47Button.TouchUpInside += async (_, _) => await RunStep47StartupLadderAsync();
+
+        (_step48Button, _step48ResultLabel, _step48DetailLabel) = AddStartupLadderStepControls(
+            content,
+            "Step 48.0 — one-shot off-tree real NMainMenu instantiation + lifecycle audit",
+            "Run Step 48.0 A–D",
+            "MAIN MENU OFF-TREE INSTANTIATION: LOCKED",
+            "Requires Step 47.0 4/4. Instantiates the retained exact main-menu PackedScene once off-tree, requires managed root NMainMenu, enumerates the actual node graph, and execution-opcode-audits actual _EnterTree/_Ready/_Notification callbacks. Deferred delegates are recorded but not traversed. Any immediate forbidden platform/Steam/Spine/native boundary stops before SceneTree admission.");
+        _step48Button.TouchUpInside += async (_, _) => await RunStep48StartupLadderAsync();
+
+        (_step49Button, _step49ResultLabel, _step49DetailLabel) = AddStartupLadderStepControls(
+            content,
+            "Step 49.0 — one frozen RootSceneContainer.AddChild(NMainMenu)",
+            "Run Step 49.0 A–D",
+            "MAIN MENU FROZEN SCENETREE ADMISSION: LOCKED",
+            "Requires Step 48.0 4/4 and its durable actual-node lifecycle map. Resolves exact retained NGame.RootSceneContainer, writes an admission map, then AddChild's the real NMainMenu exactly once while rendering stays stopped. Success requires IsInsideTree=true, exact parent, child count +1, state=2, and zero initializer/rejected/native escape.");
+        _step49Button.TouchUpInside += async (_, _) => await RunStep49StartupLadderAsync();
+
+        (_step50Button, _step50ResultLabel, _step50DetailLabel) = AddStartupLadderStepControls(
+            content,
+            "Step 50.0 — actual in-tree main-menu frame/input audit + ~100 ms render pulse",
+            "Run Step 50.0 A–D — RENDER PULSE",
+            "MAIN MENU CONTROLLED RENDER PULSE: LOCKED",
+            "Requires Step 49.0 4/4. Maps the actual in-tree menu graph's _Process/_PhysicsProcess/_Draw/input callbacks with execution-qualified traversal, writes that map before rendering, starts the existing Godot render loop exactly once, requests ~100 ms, and the first managed continuation synchronously StopRendering before telemetry. Final state remains frozen even on a successful 4/4 pulse.");
+        _step50Button.TouchUpInside += async (_, _) => await RunStep50StartupLadderAsync();
     }
 
     private (UIButton Button, UILabel Result, UILabel Detail) AddStartupLadderStepControls(
@@ -233,7 +272,7 @@ public sealed partial class RootViewController
         if (!TryPrepareStartupLadderStep(step, _step45Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep45ClosurePassed,
                 "Step 46.0 requires Step 45.0 4/4 local-save authority in this same process.", out var button, out var resultLabel, out var detailLabel))
             return;
-        if (!TryInitializeStartupLadderTelemetry(step, "LaunchMainMenu async map", "Step46-LaunchMainMenu-StaticMap", out var error))
+        if (!TryInitializeStartupLadderTelemetry(step, "LaunchMainMenu immediate frontier map", "Step46-LaunchMainMenu-ImmediateFrontier-StaticMap", out var error))
         {
             SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error);
             return;
@@ -242,18 +281,18 @@ public sealed partial class RootViewController
         _step46Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START — Step 46.0 exact LaunchMainMenu async map started; rendering remains frozen and LaunchMainMenu is not invoked.");
+            WriteStartupLadderCheckpoint(step, "RUN_START — Step 46.0 execution-aware LaunchMainMenu frontier map started; rendering remains frozen and original LaunchMainMenu is never invoked or authorized.");
             if (!RecordStartupLadderGate(_step46Gates, _transformedRealStS2VeryEarlyInitialization.RunStep46ClosedStep45Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step46Gates, _transformedRealStS2VeryEarlyInitialization.RunStep46LaunchMainMenuStateMachineMap(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step46Gates, _transformedRealStS2VeryEarlyInitialization.RunStep46LaunchMainMenuClosureAudit(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 46 complete LaunchMainMenu static map write failed: " + mapError);
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 46 immediate/deferred frontier map write failed: " + mapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep46StaticMapDurablyWritten();
-            WriteStartupLadderCheckpoint(step, "M46_C_STATIC_MAP_WRITE_RETURNED — complete LaunchMainMenu state-machine + transitive admissibility map durably written and marked authoritative before Step 46 Gate D / any Step 47 launch.");
+            WriteStartupLadderCheckpoint(step, "M46_C_STATIC_MAP_WRITE_RETURNED — complete execution-opcode-qualified immediate/deferred frontier map durably written. Unsafe immediate boundaries remain evidence only; original LaunchMainMenu is still forbidden.");
             if (!RecordStartupLadderGate(_step46Gates, _transformedRealStS2VeryEarlyInitialization.RunStep46FrozenNoInvocationConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             CompleteStartupLadderStep(step, _step46Gates, resultLabel, detailLabel,
-                "LaunchMainMenu's own compiler-generated MoveNext closure is fully mapped, durable, and admissible with no invocation. Step 47 live launch is now unlocked in this same process.");
+                "Original LaunchMainMenu's exact immediate/deferred frontier is durably mapped without invocation or authorization. Step 47 direct PCK menu-resource preparation is now unlocked.");
             button.Enabled = false;
-            WriteStartupLadderCheckpoint(step, "RUN_STEP46_4OF4 — LaunchMainMenu async map closed with launchAdmissible=True; Step 47 may run once.");
+            WriteStartupLadderCheckpoint(step, "RUN_STEP46_4OF4 — execution-aware LaunchMainMenu frontier map closed; Step 47 direct-resource route may run. Original LaunchMainMenu remains unopened.");
         }
         catch (Exception ex)
         {
@@ -261,7 +300,7 @@ public sealed partial class RootViewController
         }
         finally
         {
-            await FinishStartupLadderStepAsync(step, "Step46-TransformedRealStS2LaunchMainMenuMap.txt", "StS2 Launcher — Step 46.0 LaunchMainMenu Async Map", resultLabel, detailLabel,
+            await FinishStartupLadderStepAsync(step, "Step46-TransformedRealStS2LaunchMainMenuImmediateFrontierMap.txt", "StS2 Launcher — Step 46.0 LaunchMainMenu Immediate Frontier Map", resultLabel, detailLabel,
                 "Step 46 never invokes LaunchMainMenu or restarts rendering.");
         }
     }
@@ -269,64 +308,48 @@ public sealed partial class RootViewController
     private async Task RunStep47StartupLadderAsync()
     {
         const int step = 47;
-        if (_step47InvocationUiStarted)
+        if (_step47ResourceLoadUiStarted)
         {
             var labels = GetStartupLadderLabels(step);
-            SetStartupLadderRefusal(step, labels.Result, labels.Detail, "ONE-SHOT ALREADY ARMED", "Step 47 crossed or attempted the live LaunchMainMenu boundary in this process. Preserve reports and relaunch; never retry.");
+            SetStartupLadderRefusal(step, labels.Result, labels.Detail, "ONE-SHOT ALREADY ARMED", "Step 47 Godot resource-cache load/takeover boundary was already armed in this process. Preserve reports and relaunch; never retry.");
             return;
         }
-        if (!TryPrepareStartupLadderStep(step, _step46Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep46ClosurePassed && _transformedRealStS2VeryEarlyInitialization.Step46LaunchMainMenuAdmissible,
-                "Step 47.0 requires Step 46.0 4/4 with a durable admissible LaunchMainMenu map in this same process.", out var button, out var resultLabel, out var detailLabel))
+        if (!TryPrepareStartupLadderStep(step, _step46Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep46ClosurePassed,
+                "Step 47.0 requires Step 46.0 4/4 durable frontier-map authority in this same process.", out var button, out var resultLabel, out var detailLabel))
             return;
-        if (!TryInitializeStartupLadderTelemetry(step, "Controlled live LaunchMainMenu", null, out var error))
+        if (!TryInitializeStartupLadderTelemetry(step, "Exact main-menu resource preparation", "Step47-MainMenuResources-StaticMap", out var error))
         {
             SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error);
             return;
         }
         BeginSteamOperation(allowCancel: false);
         _step47Gates.Reset();
-        _step47RunPassed = false;
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START — Step 47.0 one-shot controlled live LaunchMainMenu started from Step-46 admissible map authority. Rendering is still frozen at entry.");
-            if (!RecordStartupLadderGate(_step47Gates, _transformedRealStS2VeryEarlyInitialization.RunStep47ClosedStep46Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            if (!RecordStartupLadderGate(_step47Gates, _transformedRealStS2VeryEarlyInitialization.RunStep47ExactRuntimeBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-
-            _step47InvocationUiStarted = true;
+            WriteStartupLadderCheckpoint(step, "RUN_START — Step 47.0 exact PCK main-menu resource preparation started. Rendering is frozen; original LaunchMainMenu/ExecuteDeferred/Steam/native game extensions remain unopened.");
+            if (!RecordStartupLadderGate(_step47Gates, _transformedRealStS2VeryEarlyInitialization.RunStep47ClosedStep46MapAuthority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!RecordStartupLadderGate(_step47Gates, _transformedRealStS2VeryEarlyInitialization.RunStep47MainMenuResourcePreparation(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 47 exact resource/derivative map write failed before ResourceLoader work: " + mapError);
+            _transformedRealStS2VeryEarlyInitialization.MarkStep47StaticMapDurablyWritten();
+            WriteStartupLadderCheckpoint(step, "M47_B_STATIC_MAP_WRITE_RETURNED — exact PCK resource authority + private Spine-neutral derivative map durably written before any Godot resource load.");
+            _step47ResourceLoadUiStarted = true;
             button.Enabled = false;
-            WriteStartupLadderCheckpoint(step, $"M47_C_UI_ARMED — first and only live LaunchMainMenu attempt authorized; managedThread={Environment.CurrentManagedThreadId}; isMain={NSThread.IsMain}; renderingActiveBefore={GodotStep15NativeBridge.IsRenderingActive}.");
-            WriteStartupLadderCheckpoint(step, "M47_C_START_RENDERING_CALL — invoking StartRendering exactly once immediately before LaunchMainMenu.");
-            var startReturned = GodotStep15NativeBridge.StartRendering();
-            WriteStartupLadderCheckpoint(step, $"M47_C_START_RENDERING_RETURNED — returned={startReturned}; renderingActiveAfterStart={GodotStep15NativeBridge.IsRenderingActive}; nativeError='{SanitizeStartupLadderCheckpoint(GodotStep15NativeBridge.LastError)}'.");
-            var gateC = await _transformedRealStS2VeryEarlyInitialization.RunStep47ControlledLaunchMainMenuInvocationAsync(
-                startReturned && GodotStep15NativeBridge.IsRenderingActive,
-                d => WriteStartupLadderCheckpoint(step, d));
-            if (!RecordStartupLadderGate(_step47Gates, gateC, resultLabel, detailLabel))
-            {
-                RefreezeStep47AfterFailure();
-                return;
-            }
-            if (!RecordStartupLadderGate(_step47Gates, _transformedRealStS2VeryEarlyInitialization.RunStep47LivePostLaunchConfinement(GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel))
-            {
-                RefreezeStep47AfterFailure();
-                return;
-            }
-            _step47RunPassed = true;
+            WriteStartupLadderCheckpoint(step, "M47_C_UI_ARMED — first/only Godot background cache takeover + exact main-menu PackedScene load authorized; no in-process retry after this checkpoint.");
+            if (!RecordStartupLadderGate(_step47Gates, _transformedRealStS2VeryEarlyInitialization.RunStep47MainMenuPackedSceneLoad(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!RecordStartupLadderGate(_step47Gates, _transformedRealStS2VeryEarlyInitialization.RunStep47FrozenResourceConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             CompleteStartupLadderStep(step, _step47Gates, resultLabel, detailLabel,
-                "FIRST CONTROLLED REAL MAIN-MENU LAUNCH CLOSED 4/4. LaunchMainMenu(skipIntro=true) completed, RootSceneContainer gained a child scene, NGame/state/context remained confined, and rendering intentionally remains active for visual observation.");
-            WriteStartupLadderCheckpoint(step, "RUN_STEP47_4OF4 — controlled LaunchMainMenu completed and a real root-scene child is present; rendering intentionally remains active on successful closure.");
+                "Exact main-menu PackedScene plus private Spine-neutral background cache authority closed 4/4 without instantiation. Step 48 off-tree NMainMenu instantiation is unlocked.");
+            button.Enabled = false;
+            WriteStartupLadderCheckpoint(step, "RUN_STEP47_4OF4 — exact direct-menu resources are loaded/retained with renderer frozen; Step 48 may instantiate NMainMenu off-tree once.");
         }
         catch (Exception ex)
         {
-            HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step47InvocationUiStarted);
-            RefreezeStep47AfterFailure();
+            HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step47ResourceLoadUiStarted);
         }
         finally
         {
-            if (_step47InvocationUiStarted && !_step47RunPassed)
-                RefreezeStep47AfterFailure();
-            await FinishStartupLadderStepAsync(step, "Step47-TransformedRealStS2ControlledLaunchMainMenu.txt", "StS2 Launcher — Step 47.0 Controlled LaunchMainMenu", resultLabel, detailLabel,
-                _step47RunPassed ? "Step 47 succeeded; rendering intentionally remains active." : "Step 47 failed/was incomplete; launcher refroze rendering at the first managed opportunity.");
+            await FinishStartupLadderStepAsync(step, "Step47-TransformedRealStS2MainMenuResourcePreparation.txt", "StS2 Launcher — Step 47.0 Main Menu Resource Preparation", resultLabel, detailLabel,
+                "Step 47 never instantiates the menu, invokes original LaunchMainMenu, or restarts rendering. If Gate C was attempted, relaunch rather than retry Step 47 in-process.");
         }
     }
 
@@ -356,7 +379,7 @@ public sealed partial class RootViewController
         }
         if (GodotStep15NativeBridge.IsRenderingActive)
         {
-            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Step 47 itself will start rendering only after its exact Gate-B binding.");
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Only Step 50 may restart rendering, and only after its exact frame/input map is durably written.");
             return false;
         }
         return true;
@@ -370,6 +393,9 @@ public sealed partial class RootViewController
             45 => (_step45Button!, _step45ResultLabel!, _step45DetailLabel!),
             46 => (_step46Button!, _step46ResultLabel!, _step46DetailLabel!),
             47 => (_step47Button!, _step47ResultLabel!, _step47DetailLabel!),
+            48 => (_step48Button!, _step48ResultLabel!, _step48DetailLabel!),
+            49 => (_step49Button!, _step49ResultLabel!, _step49DetailLabel!),
+            50 => (_step50Button!, _step50ResultLabel!, _step50DetailLabel!),
             _ => throw new ArgumentOutOfRangeException(nameof(step)),
         };
 
@@ -446,15 +472,6 @@ public sealed partial class RootViewController
         }
     }
 
-    private void RefreezeStep47AfterFailure()
-    {
-        if (!GodotStep15NativeBridge.IsRenderingActive)
-            return;
-        WriteStartupLadderCheckpoint(47, "M47_FAIL_STOP_RENDERING_CALL — Step 47 did not close 4/4; synchronously refreezing rendering at the first managed opportunity.");
-        var stopped = GodotStep15NativeBridge.StopRendering();
-        WriteStartupLadderCheckpoint(47, $"M47_FAIL_STOP_RENDERING_RETURNED — returned={stopped}; renderingActiveAfterStop={GodotStep15NativeBridge.IsRenderingActive}; nativeError='{SanitizeStartupLadderCheckpoint(GodotStep15NativeBridge.LastError)}'.");
-    }
-
     private bool TryInitializeStartupLadderTelemetry(int step, string title, string? staticMapStem, out string error)
     {
         error = string.Empty;
@@ -478,8 +495,8 @@ public sealed partial class RootViewController
                     $"Initialized UTC: {now:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
-                    "Candidate: STEPS 43–47 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; LATER RUNGS REQUIRE SAME-PROCESS PRIOR 4/4 AUTHORITY.\n" +
-                    "Global policy: Steps 43–46 keep rendering frozen. GameStartup itself, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, FMOD/Spine/native game extensions remain unopened unless a rung explicitly says otherwise. Step 47 alone may start rendering and invoke exact admissible LaunchMainMenu once.\n\n");
+                    "Candidate: STEPS 43–50 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; LATER RUNGS REQUIRE SAME-PROCESS PRIOR 4/4 AUTHORITY.\n" +
+                    "Global policy: Steps 43–49 keep rendering frozen. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, and native game GDExtensions remain unopened. Steps 47–49 use the direct main-menu resource/scene route; Step 50 alone may run one audited bounded render pulse and must synchronously refreeze.\n\n");
                 WriteStartupLadderCheckpoint(step, "RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.");
                 return true;
             }

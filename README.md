@@ -1,15 +1,19 @@
-# StS2 Launcher — Steps 43–47 startup ladder
+# StS2 Launcher — Steps 43–50 direct main-menu startup ladder
 
-Active candidate: **0.0.178 (178)** — five independently gated startup rungs in one IPA; stop on the first failure.
+Active candidate: **0.0.179 (179)** — eight independently gated startup rungs in one IPA; stop on the first failure.
 
 Physical **0.0.175 / Step 42** is closed positive **4/4**: exact `NGame.InitPools()` mapped to a 22-method zero-boundary closure, executed once on the real in-tree `NGame`, and returned with state 2, frozen rendering, and zero resolver/host/private/initializer/rejected/native deltas.
 
-Physical **0.0.176** proved the ladder can advance through same-process Step 44 authority but Step 45 Gate B stopped safely before mutation on a wrong singleton-field assumption. Physical **0.0.177** corrected that metadata and passed Step 45 Gate B completely: 3 roots, 331 same-sts2 closure methods, 6 approved classified references, zero forbidden/unresolved/external Cecil resolution. Gate C then armed the intended local-save sequence and stopped only because one managed resolver request produced one exact planned host-framework load while private/initializer/rejected/native deltas remained zero. **0.0.178 is a narrow confinement-accounting correction**: Step 45 may admit zero or one exactly paired framework-shaped host binding already admitted by the persisted Step35 host plan, records its exact requested→actual identity, and then requires zero further drift. The local-save calls and Steps 46–47 are unchanged.
+Physical **0.0.176** reached Step 45 Gate B and stopped safely before mutation on an incorrect singleton backing-field assumption. Physical **0.0.177** corrected exact `_mockInstance`/`_instance` authority and reached the real local-save call boundary; it stopped only on one planned host-framework materialization. Physical **0.0.178** then closed **Step 45 4/4**: Step 46 Gate A accepted same-process local-save authority with state 2, rendering frozen, and zero post-Step-45 resolver/host/private/initializer/rejected/native drift. Step 46 Gate B also located exact `NGame.LaunchMainMenu(bool)` token `0x06001BDF` and async `MoveNext` token `0x06001C3D` / 336 IL instructions. The old Step-46 Gate C failed safely without invocation because its graph recursively treated dormant delegate/function-pointer targets as executable and therefore pulled deferred startup, multiplayer, Steam, and Spine paths into one artificial closure.
 
-0.0.178 keeps that safety model but reduces rebuild cycles. After Step 42 4/4, the same process may advance through: **Step 43 Null-platform authority → Step 44 read-only legacy-data guard → Step 45 one-shot local SaveManager initialization → Step 46 exact `LaunchMainMenu(bool)` async state-machine/closure map → Step 47 conditional one-shot live `LaunchMainMenu(skipIntro=true)`**. Every rung has its own four-gate result and run-correlated reports; later rungs stay locked until the prior rung is 4/4.
+0.0.179 keeps physically exercised Steps 43–45 unchanged and replaces the blocked live-launch design with an execution-aware, direct-resource ladder:
 
-Steps 43–46 keep rendering frozen. Step 47 can start rendering only after Step 46's complete map is admissible and durably written. Step 47 refreezes rendering on normal failure/incomplete return and leaves rendering active only after 4/4 success with a new `RootSceneContainer` child scene.
+**Step 43 Null-platform authority → Step 44 read-only legacy-data guard → Step 45 local SaveManager initialization → Step 46.1 non-invoking immediate/deferred `LaunchMainMenu` frontier map → Step 47 exact PCK main-menu resource + private Spine-neutral background preparation → Step 48 one-shot off-tree exact `NMainMenu` instantiation/lifecycle audit → Step 49 one-shot frozen `RootSceneContainer.AddChild(NMainMenu)` → Step 50 audited bounded main-menu render pulse.**
 
-Authoritative status, exact boundaries and device sequence: `docs/CURRENT-STATUS.md`.
+Every rung has its own four-gate result and run-correlated evidence. Later rungs remain locked until the prior rung is 4/4 in the same process. Steps 43–49 keep rendering frozen; **Step 50 alone may start rendering, and it synchronously stops rendering again before evaluating success**.
 
-0.0.174 never reached device runtime: Codemagic Core compilation failed because the Step-42 source used three non-existent shorthand load-context property names and one non-existent diagnostic helper name. 0.0.175 substitutes only the existing proven members `InitializerBearingRequests`, `RejectedManagedRequests`, `NativeLoadAttempts`, and `FormatExceptionDiagnostic`; Step-42 runtime semantics are otherwise unchanged.
+Original whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration mutation, `InitializePlatform`, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, external Steamworks/native Steam, and FMOD/Spine native game extensions remain unopened.
+
+Authoritative status, exact boundaries, report names, and physical sequence: `docs/CURRENT-STATUS.md`.
+
+0.0.174 never reached device runtime: Codemagic Core compilation failed on invalid Step-42 identifier names. 0.0.175 corrected only those compile-surface identifiers and later physically closed Step 42.

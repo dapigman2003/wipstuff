@@ -1,0 +1,6 @@
+StS2 Launcher — Step 46 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260909T1935066751780Z-pid2071-94c13416961e4da8955f81b9374c596c
+Journal: Step46-CrashCheckpoint-20260909T1935066751780Z-pid2071-94c13416961e4da8955f81b9374c596c.txt
+Static map: Step46-LaunchMainMenu-StaticMap-20260909T1935066751780Z-pid2071-94c13416961e4da8955f81b9374c596c.txt
+2026-09-09T19:35:07.0957380+00:00 | run=20260909T1935066751780Z-pid2071-94c13416961e4da8955f81b9374c596c | pid=2071 | managedThread=6 | RUN_END — Step-46 UI operation ended normally; Step 46 never invokes LaunchMainMenu or restarts rendering.

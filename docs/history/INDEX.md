@@ -453,3 +453,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-45.0-0.0.176-SINGLETON-FIELD-CORRECTION.md` — physical 0.0.176 Step-45 Gate-B singleton-field failure and 0.0.177 exact `_mockInstance`/`_instance` correction.
 - `steps/STEP-45.0.1-PLANNED-HOST-BINDING-ACCOUNTING-CORRECTION.md` — physical 0.0.177 Step-45 Gate-C +1 resolver/+1 exact host-framework observation and 0.0.178 fail-closed host-binding accounting correction.
 - `reports/STEP-45.0-PHYSICAL-0.0.177-STATIC-MAP.txt` / `...-CHECKPOINT.txt` / `...-FAIL-REPORT.txt` / `...-LAST-CHECKPOINT.txt` — physical 0.0.177 authority: Gate B 331/6/0/0 clean, Gate C armed, only resolver=1/host=1 drift, private/initializer/rejected/native all zero, normal frozen teardown.
+
+## Step 45 physical closure / Step 46.0 localization / Steps 46.1–50.0 direct main-menu ladder
+
+- `reports/STEP-46.0-PHYSICAL-0.0.178-FAIL-REPORT.txt` — physical 0.0.178 final Step-46 result: safe 2/4 non-invoking map failure; its prerequisite proves same-process Step 45 closed 4/4.
+- `reports/STEP-46.0-PHYSICAL-0.0.178-FAIL-CHECKPOINT.txt` — exact Step-45 frozen authority plus `LaunchMainMenu(bool)` token `0x06001BDF`, async MoveNext token `0x06001C3D`, 336 IL, then the over-broad Gate-C frontier failure.
+- `reports/STEP-46.0-PHYSICAL-0.0.178-FAIL-LAST-CHECKPOINT.txt` — normal frozen end; original `LaunchMainMenu` was never invoked and rendering was never restarted.
+- `steps/STEP-46.1-50.0-DIRECT-MAIN-MENU-LADDER.md` — 0.0.179 correction: execution-opcode-qualified non-invoking Step 46.1 map followed by one-shot exact-PCK resource preparation, off-tree `NMainMenu` instantiation, frozen `RootSceneContainer` admission, and one bounded render pulse that always refreezes.

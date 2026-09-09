@@ -9,16 +9,43 @@ public sealed class TransformedRealStS2StartupLadderTests
     [TestMethod]
     public void GateSequenceCompletesFourOfFourInOrder()
     {
-        var gates = new TransformedRealStS2StartupLadderGateSequence(46, "LAUNCHMAINMENU ASYNC MAP");
-        gates.Record(new(46, "LAUNCHMAINMENU ASYNC MAP", TransformedRealStS2StartupLadderGate.PrerequisiteAuthority, true, "a"));
-        gates.Record(new(46, "LAUNCHMAINMENU ASYNC MAP", TransformedRealStS2StartupLadderGate.StaticAuditOrBinding, true, "b"));
-        gates.Record(new(46, "LAUNCHMAINMENU ASYNC MAP", TransformedRealStS2StartupLadderGate.ControlledAction, true, "c"));
-        gates.Record(new(46, "LAUNCHMAINMENU ASYNC MAP", TransformedRealStS2StartupLadderGate.PostActionConfinement, true, "d"));
+        var gates = new TransformedRealStS2StartupLadderGateSequence(46, "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP");
+        gates.Record(new(46, "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP", TransformedRealStS2StartupLadderGate.PrerequisiteAuthority, true, "a"));
+        gates.Record(new(46, "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP", TransformedRealStS2StartupLadderGate.StaticAuditOrBinding, true, "b"));
+        gates.Record(new(46, "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP", TransformedRealStS2StartupLadderGate.ControlledAction, true, "c"));
+        gates.Record(new(46, "LAUNCHMAINMENU IMMEDIATE FRONTIER MAP", TransformedRealStS2StartupLadderGate.PostActionConfinement, true, "d"));
 
         var snapshot = gates.Snapshot();
         Assert.IsTrue(snapshot.Passed);
-        Assert.AreEqual("STEP 46.0 LAUNCHMAINMENU ASYNC MAP COMPLETE — 4/4", snapshot.Summary);
+        Assert.AreEqual("STEP 46.0 LAUNCHMAINMENU IMMEDIATE FRONTIER MAP COMPLETE — 4/4", snapshot.Summary);
         Assert.AreEqual(4, snapshot.Gates.Count);
+    }
+
+    [TestMethod]
+    public void DirectMainMenuRungNamesProduceDistinctFourOfFourSummaries()
+    {
+        var rungs = new[]
+        {
+            (47, "MAIN MENU RESOURCE PREPARATION"),
+            (48, "MAIN MENU OFF-TREE INSTANTIATION"),
+            (49, "MAIN MENU FROZEN SCENETREE ADMISSION"),
+            (50, "MAIN MENU CONTROLLED RENDER PULSE")
+        };
+
+        var summaries = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var (step, name) in rungs)
+        {
+            var gates = new TransformedRealStS2StartupLadderGateSequence(step, name);
+            gates.Record(new(step, name, TransformedRealStS2StartupLadderGate.PrerequisiteAuthority, true, "a"));
+            gates.Record(new(step, name, TransformedRealStS2StartupLadderGate.StaticAuditOrBinding, true, "b"));
+            gates.Record(new(step, name, TransformedRealStS2StartupLadderGate.ControlledAction, true, "c"));
+            gates.Record(new(step, name, TransformedRealStS2StartupLadderGate.PostActionConfinement, true, "d"));
+            var snapshot = gates.Snapshot();
+            Assert.IsTrue(snapshot.Passed);
+            Assert.IsTrue(summaries.Add(snapshot.Summary));
+        }
+
+        Assert.AreEqual(4, summaries.Count);
     }
 
     [TestMethod]
@@ -42,10 +69,10 @@ public sealed class TransformedRealStS2StartupLadderTests
     [TestMethod]
     public void GateSequenceRejectsAdvanceAfterFailure()
     {
-        var gates = new TransformedRealStS2StartupLadderGateSequence(47, "CONTROLLED LAUNCHMAINMENU");
-        gates.Record(new(47, "CONTROLLED LAUNCHMAINMENU", TransformedRealStS2StartupLadderGate.PrerequisiteAuthority, false, "fail"));
+        var gates = new TransformedRealStS2StartupLadderGateSequence(50, "MAIN MENU CONTROLLED RENDER PULSE");
+        gates.Record(new(50, "MAIN MENU CONTROLLED RENDER PULSE", TransformedRealStS2StartupLadderGate.PrerequisiteAuthority, false, "fail"));
         Assert.ThrowsExactly<InvalidOperationException>(() =>
-            gates.Record(new(47, "CONTROLLED LAUNCHMAINMENU", TransformedRealStS2StartupLadderGate.StaticAuditOrBinding, true, "bad")));
+            gates.Record(new(50, "MAIN MENU CONTROLLED RENDER PULSE", TransformedRealStS2StartupLadderGate.StaticAuditOrBinding, true, "bad")));
     }
 
     [TestMethod]
