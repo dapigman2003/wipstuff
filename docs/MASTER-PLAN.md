@@ -1,3 +1,9 @@
+## Current frontier — Step 42.0 / 0.0.174
+
+The active candidate is **0.0.174 / Step 42.0**.
+
+Step 41 physically closed the non-invoking GameStartup async frontier at 4/4. Step 42 isolates the first newly executed startup primitive: exact `NGame.InitPools()`. It is audited independently before one-shot invocation while rendering remains frozen. Platform identity, migration, cloud sync, Steam, main-menu and deferred startup remain later gates.
+
 # StS2 Launcher iOS — Master Plan
 
 ## Purpose

@@ -1,0 +1,7 @@
+# Step 42.0 — controlled GameStartup `NGame.InitPools()` boundary
+
+Physical 0.0.173 / Step 41 closed the non-invoking GameStartup async frontier map at 4/4. The exact `GameStartup` state machine mapped 691 same-sts2 methods and 46 classified boundaries with zero unresolved same-sts2 references and zero external Cecil resolution. The original async body interleaves account/profile migration, cloud/platform/Steam work, and later main-menu startup, so Step 42 does not invoke `GameStartup()`.
+
+Step 42 isolates exact instance `void NGame.InitPools()` as the first newly executed startup primitive. Gate A re-verifies same-process Step-41 frozen authority. Gate B maps exact `InitPools` IL and its transitive same-sts2 closure with deferred Cecil and a rejecting resolver; any classified startup/platform/Steam/Sentry/FMOD/Spine/native/OneTimeInitialization edge or unresolved same-sts2 reference fails before execution. The verified static map is durably written before Gate C. Gate C binds the exact zero-argument non-generic `InitPools()` metadata token on the retained real `NGame` and invokes it once. Gate D proves rendering remains stopped, NGame singleton/parent/window/state authority remains exact, and resolver/host/private/initializer/rejected/native counters do not move.
+
+Once Gate C is armed, do not retry Step 42 in-process. `GameStartup`, migrations, cloud sync, platform identity, Steam, main-menu/deferred startup, render restart, FMOD/Spine/native game extensions, explicit `_ExitTree`, RemoveChild and Free remain unopened.

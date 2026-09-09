@@ -1,0 +1,6 @@
+StS2 Launcher — Step 41 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260909T0559448772070Z-pid95807-2469c0d3566e48cb8668ad24f6081743
+Journal: Step41-CrashCheckpoint-20260909T0559448772070Z-pid95807-2469c0d3566e48cb8668ad24f6081743.txt
+Static map: Step41-GameStartupFrontier-StaticMap-20260909T0559448772070Z-pid95807-2469c0d3566e48cb8668ad24f6081743.txt
+2026-09-09T05:59:45.0845850+00:00 | run=20260909T0559448772070Z-pid95807-2469c0d3566e48cb8668ad24f6081743 | pid=95807 | managedThread=14 | RUN_END — Step-41 UI operation ended normally; GameStartup was never invoked and Step 41 never restarted rendering.

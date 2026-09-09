@@ -46,7 +46,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Step 41.0 GameStartup async frontier-map build environment"
+  echo "StS2 Launcher — Step 42.0 controlled GameStartup InitPools build environment"
   date -u
   uname -a
   xcodebuild -version

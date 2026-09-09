@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEP 41.0 — GAMESTARTUP ASYNC FRONTIER MAP (NON-INVOKING)";
+        "STEP 42.0 — CONTROLLED GAMESTARTUP INITPOOLS";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 28–34 CLOSED POSITIVE • STEP 35 CLOSED POSITIVE • STEP 36 CLOSED POSITIVE 4/4 • STEP 37 CLOSED POSITIVE 4/4 • STEP 38 CLOSED POSITIVE 4/4 • STEP 39 CLOSED POSITIVE 4/4 • STEP 40 CLOSED POSITIVE 4/4 • STEP 41 OPEN — GAMESTARTUP ASYNC MAP";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 28–34 CLOSED POSITIVE • STEP 35 CLOSED POSITIVE • STEP 36 CLOSED POSITIVE 4/4 • STEP 37 CLOSED POSITIVE 4/4 • STEP 38 CLOSED POSITIVE 4/4 • STEP 39 CLOSED POSITIVE 4/4 • STEP 40 CLOSED POSITIVE 4/4 • STEP 41 CLOSED POSITIVE 4/4 • STEP 42 OPEN — CONTROLLED INITPOOLS";
 
     public const string Summary =
-        "Physical 0.0.171 closed Step 40 at 4/4 on the successful render-pulse run: 68 in-tree nodes, 23 selected sts2 managed types, 12 immediate frame/input callbacks, 447 same-sts2 closure methods, zero forbidden/unresolved/external-resolution edges, StartRendering active, first continuation at 101.8 ms, StopRendering inactive at 103.3 ms, and frozen NGame/state/native confinement intact. Step 41.0 is metadata-only: keep rendering frozen and GameStartupWrapper inert; map exact NGame.GameStartup, its AsyncStateMachineAttribute/compiler state-machine fields/full MoveNext IL, then map the transitive same-sts2 startup closure with path-qualified platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native-facing boundaries. GameStartup itself is not invoked.";
+        "Physical 0.0.173 closed Step 41 at 4/4: exact NGame.GameStartup token 0x06001BD1, compiler state-machine NGame/<GameStartup>d__117, MoveNext token 0x06001C31, 411 MoveNext instructions, 691 transitive same-sts2 startup methods, 46 classified boundaries (36 platform, 2 Steam, 5 inert Sentry wrapper, 2 OneTimeInitialization, 1 LaunchMainMenu), zero unresolved same-sts2 references, zero external Cecil resolution, GameStartup invoked=NO, rendering restarted=NO, and frozen NGame/state/native confinement intact. Step 42.0 isolates exact NGame.InitPools(): audit its own same-sts2 closure to zero classified/unresolved boundaries, durably write the map, invoke InitPools exactly once on the retained real NGame while rendering remains frozen, then prove zero resolver/host/private/initializer/rejected/native escape.";
 
     public const string InitialStatus =
-        "Status: Steps 39 and 40 are physically closed 4/4. For 0.0.173 use one fresh process: Step 15 A-C → Step 35.0.32 MODEL-BOOTSTRAP 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → SKIP Step 38 → Step 39.0 4/4 → Step 40.1 4/4 → immediately Step 41.0 once in the same process. Step 41 never restarts rendering and never invokes GameStartup. Preserve the Step41 static map; it becomes the authority for choosing the next exact startup boundary. InitializePlatform/Steam/main-menu/ExecuteDeferred/native game extensions/gameplay remain forbidden.";
+        "Status: Steps 39–41 are physically closed 4/4. For 0.0.174 use one fresh process: Step 15 A-C → Step 35.0.32 4/4 → Step 36.0.5 4/4 → Step 37.0.1 4/4 → SKIP Step 38 → Step 39.0 4/4 → Step 40.1 4/4 → Step 41.0 4/4 → immediately Step 42.0 once. Step 42 never restarts rendering and never invokes GameStartup/migrations/cloud/platform/Steam/main-menu/deferred work. Once Gate C is armed, preserve Step42 artifacts and relaunch rather than retrying in-process.";
 
-    public const string ExpectedDisplayVersion = "0.0.173";
-    public const string ExpectedBuildVersion = "173";
+    public const string ExpectedDisplayVersion = "0.0.174";
+    public const string ExpectedBuildVersion = "174";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -58,6 +58,9 @@ internal static class CurrentReleasePresentation
 
     public const string Step41ImplementationMarker =
         "physical Step-40 4/4 frozen authority -> no render restart -> selected Step-39.1 compatibility image unchanged -> exact NGame.GameStartup metadata + AsyncStateMachineAttribute -> compiler state-machine fields + full MoveNext IL -> deferred rejecting-resolver transitive same-sts2 closure -> path-qualified OneTimeInitialization/InitializePlatform/platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native boundary classification -> zero unresolved same-sts2/external Cecil resolution -> frozen no-invocation NGame/state/native confinement; GameStartup remains uninvoked";
+
+    public const string Step42ImplementationMarker =
+        "physical 0.0.173 Step-41 4/4 GameStartup frontier authority -> renderer remains frozen + GameStartupWrapper inert -> exact NGame.InitPools metadata/IL -> deferred rejecting-resolver reuse of Step-41 same-sts2 closure/boundary classifier -> require zero platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native/OneTimeInitialization boundaries + zero unresolved references -> durable pre-invocation static map -> one MethodInfo.Invoke(instance,null) on exact token -> require state 2 and zero resolver/host/private/initializer/rejected/native deltas -> frozen post-InitPools NGame confinement; GameStartup/migrations/cloud/platform/Steam/main-menu/deferred remain unopened";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

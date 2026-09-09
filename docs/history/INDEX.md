@@ -425,3 +425,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-STATIC-MAP.txt` — repeats the clean 68-node / 23-type / 12-callback / 447-method frame/input authority.
 - `reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-LAST-CHECKPOINT.txt` — normal frozen run endpoint.
 - `steps/STEP-41.0-GAMESTARTUP-ASYNC-FRONTIER-MAP.md` — 0.0.173 non-invoking exact GameStartup async-state-machine and transitive boundary mapping design.
+
+## Step 41.0 physical closure / Step 42.0 controlled InitPools
+
+- `reports/STEP-41.0-PHYSICAL-0.0.173-REPORT.txt` — authoritative physical 0.0.173 final report: Step 41 GameStartup async frontier map COMPLETE 4/4 without invoking GameStartup or restarting rendering.
+- `reports/STEP-41.0-PHYSICAL-0.0.173-CHECKPOINT.txt` — run-correlated proof of exact GameStartup/MoveNext mapping, 691-method closure, 46 classified boundaries, zero unresolved/external resolution, and frozen zero-native confinement.
+- `reports/STEP-41.0-PHYSICAL-0.0.173-STATIC-MAP.txt` — full GameStartup + MoveNext IL, state-machine fields, closure and path-qualified boundary authority.
+- `reports/STEP-41.0-PHYSICAL-0.0.173-LAST-CHECKPOINT.txt` — normal run end with GameStartup uninvoked and rendering not restarted.
+- `steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md` — 0.0.174 one-shot exact `NGame.InitPools()` audit/invocation design while rendering remains frozen and GameStartup itself remains unopened.

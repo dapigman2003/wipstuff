@@ -1,6 +1,10 @@
-# Testing — Step 41.0
+## 0.0.174 / Step 42.0 controlled InitPools
 
-Active candidate: `0.0.173 (173)`, IPA `StS2-Launcher-Step-41.ipa`, workflow `ios-canonical`.
+Physical prerequisite: same-process Step 41.0 4/4 with rendering frozen. Gate B must write `Step42-InitPools-StaticMap-<RunId>.txt` before Gate C. Gate C invokes exact audited `NGame.InitPools()` once; after Gate C is armed never retry in-process. Success requires state 2, rendering stopped, and resolver/host/private/initializer/rejected/native deltas all zero. GameStartup/migrations/cloud/platform/Steam/main-menu/deferred remain forbidden.
+
+# Testing — Step 42.0
+
+Active candidate: `0.0.174 (174)`, IPA `StS2-Launcher-Step-42.ipa`, workflow `ios-canonical`.
 
 Canonical validation must preserve physical Step-36/37/38/39 closures and the physical Step-40 4/4 render-pulse closure. Step 41.0 requires same-process Step-40 4/4 with rendering stopped, maps exact `NGame.GameStartup` plus its `AsyncStateMachineAttribute` and compiler-generated `MoveNext` body, then maps the transitive same-sts2 startup closure with deferred/rejecting Cecil. No GameStartup invocation or render restart is permitted.
 

@@ -1,0 +1,1301 @@
+StS2 Launcher — Step 41.0 GameStartup async frontier static map
+Read-only Cecil evidence from the exact selected compatibility image; this step never invokes GameStartup and never restarts rendering.
+Selected compatibility path: /var/mobile/Containers/Data/Application/FF2A292B-58CA-4956-A13A-635E6F420631/Documents/StS2Launcher/Step35-ExecuteVeryEarlyDiagnostic/sts2.step39.1.lifecycle-admission.dll
+Selected compatibility SHA-256: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a
+GameStartup full name: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::GameStartup()
+GameStartup token: 0x06001BD1
+Async state-machine type: MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+MoveNext token: 0x06001C31
+Transitive same-sts2 startup closure methods mapped: 691
+Classified startup/platform/native boundary references: 46
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+GameStartup invoked: NO
+Rendering restarted: NO
+Step 41 policy: map exact async state machine and path-qualified closure only; keep GameStartupWrapper inert and renderer frozen.
+
+[GAMESTARTUP METHOD]
+  token=0x06001BD1
+  fullname=System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::GameStartup()
+  returnType=System.Threading.Tasks.Task
+  IL instructions=17
+    IL_0000: ldloca.s V_0
+    IL_0002: call System.Runtime.CompilerServices.AsyncTaskMethodBuilder System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Create()
+    IL_0007: stfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_000C: ldloca.s V_0
+    IL_000E: ldarg.0
+    IL_000F: stfld MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>4__this
+    IL_0014: ldloca.s V_0
+    IL_0016: ldc.i4.m1
+    IL_0017: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_001C: ldloca.s V_0
+    IL_001E: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_0023: ldloca.s V_0
+    IL_0025: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::Start<MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117>(!!0&)
+    IL_002A: ldloca.s V_0
+    IL_002C: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_0031: call System.Threading.Tasks.Task System.Runtime.CompilerServices.AsyncTaskMethodBuilder::get_Task()
+    IL_0036: ret
+
+[ASYNC STATE MACHINE]
+  type=MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117
+  token=0x02000304
+  fields=9
+    field token=0x0400119D; System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    field token=0x0400119E; System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    field token=0x0400119F; MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>4__this
+    field token=0x040011A0; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<cloudSavesTask>5__2
+    field token=0x040011A1; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<progressReadResult>5__3
+    field token=0x040011A2; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<prefsReadResult>5__4
+    field token=0x040011A3; System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    field token=0x040011A4; System.Object MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__2
+    field token=0x040011A5; System.Runtime.CompilerServices.TaskAwaiter`1<System.Single> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__3
+
+[MOVENEXT METHOD]
+  token=0x06001C31
+  fullname=System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext()
+  IL instructions=411
+    IL_0000: ldarg.0
+    IL_0001: ldfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_0006: stloc.0
+    IL_0007: ldarg.0
+    IL_0008: ldfld MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>4__this
+    IL_000D: stloc.1
+    IL_000E: ldloc.0
+    IL_000F: switch IL_005F,IL_0112,IL_0261,IL_0394,IL_0486
+    IL_0028: call System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()
+    IL_002D: callvirt System.Runtime.CompilerServices.TaskAwaiter System.Threading.Tasks.Task::GetAwaiter()
+    IL_0032: stloc.3
+    IL_0033: ldloca.s V_3
+    IL_0035: call System.Boolean System.Runtime.CompilerServices.TaskAwaiter::get_IsCompleted()
+    IL_003A: brtrue.s IL_007B
+    IL_003C: ldarg.0
+    IL_003D: ldc.i4.0
+    IL_003E: dup
+    IL_003F: stloc.0
+    IL_0040: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_0045: ldarg.0
+    IL_0046: ldloc.3
+    IL_0047: stfld System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_004C: ldarg.0
+    IL_004D: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_0052: ldloca.s V_3
+    IL_0054: ldarg.0
+    IL_0055: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117>(!!0&,!!1&)
+    IL_005A: leave IL_0530
+    IL_005F: ldarg.0
+    IL_0060: ldfld System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_0065: stloc.3
+    IL_0066: ldarg.0
+    IL_0067: ldflda System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_006C: initobj System.Runtime.CompilerServices.TaskAwaiter
+    IL_0072: ldarg.0
+    IL_0073: ldc.i4.m1
+    IL_0074: dup
+    IL_0075: stloc.0
+    IL_0076: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_007B: ldloca.s V_3
+    IL_007D: call System.Void System.Runtime.CompilerServices.TaskAwaiter::GetResult()
+    IL_0082: call Godot.CanvasLayer MegaCrit.Sts2.Core.Nodes.Debug.NDevConsole::Create()
+    IL_0087: stloc.2
+    IL_0088: ldloc.1
+    IL_0089: ldloc.2
+    IL_008A: call System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::AddChildSafely(Godot.Node,Godot.Node)
+    IL_008F: ldloc.1
+    IL_0090: ldloc.2
+    IL_0091: ldloc.1
+    IL_0092: ldc.i4.0
+    IL_0093: call System.Int32 Godot.Node::GetChildCount(System.Boolean)
+    IL_0098: ldc.i4.1
+    IL_0099: sub
+    IL_009A: call System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::MoveChildSafely(Godot.Node,Godot.Node,System.Int32)
+    IL_009F: call System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::MigrateToUserScopedDirectories()
+    IL_00A4: call System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::ArchiveLegacyData()
+    IL_00A9: call System.Void MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator::MigrateToProfileScopedDirectories()
+    IL_00AE: call System.Void MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator::ArchiveLegacyData()
+    IL_00B3: ldarg.0
+    IL_00B4: ldloc.1
+    IL_00B5: call System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::DoCloudSync()
+    IL_00BA: stfld System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<cloudSavesTask>5__2
+    IL_00BF: ldloc.1
+    IL_00C0: call System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitPools()
+    IL_00C5: call System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential()
+    IL_00CA: ldloc.1
+    IL_00CB: call System.Boolean Godot.Node::IsNodeReady()
+    IL_00D0: brtrue.s IL_0137
+    IL_00D2: ldloc.1
+    IL_00D3: ldloc.1
+    IL_00D4: ldsfld Godot.StringName Godot.Node/SignalName::Ready
+    IL_00D9: call Godot.SignalAwaiter Godot.GodotObject::ToSignal(Godot.GodotObject,Godot.StringName)
+    IL_00DE: callvirt Godot.IAwaiter`1<Godot.Variant[]> Godot.SignalAwaiter::GetAwaiter()
+    IL_00E3: stloc.s V_4
+    IL_00E5: ldloc.s V_4
+    IL_00E7: callvirt System.Boolean Godot.IAwaiter`1<Godot.Variant[]>::get_IsCompleted()
+    IL_00EC: brtrue.s IL_012F
+    IL_00EE: ldarg.0
+    IL_00EF: ldc.i4.1
+    IL_00F0: dup
+    IL_00F1: stloc.0
+    IL_00F2: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_00F7: ldarg.0
+    IL_00F8: ldloc.s V_4
+    IL_00FA: stfld System.Object MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__2
+    IL_00FF: ldarg.0
+    IL_0100: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_0105: ldloca.s V_4
+    IL_0107: ldarg.0
+    IL_0108: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::AwaitOnCompleted<Godot.IAwaiter`1<Godot.Variant[]>,MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117>(!!0&,!!1&)
+    IL_010D: leave IL_0530
+    IL_0112: ldarg.0
+    IL_0113: ldfld System.Object MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__2
+    IL_0118: castclass Godot.IAwaiter`1<Godot.Variant[]>
+    IL_011D: stloc.s V_4
+    IL_011F: ldarg.0
+    IL_0120: ldnull
+    IL_0121: stfld System.Object MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__2
+    IL_0126: ldarg.0
+    IL_0127: ldc.i4.m1
+    IL_0128: dup
+    IL_0129: stloc.0
+    IL_012A: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_012F: ldloc.s V_4
+    IL_0131: callvirt !0 Godot.IAwaiter`1<Godot.Variant[]>::GetResult()
+    IL_0136: pop
+    IL_0137: ldloc.1
+    IL_0138: ldftn System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitializeGraphicsPreferences()
+    IL_013E: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+    IL_0143: call Godot.Callable Godot.Callable::From(System.Action)
+    IL_0148: stloc.s V_5
+    IL_014A: ldloca.s V_5
+    IL_014C: call !!0[] System.Array::Empty<Godot.Variant>()
+    IL_0151: call System.Void Godot.Callable::CallDeferred(Godot.Variant[])
+    IL_0156: ldloc.1
+    IL_0157: call MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_AudioManager()
+    IL_015C: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_0161: callvirt MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+    IL_0166: callvirt System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeMaster()
+    IL_016B: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetMasterVol(System.Single)
+    IL_0170: ldloc.1
+    IL_0171: call MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_AudioManager()
+    IL_0176: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_017B: callvirt MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+    IL_0180: callvirt System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeSfx()
+    IL_0185: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetSfxVol(System.Single)
+    IL_018A: ldloc.1
+    IL_018B: call MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_AudioManager()
+    IL_0190: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_0195: callvirt MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+    IL_019A: callvirt System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeAmbience()
+    IL_019F: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetAmbienceVol(System.Single)
+    IL_01A4: ldloc.1
+    IL_01A5: call MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_AudioManager()
+    IL_01AA: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_01AF: callvirt MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+    IL_01B4: callvirt System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeBgm()
+    IL_01B9: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetBgmVol(System.Single)
+    IL_01BE: ldloc.1
+    IL_01BF: call MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_DebugAudio()
+    IL_01C4: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_01C9: callvirt MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+    IL_01CE: callvirt System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeMaster()
+    IL_01D3: callvirt System.Void MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::SetMasterAudioVolume(System.Single)
+    IL_01D8: ldloc.1
+    IL_01D9: call MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_DebugAudio()
+    IL_01DE: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_01E3: callvirt MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+    IL_01E8: callvirt System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeSfx()
+    IL_01ED: callvirt System.Void MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::SetSfxAudioVolume(System.Single)
+    IL_01F2: call System.Void MegaCrit.Sts2.Core.Leaderboard.LeaderboardManager::Initialize()
+    IL_01F7: call System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize()
+    IL_01FC: ldloc.1
+    IL_01FD: call MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay MegaCrit.Sts2.Core.Nodes.NGame::get_TimeoutOverlay()
+    IL_0202: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay::Relocalize()
+    IL_0207: br.s IL_0286
+    IL_0209: call System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+    IL_020E: brtrue.s IL_021D
+    IL_0210: ldstr "Steam became uninitialized while the cloud sync was in-progress! This might result in unpredictable behavior"
+    IL_0215: ldc.i4.2
+    IL_0216: call System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32)
+    IL_021B: br.s IL_0296
+    IL_021D: ldloc.1
+    IL_021E: ldloca.s V_7
+    IL_0220: initobj System.Threading.CancellationToken
+    IL_0226: ldloc.s V_7
+    IL_0228: call System.Threading.Tasks.Task`1<System.Single> MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil::AwaitProcessFrame(Godot.Node,System.Threading.CancellationToken)
+    IL_022D: callvirt System.Runtime.CompilerServices.TaskAwaiter`1<!0> System.Threading.Tasks.Task`1<System.Single>::GetAwaiter()
+    IL_0232: stloc.s V_6
+    IL_0234: ldloca.s V_6
+    IL_0236: call System.Boolean System.Runtime.CompilerServices.TaskAwaiter`1<System.Single>::get_IsCompleted()
+    IL_023B: brtrue.s IL_027E
+    IL_023D: ldarg.0
+    IL_023E: ldc.i4.2
+    IL_023F: dup
+    IL_0240: stloc.0
+    IL_0241: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_0246: ldarg.0
+    IL_0247: ldloc.s V_6
+    IL_0249: stfld System.Runtime.CompilerServices.TaskAwaiter`1<System.Single> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__3
+    IL_024E: ldarg.0
+    IL_024F: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_0254: ldloca.s V_6
+    IL_0256: ldarg.0
+    IL_0257: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter`1<System.Single>,MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117>(!!0&,!!1&)
+    IL_025C: leave IL_0530
+    IL_0261: ldarg.0
+    IL_0262: ldfld System.Runtime.CompilerServices.TaskAwaiter`1<System.Single> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__3
+    IL_0267: stloc.s V_6
+    IL_0269: ldarg.0
+    IL_026A: ldflda System.Runtime.CompilerServices.TaskAwaiter`1<System.Single> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__3
+    IL_026F: initobj System.Runtime.CompilerServices.TaskAwaiter`1<System.Single>
+    IL_0275: ldarg.0
+    IL_0276: ldc.i4.m1
+    IL_0277: dup
+    IL_0278: stloc.0
+    IL_0279: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_027E: ldloca.s V_6
+    IL_0280: call !0 System.Runtime.CompilerServices.TaskAwaiter`1<System.Single>::GetResult()
+    IL_0285: pop
+    IL_0286: ldarg.0
+    IL_0287: ldfld System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<cloudSavesTask>5__2
+    IL_028C: callvirt System.Boolean System.Threading.Tasks.Task::get_IsCompleted()
+    IL_0291: brfalse IL_0209
+    IL_0296: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_029B: ldloca.s V_8
+    IL_029D: initobj System.Nullable`1<System.Int32>
+    IL_02A3: ldloc.s V_8
+    IL_02A5: callvirt System.Void MegaCrit.Sts2.Core.Saves.SaveManager::InitProfileId(System.Nullable`1<System.Int32>)
+    IL_02AA: ldarg.0
+    IL_02AB: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_02B0: callvirt MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Saves.SaveManager::InitProgressData()
+    IL_02B5: stfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<progressReadResult>5__3
+    IL_02BA: ldarg.0
+    IL_02BB: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_02C0: callvirt MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Saves.SaveManager::InitPrefsData()
+    IL_02C5: stfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<prefsReadResult>5__4
+    IL_02CA: call MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch()
+    IL_02CF: call System.String MegaCrit.Sts2.Core.Platform.PlatformBranchExtensions::ToName(MegaCrit.Sts2.Core.Platform.PlatformBranch)
+    IL_02D4: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_02D9: callvirt MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.SaveManager::get_Progress()
+    IL_02DE: callvirt System.String MegaCrit.Sts2.Core.Saves.ProgressState::get_UniqueId()
+    IL_02E3: ldloc.1
+    IL_02E4: call Godot.SceneTree Godot.Node::GetTree()
+    IL_02E9: callvirt Godot.Window Godot.SceneTree::get_Root()
+    IL_02EE: call System.Void MegaCrit.Sts2.Core.Debug.SentryService::AfterGameInit(System.String,System.String,Godot.Node)
+    IL_02F3: ldloc.1
+    IL_02F4: ldfld MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake MegaCrit.Sts2.Core.Nodes.NGame::_screenShake
+    IL_02F9: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_02FE: callvirt MegaCrit.Sts2.Core.Saves.PrefsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_PrefsSave()
+    IL_0303: callvirt System.Int32 MegaCrit.Sts2.Core.Saves.PrefsSave::get_ScreenShakeOptionIndex()
+    IL_0308: call System.Single MegaCrit.Sts2.Core.Nodes.Screens.Settings.NScreenshakePaginator::GetShakeMultiplier(System.Int32)
+    IL_030D: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake::SetMultiplier(System.Single)
+    IL_0312: ldstr "editor"
+    IL_0317: call System.Boolean Godot.OS::HasFeature(System.String)
+    IL_031C: brtrue.s IL_0340
+    IL_031E: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_0323: callvirt MegaCrit.Sts2.Core.Saves.PrefsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_PrefsSave()
+    IL_0328: callvirt MegaCrit.Sts2.Core.Settings.FastModeType MegaCrit.Sts2.Core.Saves.PrefsSave::get_FastMode()
+    IL_032D: ldc.i4.3
+    IL_032E: bne.un.s IL_0340
+    IL_0330: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_0335: callvirt MegaCrit.Sts2.Core.Saves.PrefsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_PrefsSave()
+    IL_033A: ldc.i4.2
+    IL_033B: callvirt System.Void MegaCrit.Sts2.Core.Saves.PrefsSave::set_FastMode(MegaCrit.Sts2.Core.Settings.FastModeType)
+    IL_0340: call System.Boolean MegaCrit.Sts2.Core.Nodes.NGame::IsReleaseGame()
+    IL_0345: brtrue IL_03F3
+    IL_034A: ldstr "autoslay"
+    IL_034F: call System.Boolean MegaCrit.Sts2.Core.Helpers.CommandLineHelper::HasArg(System.String)
+    IL_0354: brfalse IL_03F3
+    IL_0359: ldloc.1
+    IL_035A: ldc.i4.1
+    IL_035B: call System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::LaunchMainMenu(System.Boolean)
+    IL_0360: callvirt System.Runtime.CompilerServices.TaskAwaiter System.Threading.Tasks.Task::GetAwaiter()
+    IL_0365: stloc.s V_12
+    IL_0367: ldloca.s V_12
+    IL_0369: call System.Boolean System.Runtime.CompilerServices.TaskAwaiter::get_IsCompleted()
+    IL_036E: brtrue.s IL_03B1
+    IL_0370: ldarg.0
+    IL_0371: ldc.i4.3
+    IL_0372: dup
+    IL_0373: stloc.0
+    IL_0374: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_0379: ldarg.0
+    IL_037A: ldloc.s V_12
+    IL_037C: stfld System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_0381: ldarg.0
+    IL_0382: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_0387: ldloca.s V_12
+    IL_0389: ldarg.0
+    IL_038A: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117>(!!0&,!!1&)
+    IL_038F: leave IL_0530
+    IL_0394: ldarg.0
+    IL_0395: ldfld System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_039A: stloc.s V_12
+    IL_039C: ldarg.0
+    IL_039D: ldflda System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_03A2: initobj System.Runtime.CompilerServices.TaskAwaiter
+    IL_03A8: ldarg.0
+    IL_03A9: ldc.i4.m1
+    IL_03AA: dup
+    IL_03AB: stloc.0
+    IL_03AC: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_03B1: ldloca.s V_12
+    IL_03B3: call System.Void System.Runtime.CompilerServices.TaskAwaiter::GetResult()
+    IL_03B8: ldstr "seed"
+    IL_03BD: call System.String MegaCrit.Sts2.Core.Helpers.CommandLineHelper::GetValue(System.String)
+    IL_03C2: dup
+    IL_03C3: brtrue.s IL_03CE
+    IL_03C5: pop
+    IL_03C6: ldnull
+    IL_03C7: ldc.i4.s 10
+    IL_03C9: call System.String MegaCrit.Sts2.Core.Helpers.SeedHelper::GetRandomSeed(MegaCrit.Sts2.Core.Random.Rng,System.Int32)
+    IL_03CE: stloc.s V_9
+    IL_03D0: ldstr "log-file"
+    IL_03D5: call System.String MegaCrit.Sts2.Core.Helpers.CommandLineHelper::GetValue(System.String)
+    IL_03DA: stloc.s V_10
+    IL_03DC: newobj System.Void MegaCrit.Sts2.Core.AutoSlay.AutoSlayer::.ctor()
+    IL_03E1: stloc.s V_11
+    IL_03E3: ldloc.s V_11
+    IL_03E5: ldloc.s V_9
+    IL_03E7: ldloc.s V_10
+    IL_03E9: callvirt System.Void MegaCrit.Sts2.Core.AutoSlay.AutoSlayer::Start(System.String,System.String)
+    IL_03EE: br IL_04C7
+    IL_03F3: ldstr "bootstrap"
+    IL_03F8: call System.Boolean MegaCrit.Sts2.Core.Helpers.CommandLineHelper::HasArg(System.String)
+    IL_03FD: brfalse.s IL_0418
+    IL_03FF: ldstr "debug/scene_bootstrapper"
+    IL_0404: call T MegaCrit.Sts2.Core.Helpers.SceneHelper::Instantiate<MegaCrit.Sts2.Core.Nodes.Debug.NSceneBootstrapper>(System.String)
+    IL_0409: stloc.s V_13
+    IL_040B: ldloc.1
+    IL_040C: ldloc.s V_13
+    IL_040E: call System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::AddChildSafely(Godot.Node,Godot.Node)
+    IL_0413: br IL_04C7
+    IL_0418: ldloc.1
+    IL_0419: call System.Boolean MegaCrit.Sts2.Core.Nodes.NGame::get_StartOnMainMenu()
+    IL_041E: brfalse IL_04C7
+    IL_0423: call System.Boolean MegaCrit.Sts2.Core.Debug.DebugSettings::get_DevSkip()
+    IL_0428: brtrue.s IL_0447
+    IL_042A: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+    IL_042F: callvirt MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+    IL_0434: callvirt System.Boolean MegaCrit.Sts2.Core.Saves.SettingsSave::get_SkipIntroLogo()
+    IL_0439: brtrue.s IL_0447
+    IL_043B: ldstr "fastmp"
+    IL_0440: call System.Boolean MegaCrit.Sts2.Core.Helpers.CommandLineHelper::HasArg(System.String)
+    IL_0445: br.s IL_0448
+    IL_0447: ldc.i4.1
+    IL_0448: stloc.s V_14
+    IL_044A: ldloc.1
+    IL_044B: ldloc.s V_14
+    IL_044D: call System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::LaunchMainMenu(System.Boolean)
+    IL_0452: callvirt System.Runtime.CompilerServices.TaskAwaiter System.Threading.Tasks.Task::GetAwaiter()
+    IL_0457: stloc.s V_15
+    IL_0459: ldloca.s V_15
+    IL_045B: call System.Boolean System.Runtime.CompilerServices.TaskAwaiter::get_IsCompleted()
+    IL_0460: brtrue.s IL_04A3
+    IL_0462: ldarg.0
+    IL_0463: ldc.i4.4
+    IL_0464: dup
+    IL_0465: stloc.0
+    IL_0466: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_046B: ldarg.0
+    IL_046C: ldloc.s V_15
+    IL_046E: stfld System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_0473: ldarg.0
+    IL_0474: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_0479: ldloca.s V_15
+    IL_047B: ldarg.0
+    IL_047C: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117>(!!0&,!!1&)
+    IL_0481: leave IL_0530
+    IL_0486: ldarg.0
+    IL_0487: ldfld System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_048C: stloc.s V_15
+    IL_048E: ldarg.0
+    IL_048F: ldflda System.Runtime.CompilerServices.TaskAwaiter MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>u__1
+    IL_0494: initobj System.Runtime.CompilerServices.TaskAwaiter
+    IL_049A: ldarg.0
+    IL_049B: ldc.i4.m1
+    IL_049C: dup
+    IL_049D: stloc.0
+    IL_049E: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_04A3: ldloca.s V_15
+    IL_04A5: call System.Void System.Runtime.CompilerServices.TaskAwaiter::GetResult()
+    IL_04AA: ldloc.1
+    IL_04AB: ldarg.0
+    IL_04AC: ldfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<progressReadResult>5__3
+    IL_04B1: ldarg.0
+    IL_04B2: ldfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<prefsReadResult>5__4
+    IL_04B7: call MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SettingsSave> MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::get_SettingsReadResult()
+    IL_04BC: call System.Void MegaCrit.Sts2.Core.Nodes.NGame::CheckShowSaveFileError(MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress>,MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave>,MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SettingsSave>)
+    IL_04C1: ldloc.1
+    IL_04C2: call System.Void MegaCrit.Sts2.Core.Nodes.NGame::CheckShowLocalizationOverrideErrors()
+    IL_04C7: ldloc.1
+    IL_04C8: ldftn System.Void MegaCrit.Sts2.Core.Nodes.NGame::OnNewModDetected(MegaCrit.Sts2.Core.Modding.Mod)
+    IL_04CE: newobj System.Void System.Action`1<MegaCrit.Sts2.Core.Modding.Mod>::.ctor(System.Object,System.IntPtr)
+    IL_04D3: call System.Void MegaCrit.Sts2.Core.Modding.ModManager::add_OnModDetected(System.Action`1<MegaCrit.Sts2.Core.Modding.Mod>)
+    IL_04D8: leave.s IL_0508
+    IL_04DA: stloc.s V_16
+    IL_04DC: ldarg.0
+    IL_04DD: ldc.i4.s -2
+    IL_04DF: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_04E4: ldarg.0
+    IL_04E5: ldnull
+    IL_04E6: stfld System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<cloudSavesTask>5__2
+    IL_04EB: ldarg.0
+    IL_04EC: ldnull
+    IL_04ED: stfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<progressReadResult>5__3
+    IL_04F2: ldarg.0
+    IL_04F3: ldnull
+    IL_04F4: stfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<prefsReadResult>5__4
+    IL_04F9: ldarg.0
+    IL_04FA: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_04FF: ldloc.s V_16
+    IL_0501: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::SetException(System.Exception)
+    IL_0506: leave.s IL_0530
+    IL_0508: ldarg.0
+    IL_0509: ldc.i4.s -2
+    IL_050B: stfld System.Int32 MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>1__state
+    IL_0510: ldarg.0
+    IL_0511: ldnull
+    IL_0512: stfld System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<cloudSavesTask>5__2
+    IL_0517: ldarg.0
+    IL_0518: ldnull
+    IL_0519: stfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<progressReadResult>5__3
+    IL_051E: ldarg.0
+    IL_051F: ldnull
+    IL_0520: stfld MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<prefsReadResult>5__4
+    IL_0525: ldarg.0
+    IL_0526: ldflda System.Runtime.CompilerServices.AsyncTaskMethodBuilder MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::<>t__builder
+    IL_052B: call System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder::SetResult()
+    IL_0530: ret
+
+[TRANSITIVE SAME-STS2 CLOSURE METHODS]
+  - token=0x06000332; System.Collections.Generic.IEnumerable`1<System.String> MegaCrit.Sts2.Core.Timeline.EpochModel::get_EpochIds()
+  - token=0x06000333; System.Collections.Generic.IReadOnlyList`1<System.String> MegaCrit.Sts2.Core.Timeline.EpochModel::get_AllEpochIds()
+  - token=0x06000336; System.String MegaCrit.Sts2.Core.Timeline.EpochModel::get_Id()
+  - token=0x0600034A; MegaCrit.Sts2.Core.Timeline.EpochModel[] MegaCrit.Sts2.Core.Timeline.EpochModel::GetTimelineExpansion()
+  - token=0x0600034C; System.String MegaCrit.Sts2.Core.Timeline.EpochModel::GetId()
+  - token=0x0600034E; System.Boolean MegaCrit.Sts2.Core.Timeline.EpochModel::IsValid(System.String)
+  - token=0x0600034F; MegaCrit.Sts2.Core.Timeline.EpochModel MegaCrit.Sts2.Core.Timeline.EpochModel::Get(System.String)
+  - token=0x0600035E; System.Void MegaCrit.Sts2.Core.Timeline.EpochModel/<>c__DisplayClass56_0::.ctor()
+  - token=0x0600035F; System.Boolean MegaCrit.Sts2.Core.Timeline.EpochModel/<>c__DisplayClass56_0::<IsValid>b__0(System.String)
+  - token=0x06000573; System.Boolean MegaCrit.Sts2.Core.TestSupport.TestMode::get_IsOn()
+  - token=0x06000584; System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::MigrateToUserScopedDirectories()
+  - token=0x06000585; System.Boolean MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::HasLegacyData()
+  - token=0x06000586; System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::ArchiveLegacyData()
+  - token=0x06000587; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.AncientCharacterStats::get_Character()
+  - token=0x06000589; System.Int32 MegaCrit.Sts2.Core.Saves.AncientCharacterStats::get_Wins()
+  - token=0x0600058A; System.Void MegaCrit.Sts2.Core.Saves.AncientCharacterStats::set_Wins(System.Int32)
+  - token=0x0600058B; System.Int32 MegaCrit.Sts2.Core.Saves.AncientCharacterStats::get_Losses()
+  - token=0x0600058C; System.Void MegaCrit.Sts2.Core.Saves.AncientCharacterStats::set_Losses(System.Int32)
+  - token=0x0600058F; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.AncientStats::get_Id()
+  - token=0x06000591; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.AncientCharacterStats> MegaCrit.Sts2.Core.Saves.AncientStats::get_CharStats()
+  - token=0x060005A9; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.CardStats::get_Id()
+  - token=0x060005AB; System.Int64 MegaCrit.Sts2.Core.Saves.CardStats::get_TimesPicked()
+  - token=0x060005AC; System.Void MegaCrit.Sts2.Core.Saves.CardStats::set_TimesPicked(System.Int64)
+  - token=0x060005AD; System.Int64 MegaCrit.Sts2.Core.Saves.CardStats::get_TimesSkipped()
+  - token=0x060005AE; System.Void MegaCrit.Sts2.Core.Saves.CardStats::set_TimesSkipped(System.Int64)
+  - token=0x060005AF; System.Int64 MegaCrit.Sts2.Core.Saves.CardStats::get_TimesWon()
+  - token=0x060005B0; System.Void MegaCrit.Sts2.Core.Saves.CardStats::set_TimesWon(System.Int64)
+  - token=0x060005B1; System.Int64 MegaCrit.Sts2.Core.Saves.CardStats::get_TimesLost()
+  - token=0x060005B2; System.Void MegaCrit.Sts2.Core.Saves.CardStats::set_TimesLost(System.Int64)
+  - token=0x060005B4; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.CharacterStats::get_Id()
+  - token=0x060005B6; System.Int32 MegaCrit.Sts2.Core.Saves.CharacterStats::get_MaxAscension()
+  - token=0x060005B7; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_MaxAscension(System.Int32)
+  - token=0x060005B8; System.Int32 MegaCrit.Sts2.Core.Saves.CharacterStats::get_PreferredAscension()
+  - token=0x060005B9; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_PreferredAscension(System.Int32)
+  - token=0x060005BA; System.Int32 MegaCrit.Sts2.Core.Saves.CharacterStats::get_TotalWins()
+  - token=0x060005BB; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_TotalWins(System.Int32)
+  - token=0x060005BC; System.Int32 MegaCrit.Sts2.Core.Saves.CharacterStats::get_TotalLosses()
+  - token=0x060005BD; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_TotalLosses(System.Int32)
+  - token=0x060005BE; System.Int64 MegaCrit.Sts2.Core.Saves.CharacterStats::get_FastestWinTime()
+  - token=0x060005BF; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_FastestWinTime(System.Int64)
+  - token=0x060005C0; System.Int64 MegaCrit.Sts2.Core.Saves.CharacterStats::get_BestWinStreak()
+  - token=0x060005C1; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_BestWinStreak(System.Int64)
+  - token=0x060005C2; System.Int64 MegaCrit.Sts2.Core.Saves.CharacterStats::get_CurrentWinStreak()
+  - token=0x060005C3; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_CurrentWinStreak(System.Int64)
+  - token=0x060005C4; System.Int64 MegaCrit.Sts2.Core.Saves.CharacterStats::get_Playtime()
+  - token=0x060005C5; System.Void MegaCrit.Sts2.Core.Saves.CharacterStats::set_Playtime(System.Int64)
+  - token=0x060005CB; System.Void MegaCrit.Sts2.Core.Saves.CloudSaveStore::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.ICloudSaveStore)
+  - token=0x0600060D; System.String MegaCrit.Sts2.Core.Saves.CorruptFileHandler::GenerateCorruptFilePath(System.String,MegaCrit.Sts2.Core.Saves.ReadSaveStatus)
+  - token=0x0600060E; System.String MegaCrit.Sts2.Core.Saves.CorruptFileHandler::GetReasonChar(MegaCrit.Sts2.Core.Saves.ReadSaveStatus)
+  - token=0x0600060F; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.EncounterStats::get_Id()
+  - token=0x06000611; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.FightStats> MegaCrit.Sts2.Core.Saves.EncounterStats::get_FightStats()
+  - token=0x06000620; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.EnemyStats::get_Id()
+  - token=0x06000622; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.FightStats> MegaCrit.Sts2.Core.Saves.EnemyStats::get_FightStats()
+  - token=0x06000631; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.FightStats::get_Character()
+  - token=0x06000633; System.Int32 MegaCrit.Sts2.Core.Saves.FightStats::get_Wins()
+  - token=0x06000634; System.Void MegaCrit.Sts2.Core.Saves.FightStats::set_Wins(System.Int32)
+  - token=0x06000635; System.Int32 MegaCrit.Sts2.Core.Saves.FightStats::get_Losses()
+  - token=0x06000636; System.Void MegaCrit.Sts2.Core.Saves.FightStats::set_Losses(System.Int32)
+  - token=0x06000645; System.String MegaCrit.Sts2.Core.Saves.GodotFileIo::get_SaveDir()
+  - token=0x06000646; System.Void MegaCrit.Sts2.Core.Saves.GodotFileIo::set_SaveDir(System.String)
+  - token=0x06000647; System.Void MegaCrit.Sts2.Core.Saves.GodotFileIo::.ctor(System.String)
+  - token=0x06000648; System.String MegaCrit.Sts2.Core.Saves.GodotFileIo::GetFullPath(System.String)
+  - token=0x06000649; System.String MegaCrit.Sts2.Core.Saves.GodotFileIo::ReadFile(System.String)
+  - token=0x06000658; System.Void MegaCrit.Sts2.Core.Saves.GodotFileIo::CreateDirectory(System.String)
+  - token=0x06000668; System.Int32 MegaCrit.Sts2.Core.Saves.IProfileIdProvider::get_CurrentProfileId()
+  - token=0x06000669; System.Int32 MegaCrit.Sts2.Core.Saves.ISaveSchema::get_SchemaVersion()
+  - token=0x0600066A; System.Void MegaCrit.Sts2.Core.Saves.ISaveSchema::set_SchemaVersion(System.Int32)
+  - token=0x0600066B; System.String MegaCrit.Sts2.Core.Saves.ISaveStore::ReadFile(System.String)
+  - token=0x0600066D; System.Void MegaCrit.Sts2.Core.Saves.ISaveStore::WriteFile(System.String,System.String)
+  - token=0x06000671; System.Boolean MegaCrit.Sts2.Core.Saves.ISaveStore::FileExists(System.String)
+  - token=0x06000674; System.Void MegaCrit.Sts2.Core.Saves.ISaveStore::RenameFile(System.String,System.String)
+  - token=0x06000677; System.Void MegaCrit.Sts2.Core.Saves.ISaveStore::CreateDirectory(System.String)
+  - token=0x06000679; System.Void MegaCrit.Sts2.Core.Saves.ISaveStore::DeleteTemporaryFiles(System.String)
+  - token=0x0600067F; System.Text.Json.JsonSerializerOptions MegaCrit.Sts2.Core.Saves.JsonSerializationUtility::get_Options()
+  - token=0x06000683; System.Text.Json.Serialization.Metadata.JsonTypeInfo`1<T> MegaCrit.Sts2.Core.Saves.JsonSerializationUtility::GetTypeInfo()
+  - token=0x06000685; System.String MegaCrit.Sts2.Core.Saves.JsonSerializationUtility::ToJson(T)
+  - token=0x06000686; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<T> MegaCrit.Sts2.Core.Saves.JsonSerializationUtility::FromJson(System.String)
+  - token=0x06000E06; System.Boolean MegaCrit.Sts2.Core.Saves.MigrationUtil::MigrateDirectory(System.String,System.String,System.String)
+  - token=0x06000E07; System.Boolean MegaCrit.Sts2.Core.Saves.MigrationUtil::MigrateFile(System.String,System.String,System.String)
+  - token=0x06000E08; System.Void MegaCrit.Sts2.Core.Saves.MigrationUtil::CopyDirectoryRecursively(System.String,System.String)
+  - token=0x06000E09; System.Void MegaCrit.Sts2.Core.Saves.MigrationUtil::ArchiveLegacyDirectory(System.String,System.String)
+  - token=0x06000E0A; System.Void MegaCrit.Sts2.Core.Saves.MigrationUtil::ArchiveLegacyFile(System.String,System.String)
+  - token=0x06000E0C; System.Void MegaCrit.Sts2.Core.Saves.PrefsSave::set_SchemaVersion(System.Int32)
+  - token=0x06000E0D; MegaCrit.Sts2.Core.Settings.FastModeType MegaCrit.Sts2.Core.Saves.PrefsSave::get_FastMode()
+  - token=0x06000E0E; System.Void MegaCrit.Sts2.Core.Saves.PrefsSave::set_FastMode(MegaCrit.Sts2.Core.Settings.FastModeType)
+  - token=0x06000E11; System.Int32 MegaCrit.Sts2.Core.Saves.PrefsSave::get_ScreenShakeOptionIndex()
+  - token=0x06000E24; System.Int32 MegaCrit.Sts2.Core.Saves.ProfileSave::get_LastProfileId()
+  - token=0x06000E27; System.Void MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator::MigrateToProfileScopedDirectories()
+  - token=0x06000E28; System.Boolean MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator::HasLegacyData()
+  - token=0x06000E29; System.Void MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator::ArchiveLegacyData()
+  - token=0x06000E37; System.String MegaCrit.Sts2.Core.Saves.ProgressState::get_UniqueId()
+  - token=0x06000E38; System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) MegaCrit.Sts2.Core.Saves.ProgressState::set_UniqueId(System.String)
+  - token=0x06000E39; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState::get_EnableFtues()
+  - token=0x06000E3A; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_EnableFtues(System.Boolean)
+  - token=0x06000E3B; System.Int64 MegaCrit.Sts2.Core.Saves.ProgressState::get_TotalPlaytime()
+  - token=0x06000E3C; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_TotalPlaytime(System.Int64)
+  - token=0x06000E3D; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_TotalUnlocks()
+  - token=0x06000E3E; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_TotalUnlocks(System.Int32)
+  - token=0x06000E3F; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_CurrentScore()
+  - token=0x06000E40; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_CurrentScore(System.Int32)
+  - token=0x06000E41; System.Int64 MegaCrit.Sts2.Core.Saves.ProgressState::get_FloorsClimbed()
+  - token=0x06000E42; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_FloorsClimbed(System.Int64)
+  - token=0x06000E43; System.Int64 MegaCrit.Sts2.Core.Saves.ProgressState::get_ArchitectDamage()
+  - token=0x06000E44; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_ArchitectDamage(System.Int64)
+  - token=0x06000E45; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_WongoPoints()
+  - token=0x06000E46; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_WongoPoints(System.Int32)
+  - token=0x06000E47; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_PreferredMultiplayerAscension()
+  - token=0x06000E48; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_PreferredMultiplayerAscension(System.Int32)
+  - token=0x06000E49; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_MaxMultiplayerAscension()
+  - token=0x06000E4A; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_MaxMultiplayerAscension(System.Int32)
+  - token=0x06000E4B; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_TestSubjectKills()
+  - token=0x06000E4C; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_TestSubjectKills(System.Int32)
+  - token=0x06000E4D; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.ProgressState::get_PendingCharacterUnlock()
+  - token=0x06000E4E; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_PendingCharacterUnlock(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06000E54; MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.ProgressState::CreateDefault()
+  - token=0x06000E55; MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.ProgressState::FromSerializable(MegaCrit.Sts2.Core.Saves.SerializableProgress,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E56; MegaCrit.Sts2.Core.Saves.SerializableProgress MegaCrit.Sts2.Core.Saves.ProgressState::ToSerializable()
+  - token=0x06000E59; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState::MarkCardAsSeen(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06000E5A; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState::MarkRelicAsSeen(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06000E70; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseCharacterStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.CharacterStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.CharacterStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.CharacterStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E71; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::AddCharacterStats(MegaCrit.Sts2.Core.Saves.CharacterStats,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.CharacterStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E72; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseCardStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.CardStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.CardStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.CardStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E73; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::AddCardStats(MegaCrit.Sts2.Core.Saves.CardStats,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.CardStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E74; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseEncounterStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.EncounterStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.EncounterStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.EncounterStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E75; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::AddEncounterStats(MegaCrit.Sts2.Core.Saves.EncounterStats,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.EncounterStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E76; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseEnemyStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.EnemyStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.EnemyStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.EnemyStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E77; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::AddEnemyStats(MegaCrit.Sts2.Core.Saves.EnemyStats,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.EnemyStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E78; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseAncientStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.AncientStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.AncientStats>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.AncientStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E79; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::AddAncientStats(MegaCrit.Sts2.Core.Saves.AncientStats,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.AncientStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E7A; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseDiscoveredSet(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId>,System.Collections.Generic.HashSet`1<MegaCrit.Sts2.Core.Models.ModelId>,System.Collections.Generic.HashSet`1<MegaCrit.Sts2.Core.Models.ModelId>,System.String,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E7B; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseEpochs(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableEpoch>,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableEpoch>,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableEpoch>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E7C; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::FixMissingSlots(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableEpoch>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E7D; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseFtues(System.Collections.Generic.List`1<System.String>,System.Collections.Generic.HashSet`1<System.String>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E7E; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ParseAchievements(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement>,System.Collections.Generic.Dictionary`2<MegaCrit.Sts2.Core.Achievements.Achievement,System.Int64>,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E80; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ClampCharacterStatsFields(MegaCrit.Sts2.Core.Saves.CharacterStats,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E81; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ClampCardStatsFields(MegaCrit.Sts2.Core.Saves.CardStats,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E82; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ClampFightStatsFields(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.FightStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E83; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::ClampAncientCharacterStatsFields(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.AncientCharacterStats>,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E84; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::MergeCharacterStats(MegaCrit.Sts2.Core.Saves.CharacterStats,MegaCrit.Sts2.Core.Saves.CharacterStats)
+  - token=0x06000E85; System.Int64 MegaCrit.Sts2.Core.Saves.ProgressState::MergeFastestWinTime(System.Int64,System.Int64)
+  - token=0x06000E86; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::MergeCardStats(MegaCrit.Sts2.Core.Saves.CardStats,MegaCrit.Sts2.Core.Saves.CardStats)
+  - token=0x06000E87; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::MergeFightStatsList(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.FightStats>,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.FightStats>)
+  - token=0x06000E88; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::MergeAncientCharacterStatsList(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.AncientCharacterStats>,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.AncientCharacterStats>)
+  - token=0x06000E89; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.ProgressState::ValidateModelId(MegaCrit.Sts2.Core.Models.ModelId,System.String,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E8A; System.Int64 MegaCrit.Sts2.Core.Saves.ProgressState::ClampNonNegative(System.Int64,System.String,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E8B; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::ClampNonNegativeInt(System.Int32,System.String,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E8C; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::ClampAscension(System.Int32,System.String,MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext)
+  - token=0x06000E8D; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::FilterAndSortEpochs()
+  - token=0x06000E8E; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::.ctor()
+  - token=0x06000E96; MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement MegaCrit.Sts2.Core.Saves.ProgressState/<>c::<ToSerializable>b__112_0(System.Collections.Generic.KeyValuePair`2<MegaCrit.Sts2.Core.Achievements.Achievement,System.Int64>)
+  - token=0x06000E97; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState/<>c::<FilterAndSortEpochs>b__167_0(MegaCrit.Sts2.Core.Saves.SerializableEpoch)
+  - token=0x06000EA6; System.Void MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass156_0::.ctor()
+  - token=0x06000EA7; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass156_0::<ClampFightStatsFields>b__0(MegaCrit.Sts2.Core.Saves.FightStats)
+  - token=0x06000EA8; System.Void MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass157_0::.ctor()
+  - token=0x06000EA9; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass157_0::<ClampAncientCharacterStatsFields>b__0(MegaCrit.Sts2.Core.Saves.AncientCharacterStats)
+  - token=0x06000EAA; System.Void MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass161_0::.ctor()
+  - token=0x06000EAB; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass161_0::<MergeFightStatsList>b__0(MegaCrit.Sts2.Core.Saves.FightStats)
+  - token=0x06000EAC; System.Void MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass162_0::.ctor()
+  - token=0x06000EAD; System.Boolean MegaCrit.Sts2.Core.Saves.ProgressState/<>c__DisplayClass162_0::<MergeAncientCharacterStatsList>b__0(MegaCrit.Sts2.Core.Saves.AncientCharacterStats)
+  - token=0x06000EAE; T MegaCrit.Sts2.Core.Saves.ReadSaveResult`1::get_SaveData()
+  - token=0x06000EAF; MegaCrit.Sts2.Core.Saves.ReadSaveStatus MegaCrit.Sts2.Core.Saves.ReadSaveResult`1::get_Status()
+  - token=0x06000EB0; System.Boolean MegaCrit.Sts2.Core.Saves.ReadSaveResult`1::get_Success()
+  - token=0x06000EB1; System.String MegaCrit.Sts2.Core.Saves.ReadSaveResult`1::get_ErrorMessage()
+  - token=0x06000EB2; System.Void MegaCrit.Sts2.Core.Saves.ReadSaveResult`1::.ctor(T)
+  - token=0x06000EB3; System.Void MegaCrit.Sts2.Core.Saves.ReadSaveResult`1::.ctor(MegaCrit.Sts2.Core.Saves.ReadSaveStatus,System.String)
+  - token=0x06000EB4; System.Void MegaCrit.Sts2.Core.Saves.ReadSaveResult`1::.ctor(T,MegaCrit.Sts2.Core.Saves.ReadSaveStatus,System.String)
+  - token=0x06000EB6; MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+  - token=0x06000EB7; MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_SettingsSave()
+  - token=0x06000EB8; MegaCrit.Sts2.Core.Saves.PrefsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_PrefsSave()
+  - token=0x06000EB9; MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.SaveManager::get_Progress()
+  - token=0x06000EBE; System.Int32 MegaCrit.Sts2.Core.Saves.SaveManager::get_CurrentProfileId()
+  - token=0x06000EC7; System.Void MegaCrit.Sts2.Core.Saves.SaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,System.Boolean)
+  - token=0x06000EC8; System.Void MegaCrit.Sts2.Core.Saves.SaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.ISaveStore,System.Boolean)
+  - token=0x06000EC9; MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::ConstructDefault()
+  - token=0x06000ECA; System.Void MegaCrit.Sts2.Core.Saves.SaveManager::InitProfileId(System.Nullable`1<System.Int32>)
+  - token=0x06000EDE; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Saves.SaveManager::InitPrefsData()
+  - token=0x06000EDF; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Saves.SaveManager::InitProgressData()
+  - token=0x06000EE5; System.Void MegaCrit.Sts2.Core.Saves.SaveManager::CleanupTemporaryFiles()
+  - token=0x06000F46; System.String MegaCrit.Sts2.Core.Saves.SerializableEpoch::get_Id()
+  - token=0x06000F47; MegaCrit.Sts2.Core.Saves.EpochState MegaCrit.Sts2.Core.Saves.SerializableEpoch::get_State()
+  - token=0x06000F48; System.Void MegaCrit.Sts2.Core.Saves.SerializableEpoch::set_State(MegaCrit.Sts2.Core.Saves.EpochState)
+  - token=0x06000F4A; System.Void MegaCrit.Sts2.Core.Saves.SerializableEpoch::set_ObtainDate(System.Int64)
+  - token=0x06000F4B; System.Void MegaCrit.Sts2.Core.Saves.SerializableEpoch::.ctor(System.String,MegaCrit.Sts2.Core.Saves.EpochState)
+  - token=0x06000F4C; System.Void MegaCrit.Sts2.Core.Saves.SerializableEpoch::SetObtained(MegaCrit.Sts2.Core.Saves.EpochState)
+  - token=0x06000F61; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::.ctor()
+  - token=0x06000F63; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_SchemaVersion(System.Int32)
+  - token=0x06000F64; System.String MegaCrit.Sts2.Core.Saves.SerializableProgress::get_UniqueId()
+  - token=0x06000F65; System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) MegaCrit.Sts2.Core.Saves.SerializableProgress::set_UniqueId(System.String)
+  - token=0x06000F66; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.CharacterStats> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_CharStats()
+  - token=0x06000F67; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_CharStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.CharacterStats>)
+  - token=0x06000F68; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.CardStats> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_CardStats()
+  - token=0x06000F69; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_CardStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.CardStats>)
+  - token=0x06000F6A; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.EncounterStats> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_EncounterStats()
+  - token=0x06000F6B; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_EncounterStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.EncounterStats>)
+  - token=0x06000F6C; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.EnemyStats> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_EnemyStats()
+  - token=0x06000F6D; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_EnemyStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.EnemyStats>)
+  - token=0x06000F6E; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.AncientStats> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_AncientStats()
+  - token=0x06000F6F; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_AncientStats(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.AncientStats>)
+  - token=0x06000F70; System.Boolean MegaCrit.Sts2.Core.Saves.SerializableProgress::get_EnableFtues()
+  - token=0x06000F71; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_EnableFtues(System.Boolean)
+  - token=0x06000F72; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableEpoch> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_Epochs()
+  - token=0x06000F73; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_Epochs(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableEpoch>)
+  - token=0x06000F74; System.Collections.Generic.List`1<System.String> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_FtueCompleted()
+  - token=0x06000F75; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_FtueCompleted(System.Collections.Generic.List`1<System.String>)
+  - token=0x06000F76; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_UnlockedAchievements()
+  - token=0x06000F77; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_UnlockedAchievements(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement>)
+  - token=0x06000F78; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_DiscoveredCards()
+  - token=0x06000F79; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_DiscoveredCards(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId>)
+  - token=0x06000F7A; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_DiscoveredRelics()
+  - token=0x06000F7B; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_DiscoveredRelics(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId>)
+  - token=0x06000F7C; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_DiscoveredEvents()
+  - token=0x06000F7D; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_DiscoveredEvents(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId>)
+  - token=0x06000F7E; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_DiscoveredPotions()
+  - token=0x06000F7F; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_DiscoveredPotions(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId>)
+  - token=0x06000F80; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId> MegaCrit.Sts2.Core.Saves.SerializableProgress::get_DiscoveredActs()
+  - token=0x06000F81; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_DiscoveredActs(System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Models.ModelId>)
+  - token=0x06000F82; System.Int64 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_TotalPlaytime()
+  - token=0x06000F83; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_TotalPlaytime(System.Int64)
+  - token=0x06000F84; System.Int32 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_TotalUnlocks()
+  - token=0x06000F85; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_TotalUnlocks(System.Int32)
+  - token=0x06000F86; System.Int32 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_CurrentScore()
+  - token=0x06000F87; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_CurrentScore(System.Int32)
+  - token=0x06000F88; System.Int64 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_FloorsClimbed()
+  - token=0x06000F89; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_FloorsClimbed(System.Int64)
+  - token=0x06000F8A; System.Int64 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_ArchitectDamage()
+  - token=0x06000F8B; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_ArchitectDamage(System.Int64)
+  - token=0x06000F8C; System.Int32 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_WongoPoints()
+  - token=0x06000F8D; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_WongoPoints(System.Int32)
+  - token=0x06000F8E; System.Int32 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_PreferredMultiplayerAscension()
+  - token=0x06000F8F; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_PreferredMultiplayerAscension(System.Int32)
+  - token=0x06000F90; System.Int32 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_MaxMultiplayerAscension()
+  - token=0x06000F91; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_MaxMultiplayerAscension(System.Int32)
+  - token=0x06000F92; System.Int32 MegaCrit.Sts2.Core.Saves.SerializableProgress::get_TestSubjectKills()
+  - token=0x06000F93; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_TestSubjectKills(System.Int32)
+  - token=0x06000F94; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.SerializableProgress::get_PendingCharacterUnlock()
+  - token=0x06000F95; System.Void MegaCrit.Sts2.Core.Saves.SerializableProgress::set_PendingCharacterUnlock(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06000F9D; System.String MegaCrit.Sts2.Core.Saves.SerializableProgress::<.ctor>g__GenerateUniqueId|0_0(System.Int32)
+  - token=0x06000FA0; System.Char MegaCrit.Sts2.Core.Saves.SerializableProgress/<>c::<.ctor>b__0_1(System.String)
+  - token=0x06000FE3; System.String MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement::get_Achievement()
+  - token=0x06000FE4; System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement::set_Achievement(System.String)
+  - token=0x06000FE5; System.Int64 MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement::get_UnlockTime()
+  - token=0x06000FE6; System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement::set_UnlockTime(System.Int64)
+  - token=0x06000FF0; System.Void MegaCrit.Sts2.Core.Saves.SerializableUnlockedAchievement::.ctor()
+  - token=0x06000FF3; System.Int32 MegaCrit.Sts2.Core.Saves.SettingsSave::get_FpsLimit()
+  - token=0x06000FF5; System.String MegaCrit.Sts2.Core.Saves.SettingsSave::get_Language()
+  - token=0x06000FF6; System.Void MegaCrit.Sts2.Core.Saves.SettingsSave::set_Language(System.String)
+  - token=0x06000FF7; Godot.Vector2I MegaCrit.Sts2.Core.Saves.SettingsSave::get_WindowPosition()
+  - token=0x06000FF8; System.Void MegaCrit.Sts2.Core.Saves.SettingsSave::set_WindowPosition(Godot.Vector2I)
+  - token=0x06000FF9; Godot.Vector2I MegaCrit.Sts2.Core.Saves.SettingsSave::get_WindowSize()
+  - token=0x06000FFB; System.Boolean MegaCrit.Sts2.Core.Saves.SettingsSave::get_Fullscreen()
+  - token=0x06000FFC; System.Void MegaCrit.Sts2.Core.Saves.SettingsSave::set_Fullscreen(System.Boolean)
+  - token=0x06000FFD; MegaCrit.Sts2.Core.Settings.AspectRatioSetting MegaCrit.Sts2.Core.Saves.SettingsSave::get_AspectRatioSetting()
+  - token=0x06000FFF; System.Int32 MegaCrit.Sts2.Core.Saves.SettingsSave::get_TargetDisplay()
+  - token=0x06001000; System.Void MegaCrit.Sts2.Core.Saves.SettingsSave::set_TargetDisplay(System.Int32)
+  - token=0x06001001; System.Boolean MegaCrit.Sts2.Core.Saves.SettingsSave::get_ResizeWindows()
+  - token=0x06001003; MegaCrit.Sts2.Core.Settings.VSyncType MegaCrit.Sts2.Core.Saves.SettingsSave::get_VSync()
+  - token=0x06001007; System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeBgm()
+  - token=0x06001009; System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeMaster()
+  - token=0x0600100B; System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeSfx()
+  - token=0x0600100D; System.Single MegaCrit.Sts2.Core.Saves.SettingsSave::get_VolumeAmbience()
+  - token=0x06001011; System.Boolean MegaCrit.Sts2.Core.Saves.SettingsSave::get_SkipIntroLogo()
+  - token=0x06001022; System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::get_SavesDir()
+  - token=0x06001023; System.Boolean MegaCrit.Sts2.Core.Saves.UserDataPathProvider::get_IsRunningModded()
+  - token=0x06001026; System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetProfileScopedBasePath(System.Int32,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>)
+  - token=0x06001027; System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetAccountScopedBasePath(System.String,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>)
+  - token=0x06001028; System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetProfileDir(System.Int32)
+  - token=0x0600102A; System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetPlatformDirectoryName(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - token=0x0600102C; System.Void MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext::PushPath(System.String)
+  - token=0x0600102D; System.Void MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext::PopPath()
+  - token=0x0600102E; System.String MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext::get_CurrentPath()
+  - token=0x0600102F; System.Void MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext::Warn(System.String)
+  - token=0x06001031; System.Collections.Generic.IReadOnlyList`1<MegaCrit.Sts2.Core.Saves.Validation.ValidationError> MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext::get_Errors()
+  - token=0x06001035; System.Void MegaCrit.Sts2.Core.Saves.Validation.DeserializationContext::.ctor()
+  - token=0x0600103B; System.Void MegaCrit.Sts2.Core.Saves.Validation.ValidationError::.ctor(MegaCrit.Sts2.Core.Saves.Validation.ValidationSeverity,System.String,System.String)
+  - token=0x06001055; System.Collections.Generic.List`1<System.ValueTuple`2<System.String,System.Object[]>> MegaCrit.Sts2.Core.Saves.Test.MockGodotFileIo::get_Calls()
+  - token=0x06001058; System.Void MegaCrit.Sts2.Core.Saves.Test.MockGodotFileIo::.ctor(System.String)
+  - token=0x0600106A; System.Void MegaCrit.Sts2.Core.Saves.Test.MockGodotFileIo::CreateDirectory(System.String)
+  - token=0x0600106D; System.Void MegaCrit.Sts2.Core.Saves.Test.MockGodotFileIo::CanonicalizePath(System.String&,System.Boolean)
+  - token=0x060011A0; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.IMigration::get_FromVersion()
+  - token=0x060011A1; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.IMigration::get_ToVersion()
+  - token=0x060011A2; System.Type MegaCrit.Sts2.Core.Saves.Migrations.IMigration::get_SaveType()
+  - token=0x060011A3; MegaCrit.Sts2.Core.Saves.Migrations.MigratingData MegaCrit.Sts2.Core.Saves.Migrations.IMigration::Migrate(MegaCrit.Sts2.Core.Saves.Migrations.MigratingData)
+  - token=0x060011A4; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::.ctor(System.Text.Json.JsonDocument)
+  - token=0x060011A6; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::.ctor(System.Text.Json.Nodes.JsonObject)
+  - token=0x060011A7; T MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::ToObject()
+  - token=0x060011AB; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::Has(System.String)
+  - token=0x060011AE; T MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::GetAs(System.String)
+  - token=0x060011B1; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::GetInt(System.String)
+  - token=0x060011B3; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::Set(System.String,T)
+  - token=0x060011B8; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigratingData::SetList(System.String,System.Collections.Generic.IEnumerable`1<T>)
+  - token=0x060011C4; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationException::.ctor(System.String)
+  - token=0x060011C5; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationException::.ctor(System.String,System.Exception)
+  - token=0x060011C6; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MissingSchemaVersionException::.ctor(System.String)
+  - token=0x060011C7; System.Void MegaCrit.Sts2.Core.Saves.Migrations.InvalidMigrationPathException::.ctor(System.String)
+  - token=0x060011C8; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationPathGapException::.ctor(System.String)
+  - token=0x060011C9; System.Void MegaCrit.Sts2.Core.Saves.Migrations.DuplicateMigrationException::.ctor(System.String)
+  - token=0x060011CA; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore)
+  - token=0x060011CB; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::Initialize()
+  - token=0x060011CC; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::DeriveAndSetLatestVersions()
+  - token=0x060011CD; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::EnsureVersionSet()
+  - token=0x060011CE; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::ValidateMigrationPaths()
+  - token=0x060011CF; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::GetLatestVersion()
+  - token=0x060011D0; System.Collections.Generic.List`1<System.Int32> MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::GetGapsInMigrationPath(System.Type)
+  - token=0x060011D1; System.Collections.Generic.List`1<System.Int32> MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::GetDuplicateMigrationSources(System.Type)
+  - token=0x060011D2; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::IsMigrationPathValid(System.Type)
+  - token=0x060011D3; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::RegisterMigration(MegaCrit.Sts2.Core.Saves.Migrations.IMigration)
+  - token=0x060011D4; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::SetMinimumSupportedVersion(System.Int32)
+  - token=0x060011D5; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::GetCurrentVersion()
+  - token=0x060011D6; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::GetMinimumSupportedVersion()
+  - token=0x060011D7; MegaCrit.Sts2.Core.Saves.Migrations.IMigration MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::GetMigration(System.Int32,System.Int32)
+  - token=0x060011D8; System.Nullable`1<System.Int32> MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::GetNextVersion(System.Int32)
+  - token=0x060011DB; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::ExtractSchemaVersion(MegaCrit.Sts2.Core.Saves.Migrations.MigratingData)
+  - token=0x060011DC; T MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::CreateNewSave()
+  - token=0x060011DD; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::PreserveCorruptFile(System.String,MegaCrit.Sts2.Core.Saves.ReadSaveStatus)
+  - token=0x060011DE; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::ShouldPreserveCorrupt(MegaCrit.Sts2.Core.Saves.ReadSaveStatus)
+  - token=0x060011DF; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<T> MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::LoadSave(System.String)
+  - token=0x060011E0; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<T> MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::LoadSaveFromPath(System.String)
+  - token=0x060011E1; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<T> MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::LoadWithAggressiveRecovery(System.String,System.String)
+  - token=0x060011E2; System.Nullable`1<System.Int32> MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::InferSchemaVersionFromStructure(MegaCrit.Sts2.Core.Saves.Migrations.MigratingData)
+  - token=0x060011E3; T MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::RecoverPartialDataFromCorruptSave(MegaCrit.Sts2.Core.Saves.Migrations.MigratingData)
+  - token=0x060011E4; System.String MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::RepairCommonJsonErrors(System.String)
+  - token=0x060011E5; MegaCrit.Sts2.Core.Saves.Migrations.MigratingData MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager::MigrateDataSequentially(MegaCrit.Sts2.Core.Saves.Migrations.MigratingData)
+  - token=0x060011E8; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<DeriveAndSetLatestVersions>b__6_1(MegaCrit.Sts2.Core.Saves.Migrations.IMigration)
+  - token=0x060011E9; System.String MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<DeriveAndSetLatestVersions>b__6_0(System.Collections.Generic.KeyValuePair`2<System.Type,System.Int32>)
+  - token=0x060011EA; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<GetGapsInMigrationPath>b__10_0(MegaCrit.Sts2.Core.Saves.Migrations.IMigration)
+  - token=0x060011EB; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<GetGapsInMigrationPath>b__10_1(MegaCrit.Sts2.Core.Saves.Migrations.IMigration)
+  - token=0x060011EC; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<GetDuplicateMigrationSources>b__11_0(MegaCrit.Sts2.Core.Saves.Migrations.IMigration)
+  - token=0x060011ED; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<GetDuplicateMigrationSources>b__11_1(System.Linq.IGrouping`2<System.Int32,MegaCrit.Sts2.Core.Saves.Migrations.IMigration>)
+  - token=0x060011EE; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<GetDuplicateMigrationSources>b__11_2(System.Linq.IGrouping`2<System.Int32,MegaCrit.Sts2.Core.Saves.Migrations.IMigration>)
+  - token=0x060011EF; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<RepairCommonJsonErrors>b__30_0(System.Char)
+  - token=0x060011F0; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<RepairCommonJsonErrors>b__30_1(System.Char)
+  - token=0x060011F1; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<RepairCommonJsonErrors>b__30_2(System.Char)
+  - token=0x060011F2; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c::<RepairCommonJsonErrors>b__30_3(System.Char)
+  - token=0x060011F3; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c__DisplayClass17_0`1::.ctor()
+  - token=0x060011F4; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c__DisplayClass17_0`1::<GetMigration>b__0(MegaCrit.Sts2.Core.Saves.Migrations.IMigration)
+  - token=0x060011F5; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c__DisplayClass18_0`1::.ctor()
+  - token=0x060011F6; System.Boolean MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager/<>c__DisplayClass18_0`1::<GetNextVersion>b__0(MegaCrit.Sts2.Core.Saves.Migrations.IMigration)
+  - token=0x060011F7; System.Collections.Generic.Dictionary`2<System.Type,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Saves.Migrations.IMigration>> MegaCrit.Sts2.Core.Saves.Migrations.MigrationRegistry::get_Migrations()
+  - token=0x060011F8; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationRegistry::RegisterAllMigrations(MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager)
+  - token=0x060011F9; System.Void MegaCrit.Sts2.Core.Saves.Migrations.MigrationRegistry::.ctor()
+  - token=0x060011FA; System.Int32 MegaCrit.Sts2.Core.Saves.Migrations.IMigrationSubtypes::get_Count()
+  - token=0x060011FC; System.Type MegaCrit.Sts2.Core.Saves.Migrations.IMigrationSubtypes::Get(System.Int32)
+  - token=0x0600122F; MegaCrit.Sts2.Core.Saves.PrefsSave MegaCrit.Sts2.Core.Saves.Managers.PrefsSaveManager::get_Prefs()
+  - token=0x06001230; System.Void MegaCrit.Sts2.Core.Saves.Managers.PrefsSaveManager::set_Prefs(MegaCrit.Sts2.Core.Saves.PrefsSave)
+  - token=0x06001232; System.Void MegaCrit.Sts2.Core.Saves.Managers.PrefsSaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager,MegaCrit.Sts2.Core.Saves.IProfileIdProvider)
+  - token=0x06001233; System.String MegaCrit.Sts2.Core.Saves.Managers.PrefsSaveManager::GetPrefsPath(System.Int32)
+  - token=0x06001234; System.Void MegaCrit.Sts2.Core.Saves.Managers.PrefsSaveManager::SavePrefs()
+  - token=0x06001235; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave> MegaCrit.Sts2.Core.Saves.Managers.PrefsSaveManager::LoadPrefs()
+  - token=0x06001236; System.String MegaCrit.Sts2.Core.Saves.Managers.ProfileSaveManager::get_ProfilePath()
+  - token=0x06001237; MegaCrit.Sts2.Core.Saves.ProfileSave MegaCrit.Sts2.Core.Saves.Managers.ProfileSaveManager::get_Profile()
+  - token=0x06001238; System.Void MegaCrit.Sts2.Core.Saves.Managers.ProfileSaveManager::set_Profile(MegaCrit.Sts2.Core.Saves.ProfileSave)
+  - token=0x06001239; System.Void MegaCrit.Sts2.Core.Saves.Managers.ProfileSaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager)
+  - token=0x0600123B; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.ProfileSave> MegaCrit.Sts2.Core.Saves.Managers.ProfileSaveManager::LoadProfile()
+  - token=0x0600123C; MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::get_Progress()
+  - token=0x0600123D; System.Void MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::set_Progress(MegaCrit.Sts2.Core.Saves.ProgressState)
+  - token=0x0600123F; System.Void MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager,MegaCrit.Sts2.Core.Saves.IProfileIdProvider)
+  - token=0x06001240; System.String MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::GetProgressPathForProfile(System.Int32)
+  - token=0x06001241; System.Void MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::SaveProgress()
+  - token=0x06001242; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::LoadProgress()
+  - token=0x06001277; System.String MegaCrit.Sts2.Core.Saves.Managers.RunHistorySaveManager::get_HistoryPath()
+  - token=0x06001279; System.Void MegaCrit.Sts2.Core.Saves.Managers.RunHistorySaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager,MegaCrit.Sts2.Core.Saves.IProfileIdProvider)
+  - token=0x0600127A; System.Void MegaCrit.Sts2.Core.Saves.Managers.RunHistorySaveManager::CreateRunHistoryDirectory()
+  - token=0x0600127B; System.String MegaCrit.Sts2.Core.Saves.Managers.RunHistorySaveManager::GetHistoryPath(System.Int32)
+  - token=0x06001289; System.Void MegaCrit.Sts2.Core.Saves.Managers.RunSaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager,MegaCrit.Sts2.Core.Saves.IProfileIdProvider,System.Boolean)
+  - token=0x06001298; MegaCrit.Sts2.Core.Saves.SettingsSave MegaCrit.Sts2.Core.Saves.Managers.SettingsSaveManager::get_Settings()
+  - token=0x0600129A; System.Void MegaCrit.Sts2.Core.Saves.Managers.SettingsSaveManager::.ctor(MegaCrit.Sts2.Core.Saves.ISaveStore,MegaCrit.Sts2.Core.Saves.Migrations.MigrationManager)
+  - token=0x060019FA; System.UInt64 MegaCrit.Sts2.Core.Random.MegaRandom::NextULongInner()
+  - token=0x060019FB; System.Int32 MegaCrit.Sts2.Core.Random.MegaRandom::Next(System.Int32)
+  - token=0x060019FC; System.Int32 MegaCrit.Sts2.Core.Random.MegaRandom::Next(System.Int32,System.Int32)
+  - token=0x060019FD; System.Double MegaCrit.Sts2.Core.Random.MegaRandom::NextDouble()
+  - token=0x06001A03; System.Int32 MegaCrit.Sts2.Core.Random.MegaRandom::NextInner(System.Int32)
+  - token=0x06001A04; System.Int64 MegaCrit.Sts2.Core.Random.MegaRandom::NextInner(System.Int64)
+  - token=0x06001A0F; MegaCrit.Sts2.Core.Random.Rng MegaCrit.Sts2.Core.Random.Rng::get_Chaotic()
+  - token=0x06001A10; System.Int32 MegaCrit.Sts2.Core.Random.Rng::get_Counter()
+  - token=0x06001A11; System.Void MegaCrit.Sts2.Core.Random.Rng::set_Counter(System.Int32)
+  - token=0x06001A18; System.Int32 MegaCrit.Sts2.Core.Random.Rng::NextInt(System.Int32)
+  - token=0x06001A19; System.Int32 MegaCrit.Sts2.Core.Random.Rng::NextInt(System.Int32,System.Int32)
+  - token=0x06001A23; T MegaCrit.Sts2.Core.Random.Rng::NextItem(System.Collections.Generic.IEnumerable`1<T>)
+  - token=0x06001A36; System.UInt64 MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetLocalPlayerId()
+  - token=0x06001A3C; MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetPlatformBranch()
+  - token=0x06001A3D; System.String MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetThreeLetterLanguageCode()
+  - token=0x06001A3E; System.String MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetRawLanguage()
+  - token=0x06001A42; MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetSupportedWindowMode()
+  - token=0x06001A43; System.String MegaCrit.Sts2.Core.Platform.PlatformBranchExtensions::ToName(MegaCrit.Sts2.Core.Platform.PlatformBranch)
+  - token=0x06001A45; MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+  - token=0x06001A46; MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - token=0x06001A49; System.UInt64 MegaCrit.Sts2.Core.Platform.PlatformUtil::GetLocalPlayerId(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - token=0x06001A50; MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch()
+  - token=0x06001A51; System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetThreeLetterLanguageCode()
+  - token=0x06001A52; System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetRawLanguage()
+  - token=0x06001A56; MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.PlatformUtil::GetSupportedWindowMode()
+  - token=0x06001A5D; System.Boolean MegaCrit.Sts2.Core.Platform.SupportedWindowModeExtensions::ShouldForceFullscreen(MegaCrit.Sts2.Core.Platform.SupportedWindowMode)
+  - token=0x06001A60; System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+  - token=0x06001A84; System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamLeaderboardStrategy::.ctor()
+  - token=0x06001ABC; System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamRemoteSaveStore::.ctor()
+  - token=0x06001AC5; System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize()
+  - token=0x06001AC6; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::RefreshGlobalStats()
+  - token=0x06001AC9; System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::OnUserStatsReceived(Steamworks.UserStatsReceived_t)
+  - token=0x06001AD8; System.Void MegaCrit.Sts2.Core.Platform.Null.NullLeaderboardStrategy::.ctor()
+  - token=0x06001AE2; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Platform.Null.NullLeaderboard> MegaCrit.Sts2.Core.Platform.Null.NullLeaderboardStrategy::Read()
+  - token=0x06001BA3; MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay MegaCrit.Sts2.Core.Nodes.NGame::get_TimeoutOverlay()
+  - token=0x06001BA5; MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_AudioManager()
+  - token=0x06001BB5; MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_DebugAudio()
+  - token=0x06001BB9; System.Boolean MegaCrit.Sts2.Core.Nodes.NGame::get_StartOnMainMenu()
+  - token=0x06001BD2; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::DoCloudSync()
+  - token=0x06001BD4; System.Boolean MegaCrit.Sts2.Core.Nodes.NGame::IsMainThread()
+  - token=0x06001BD6; System.Boolean MegaCrit.Sts2.Core.Nodes.NGame::IsReleaseGame()
+  - token=0x06001BD7; System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitializeGraphicsPreferences()
+  - token=0x06001BD8; System.Void MegaCrit.Sts2.Core.Nodes.NGame::ApplyDisplaySettings()
+  - token=0x06001BDB; System.Void MegaCrit.Sts2.Core.Nodes.NGame::ApplySyncSetting()
+  - token=0x06001BDF; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::LaunchMainMenu(System.Boolean)
+  - token=0x06001BFA; System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitPools()
+  - token=0x06001BFB; System.Void MegaCrit.Sts2.Core.Nodes.NGame::OnNewModDetected(MegaCrit.Sts2.Core.Modding.Mod)
+  - token=0x06001BFC; System.Void MegaCrit.Sts2.Core.Nodes.NGame::CheckShowSaveFileError(MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress>,MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.PrefsSave>,MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SettingsSave>)
+  - token=0x06001BFD; System.Void MegaCrit.Sts2.Core.Nodes.NGame::CheckShowLocalizationOverrideErrors()
+  - token=0x06001C2D; System.String MegaCrit.Sts2.Core.Nodes.NGame/<>c::<CheckShowLocalizationOverrideErrors>b__161_0(MegaCrit.Sts2.Core.Localization.LocValidationError)
+  - token=0x06001C2E; System.String MegaCrit.Sts2.Core.Nodes.NGame/<>c::<CheckShowLocalizationOverrideErrors>b__161_1(System.Linq.IGrouping`2<System.String,MegaCrit.Sts2.Core.Localization.LocValidationError>)
+  - token=0x06001C31; System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext()
+  - token=0x060029AC; System.Void MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake::SetMultiplier(System.Single)
+  - token=0x06002A09; System.Void MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ScreenTraumaRumble::SetMultiplier(System.Single)
+  - token=0x06002E66; System.Void MegaCrit.Sts2.Core.Nodes.Screens.Timeline.EpochComparer::.ctor()
+  - token=0x060035E8; System.Single MegaCrit.Sts2.Core.Nodes.Screens.Settings.NScreenshakePaginator::GetShakeMultiplier(System.Int32)
+  - token=0x06003783; System.Void MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::Update()
+  - token=0x06003784; MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::get_Instance()
+  - token=0x06003788; System.Void MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::.ctor()
+  - token=0x06004CB1; System.Void MegaCrit.Sts2.Core.Nodes.Pooling.IPoolable::OnInstantiated()
+  - token=0x06004CB4; MegaCrit.Sts2.Core.Nodes.Pooling.NodePool`1<T> MegaCrit.Sts2.Core.Nodes.Pooling.NodePool::Init(System.String,System.Int32)
+  - token=0x06004CBE; System.Void MegaCrit.Sts2.Core.Nodes.Pooling.NodePool`1::.ctor(System.String,System.Int32)
+  - token=0x06004CC3; T MegaCrit.Sts2.Core.Nodes.Pooling.NodePool`1::Instantiate()
+  - token=0x06004E34; System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay::Relocalize()
+  - token=0x06004FDF; System.Threading.Tasks.Task`1<System.Single> MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil::AwaitProcessFrame(Godot.Node,System.Threading.CancellationToken)
+  - token=0x06005379; Godot.CanvasLayer MegaCrit.Sts2.Core.Nodes.Debug.NDevConsole::Create()
+  - token=0x060055A6; MegaCrit.Sts2.Core.Nodes.CommonUi.NErrorPopup MegaCrit.Sts2.Core.Nodes.CommonUi.NErrorPopup::Create(MegaCrit.Sts2.Core.Localization.LocString,MegaCrit.Sts2.Core.Localization.LocString,MegaCrit.Sts2.Core.Localization.LocString,System.Boolean)
+  - token=0x060055A7; MegaCrit.Sts2.Core.Nodes.CommonUi.NErrorPopup MegaCrit.Sts2.Core.Nodes.CommonUi.NErrorPopup::Create(System.String,System.String,System.Boolean)
+  - token=0x0600569C; MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::get_Instance()
+  - token=0x0600569E; MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.IScreenContext MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::get_OpenModal()
+  - token=0x0600569F; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::set_OpenModal(MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.IScreenContext)
+  - token=0x060056A1; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::Add(Godot.Node,System.Boolean)
+  - token=0x060056A3; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NModalContainer::ShowBackstop()
+  - token=0x06005D4F; System.Void MegaCrit.Sts2.Core.Nodes.Cards.NCard::InitPool()
+  - token=0x06005EE3; System.String MegaCrit.Sts2.Core.Nodes.Cards.Holders.NGridCardHolder::get_ScenePath()
+  - token=0x06005EE9; System.Void MegaCrit.Sts2.Core.Nodes.Cards.Holders.NGridCardHolder::InitPool()
+  - token=0x06005F94; System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetMasterVol(System.Single)
+  - token=0x06005F95; System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetSfxVol(System.Single)
+  - token=0x06005F96; System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetAmbienceVol(System.Single)
+  - token=0x06005F97; System.Void MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager::SetBgmVol(System.Single)
+  - token=0x06006136; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.MessageTypes::Initialize()
+  - token=0x0600613C; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::set_CategoryIdBitSize(System.Int32)
+  - token=0x0600613E; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::set_EntryIdBitSize(System.Int32)
+  - token=0x06006140; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::set_EpochIdBitSize(System.Int32)
+  - token=0x06006141; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::get_MaxCategoryId()
+  - token=0x06006142; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::get_MaxEntryId()
+  - token=0x06006143; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::get_MaxEpochId()
+  - token=0x06006144; System.UInt32 MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::get_Hash()
+  - token=0x06006145; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::set_Hash(System.UInt32)
+  - token=0x06006146; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::Init()
+  - token=0x06006147; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::GetNetIdForCategory(System.String)
+  - token=0x0600614A; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache::GetNetIdForEntry(System.String)
+  - token=0x06006153; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache/<>c::<Init>b__28_0(System.ValueTuple`2<System.Type,MegaCrit.Sts2.Core.Modding.Mod>,System.ValueTuple`2<System.Type,MegaCrit.Sts2.Core.Modding.Mod>)
+  - token=0x06006154; System.Type MegaCrit.Sts2.Core.Multiplayer.Serialization.ModelIdSerializationCache/<>c::<Init>b__28_1(System.ValueTuple`2<System.Type,MegaCrit.Sts2.Core.Modding.Mod>)
+  - token=0x06006155; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.NetTypeCache`1::.ctor(System.Collections.Generic.List`1<System.Type>)
+  - token=0x0600615B; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Serialization.NetTypeCache`1/<>c::<.ctor>b__2_0(System.Type,System.Type)
+  - token=0x06006196; System.Void MegaCrit.Sts2.Core.Multiplayer.Serialization.PacketWriter::.ctor()
+  - token=0x060061A2; System.Collections.Generic.IReadOnlyList`1<System.Type> MegaCrit.Sts2.Core.Multiplayer.Serialization.INetMessageSubtypes::get_All()
+  - token=0x0600665D; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Models.AbstractModel::get_Id()
+  - token=0x0600665E; System.Boolean MegaCrit.Sts2.Core.Models.AbstractModel::get_IsMutable()
+  - token=0x06006662; System.Void MegaCrit.Sts2.Core.Models.AbstractModel::set_CategorySortingId(System.Int32)
+  - token=0x06006664; System.Void MegaCrit.Sts2.Core.Models.AbstractModel::set_EntrySortingId(System.Int32)
+  - token=0x06006666; System.Void MegaCrit.Sts2.Core.Models.AbstractModel::InitId(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06006669; System.Void MegaCrit.Sts2.Core.Models.AbstractModel::AssertCanonical()
+  - token=0x06006905; System.Collections.Generic.IEnumerable`1<MegaCrit.Sts2.Core.Models.CardModel> MegaCrit.Sts2.Core.Models.CharacterModel::get_StartingDeck()
+  - token=0x06006906; System.Collections.Generic.IReadOnlyList`1<MegaCrit.Sts2.Core.Models.RelicModel> MegaCrit.Sts2.Core.Models.CharacterModel::get_StartingRelics()
+  - token=0x060069FE; System.Type[] MegaCrit.Sts2.Core.Models.ModelDb::get_AllAbstractModelSubtypes()
+  - token=0x060069FF; System.Void MegaCrit.Sts2.Core.Models.ModelDb::Init()
+  - token=0x06006A00; System.Void MegaCrit.Sts2.Core.Models.ModelDb::Inject(System.Type)
+  - token=0x06006A02; System.Void MegaCrit.Sts2.Core.Models.ModelDb::InitIds()
+  - token=0x06006A04; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Models.ModelDb::GetId()
+  - token=0x06006A05; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Models.ModelDb::GetId(System.Type)
+  - token=0x06006A06; System.Type MegaCrit.Sts2.Core.Models.ModelDb::GetCategoryType(System.Type)
+  - token=0x06006A07; System.String MegaCrit.Sts2.Core.Models.ModelDb::GetCategory(System.Type)
+  - token=0x06006A08; System.String MegaCrit.Sts2.Core.Models.ModelDb::GetEntry(System.Type)
+  - token=0x06006A09; T MegaCrit.Sts2.Core.Models.ModelDb::GetByIdOrNull(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06006A0B; System.Boolean MegaCrit.Sts2.Core.Models.ModelDb::Contains(System.Type)
+  - token=0x06006A0C; T MegaCrit.Sts2.Core.Models.ModelDb::Get()
+  - token=0x06006A18; T MegaCrit.Sts2.Core.Models.ModelDb::Character()
+  - token=0x06006A44; System.Void MegaCrit.Sts2.Core.Models.ModelDb::StS2LauncherBootstrapInjectOrReorder(System.Type)
+  - token=0x06006A5C; System.Type MegaCrit.Sts2.Core.Models.ModelId::get_EqualityContract()
+  - token=0x06006A5D; System.String MegaCrit.Sts2.Core.Models.ModelId::get_Category()
+  - token=0x06006A5E; System.String MegaCrit.Sts2.Core.Models.ModelId::get_Entry()
+  - token=0x06006A5F; System.Void MegaCrit.Sts2.Core.Models.ModelId::.ctor(System.String,System.String)
+  - token=0x06006A60; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Models.ModelId::Deserialize(System.String)
+  - token=0x06006A64; System.String MegaCrit.Sts2.Core.Models.ModelId::SlugifyCategory(System.String)
+  - token=0x06006A67; System.Boolean MegaCrit.Sts2.Core.Models.ModelId::op_Equality(MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06006A6A; System.Boolean MegaCrit.Sts2.Core.Models.ModelId::Equals(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06006BF8; System.Collections.Generic.IReadOnlyList`1<System.Type> MegaCrit.Sts2.Core.Models.AbstractModelSubtypes::get_All()
+  - token=0x06008E0B; System.Void MegaCrit.Sts2.Core.Models.Exceptions.MutableModelException::.ctor(System.Type)
+  - token=0x0600AA8F; MegaCrit.Sts2.Core.Modding.ModManagerState MegaCrit.Sts2.Core.Modding.ModManager::get_State()
+  - token=0x0600AA91; System.Collections.Generic.IReadOnlyList`1<MegaCrit.Sts2.Core.Modding.Mod> MegaCrit.Sts2.Core.Modding.ModManager::get_Mods()
+  - token=0x0600AA92; System.Void MegaCrit.Sts2.Core.Modding.ModManager::add_OnModDetected(System.Action`1<MegaCrit.Sts2.Core.Modding.Mod>)
+  - token=0x0600AAA5; System.Collections.Generic.IEnumerable`1<System.String> MegaCrit.Sts2.Core.Modding.ModManager::GetModdedLocTables(System.String,System.String)
+  - token=0x0600AAAC; System.Collections.Generic.IEnumerable`1<MegaCrit.Sts2.Core.Modding.Mod> MegaCrit.Sts2.Core.Modding.ModManager::GetLoadedMods()
+  - token=0x0600AABD; System.Boolean MegaCrit.Sts2.Core.Modding.ModManager/<>c::<GetLoadedMods>b__44_0(MegaCrit.Sts2.Core.Modding.Mod)
+  - token=0x0600AACA; System.Void MegaCrit.Sts2.Core.Modding.ModManager/<GetModdedLocTables>d__36::.ctor(System.Int32)
+  - token=0x0600ABFE; System.Void MegaCrit.Sts2.Core.Logging.ILogPrinter::Print(MegaCrit.Sts2.Core.Logging.LogLevel,System.String,System.Int32)
+  - token=0x0600AC04; System.Void MegaCrit.Sts2.Core.Logging.Log::Debug(System.String,System.Int32)
+  - token=0x0600AC05; System.Void MegaCrit.Sts2.Core.Logging.Log::VeryDebug(System.String,System.Int32)
+  - token=0x0600AC06; System.Void MegaCrit.Sts2.Core.Logging.Log::Info(System.String,System.Int32)
+  - token=0x0600AC07; System.Void MegaCrit.Sts2.Core.Logging.Log::Warn(System.String,System.Int32)
+  - token=0x0600AC08; System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32)
+  - token=0x0600AC0B; MegaCrit.Sts2.Core.Logging.LogLevel MegaCrit.Sts2.Core.Logging.Logger::get_GlobalLogLevel()
+  - token=0x0600AC0E; System.String MegaCrit.Sts2.Core.Logging.Logger::get_Context()
+  - token=0x0600AC14; System.Boolean MegaCrit.Sts2.Core.Logging.Logger::WillLog(MegaCrit.Sts2.Core.Logging.LogLevel)
+  - token=0x0600AC15; System.Void MegaCrit.Sts2.Core.Logging.Logger::LogMessage(MegaCrit.Sts2.Core.Logging.LogLevel,System.String,System.Int32)
+  - token=0x0600AC16; System.Void MegaCrit.Sts2.Core.Logging.Logger::LogMessage(MegaCrit.Sts2.Core.Logging.LogLevel,MegaCrit.Sts2.Core.Logging.LogType,System.String,System.Int32)
+  - token=0x0600AC18; System.Void MegaCrit.Sts2.Core.Logging.Logger::Debug(System.String,System.Int32)
+  - token=0x0600AC19; System.Void MegaCrit.Sts2.Core.Logging.Logger::VeryDebug(System.String,System.Int32)
+  - token=0x0600AC1A; System.Void MegaCrit.Sts2.Core.Logging.Logger::Info(System.String,System.Int32)
+  - token=0x0600AC1B; System.Void MegaCrit.Sts2.Core.Logging.Logger::Warn(System.String,System.Int32)
+  - token=0x0600AC1C; System.Void MegaCrit.Sts2.Core.Logging.Logger::Error(System.String,System.Int32)
+  - token=0x0600AC2A; System.Void MegaCrit.Sts2.Core.Localization.LocException::.ctor(System.String)
+  - token=0x0600AC2B; System.Void MegaCrit.Sts2.Core.Localization.LocException::.ctor(System.String,System.Exception)
+  - token=0x0600AC2C; System.Text.Json.Serialization.Metadata.JsonTypeInfo`1<System.Collections.Generic.Dictionary`2<System.String,System.Int32>> MegaCrit.Sts2.Core.Localization.LocManagerSerializerContext::get_DictionaryStringInt32()
+  - token=0x0600AC2F; System.Text.Json.Serialization.Metadata.JsonTypeInfo`1<System.Collections.Generic.Dictionary`2<System.String,System.String>> MegaCrit.Sts2.Core.Localization.LocManagerSerializerContext::get_DictionaryStringString()
+  - token=0x0600AC36; MegaCrit.Sts2.Core.Localization.LocManagerSerializerContext MegaCrit.Sts2.Core.Localization.LocManagerSerializerContext::get_Default()
+  - token=0x0600AC44; MegaCrit.Sts2.Core.Localization.LocManager MegaCrit.Sts2.Core.Localization.LocManager::get_Instance()
+  - token=0x0600AC45; System.Void MegaCrit.Sts2.Core.Localization.LocManager::set_Instance(MegaCrit.Sts2.Core.Localization.LocManager)
+  - token=0x0600AC46; System.String MegaCrit.Sts2.Core.Localization.LocManager::get_LocalizationAssetDir()
+  - token=0x0600AC47; System.Boolean MegaCrit.Sts2.Core.Localization.LocManager::get_OverridesActive()
+  - token=0x0600AC48; System.Void MegaCrit.Sts2.Core.Localization.LocManager::set_OverridesActive(System.Boolean)
+  - token=0x0600AC49; System.Collections.Generic.IReadOnlyList`1<MegaCrit.Sts2.Core.Localization.LocValidationError> MegaCrit.Sts2.Core.Localization.LocManager::get_ValidationErrors()
+  - token=0x0600AC4A; System.Void MegaCrit.Sts2.Core.Localization.LocManager::set_ValidationErrors(System.Collections.Generic.IReadOnlyList`1<MegaCrit.Sts2.Core.Localization.LocValidationError>)
+  - token=0x0600AC4B; System.String MegaCrit.Sts2.Core.Localization.LocManager::get_Language()
+  - token=0x0600AC4C; System.Void MegaCrit.Sts2.Core.Localization.LocManager::set_Language(System.String)
+  - token=0x0600AC4D; System.Collections.Generic.List`1<System.String> MegaCrit.Sts2.Core.Localization.LocManager::get_Languages()
+  - token=0x0600AC4E; System.Globalization.CultureInfo MegaCrit.Sts2.Core.Localization.LocManager::get_CultureInfo()
+  - token=0x0600AC4F; System.Void MegaCrit.Sts2.Core.Localization.LocManager::set_CultureInfo(System.Globalization.CultureInfo)
+  - token=0x0600AC51; System.Void MegaCrit.Sts2.Core.Localization.LocManager::set_StringComparer(System.StringComparer)
+  - token=0x0600AC52; System.Globalization.CultureInfo MegaCrit.Sts2.Core.Localization.LocManager::GetCultureInfoSafe(System.String)
+  - token=0x0600AC53; System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize()
+  - token=0x0600AC54; System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor()
+  - token=0x0600AC55; System.Globalization.CultureInfo MegaCrit.Sts2.Core.Localization.LocManager::CultureInfoFromThreeLetterCode(System.String)
+  - token=0x0600AC56; System.Void MegaCrit.Sts2.Core.Localization.LocManager::LoadLocFormatters()
+  - token=0x0600AC57; System.Void MegaCrit.Sts2.Core.Localization.LocManager::LoadLocCompletionFile()
+  - token=0x0600AC59; System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>)
+  - token=0x0600AC5A; System.String MegaCrit.Sts2.Core.Localization.LocManager::ConvertToW(System.String)
+  - token=0x0600AC5B; System.String MegaCrit.Sts2.Core.Localization.LocManager::ToString(System.Collections.Generic.Dictionary`2<System.String,System.Object>)
+  - token=0x0600AC5C; System.Void MegaCrit.Sts2.Core.Localization.LocManager::SetLanguage(System.String)
+  - token=0x0600AC5D; System.Void MegaCrit.Sts2.Core.Localization.LocManager::SetLanguageInternal(System.String,System.Collections.Generic.Dictionary`2<System.String,MegaCrit.Sts2.Core.Localization.LocTable>,System.Boolean,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Localization.LocValidationError>)
+  - token=0x0600AC60; System.ValueTuple`3<System.Collections.Generic.Dictionary`2<System.String,MegaCrit.Sts2.Core.Localization.LocTable>,System.Boolean,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Localization.LocValidationError>> MegaCrit.Sts2.Core.Localization.LocManager::LoadTablesFromPath(System.String,System.Boolean)
+  - token=0x0600AC61; MegaCrit.Sts2.Core.Localization.LocTable MegaCrit.Sts2.Core.Localization.LocManager::GetTable(System.String)
+  - token=0x0600AC62; System.Collections.Generic.Dictionary`2<System.String,System.String> MegaCrit.Sts2.Core.Localization.LocManager::LoadTable(System.String)
+  - token=0x0600AC63; System.Collections.Generic.IEnumerable`1<System.String> MegaCrit.Sts2.Core.Localization.LocManager::ListLocalizationFiles(System.String)
+  - token=0x0600AC64; System.Boolean MegaCrit.Sts2.Core.Localization.LocManager::TryLoadOverrideFile(System.String,MegaCrit.Sts2.Core.Localization.LocTable,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Localization.LocValidationError>)
+  - token=0x0600AC65; System.Boolean MegaCrit.Sts2.Core.Localization.LocManager::TryLoadWeblateNestedOverrides(System.String,System.String,System.String,MegaCrit.Sts2.Core.Localization.LocTable,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Localization.LocValidationError>)
+  - token=0x0600AC68; System.Void MegaCrit.Sts2.Core.Localization.LocManager::TriggerLocaleChange()
+  - token=0x0600AC6C; System.Void MegaCrit.Sts2.Core.Localization.LocManager/LocaleChangeCallback::Invoke()
+  - token=0x0600AC71; System.String MegaCrit.Sts2.Core.Localization.LocManager/<>c::<ToString>b__50_0(System.Collections.Generic.KeyValuePair`2<System.String,System.Object>)
+  - token=0x0600AC72; System.String MegaCrit.Sts2.Core.Localization.LocManager/<>c::<LoadTablesFromPath>b__55_0(System.Collections.Generic.KeyValuePair`2<System.String,System.String>)
+  - token=0x0600AC73; System.String MegaCrit.Sts2.Core.Localization.LocManager/<>c::<LoadTablesFromPath>b__55_1(System.Collections.Generic.KeyValuePair`2<System.String,System.String>)
+  - token=0x0600AC74; System.String MegaCrit.Sts2.Core.Localization.LocManager/<>c::<LoadTablesFromPath>b__55_2(System.Collections.Generic.KeyValuePair`2<System.String,System.String>)
+  - token=0x0600AC75; System.String MegaCrit.Sts2.Core.Localization.LocManager/<>c::<LoadTablesFromPath>b__55_3(System.Collections.Generic.KeyValuePair`2<System.String,System.String>)
+  - token=0x0600AC76; System.Boolean MegaCrit.Sts2.Core.Localization.LocManager/<>c::<ListLocalizationFiles>b__58_0(System.String)
+  - token=0x0600AC79; System.Void MegaCrit.Sts2.Core.Localization.LocManager/<>c__DisplayClass48_0::.ctor()
+  - token=0x0600AC7A; System.Void MegaCrit.Sts2.Core.Localization.LocManager/<>c__DisplayClass48_0::<SmartFormat>b__0(Sentry.Scope)
+  - token=0x0600AC7B; System.Void MegaCrit.Sts2.Core.Localization.LocString::.ctor(System.String,System.String)
+  - token=0x0600AC7C; System.String MegaCrit.Sts2.Core.Localization.LocString::get_LocTable()
+  - token=0x0600AC7D; System.String MegaCrit.Sts2.Core.Localization.LocString::get_LocEntryKey()
+  - token=0x0600AC82; System.String MegaCrit.Sts2.Core.Localization.LocString::GetFormattedText()
+  - token=0x0600AC83; System.String MegaCrit.Sts2.Core.Localization.LocString::GetRawText()
+  - token=0x0600ACC5; System.Void MegaCrit.Sts2.Core.Localization.LocTable::.ctor(System.String,System.Collections.Generic.Dictionary`2<System.String,System.String>,MegaCrit.Sts2.Core.Localization.LocTable)
+  - token=0x0600ACC7; System.Void MegaCrit.Sts2.Core.Localization.LocTable::MergeWith(System.Collections.Generic.Dictionary`2<System.String,System.String>)
+  - token=0x0600ACC9; System.String MegaCrit.Sts2.Core.Localization.LocTable::GetRawText(System.String)
+  - token=0x0600ACCB; System.Boolean MegaCrit.Sts2.Core.Localization.LocTable::IsLocalKey(System.String)
+  - token=0x0600ACE5; System.Void MegaCrit.Sts2.Core.Localization.LocValidationError::.ctor(System.String,System.String,System.String)
+  - token=0x0600ACE7; System.String MegaCrit.Sts2.Core.Localization.LocValidationError::get_FilePath()
+  - token=0x0600ACF7; System.Boolean MegaCrit.Sts2.Core.Localization.LocValidator::ValidateFormatString(System.String,System.String&)
+  - token=0x0600AD02; System.Void MegaCrit.Sts2.Core.Localization.Formatters.AbsoluteValueFormatter::.ctor()
+  - token=0x0600AD08; System.Void MegaCrit.Sts2.Core.Localization.Formatters.EnergyIconsFormatter::.ctor()
+  - token=0x0600AD0E; System.Void MegaCrit.Sts2.Core.Localization.Formatters.HighlightDifferencesFormatter::.ctor()
+  - token=0x0600AD14; System.Void MegaCrit.Sts2.Core.Localization.Formatters.HighlightDifferencesInverseFormatter::.ctor()
+  - token=0x0600AD1B; System.Void MegaCrit.Sts2.Core.Localization.Formatters.LocaleNumberFormatter::.ctor()
+  - token=0x0600AD21; System.Void MegaCrit.Sts2.Core.Localization.Formatters.PercentLessFormatter::.ctor()
+  - token=0x0600AD27; System.Void MegaCrit.Sts2.Core.Localization.Formatters.PercentMoreFormatter::.ctor()
+  - token=0x0600AD2D; System.Void MegaCrit.Sts2.Core.Localization.Formatters.ShowIfUpgradedFormatter::.ctor()
+  - token=0x0600AD33; System.Void MegaCrit.Sts2.Core.Localization.Formatters.StarIconsFormatter::.ctor()
+  - token=0x0600AD34; System.Void MegaCrit.Sts2.Core.Localization.Fonts.FontControlUtils::ApplyLocaleFontSubstitution(Godot.Control,MegaCrit.Sts2.Core.Localization.Fonts.FontType,Godot.StringName)
+  - token=0x0600AD35; System.Boolean MegaCrit.Sts2.Core.Localization.Fonts.FontManager::NeedsFontSubstitution(System.String)
+  - token=0x0600AD36; Godot.Font MegaCrit.Sts2.Core.Localization.Fonts.FontManager::GetSubstituteFont(System.String,MegaCrit.Sts2.Core.Localization.Fonts.FontType)
+  - token=0x0600AD38; Godot.Font MegaCrit.Sts2.Core.Localization.Fonts.FontManager::GetFontForLanguage(System.String,MegaCrit.Sts2.Core.Localization.Fonts.FontType)
+  - token=0x0600AD3A; System.String MegaCrit.Sts2.Core.Localization.Fonts.FontPathSet::GetPath(MegaCrit.Sts2.Core.Localization.Fonts.FontType)
+  - token=0x0600ADED; System.Void MegaCrit.Sts2.Core.Leaderboard.LeaderboardManager::Initialize()
+  - token=0x0600AF90; System.Boolean MegaCrit.Sts2.Core.Helpers.BadWordChecker::ContainsBadWord(System.String)
+  - token=0x0600AF93; System.Boolean MegaCrit.Sts2.Core.Helpers.CommandLineHelper::HasArg(System.String)
+  - token=0x0600AF94; System.Boolean MegaCrit.Sts2.Core.Helpers.CommandLineHelper::TryGetValue(System.String,System.String&)
+  - token=0x0600AF95; System.String MegaCrit.Sts2.Core.Helpers.CommandLineHelper::GetValue(System.String)
+  - token=0x0600AFBA; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::AddChildSafely(Godot.Node,Godot.Node)
+  - token=0x0600AFBC; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::MoveChildSafely(Godot.Node,Godot.Node,System.Int32)
+  - token=0x0600AFE6; MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SettingsSave> MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::get_SettingsReadResult()
+  - token=0x0600AFE8; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()
+  - token=0x0600AFE9; System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential()
+  - token=0x0600AFF0; System.Type[] MegaCrit.Sts2.Core.Helpers.ReflectionHelper::get_ModTypes()
+  - token=0x0600AFF2; System.Collections.Generic.IEnumerable`1<System.Type> MegaCrit.Sts2.Core.Helpers.ReflectionHelper::GetSubtypesInMods(System.Type)
+  - token=0x0600AFF3; System.Collections.Generic.IEnumerable`1<System.Type> MegaCrit.Sts2.Core.Helpers.ReflectionHelper::GetSubtypesFromAssembly(System.Reflection.Assembly,System.Type)
+  - token=0x0600AFF4; System.Collections.Generic.IEnumerable`1<System.Type> MegaCrit.Sts2.Core.Helpers.ReflectionHelper::GetSubtypesFromList(System.Collections.Generic.IList`1<System.Type>,System.Type)
+  - token=0x0600AFF6; System.Collections.Generic.IEnumerable`1<System.Type> MegaCrit.Sts2.Core.Helpers.ReflectionHelper::GetSubtypesInMods()
+  - token=0x0600AFF7; System.Boolean MegaCrit.Sts2.Core.Helpers.ReflectionHelper::InheritsOrImplements(System.Type,System.Type)
+  - token=0x0600AFFA; System.Reflection.Assembly MegaCrit.Sts2.Core.Helpers.ReflectionHelper/<>c::<get_ModTypes>b__8_0(MegaCrit.Sts2.Core.Modding.Mod)
+  - token=0x0600AFFB; System.Collections.Generic.IEnumerable`1<System.Type> MegaCrit.Sts2.Core.Helpers.ReflectionHelper/<>c::<get_ModTypes>b__8_1(System.Reflection.Assembly)
+  - token=0x0600AFFC; System.Void MegaCrit.Sts2.Core.Helpers.ReflectionHelper/<>c__DisplayClass12_0::.ctor()
+  - token=0x0600AFFD; System.Boolean MegaCrit.Sts2.Core.Helpers.ReflectionHelper/<>c__DisplayClass12_0::<GetSubtypesFromList>b__0(System.Type)
+  - token=0x0600AFFE; System.String MegaCrit.Sts2.Core.Helpers.SceneHelper::GetScenePath(System.String)
+  - token=0x0600AFFF; Godot.PackedScene MegaCrit.Sts2.Core.Helpers.SceneHelper::Load(System.String)
+  - token=0x0600B000; T MegaCrit.Sts2.Core.Helpers.SceneHelper::Instantiate(System.String)
+  - token=0x0600B002; System.String MegaCrit.Sts2.Core.Helpers.SeedHelper::GetRandomSeed(MegaCrit.Sts2.Core.Random.Rng,System.Int32)
+  - token=0x0600B008; System.Text.RegularExpressions.Regex MegaCrit.Sts2.Core.Helpers.StringHelper::CamelCaseRegex()
+  - token=0x0600B00A; System.Text.RegularExpressions.Regex MegaCrit.Sts2.Core.Helpers.StringHelper::WhitespaceRegex()
+  - token=0x0600B00B; System.Text.RegularExpressions.Regex MegaCrit.Sts2.Core.Helpers.StringHelper::SpecialCharRegex()
+  - token=0x0600B00D; System.String MegaCrit.Sts2.Core.Helpers.StringHelper::Slugify(System.String)
+  - token=0x0600B01B; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::RunSafely(System.Threading.Tasks.Task)
+  - token=0x0600B01C; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::LogTaskExceptions(System.Threading.Tasks.Task)
+  - token=0x0600B15B; System.Void MegaCrit.Sts2.Core.GameActions.Multiplayer.ActionTypes::Initialize()
+  - token=0x0600B1BF; System.Collections.Generic.IReadOnlyList`1<System.Type> MegaCrit.Sts2.Core.GameActions.Multiplayer.INetActionSubtypes::get_All()
+  - token=0x0600B20A; System.Int32 MegaCrit.Sts2.Core.Extensions.ListExtensions::IndexOf(System.Collections.Generic.IReadOnlyList`1<T>,T)
+  - token=0x0600B20F; System.Void MegaCrit.Sts2.Core.Exceptions.SaveException::.ctor(System.String)
+  - token=0x0600B8A5; System.Boolean MegaCrit.Sts2.Core.Debug.DebugSettings::get_DevSkip()
+  - token=0x0600B96E; System.Void MegaCrit.Sts2.Core.Debug.SentryService::AfterGameInit(System.String,System.String,Godot.Node)
+  - token=0x0600B974; System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception)
+  - token=0x0600B975; System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception,System.Action`1<Sentry.Scope>)
+  - token=0x0600B976; System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureMessage(System.String,Sentry.SentryLevel,System.Action`1<Sentry.Scope>)
+  - token=0x0600B977; System.Void MegaCrit.Sts2.Core.Debug.SentryService::SetTag(System.String,System.String)
+  - token=0x0600BEDE; System.Void MegaCrit.Sts2.Core.AutoSlay.AutoSlayer::set_IsActive(System.Boolean)
+  - token=0x0600BEE1; System.Void MegaCrit.Sts2.Core.AutoSlay.AutoSlayer::.ctor()
+  - token=0x0600BEE2; System.Void MegaCrit.Sts2.Core.AutoSlay.AutoSlayer::Start(System.String,System.String)
+  - token=0x0600BEE5; System.Threading.Tasks.Task MegaCrit.Sts2.Core.AutoSlay.AutoSlayer::RunAsync(System.String,System.Threading.CancellationToken)
+  - token=0x0600BF21; System.Void MegaCrit.Sts2.Core.AutoSlay.AutoSlayLog::OpenLogFile(System.String)
+  - token=0x0600BF85; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.CardRewardScreenHandler::.ctor()
+  - token=0x0600BF8D; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.ChooseABundleScreenHandler::.ctor()
+  - token=0x0600BF95; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.ChooseACardScreenHandler::.ctor()
+  - token=0x0600BF9B; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.ChooseARelicScreenHandler::.ctor()
+  - token=0x0600BFA1; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.CrystalSphereScreenHandler::.ctor()
+  - token=0x0600BFAE; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.DeckCardSelectScreenHandler::.ctor()
+  - token=0x0600BFBD; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.DeckEnchantScreenHandler::.ctor()
+  - token=0x0600BFCC; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.DeckTransformScreenHandler::.ctor()
+  - token=0x0600BFD8; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.DeckUpgradeScreenHandler::.ctor()
+  - token=0x0600BFE2; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.GameOverScreenHandler::.ctor()
+  - token=0x0600BFED; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.MapScreenHandler::.ctor()
+  - token=0x0600BFFC; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.RewardsScreenHandler::.ctor()
+  - token=0x0600C006; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Screens.SimpleCardSelectScreenHandler::.ctor()
+  - token=0x0600C012; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Rooms.CombatRoomHandler::.ctor()
+  - token=0x0600C02A; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Rooms.EventRoomHandler::.ctor()
+  - token=0x0600C053; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Rooms.RestSiteRoomHandler::.ctor()
+  - token=0x0600C05E; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Rooms.ShopRoomHandler::.ctor()
+  - token=0x0600C068; System.Void MegaCrit.Sts2.Core.AutoSlay.Handlers.Rooms.TreasureRoomHandler::.ctor()
+  - token=0x0600C07E; System.Void MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::SetMasterAudioVolume(System.Single)
+  - token=0x0600C07F; System.Void MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::SetSfxAudioVolume(System.Single)
+  - token=0x0600C09A; Godot.Resource MegaCrit.Sts2.Core.Assets.AssetCache::GetAsset(System.String)
+  - token=0x0600C09C; Godot.Resource MegaCrit.Sts2.Core.Assets.AssetCache::LoadAsset(System.String)
+  - token=0x0600C0A4; Godot.PackedScene MegaCrit.Sts2.Core.Assets.AssetCache::GetScene(System.String)
+  - token=0x0600C0AB; System.Void MegaCrit.Sts2.Core.Assets.AssetLoadException::.ctor(System.String)
+  - token=0x0600C0CC; System.Void MegaCrit.Sts2.Core.Assets.AtlasManager::LoadEssentialAtlases()
+  - token=0x0600C0CD; System.Void MegaCrit.Sts2.Core.Assets.AtlasManager::LoadAtlas(System.String)
+  - token=0x0600C0CE; System.Void MegaCrit.Sts2.Core.Assets.AtlasManager::LoadAtlasInternal(System.String)
+  - token=0x0600C0D5; System.String MegaCrit.Sts2.Core.Assets.AtlasManager::NormalizeSpriteKey(System.String)
+  - token=0x0600C0D8; System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) MegaCrit.Sts2.Core.Assets.AtlasManager/AtlasData::set_TpSheet(MegaCrit.Sts2.Core.Assets.TpSheetData)
+  - token=0x0600C0DA; System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) MegaCrit.Sts2.Core.Assets.AtlasManager/AtlasData::set_PageTextures(System.Collections.Generic.Dictionary`2<System.String,Godot.Texture2D>)
+  - token=0x0600C0DC; System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) MegaCrit.Sts2.Core.Assets.AtlasManager/AtlasData::set_SpriteMap(System.Collections.Generic.Dictionary`2<System.String,MegaCrit.Sts2.Core.Assets.AtlasManager/SpriteInfo>)
+  - token=0x0600C0DD; System.Void MegaCrit.Sts2.Core.Assets.AtlasManager/AtlasData::.ctor()
+  - token=0x0600C0DE; System.Void MegaCrit.Sts2.Core.Assets.AtlasManager/SpriteInfo::.ctor(Godot.Texture2D,MegaCrit.Sts2.Core.Assets.TpSheetSprite)
+  - token=0x0600C107; System.Void MegaCrit.Sts2.Core.Assets.AtlasResourceLoader::.ctor()
+  - token=0x0600C10D; MegaCrit.Sts2.Core.Assets.AssetCache MegaCrit.Sts2.Core.Assets.PreloadManager::get_Cache()
+  - token=0x0600C14B; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Assets.TpSheetTexture> MegaCrit.Sts2.Core.Assets.TpSheetData::get_Textures()
+  - token=0x0600C14E; System.String MegaCrit.Sts2.Core.Assets.TpSheetTexture::get_Image()
+  - token=0x0600C152; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Assets.TpSheetSprite> MegaCrit.Sts2.Core.Assets.TpSheetTexture::get_Sprites()
+  - token=0x0600C15A; System.String MegaCrit.Sts2.Core.Assets.TpSheetSprite::get_Filename()
+  - token=0x0600C193; System.Boolean MegaCrit.Sts2.addons.mega_text.MegaLabel::get_AutoSizeEnabled()
+  - token=0x0600C195; System.Int32 MegaCrit.Sts2.addons.mega_text.MegaLabel::get_MinFontSize()
+  - token=0x0600C197; System.Int32 MegaCrit.Sts2.addons.mega_text.MegaLabel::get_MaxFontSize()
+  - token=0x0600C19A; System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::RefreshFont()
+  - token=0x0600C19C; System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::SetTextAutoSize(System.String)
+  - token=0x0600C19D; System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::SetFontSize(System.Int32)
+  - token=0x0600C19E; System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::AdjustFontSize()
+  - token=0x0600C1B3; Godot.Vector2 MegaCrit.Sts2.addons.mega_text.MegaLabelHelper::EstimateTextSize(Godot.TextParagraph,System.String,Godot.Font,System.Int32,System.Single,System.Single,System.Boolean)
+  - token=0x0600C1B4; System.Boolean MegaCrit.Sts2.addons.mega_text.MegaLabelHelper::IsTooBig(Godot.TextParagraph,System.String,Godot.Font,System.Int32,System.Single,System.Boolean,Godot.Vector2)
+  - token=0x0600C1B7; System.Boolean MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::get_AutoSizeEnabled()
+  - token=0x0600C1C2; System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::RefreshFont()
+  - token=0x0600C1C4; System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::InstallEffectsIfNeeded()
+  - token=0x0600C1C6; System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::SetTextAutoSize(System.String)
+  - token=0x0600C1E3; System.ReadOnlySpan`1<TElement> <PrivateImplementationDetails>::InlineArrayAsReadOnlySpan(TBuffer&,System.Int32)
+  - token=0x0600C1E4; TElement& <PrivateImplementationDetails>::InlineArrayElementRef(TBuffer&,System.Int32)
+  - token=0x0600C1E5; System.Void <PrivateImplementationDetails>::ThrowSwitchExpressionException(System.Object)
+  - token=0x0600C1E6; System.Void <>z__ReadOnlyArray`1::.ctor(T[])
+
+[CLASSIFIED BOUNDARY REFERENCES]
+  - category=LAUNCH_MAIN_MENU
+      reference: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::LaunchMainMenu(System.Boolean)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.NGame::LaunchMainMenu(System.Boolean)
+  - category=ONE_TIME_INITIALIZATION
+      reference: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteVeryEarly()
+  - category=ONE_TIME_INITIALIZATION
+      reference: System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch() -> MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetRawLanguage() -> MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetThreeLetterLanguageCode() -> MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitializeGraphicsPreferences() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::ApplyDisplaySettings() -> MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.PlatformUtil::GetSupportedWindowMode() -> MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::MigrateToUserScopedDirectories() -> System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetProfileScopedBasePath(System.Int32,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>) -> System.UInt64 MegaCrit.Sts2.Core.Platform.PlatformUtil::GetLocalPlayerId(MegaCrit.Sts2.Core.Platform.PlatformType) -> MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetPlatformBranch()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch() -> MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetPlatformBranch()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch() -> MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetRawLanguage() -> MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetThreeLetterLanguageCode() -> MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitializeGraphicsPreferences() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::ApplyDisplaySettings() -> MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.PlatformUtil::GetSupportedWindowMode() -> MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::MigrateToUserScopedDirectories() -> System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetProfileScopedBasePath(System.Int32,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>) -> MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator::MigrateToProfileScopedDirectories() -> System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetAccountScopedBasePath(System.String,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>) -> MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetSupportedWindowMode()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitializeGraphicsPreferences() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::ApplyDisplaySettings() -> MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.PlatformUtil::GetSupportedWindowMode() -> MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetSupportedWindowMode()
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.PlatformUtil::GetSupportedWindowMode()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitializeGraphicsPreferences() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::ApplyDisplaySettings() -> MegaCrit.Sts2.Core.Platform.SupportedWindowMode MegaCrit.Sts2.Core.Platform.PlatformUtil::GetSupportedWindowMode()
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Platform.PlatformBranch MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformBranch() -> MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Platform.PlatformUtil::get_PrimaryPlatform() -> System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance() -> MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::ConstructDefault() -> System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Leaderboard.LeaderboardManager::Initialize() -> System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize() -> System.Boolean MegaCrit.Sts2.Core.Platform.Steam.SteamInitializer::get_Initialized()
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.SupportedWindowModeExtensions::ShouldForceFullscreen(MegaCrit.Sts2.Core.Platform.SupportedWindowMode)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::InitializeGraphicsPreferences() -> System.Void MegaCrit.Sts2.Core.Nodes.NGame::ApplyDisplaySettings() -> System.Boolean MegaCrit.Sts2.Core.Platform.SupportedWindowModeExtensions::ShouldForceFullscreen(MegaCrit.Sts2.Core.Platform.SupportedWindowMode)
+  - category=PLATFORM
+      reference: System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Platform.Null.NullLeaderboard> MegaCrit.Sts2.Core.Platform.Null.NullLeaderboardStrategy::Read()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Leaderboard.LeaderboardManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Platform.Null.NullLeaderboardStrategy::.ctor() -> System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Platform.Null.NullLeaderboard> MegaCrit.Sts2.Core.Platform.Null.NullLeaderboardStrategy::Read()
+  - category=PLATFORM
+      reference: System.String MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetRawLanguage()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetRawLanguage() -> System.String MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetRawLanguage()
+  - category=PLATFORM
+      reference: System.String MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetThreeLetterLanguageCode()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetThreeLetterLanguageCode() -> System.String MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetThreeLetterLanguageCode()
+  - category=PLATFORM
+      reference: System.String MegaCrit.Sts2.Core.Platform.PlatformBranchExtensions::ToName(MegaCrit.Sts2.Core.Platform.PlatformBranch)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.String MegaCrit.Sts2.Core.Platform.PlatformBranchExtensions::ToName(MegaCrit.Sts2.Core.Platform.PlatformBranch)
+  - category=PLATFORM
+      reference: System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetRawLanguage()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetRawLanguage()
+  - category=PLATFORM
+      reference: System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetThreeLetterLanguageCode()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.String MegaCrit.Sts2.Core.Platform.PlatformUtil::GetThreeLetterLanguageCode()
+  - category=PLATFORM
+      reference: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::RefreshGlobalStats()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::RefreshGlobalStats()
+  - category=PLATFORM
+      reference: System.UInt64 MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetLocalPlayerId()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::MigrateToUserScopedDirectories() -> System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetProfileScopedBasePath(System.Int32,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>) -> System.UInt64 MegaCrit.Sts2.Core.Platform.PlatformUtil::GetLocalPlayerId(MegaCrit.Sts2.Core.Platform.PlatformType) -> System.UInt64 MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::GetLocalPlayerId()
+  - category=PLATFORM
+      reference: System.UInt64 MegaCrit.Sts2.Core.Platform.PlatformUtil::GetLocalPlayerId(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Saves.AccountScopeUserDataMigrator::MigrateToUserScopedDirectories() -> System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetProfileScopedBasePath(System.Int32,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>) -> System.UInt64 MegaCrit.Sts2.Core.Platform.PlatformUtil::GetLocalPlayerId(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: System.UInt64 MegaCrit.Sts2.Core.Platform.PlatformUtil::GetLocalPlayerId(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Saves.ProfileAccountScopeMigrator::MigrateToProfileScopedDirectories() -> System.String MegaCrit.Sts2.Core.Saves.UserDataPathProvider::GetAccountScopedBasePath(System.String,System.Nullable`1<MegaCrit.Sts2.Core.Platform.PlatformType>,System.Nullable`1<System.UInt64>) -> System.UInt64 MegaCrit.Sts2.Core.Platform.PlatformUtil::GetLocalPlayerId(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: System.Void MegaCrit.Sts2.Core.Platform.Null.NullLeaderboardStrategy::.ctor()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Leaderboard.LeaderboardManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Platform.Null.NullLeaderboardStrategy::.ctor()
+  - category=PLATFORM
+      reference: System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamLeaderboardStrategy::.ctor()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Leaderboard.LeaderboardManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamLeaderboardStrategy::.ctor()
+  - category=PLATFORM
+      reference: System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamRemoteSaveStore::.ctor()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance() -> MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::ConstructDefault() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamRemoteSaveStore::.ctor()
+  - category=PLATFORM
+      reference: System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize()
+  - category=PLATFORM
+      reference: System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::OnUserStatsReceived(Steamworks.UserStatsReceived_t)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::OnUserStatsReceived(Steamworks.UserStatsReceived_t)
+  - category=SENTRY_INERT_WRAPPER
+      reference: System.Void MegaCrit.Sts2.Core.Debug.SentryService::AfterGameInit(System.String,System.String,Godot.Node)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Debug.SentryService::AfterGameInit(System.String,System.String,Godot.Node)
+  - category=SENTRY_INERT_WRAPPER
+      reference: System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Saves.SaveManager::InitProgressData() -> MegaCrit.Sts2.Core.Saves.ReadSaveResult`1<MegaCrit.Sts2.Core.Saves.SerializableProgress> MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::LoadProgress() -> System.Void MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::SaveProgress() -> System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception)
+  - category=SENTRY_INERT_WRAPPER
+      reference: System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception,System.Action`1<Sentry.Scope>)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay::Relocalize() -> System.String MegaCrit.Sts2.Core.Localization.LocString::GetFormattedText() -> System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>) -> System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception,System.Action`1<Sentry.Scope>)
+  - category=SENTRY_INERT_WRAPPER
+      reference: System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureMessage(System.String,Sentry.SentryLevel,System.Action`1<Sentry.Scope>)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Helpers.OneTimeInitialization::ExecuteEssential() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::Initialize() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::.ctor() -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::SetLanguage(System.String) -> System.Void MegaCrit.Sts2.Core.Localization.LocManager::SetLanguageInternal(System.String,System.Collections.Generic.Dictionary`2<System.String,MegaCrit.Sts2.Core.Localization.LocTable>,System.Boolean,System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Localization.LocValidationError>) -> System.Globalization.CultureInfo MegaCrit.Sts2.Core.Localization.LocManager::CultureInfoFromThreeLetterCode(System.String) -> System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureMessage(System.String,Sentry.SentryLevel,System.Action`1<Sentry.Scope>)
+  - category=SENTRY_INERT_WRAPPER
+      reference: System.Void MegaCrit.Sts2.Core.Debug.SentryService::SetTag(System.String,System.String)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.AutoSlay.AutoSlayer::Start(System.String,System.String) -> System.Void MegaCrit.Sts2.Core.Debug.SentryService::SetTag(System.String,System.String)
+  - category=STEAM
+      reference: Steamworks.Callback`1<!0> Steamworks.Callback`1<Steamworks.UserStatsReceived_t>::Create(Steamworks.Callback`1/DispatchDelegate<!0>)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize() -> Steamworks.Callback`1<!0> Steamworks.Callback`1<Steamworks.UserStatsReceived_t>::Create(Steamworks.Callback`1/DispatchDelegate<!0>)
+  - category=STEAM
+      reference: System.Boolean Steamworks.SteamUserStats::RequestCurrentStats()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.NGame/<GameStartup>d__117::MoveNext() -> System.Void MegaCrit.Sts2.Core.Platform.Steam.SteamStatsManager::Initialize() -> System.Boolean Steamworks.SteamUserStats::RequestCurrentStats()

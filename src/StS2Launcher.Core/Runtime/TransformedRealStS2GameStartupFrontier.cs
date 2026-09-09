@@ -28,6 +28,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private void ResetStep41State()
     {
+        ResetStep42State();
         _step41Preflight = null;
         _step41StateMachineMapped = false;
         _step41ClosureMapped = false;

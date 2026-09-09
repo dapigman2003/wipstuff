@@ -1,9 +1,9 @@
-# StS2 Launcher — Step 41.0
+# StS2 Launcher — Step 42.0
 
-Active candidate: **0.0.173 (173)** — non-invoking GameStartup async frontier map.
+Active candidate: **0.0.174 (174)** — controlled GameStartup `NGame.InitPools()` boundary.
 
-Physical **0.0.170 / Step 39** closed real SceneTree admission **4/4**. A second physical **0.0.171 / Step 40** run then closed the controlled real-game render pulse **4/4**: the in-tree hierarchy passed its 68-node / 23-managed-type / 12-callback / 447-method audit, `StartRendering()` returned active, the first continuation arrived at 101.8 ms, `StopRendering()` returned inactive at 103.3 ms, and frozen NGame/state/native confinement held. The earlier 0.0.171 523.5 ms run remains useful timing evidence but is superseded for closure by the later 4/4 run.
+Physical **0.0.173 / Step 41** closed the non-invoking GameStartup async frontier map **4/4**: exact `GameStartup` and compiler `MoveNext` were mapped, 691 transitive same-sts2 methods and 46 classified startup/platform boundaries were recorded, unresolved same-sts2 and external Cecil resolution stayed zero, and GameStartup was never invoked.
 
-**Step 41.0 does not invoke GameStartup.** It requires same-process Step-40 4/4 with rendering frozen, maps exact `NGame.GameStartup`, its `AsyncStateMachineAttribute`, compiler-generated state-machine fields and full `MoveNext` IL, then traverses the same-sts2 closure and records path-qualified platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native-facing boundaries. Gate D proves the map was runtime-inert. `GameStartupWrapper` remains inert and rendering remains stopped throughout.
+**Step 42.0 still does not invoke GameStartup.** It keeps rendering frozen and `GameStartupWrapper` inert, maps exact `NGame.InitPools()` plus its own transitive same-sts2 closure, requires zero classified/unresolved boundaries, writes the verified map durably, then invokes exact `InitPools()` once on the retained real in-tree `NGame`. Final confinement requires state 2 and zero resolver/host/private/initializer/rejected/native deltas. Migrations, cloud sync, platform, Steam, main-menu, deferred startup and render restart remain unopened. Once Gate C is armed, do not retry Step 42 in-process.
 
 Authoritative status and exact device sequence: `docs/CURRENT-STATUS.md`.

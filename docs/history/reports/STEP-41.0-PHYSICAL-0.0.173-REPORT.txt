@@ -1,0 +1,22 @@
+StS2 Launcher — Step 41.0 GameStartup Async Frontier Map
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-09T05:59:45.0826380+00:00
+
+RESULT
+STEP 41.0 GAMESTARTUP ASYNC FRONTIER MAP COMPLETE — 4/4
+
+METADATA
+App version: 0.0.173 (173)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+All four Step 41.0 gates passed. Same-process Step-40 frozen authority was reverified; exact NGame.GameStartup and its compiler async state-machine MoveNext IL were mapped from the selected compatibility image with zero external Cecil resolution; the transitive same-sts2 startup closure and path-qualified platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native-facing references were recorded; and final frozen NGame/state/native confinement held. GameStartup itself was never invoked. The static map is the authority for designing the next separately bounded startup transform/invocation step.
+
+END OF REPORT
