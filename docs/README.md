@@ -1,11 +1,11 @@
-# StS2 Launcher — Step 40.0
+# StS2 Launcher — Step 41.0
 
-Active candidate: **0.0.171 (171)** — first controlled render-loop resumption against the physically admitted real StS2 hierarchy.
+Active candidate: **0.0.173 (173)** — exact GameStartup async frontier map, non-invoking.
 
-Physical **0.0.170 / Step 39.2** is closed positive 4/4. The real NGame hierarchy is physically proven in the live SceneTree with exact singleton/window/parent authority, OneTimeInitialization state 2, and rendering frozen with zero initializer-bearing/rejected/native escape.
+Physical **0.0.171 / Step 40** is now closed positive 4/4: a successful run completed the real render pulse at 103.3 ms, refroze rendering, retained the real NGame authority/state, and produced zero initializer/rejected/native deltas.
 
-Step 40 preserves that exact compatibility image and keeps `GameStartupWrapper` inert. Gate A requires the same-process frozen Step-39 authority. Gate B maps actual in-tree `_Process`, `_PhysicsProcess`, `_Draw`, and Godot input callbacks with deferred/rejecting Cecil before any restart. Gate C authorizes exactly one `StartRendering()` pulse targeted at 100 ms and immediately refreezes on the first continuation; observed elapsed must be <=500 ms. Gate D requires the same in-tree authority and zero forbidden escape with rendering stopped again.
+Step 41.0 keeps the Step-39.1 compatibility image and inert `GameStartupWrapper` unchanged. It never restarts rendering and never calls GameStartup. Instead it maps exact `NGame.GameStartup` metadata/IL, its compiler-generated async state machine and `MoveNext`, then maps the transitive same-sts2 startup closure with path-qualified boundary classification.
 
-Still closed: GameStartup/platform/main-menu/deferred startup, Steam/native Steam, native game GDExtensions, explicit `_ExitTree`, RemoveChild/Free, gameplay startup, and leaving rendering active.
+Still closed: GameStartup execution, InitializePlatform, Steam/native Steam, main-menu launch, ExecuteDeferred, native game GDExtensions, gameplay startup, explicit `_ExitTree`, RemoveChild/Free.
 
-Authoritative status: `CURRENT-STATUS.md`. Historical design/evidence remains under `history/`.
+Authoritative status: `CURRENT-STATUS.md`.

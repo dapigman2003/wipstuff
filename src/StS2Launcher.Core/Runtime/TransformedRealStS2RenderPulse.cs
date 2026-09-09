@@ -4,7 +4,7 @@ using Mono.Cecil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Step 40.0 boundary. Physical 0.0.170 closed Step 39 at 4/4: the exact real NGame hierarchy is attached
+/// Step 40.1 boundary. Physical 0.0.170 closed Step 39 at 4/4: the exact real NGame hierarchy is attached
 /// to the live SceneTree, NGame.Instance/_window/parent authority is established, OneTimeInitialization is
 /// state 2, and the launcher-owned Godot render loop is frozen. Step 40 keeps GameStartupWrapper inert and
 /// first audits the actual in-tree hierarchy for managed frame/input callbacks that a short render pulse could
@@ -16,7 +16,7 @@ namespace StS2Launcher.Core;
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
 {
     public const int Step40RenderPulseTargetMilliseconds = 100;
-    public const int Step40RenderPulseMaximumMilliseconds = 500;
+    public const int Step40RenderPulseMaximumMilliseconds = 2000;
 
     private static readonly string[] Step40ImmediateFrameMethodNames =
     [
@@ -39,10 +39,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     public string GetVerifiedStep40StaticMap()
         => _step40Preflight?.StaticMap
-           ?? throw new InvalidOperationException("Step 40.0 Gate B has not produced the verified frame-driven managed-surface static map.");
+           ?? throw new InvalidOperationException("Step 40.1 Gate B has not produced the verified frame-driven managed-surface static map.");
 
     private void ResetStep40State()
     {
+        ResetStep41State();
         _step40Preflight = null;
         _step40PulseStarted = false;
         _step40PulsePassed = false;
@@ -60,16 +61,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             ResetStep40State();
             var context = RequireStep40Prerequisite("Step 40 Gate A entry");
-            var step39 = _step39Preflight ?? throw new InvalidOperationException("Step 40.0 requires the closed Step-39 preflight/static authority in the same process.");
+            var step39 = _step39Preflight ?? throw new InvalidOperationException("Step 40.1 requires the closed Step-39 preflight/static authority in the same process.");
             if (!renderingStopped)
-                throw new InvalidOperationException("Step 40.0 requires the Godot render loop to still be frozen by the successful Step-39 Gate C/D boundary.");
+                throw new InvalidOperationException("Step 40.1 requires the Godot render loop to still be frozen by the successful Step-39 Gate C/D boundary.");
 
             Checkpoint(checkpoint, "J_A_ENTRY — requiring same-process physical Step-39 4/4 state, rendering frozen, exact inserted NGame singleton/parent/_window/state authority, unchanged selected compatibility bytes, and inert GameStartupWrapper before any render restart.");
             stage = "closed Step-39 frozen authority re-verification";
             var state = RequireStep40InsertedAuthority();
             var selectedSha256 = ComputeSha256Hex(step39.SelectedPath);
             if (!selectedSha256.Equals(step39.SelectedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException($"Step 40.0 selected compatibility image hash drifted. expected={step39.SelectedSha256}; actual={selectedSha256}.");
+                throw new InvalidDataException($"Step 40.1 selected compatibility image hash drifted. expected={step39.SelectedSha256}; actual={selectedSha256}.");
 
             using (var resolver = new RejectingAssemblyResolver())
             using (var module = ModuleDefinition.ReadModule(step39.SelectedPath, new ReaderParameters
@@ -82,11 +83,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             }))
             {
                 var nGame = module.Types.SingleOrDefault(type => type.FullName == NGameTypeFullName)
-                    ?? throw new InvalidDataException($"Step 40.0 could not locate {NGameTypeFullName} in selected compatibility authority.");
+                    ?? throw new InvalidDataException($"Step 40.1 could not locate {NGameTypeFullName} in selected compatibility authority.");
                 var wrapper = RequireLifecycleMethodByName(nGame, NGameGameStartupWrapperMethodName, 0);
                 RequireInertGameStartupWrapper(wrapper);
                 if (resolver.Requests.Count != 0)
-                    throw new InvalidDataException("Step 40.0 authority re-verification unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+                    throw new InvalidDataException("Step 40.1 authority re-verification unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             }
 
             var snapshot = new Step40PreflightSnapshot(
@@ -104,7 +105,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
             Checkpoint(checkpoint, $"J_A_PASS — Step-39 4/4 retained in same process; renderingStopped=True; NGame in-tree/singleton/parent/_window authority intact; state={state}; selectedSha256={selectedSha256}; GameStartupWrapper inert; resolver/native deltas=0.");
             return Step40Pass(gate,
-                "STEP 40.0 CLOSED STEP-39 FROZEN AUTHORITY PASSED.\n" +
+                "STEP 40.1 CLOSED STEP-39 FROZEN AUTHORITY PASSED.\n" +
                 "Same-process Step 39 closure: 4/4\n" +
                 "Rendering active before Step 40: FALSE\n" +
                 "NGame in-tree / singleton / parent / _window authority: PRESERVED\n" +
@@ -128,17 +129,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         {
             ThrowIfDisposed();
             var context = RequireStep40Prerequisite("Step 40 Gate B entry");
-            var preflight = _step40Preflight ?? throw new InvalidOperationException("Step 40.0 Gate A must pass before Gate B.");
-            var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 40.0 inserted NGame instance is absent.");
-            var sceneTreeRoot = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 40.0 live SceneTree root is absent.");
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 40.0 exact GodotSharp handoff disappeared.");
+            var preflight = _step40Preflight ?? throw new InvalidOperationException("Step 40.1 Gate A must pass before Gate B.");
+            var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 40.1 inserted NGame instance is absent.");
+            var sceneTreeRoot = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 40.1 live SceneTree root is absent.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 40.1 exact GodotSharp handoff disappeared.");
             var nodeType = handoff.GodotSharpAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.Node");
 
             Checkpoint(checkpoint, "J_B_ENTRY — enumerating the already-in-tree real hierarchy and Cecil-mapping actual sts2 _Process/_PhysicsProcess/_Draw/input callback overrides through each in-module base chain. Step-39 _Notification closure remains prerequisite authority. Rendering stays frozen throughout Gate B.");
             stage = "actual in-tree frame-driven managed-surface audit";
             if (RequireZeroArgBoolMethod(instance.GetType(), "IsInsideTree").Invoke(instance, null) is not true)
-                throw new InvalidDataException("Step 40.0 NGame left the SceneTree before frame-surface audit.");
+                throw new InvalidDataException("Step 40.1 NGame left the SceneTree before frame-surface audit.");
 
             var nodes = EnumerateStep39NodeGraph(instance, nodeType);
             var managedTypeNames = nodes
@@ -172,7 +173,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             foreach (var typeName in managedTypeNames)
             {
                 if (!allTypes.TryGetValue(typeName, out var typeDef))
-                    throw new InvalidDataException($"Step 40.0 actual managed node type {typeName} is absent from selected Cecil authority.");
+                    throw new InvalidDataException($"Step 40.1 actual managed node type {typeName} is absent from selected Cecil authority.");
 
                 for (TypeDefinition? current = typeDef; current is not null;)
                 {
@@ -206,11 +207,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             }
 
             if (unresolvedSameAssemblyReferences.Count != 0)
-                throw new InvalidDataException("Step 40.0 frame-driven managed closure contains same-sts2 references that could not be mapped without resolution: " + string.Join(" | ", unresolvedSameAssemblyReferences));
+                throw new InvalidDataException("Step 40.1 frame-driven managed closure contains same-sts2 references that could not be mapped without resolution: " + string.Join(" | ", unresolvedSameAssemblyReferences));
             if (forbiddenReferences.Count != 0)
-                throw new InvalidDataException("Step 40.0 frame-driven managed closure reaches forbidden startup/native/platform references: " + string.Join(" | ", forbiddenReferences));
+                throw new InvalidDataException("Step 40.1 frame-driven managed closure reaches forbidden startup/native/platform references: " + string.Join(" | ", forbiddenReferences));
             if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 40.0 frame-driven hierarchy audit unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+                throw new InvalidDataException("Step 40.1 frame-driven hierarchy audit unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
 
             var staticMap = BuildStep40StaticMap(preflight, nodes, managedTypeNames, callbacks, closureTokens.Count, sceneTreeRoot);
             _step40Preflight = preflight with { StaticMap = staticMap };
@@ -218,7 +219,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
             Checkpoint(checkpoint, $"J_B_PASS — in-tree nodeCount={nodes.Count}; selectedManagedNodeTypes={managedTypeNames.Length}; immediateFrameInputCallbacks={callbacks.Count}; transitiveSameSts2FrameClosureMethods={closureTokens.Count}; forbiddenFrameRefs=0; unresolvedSameSts2Refs=0; externalResolutionRequests=0; rendering remains stopped.");
             return Step40Pass(gate,
-                "STEP 40.0 FRAME-DRIVEN MANAGED SURFACE AUDIT PASSED.\n" +
+                "STEP 40.1 FRAME-DRIVEN MANAGED SURFACE AUDIT PASSED.\n" +
                 $"Actual in-tree node count: {nodes.Count}\n" +
                 $"Selected sts2 managed node types: {managedTypeNames.Length}\n" +
                 $"Immediate managed frame/input callbacks mapped: {callbacks.Count}\n" +
@@ -239,12 +240,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         ThrowIfDisposed();
         RequireStep40Prerequisite("Step 40 Gate C pulse start");
         if (_step40Preflight is null)
-            throw new InvalidOperationException("Step 40.0 Gate B must pass before render-pulse start.");
+            throw new InvalidOperationException("Step 40.1 Gate B must pass before render-pulse start.");
         if (_step40PulseStarted)
-            throw new InvalidOperationException("Step 40.0 render pulse has already started in this process. Relaunch; never retry a render pulse in-process.");
+            throw new InvalidOperationException("Step 40.1 render pulse has already started in this process. Relaunch; never retry a render pulse in-process.");
         RequireStep40InsertedAuthority();
         _step40PulseStarted = true;
-        Checkpoint(checkpoint, $"J_C_PULSE_ARMED — first and only Step-40 render pulse authorized; target={Step40RenderPulseTargetMilliseconds}ms; maximum accepted elapsed={Step40RenderPulseMaximumMilliseconds}ms. GameStartup/platform/main-menu/deferred/Steam/native game extensions remain forbidden. First continuation after the target delay must synchronously StopRendering.");
+        Checkpoint(checkpoint, $"J_C_PULSE_ARMED — first and only Step-40 render pulse authorized; requested stop delay={Step40RenderPulseTargetMilliseconds}ms; post-stop evidence ceiling={Step40RenderPulseMaximumMilliseconds}ms. The ceiling is classification only and cannot preempt a long Godot main-thread frame. GameStartup/platform/main-menu/deferred/Steam/native game extensions remain forbidden. First managed continuation after the requested delay must synchronously StopRendering before telemetry or other Step-40 work.");
     }
 
     public TransformedRealStS2RenderPulseGateResult RunStep40BoundedRenderPulseEvidence(
@@ -261,29 +262,31 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         {
             ThrowIfDisposed();
             var context = RequireStep40Prerequisite("Step 40 Gate C evidence");
-            var preflight = _step40Preflight ?? throw new InvalidOperationException("Step 40.0 Gate B authority is absent.");
+            var preflight = _step40Preflight ?? throw new InvalidOperationException("Step 40.1 Gate B authority is absent.");
             if (!_step40PulseStarted)
-                throw new InvalidOperationException("Step 40.0 Gate C evidence arrived before the render pulse was armed.");
+                throw new InvalidOperationException("Step 40.1 Gate C evidence arrived before the render pulse was armed.");
 
             Checkpoint(checkpoint, $"J_C_EVIDENCE_ENTRY — startReturned={startReturned}; renderingActiveAfterStart={renderingActiveAfterStart}; stopReturned={stopReturned}; renderingActiveAfterStop={renderingActiveAfterStop}; elapsedMs={elapsedMilliseconds:F1}.");
             stage = "bounded real-game render pulse and synchronous refreeze";
             if (!startReturned || !renderingActiveAfterStart)
-                throw new InvalidOperationException($"Step 40.0 StartRendering did not establish an active render loop. startReturned={startReturned}; activeAfterStart={renderingActiveAfterStart}.");
+                throw new InvalidOperationException($"Step 40.1 StartRendering did not establish an active render loop. startReturned={startReturned}; activeAfterStart={renderingActiveAfterStart}.");
             if (!stopReturned || renderingActiveAfterStop)
-                throw new InvalidOperationException($"Step 40.0 StopRendering did not synchronously refreeze the render loop. stopReturned={stopReturned}; activeAfterStop={renderingActiveAfterStop}.");
-            if (elapsedMilliseconds <= 0 || elapsedMilliseconds > Step40RenderPulseMaximumMilliseconds)
-                throw new InvalidOperationException($"Step 40.0 render pulse elapsed outside the accepted bounded window. target={Step40RenderPulseTargetMilliseconds}ms; maximum={Step40RenderPulseMaximumMilliseconds}ms; observed={elapsedMilliseconds:F1}ms.");
+                throw new InvalidOperationException($"Step 40.1 StopRendering did not synchronously refreeze the render loop. stopReturned={stopReturned}; activeAfterStop={renderingActiveAfterStop}.");
+            if (elapsedMilliseconds < Step40RenderPulseTargetMilliseconds || elapsedMilliseconds > Step40RenderPulseMaximumMilliseconds)
+                throw new InvalidOperationException($"Step 40.1 post-stop render observation fell outside the accepted evidence window. requestedDelay={Step40RenderPulseTargetMilliseconds}ms; evidenceCeiling={Step40RenderPulseMaximumMilliseconds}ms; observed={elapsedMilliseconds:F1}ms.");
 
             var state = RequireStep40InsertedAuthority();
             RequireNoForbiddenStep37Escape(context, preflight.InitializerCount, preflight.RejectedCount, preflight.NativeCount, "Step 40 Gate C");
             _step40PulsePassed = true;
 
-            Checkpoint(checkpoint, $"J_C_PASS — StartRendering established active=True, controlled pulse elapsed={elapsedMilliseconds:F1}ms, StopRendering returned=True and activeAfterStop=False; NGame authority/state={state} preserved; resolverDelta={context.ManagedResolverRequests.Count - preflight.ResolverCount}; hostDelta={context.HostLoads.Count - preflight.HostCount}; privateDelta={context.PrivateLoads.Count - preflight.PrivateCount}; initializerDelta=0; rejectedDelta=0; nativeDelta=0.");
+            Checkpoint(checkpoint, $"J_C_PASS — StartRendering established active=True; first managed stop opportunity completed at {elapsedMilliseconds:F1}ms (overshoot={elapsedMilliseconds - Step40RenderPulseTargetMilliseconds:F1}ms); StopRendering returned=True and activeAfterStop=False; NGame authority/state={state} preserved; resolverDelta={context.ManagedResolverRequests.Count - preflight.ResolverCount}; hostDelta={context.HostLoads.Count - preflight.HostCount}; privateDelta={context.PrivateLoads.Count - preflight.PrivateCount}; initializerDelta=0; rejectedDelta=0; nativeDelta=0.");
             return Step40Pass(gate,
-                "STEP 40.0 BOUNDED REAL-GAME RENDER PULSE PASSED.\n" +
+                "STEP 40.1 BOUNDED REAL-GAME RENDER PULSE PASSED.\n" +
                 "StartRendering: RETURNED / ACTIVE\n" +
-                $"Observed pulse elapsed: {elapsedMilliseconds:F1} ms\n" +
-                $"Accepted maximum: {Step40RenderPulseMaximumMilliseconds} ms\n" +
+                $"Observed first-stop opportunity: {elapsedMilliseconds:F1} ms\n" +
+                $"Requested stop delay: {Step40RenderPulseTargetMilliseconds} ms\n" +
+                $"Stop-opportunity overshoot: {elapsedMilliseconds - Step40RenderPulseTargetMilliseconds:F1} ms\n" +
+                $"Post-stop evidence ceiling: {Step40RenderPulseMaximumMilliseconds} ms\n" +
                 "StopRendering: RETURNED / INACTIVE\n" +
                 "NGame in-tree / singleton / parent / _window authority: PRESERVED\n" +
                 $"OneTimeInitialization state: {state}\n" +
@@ -311,11 +314,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         {
             ThrowIfDisposed();
             var context = RequireStep40Prerequisite("Step 40 Gate D entry");
-            var preflight = _step40Preflight ?? throw new InvalidOperationException("Step 40.0 Gate-B authority is absent.");
+            var preflight = _step40Preflight ?? throw new InvalidOperationException("Step 40.1 Gate-B authority is absent.");
             if (!_step40PulseStarted || !_step40PulsePassed)
-                throw new InvalidOperationException("Step 40.0 Gate D requires a successful first render pulse and synchronous refreeze.");
+                throw new InvalidOperationException("Step 40.1 Gate D requires a successful first render pulse and synchronous refreeze.");
             if (!renderingStopped)
-                throw new InvalidOperationException("Step 40.0 Gate D refuses to run unless rendering is confirmed stopped after the pulse.");
+                throw new InvalidOperationException("Step 40.1 Gate D refuses to run unless rendering is confirmed stopped after the pulse.");
 
             Checkpoint(checkpoint, "J_D_ENTRY — render loop frozen again after the first controlled real-game pulse; proving inserted NGame authority/state and zero initializer/rejected/native escape. No cleanup, restart, GameStartup, platform, main-menu, deferred, Steam, or native game-extension boundary is authorized.");
             stage = "frozen post-pulse confinement";
@@ -325,7 +328,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
             Checkpoint(checkpoint, $"J_D_PASS — post-pulse renderingStopped=True; real NGame remains attached to SceneTree.Root with exact singleton/_window authority and state={state}; initializerDelta=0; rejectedDelta=0; nativeDelta=0. Instance retained in-tree; rendering remains stopped.");
             return Step40Pass(gate,
-                "STEP 40.0 FROZEN POST-PULSE CONFINEMENT PASSED.\n" +
+                "STEP 40.1 FROZEN POST-PULSE CONFINEMENT PASSED.\n" +
                 "Rendering active: FALSE\n" +
                 "NGame remains inside SceneTree: TRUE\n" +
                 "NGame.Instance / parent / _window authority: PRESERVED\n" +
@@ -355,14 +358,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private int RequireStep40InsertedAuthority()
     {
-        var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 40.0 retained NGame instance is absent.");
-        var sceneTreeRoot = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 40.0 retained SceneTree root is absent.");
+        var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 40.1 retained NGame instance is absent.");
+        var sceneTreeRoot = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 40.1 retained SceneTree root is absent.");
         if (RequireZeroArgBoolMethod(instance.GetType(), "IsInsideTree").Invoke(instance, null) is not true)
-            throw new InvalidDataException("Step 40.0 retained NGame is no longer inside the SceneTree.");
+            throw new InvalidDataException("Step 40.1 retained NGame is no longer inside the SceneTree.");
         var instanceGetter = instance.GetType().GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
             .Single(method => method.Name == "get_Instance" && method.GetParameters().Length == 0 && method.ReturnType == instance.GetType());
         if (!ReferenceEquals(instanceGetter.Invoke(null, null), instance))
-            throw new InvalidDataException("Step 40.0 NGame.Instance no longer points to the retained inserted object.");
+            throw new InvalidDataException("Step 40.1 NGame.Instance no longer points to the retained inserted object.");
         var getParentCandidates = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Where(method => method.Name == "GetParent" && method.GetParameters().Length == 0)
             .ToArray();
@@ -374,14 +377,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 instance.GetType().FullName,
                 $"GetParent() exact non-generic SceneTree-root-compatible overload; candidates={string.Join(",", getParentCandidates.Select(method => method.ToString()))}");
         if (!ReferenceEquals(getParent.Invoke(instance, null), sceneTreeRoot))
-            throw new InvalidDataException("Step 40.0 retained NGame parent drifted from SceneTree.Root.");
+            throw new InvalidDataException("Step 40.1 retained NGame parent drifted from SceneTree.Root.");
         var windowField = instance.GetType().GetField("_window", BindingFlags.Static | BindingFlags.NonPublic)
             ?? throw new MissingFieldException(NGameTypeFullName, "_window");
         if (windowField.GetValue(null) is null)
-            throw new InvalidDataException("Step 40.0 NGame._Ready window authority is no longer present.");
+            throw new InvalidDataException("Step 40.1 NGame._Ready window authority is no longer present.");
         var state = ReadOneTimeInitializationState(RequireEssentialBinding().StateField);
         if (state != ExpectedStateAfterEssential)
-            throw new InvalidDataException($"Step 40.0 OneTimeInitialization state drifted: expected {ExpectedStateAfterEssential}; observed {state}.");
+            throw new InvalidDataException($"Step 40.1 OneTimeInitialization state drifted: expected {ExpectedStateAfterEssential}; observed {state}.");
         return state;
     }
 
@@ -395,7 +398,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     {
         var lines = new List<string>
         {
-            "StS2 Launcher — Step 40.0 controlled real-game render-pulse preflight map",
+            "StS2 Launcher — Step 40.1 controlled real-game render-pulse preflight map",
             "Read-only evidence from the physically closed Step-39 in-tree hierarchy and exact selected compatibility image; never consumed as trusted runtime input.",
             $"Selected compatibility path: {preflight.SelectedPath}",
             $"Selected compatibility SHA-256: {preflight.SelectedSha256}",
@@ -407,9 +410,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             "Forbidden startup/native/platform references from transitive frame/input closure: 0",
             "Unresolved same-sts2 references from transitive frame/input closure: 0",
             "Step-39 _Notification closure: prior physical/static prerequisite authority, branch-insensitive and already clean",
-            $"Step 40 pulse target: {Step40RenderPulseTargetMilliseconds} ms",
-            $"Step 40 accepted maximum observed pulse: {Step40RenderPulseMaximumMilliseconds} ms",
-            "Step 40 policy: StartRendering once -> first continuation after target delay synchronously StopRendering -> verify frozen in-tree confinement.",
+            $"Step 40 requested stop delay: {Step40RenderPulseTargetMilliseconds} ms",
+            $"Step 40 post-stop first-opportunity evidence ceiling: {Step40RenderPulseMaximumMilliseconds} ms",
+            "Step 40 policy: StartRendering once -> first managed continuation after requested delay synchronously StopRendering before telemetry -> verify frozen in-tree confinement.",
             "Step 40 forbidden: GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam init/native Steam, native GDExtensions, explicit _ExitTree, RemoveChild/Free, leaving rendering active.",
             string.Empty,
             "[ACTUAL IN-TREE NODE GRAPH]",

@@ -37,7 +37,7 @@ workflows:
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Step-40.ipa
+      - artifacts/StS2-Launcher-Step-41.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**

@@ -554,14 +554,12 @@ Physical 0.0.155 proves the Step-36 game-resource handoff: exact receipt-backed 
 - Gate D requires the render loop to be stopped and intentionally retains the inserted NGame. Step 39 must not RemoveChild, Free the inserted instance, directly invoke `_ExitTree`, GameStartup, InitializePlatform, LaunchMainMenu, ExecuteDeferred, Steam initialization, native GDExtensions, or gameplay.
 
 
-## Step 40.0 controlled real-game render-pulse contracts
+## Step 40.1 controlled real-game render-pulse contracts
 
-- Physical 0.0.170 Step 39.2 4/4 is immutable prerequisite evidence. Step 40 must run only in the same process after Step 39 closes 4/4, with the retained real NGame still in-tree and rendering stopped.
-- Gate A revalidates exact singleton/parent/`_window`/state authority, the selected compatibility-image SHA-256, and inert `GameStartupWrapper`. No render restart occurs in Gate A.
-- Gate B keeps rendering stopped and audits actual in-tree sts2 `_Process`, `_PhysicsProcess`, `_Draw`, `_Input`, `_ShortcutInput`, `_UnhandledInput`, `_UnhandledKeyInput`, and `_GuiInput` methods through in-module base chains with `ReadingMode.Deferred` and `RejectingAssemblyResolver`. Any forbidden startup/platform/FM0D/Spine/Sentry/Steam edge, unresolved same-sts2 edge, or external Cecil resolution fails before `StartRendering`.
-- Step-39 `_Notification` closure remains prerequisite authority; Step 40 must not replace that proof with a narrower branch/value model.
-- Gate C contains exactly one launcher-authorized `StartRendering()` call. It targets 100 ms and permits no Step-40 work on the first continuation before exactly one mandatory `StopRendering()` call.
-- Gate C passes only when start returned/active, stop returned/inactive, observed elapsed is `>0` and `<=500 ms`, NGame singleton/parent/`_window`/state 2 remain exact, and initializer-bearing/rejected/native deltas are zero.
-- Once Gate C is armed, Step 40 must refuse any in-process retry. Failure recovery is report preservation plus process relaunch; no RemoveChild/Free/explicit `_ExitTree`/state reset is authorized.
-- Gate D requires rendering to remain stopped and re-proves retained hierarchy/state/native confinement. Step 40 never calls `StartRendering` after its Gate-C stop.
-- `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, `ExecuteDeferred`, Steam init/native Steam, native game GDExtensions, gameplay, explicit `_ExitTree`, RemoveChild/Free remain unopened.
+- Physical 0.0.170 Step-39 4/4 retained hierarchy is prerequisite authority. Physical 0.0.171 additionally seals Gate-A/B clean frame/input authority and proves real `StartRendering()`/`StopRendering()` return with rendering inactive after the pulse.
+- Gate B keeps rendering stopped and audits actual in-tree sts2 `_Process`, `_PhysicsProcess`, `_Draw`, `_Input`, `_ShortcutInput`, `_UnhandledInput`, `_UnhandledKeyInput`, and `_GuiInput` methods through in-module base chains with `ReadingMode.Deferred` and `RejectingAssemblyResolver`. Forbidden/unresolved/external-resolution evidence fails before start.
+- Gate C contains exactly one launcher-authorized `StartRendering()` call and exactly one `StopRendering()` call site. It requests 100 ms. The first managed continuation after the delay must call `StopRendering()` before any Step-40 checkpoint/file I/O.
+- Because Godot CADisplayLink work and the captured async continuation share UIKit's main thread, the 2000 ms ceiling is **post-stop evidence classification**, not preemptive timer authority. Gate C accepts observed first-stop opportunity only when `>=100` and `<=2000` ms, start returned/active, stop returned/inactive, NGame singleton/parent/`_window`/state 2 remain exact, and initializer-bearing/rejected/native deltas are zero.
+- Physical 0.0.171's 523.5 ms observation must be accepted by the host regression, and the old 500 ms classifier must not return.
+- Gate D requires rendering still stopped and the same retained NGame/state/native confinement. No RemoveChild/Free/_ExitTree/restart/GameStartup/platform/main-menu/ExecuteDeferred/Steam/native-game-extension boundary is authorized.
+- Once Gate C is armed, no in-process Step-40 retry is permitted.

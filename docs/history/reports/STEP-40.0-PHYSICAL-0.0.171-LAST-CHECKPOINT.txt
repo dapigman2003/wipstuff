@@ -1,0 +1,6 @@
+StS2 Launcher — Step 40 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260909T0215410073300Z-pid93673-540aa21d6d314e42be8c852dc2f50560
+Journal: Step40-CrashCheckpoint-20260909T0215410073300Z-pid93673-540aa21d6d314e42be8c852dc2f50560.txt
+Static map: Step40-RenderPulse-StaticMap-20260909T0215410073300Z-pid93673-540aa21d6d314e42be8c852dc2f50560.txt
+2026-09-09T02:15:41.7329600+00:00 | run=20260909T0215410073300Z-pid93673-540aa21d6d314e42be8c852dc2f50560 | pid=93673 | managedThread=7 | RUN_END — Step-40 UI operation ended normally after explicit teardown; Step 40 never restarts rendering after its single StopRendering call.

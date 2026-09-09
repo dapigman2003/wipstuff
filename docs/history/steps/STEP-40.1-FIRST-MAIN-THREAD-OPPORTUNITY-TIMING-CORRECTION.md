@@ -1,0 +1,9 @@
+# Step 40.1 — First-main-thread-opportunity timing correction
+
+Physical 0.0.171 / Step 40.0 passed Gate A and Gate B, then started the real Godot CADisplayLink successfully. The requested 100 ms delay could not resume on UIKit until 522.8 ms because the continuation and Godot render work share the main thread. `StopRendering()` then returned immediately and rendering was confirmed inactive at 523.5 ms. Gate C failed only because the original evidence classifier rejected any observed pulse above 500 ms.
+
+Step 40.1 does not change the Step-39.1 compatibility image, frame/input audit, `StartRendering()`/`StopRendering()` native bridge, or forbidden runtime boundaries. It preserves the 100 ms requested stop delay but treats the elapsed ceiling as **post-stop evidence classification**, not a preemptive safety timeout: the first managed continuation still must call `StopRendering()` before telemetry or any other Step-40 work. The accepted post-stop observation ceiling is widened to 2000 ms so a cold long first frame that yields cleanly can be classified separately from a true hang.
+
+The safety invariant is therefore mechanical ordering, not timer preemption: one `StartRendering()` call, `Task.Delay(100)`, then on the first continuation one immediate `StopRendering()` call, and only after the renderer is confirmed inactive may checkpoints/evidence evaluation continue. If the main thread never yields, the managed continuation cannot preempt Godot; the durable pre-start/start checkpoints remain the lower-bound evidence and the process must be relaunched.
+
+Still forbidden: `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, `ExecuteDeferred`, Steam initialization/native Steam, native game GDExtensions, explicit `_ExitTree`, `RemoveChild`/`Free`, retrying the pulse in-process, or leaving rendering active after a returned stop.

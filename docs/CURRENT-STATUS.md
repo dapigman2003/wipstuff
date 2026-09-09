@@ -1,26 +1,24 @@
 # Current status
 
-## Active candidate — Step 40.0 / 0.0.171 (171)
+## Active candidate — Step 41.0 / 0.0.173 (173)
 
-**Physical 0.0.170 / Step 39.2 — CLOSED POSITIVE 4/4.** Gate A reverified the exact compatibility/PCK authority. Gate B mapped the real 69-node hierarchy with 23 selected sts2 managed node types, 26 immediate lifecycle callbacks, 557 transitive same-sts2 closure methods, zero forbidden references, zero unresolved same-sts2 references, and zero external Cecil resolution. Gate C performed the real `SceneTree.Root.AddChild(NGame)` and returned with `IsInsideTree=True`, exact `NGame.Instance`, non-null `_window`, exact `SceneTree.Root` parent, OneTimeInitialization state 2, and zero initializer-bearing/rejected/native escape. The iOS caller synchronously called `StopRendering()` immediately afterward. Gate D then passed with the inserted hierarchy retained in-tree, rendering frozen, and the same state/native confinement intact.
+**Physical 0.0.171 / Step 40 — CLOSED POSITIVE 4/4.** The successful run retained same-process Step-39 4/4 authority with rendering frozen, passed the real in-tree frame/input audit at 68 nodes / 23 selected sts2 managed types / 12 immediate callbacks / 447 transitive same-sts2 methods / zero forbidden / zero unresolved / zero external-resolution requests, then `StartRendering()` returned `True` and active. The first managed continuation arrived at 101.8 ms; `StopRendering()` returned `True`, rendering was inactive at 103.3 ms, Gate C passed with zero resolver/host/private/initializer/rejected/native deltas, and Gate D proved frozen NGame singleton/parent/`_window`/state-2 confinement. The operation ended normally with rendering still stopped.
 
-Physical **0.0.169 / Step 39.1** remains the first successful real `AddChild` evidence; its only Gate-D failure was launcher reflection bookkeeping (`MoreThanOneMatch`). 0.0.170 corrected only the exact non-generic root-compatible `GetParent()` selector and physically closed Gate D. Physical **0.0.168** remains the Sentry generic-delegate audit false-positive localization; physical **0.0.167** remains the pre-insertion Steam/Sentry lifecycle blocker localization. The Step-39.1 private compatibility image remains unchanged: exact Steam Cloud availability probes are forced false and the game-owned Sentry boundary is inert/serialization-verified.
+The earlier physical 0.0.171 run that observed 523.5 ms and failed the old 500 ms classifier remains timing provenance only. It does not override the later 4/4 physical closure. Step 40 is now closed positive. The unrun 0.0.172 harness correction is retained in source ancestry but is not required as separate physical authority.
 
-Physical **0.0.159** remains Step 36.0.5 4/4 authority. Physical **0.0.161** remains Step 37.0.1 4/4 authority. Physical **0.0.165 / Step 38.2** remains Step 38 closed 4/4 authority. Step 38 must still be skipped in the process used for Step 39/40.
+Physical **0.0.170 / Step 39 remains CLOSED POSITIVE 4/4**. Physical **0.0.159**, **0.0.161**, and **0.0.165** remain Step 36/37/38 authorities. Step 38 must still be skipped in the process used for Step 39/40/41.
 
-## Step 40.0 boundary
+## Step 41.0 boundary
 
-Step 40 opens only controlled render-loop resumption. It does **not** enable `GameStartup` or later startup.
+Gate A requires same-process Step 40 4/4 with the real NGame retained in-tree, renderer frozen, exact selected compatibility-image SHA-256 unchanged, OneTimeInitialization state 2, and the exact inert `GameStartupWrapper` still serialized in the private image.
 
-Gate A requires same-process Step 39 4/4 with the real NGame retained in-tree and `GodotStep15NativeBridge.IsRenderingActive == false`. It rechecks singleton/parent/`_window`/state authority, the exact selected compatibility-image SHA-256, and the inert `GameStartupWrapper`.
+Gate B is metadata-only. It locates exact `NGame.GameStartup`, requires its `AsyncStateMachineAttribute`, resolves the compiler-generated state-machine type from the same module without external Cecil resolution, records state-machine fields, and emits the full `GameStartup` and `MoveNext` IL/token map. **GameStartup is not invoked.**
 
-Gate B keeps rendering frozen. It enumerates the actual in-tree hierarchy and audits sts2 managed `_Process`, `_PhysicsProcess`, `_Draw`, `_Input`, `_ShortcutInput`, `_UnhandledInput`, `_UnhandledKeyInput`, and `_GuiInput` callbacks through each in-module base chain using Cecil `ReadingMode.Deferred` plus the rejecting resolver. It reuses the Step-39 fail-closed startup/native/platform classifier. Step-39's already-proven branch-insensitive `_Notification` closure remains prerequisite authority. Any surviving forbidden or unresolved same-sts2 edge stops before `StartRendering()`.
+Gate C traverses the `MoveNext` transitive same-sts2 method closure using deferred/rejecting Cecil and records path-qualified boundary references for OneTimeInitialization, InitializePlatform, platform services, Steam, main-menu launch, deferred startup assets, FMOD, Spine, Sentry, and native-extension surfaces. Same-sts2 references must resolve inside the selected module and external Cecil resolution must remain zero. Boundaries are mapped, not executed.
 
-Gate C is one-shot. The UI durably checkpoints immediately before one `StartRendering()` call, targets **100 ms**, and the first continuation performs no work before synchronously calling `StopRendering()`. Success requires start returned/active, stop returned/inactive, observed elapsed `>0` and `<=500 ms`, retained NGame authority/state 2, and zero initializer-bearing/rejected/native escape. Once Gate C is armed, never retry Step 40 in-process.
+Gate D proves no-invocation confinement: rendering still stopped, real NGame singleton/parent/`_window` authority intact, state 2 unchanged, inert `GameStartupWrapper` still present, and zero initializer-bearing/rejected/native runtime escape.
 
-Gate D requires the renderer to remain frozen after the pulse and re-proves the same retained hierarchy/state/native confinement. No cleanup/restart is performed.
-
-## Physical sequence for 0.0.171
+## Physical sequence for 0.0.173
 
 1. Fresh process → Step 15 A-C.
 2. Step 35.0.32 MODEL-BOOTSTRAP → require 4/4.
@@ -28,13 +26,14 @@ Gate D requires the renderer to remain frozen after the pulse and re-proves the 
 4. Step 37.0.1 → require 4/4.
 5. **Skip Step 38 in this process.**
 6. Step 39.0 A-D once → require **4/4** and renderer frozen.
-7. **Without relaunching**, run Step 40.0 A-D once.
-8. If Step 40 Gate C is armed, preserve Step40 reports and relaunch after the run/failure; never retry the pulse in-process.
+7. **Without relaunching**, run Step 40.1 A-D once → require **4/4** and renderer frozen again.
+8. **Without relaunching**, run Step 41.0 A-D once. Step 41 never invokes GameStartup or restarts rendering.
+9. Preserve Step41 reports/static map and relaunch after the map is captured.
 
-Step 40 reports:
-- `Step40-CrashCheckpoint-<RunId>.txt`
-- `Step40-RenderPulse-StaticMap-<RunId>.txt`
-- `Step40-LastCheckpoint.txt`
-- `Step40-TransformedRealStS2RenderPulse.txt`
+Step 41 reports:
+- `Step41-CrashCheckpoint-<RunId>.txt`
+- `Step41-GameStartupFrontier-StaticMap-<RunId>.txt`
+- `Step41-LastCheckpoint.txt`
+- `Step41-TransformedRealStS2GameStartupFrontier.txt`
 
-Still forbidden: `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, `ExecuteDeferred`, Steam initialization/native Steam API loading, FMOD/Spine/native Sentry game extensions, gameplay startup, explicit `_ExitTree`, RemoveChild/Free, state reset, mutation of the trusted Step-12 install, and leaving rendering active after the Step-40 pulse.
+Still forbidden: invoking `GameStartup`, `InitializePlatform`, `LaunchMainMenu`, `ExecuteDeferred`, Steam initialization/native Steam API loading, FMOD/Spine/native game extensions, gameplay startup, explicit `_ExitTree`, RemoveChild/Free, state reset, mutation of the trusted Step-12 install, and restarting rendering during Step 41.

@@ -39,3 +39,5 @@ Selected build/device diagnostic outputs are retained here when they materially 
 - `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-CHECKPOINT.txt` — physical 0.0.170 run journal through Gate B/C/D PASS and normal report return.
 - `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-STATIC-MAP.txt` — physical 0.0.170 pre-insertion lifecycle map: 69 nodes, 23 managed types, 26 immediate callbacks, 557 same-sts2 closure methods, zero forbidden/unresolved references.
 - `STEP-39.2-PHYSICAL-COMPLETE-0.0.170-LAST-CHECKPOINT.txt` — physical 0.0.170 final durable checkpoint with Step 39 normal run end and no render restart.
+
+Physical 0.0.171 Step-40 Gate-A/B + successful Start/Stop timing localization is preserved in the STEP-40.0-PHYSICAL-0.0.171-* report set.

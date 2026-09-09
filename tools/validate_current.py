@@ -125,7 +125,7 @@ def text_files_under(base: Path):
             continue
 
 
-print("StS2 Launcher — Step 40.0 controlled real-game render-pulse validation")
+print("StS2 Launcher — Step 41.0 GameStartup async frontier-map validation")
 print(f"Root: {ROOT}")
 
 # Parse all repository project/property/target XML and root JSON before detailed policy assertions.
@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>171</ApplicationVersion>" in project_text, "build version is 171")
-require("<ApplicationDisplayVersion>0.0.171</ApplicationDisplayVersion>" in project_text, "display version is 0.0.171")
-require(plist.get("CFBundleVersion") == "171", "Info.plist build version is 171")
-require(plist.get("CFBundleShortVersionString") == "0.0.171", "Info.plist display version is 0.0.171")
+require("<ApplicationVersion>173</ApplicationVersion>" in project_text, "build version is 173")
+require("<ApplicationDisplayVersion>0.0.173</ApplicationDisplayVersion>" in project_text, "display version is 0.0.173")
+require(plist.get("CFBundleVersion") == "173", "Info.plist build version is 173")
+require(plist.get("CFBundleShortVersionString") == "0.0.173", "Info.plist display version is 0.0.173")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,13 +198,13 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEP 40.0 — CONTROLLED REAL-GAME RENDER PULSE" in release_presentation, "top launcher banner identifies the active Step 40.0 controlled render pulse")
-require("Physical 0.0.170 / Step 39.2 closed real SceneTree admission at 4/4" in release_presentation and "Step 40.0 keeps the physically proven Step-39.1 compatibility image" in release_presentation, "top launcher presentation records physical Step-39 closure and the isolated Step-40 render-pulse boundary")
-require("Active candidate: **0.0.171 (171)**" in read("README.md") and "Active candidate: **0.0.171 (171)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.171 (171) release identity")
-require("active candidate is **0.0.171 / Step 40.0**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.171 / Step 40.0 frontier")
-require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "STEP 39 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "SceneTree.Root.AddChild", "StartRendering", "StopRendering", "GameStartup", "ExecuteDeferred"]), "top launcher banner records closed Step-37/38/39 authority and the bounded Step-40 render-pulse boundary")
+require("STEP 41.0 — GAMESTARTUP ASYNC FRONTIER MAP (NON-INVOKING)" in release_presentation, "top launcher banner identifies the active Step 41.0 non-invoking GameStartup map")
+require("Physical 0.0.171 closed Step 40 at 4/4" in release_presentation and "GameStartup itself is not invoked" in release_presentation, "top launcher presentation records physical Step-40 closure and the non-invoking Step-41 boundary")
+require("Active candidate: **0.0.173 (173)**" in read("README.md") and "Active candidate: **0.0.173 (173)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.173 (173) release identity")
+require("active candidate is **0.0.173 / Step 41.0**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.173 / Step 41.0 frontier")
+require(all(marker in release_presentation for marker in ["STEP 37 CLOSED POSITIVE 4/4", "STEP 38 CLOSED POSITIVE 4/4", "STEP 39 CLOSED POSITIVE 4/4", "STEP 40 CLOSED POSITIVE 4/4", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "GameStartup", "AsyncStateMachineAttribute", "MoveNext", "InitializePlatform", "Steam"]), "top launcher banner records closed Step-37/38/39/40 authority and the non-invoking Step-41 GameStartup map boundary")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.171"' in release_presentation and 'ExpectedBuildVersion = "171"' in release_presentation, "Step 40 source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.173"' in release_presentation and 'ExpectedBuildVersion = "173"' in release_presentation, "Step 41.0 source pins expected bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -344,9 +344,9 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-40.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.171",
-    "STS2_BUILD_VERSION": "171",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Step-41.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.173",
+    "STS2_BUILD_VERSION": "173",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -699,7 +699,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Step 40.0 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-40 candidate rather than retired Step 27")
+require("Step 41.0 IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Step-41.0 candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -1677,10 +1677,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Step 40.0 / 0.0.171 (171)", "Physical 0.0.170 / Step 39.2 — CLOSED POSITIVE 4/4", "Step 37.0.1", "NGame.Instance", "SceneTree.Root.AddChild", "StartRendering", "StopRendering", "GameStartup", "ExecuteDeferred", "Skip Step 38"]), "current status records physical Step-39 closure and the active controlled Step-40 render-pulse boundary")
+require(all(marker in current_status for marker in ["Active candidate — Step 41.0 / 0.0.173 (173)", "Physical 0.0.171 / Step 40 — CLOSED POSITIVE 4/4", "Physical **0.0.170 / Step 39 remains CLOSED POSITIVE 4/4**", "Step 37.0.1", "GameStartup", "AsyncStateMachineAttribute", "MoveNext", "Step 41 never invokes GameStartup", "Skip Step 38"]), "current status records physical Step-39/40 closure and the active Step-41 non-invoking async frontier")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.171 (171)" in testing_doc and "0.0.171 (171)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.171 (171) release identity")
+require("0.0.173 (173)" in testing_doc and "0.0.173 (173)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.173 (173) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -1784,9 +1784,9 @@ for cache_path in [
     require(cache_path in codemagic, f"Codemagic preserves canonical cache path: {cache_path}")
 cm_script = read("scripts/codemagic.sh")
 require(all(marker in cm_script for marker in ["Pinned .NET SDK/workloads", ".sts2launcher-ios-workload-set", "workload list", "Using verified cached iOS workload set", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE=1"]), "Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation")
-require("Step 40 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 40")
-require("LogFileName=step40.trx" in read("scripts/test.sh") and "artifacts/test-results/step40.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 40")
-require("Step 40.0 controlled real-game render-pulse build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Step 40.0 candidate")
+require("Step 41 canonical host regression tests" in read("scripts/test.sh"), "host-test report heading identifies Step 41")
+require("LogFileName=step41.trx" in read("scripts/test.sh") and "artifacts/test-results/step41.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Step 41")
+require("Step 41.0 GameStartup async frontier-map build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Step 41.0 candidate")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1801,7 +1801,7 @@ require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical pr
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEP 40.0 — CONTROLLED REAL-GAME RENDER PULSE" in verify_ipa and "step40-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step-40.0 candidate")
+require("Expected device UI: STEP 41.0 — GAMESTARTUP ASYNC FRONTIER MAP (NON-INVOKING)" in verify_ipa and "step41-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Step-41.0 candidate")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
@@ -2193,8 +2193,8 @@ require(all(value in step40_gate for value in [
     "BoundedRenderPulseAndRefreeze = 3",
     "FrozenPostPulseConfinement = 4",
 ]), "Step 40 gate ordinals pin closed-Step39 authority, frame audit, bounded pulse/refreeze, and frozen confinement")
-require("STEP 40.0 CONTROLLED REAL-GAME RENDER PULSE COMPLETE — 4/4" in step40_summary and "Gates.Count == 4" in step40_summary, "Step 40 summary requires exact four-of-four closure")
-require("Step40RenderPulseTargetMilliseconds = 100" in step40_core and "Step40RenderPulseMaximumMilliseconds = 500" in step40_core, "Step 40 render pulse target and accepted maximum are pinned to 100 ms / 500 ms")
+require("STEP 40.1 CONTROLLED REAL-GAME RENDER PULSE COMPLETE — 4/4" in step40_summary and "Gates.Count == 4" in step40_summary, "Step 40.1 summary requires exact four-of-four closure")
+require("Step40RenderPulseTargetMilliseconds = 100" in step40_core and "Step40RenderPulseMaximumMilliseconds = 2000" in step40_core, "Step 40.1 requested stop delay and post-stop evidence ceiling are pinned to 100 ms / 2000 ms")
 require(all(name in step40_core for name in ["_Process", "_PhysicsProcess", "_Draw", "_Input", "_ShortcutInput", "_UnhandledInput", "_UnhandledKeyInput", "_GuiInput"]), "Step 40 audits the planned managed frame/draw/input callback family")
 require(all(value in step40_core for value in ["_exactStep39ClosurePassed", "_step39InsertionStarted", "_step39InsertionPassed", "RequireStep40InsertedAuthority", "GameStartupWrapper", "RequireInertGameStartupWrapper"]), "Step 40 Gate A requires exact same-process Step-39 4/4 inserted authority and re-verifies inert GameStartupWrapper")
 require("new FileInfo(step39.SelectedPath).Length" not in step40_core, "Step 40 does not use a tautological selected-image length check")
@@ -2206,16 +2206,17 @@ require(step40_ui.count("GodotStep15NativeBridge.StopRendering()") == 1, "Step 4
 step40_static_map_pos = step40_ui.find("J_B_STATIC_MAP_WRITE_RETURNED")
 step40_start_pos = step40_ui.find("GodotStep15NativeBridge.StartRendering()")
 step40_delay_pos = step40_ui.find("Task.Delay(TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseTargetMilliseconds)")
-step40_stop_checkpoint_pos = step40_ui.find("J_C_STOP_RENDERING_CALL")
-step40_stop_helper_pos = step40_ui.find("StopStep40RenderingOnMainThreadAsync()", step40_stop_checkpoint_pos)
+step40_stop_helper_pos = step40_ui.find("StopStep40RenderingOnMainThreadAsync()", step40_delay_pos)
+step40_stop_returned_checkpoint_pos = step40_ui.find("J_C_STOP_RENDERING_RETURNED", step40_stop_helper_pos)
 step40_gatec_evidence_pos = step40_ui.find("RunStep40BoundedRenderPulseEvidence")
-require(-1 not in [step40_static_map_pos, step40_start_pos, step40_delay_pos, step40_stop_checkpoint_pos, step40_stop_helper_pos, step40_gatec_evidence_pos] and step40_static_map_pos < step40_start_pos < step40_delay_pos < step40_stop_checkpoint_pos < step40_stop_helper_pos < step40_gatec_evidence_pos, "Step 40 writes the verified map before StartRendering, delays only after start, checkpoints before the synchronous stop helper, and refreezes before evaluating Gate C")
+require(-1 not in [step40_static_map_pos, step40_start_pos, step40_delay_pos, step40_stop_helper_pos, step40_stop_returned_checkpoint_pos, step40_gatec_evidence_pos] and step40_static_map_pos < step40_start_pos < step40_delay_pos < step40_stop_helper_pos < step40_stop_returned_checkpoint_pos < step40_gatec_evidence_pos, "Step 40.1 writes the verified map before StartRendering, delays only after start, calls the synchronous stop helper before any stop telemetry, and refreezes before evaluating Gate C")
+require("J_C_STOP_RENDERING_CALL —" not in step40_ui and "first managed continuation called StopRendering before telemetry" in step40_ui, "Step 40.1 removes the pre-stop checkpoint/file-I/O defect and records stop evidence only after StopRendering returns")
 require(all(value in step40_ui for value in ["_step40PulseUiStarted", "BeginStep40BoundedRenderPulse", "do not retry", "Step40-CrashCheckpoint-", "Step40-RenderPulse-StaticMap-", "Step40-LastCheckpoint.txt", "Step40-TransformedRealStS2RenderPulse.txt"]), "Step 40 UI enforces one-shot pulse semantics and durable run-correlated telemetry")
 require("ResetStep40State();" in step39_scene_source and "AddTransformedRealStS2RenderPulseControls(content);" in step40_root_ui, "Step 39 reset clears Step 40 state and RootViewController exposes the Step 40 control")
-require(all(value in step40_presentation for value in ["STEP 40.0 — CONTROLLED REAL-GAME RENDER PULSE", "Physical 0.0.170 / Step 39.2 closed real SceneTree admission at 4/4", "Step40ImplementationMarker", "ExpectedDisplayVersion = \"0.0.171\"", "ExpectedBuildVersion = \"171\""]), "active release presentation pins physical Step-39 closure and the Step-40 / 0.0.171 identity")
+require(all(value in step40_presentation for value in ["STEP 40 CLOSED POSITIVE 4/4", "Step40ImplementationMarker", "second physical 0.0.171 Step-40 run", "StopRendering inactive at 103.3 ms"]), "release presentation preserves physical Step-40 4/4 closure while Step 41 becomes active")
 require(not any(call in step40_core for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 40 Core does not directly invoke forbidden game startup/platform/main-menu/deferred methods")
 require(not any(call in step40_ui for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 40 UI does not directly invoke forbidden game startup/platform/main-menu/deferred methods")
-require(all(value in step40_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "Step40PulseWindowIsNarrowAndPinned", "Step40GateOrdinalsAreStable"]), "Step 40 host regression tests pin gate sequencing and the bounded pulse window with MSTest-v4-compatible assertions")
+require(all(value in step40_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "Step40FirstOpportunityEvidenceWindowIsPinned", "523.5 <=", "Step40GateOrdinalsAreStable"]), "Step 40.1 host regressions pin gate sequencing, the 100/2000 evidence window, and physical 523.5 ms acceptance with MSTest-v4-compatible assertions")
 
 step39_physical_170 = read("docs/history/reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-CHECKPOINT.txt")
 step39_static_170 = read("docs/history/reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-STATIC-MAP.txt")
@@ -2226,39 +2227,88 @@ require(all(value in step39_physical_170 for value in ["App version: 0.0.170 (17
 require(all(value in step39_static_170 for value in ["Actual off-tree game hierarchy nodes: 69", "Selected sts2 managed node types: 23", "Immediate managed lifecycle callbacks mapped including in-module base chains (_EnterTree/_Ready/_Notification): 26", "Transitive same-sts2 lifecycle closure methods mapped: 557", "Forbidden startup/native/platform references from transitive lifecycle closure: 0", "Unresolved same-sts2 references from transitive lifecycle closure: 0"]), "physical 0.0.170 static map pins the 69/23/26/557 clean SceneTree lifecycle authority")
 require("RUN_END" in step39_last_170 and "Step 39 never restarts Godot rendering" in step39_last_170, "physical 0.0.170 last checkpoint proves normal Step-39 return with rendering not restarted")
 
+step40_physical_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-CHECKPOINT.txt")
+step40_static_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-STATIC-MAP.txt")
+step40_report_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-REPORT.txt")
+step40_last_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-LAST-CHECKPOINT.txt")
+require("STEP 40.0 CONTROLLED REAL-GAME RENDER PULSE FAIL — 2/4" in step40_report_171 and "observed=523.5ms" in step40_report_171, "physical 0.0.171 final report seals the old 500 ms classifier as the only reported Step-40 Gate-C failure")
+require(all(value in step40_physical_171 for value in ["App version: 0.0.171 (171)", "J_A_PASS", "J_B_PASS", "J_C_START_RENDERING_RETURNED — returned=True; renderingActiveAfterStart=True", "elapsedBeforeStopMs=522.8", "J_C_STOP_RENDERING_RETURNED — returned=True; renderingActiveAfterStop=False; observedElapsedMs=523.5", "RUN_END"]), "physical 0.0.171 checkpoint proves Gate A/B clean, real render start, safe refreeze, 523.5 ms observation, and normal return")
+require(all(value in step40_static_171 for value in ["Actual in-tree game hierarchy nodes: 68", "Selected sts2 managed node types: 23", "Immediate managed frame/input callbacks mapped including in-module base chains (_Process/_PhysicsProcess/_Draw/_Input/_ShortcutInput/_UnhandledInput/_UnhandledKeyInput/_GuiInput): 12", "Transitive same-sts2 frame/input closure methods mapped: 447", "Forbidden startup/native/platform references from transitive frame/input closure: 0", "Unresolved same-sts2 references from transitive frame/input closure: 0"]), "physical 0.0.171 static map pins the 68/23/12/447 clean in-tree frame/input authority")
+require("RUN_END" in step40_last_171 and "Step 40 never restarts rendering after its single StopRendering call" in step40_last_171, "physical 0.0.171 last checkpoint proves normal return with rendering not restarted after stop")
+
+step40_success_physical_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-CHECKPOINT.txt")
+step40_success_static_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-STATIC-MAP.txt")
+step40_success_report_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-REPORT.txt")
+step40_success_last_171 = read("docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-LAST-CHECKPOINT.txt")
+require("STEP 40.0 CONTROLLED REAL-GAME RENDER PULSE COMPLETE — 4/4" in step40_success_report_171, "second physical 0.0.171 report closes Step 40 at 4/4")
+require(all(value in step40_success_physical_171 for value in ["App version: 0.0.171 (171)", "J_A_PASS", "J_B_PASS", "elapsedBeforeStopMs=101.8", "observedElapsedMs=103.3", "J_C_PASS", "J_D_PASS", "RUN_STEP40_4OF4", "nativeDelta=0"]), "second physical 0.0.171 checkpoint proves controlled 103.3 ms pulse and frozen zero-native confinement")
+require(all(value in step40_success_static_171 for value in ["Actual in-tree game hierarchy nodes: 68", "Selected sts2 managed node types: 23", "Immediate managed frame/input callbacks mapped including in-module base chains (_Process/_PhysicsProcess/_Draw/_Input/_ShortcutInput/_UnhandledInput/_UnhandledKeyInput/_GuiInput): 12", "Transitive same-sts2 frame/input closure methods mapped: 447", "Forbidden startup/native/platform references from transitive frame/input closure: 0", "Unresolved same-sts2 references from transitive frame/input closure: 0"]), "successful physical 0.0.171 static map repeats the clean 68/23/12/447 frame/input authority")
+require("RUN_END" in step40_success_last_171 and "Step 40 never restarts rendering after its single StopRendering call" in step40_success_last_171, "successful physical 0.0.171 run ended normally with rendering not restarted")
+require((ROOT / "docs/history/steps/STEP-40.1-FIRST-MAIN-THREAD-OPPORTUNITY-TIMING-CORRECTION.md").is_file(), "Step 40.1 timing-correction design/provenance record is present")
+
 step40_manifest = ROOT / "tools/validation/candidate-step40-controlled-real-game-render-pulse.sha256"
-require(step40_manifest.is_file(), "Step 40 active candidate hash manifest exists")
-if step40_manifest.is_file():
-    step40_manifest_text = step40_manifest.read_text()
-    required_step40_manifest_paths = [
+require(step40_manifest.is_file(), "Step 40 historical candidate hash manifest remains present")
+
+active_step40_text = "\n".join([step40_core, step40_tests, step40_ui, step40_presentation, current_status, testing_doc, release_checklist_doc, read("docs/MASTER-PLAN.md"), read("docs/REGRESSION-CONTRACTS.md"), read("docs/REPORTS.md"), read("README.md"), read("docs/README.md")])
+require("<=500" not in active_step40_text and "MaximumMilliseconds = 500" not in active_step40_text, "active Step-40.1 source/docs contain no stale 500 ms acceptance contract")
+require("2000 ms" in active_step40_text and "before telemetry" in active_step40_text, "active Step-40.1 source/docs describe the 2000 ms post-stop evidence ceiling and Stop-before-telemetry invariant")
+
+# ---------------------------------------------------------------------------
+# Step 41 non-invoking GameStartup async frontier map
+# ---------------------------------------------------------------------------
+step41_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontier.cs")
+step41_gate = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierGate.cs")
+step41_result = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierGateResult.cs")
+step41_sequence = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierGateSequence.cs")
+step41_summary = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierSummary.cs")
+step41_tests = read("tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2GameStartupFrontierTests.cs")
+step41_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2GameStartupFrontier.cs")
+step41_root_ui = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
+require(all(text for text in [step41_core, step41_gate, step41_result, step41_sequence, step41_summary, step41_tests, step41_ui]), "Step 41 implementation, gate sequence, tests, and iOS UI surfaces exist")
+require(all(value in step41_gate for value in ["ClosedStep40FrozenAuthority = 1", "GameStartupAsyncStateMachineMap = 2", "TransitiveStartupBoundaryMap = 3", "FrozenNoInvocationConfinement = 4"]), "Step 41 gate ordinals pin frozen Step40 authority, async-state-machine map, closure map, and no-invocation confinement")
+require("STEP 41.0 GAMESTARTUP ASYNC FRONTIER MAP COMPLETE — 4/4" in step41_summary and "Gates.Count == 4" in step41_summary, "Step 41 summary requires exact four-of-four closure")
+require(all(value in step41_core for value in ["AsyncStateMachineAttribute", "MoveNext", "BuildStep41DirectStateMachineMap", "AuditStep41StartupClosure", "BuildStep41StaticMap", "ReadingMode = ReadingMode.Deferred", "RejectingAssemblyResolver"]), "Step 41 maps exact async state-machine IL and transitive same-sts2 closure with deferred rejecting-resolver Cecil")
+require(all(value in step41_core for value in ["INITIALIZE_PLATFORM", "LAUNCH_MAIN_MENU", "LOAD_DEFERRED_STARTUP_ASSETS", "PLATFORM", "STEAM", "FMOD", "SPINE", "SENTRY_INERT_WRAPPER", "SENTRY_EXTERNAL", "NATIVE_EXTENSION"]), "Step 41 classifies the planned startup/platform/native boundary families")
+require("GameStartup invoked: NO" in step41_core and "Rendering restarted: NO" in step41_core, "Step 41 static map explicitly records no GameStartup invocation and no render restart")
+require("GodotStep15NativeBridge.StartRendering()" not in step41_ui and "GodotStep15NativeBridge.StopRendering()" not in step41_ui, "Step 41 UI contains no render restart/refreeze call sites")
+require(not any(call in step41_core for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 41 Core never directly invokes startup/platform/main-menu/deferred methods")
+require(not any(call in step41_ui for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 41 UI never directly invokes startup/platform/main-menu/deferred methods")
+require(all(value in step41_ui for value in ["Step41-CrashCheckpoint-", "Step41-GameStartupFrontier-StaticMap-", "Step41-LastCheckpoint.txt", "Step41-TransformedRealStS2GameStartupFrontier.txt", "K_C_STATIC_MAP_WRITE_RETURNED"]), "Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts")
+require("AddTransformedRealStS2GameStartupFrontierControls(content);" in step41_root_ui and "ResetStep41State();" in step40_core, "RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state")
+require(all(value in release_presentation for value in ["STEP 41.0 — GAMESTARTUP ASYNC FRONTIER MAP (NON-INVOKING)", "STEP 40 CLOSED POSITIVE 4/4", "Step41ImplementationMarker", "ExpectedDisplayVersion = \"0.0.173\"", "ExpectedBuildVersion = \"173\""]), "active release presentation pins physical Step-40 closure and Step-41 / 0.0.173 identity")
+require(all(value in step41_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "GameStartupAsyncStateMachineMap", "FrozenNoInvocationConfinement"]), "Step 41 host regressions pin gate sequencing and stable ordinals")
+require("Step 41 never invokes GameStartup" in current_status and "Step41-GameStartupFrontier-StaticMap-<RunId>.txt" in current_status, "current status pins Step-41 no-invocation boundary and report contract")
+
+step41_manifest = ROOT / "tools/validation/candidate-step41-gamestartup-async-frontier.sha256"
+require(step41_manifest.is_file(), "Step 41 active candidate hash manifest exists")
+if step41_manifest.is_file():
+    step41_manifest_text = step41_manifest.read_text()
+    required_step41_manifest_paths = [
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontier.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierGate.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierGateResult.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierGateSequence.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2GameStartupFrontierSummary.cs",
+        "tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2GameStartupFrontierTests.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2GameStartupFrontier.cs",
         "src/StS2Launcher.Core/Runtime/TransformedRealStS2RenderPulse.cs",
-        "src/StS2Launcher.Core/Runtime/TransformedRealStS2RenderPulseGate.cs",
-        "src/StS2Launcher.Core/Runtime/TransformedRealStS2RenderPulseGateResult.cs",
-        "src/StS2Launcher.Core/Runtime/TransformedRealStS2RenderPulseGateSequence.cs",
-        "src/StS2Launcher.Core/Runtime/TransformedRealStS2RenderPulseSummary.cs",
-        "tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2RenderPulseTests.cs",
-        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2RenderPulse.cs",
-        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2SceneTreeAdmission.cs",
         "src/StS2Launcher.iOS/UI/RootViewController.cs",
         "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs",
         "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj", "src/StS2Launcher.iOS/Info.plist",
-        "scripts/lib/current-release.sh", "scripts/build-ios.sh", "scripts/test.sh", "scripts/codemagic.sh", "scripts/verify-ipa.sh",
-        "codemagic.yaml", "tools/validate_current.py",
-        "README.md", "docs/README.md", "docs/CURRENT-STATUS.md", "docs/MASTER-PLAN.md", "docs/ARCHITECTURE.md",
-        "docs/TESTING.md", "docs/REGRESSION-CONTRACTS.md", "docs/REPORTS.md", "docs/RELEASE-CHECKLIST.md", "docs/history/INDEX.md",
-        "docs/history/steps/STEP-40.0-CONTROLLED-REAL-GAME-RENDER-PULSE.md",
-        "docs/history/reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-CHECKPOINT.txt",
-        "docs/history/reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-STATIC-MAP.txt",
-        "docs/history/reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-LAST-CHECKPOINT.txt",
-        "docs/history/reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-REPORT.txt",
+        "scripts/lib/current-release.sh", "scripts/test.sh", "scripts/codemagic.sh", "scripts/verify-ipa.sh", "codemagic.yaml", "tools/validate_current.py",
+        "README.md", "docs/README.md", "docs/CURRENT-STATUS.md", "docs/MASTER-PLAN.md", "docs/TESTING.md", "docs/RELEASE-CHECKLIST.md",
+        "docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-CHECKPOINT.txt",
+        "docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-STATIC-MAP.txt",
+        "docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-LAST-CHECKPOINT.txt",
+        "docs/history/reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-REPORT.txt",
     ]
-    require(all(f"  {relative}" in step40_manifest_text for relative in required_step40_manifest_paths), "Step 40 candidate manifest pins render-pulse implementation/tests/UI, active release wiring/docs, and physical Step-39 closure authority")
+    require(all(f"  {relative}" in step41_manifest_text for relative in required_step41_manifest_paths), "Step 41 candidate manifest pins implementation/tests/UI, active release wiring/docs, and physical Step-40 closure")
     mismatches=[]
-    for line in step40_manifest.read_text().splitlines():
+    for line in step41_manifest.read_text().splitlines():
         if not line.strip(): continue
         digest, relative = line.split("  ",1); path=ROOT/relative
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
-    require(not mismatches, "Step 40 active implementation/release/provenance files are hash-pinned", ", ".join(mismatches))
+    require(not mismatches, "Step 41 active implementation/release/provenance files are hash-pinned", ", ".join(mismatches))
 
 # ---------------------------------------------------------------------------
 # Source archive cleanliness/security

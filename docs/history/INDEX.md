@@ -410,3 +410,18 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-STATIC-MAP.txt` — exact 69-node / 23-managed-type / 26-callback / 557-method lifecycle map with zero forbidden/unresolved references.
 - `reports/STEP-39.2-PHYSICAL-COMPLETE-0.0.170-LAST-CHECKPOINT.txt` — final durable normal-run endpoint with rendering not restarted.
 - `steps/STEP-40.0-CONTROLLED-REAL-GAME-RENDER-PULSE.md` — first bounded render-loop resumption design after physical Step-39 closure; GameStartup remains inert.
+
+## Step 40.0 physical timing localization / Step 40.1 correction
+
+- `steps/STEP-40.1-FIRST-MAIN-THREAD-OPPORTUNITY-TIMING-CORRECTION.md` — design correction after physical 0.0.171 proved the 100 ms UIKit delay is non-preemptive while Godot owns the main thread.
+- `reports/STEP-40.0-PHYSICAL-0.0.171-CHECKPOINT.txt` — Gate A/B pass, StartRendering active, first continuation at 522.8 ms, StopRendering inactive at 523.5 ms, old ceiling failure.
+- `reports/STEP-40.0-PHYSICAL-0.0.171-STATIC-MAP.txt` — 68 in-tree nodes, 23 selected types, 12 immediate frame/input callbacks, 447 closure methods, zero forbidden/unresolved references.
+- `reports/STEP-40.0-PHYSICAL-0.0.171-REPORT.txt` and `...LAST-CHECKPOINT.txt` — final 2/4 timing-classifier failure and normal frozen return.
+
+## Step 40.0 physical closure / Step 41.0 GameStartup map
+
+- `reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-REPORT.txt` — second physical 0.0.171 run closes Step 40 at 4/4.
+- `reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-CHECKPOINT.txt` — Gate A/B clean, StartRendering active, first continuation at 101.8 ms, StopRendering inactive at 103.3 ms, Gate C/D pass, zero native/initializer/rejected escape.
+- `reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-STATIC-MAP.txt` — repeats the clean 68-node / 23-type / 12-callback / 447-method frame/input authority.
+- `reports/STEP-40.0-PHYSICAL-0.0.171-SUCCESS-LAST-CHECKPOINT.txt` — normal frozen run endpoint.
+- `steps/STEP-41.0-GAMESTARTUP-ASYNC-FRONTIER-MAP.md` — 0.0.173 non-invoking exact GameStartup async-state-machine and transitive boundary mapping design.

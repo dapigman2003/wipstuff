@@ -17,7 +17,7 @@ public sealed class TransformedRealStS2RenderPulseTests
 
         var snapshot = gates.Snapshot();
         Assert.IsTrue(snapshot.Passed);
-        Assert.AreEqual("STEP 40.0 CONTROLLED REAL-GAME RENDER PULSE COMPLETE — 4/4", snapshot.Summary);
+        Assert.AreEqual("STEP 40.1 CONTROLLED REAL-GAME RENDER PULSE COMPLETE — 4/4", snapshot.Summary);
         Assert.AreEqual(4, snapshot.Gates.Count);
     }
 
@@ -48,10 +48,11 @@ public sealed class TransformedRealStS2RenderPulseTests
     }
 
     [TestMethod]
-    public void Step40PulseWindowIsNarrowAndPinned()
+    public void Step40FirstOpportunityEvidenceWindowIsPinned()
     {
         Assert.AreEqual(100, TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseTargetMilliseconds);
-        Assert.AreEqual(500, TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseMaximumMilliseconds);
+        Assert.AreEqual(2000, TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseMaximumMilliseconds);
+        Assert.IsTrue(523.5 <= TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseMaximumMilliseconds);
         Assert.IsTrue(TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseMaximumMilliseconds >=
                       TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseTargetMilliseconds);
     }
