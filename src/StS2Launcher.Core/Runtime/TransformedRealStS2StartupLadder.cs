@@ -5,10 +5,10 @@ using Mono.Cecil.Cil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Steps 43-50 are packaged together as an explicitly sequential startup ladder. Every rung keeps
+/// Steps 43-52 are packaged together as an explicitly sequential startup ladder. Every rung keeps
 /// its own four-gate authority and later rungs require the exact same-process closure of the prior
 /// rung. Step 46 maps the real LaunchMainMenu immediate/deferred frontier without invoking it;
-/// Steps 47-50 use a separate direct main-menu resource/scene path so original GameStartup,
+/// Steps 47-52 use a separate guarded direct main-menu resource/scene path so original GameStartup,
 /// LaunchMainMenu, ExecuteDeferred, Steam startup, and native game extensions remain unopened.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
@@ -21,6 +21,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string Step48Name = "MAIN MENU OFF-TREE INSTANTIATION";
     private const string Step49Name = "MAIN MENU FROZEN SCENETREE ADMISSION";
     private const string Step50Name = "MAIN MENU CONTROLLED RENDER PULSE";
+    private const string Step51Name = "SINGLEPLAYER FRONTIER MAP";
+    private const string Step52Name = "MAIN MENU SUSTAINED RENDER RESIDENCY";
 
     private const string PlatformUtilTypeFullName = "MegaCrit.Sts2.Core.Platform.PlatformUtil";
     private const string PlatformUtilInterfaceTypeFullName = "MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy";
@@ -89,6 +91,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             48 when !string.IsNullOrWhiteSpace(_step48DirectStaticMap) => _step48DirectStaticMap,
             49 when !string.IsNullOrWhiteSpace(_step49DirectStaticMap) => _step49DirectStaticMap,
             50 when !string.IsNullOrWhiteSpace(_step50DirectStaticMap) => _step50DirectStaticMap,
+            51 when !string.IsNullOrWhiteSpace(_step51DirectStaticMap) => _step51DirectStaticMap,
+            52 when !string.IsNullOrWhiteSpace(_step52DirectStaticMap) => _step52DirectStaticMap,
             _ => throw new InvalidOperationException($"Step {step}.0 has not produced a verified startup-ladder static map."),
         };
 

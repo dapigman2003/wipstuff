@@ -9,12 +9,12 @@ using Mono.Cecil.Cil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Steps 47-50 direct-main-menu path. This path intentionally does not invoke NGame.LaunchMainMenu,
+/// Steps 47-52 direct-main-menu path. This path intentionally does not invoke NGame.LaunchMainMenu,
 /// NGame.LoadDeferredStartupAssetsAsync, OneTimeInitialization.ExecuteDeferred, Steam command-line join,
 /// or any native game GDExtension. It extracts the exact menu resources from the receipt-backed PCK,
 /// prepares a private Spine-neutral background derivative, loads/instantiates the real main-menu scene,
 /// admits it into the already-proven NGame.RootSceneContainer while rendering remains frozen, and finally
-/// permits one short render pulse after an execution-opcode-qualified frame/input audit.
+/// permits one short render pulse after an execution-opcode-qualified frame/input audit, maps the single-player frontier without invoking it, and finally permits one longer bounded render residency pulse.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
 {
@@ -29,6 +29,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const string Step47WorkRootName = "Step47-DirectMainMenu";
     public const string Step47BackgroundDerivativeFileName = "main_menu_bg-step47-spine-neutral.tscn";
     public const string MainMenuManagedRootTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu";
+    private const string MainMenuCheckCommandLineArgsMethodName = "CheckCommandLineArgs";
+    private const string MainMenuSingleplayerButtonPressedMethodName = "SingleplayerButtonPressed";
+    private const string MainMenuOpenSingleplayerSubmenuMethodName = "OpenSingleplayerSubmenu";
+    private const string PlatformSetRichPresenceMethodName = "SetRichPresence";
+    public const int Step52SustainedRenderTargetMilliseconds = 1_500;
+    public const int Step52SustainedRenderEvidenceCeilingMilliseconds = 6_000;
 
     private StartupLadderBaseline? _step47PostLoadBaseline;
     private StartupLadderBaseline? _step48Baseline;
@@ -37,6 +43,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private StartupLadderBaseline? _step49PostAdmissionBaseline;
     private StartupLadderBaseline? _step50Baseline;
     private StartupLadderBaseline? _step50PostPulseBaseline;
+    private StartupLadderRuntimeGuardAuthority? _step48LifecycleGuardAuthority;
 
     private string _step47DirectStaticMap = string.Empty;
     private string _step48DirectStaticMap = string.Empty;
@@ -110,6 +117,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step49PostAdmissionBaseline = null;
         _step50Baseline = null;
         _step50PostPulseBaseline = null;
+        _step48LifecycleGuardAuthority = null;
         _step47DirectStaticMap = string.Empty;
         _step48DirectStaticMap = string.Empty;
         _step49DirectStaticMap = string.Empty;
@@ -137,6 +145,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step49RootSceneContainer = null;
         _step49ChildrenBefore = 0;
         _step49ChildrenAfter = 0;
+        ResetDirectMainMenuContinuationState();
     }
 
     // STEP 46 helper — invocation-opcode-qualified map.
@@ -144,7 +153,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private static StartupLadderInvocationFrontierAudit AuditStartupLadderInvocationFrontier(
         IEnumerable<MethodDefinition> roots,
         IReadOnlyDictionary<string, TypeDefinition> allTypes,
-        IReadOnlyDictionary<string, MethodDefinition> allMethods)
+        IReadOnlyDictionary<string, MethodDefinition> allMethods,
+        StartupLadderRuntimeGuardAuthority? runtimeGuards = null)
     {
         var queue = new Queue<(MethodDefinition Method, string Path)>();
         foreach (var root in roots)
@@ -154,6 +164,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         var closure = new SortedDictionary<uint, Step41ClosureMethod>();
         var immediateBoundaries = new SortedDictionary<string, Step41BoundaryObservation>(StringComparer.Ordinal);
         var deferred = new SortedDictionary<string, StartupLadderDeferredMethodFrontier>(StringComparer.Ordinal);
+        var guarded = new SortedDictionary<string, StartupLadderGuardedMethodFrontier>(StringComparer.Ordinal);
         var unresolved = new SortedSet<string>(StringComparer.Ordinal);
         var expansions = new SortedSet<string>(StringComparer.Ordinal);
 
@@ -176,6 +187,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
                 if (IsImmediateExecutionOpcode(instruction.OpCode.Code))
                 {
+                    if (TryCreateStartupLadderGuardedFrontier(reference, path, runtimeGuards, out var guardedFrontier))
+                    {
+                        guarded.TryAdd(guardedFrontier.ReferenceFullName + "|" + guardedFrontier.Path, guardedFrontier);
+                        continue;
+                    }
+
                     var category = ClassifyStep41Boundary(reference);
                     if (category is not null)
                     {
@@ -219,8 +236,35 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             closure.Values.ToArray(),
             immediateBoundaries.Values.ToArray(),
             deferred.Values.ToArray(),
+            guarded.Values.ToArray(),
             unresolved.ToArray(),
             expansions.ToArray());
+    }
+
+    private static bool TryCreateStartupLadderGuardedFrontier(
+        MethodReference reference,
+        string path,
+        StartupLadderRuntimeGuardAuthority? guards,
+        out StartupLadderGuardedMethodFrontier frontier)
+    {
+        frontier = null!;
+        if (guards is null || !guards.RehearsalPassed)
+            return false;
+
+        var declaring = GetStep41DefinitionTypeName(reference.DeclaringType);
+        string? reason = null;
+        if (declaring == MainMenuManagedRootTypeFullName && reference.Name == MainMenuCheckCommandLineArgsMethodName && reference.Parameters.Count == 0)
+            reason = "exact CheckCommandLineArgs() was already invoked once off-tree with an empty Godot command line and returned with zero context/native/tree drift";
+        else if (declaring == SaveManagerTypeFullName && reference.Name == "get_Instance" && reference.Parameters.Count == 0)
+            reason = "SaveManager _mockInstance is null, production _instance is non-null, and exact get_Instance() rehearsal returned that same instance with zero context/native drift";
+        else if (declaring == PlatformUtilTypeFullName && reference.Name == PlatformSetRichPresenceMethodName && reference.Parameters.Count == 3)
+            reason = "PrimaryPlatform resolves to exact NullPlatformUtilStrategy and exact PlatformUtil.SetRichPresence rehearsal returned with zero context/native drift";
+
+        if (reason is null)
+            return false;
+
+        frontier = new StartupLadderGuardedMethodFrontier(reference.FullName, reason, path + " -> [RUNTIME-GUARDED] " + reference.FullName);
+        return true;
     }
 
     private static bool IsImmediateExecutionOpcode(Code code)
@@ -314,6 +358,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             $"Compiler state-machine MoveNext expansions reached from immediate edges: {audit.StateMachineExpansions.Length}",
             $"Immediate classified boundary references: {audit.ImmediateBoundaries.Length}",
             $"Deferred/non-executing method-reference frontiers: {audit.DeferredMethodFrontiers.Length}",
+            $"Runtime-guarded immediate frontiers: {audit.GuardedMethodFrontiers.Length}",
             "Unresolved same-sts2 references: 0",
             "External Cecil resolution requests: 0",
             "Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.",
@@ -338,6 +383,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             lines.Add("  - none");
         foreach (var frontier in audit.DeferredMethodFrontiers)
             lines.Add($"  - opcode={frontier.Opcode}; category={frontier.Category ?? "UNCLASSIFIED"}; reference={frontier.ReferenceFullName}; path={frontier.Path}");
+        lines.Add(string.Empty);
+        lines.Add("[RUNTIME-GUARDED IMMEDIATE FRONTIERS]");
+        if (audit.GuardedMethodFrontiers.Length == 0)
+            lines.Add("  - none");
+        foreach (var guarded in audit.GuardedMethodFrontiers)
+        {
+            lines.Add("  - reference=" + guarded.ReferenceFullName);
+            lines.Add("      reason: " + guarded.Reason);
+            lines.Add("      path: " + guarded.Path);
+        }
         lines.Add(string.Empty);
         lines.Add("[COMPILER STATE-MACHINE EXPANSIONS]");
         if (audit.StateMachineExpansions.Length == 0)
@@ -571,19 +626,56 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             using var resolver = new RejectingAssemblyResolver();
             using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
             var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
-            if (!allTypes.ContainsKey(MainMenuManagedRootTypeFullName))
-                throw new InvalidDataException("Step 48.0 selected sts2 image does not contain exact NMainMenu managed root type.");
+            var mainMenuType = RequireStartupLadderType(allTypes, MainMenuManagedRootTypeFullName, step);
+            var ready = RequireStartupLadderMethod(mainMenuType, "_Ready", 0, false, step);
+            var checkCommandLineArgs = RequireStartupLadderMethod(mainMenuType, MainMenuCheckCommandLineArgsMethodName, 0, false, step);
+            var readyCommandLineCalls = ready.Body.Instructions.Count(instruction =>
+                instruction.Operand is MethodReference method &&
+                GetStep41DefinitionTypeName(method.DeclaringType) == MainMenuManagedRootTypeFullName &&
+                method.Name == MainMenuCheckCommandLineArgsMethodName && method.Parameters.Count == 0);
+            if (readyCommandLineCalls != 1)
+                throw new InvalidDataException($"Step 48.1 expected exactly one NMainMenu._Ready -> CheckCommandLineArgs call; observed {readyCommandLineCalls}.");
+
+            var commandLineHelperCalls = checkCommandLineArgs.Body.Instructions
+                .Where(instruction => instruction.Operand is MethodReference method &&
+                                      GetStep41DefinitionTypeName(method.DeclaringType) == "MegaCrit.Sts2.Core.Helpers.CommandLineHelper")
+                .Select(instruction => ((MethodReference)instruction.Operand).FullName)
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray();
+            if (commandLineHelperCalls.Length == 0)
+                throw new InvalidDataException("Step 48.1 CheckCommandLineArgs no longer references CommandLineHelper; runtime empty-command-line guard cannot be justified by the physically proven command-line compatibility path.");
+
+            var saveManager = RequireStartupLadderType(allTypes, SaveManagerTypeFullName, step);
+            var getInstance = RequireStartupLadderMethod(saveManager, "get_Instance", 0, true, step);
+            var getInstanceConstructDefaultCalls = getInstance.Body.Instructions.Count(instruction =>
+                instruction.Operand is MethodReference method &&
+                GetStep41DefinitionTypeName(method.DeclaringType) == SaveManagerTypeFullName &&
+                method.Name == "ConstructDefault" && method.Parameters.Count == 0);
+            if (getInstanceConstructDefaultCalls != 1)
+                throw new InvalidDataException($"Step 48.1 expected SaveManager.get_Instance to retain exactly one ConstructDefault fallback; observed {getInstanceConstructDefaultCalls}.");
+
+            var nullPlatform = RequireStartupLadderType(allTypes, NullPlatformTypeFullName, step);
+            var nullSetRichPresence = RequireStartupLadderMethod(nullPlatform, PlatformSetRichPresenceMethodName, 3, false, step);
+            var allMethods = BuildStartupLadderMethodMap(allTypes);
+            var nullPresenceAudit = AuditStartupLadderInvocationFrontier(new[] { nullSetRichPresence }, allTypes, allMethods);
+            RequireImmediateFrontierAdmissible(nullPresenceAudit, "Step 48.1 exact Null-platform SetRichPresence implementation");
             if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 48.0 binding audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+                throw new InvalidDataException("Step 48.1 binding/guard-shape audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 48 Gate B");
             _step48DirectStaticMap =
-                "StS2 Launcher — Step 48.0 off-tree main-menu instantiation static map\n" +
-                "Pre-instantiation authority only; actual node/lifecycle map is appended after controlled off-tree Instantiate.\n" +
+                "StS2 Launcher — Step 48.1 guarded off-tree main-menu instantiation static map\n" +
+                "Pre-instantiation authority plus exact runtime-guard shape; actual node/lifecycle map is appended after controlled off-tree Instantiate and guard rehearsal.\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
                 $"Expected managed root: {MainMenuManagedRootTypeFullName}\n" +
                 "PackedScene.Instantiate(GenEditState) exact reflection binding: PRESENT\n" +
+                $"NMainMenu._Ready -> CheckCommandLineArgs calls: {readyCommandLineCalls}\n" +
+                $"CheckCommandLineArgs CommandLineHelper references: {commandLineHelperCalls.Length} ({string.Join(" | ", commandLineHelperCalls)})\n" +
+                $"SaveManager.get_Instance ConstructDefault fallback calls: {getInstanceConstructDefaultCalls}\n" +
+                $"NullPlatformUtilStrategy.SetRichPresence immediate closure methods: {nullPresenceAudit.ImmediateClosureMethods.Length}; forbidden boundaries=0; unresolved=0\n" +
+                "Guard policy: before lifecycle admission, require empty Godot OS.GetCmdlineArgs, existing production SaveManager _instance with null _mockInstance, exact getter rehearsal returning that same instance, exact Null-platform routing, zero-drift SetRichPresence rehearsal, and zero-drift off-tree CheckCommandLineArgs rehearsal. Only those exact rehearsed methods may terminate static traversal.\n" +
                 "Rendering restarted: NO\nOriginal LaunchMainMenu invoked: NO\n";
-            Checkpoint(checkpoint, "M48_B_PASS — exact PackedScene.Instantiate(GenEditState) binding present; exact NMainMenu managed type exists in selected image; no external Cecil resolution; instantiation=NO.");
+            Checkpoint(checkpoint, $"M48_B_PASS — exact Instantiate binding + NMainMenu guard shape sealed; _Ready->CheckCommandLineArgs calls={readyCommandLineCalls}; CommandLineHelper refs={commandLineHelperCalls.Length}; SaveManager getter fallback calls={getInstanceConstructDefaultCalls}; Null SetRichPresence closure={nullPresenceAudit.ImmediateClosureMethods.Length}; forbidden/unresolved/external=0; instantiation=NO.");
             return StartupLadderPass(step, Step48Name, gate,
                 "Exact PackedScene.Instantiate binding and NMainMenu type authority passed without instantiation. Rendering remains frozen.");
         }
@@ -630,8 +722,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (RequireZeroArgBoolMethod(instance.GetType(), "IsInsideTree").Invoke(instance, null) is not false)
                 throw new InvalidDataException("Step 48.0 off-tree NMainMenu unexpectedly reports IsInsideTree=true.");
             _step48MainMenuInstance = instance;
+            RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 48 off-tree instantiate");
+            var postInstantiateBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
 
-            stage = "actual off-tree hierarchy + immediate lifecycle audit";
+            stage = "runtime lifecycle guard rehearsal";
+            _step48LifecycleGuardAuthority = RehearseStep48LifecycleRuntimeGuards(instance, context, postInstantiateBaseline, checkpoint);
+
+            stage = "actual off-tree hierarchy + runtime-guarded immediate lifecycle audit";
             var nodes = EnumerateStep39NodeGraph(instance, nodeType);
             var managedTypes = nodes.Select(item => item.Node.GetType())
                 .Where(type => ReferenceEquals(AssemblyLoadContext.GetLoadContext(type.Assembly), context) && ReferenceEquals(type.Assembly, instance.GetType().Assembly))
@@ -646,17 +743,18 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
             var allMethods = BuildStartupLadderMethodMap(allTypes);
             var lifecycleRoots = CollectStartupLadderActualNodeCallbackRoots(managedTypes, allTypes, new[] { "_EnterTree", "_Ready", "_Notification" });
-            var audit = AuditStartupLadderInvocationFrontier(lifecycleRoots, allTypes, allMethods);
-            RequireImmediateFrontierAdmissible(audit, "Step 48.0 actual main-menu lifecycle frontier");
+            var guards = _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 48.1 runtime lifecycle guard authority absent after rehearsal.");
+            var audit = AuditStartupLadderInvocationFrontier(lifecycleRoots, allTypes, allMethods, guards);
+            RequireImmediateFrontierAdmissible(audit, "Step 48.1 actual main-menu lifecycle frontier after exact runtime guard rehearsal");
             if (resolver.Requests.Count != 0)
                 throw new InvalidDataException("Step 48.0 lifecycle audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 48 Gate C");
             _step48PostInstantiationBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
             _step48DirectStaticMap += BuildStep48ActualHierarchyAppendix(nodes, managedTypes, lifecycleRoots, audit);
             _step48InstantiationPassed = true;
-            Checkpoint(checkpoint, $"M48_C_PASS — offTreeRoot={instance.GetType().FullName}; nodeCount={nodes.Count}; selectedManagedTypes={managedTypes.Length}; immediateLifecycleRoots={lifecycleRoots.Length}; immediateClosureMethods={audit.ImmediateClosureMethods.Length}; immediateBoundaryRefs={audit.ImmediateBoundaries.Length}; deferredFrontiers={audit.DeferredMethodFrontiers.Length}; unresolved=0; externalResolution=0; nativeDelta=0; insideTree=False.");
+            Checkpoint(checkpoint, $"M48_C_PASS — offTreeRoot={instance.GetType().FullName}; nodeCount={nodes.Count}; selectedManagedTypes={managedTypes.Length}; immediateLifecycleRoots={lifecycleRoots.Length}; immediateClosureMethods={audit.ImmediateClosureMethods.Length}; immediateBoundaryRefs={audit.ImmediateBoundaries.Length}; runtimeGuardedFrontiers={audit.GuardedMethodFrontiers.Length}; deferredFrontiers={audit.DeferredMethodFrontiers.Length}; instantiateResolverDelta={postInstantiateBaseline.ResolverCount - baseline.ResolverCount}; instantiateHostDelta={postInstantiateBaseline.HostCount - baseline.HostCount}; instantiatePrivateDelta={postInstantiateBaseline.PrivateCount - baseline.PrivateCount}; unresolved=0; externalResolution=0; nativeDelta=0; insideTree=False.");
             return StartupLadderPass(step, Step48Name, gate,
-                $"Real NMainMenu instantiated off-tree once. Actual graph nodes={nodes.Count}; selected managed types={managedTypes.Length}; immediate lifecycle roots={lifecycleRoots.Length}; immediate closure={audit.ImmediateClosureMethods.Length}; all immediate boundaries admissible; deferred delegate/frontier refs recorded separately; no native escape.");
+                $"Real NMainMenu instantiated off-tree once. Runtime guards were rehearsed with zero post-rehearsal drift; actual graph nodes={nodes.Count}; selected managed types={managedTypes.Length}; immediate lifecycle roots={lifecycleRoots.Length}; immediate closure={audit.ImmediateClosureMethods.Length}; guarded frontiers={audit.GuardedMethodFrontiers.Length}; remaining immediate boundaries admissible; deferred delegate/frontier refs recorded separately; no native escape.");
         }
         catch (Exception ex)
         {
@@ -680,6 +778,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidOperationException("Step 48.0 must leave rendering frozen.");
             var post = _step48PostInstantiationBaseline ?? throw new InvalidOperationException("Step 48.0 post-instantiation baseline is absent.");
             RequireStartupLadderBaselineUnchanged(context, post, "Step 48 Gate D");
+            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 48 Gate D", requirePreAdmissionCounts: true);
             if (RequireZeroArgBoolMethod(_step48MainMenuInstance.GetType(), "IsInsideTree").Invoke(_step48MainMenuInstance, null) is not false)
                 throw new InvalidDataException("Step 48.0 NMainMenu entered the SceneTree before Step 49 authorization.");
             var state = RequireStep40InsertedAuthority();
@@ -711,6 +810,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var selected = RequireStartupLadderSelectedAuthority(step);
             _step49Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
             RequireStartupLadderBaselineUnchanged(context, _step49Baseline, "Step 49 Gate A");
+            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 49 Gate A pre-admission guard recheck", requirePreAdmissionCounts: true);
             if (_step48MainMenuInstance is null || RequireZeroArgBoolMethod(_step48MainMenuInstance.GetType(), "IsInsideTree").Invoke(_step48MainMenuInstance, null) is not false)
                 throw new InvalidDataException("Step 49.0 requires retained off-tree NMainMenu authority.");
             Checkpoint(checkpoint, "M49_A_PASS — Step-48 4/4 retained; real NMainMenu remains off-tree; renderingStopped=True; state=2; first frozen RootSceneContainer admission not yet armed.");
@@ -779,6 +879,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidOperationException("Step 49.0 AddChild boundary is one-shot in-process.");
             if (RequireZeroArgBoolMethod(menu.GetType(), "IsInsideTree").Invoke(menu, null) is not false)
                 throw new InvalidDataException("Step 49.0 NMainMenu is already in the SceneTree before authorized AddChild.");
+            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 49 Gate C immediately before AddChild", requirePreAdmissionCounts: true);
             _step49AdmissionStarted = true;
             var nodeType = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly.GetType("Godot.Node", true, false)!;
             var addChild = RequireStartupLadderAddChildMethod(rootScene.GetType(), nodeType);
@@ -863,6 +964,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var selected = RequireStartupLadderSelectedAuthority(step);
             _step50Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
             RequireStartupLadderBaselineUnchanged(context, _step50Baseline, "Step 50 Gate A");
+            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 50 Gate A guard recheck", requirePreAdmissionCounts: false);
             if (_step48MainMenuInstance is null || RequireZeroArgBoolMethod(_step48MainMenuInstance.GetType(), "IsInsideTree").Invoke(_step48MainMenuInstance, null) is not true)
                 throw new InvalidDataException("Step 50.0 requires retained in-tree NMainMenu authority.");
             Checkpoint(checkpoint, "M50_A_PASS — Step-49 4/4 frozen main-menu admission retained; state=2; NMainMenu inside RootSceneContainer; renderer stopped; no render pulse armed yet.");
@@ -903,8 +1005,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
             var allMethods = BuildStartupLadderMethodMap(allTypes);
             var roots = CollectStartupLadderActualNodeCallbackRoots(managedTypes, allTypes, Step40ImmediateFrameMethodNames);
-            var audit = AuditStartupLadderInvocationFrontier(roots, allTypes, allMethods);
-            RequireImmediateFrontierAdmissible(audit, "Step 50.0 actual in-tree main-menu frame/input frontier");
+            var guards = _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 50.0 requires retained Step-48 runtime-guard authority.");
+            var audit = AuditStartupLadderInvocationFrontier(roots, allTypes, allMethods, guards);
+            RequireImmediateFrontierAdmissible(audit, "Step 50.0 actual in-tree main-menu frame/input frontier under retained runtime guards");
             if (resolver.Requests.Count != 0)
                 throw new InvalidDataException("Step 50.0 frame/input audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 50 Gate B");
@@ -1005,6 +1108,146 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
 
     // Direct-main-menu shared helpers.
+
+    private StartupLadderRuntimeGuardAuthority RehearseStep48LifecycleRuntimeGuards(
+        object menu,
+        Step35ExecutionLoadContext context,
+        StartupLadderBaseline baseline,
+        Action<string>? checkpoint)
+    {
+        RequireStartupLadderBaselineUnchanged(context, baseline, "Step 48 runtime-guard rehearsal entry");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
+        var osType = godotAssembly.GetType("Godot.OS", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.OS");
+        var getCmdlineArgs = osType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == "GetCmdlineArgs" && method.GetParameters().Length == 0)
+            ?? throw new MissingMethodException("Godot.OS", "GetCmdlineArgs()");
+        var commandLineArgs = NormalizeStartupLadderCommandLineArgs(
+            InvokeStartupLadderMethod(getCmdlineArgs, null, null, "Step 48 Godot.OS.GetCmdlineArgs"));
+        if (commandLineArgs.Length != 0)
+            throw new InvalidDataException("Step 48.1 refuses lifecycle admission unless Godot.OS.GetCmdlineArgs is empty. observed=" + string.Join(" | ", commandLineArgs.Select(SanitizeCheckpoint)));
+
+        var admission = RequireAdmission();
+        var saveManagerType = admission.Assembly.GetType(SaveManagerTypeFullName, throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException(SaveManagerTypeFullName);
+        var saveManager = RequireExistingStartupLadderSaveManagerInstance(saveManagerType, 48);
+        var getInstance = saveManagerType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == "get_Instance" && method.GetParameters().Length == 0 && method.ReturnType == saveManagerType)
+            ?? throw new MissingMethodException(SaveManagerTypeFullName, "get_Instance()");
+        var getterResult = InvokeStartupLadderMethod(getInstance, null, null, "Step 48 SaveManager.get_Instance rehearsal")
+            ?? throw new InvalidDataException("Step 48.1 SaveManager.get_Instance rehearsal returned null.");
+        if (!ReferenceEquals(getterResult, saveManager))
+            throw new InvalidDataException("Step 48.1 SaveManager.get_Instance rehearsal did not return the exact already-created production _instance.");
+
+        var platformUtilType = admission.Assembly.GetType(PlatformUtilTypeFullName, throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException(PlatformUtilTypeFullName);
+        var nullPlatformType = admission.Assembly.GetType(NullPlatformTypeFullName, throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException(NullPlatformTypeFullName);
+        var primaryProperty = platformUtilType.GetProperty("PrimaryPlatform", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            ?? throw new MissingMemberException(PlatformUtilTypeFullName, "PrimaryPlatform");
+        var primaryPlatform = primaryProperty.GetValue(null)
+            ?? throw new InvalidDataException("Step 48.1 PlatformUtil.PrimaryPlatform returned null.");
+        var getPlatformUtil = platformUtilType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == "GetPlatformUtil" && method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == primaryPlatform.GetType())
+            ?? throw new MissingMethodException(PlatformUtilTypeFullName, "GetPlatformUtil(PlatformType)");
+        var strategy = InvokeStartupLadderMethod(getPlatformUtil, null, new[] { primaryPlatform }, "Step 48 PlatformUtil.GetPlatformUtil rehearsal")
+            ?? throw new InvalidDataException("Step 48.1 PlatformUtil.GetPlatformUtil returned null.");
+        if (strategy.GetType() != nullPlatformType)
+            throw new InvalidDataException($"Step 48.1 requires exact NullPlatformUtilStrategy before NMainMenu lifecycle admission; observed {strategy.GetType().FullName} for PrimaryPlatform={primaryPlatform}.");
+
+        var setRichPresence = platformUtilType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method =>
+            {
+                if (method.Name != PlatformSetRichPresenceMethodName || method.ReturnType != typeof(void))
+                    return false;
+                var p = method.GetParameters();
+                return p.Length == 3 && p[0].ParameterType == typeof(string) && p[1].ParameterType == typeof(string) && p[2].ParameterType == typeof(int?);
+            }) ?? throw new MissingMethodException(PlatformUtilTypeFullName, "SetRichPresence(string,string,int?)");
+        InvokeStartupLadderMethod(setRichPresence, null, new object?[] { string.Empty, string.Empty, null }, "Step 48 Null-platform SetRichPresence rehearsal");
+
+        var nGame = _step39NGameInstance ?? throw new InvalidOperationException("Step 48.1 retained NGame absent during lifecycle-guard rehearsal.");
+        var rootScene = RequireStartupLadderPropertyValue(nGame, "RootSceneContainer", 48);
+        var rootChildrenBefore = GetStartupLadderChildCount(rootScene);
+        var menuChildrenBefore = GetStartupLadderChildCount(menu);
+        var checkCommandLineArgs = menu.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == MainMenuCheckCommandLineArgsMethodName && method.GetParameters().Length == 0 && method.ReturnType == typeof(void))
+            ?? throw new MissingMethodException(MainMenuManagedRootTypeFullName, MainMenuCheckCommandLineArgsMethodName + "()");
+        InvokeStartupLadderMethod(checkCommandLineArgs, menu, null, "Step 48 off-tree CheckCommandLineArgs rehearsal");
+        if (RequireZeroArgBoolMethod(menu.GetType(), "IsInsideTree").Invoke(menu, null) is not false)
+            throw new InvalidDataException("Step 48.1 CheckCommandLineArgs rehearsal unexpectedly admitted NMainMenu into the SceneTree.");
+        if (GetStartupLadderChildCount(rootScene) != rootChildrenBefore)
+            throw new InvalidDataException("Step 48.1 CheckCommandLineArgs rehearsal changed NGame.RootSceneContainer child count.");
+        if (GetStartupLadderChildCount(menu) != menuChildrenBefore)
+            throw new InvalidDataException("Step 48.1 CheckCommandLineArgs rehearsal changed NMainMenu child count despite an empty Godot command line.");
+        if (!ReferenceEquals(RequireExistingStartupLadderSaveManagerInstance(saveManagerType, 48), saveManager))
+            throw new InvalidDataException("Step 48.1 runtime-guard rehearsal changed production SaveManager singleton identity.");
+        _ = RequireStep40InsertedAuthority();
+        RequireStartupLadderBaselineUnchanged(context, baseline, "Step 48 runtime-guard rehearsal exit");
+        var post = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
+        Checkpoint(checkpoint,
+            $"M48_C_GUARDS_PASS — GodotCmdlineArgs=0; SaveManager getter returned exact production _instance; PrimaryPlatform={primaryPlatform}; strategy={strategy.GetType().FullName}; SetRichPresence rehearsal returned; CheckCommandLineArgs rehearsal returned off-tree; rootChildren={rootChildrenBefore}; menuChildren={menuChildrenBefore}; resolver/host/private/initializer/rejected/native drift=0.");
+        return new StartupLadderRuntimeGuardAuthority(commandLineArgs, saveManager, strategy, primaryPlatform.ToString() ?? string.Empty,
+            rootChildrenBefore, menuChildrenBefore, post, true);
+    }
+
+    private void RequireStep48LifecycleRuntimeGuardsCurrent(
+        Step35ExecutionLoadContext context,
+        string boundary,
+        bool requirePreAdmissionCounts)
+    {
+        var guards = _step48LifecycleGuardAuthority
+            ?? throw new InvalidOperationException(boundary + " requires retained Step-48 runtime-guard rehearsal authority.");
+        if (!guards.RehearsalPassed)
+            throw new InvalidOperationException(boundary + " runtime-guard rehearsal is not marked passed.");
+        if (requirePreAdmissionCounts)
+            RequireStartupLadderBaselineUnchanged(context, guards.PostRehearsalBaseline, boundary + " context");
+
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
+        var osType = godotAssembly.GetType("Godot.OS", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.OS");
+        var getCmdlineArgs = osType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == "GetCmdlineArgs" && method.GetParameters().Length == 0)
+            ?? throw new MissingMethodException("Godot.OS", "GetCmdlineArgs()");
+        var args = NormalizeStartupLadderCommandLineArgs(InvokeStartupLadderMethod(getCmdlineArgs, null, null, boundary + " GetCmdlineArgs"));
+        if (args.Length != 0 || guards.GodotCommandLineArgs.Length != 0)
+            throw new InvalidDataException(boundary + " requires the rehearsed empty Godot command-line state to remain unchanged.");
+
+        var admission = RequireAdmission();
+        var saveManagerType = admission.Assembly.GetType(SaveManagerTypeFullName, true, false)!;
+        if (!ReferenceEquals(RequireExistingStartupLadderSaveManagerInstance(saveManagerType, 48), guards.SaveManagerInstance))
+            throw new InvalidDataException(boundary + " production SaveManager singleton identity drifted after Step-48 rehearsal.");
+        var platformUtilType = admission.Assembly.GetType(PlatformUtilTypeFullName, true, false)!;
+        var primaryProperty = platformUtilType.GetProperty("PrimaryPlatform", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            ?? throw new MissingMemberException(PlatformUtilTypeFullName, "PrimaryPlatform");
+        var primaryPlatform = primaryProperty.GetValue(null) ?? throw new InvalidDataException(boundary + " PrimaryPlatform returned null.");
+        var getPlatformUtil = platformUtilType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .Single(method => method.Name == "GetPlatformUtil" && method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == primaryPlatform.GetType());
+        var strategy = InvokeStartupLadderMethod(getPlatformUtil, null, new[] { primaryPlatform }, boundary + " GetPlatformUtil")
+            ?? throw new InvalidDataException(boundary + " GetPlatformUtil returned null.");
+        if (!ReferenceEquals(strategy, guards.NullPlatformStrategy) || strategy.GetType().FullName != NullPlatformTypeFullName ||
+            !string.Equals(primaryPlatform.ToString(), guards.PrimaryPlatform, StringComparison.Ordinal))
+            throw new InvalidDataException(boundary + " Null-platform authority drifted after Step-48 rehearsal.");
+
+        if (requirePreAdmissionCounts)
+        {
+            var menu = _step48MainMenuInstance ?? throw new InvalidOperationException(boundary + " NMainMenu instance absent.");
+            var nGame = _step39NGameInstance ?? throw new InvalidOperationException(boundary + " NGame instance absent.");
+            var rootScene = RequireStartupLadderPropertyValue(nGame, "RootSceneContainer", 48);
+            if (GetStartupLadderChildCount(rootScene) != guards.RootSceneChildren || GetStartupLadderChildCount(menu) != guards.MenuChildren)
+                throw new InvalidDataException(boundary + " tree shape drifted after Step-48 guard rehearsal and before lifecycle admission.");
+        }
+    }
+
+    private static string[] NormalizeStartupLadderCommandLineArgs(object? raw)
+    {
+        if (raw is null)
+            return [];
+        if (raw is string[] array)
+            return array;
+        if (raw is IEnumerable enumerable)
+            return enumerable.Cast<object?>().Select(item => item?.ToString() ?? string.Empty).ToArray();
+        throw new InvalidDataException("Godot.OS.GetCmdlineArgs returned unsupported runtime type: " + raw.GetType().FullName);
+    }
 
     private Step35ExecutionLoadContext RequireStep48Prerequisite(string boundary)
     {
@@ -1275,6 +1518,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             $"Invocation-qualified lifecycle closure methods: {audit.ImmediateClosureMethods.Length}",
             $"Immediate classified boundaries: {audit.ImmediateBoundaries.Length}",
             $"Deferred method frontiers: {audit.DeferredMethodFrontiers.Length}",
+            $"Runtime-guarded immediate frontiers: {audit.GuardedMethodFrontiers.Length}",
             "Forbidden immediate boundaries: 0",
             "Unresolved same-sts2 references: 0",
         };
@@ -1307,6 +1551,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             $"Invocation-qualified closure methods: {audit.ImmediateClosureMethods.Length}",
             $"Immediate classified boundaries: {audit.ImmediateBoundaries.Length}",
             $"Deferred method frontiers: {audit.DeferredMethodFrontiers.Length}",
+            $"Runtime-guarded immediate frontiers: {audit.GuardedMethodFrontiers.Length}",
             "Forbidden immediate boundaries: 0",
             "Unresolved same-sts2 references: 0",
             "Rendering restarted while map built: NO",
@@ -1320,10 +1565,21 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
 
     private sealed record StartupLadderDeferredMethodFrontier(string Opcode, string ReferenceFullName, string? Category, string Path);
+    private sealed record StartupLadderGuardedMethodFrontier(string ReferenceFullName, string Reason, string Path);
+    private sealed record StartupLadderRuntimeGuardAuthority(
+        string[] GodotCommandLineArgs,
+        object SaveManagerInstance,
+        object NullPlatformStrategy,
+        string PrimaryPlatform,
+        int RootSceneChildren,
+        int MenuChildren,
+        StartupLadderBaseline PostRehearsalBaseline,
+        bool RehearsalPassed);
     private sealed record StartupLadderInvocationFrontierAudit(
         Step41ClosureMethod[] ImmediateClosureMethods,
         Step41BoundaryObservation[] ImmediateBoundaries,
         StartupLadderDeferredMethodFrontier[] DeferredMethodFrontiers,
+        StartupLadderGuardedMethodFrontier[] GuardedMethodFrontiers,
         string[] UnresolvedSameAssemblyReferences,
         string[] StateMachineExpansions);
 }

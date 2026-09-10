@@ -231,7 +231,7 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
 }
 
 {
-  echo "Steps 43–50 direct-main-menu ladder IPA verification passed."
+  echo "Steps 43–52 guarded direct-main-menu ladder IPA verification passed."
   echo "  Bundle ID: $BUNDLE_ID"
   echo "  Version: $VERSION ($BUILD_VERSION)"
   echo "  Architecture: arm64"
@@ -245,5 +245,5 @@ grep -Fq '4.5.1-stable' "$STRINGS_FILE" || {
   echo "  iOS Documents file sharing: enabled (UIFileSharingEnabled + LSSupportsOpeningDocumentsInPlace)"
   echo "  Runtime binding text report: generated at runtime under Documents/StS2Launcher/Step21.1-RuntimeBindingDiagnostics.txt"
   echo "  Consolidated device test reports: Documents/StS2Launcher/Reports/*.txt"
-  echo "  Expected device UI: STEPS 43–50 — DIRECT MAIN-MENU STARTUP LADDER"
-} | tee artifacts/logs/steps43-50-ipa-verification-summary.log
+  echo "  Expected device UI: STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER"
+} | tee artifacts/logs/steps43-52-ipa-verification-summary.log

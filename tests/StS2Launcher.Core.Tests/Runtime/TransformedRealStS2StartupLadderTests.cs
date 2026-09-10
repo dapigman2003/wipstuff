@@ -29,7 +29,9 @@ public sealed class TransformedRealStS2StartupLadderTests
             (47, "MAIN MENU RESOURCE PREPARATION"),
             (48, "MAIN MENU OFF-TREE INSTANTIATION"),
             (49, "MAIN MENU FROZEN SCENETREE ADMISSION"),
-            (50, "MAIN MENU CONTROLLED RENDER PULSE")
+            (50, "MAIN MENU CONTROLLED RENDER PULSE"),
+            (51, "SINGLEPLAYER FRONTIER MAP"),
+            (52, "MAIN MENU SUSTAINED RENDER RESIDENCY")
         };
 
         var summaries = new HashSet<string>(StringComparer.Ordinal);
@@ -45,7 +47,7 @@ public sealed class TransformedRealStS2StartupLadderTests
             Assert.IsTrue(summaries.Add(snapshot.Summary));
         }
 
-        Assert.AreEqual(4, summaries.Count);
+        Assert.AreEqual(6, summaries.Count);
     }
 
     [TestMethod]

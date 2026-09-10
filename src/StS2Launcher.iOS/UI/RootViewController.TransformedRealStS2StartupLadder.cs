@@ -16,6 +16,8 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step48Gates = new(48, "MAIN MENU OFF-TREE INSTANTIATION");
     private readonly TransformedRealStS2StartupLadderGateSequence _step49Gates = new(49, "MAIN MENU FROZEN SCENETREE ADMISSION");
     private readonly TransformedRealStS2StartupLadderGateSequence _step50Gates = new(50, "MAIN MENU CONTROLLED RENDER PULSE");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step51Gates = new(51, "SINGLEPLAYER FRONTIER MAP");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step52Gates = new(52, "MAIN MENU SUSTAINED RENDER RESIDENCY");
 
     private readonly Dictionary<int, StartupLadderTelemetryState> _startupLadderTelemetry = [];
     private readonly object _startupLadderCheckpointSync = new();
@@ -28,6 +30,8 @@ public sealed partial class RootViewController
     private UIButton? _step48Button;
     private UIButton? _step49Button;
     private UIButton? _step50Button;
+    private UIButton? _step51Button;
+    private UIButton? _step52Button;
     private UILabel? _step43ResultLabel;
     private UILabel? _step44ResultLabel;
     private UILabel? _step45ResultLabel;
@@ -36,6 +40,8 @@ public sealed partial class RootViewController
     private UILabel? _step48ResultLabel;
     private UILabel? _step49ResultLabel;
     private UILabel? _step50ResultLabel;
+    private UILabel? _step51ResultLabel;
+    private UILabel? _step52ResultLabel;
     private UILabel? _step43DetailLabel;
     private UILabel? _step44DetailLabel;
     private UILabel? _step45DetailLabel;
@@ -44,21 +50,24 @@ public sealed partial class RootViewController
     private UILabel? _step48DetailLabel;
     private UILabel? _step49DetailLabel;
     private UILabel? _step50DetailLabel;
+    private UILabel? _step51DetailLabel;
+    private UILabel? _step52DetailLabel;
     private bool _step45InvocationUiStarted;
     private bool _step47ResourceLoadUiStarted;
     private bool _step48InstantiationUiStarted;
     private bool _step49AdmissionUiStarted;
     private bool _step50PulseUiStarted;
+    private bool _step52PulseUiStarted;
 
     private void AddTransformedRealStS2StartupLadderControls(UIStackView content)
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Steps 43–50 — sequential startup ladder (stop on first failure)",
+            "Steps 43–52 — sequential startup ladder (stop on first failure)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Steps 43–49 keep rendering frozen. Step 46 maps original LaunchMainMenu without invoking or authorizing it. Steps 47–49 use a separate exact PCK direct-menu path with a private Spine-neutral background derivative. Step 50 alone performs one short render pulse and synchronously refreezes.",
+            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Steps 43–49 and Step 51 keep rendering frozen. Step 46 maps original LaunchMainMenu without invoking or authorizing it. Steps 47–49 use a separate exact PCK direct-menu path with a private Spine-neutral background derivative. Step 48.1 rehearses exact runtime guards before lifecycle admission. Step 50 performs a short render pulse; Step 51 maps the single-player button frontier without invoking it; Step 52 performs a longer bounded render residency pulse. Both render steps synchronously refreeze before evaluation.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel));
 
@@ -104,10 +113,10 @@ public sealed partial class RootViewController
 
         (_step48Button, _step48ResultLabel, _step48DetailLabel) = AddStartupLadderStepControls(
             content,
-            "Step 48.0 — one-shot off-tree real NMainMenu instantiation + lifecycle audit",
-            "Run Step 48.0 A–D",
+            "Step 48.1 — one-shot off-tree NMainMenu + runtime-guarded lifecycle audit",
+            "Run Step 48.1 A–D",
             "MAIN MENU OFF-TREE INSTANTIATION: LOCKED",
-            "Requires Step 47.0 4/4. Instantiates the retained exact main-menu PackedScene once off-tree, requires managed root NMainMenu, enumerates the actual node graph, and execution-opcode-audits actual _EnterTree/_Ready/_Notification callbacks. Deferred delegates are recorded but not traversed. Any immediate forbidden platform/Steam/Spine/native boundary stops before SceneTree admission.");
+            "Requires Step 47.0 4/4. Instantiates exact NMainMenu off-tree, then rehearses the three physical runtime guards before lifecycle admission: empty Godot command line + zero-drift CheckCommandLineArgs, existing production SaveManager + zero-drift get_Instance, and exact Null-platform + zero-drift SetRichPresence. Only those rehearsed calls may terminate static lifecycle traversal; every other immediate Steam/Spine/native boundary still fails before AddChild.");
         _step48Button.TouchUpInside += async (_, _) => await RunStep48StartupLadderAsync();
 
         (_step49Button, _step49ResultLabel, _step49DetailLabel) = AddStartupLadderStepControls(
@@ -125,6 +134,22 @@ public sealed partial class RootViewController
             "MAIN MENU CONTROLLED RENDER PULSE: LOCKED",
             "Requires Step 49.0 4/4. Maps the actual in-tree menu graph's _Process/_PhysicsProcess/_Draw/input callbacks with execution-qualified traversal, writes that map before rendering, starts the existing Godot render loop exactly once, requests ~100 ms, and the first managed continuation synchronously StopRendering before telemetry. Final state remains frozen even on a successful 4/4 pulse.");
         _step50Button.TouchUpInside += async (_, _) => await RunStep50StartupLadderAsync();
+
+        (_step51Button, _step51ResultLabel, _step51DetailLabel) = AddStartupLadderStepControls(
+            content,
+            "Step 51.0 — non-invoking single-player button frontier map",
+            "Run Step 51.0 A–D — MAP ONLY",
+            "SINGLEPLAYER FRONTIER MAP: LOCKED",
+            "Requires Step 50.0 4/4/refrozen. Locates exact NMainMenu.SingleplayerButtonPressed and OpenSingleplayerSubmenu, records their direct IL, then builds an execution-qualified immediate/deferred frontier under the retained Step-48 runtime guards. Classified boundaries are evidence only; no handler is invoked and rendering stays stopped.");
+        _step51Button.TouchUpInside += async (_, _) => await RunStep51StartupLadderAsync();
+
+        (_step52Button, _step52ResultLabel, _step52DetailLabel) = AddStartupLadderStepControls(
+            content,
+            "Step 52.0 — sustained real-main-menu render residency (~1.5 s) + refreeze",
+            "Run Step 52.0 A–D — SUSTAINED RENDER",
+            "MAIN MENU SUSTAINED RENDER RESIDENCY: LOCKED",
+            "Requires Step 51.0 4/4. Re-audits the actual in-tree frame/input surface under retained runtime guards, writes a fresh pre-render map, then runs one ~1.5 s render residency pulse and synchronously StopRendering before telemetry. Final state must remain frozen with no initializer/rejected/native escape.");
+        _step52Button.TouchUpInside += async (_, _) => await RunStep52StartupLadderAsync();
     }
 
     private (UIButton Button, UILabel Result, UILabel Detail) AddStartupLadderStepControls(
@@ -379,7 +404,7 @@ public sealed partial class RootViewController
         }
         if (GodotStep15NativeBridge.IsRenderingActive)
         {
-            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Only Step 50 may restart rendering, and only after its exact frame/input map is durably written.");
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Only Steps 50 and 52 may restart rendering, and only after their exact frame/input maps are durably written.");
             return false;
         }
         return true;
@@ -396,6 +421,8 @@ public sealed partial class RootViewController
             48 => (_step48Button!, _step48ResultLabel!, _step48DetailLabel!),
             49 => (_step49Button!, _step49ResultLabel!, _step49DetailLabel!),
             50 => (_step50Button!, _step50ResultLabel!, _step50DetailLabel!),
+            51 => (_step51Button!, _step51ResultLabel!, _step51DetailLabel!),
+            52 => (_step52Button!, _step52ResultLabel!, _step52DetailLabel!),
             _ => throw new ArgumentOutOfRangeException(nameof(step)),
         };
 
@@ -495,7 +522,7 @@ public sealed partial class RootViewController
                     $"Initialized UTC: {now:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
-                    "Candidate: STEPS 43–50 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; LATER RUNGS REQUIRE SAME-PROCESS PRIOR 4/4 AUTHORITY.\n" +
+                    "Candidate: STEPS 43–52 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; LATER RUNGS REQUIRE SAME-PROCESS PRIOR 4/4 AUTHORITY.\n" +
                     "Global policy: Steps 43–49 keep rendering frozen. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, and native game GDExtensions remain unopened. Steps 47–49 use the direct main-menu resource/scene route; Step 50 alone may run one audited bounded render pulse and must synchronously refreeze.\n\n");
                 WriteStartupLadderCheckpoint(step, "RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.");
                 return true;

@@ -1,0 +1,6 @@
+StS2 Launcher — Step 48 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260910T0219387570410Z-pid5693-d5a57c8be1744be59676ab9b4365c0a2
+Journal: Step48-CrashCheckpoint-20260910T0219387570410Z-pid5693-d5a57c8be1744be59676ab9b4365c0a2.txt
+Static map: Step48-MainMenuOffTree-StaticMap-20260910T0219387570410Z-pid5693-d5a57c8be1744be59676ab9b4365c0a2.txt
+2026-09-10T02:19:39.7346690+00:00 | run=20260910T0219387570410Z-pid5693-d5a57c8be1744be59676ab9b4365c0a2 | pid=5693 | managedThread=4 | RUN_END — Step-48 UI operation ended normally; If off-tree instantiation was armed, never retry Step 48 in-process.

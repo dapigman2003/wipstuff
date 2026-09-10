@@ -1,6 +1,6 @@
 workflows:
   ios-canonical:
-    name: Steps 43-50 - direct main-menu startup ladder
+    name: Steps 43-52 - guarded direct main-menu startup ladder
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -30,14 +30,14 @@ workflows:
         - $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 
     scripts:
-      - name: Validate, test, build, and verify Steps 43-50 direct main-menu startup ladder
+      - name: Validate, test, build, and verify Steps 43-52 guarded direct main-menu startup ladder
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh
           bash scripts/codemagic.sh
 
     artifacts:
-      - artifacts/StS2-Launcher-Steps-43-50.ipa
+      - artifacts/StS2-Launcher-Steps-43-52.ipa
       - artifacts/reports/**
       - artifacts/test-results/**
       - artifacts/logs/**
