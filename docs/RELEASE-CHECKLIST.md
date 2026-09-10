@@ -1,6 +1,6 @@
-# Release checklist — Steps 43–52 guarded direct main-menu ladder / 0.0.180
+# Release checklist — Steps 43–52 guarded direct main-menu ladder / 0.0.181
 
-Release identity: display/build `0.0.180 (180)`, IPA `StS2-Launcher-Steps-43-52.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.181 (181)`, IPA `StS2-Launcher-Steps-43-52.ipa`, workflow `ios-canonical`.
 
 Require physical Step-42 4/4 provenance sealed and physical 0.0.178 Step-45 closure preserved.
 
@@ -22,4 +22,6 @@ Require rendering calls isolated to Steps 50 and 52; Steps 43–49 and 51 must c
 
 Require no direct whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, external Steamworks/native Steam, or FMOD/Spine native game-extension execution in the active ladder UI/control path.
 
-Require exact version/build `0.0.180/180` in csproj/plist/release presentation/current-release shell constants; Codemagic/build/test/IPA-verifier headings and filenames updated to Steps 43–52; active candidate manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload; exact `history.zip`; final ZIP integrity clean; canonical validator green from both the release tree and a completely fresh extraction.
+Require exact version/build `0.0.181/181` in csproj/plist/release presentation/current-release shell constants; Codemagic/build/test/IPA-verifier headings and filenames updated to Steps 43–52; active candidate manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload; exact `history.zip`; final ZIP integrity clean; canonical validator green from both the release tree and a completely fresh extraction.
+
+- Step 48–52 focused seal: validator must prove exact retained `/Game/RootSceneContainer` child authority, preliminary Step-48 map-before-arm evidence, Step-49 exact setter token/Cecil trivial-field audit, null-only exact-child repair, and inherited exact property identity through Steps 50–52.

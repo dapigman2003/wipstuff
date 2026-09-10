@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>180</ApplicationVersion>" in project_text, "build version is 180")
-require("<ApplicationDisplayVersion>0.0.180</ApplicationDisplayVersion>" in project_text, "display version is 0.0.180")
-require(plist.get("CFBundleVersion") == "180", "Info.plist build version is 180")
-require(plist.get("CFBundleShortVersionString") == "0.0.180", "Info.plist display version is 0.0.180")
+require("<ApplicationVersion>181</ApplicationVersion>" in project_text, "build version is 181")
+require("<ApplicationDisplayVersion>0.0.181</ApplicationDisplayVersion>" in project_text, "display version is 0.0.181")
+require(plist.get("CFBundleVersion") == "181", "Info.plist build version is 181")
+require(plist.get("CFBundleShortVersionString") == "0.0.181", "Info.plist display version is 0.0.181")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -199,12 +199,12 @@ release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresen
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
 require("STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER" in release_presentation, "top launcher banner identifies the active Steps 43–52 guarded direct main-menu ladder")
-require("Physical 0.0.179 proves Steps 46.1 and 47 closed 4/4" in release_presentation and "STEPS 48.1–52 ACTIVE" in release_presentation, "top launcher presentation records physical Step-47 closure and the guarded Step-48.1–52 frontier")
-require("Active candidate: **0.0.180 (180)**" in read("README.md") and "Active candidate: **0.0.180 (180)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.180 (180) release identity")
-require("active candidate is **0.0.180 / sequential startup ladder Steps 43–52**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.180 / Steps 43–52 frontier")
-require(all(marker in release_presentation for marker in ["STEPS 37–47 CLOSED POSITIVE", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "NMainMenu", "Steam", "Step 48.1", "Steps 51–52"]), "top launcher banner preserves closed runtime authority and identifies the active guarded direct-menu ladder")
+require("Physical 0.0.180 passed Step 48 Gate A/B" in release_presentation and "STEPS 48.2–52 ACTIVE" in release_presentation, "top launcher presentation records physical 0.0.180 root-authority localization and the focused Step-48.2–52 frontier")
+require("Active candidate: **0.0.181 (181)**" in read("README.md") and "Active candidate: **0.0.181 (181)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.181 (181) release identity")
+require("active candidate is **0.0.181 / sequential startup ladder Steps 43–52**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.181 / Steps 43–52 frontier")
+require(all(marker in release_presentation for marker in ["STEPS 37–47 CLOSED POSITIVE", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "NMainMenu", "Steam", "Step 48.2", "Steps 50–52"]), "top launcher banner preserves closed runtime authority and identifies the active guarded direct-menu ladder")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.180"' in release_presentation and 'ExpectedBuildVersion = "180"' in release_presentation, "startup-ladder source pins expected bundle release identity")
+require('ExpectedDisplayVersion = "0.0.181"' in release_presentation and 'ExpectedBuildVersion = "181"' in release_presentation, "startup-ladder source pins expected 0.0.181 bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -345,8 +345,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-43-52.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.180",
-    "STS2_BUILD_VERSION": "180",
+    "STS2_DISPLAY_VERSION": "0.0.181",
+    "STS2_BUILD_VERSION": "181",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1677,10 +1677,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Steps 43–52 guarded direct main-menu ladder / 0.0.180 (180)", "Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "Physical 0.0.178 / Step 45 — CLOSED POSITIVE 4/4", "Physical 0.0.179 / Step 48 — SAFE 2/4 STOP", "_mockInstance", "_instance", "Step 43.0", "Step 48.1", "Step 52.0", "stop-on-first-failure", "Step 38 must still be skipped"]), "current status records physical Step-42/45/47 authority, Step-48 safe stop, and active Steps-43–52 guarded ladder")
+require(all(marker in current_status for marker in ["Active candidate — Steps 43–52 guarded direct main-menu ladder / 0.0.181 (181)", "Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "Physical 0.0.178 / Step 45 — CLOSED POSITIVE 4/4", "Physical 0.0.180 / Step 48.1 — SAFE 2/4 ROOT-AUTHORITY STOP", "_mockInstance", "_instance", "Step 43.0", "Step 48.2", "Step 52.0", "stop-on-first-failure", "Step 38 must still be skipped"]), "current status records physical Step-42/45/47 authority, 0.0.180 Step-48 root-authority stop, and active Steps-43–52 focused correction")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.180 (180)" in testing_doc and "0.0.180 (180)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.180 (180) release identity")
+require("0.0.181 (181)" in testing_doc and "0.0.181 (181)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.181 (181) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -2280,7 +2280,7 @@ require(not any(call in step41_core for call in [".GameStartup(", ".InitializePl
 require(not any(call in step41_ui for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 41 UI never directly invokes startup/platform/main-menu/deferred methods")
 require(all(value in step41_ui for value in ["Step41-CrashCheckpoint-", "Step41-GameStartupFrontier-StaticMap-", "Step41-LastCheckpoint.txt", "Step41-TransformedRealStS2GameStartupFrontier.txt", "K_C_STATIC_MAP_WRITE_RETURNED"]), "Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts")
 require("AddTransformedRealStS2GameStartupFrontierControls(content);" in step41_root_ui and "ResetStep41State();" in step40_core, "RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "Physical 0.0.179 proves Steps 46.1 and 47 closed 4/4", "SaveManager", "NullPlatformUtilStrategy", "Step42ImplementationMarker", "StartupLadderImplementationMarker"]), "active release presentation preserves Step-42/47 physical authority and the guarded Step-48.1 frontier")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "Physical 0.0.180", "RootSceneContainer", "SaveManager", "Null-platform", "Step42ImplementationMarker", "StartupLadderImplementationMarker"]), "active release presentation preserves Step-42/47 authority and the physical 0.0.180 Step-48 root-container localization")
 require(all(value in step41_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "GameStartupAsyncStateMachineMap", "FrozenNoInvocationConfinement"]), "Step 41 host regressions pin gate sequencing and stable ordinals")
 require("Earlier physical Step 39/40/41 authorities remain closed" in current_status and "GameStartup remains uninvoked" in current_status, "current status preserves physical Step-41 no-invocation authority")
 
@@ -2345,7 +2345,7 @@ require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.180\"", "ExpectedBuildVersion = \"180\"", "STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER"]), "active release presentation pins physical closure and Steps-43–52 / 0.0.180 identity")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.181\"", "ExpectedBuildVersion = \"181\"", "STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER"]), "active release presentation pins physical closure and Steps-43–52 / 0.0.181 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "22-method zero-boundary closure", "renderer frozen", "zero resolver/host/private/initializer/rejected/native deltas"]), "current status pins the physically closed Step-42 InitPools authority")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
@@ -2474,22 +2474,33 @@ require("STEP 48.0 MAIN MENU OFF-TREE INSTANTIATION FAIL — 2/4" in step48_179_
 require(all(value in step48_179_checkpoint for value in ["M48_A_PASS", "Step-47 4/4", "M48_B_PASS", "M48_C_UI_ARMED", "M48_C_INSTANTIATE_START", "M48_C_FAIL"]), "physical 0.0.179 checkpoint proves Step47 4/4 authority and exact off-tree NMainMenu instantiation boundary")
 require(all(value in step48_179_report for value in ["NMainMenu::_Ready()", "CheckCommandLineArgs", "SaveManager::get_Instance()", "SetRichPresence", "SteamRemoteSaveStore"]), "physical Step48 report preserves the conditional lifecycle branches that polluted the old static audit")
 require("RUN_END" in step48_179_last, "physical Step48 ended normally after the safe off-tree audit stop")
+step48_180_report = read("docs/history/reports/STEP-48.1-PHYSICAL-0.0.180-REPORT.txt")
+step48_180_checkpoint = read("docs/history/reports/STEP-48.1-PHYSICAL-0.0.180-CHECKPOINT.txt")
+step48_180_last = read("docs/history/reports/STEP-48.1-PHYSICAL-0.0.180-LAST-CHECKPOINT.txt")
+require("STEP 48.0 MAIN MENU OFF-TREE INSTANTIATION FAIL — 2/4" in step48_180_report and "App version: 0.0.180 (180)" in step48_180_report and "RootSceneContainer to be non-null" in step48_180_report, "physical 0.0.180 report localizes Step48 to nullable NGame.RootSceneContainer assumption")
+require(all(value in step48_180_checkpoint for value in ["M48_A_PASS", "M48_B_PASS", "M48_C_UI_ARMED", "M48_C_INSTANTIATE_START", "runtime lifecycle guard rehearsal", "RootSceneContainer to be non-null"]), "physical 0.0.180 checkpoint proves revised Gate B and exact off-tree instantiation before root-property stop")
+require("RUN_END" in step48_180_last, "physical 0.0.180 Step48 ended normally with no retry after arm")
 require((ROOT / "docs/history/steps/STEP-48.1-52.0-GUARDED-DIRECT-MAIN-MENU-CONTINUATION.md").is_file(), "Step 48.1-52 guarded continuation design record is present")
+require((ROOT / "docs/history/steps/STEP-48.2-52.0-ROOT-CONTAINER-AUTHORITY-CORRECTION.md").is_file(), "Step 48.2-52 RootSceneContainer authority correction record is present")
 
 # Step 48.1: concrete runtime guard rehearsal, then lifecycle audit that prunes only exact rehearsed surfaces.
-require(all(value in direct_core for value in ["RehearseStep48LifecycleRuntimeGuards", "RequireStep48LifecycleRuntimeGuardsCurrent", "TryCreateStartupLadderGuardedFrontier", "StartupLadderRuntimeGuardAuthority", "GuardedMethodFrontiers", "Godot.OS", "GetCmdlineArgs", "SaveManager.get_Instance rehearsal", "NullPlatformUtilStrategy", "SetRichPresence rehearsal", "CheckCommandLineArgs rehearsal"]), "Step 48.1 implements concrete off-tree runtime-guard rehearsal before lifecycle authority")
-require(all(value in direct_core for value in ["commandLineArgs.Length != 0", "ReferenceEquals(getterResult, saveManager)", "strategy.GetType() != nullPlatformType", "GetStartupLadderChildCount(rootScene) != rootChildrenBefore", "GetStartupLadderChildCount(menu) != menuChildrenBefore", "RequireStartupLadderBaselineUnchanged(context, baseline, \"Step 48 runtime-guard rehearsal exit\")"]), "Step 48.1 fails closed on command-line, singleton, platform, tree-shape, or context drift")
+require(all(value in direct_core for value in ["RehearseStep48LifecycleRuntimeGuards", "RequireStep48LifecycleRuntimeGuardsCurrent", "TryCreateStartupLadderGuardedFrontier", "StartupLadderRuntimeGuardAuthority", "StartupLadderRootSceneAuthority", "RequireRetainedStartupLadderRootSceneContainer", "GuardedMethodFrontiers", "Godot.OS", "GetCmdlineArgs", "SaveManager.get_Instance rehearsal", "NullPlatformUtilStrategy", "SetRichPresence rehearsal", "CheckCommandLineArgs rehearsal"]), "Step 48.2 implements concrete off-tree runtime-guard rehearsal with exact retained RootSceneContainer child authority")
+require(all(value in direct_core for value in ["/Game/RootSceneContainer", "RootSceneContainerManagedTypeFullName", "propertyValue is not null && !ReferenceEquals(propertyValue, rootScene)", "commandLineArgs.Length != 0", "ReferenceEquals(getterResult, saveManager)", "strategy.GetType() != nullPlatformType", "GetStartupLadderChildCount(rootScene) != rootChildrenBefore", "GetStartupLadderChildCount(menu) != menuChildrenBefore", "RequireStartupLadderBaselineUnchanged(context, baseline, \"Step 48 runtime-guard rehearsal exit\")"]), "Step 48.2 resolves exact retained root child independently of nullable property and fails closed on command-line/singleton/platform/tree/context drift")
 require(all(value in direct_core for value in ["declaring == MainMenuManagedRootTypeFullName", "reference.Name == MainMenuCheckCommandLineArgsMethodName", "declaring == SaveManagerTypeFullName", "reference.Name == \"get_Instance\"", "declaring == PlatformUtilTypeFullName", "reference.Name == PlatformSetRichPresenceMethodName"]), "Step 48.1 guard pruning is limited to the three exact rehearsed immediate-call surfaces")
 require("category is not null" in direct_core and "immediateBoundaries.TryAdd" in direct_core, "all non-guarded classified immediate boundaries remain visible/fail-closed")
 require(all(value in direct_core for value in ["_Ready -> CheckCommandLineArgs", "CommandLineHelper", "ConstructDefaultCalls", "Null-platform SetRichPresence"]), "Step 48.1 Gate B serializes exact lifecycle guard shapes before runtime rehearsal")
 require(all(value in direct_core for value in ["Step 49 Gate A pre-admission guard recheck", "Step 49 Gate C immediately before AddChild", "Step 50 Gate A guard recheck"]), "Steps 49-50 recheck retained Step48 runtime-guard authority at their boundaries")
+require(all(value in direct_core for value in ["RequireStartupLadderRootSceneContainerPropertyIdentity(rootScene, 50", "requires retained exact RootSceneContainer authority"]), "Step 50 prerequisite chain requires repaired/exact NGame.RootSceneContainer identity")
+require("RequireStep50Prerequisite(boundary)" in continuation_core and "RequireStep51Prerequisite(boundary)" in continuation_core, "Steps 51-52 inherit exact RootSceneContainer identity through the Step50 prerequisite chain")
 
 # Step 48: one-shot off-tree exact NMainMenu + actual hierarchy/lifecycle immediate frontier.
 require(all(value in direct_core for value in ["RunStep48ClosedStep47Authority", "RunStep48ExactInstantiationBinding", "RunStep48OffTreeInstantiationAndLifecycleAudit", "RunStep48FrozenOffTreeConfinement", 'MainMenuManagedRootTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu"', "PackedScene.Instantiate", "GenEditState.Disabled", "IsInsideTree=false", "CollectStartupLadderActualNodeCallbackRoots", "RequireImmediateFrontierAdmissible", "_step48InstantiationStarted"]), "Step 48 is one-shot exact off-tree NMainMenu instantiation with actual lifecycle immediate-frontier audit")
 require(all(value in direct_ui for value in ["_step48InstantiationUiStarted", "RunStep48OffTreeInstantiationAndLifecycleAudit", "MarkStep48StaticMapDurablyWritten", "RUN_STEP48_4OF4"]), "Step 48 UI locks retry and durably records actual off-tree authority")
+require(all(value in direct_ui for value in ["Step 48 preliminary guard-shape static map write failed before off-tree instantiation", "M48_B_STATIC_MAP_WRITE_RETURNED", "A successful Gate C will overwrite this same report"]), "Step 48 writes preliminary Gate-B map evidence before arming the one-shot instantiation")
 
 # Step 49: one-shot frozen RootSceneContainer admission, no rendering.
-require(all(value in direct_core for value in ["RunStep49ClosedStep48Authority", "RunStep49RootSceneContainerBinding", "RunStep49FrozenMainMenuAdmission", "RunStep49FrozenAdmissionConfinement", "RootSceneContainer", "AddChild(Node,bool,InternalMode)", "childrenAfter", "insideTree=True", "_step49AdmissionStarted"]), "Step 49 binds exact RootSceneContainer/AddChild and admits NMainMenu once while frozen")
+require(all(value in direct_core for value in ["RunStep49ClosedStep48Authority", "RunStep49RootSceneContainerBinding", "RunStep49FrozenMainMenuAdmission", "RunStep49FrozenAdmissionConfinement", "RequireRetainedStartupLadderRootSceneContainer", "GetSetMethod(nonPublic: true)", "set_RootSceneContainer", "setter token mismatch", "setterMethodRefs.Length != 0", "setterFieldWrites.Length != 1", "allowedSetterOpcodes", "GetParent() exact non-generic RootSceneContainer-compatible overload", "GetParent() exact non-generic NGame-compatible overload", "M49_C_ROOT_PROPERTY_REPAIR_START", "M49_C_ROOT_PROPERTY_REPAIR_PASS", "M49_C_ROOT_PROPERTY_ALREADY_EXACT", "RequireStartupLadderRootSceneContainerPropertyIdentity", "AddChild(Node,bool,InternalMode)", "childrenAfter", "insideTree=True", "_step49AdmissionStarted"]), "Step 49 audits and, only if null, repairs exact RootSceneContainer property before one-shot frozen NMainMenu admission with exact reflection overloads")
+require(all(value in direct_core for value in ["setterCecil.MetadataToken.ToInt32() != rootSetter.MetadataToken", "setterFieldWrites[0].FieldType.FullName != RootSceneContainerManagedTypeFullName", "Code.Ldarg_0", "Code.Ldarg_1", "Code.Stfld", "Code.Ret", "RequireStartupLadderBaselineUnchanged(context, baseline, \"Step 49 post RootSceneContainer repair\")"]), "Step 49 RootSceneContainer compatibility repair is token-matched, trivial-field-only, and zero-drift")
 require(all(value in direct_ui for value in ["_step49AdmissionUiStarted", "MarkStep49StaticMapDurablyWritten", "RunStep49FrozenMainMenuAdmission", "RUN_STEP49_4OF4"]), "Step 49 UI writes admission authority before one-shot AddChild")
 
 # Step 50: actual in-tree frame/input audit then one bounded pulse, stop-before-telemetry, always frozen afterward.
@@ -2556,6 +2567,10 @@ if startup_manifest.is_file():
         "README.md", "docs/README.md", "docs/CURRENT-STATUS.md", "docs/MASTER-PLAN.md", "docs/TESTING.md", "docs/RELEASE-CHECKLIST.md", "docs/history/INDEX.md",
         "docs/history/steps/STEP-46.1-50.0-DIRECT-MAIN-MENU-LADDER.md",
         "docs/history/steps/STEP-48.1-52.0-GUARDED-DIRECT-MAIN-MENU-CONTINUATION.md",
+        "docs/history/steps/STEP-48.2-52.0-ROOT-CONTAINER-AUTHORITY-CORRECTION.md",
+        "docs/history/reports/STEP-48.1-PHYSICAL-0.0.180-REPORT.txt",
+        "docs/history/reports/STEP-48.1-PHYSICAL-0.0.180-CHECKPOINT.txt",
+        "docs/history/reports/STEP-48.1-PHYSICAL-0.0.180-LAST-CHECKPOINT.txt",
         "docs/history/reports/STEP-48.0-PHYSICAL-0.0.179-FAIL-REPORT.txt",
         "docs/history/reports/STEP-48.0-PHYSICAL-0.0.179-FAIL-CHECKPOINT.txt",
         "docs/history/reports/STEP-48.0-PHYSICAL-0.0.179-FAIL-LAST-CHECKPOINT.txt",

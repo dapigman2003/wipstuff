@@ -1,0 +1,39 @@
+StS2 Launcher — Step 48.0 Main Menu Off-Tree Instantiation
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-10T14:28:49.6771700+00:00
+
+RESULT
+STEP 48.0 MAIN MENU OFF-TREE INSTANTIATION FAIL — 2/4
+
+METADATA
+App version: 0.0.180 (180)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: runtime lifecycle guard rehearsal
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 48.0 required property MegaCrit.Sts2.Core.Nodes.NGame.RootSceneContainer to be non-null.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::System.Object RequireStartupLadderPropertyValue(System.Object, System.String, Int32)
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireStartupLadderPropertyValue(Object instance, String propertyName, Int32 step)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RehearseStep48LifecycleRuntimeGuards(Object menu, Step35ExecutionLoadContext context, StartupLadderBaseline baseline, Action`1 checkpoint)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep48OffTreeInstantiationAndLifecycleAudit(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 48.0 required property MegaCrit.Sts2.Core.Nodes.NGame.RootSceneContainer to be non-null.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::System.Object RequireStartupLadderPropertyValue(System.Object, System.String, Int32)
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireStartupLadderPropertyValue(Object instance, String propertyName, Int32 step)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RehearseStep48LifecycleRuntimeGuards(Object menu, Step35ExecutionLoadContext context, StartupLadderBaseline baseline, Action`1 checkpoint)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep48OffTreeInstantiationAndLifecycleAudit(Action`1 checkpoint)
+
+END OF REPORT

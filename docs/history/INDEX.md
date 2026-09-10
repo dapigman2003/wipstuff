@@ -464,3 +464,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-48.0-PHYSICAL-0.0.179-FAIL-REPORT.txt` — final Step 48 2/4 report for the same safe off-tree audit stop.
 - `reports/STEP-48.0-PHYSICAL-0.0.179-FAIL-LAST-CHECKPOINT.txt` — normal end checkpoint; rendering remained frozen and no retry is allowed after the one-shot instantiation arm.
 - `steps/STEP-48.1-52.0-GUARDED-DIRECT-MAIN-MENU-CONTINUATION.md` — 0.0.180 correction: exact off-tree runtime guard rehearsal before lifecycle admission, followed by frozen admission/short pulse, non-invoking single-player frontier mapping, and bounded sustained menu render residency/refreeze.
+
+## Step 48.1 physical root-authority localization / 0.0.181 focused correction
+
+- `reports/STEP-48.1-PHYSICAL-0.0.180-REPORT.txt` — physical 0.0.180 final Step-48 result: safe 2/4 stop during runtime lifecycle-guard rehearsal because `NGame.RootSceneContainer` was null; no AddChild/rendering.
+- `reports/STEP-48.1-PHYSICAL-0.0.180-CHECKPOINT.txt` — Gate A/B pass, one-shot off-tree NMainMenu instantiation start, then exact null RootSceneContainer property localization with normal frozen end.
+- `reports/STEP-48.1-PHYSICAL-0.0.180-LAST-CHECKPOINT.txt` — normal run end; no Step-48 retry allowed after arm.
+- `steps/STEP-48.2-52.0-ROOT-CONTAINER-AUTHORITY-CORRECTION.md` — 0.0.181 focused correction: Step 48 uses exact retained `/Game/RootSceneContainer` child authority; Step 49 may repair only a null property through a token-matched trivial setter before frozen AddChild; Steps 50–52 inherit exact property identity with no expansion.

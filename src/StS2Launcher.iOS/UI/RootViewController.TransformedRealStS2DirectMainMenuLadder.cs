@@ -31,6 +31,8 @@ public sealed partial class RootViewController
             WriteStartupLadderCheckpoint(step, "RUN_START — Step 48.0 one-shot off-tree real NMainMenu instantiation + actual lifecycle audit started; rendering remains frozen and no SceneTree admission is authorized yet.");
             if (!RecordStartupLadderGate(_step48Gates, _transformedRealStS2VeryEarlyInitialization.RunStep48ClosedStep47Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step48Gates, _transformedRealStS2VeryEarlyInitialization.RunStep48ExactInstantiationBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!WriteStartupLadderStaticMap(step, out var preliminaryMapError)) throw new IOException("Step 48 preliminary guard-shape static map write failed before off-tree instantiation: " + preliminaryMapError);
+            WriteStartupLadderCheckpoint(step, "M48_B_STATIC_MAP_WRITE_RETURNED — preliminary exact instantiation/guard-shape map durably written before the one-shot off-tree instance and runtime rehearsal. A successful Gate C will overwrite this same report with the actual hierarchy/lifecycle appendix.");
             _step48InstantiationUiStarted = true;
             button.Enabled = false;
             WriteStartupLadderCheckpoint(step, "M48_C_UI_ARMED — first/only off-tree NMainMenu PackedScene.Instantiate authorized; no in-process retry after this checkpoint.");

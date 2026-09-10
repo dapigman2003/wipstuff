@@ -29,6 +29,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const string Step47WorkRootName = "Step47-DirectMainMenu";
     public const string Step47BackgroundDerivativeFileName = "main_menu_bg-step47-spine-neutral.tscn";
     public const string MainMenuManagedRootTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu";
+    private const string RootSceneContainerManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.NSceneContainer";
     private const string MainMenuCheckCommandLineArgsMethodName = "CheckCommandLineArgs";
     private const string MainMenuSingleplayerButtonPressedMethodName = "SingleplayerButtonPressed";
     private const string MainMenuOpenSingleplayerSubmenuMethodName = "OpenSingleplayerSubmenu";
@@ -70,6 +71,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private object? _step47MainMenuPackedScene;
     private object? _step48MainMenuInstance;
     private object? _step49RootSceneContainer;
+    private MethodInfo? _step49RootSceneContainerSetter;
     private int _step49ChildrenBefore;
     private int _step49ChildrenAfter;
 
@@ -143,6 +145,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step47MainMenuPackedScene = null;
         _step48MainMenuInstance = null;
         _step49RootSceneContainer = null;
+        _step49RootSceneContainerSetter = null;
         _step49ChildrenBefore = 0;
         _step49ChildrenAfter = 0;
         ResetDirectMainMenuContinuationState();
@@ -836,23 +839,62 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var baseline = _step49Baseline ?? throw new InvalidOperationException("Step 49.0 Gate A must pass before Gate B.");
             var menu = _step48MainMenuInstance ?? throw new InvalidOperationException("Step 49.0 NMainMenu instance absent.");
             var nGame = _step39NGameInstance ?? throw new InvalidOperationException("Step 49.0 retained NGame absent.");
-            var rootScene = RequireStartupLadderPropertyValue(nGame, "RootSceneContainer", step);
+            var rootAuthority = RequireRetainedStartupLadderRootSceneContainer(step);
+            var rootScene = rootAuthority.RootSceneContainer;
+            var rootProperty = nGame.GetType().GetProperty("RootSceneContainer", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                ?? throw new MissingMemberException(nGame.GetType().FullName, "RootSceneContainer");
+            var rootSetter = rootProperty.GetSetMethod(nonPublic: true)
+                ?? throw new MissingMethodException(nGame.GetType().FullName, "set_RootSceneContainer(NSceneContainer)");
+            var setterParameters = rootSetter.GetParameters();
+            if (rootSetter.ReturnType != typeof(void) || setterParameters.Length != 1 || setterParameters[0].ParameterType != rootScene.GetType())
+                throw new InvalidDataException($"Step 49.0 RootSceneContainer setter signature drifted: {rootSetter}.");
+
+            using var setterResolver = new RejectingAssemblyResolver();
+            using var setterModule = OpenStartupLadderModule(baseline.SelectedPath, setterResolver);
+            var setterType = EnumerateTypes(setterModule.Types).SingleOrDefault(type => type.FullName == nGame.GetType().FullName)
+                ?? throw new MissingMemberException(nGame.GetType().FullName);
+            var setterCecil = setterType.Methods.SingleOrDefault(method =>
+                method.Name == "set_RootSceneContainer" && method.HasBody && method.ReturnType.MetadataType == MetadataType.Void &&
+                method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == RootSceneContainerManagedTypeFullName)
+                ?? throw new MissingMethodException(nGame.GetType().FullName, "set_RootSceneContainer(NSceneContainer)");
+            if (setterCecil.MetadataToken.ToInt32() != rootSetter.MetadataToken)
+                throw new InvalidDataException($"Step 49.0 RootSceneContainer setter token mismatch. Cecil=0x{setterCecil.MetadataToken.ToInt32():X8}; runtime=0x{rootSetter.MetadataToken:X8}.");
+            var setterMethodRefs = setterCecil.Body.Instructions.Select(instruction => instruction.Operand).OfType<MethodReference>().ToArray();
+            if (setterMethodRefs.Length != 0)
+                throw new InvalidDataException("Step 49.0 RootSceneContainer setter unexpectedly calls methods: " + string.Join(" | ", setterMethodRefs.Select(reference => reference.FullName)));
+            var setterFieldWrites = setterCecil.Body.Instructions
+                .Where(instruction => instruction.OpCode == OpCodes.Stfld)
+                .Select(instruction => instruction.Operand)
+                .OfType<FieldReference>()
+                .ToArray();
+            if (setterFieldWrites.Length != 1 || setterFieldWrites[0].DeclaringType.FullName != nGame.GetType().FullName || setterFieldWrites[0].FieldType.FullName != RootSceneContainerManagedTypeFullName)
+                throw new InvalidDataException("Step 49.0 RootSceneContainer setter is not the expected single NGame NSceneContainer field assignment.");
+            var allowedSetterOpcodes = new HashSet<Code> { Code.Nop, Code.Ldarg_0, Code.Ldarg_1, Code.Stfld, Code.Ret };
+            var unexpectedSetterOpcodes = setterCecil.Body.Instructions.Where(instruction => !allowedSetterOpcodes.Contains(instruction.OpCode.Code)).ToArray();
+            if (unexpectedSetterOpcodes.Length != 0)
+                throw new InvalidDataException("Step 49.0 RootSceneContainer setter contains unexpected opcodes: " + string.Join(" | ", unexpectedSetterOpcodes.Select(instruction => instruction.OpCode.Code.ToString())));
+            if (setterResolver.Requests.Count != 0)
+                throw new InvalidDataException("Step 49.0 RootSceneContainer setter audit attempted external Cecil resolution: " + string.Join(" | ", setterResolver.Requests));
+
             var nodeType = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly.GetType("Godot.Node", true, false)!;
             var addChild = RequireStartupLadderAddChildMethod(rootScene.GetType(), nodeType);
             _step49RootSceneContainer = rootScene;
+            _step49RootSceneContainerSetter = rootSetter;
             _step49ChildrenBefore = GetStartupLadderChildCount(rootScene);
             _step49DirectStaticMap =
                 "StS2 Launcher — Step 49.0 frozen main-menu SceneTree admission static map\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
                 $"Menu root: {menu.GetType().FullName}\n" +
-                $"RootSceneContainer: {rootScene.GetType().FullName}\n" +
+                $"RootSceneContainer exact retained child: {rootScene.GetType().FullName} at /Game/RootSceneContainer\n" +
+                $"NGame.RootSceneContainer property before admission: {(rootAuthority.PropertyWasNull ? "NULL — exact-child repair required in one-shot Gate C" : "EXACT retained child")}\n" +
+                $"RootSceneContainer setter token: 0x{rootSetter.MetadataToken:X8}; IL instructions={setterCecil.Body.Instructions.Count}; method calls=0; NSceneContainer field writes=1; unexpected opcodes=0; external Cecil resolution=0\n" +
                 $"Children before AddChild: {_step49ChildrenBefore}\n" +
                 $"AddChild binding: {addChild}\n" +
                 "Rendering restarted: NO\nOriginal LaunchMainMenu invoked: NO\n";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 49 Gate B");
-            Checkpoint(checkpoint, $"M49_B_PASS — exact RootSceneContainer resolved; childrenBefore={_step49ChildrenBefore}; AddChild(Node,bool,InternalMode) bound; NMainMenu still off-tree; renderingStopped=True; AddChild=NO.");
+            Checkpoint(checkpoint, $"M49_B_PASS — exact retained /Game/RootSceneContainer resolved independent of nullable NGame property; propertyWasNull={rootAuthority.PropertyWasNull}; setterToken=0x{rootSetter.MetadataToken:X8}; setterCalls=0; setterFieldWrites=1; unexpectedSetterOpcodes=0; childrenBefore={_step49ChildrenBefore}; AddChild(Node,bool,InternalMode) bound; NMainMenu still off-tree; renderingStopped=True; AddChild=NO.");
             return StartupLadderPass(step, Step49Name, gate,
-                $"Exact RootSceneContainer + AddChild binding passed with menu still off-tree. Child count before admission={_step49ChildrenBefore}; rendering remains frozen.");
+                $"Exact retained /Game/RootSceneContainer + setter/AddChild binding passed. NGame property {(rootAuthority.PropertyWasNull ? "is null and requires exact-child repair inside one-shot Gate C" : "already points to the exact child")}; child count before admission={_step49ChildrenBefore}; rendering remains frozen.");
         }
         catch (Exception ex)
         {
@@ -881,6 +923,28 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException("Step 49.0 NMainMenu is already in the SceneTree before authorized AddChild.");
             RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 49 Gate C immediately before AddChild", requirePreAdmissionCounts: true);
             _step49AdmissionStarted = true;
+
+            var rootAuthorityBeforeRepair = RequireRetainedStartupLadderRootSceneContainer(step);
+            if (!ReferenceEquals(rootAuthorityBeforeRepair.RootSceneContainer, rootScene))
+                throw new InvalidDataException("Step 49.0 retained /Game/RootSceneContainer identity changed between Gate B and Gate C.");
+            var rootSetter = _step49RootSceneContainerSetter ?? throw new InvalidOperationException("Step 49.0 RootSceneContainer setter binding absent.");
+            if (rootAuthorityBeforeRepair.PropertyWasNull)
+            {
+                Checkpoint(checkpoint, $"M49_C_ROOT_PROPERTY_REPAIR_START — NGame.RootSceneContainer is null while exact retained /Game/RootSceneContainer exists; assigning that exact child once via token=0x{rootSetter.MetadataToken:X8} before menu lifecycle admission.");
+                stage = "exact NGame.RootSceneContainer property repair";
+                InvokeStartupLadderMethod(rootSetter, _step39NGameInstance, new object?[] { rootScene }, "Step 49 exact RootSceneContainer property repair");
+                var repaired = RequireStartupLadderPropertyValue(_step39NGameInstance!, "RootSceneContainer", step);
+                if (!ReferenceEquals(repaired, rootScene))
+                    throw new InvalidDataException("Step 49.0 RootSceneContainer property repair did not retain the exact /Game/RootSceneContainer child.");
+                RequireStartupLadderBaselineUnchanged(context, baseline, "Step 49 post RootSceneContainer repair");
+                Checkpoint(checkpoint, "M49_C_ROOT_PROPERTY_REPAIR_PASS — NGame.RootSceneContainer now points to exact retained /Game/RootSceneContainer; context/native counts unchanged; menu remains off-tree; renderer frozen.");
+            }
+            else
+            {
+                RequireStartupLadderRootSceneContainerPropertyIdentity(rootScene, step, "Step 49 Gate C existing property authority");
+                Checkpoint(checkpoint, "M49_C_ROOT_PROPERTY_ALREADY_EXACT — NGame.RootSceneContainer already points to exact retained /Game/RootSceneContainer; no repair write performed.");
+            }
+
             var nodeType = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly.GetType("Godot.Node", true, false)!;
             var addChild = RequireStartupLadderAddChildMethod(rootScene.GetType(), nodeType);
             var internalMode = Enum.Parse(addChild.GetParameters()[2].ParameterType, "Disabled", ignoreCase: true);
@@ -892,13 +956,19 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             InvokeStartupLadderMethod(addChild, rootScene, new object?[] { menu, false, internalMode }, "Step 49 RootSceneContainer.AddChild");
             if (RequireZeroArgBoolMethod(menu.GetType(), "IsInsideTree").Invoke(menu, null) is not true)
                 throw new InvalidDataException("Step 49.0 AddChild returned but NMainMenu reports IsInsideTree=false.");
-            var getParent = menu.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(method => method.Name == "GetParent" && method.GetParameters().Length == 0 && !method.IsGenericMethodDefinition && !method.ContainsGenericParameters)
-                .FirstOrDefault(method => method.ReturnType.IsAssignableFrom(rootScene.GetType()) || method.ReturnType.IsInstanceOfType(rootScene))
-                ?? menu.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .FirstOrDefault(method => method.Name == "GetParent" && method.GetParameters().Length == 0);
-            if (getParent is null || !ReferenceEquals(getParent.Invoke(menu, null), rootScene))
+            var getParentCandidates = menu.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(method => method.Name == "GetParent" && method.GetParameters().Length == 0)
+                .ToArray();
+            var getParent = getParentCandidates.SingleOrDefault(method =>
+                    !method.IsGenericMethodDefinition &&
+                    !method.ContainsGenericParameters &&
+                    method.ReturnType.IsAssignableFrom(rootScene.GetType()))
+                ?? throw new MissingMethodException(
+                    menu.GetType().FullName,
+                    $"GetParent() exact non-generic RootSceneContainer-compatible overload; candidates={string.Join(",", getParentCandidates.Select(method => method.ToString()))}");
+            if (!ReferenceEquals(getParent.Invoke(menu, null), rootScene))
                 throw new InvalidDataException("Step 49.0 NMainMenu parent is not the exact retained RootSceneContainer after AddChild.");
+            RequireStartupLadderRootSceneContainerPropertyIdentity(rootScene, step, "Step 49 Gate C post-AddChild property authority");
             _step49ChildrenAfter = GetStartupLadderChildCount(rootScene);
             if (_step49ChildrenAfter != _step49ChildrenBefore + 1)
                 throw new InvalidDataException($"Step 49.0 RootSceneContainer child count drifted unexpectedly. before={_step49ChildrenBefore}; after={_step49ChildrenAfter}; expected={_step49ChildrenBefore + 1}.");
@@ -935,6 +1005,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException("Step 49.0 NMainMenu left the SceneTree before Gate D.");
             if (GetStartupLadderChildCount(_step49RootSceneContainer) != _step49ChildrenAfter)
                 throw new InvalidDataException("Step 49.0 RootSceneContainer child count changed after admission.");
+            RequireStartupLadderRootSceneContainerPropertyIdentity(_step49RootSceneContainer, step, "Step 49 Gate D property authority");
             var state = RequireStep40InsertedAuthority();
             _exactStep49ClosurePassed = true;
             Checkpoint(checkpoint, $"M49_D_PASS — renderingStopped=True; state={state}; NMainMenu retained inside RootSceneContainer; children={_step49ChildrenAfter}; post-admission resolver/host/private/initializer/rejected/native drift=0.");
@@ -1166,7 +1237,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         InvokeStartupLadderMethod(setRichPresence, null, new object?[] { string.Empty, string.Empty, null }, "Step 48 Null-platform SetRichPresence rehearsal");
 
         var nGame = _step39NGameInstance ?? throw new InvalidOperationException("Step 48.1 retained NGame absent during lifecycle-guard rehearsal.");
-        var rootScene = RequireStartupLadderPropertyValue(nGame, "RootSceneContainer", 48);
+        var rootAuthority = RequireRetainedStartupLadderRootSceneContainer(48);
+        var rootScene = rootAuthority.RootSceneContainer;
         var rootChildrenBefore = GetStartupLadderChildCount(rootScene);
         var menuChildrenBefore = GetStartupLadderChildCount(menu);
         var checkCommandLineArgs = menu.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -1185,9 +1257,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         RequireStartupLadderBaselineUnchanged(context, baseline, "Step 48 runtime-guard rehearsal exit");
         var post = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
         Checkpoint(checkpoint,
-            $"M48_C_GUARDS_PASS — GodotCmdlineArgs=0; SaveManager getter returned exact production _instance; PrimaryPlatform={primaryPlatform}; strategy={strategy.GetType().FullName}; SetRichPresence rehearsal returned; CheckCommandLineArgs rehearsal returned off-tree; rootChildren={rootChildrenBefore}; menuChildren={menuChildrenBefore}; resolver/host/private/initializer/rejected/native drift=0.");
+            $"M48_C_GUARDS_PASS — GodotCmdlineArgs=0; SaveManager getter returned exact production _instance; PrimaryPlatform={primaryPlatform}; strategy={strategy.GetType().FullName}; SetRichPresence rehearsal returned; CheckCommandLineArgs rehearsal returned off-tree; exactRoot=/Game/RootSceneContainer; rootPropertyWasNull={rootAuthority.PropertyWasNull}; rootChildren={rootChildrenBefore}; menuChildren={menuChildrenBefore}; resolver/host/private/initializer/rejected/native drift=0.");
         return new StartupLadderRuntimeGuardAuthority(commandLineArgs, saveManager, strategy, primaryPlatform.ToString() ?? string.Empty,
-            rootChildrenBefore, menuChildrenBefore, post, true);
+            rootScene, rootAuthority.PropertyWasNull, rootChildrenBefore, menuChildrenBefore, post, true);
     }
 
     private void RequireStep48LifecycleRuntimeGuardsCurrent(
@@ -1228,14 +1300,59 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             !string.Equals(primaryPlatform.ToString(), guards.PrimaryPlatform, StringComparison.Ordinal))
             throw new InvalidDataException(boundary + " Null-platform authority drifted after Step-48 rehearsal.");
 
+        var currentRootAuthority = RequireRetainedStartupLadderRootSceneContainer(48);
+        if (!ReferenceEquals(currentRootAuthority.RootSceneContainer, guards.RootSceneContainer))
+            throw new InvalidDataException(boundary + " exact retained /Game/RootSceneContainer identity drifted after Step-48 rehearsal.");
         if (requirePreAdmissionCounts)
         {
             var menu = _step48MainMenuInstance ?? throw new InvalidOperationException(boundary + " NMainMenu instance absent.");
-            var nGame = _step39NGameInstance ?? throw new InvalidOperationException(boundary + " NGame instance absent.");
-            var rootScene = RequireStartupLadderPropertyValue(nGame, "RootSceneContainer", 48);
-            if (GetStartupLadderChildCount(rootScene) != guards.RootSceneChildren || GetStartupLadderChildCount(menu) != guards.MenuChildren)
+            if (GetStartupLadderChildCount(currentRootAuthority.RootSceneContainer) != guards.RootSceneChildren || GetStartupLadderChildCount(menu) != guards.MenuChildren)
                 throw new InvalidDataException(boundary + " tree shape drifted after Step-48 guard rehearsal and before lifecycle admission.");
         }
+    }
+
+    private StartupLadderRootSceneAuthority RequireRetainedStartupLadderRootSceneContainer(int step)
+    {
+        var nGame = _step39NGameInstance ?? throw new InvalidOperationException($"Step {step}.0 retained NGame instance is absent.");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
+        var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.Node");
+        var candidates = EnumerateStep39NodeGraph(nGame, nodeType)
+            .Where(item => string.Equals(item.Path, "/Game/RootSceneContainer", StringComparison.Ordinal) &&
+                           string.Equals(item.Node.GetType().FullName, RootSceneContainerManagedTypeFullName, StringComparison.Ordinal))
+            .ToArray();
+        if (candidates.Length != 1)
+            throw new InvalidDataException($"Step {step}.0 requires exactly one retained /Game/RootSceneContainer of type {RootSceneContainerManagedTypeFullName}; observed {candidates.Length}.");
+        var rootScene = candidates[0].Node;
+        if (RequireZeroArgBoolMethod(rootScene.GetType(), "IsInsideTree").Invoke(rootScene, null) is not true)
+            throw new InvalidDataException($"Step {step}.0 retained /Game/RootSceneContainer is not inside the SceneTree.");
+        var getParentCandidates = rootScene.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(method => method.Name == "GetParent" && method.GetParameters().Length == 0)
+            .ToArray();
+        var getParent = getParentCandidates.SingleOrDefault(method =>
+                !method.IsGenericMethodDefinition &&
+                !method.ContainsGenericParameters &&
+                method.ReturnType.IsAssignableFrom(nGame.GetType()))
+            ?? throw new MissingMethodException(
+                rootScene.GetType().FullName,
+                $"GetParent() exact non-generic NGame-compatible overload; candidates={string.Join(",", getParentCandidates.Select(method => method.ToString()))}");
+        if (!ReferenceEquals(getParent.Invoke(rootScene, null), nGame))
+            throw new InvalidDataException($"Step {step}.0 retained /Game/RootSceneContainer is not an exact direct child of retained NGame.");
+        var property = nGame.GetType().GetProperty("RootSceneContainer", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            ?? throw new MissingMemberException(nGame.GetType().FullName, "RootSceneContainer");
+        var propertyValue = property.GetValue(nGame);
+        if (propertyValue is not null && !ReferenceEquals(propertyValue, rootScene))
+            throw new InvalidDataException($"Step {step}.0 NGame.RootSceneContainer is non-null but does not point to exact retained /Game/RootSceneContainer.");
+        return new StartupLadderRootSceneAuthority(rootScene, propertyValue is null);
+    }
+
+    private void RequireStartupLadderRootSceneContainerPropertyIdentity(object expectedRootScene, int step, string boundary)
+    {
+        var authority = RequireRetainedStartupLadderRootSceneContainer(step);
+        if (!ReferenceEquals(authority.RootSceneContainer, expectedRootScene))
+            throw new InvalidDataException(boundary + " exact retained RootSceneContainer identity drifted.");
+        if (authority.PropertyWasNull)
+            throw new InvalidDataException(boundary + " requires NGame.RootSceneContainer to reference the exact retained child, but the property is null.");
     }
 
     private static string[] NormalizeStartupLadderCommandLineArgs(object? raw)
@@ -1270,6 +1387,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         var context = RequireStep49Prerequisite(boundary);
         if (!_exactStep49ClosurePassed || !_step49AdmissionPassed || !_step49StaticMapDurablyWritten)
             throw new InvalidOperationException(boundary + " requires same-process Step-49 4/4 frozen in-tree NMainMenu authority.");
+        var rootScene = _step49RootSceneContainer ?? throw new InvalidOperationException(boundary + " requires retained exact RootSceneContainer authority.");
+        RequireStartupLadderRootSceneContainerPropertyIdentity(rootScene, 50, boundary + " RootSceneContainer property authority");
         return context;
     }
 
@@ -1566,11 +1685,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private sealed record StartupLadderDeferredMethodFrontier(string Opcode, string ReferenceFullName, string? Category, string Path);
     private sealed record StartupLadderGuardedMethodFrontier(string ReferenceFullName, string Reason, string Path);
+    private sealed record StartupLadderRootSceneAuthority(object RootSceneContainer, bool PropertyWasNull);
     private sealed record StartupLadderRuntimeGuardAuthority(
         string[] GodotCommandLineArgs,
         object SaveManagerInstance,
         object NullPlatformStrategy,
         string PrimaryPlatform,
+        object RootSceneContainer,
+        bool RootScenePropertyWasNullAtRehearsal,
         int RootSceneChildren,
         int MenuChildren,
         StartupLadderBaseline PostRehearsalBaseline,

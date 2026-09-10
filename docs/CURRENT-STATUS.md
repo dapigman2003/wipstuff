@@ -1,8 +1,10 @@
 # Current status
 
-## Active candidate — Steps 43–52 guarded direct main-menu ladder / 0.0.180 (180)
+## Active candidate — Steps 43–52 guarded direct main-menu ladder / 0.0.181 (181)
 
-Physical runtime authority now reaches **Step 47 closed 4/4**. Physical 0.0.179 then proved exact real `NMainMenu` PackedScene instantiation succeeds once off-tree, but Step 48 stopped safely in its lifecycle-frontier audit before any SceneTree admission or rendering. The failure was caused by static over-expansion of conditional `_Ready()` branches, not by an observed Steam/native execution.
+Physical runtime authority remains **Step 47 closed 4/4**, with progressively deeper safe Step-48 evidence. Physical 0.0.179 proved exact real `NMainMenu` PackedScene instantiation succeeds once off-tree. Physical 0.0.180 then passed the revised Step-48 Gate A/B and again instantiated exact real `NMainMenu` off-tree, but stopped during runtime-guard rehearsal because `NGame.RootSceneContainer` was null. No SceneTree admission or rendering occurred.
+
+**Physical 0.0.180 / Step 48.1 — SAFE 2/4 ROOT-AUTHORITY STOP.** Gate A retained Step-47 4/4 with rendering frozen/state 2. Gate B passed the exact instantiation + guard-shape seal: `_Ready -> CheckCommandLineArgs` calls=1, command-line helper refs=1, SaveManager getter fallback calls=1, Null `SetRichPresence` closure=1, forbidden/unresolved/external=0. Gate C armed and exact `PackedScene.Instantiate(GenEditState.Disabled)` returned an off-tree real `NMainMenu`; runtime rehearsal then failed before `CheckCommandLineArgs`, AddChild, or rendering because `NGame.RootSceneContainer` was null. The UI operation ended normally with rendering frozen.
 
 **Physical 0.0.179 / Step 48 — SAFE 2/4 STOP.** Gate A accepted same-process Step-47 4/4 exact main-menu PackedScene authority with rendering stopped and NGame state 2. Gate B bound exact `PackedScene.Instantiate(GenEditState)` and exact managed `NMainMenu` with zero external Cecil resolution. Gate C armed once, invoked exact off-tree PackedScene instantiation, and then failed only while auditing `_Ready()` because the static graph followed conditional `CheckCommandLineArgs` multiplayer-host branches, `SaveManager.get_Instance` fallback to `ConstructDefault`, and platform rich-presence routing. No `AddChild`, original `LaunchMainMenu`, deferred startup, Steam startup, or render restart was authorized. The UI operation ended normally with rendering still frozen.
 
@@ -34,26 +36,17 @@ Requires Step 45 4/4. Maps exact original `LaunchMainMenu(bool)`, async state ma
 
 Requires Step 46.1 4/4. Uses exact receipt-backed `main_menu.tscn` (19,087 B, SHA-256 `402b03596092097ffd7742a482642d740a293aa68dad6645f8b0c5aeab3376c0`) and `main_menu_bg.tscn` (7,916 B, SHA-256 `133a2ce2e05fb8d2e72a8e2087019cb5405b105636e16889525e53cc379aeab7`), creates only the private deterministic Spine-neutral background derivative (6,375 B, SHA-256 `0cf0c664f97e36325ef1645986af4ef5efaeff41f0ef0ee8180d115c381b8f3f`), performs one-shot resource-cache takeover/load, and does not instantiate/render. Physical 0.0.179 passed this rung.
 
-## Step 48.1 — guarded off-tree NMainMenu lifecycle authority
+## Step 48.2 — guarded off-tree NMainMenu lifecycle authority with retained root-child authority
 
-Requires Step 47 4/4. Gate B binds exact instantiation and verifies serialized lifecycle guard shapes: `_Ready()` must contain exactly one call to `CheckCommandLineArgs()`, that method must reference the game command-line helper, `SaveManager.get_Instance()` must retain its single `ConstructDefault()` fallback, and exact Null-platform `SetRichPresence` must itself have an admissible immediate closure.
+Requires Step 47 4/4. Gate B retains the exact instantiation and lifecycle guard-shape audit. Gate C is one-shot and instantiates exact real `NMainMenu` off-tree. For tree-shape authority it now resolves the exact retained `/Game/RootSceneContainer` directly from the real NGame child graph, requiring exact path, exact `NSceneContainer` type, direct NGame parent, and `IsInsideTree=true`. The nullable `NGame.RootSceneContainer` property is observed but is **not** required to be non-null in Step 48; if non-null it must already reference that exact child.
 
-Gate C is one-shot. It instantiates exact real `NMainMenu` off-tree, then **rehearses the concrete risky guards before lifecycle admission**:
-
-- exact `Godot.OS.GetCmdlineArgs()` must return zero arguments;
-- exact production `SaveManager._instance` must already exist and `_mockInstance` must be null;
-- exact `SaveManager.get_Instance()` must return that same production instance;
-- `PlatformUtil.PrimaryPlatform → GetPlatformUtil` must resolve to exact `NullPlatformUtilStrategy`;
-- exact `PlatformUtil.SetRichPresence("", "", null)` must return with zero context/native drift;
-- exact `NMainMenu.CheckCommandLineArgs()` must return once off-tree with menu/root child counts unchanged, NGame state 2 retained, and zero resolver/host/private/initializer/rejected/native drift.
-
-Only after that rehearsal may the lifecycle auditor treat exactly those three immediate calls (`CheckCommandLineArgs`, `SaveManager.get_Instance`, `PlatformUtil.SetRichPresence`) as **runtime-guarded frontiers**. There is no generic PLATFORM/STEAM whitelist. Any other classified forbidden immediate boundary, unresolved same-sts2 edge, external Cecil resolution, non-empty command line, tree mutation, singleton drift, strategy drift, or context/native drift fails before Step 49.
+The remaining rehearsal stays strict: zero Godot command-line args; exact production SaveManager `_instance` with null `_mockInstance`; exact getter returning that same instance; exact Null-platform routing; no-drift `SetRichPresence`; and exact off-tree `CheckCommandLineArgs()` with retained menu/root child counts, state 2, and zero resolver/host/private/initializer/rejected/native drift. Only `CheckCommandLineArgs`, `SaveManager.get_Instance`, and `PlatformUtil.SetRichPresence` may be runtime-guarded frontiers. No generic PLATFORM/STEAM whitelist exists. Step 48 also writes its preliminary Gate-B guard-shape map before the one-shot instantiation, so any later Gate-C failure retains useful static evidence.
 
 Reports: `Step48-CrashCheckpoint-<RunId>.txt`, `Step48-MainMenuOffTree-StaticMap-<RunId>.txt`, `Step48-LastCheckpoint.txt`, `Step48-TransformedRealStS2MainMenuOffTreeInstantiation.txt`.
 
 ## Step 49.0 — one-shot frozen NMainMenu SceneTree admission
 
-Requires Step 48.1 4/4 retained guard authority. Rechecks those guards immediately before exact `NGame.RootSceneContainer.AddChild(NMainMenu)` while rendering remains stopped. Gate D requires exact parent, child-count +1, `IsInsideTree=true`, retained NGame/state 2, and frozen context/native confinement.
+Requires Step 48.2 4/4 retained guard authority. Gate B resolves the exact retained `/Game/RootSceneContainer` independently of the nullable property and binds exact `NGame.set_RootSceneContainer(NSceneContainer)`. The runtime method token must match Cecil; the setter must have zero method calls, exactly one `NSceneContainer` field write on NGame, only trivial load/store/return opcodes, and zero external Cecil resolution. In the already one-shot frozen Gate C, if and only if the property is null it is set to that exact retained child and reverified with zero drift before `AddChild(NMainMenu)`. A non-null mismatched property fails closed and is never overwritten. Gate D requires exact property/child identity, exact menu parent, child-count +1, `IsInsideTree=true`, retained NGame/state 2, and frozen context/native confinement.
 
 ## Step 50.0 — in-tree menu frame/input audit + short bounded render pulse
 
@@ -71,7 +64,7 @@ Requires Step 51 4/4 durable map authority. Runs a fresh actual in-tree frame/in
 
 Reports: `Step52-CrashCheckpoint-<RunId>.txt`, `Step52-MainMenuSustainedFrameInput-StaticMap-<RunId>.txt`, `Step52-LastCheckpoint.txt`, `Step52-TransformedRealStS2MainMenuSustainedRender.txt`.
 
-## Physical sequence for 0.0.180
+## Physical sequence for 0.0.181
 
 1. Fresh process → Step 15 A-C.
 2. Step 35.0.32 MODEL-BOOTSTRAP → require 4/4.
@@ -87,10 +80,10 @@ Reports: `Step52-CrashCheckpoint-<RunId>.txt`, `Step52-MainMenuSustainedFrameInp
 12. Step 45 once → continue only on 4/4; never retry after arm.
 13. Step 46.1 → non-invoking map; continue only on 4/4.
 14. Step 47 once → resource prep/load; continue only on 4/4; never retry after arm.
-15. Step 48.1 once → off-tree instantiate + guard rehearsal/audit; continue only on 4/4; never retry after arm.
+15. Step 48.2 once → off-tree instantiate + retained-root guard rehearsal/audit; continue only on 4/4; never retry after arm.
 16. Step 49 once → frozen SceneTree admission; continue only on 4/4; never retry after arm.
 17. Step 50 once → short audited render pulse/refreeze; continue only on 4/4.
 18. Step 51 → non-invoking single-player frontier map; continue only on 4/4.
 19. Step 52 once → sustained audited render residency/refreeze; preserve reports/visual observations and relaunch afterward.
 
-Still globally forbidden in 0.0.180 unless explicitly authorized above: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, trusted-install mutation, and any single-player handler invocation. **Only Steps 50 and 52 may restart rendering; both must synchronously refreeze before success evaluation.**
+Still globally forbidden in 0.0.181 unless explicitly authorized above: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, trusted-install mutation, and any single-player handler invocation. **Only Steps 50 and 52 may restart rendering; both must synchronously refreeze before success evaluation.**
