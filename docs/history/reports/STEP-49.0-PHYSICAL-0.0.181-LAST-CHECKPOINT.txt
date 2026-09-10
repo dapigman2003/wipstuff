@@ -1,0 +1,6 @@
+StS2 Launcher — Step 49 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260910T1651224775280Z-pid11478-ba82d869e2394659b9d503c7162bca50
+Journal: Step49-CrashCheckpoint-20260910T1651224775280Z-pid11478-ba82d869e2394659b9d503c7162bca50.txt
+Static map: Step49-MainMenuAdmission-StaticMap-20260910T1651224775280Z-pid11478-ba82d869e2394659b9d503c7162bca50.txt
+2026-09-10T16:51:22.7128930+00:00 | run=20260910T1651224775280Z-pid11478-ba82d869e2394659b9d503c7162bca50 | pid=11478 | managedThread=15 | RUN_END — Step-49 UI operation ended normally; If AddChild was armed, never retry Step 49 in-process. Rendering must remain frozen.

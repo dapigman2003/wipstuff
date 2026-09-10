@@ -1,0 +1,10 @@
+StS2 Launcher — Step 49.0 frozen main-menu SceneTree admission static map
+Selected compatibility SHA-256: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a
+Menu root: MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu
+RootSceneContainer exact retained child: MegaCrit.Sts2.Core.Nodes.NSceneContainer at /Game/RootSceneContainer
+NGame.RootSceneContainer property before admission: NULL — exact-child repair required in one-shot Gate C
+RootSceneContainer setter token: 0x06001B9B; IL instructions=4; method calls=0; NSceneContainer field writes=1; unexpected opcodes=0; external Cecil resolution=0
+Children before AddChild: 0
+AddChild binding: Void AddChild(Godot.Node, Boolean, InternalMode)
+Rendering restarted: NO
+Original LaunchMainMenu invoked: NO

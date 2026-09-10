@@ -244,7 +244,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var menu = _step48MainMenuInstance ?? throw new InvalidOperationException("Step 52.0 NMainMenu absent.");
             var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
             var nodeType = godotAssembly.GetType("Godot.Node", true, false)!;
-            var nodes = EnumerateStep39NodeGraph(menu, nodeType);
+            var nodes = EnumerateStartupLadderMenuNodeGraph(menu, nodeType, "Step 52.0 sustained main-menu frame/input audit");
             var managedTypes = nodes.Select(item => item.Node.GetType())
                 .Where(type => ReferenceEquals(type.Assembly, menu.GetType().Assembly))
                 .Select(type => type.FullName)

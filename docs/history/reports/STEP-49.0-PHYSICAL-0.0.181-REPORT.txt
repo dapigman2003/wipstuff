@@ -1,0 +1,41 @@
+StS2 Launcher — Step 49.0 Main Menu Frozen SceneTree Admission
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-10T16:51:22.6952620+00:00
+
+RESULT
+STEP 49.0 MAIN MENU FROZEN SCENETREE ADMISSION FAIL — 2/4
+
+METADATA
+App version: 0.0.181 (181)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: frozen RootSceneContainer.AddChild(NMainMenu)
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 39.0 node-graph traversal exceeded 256 nodes.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::System.Collections.Generic.List`1[StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization+Step39NodeObservation] EnumerateStep39NodeGraph(System.Object, System.Type)
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.EnumerateStep39NodeGraph(Object root, Type nodeType)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireRetainedStartupLadderRootSceneContainer(Int32 step)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireStartupLadderRootSceneContainerPropertyIdentity(Object expectedRootScene, Int32 step, String boundary)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep49FrozenMainMenuAdmission(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 39.0 node-graph traversal exceeded 256 nodes.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::System.Collections.Generic.List`1[StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization+Step39NodeObservation] EnumerateStep39NodeGraph(System.Object, System.Type)
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.EnumerateStep39NodeGraph(Object root, Type nodeType)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireRetainedStartupLadderRootSceneContainer(Int32 step)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireStartupLadderRootSceneContainerPropertyIdentity(Object expectedRootScene, Int32 step, String boundary)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep49FrozenMainMenuAdmission(Action`1 checkpoint)
+
+END OF REPORT

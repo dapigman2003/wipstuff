@@ -471,3 +471,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-48.1-PHYSICAL-0.0.180-CHECKPOINT.txt` — Gate A/B pass, one-shot off-tree NMainMenu instantiation start, then exact null RootSceneContainer property localization with normal frozen end.
 - `reports/STEP-48.1-PHYSICAL-0.0.180-LAST-CHECKPOINT.txt` — normal run end; no Step-48 retry allowed after arm.
 - `steps/STEP-48.2-52.0-ROOT-CONTAINER-AUTHORITY-CORRECTION.md` — 0.0.181 focused correction: Step 48 uses exact retained `/Game/RootSceneContainer` child authority; Step 49 may repair only a null property through a token-matched trivial setter before frozen AddChild; Steps 50–52 inherit exact property identity with no expansion.
+
+## Step 48 physical closure / Step 49 post-admission diagnostic localization / 0.0.182 focused correction
+
+- `reports/STEP-49.0-PHYSICAL-0.0.181-REPORT.txt` — physical 0.0.181 Step 49 final result: safe 2/4 stop after exact RootSceneContainer property repair and frozen AddChild start, caused by the historical Step-39 256-node verification ceiling.
+- `reports/STEP-49.0-PHYSICAL-0.0.181-CHECKPOINT.txt` — same-process proof that Step 48 was 4/4, setter audit passed, null property repair passed with zero context/native drift, and AddChild was invoked before the 256-node diagnostic stop.
+- `reports/STEP-49.0-PHYSICAL-0.0.181-STATIC-MAP.txt` — exact retained RootSceneContainer authority and trivial setter token `0x06001B9B`; rendering/original LaunchMainMenu remained unopened while the map was built.
+- `reports/STEP-49.0-PHYSICAL-0.0.181-LAST-CHECKPOINT.txt` — normal frozen process end after the one-shot Step-49 attempt.
+- `steps/STEP-49.1-52.0-POST-ADMISSION-NODE-GRAPH-DIAGNOSTIC-CORRECTION.md` — 0.0.182 focused correction: immediate-child RootSceneContainer identity lookup, post-AddChild durable checkpoints, and separate 4,096-node menu-only diagnostic traversal for Steps 50/52; no frontier expansion.

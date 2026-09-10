@@ -954,8 +954,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             Checkpoint(checkpoint, $"M49_C_ADDCHILD_START — adding exact audited NMainMenu once to retained NGame.RootSceneContainer while renderer remains frozen; childrenBefore={_step49ChildrenBefore}. Automatic audited _EnterTree/_Ready/_Notification only; no original LaunchMainMenu/deferred/Steam/native extension authorized.");
             stage = "frozen RootSceneContainer.AddChild(NMainMenu)";
             InvokeStartupLadderMethod(addChild, rootScene, new object?[] { menu, false, internalMode }, "Step 49 RootSceneContainer.AddChild");
+            Checkpoint(checkpoint, "M49_C_ADDCHILD_RETURNED — AddChild returned; validating in-tree identity before any broader diagnostics.");
             if (RequireZeroArgBoolMethod(menu.GetType(), "IsInsideTree").Invoke(menu, null) is not true)
                 throw new InvalidDataException("Step 49.0 AddChild returned but NMainMenu reports IsInsideTree=false.");
+            Checkpoint(checkpoint, "M49_C_INSIDE_TREE_PASS — exact NMainMenu reports IsInsideTree=true after frozen AddChild.");
             var getParentCandidates = menu.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .Where(method => method.Name == "GetParent" && method.GetParameters().Length == 0)
                 .ToArray();
@@ -968,8 +970,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                     $"GetParent() exact non-generic RootSceneContainer-compatible overload; candidates={string.Join(",", getParentCandidates.Select(method => method.ToString()))}");
             if (!ReferenceEquals(getParent.Invoke(menu, null), rootScene))
                 throw new InvalidDataException("Step 49.0 NMainMenu parent is not the exact retained RootSceneContainer after AddChild.");
-            RequireStartupLadderRootSceneContainerPropertyIdentity(rootScene, step, "Step 49 Gate C post-AddChild property authority");
+            Checkpoint(checkpoint, "M49_C_PARENT_PASS — exact NMainMenu parent is the retained RootSceneContainer.");
             _step49ChildrenAfter = GetStartupLadderChildCount(rootScene);
+            Checkpoint(checkpoint, $"M49_C_CHILD_COUNT_OBSERVED — RootSceneContainer childrenAfter={_step49ChildrenAfter}; expected={_step49ChildrenBefore + 1}.");
+            RequireStartupLadderRootSceneContainerPropertyIdentity(rootScene, step, "Step 49 Gate C post-AddChild property authority");
             if (_step49ChildrenAfter != _step49ChildrenBefore + 1)
                 throw new InvalidDataException($"Step 49.0 RootSceneContainer child count drifted unexpectedly. before={_step49ChildrenBefore}; after={_step49ChildrenAfter}; expected={_step49ChildrenBefore + 1}.");
             RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 49 Gate C");
@@ -1062,7 +1066,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var menu = _step48MainMenuInstance ?? throw new InvalidOperationException("Step 50.0 NMainMenu absent.");
             var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
             var nodeType = godotAssembly.GetType("Godot.Node", true, false)!;
-            var nodes = EnumerateStep39NodeGraph(menu, nodeType);
+            var nodes = EnumerateStartupLadderMenuNodeGraph(menu, nodeType, "Step 50.0 in-tree main-menu frame/input audit");
             var managedTypes = nodes.Select(item => item.Node.GetType())
                 .Where(type => ReferenceEquals(type.Assembly, menu.GetType().Assembly))
                 .Select(type => type.FullName)
@@ -1317,12 +1321,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
         var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
             ?? throw new MissingMemberException("Godot.Node");
-        var candidates = EnumerateStep39NodeGraph(nGame, nodeType)
-            .Where(item => string.Equals(item.Path, "/Game/RootSceneContainer", StringComparison.Ordinal) &&
+        var directChildren = EnumerateStartupLadderImmediateNodeChildren(nGame, nodeType, $"Step {step}.0 retained NGame immediate children");
+        var candidates = directChildren
+            .Where(item => string.Equals(item.Name, "RootSceneContainer", StringComparison.Ordinal) &&
                            string.Equals(item.Node.GetType().FullName, RootSceneContainerManagedTypeFullName, StringComparison.Ordinal))
             .ToArray();
         if (candidates.Length != 1)
-            throw new InvalidDataException($"Step {step}.0 requires exactly one retained /Game/RootSceneContainer of type {RootSceneContainerManagedTypeFullName}; observed {candidates.Length}.");
+            throw new InvalidDataException($"Step {step}.0 requires exactly one immediate retained /Game/RootSceneContainer of type {RootSceneContainerManagedTypeFullName}; observed {candidates.Length} among {directChildren.Count} direct NGame children.");
         var rootScene = candidates[0].Node;
         if (RequireZeroArgBoolMethod(rootScene.GetType(), "IsInsideTree").Invoke(rootScene, null) is not true)
             throw new InvalidDataException($"Step {step}.0 retained /Game/RootSceneContainer is not inside the SceneTree.");
@@ -1353,6 +1358,56 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             throw new InvalidDataException(boundary + " exact retained RootSceneContainer identity drifted.");
         if (authority.PropertyWasNull)
             throw new InvalidDataException(boundary + " requires NGame.RootSceneContainer to reference the exact retained child, but the property is null.");
+    }
+
+    private static List<(object Node, string Name)> EnumerateStartupLadderImmediateNodeChildren(object parent, Type nodeType, string boundary)
+    {
+        var getChildren = parent.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(method => method.Name == "GetChildren")
+            .OrderBy(method => method.GetParameters().Length)
+            .FirstOrDefault(method =>
+            {
+                var parameters = method.GetParameters();
+                return parameters.Length == 0 || (parameters.Length == 1 && parameters[0].ParameterType == typeof(bool));
+            })
+            ?? throw new MissingMethodException(parent.GetType().FullName, "GetChildren([bool])");
+        var childrenObject = getChildren.GetParameters().Length == 0
+            ? getChildren.Invoke(parent, null)
+            : getChildren.Invoke(parent, new object?[] { false });
+        if (childrenObject is not IEnumerable children)
+            throw new InvalidDataException(boundary + " GetChildren did not return IEnumerable.");
+        var result = new List<(object Node, string Name)>();
+        var index = 0;
+        foreach (var child in children)
+        {
+            if (child is null || !nodeType.IsInstanceOfType(child))
+                continue;
+            result.Add((child, GetStep39NodeName(child, index)));
+            index++;
+        }
+        return result;
+    }
+
+    private static List<Step39NodeObservation> EnumerateStartupLadderMenuNodeGraph(object root, Type nodeType, string boundary)
+    {
+        const int maximumNodes = 4096;
+        var observations = new List<Step39NodeObservation>();
+        var queue = new Queue<(object Node, string Path)>();
+        queue.Enqueue((root, "/MainMenu"));
+        while (queue.Count != 0)
+        {
+            if (observations.Count >= maximumNodes)
+                throw new InvalidDataException($"{boundary} node-graph traversal exceeded {maximumNodes} nodes; queued={queue.Count}.");
+            var (node, path) = queue.Dequeue();
+            observations.Add(new Step39NodeObservation(path, node));
+            var children = EnumerateStartupLadderImmediateNodeChildren(node, nodeType, boundary + " at " + path);
+            for (var index = 0; index < children.Count; index++)
+            {
+                var child = children[index];
+                queue.Enqueue((child.Node, path + "/" + child.Name));
+            }
+        }
+        return observations;
     }
 
     private static string[] NormalizeStartupLadderCommandLineArgs(object? raw)
