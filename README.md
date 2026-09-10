@@ -1,19 +1,17 @@
-# StS2 Launcher — Steps 43–52 guarded direct main-menu ladder
+# StS2 Launcher — Steps 43–52 physically closed stabilization
 
-Active candidate: **0.0.182 (182)** — same independently gated Steps 43–52 ladder; engineering changes are intentionally limited to **Steps 49–52**. Step 48 is now physically closed 4/4.
+Active candidate: **0.0.183 (183)** — stabilization/ergonomics/CI only. **Step 53 remains unopened.**
 
-Physical **0.0.175 / Step 42** is closed positive **4/4**. Physical **0.0.178** closed **Step 45 4/4**. Physical **0.0.179** closed **Steps 46.1 and 47 4/4**. Physical **0.0.181** then closed **Step 48 4/4** and advanced Step 49 through exact retained-root binding, exact trivial setter audit, null-property repair, and frozen `RootSceneContainer.AddChild(NMainMenu)` execution.
+Physical authority now reaches **Step 52 4/4** on the current same-process route. The supplied first 0.0.182 Step-50 attempt proved a clean 1,075-node in-tree frame/input map and successful renderer start/refreeze, then failed only because its first managed continuation arrived at ~2526 ms beyond the old 2000 ms evidence ceiling. The user subsequently reported a fresh rerun with **Steps 50, 51 and 52 all 4/4**; successful rerun report files were not supplied, so history records that closure explicitly as user-reported physical authority rather than fabricating artifacts.
 
-Step 49 stopped only during post-admission verification because the helper reused the historical Step-39 whole-NGame traversal, whose immutable diagnostic ceiling is 256 nodes. Once the real menu lifecycle expanded the SceneTree, that verification helper hit its ceiling. Rendering stayed frozen and the operation ended normally.
+0.0.183 does not broaden runtime authorization. It makes the already-closed path easier and the CI build more measurable:
 
-0.0.182 does **not** broaden runtime authorization. It improves only the current 49–52 portion:
+- a **fresh-process, one-shot Physically Closed Path button** runs Step 15 A–C → Step 35.0.32 MODEL-BOOTSTRAP → 36 → 37 → **skips 38** → 39 through 52, calling the existing step implementations and requiring each exact pass/closure predicate before advancing;
+- Step 50 keeps its exact **100 ms requested stop delay** and synchronous stop-before-telemetry behavior, but uses a Step-50-specific **4000 ms evidence ceiling** to cover the physically observed cold-frame 2526 ms return. Historical Step 40 stays 2000 ms; Step 52 stays 1500/6000 ms;
+- Codemagic keeps workflow `ios-canonical` and the existing caches, but now also caches the two tiny .NET iOS AOT dependency sentinels `AOTCompileInputs.cache` and `AOTCompileInputs.cache.uptodate`, plus reports pre/post marker hashes and LLVM `opt`/`llc` counts. The supplied 0.0.182 artifact localized **3195 of 3250 seconds** to iOS publish/package despite 2.9 GB of restored iOS obj/AOT cache and 1092 cached AOT outputs.
 
-**Step 49.1 exact immediate-child RootSceneContainer authority + richer post-AddChild checkpoints → Step 50 audited short render pulse/refreeze with a dedicated 4,096-node menu diagnostic traversal → Step 51 non-invoking single-player frontier map → Step 52 audited 1.5-second render residency/refreeze using the same dedicated menu traversal.**
+Every existing step keeps its independent reports/checkpoints and fail-closed behavior. The convenience runner stops at the first non-closed return and requires a process relaunch; it does not run Step 15 Gate D and it never invokes Step 38. Rendering must be frozen after Step 52.
 
-The historical Step-39 256-node helper is left untouched. RootSceneContainer identity no longer traverses the admitted menu subtree at all: it requires exactly one immediate NGame child named `RootSceneContainer` of exact managed type `MegaCrit.Sts2.Core.Nodes.NSceneContainer`, exact direct parent NGame, `IsInsideTree=true`, and nullable-property consistency. Steps 50/52 use a separate bounded 4,096-node breadth-first traversal solely for menu diagnostics/audits.
+Original whole `GameStartup`, original `LaunchMainMenu`, single-player handler invocation, `DoCloudSync`, migration mutation, `InitializePlatform`, deferred startup/`ExecuteDeferred`, external/native Steam, and native FMOD/Spine remain unopened.
 
-Every rung retains independent four-gate results, durable evidence, same-process prerequisite authority, and stop-on-first-failure behavior. Steps 49 and 51 keep rendering frozen. **Steps 50 and 52 alone may start rendering, and both synchronously stop rendering again before evaluating success.**
-
-Original whole `GameStartup`, original `LaunchMainMenu`, single-player handler invocation, `DoCloudSync`, migration mutation, `InitializePlatform`, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, external Steamworks/native Steam, and FMOD/Spine native game extensions remain unopened.
-
-Authoritative status, exact boundaries, report names, and physical sequence: `docs/CURRENT-STATUS.md`.
+Authoritative status and exact physical sequence: `docs/CURRENT-STATUS.md`.

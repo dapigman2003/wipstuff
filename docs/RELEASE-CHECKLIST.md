@@ -1,23 +1,15 @@
-# Release checklist — Steps 43–52 guarded direct main-menu ladder / 0.0.182
+# Release checklist — Steps 43–52 physically closed stabilization / 0.0.183
 
-Release identity: display/build `0.0.182 (182)`, IPA `StS2-Launcher-Steps-43-52.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.183 (183)`, IPA `StS2-Launcher-Steps-43-52.ipa`, workflow `ios-canonical`.
 
-Require physical Step-48 closure evidence through same-process 0.0.181 Step-49 Gate A, and seal the complete physical Step-49 0.0.181 report/checkpoint/static-map/last-checkpoint evidence.
+Require the current physical status to state that Step 49 is closed and Steps 50–52 are user-reported 4/4 on a fresh rerun; do not fabricate missing successful rerun report files. Seal the supplied first Step-50 checkpoint/static-map/final-report/last-checkpoint as the durable timing-only failure evidence.
 
-Require the Step-49 physical result to be interpreted narrowly: Gate A/B passed; exact null RootSceneContainer property repair passed with zero context/native drift; frozen AddChild was invoked; the observed failure came from the historical Step-39 256-node graph ceiling inside post-AddChild property verification. Rendering stayed frozen and process teardown was normal.
+Require the Physically Closed Path control to be fresh-process-only and one-shot. It must call existing implementations in this exact order: Step 15 A–C; Step 35.0.32 MODEL-BOOTSTRAP; 36; 37; explicit skip of 38; 39; 40.1; 41; 42; 43 through 52. It must require each exact pass/closure predicate before advancing, stop immediately on failure, preserve normal per-step reports, write `PhysicallyClosedPath-ToStep52.txt`, and require final rendering frozen. Step 15 Gate D must not be auto-run.
 
-Require Step49.1 root authority to enumerate **immediate NGame children only**, require exactly one `RootSceneContainer` child of exact managed type `NSceneContainer`, exact direct NGame parent and `IsInsideTree=true`, and reject a mismatched non-null property. Do not increase or alter the historical Step-39 256-node helper.
+Require Step 50 target to remain 100 ms and stop-before-telemetry ordering unchanged. Require a Step-50-specific evidence ceiling of exactly 4000 ms. Require historical Step 40 maximum to remain exactly 2000 ms and Step 52 to remain exactly 1500/6000 ms.
 
-Require Step49 Gate C durable checkpoints after AddChild return, inside-tree verification, exact-parent verification, and child-count observation. Require the existing exact setter token/Cecil trivial-field audit and null-only repair behavior unchanged.
+Require Codemagic workflow ID `ios-canonical` and `mac_mini_m2` to remain stable. Keep existing NuGet/Godot/.NET/obj caches and add only canonical `bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache` and `AOTCompileInputs.cache.uptodate`, not the whole bin tree. Require pre/post marker hash/size/mtime telemetry and post-publish binlog counts for AOT-up-to-date messages, LLVM opt, LLVM llc, and missing-sentinel diagnostics.
 
-Require Steps 50 and 52 to use the dedicated menu-only breadth-first diagnostic traversal capped at exactly 4,096 nodes. That helper must be separate from the Step-39 enumerator and must emit a boundary-specific overflow message.
+Require no Step 53+ implementation or UI control. Original whole `GameStartup`, original `LaunchMainMenu`, single-player handler invocation, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, deferred startup/`ExecuteDeferred`, external/native Steam, and native FMOD/Spine remain unopened.
 
-Require Step50 actual in-tree frame/input frontier audit, durable map before `StartRendering`, exactly one short pulse, synchronous `StopRendering` before post-stop telemetry/file I/O, and frozen post-pulse authority.
-
-Require Step51 to map exact `SingleplayerButtonPressed` and `OpenSingleplayerSubmenu` IL/frontiers without invoking either handler and without rendering. Classified frontiers are evidence only; unresolved/external Cecil resolution remains fatal.
-
-Require Step52 fresh in-tree frame/input audit, durable map before rendering, one-shot requested 1500 ms residency with 6000 ms evidence ceiling, synchronous `StopRendering` before post-stop telemetry/file I/O, zero initializer/rejected/native escape, and exact frozen post-pulse authority.
-
-Require no direct whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, external Steamworks/native Steam, FMOD/Spine native game-extension execution, or single-player handler invocation in the active control path.
-
-Require exact version/build `0.0.182/182` in csproj/plist/release presentation/current-release shell constants; active candidate manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload; exact `history.zip`; final ZIP integrity clean; canonical validator green from both the release tree and a completely fresh extraction.
+Require exact version/build `0.0.183/183` in csproj/plist/release presentation/current-release shell constants; active candidate manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload; exact `history.zip`; final ZIP integrity clean; canonical validator green from both the release tree and a completely fresh extraction.

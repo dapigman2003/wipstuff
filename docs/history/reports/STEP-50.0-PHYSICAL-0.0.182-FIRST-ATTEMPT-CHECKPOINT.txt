@@ -1,0 +1,22 @@
+StS2 Launcher — Step 50.0 Controlled direct-main-menu render pulse checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706
+Initialized UTC: 2026-09-10T18:50:07.9688990+00:00
+Process ID: 12492
+App version: 0.0.182 (182)
+Candidate: STEPS 43–52 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; LATER RUNGS REQUIRE SAME-PROCESS PRIOR 4/4 AUTHORITY.
+Global policy: Steps 43–49 keep rendering frozen. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, and native game GDExtensions remain unopened. Steps 47–49 use the direct main-menu resource/scene route; Step 50 alone may run one audited bounded render pulse and must synchronously refreeze.
+
+2026-09-10T18:50:07.9770050+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-10T18:50:07.9784860+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | RUN_START — Step 50.0 actual in-tree main-menu frame/input audit + first/only controlled render pulse started from frozen Step-49 authority.
+2026-09-10T18:50:07.9953380+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_A_PASS — Step-49 4/4 frozen main-menu admission retained; state=2; NMainMenu inside RootSceneContainer; renderer stopped; no render pulse armed yet.
+2026-09-10T18:50:08.2217860+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_B_PASS — inTreeMenuNodes=1075; selectedManagedTypes=94; immediateFrameInputRoots=24; immediateClosureMethods=149; immediateBoundaryRefs=2; deferredFrontiers=6; forbiddenImmediateRefs=0; unresolved=0; externalResolution=0; rendering remains stopped.
+2026-09-10T18:50:08.2293370+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_B_STATIC_MAP_WRITE_RETURNED — actual in-tree main-menu frame/input map durably written before StartRendering.
+2026-09-10T18:50:08.2299490+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_C_PULSE_ARMED — first/only direct-main-menu render pulse authorized; requested stop delay=100ms; evidence ceiling=2000ms. First managed continuation must StopRendering before telemetry.
+2026-09-10T18:50:08.2301120+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_C_START_RENDERING_CALL — invoking StartRendering exactly once; managedThread=1; isMain=True; activeBefore=False.
+2026-09-10T18:50:08.2303430+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_C_START_RENDERING_RETURNED — returned=True; activeAfterStart=True; nativeError=''.
+2026-09-10T18:50:10.7563760+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_C_STOP_RENDERING_RETURNED — elapsedBeforeStopMs=2525.7; stopReturned=True; activeAfterStop=False; observedElapsedMs=2526.0; nativeError=''.
+2026-09-10T18:50:10.7573760+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | M50_C_FAIL — stage=bounded direct-main-menu render pulse + synchronous refreeze; System.InvalidOperationException: Step 50.0 post-stop evidence outside accepted window. target=100; ceiling=2000; observed=2526.0.
+2026-09-10T18:50:10.7754240+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. Step 50 always leaves rendering frozen. If the pulse was armed, never retry Step 50 in-process.
+2026-09-10T18:50:10.7829170+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=19 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-10T18:50:10.7923480+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=19 | RUN_END — Step-50 UI operation ended normally; Step 50 always leaves rendering frozen. If the pulse was armed, never retry Step 50 in-process.

@@ -13,6 +13,8 @@ export DOTNET_ROOT PATH="$DOTNET_ROOT:$PATH" DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNE
 # Cache telemetry is evidence only. It never changes build inputs or bypasses validation.
 IOS_CACHE_ROOT="$ROOT/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64"
 AOT_CACHE_DIR="$IOS_CACHE_ROOT/nativelibraries/aot-output"
+AOT_INPUT_CACHE="$ROOT/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache"
+AOT_UPTODATE_MARKER="$ROOT/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache.uptodate"
 CACHE_REPORT="artifacts/reports/cache-state.txt"
 cache_path_line() {
   local label="$1" path="$2"
@@ -24,14 +26,28 @@ cache_path_line() {
     echo "$label: COLD/MISSING path=$path"
   fi
 }
+cache_file_line() {
+  local label="$1" path="$2"
+  if [[ -f "$path" ]]; then
+    local bytes hash mtime
+    bytes="$(stat -f '%z' "$path" 2>/dev/null || echo unknown)"
+    hash="$(shasum -a 256 "$path" 2>/dev/null | awk '{print $1}' || true)"
+    mtime="$(stat -f '%Sm' -t '%Y-%m-%dT%H:%M:%SZ' "$path" 2>/dev/null || echo unknown)"
+    echo "$label: RESTORED/PRESENT bytes=${bytes:-unknown} sha256=${hash:-unknown} mtime=${mtime:-unknown} path=$path"
+  else
+    echo "$label: COLD/MISSING path=$path"
+  fi
+}
 {
-  echo "StS2 Launcher — Codemagic cache state before Steps 43–52 guarded direct-main-menu ladder build"
+  echo "StS2 Launcher — Codemagic cache state before Steps 43–52 physically closed stabilization build"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   cache_path_line "Home NuGet" "$HOME/.nuget/packages"
   cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
   cache_path_line "Godot Step 15" "$HOME/.cache/sts2launcher/godot-step15"
   cache_path_line "Pinned .NET SDK/workloads" "$DOTNET_ROOT"
   cache_path_line "iOS arm64 obj" "$IOS_CACHE_ROOT"
+  cache_file_line "AOT input cache" "$AOT_INPUT_CACHE"
+  cache_file_line "AOT up-to-date sentinel" "$AOT_UPTODATE_MARKER"
   if [[ -d "$AOT_CACHE_DIR" ]]; then
     echo "AOT output files before build: $(find "$AOT_CACHE_DIR" -type f | wc -l | tr -d ' ')"
   else
@@ -46,7 +62,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Steps 43–52 guarded direct main-menu startup ladder build environment"
+  echo "StS2 Launcher — Steps 43–52 physically closed stabilization build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -112,11 +128,42 @@ IOS_BUILD_SECONDS="$(elapsed_seconds "$IOS_BUILD_START_EPOCH")"
   cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
   cache_path_line "Pinned .NET SDK/workloads" "$DOTNET_ROOT"
   cache_path_line "iOS arm64 obj" "$IOS_CACHE_ROOT"
+  cache_file_line "AOT input cache" "$AOT_INPUT_CACHE"
+  cache_file_line "AOT up-to-date sentinel" "$AOT_UPTODATE_MARKER"
   if [[ -d "$AOT_CACHE_DIR" ]]; then
     echo "AOT output files after build: $(find "$AOT_CACHE_DIR" -type f | wc -l | tr -d ' ')"
   else
     echo "AOT output files after build: 0"
   fi
+} | tee -a "$CACHE_REPORT"
+
+# Extract small, deterministic build-performance counters from the MSBuild binary log.
+# These are diagnostic only and never alter build inputs or success/failure.
+AOT_UPTODATE_COUNT=0
+LLVM_OPT_COUNT=0
+LLVM_LLC_COUNT=0
+AOT_SENTINEL_MISSING_COUNT=0
+BINLOG="artifacts/logs/dotnet-ios.binlog"
+BINLOG_STRINGS="$(mktemp)"
+if [[ -f "$BINLOG" ]]; then
+  if gzip -t "$BINLOG" >/dev/null 2>&1; then
+    gzip -dc "$BINLOG" | strings > "$BINLOG_STRINGS" || true
+  else
+    strings "$BINLOG" > "$BINLOG_STRINGS" || true
+  fi
+  AOT_UPTODATE_COUNT="$(grep -c 'The AOT-compiled code for .* is up-to-date' "$BINLOG_STRINGS" || true)"
+  LLVM_OPT_COUNT="$(grep -c 'Executing opt:' "$BINLOG_STRINGS" || true)"
+  LLVM_LLC_COUNT="$(grep -c 'Executing llc:' "$BINLOG_STRINGS" || true)"
+  AOT_SENTINEL_MISSING_COUNT="$(grep -c 'AOTCompileInputs.cache.uptodate.*does not exist' "$BINLOG_STRINGS" || true)"
+fi
+rm -f "$BINLOG_STRINGS"
+{
+  echo
+  echo "MSBuild AOT/LLVM incremental telemetry"
+  echo "AOT assemblies reported up-to-date: $AOT_UPTODATE_COUNT"
+  echo "LLVM opt executions: $LLVM_OPT_COUNT"
+  echo "LLVM llc executions: $LLVM_LLC_COUNT"
+  echo "Missing AOTCompileInputs.cache.uptodate diagnostics: $AOT_SENTINEL_MISSING_COUNT"
 } | tee -a "$CACHE_REPORT"
 
 IPA_VERIFY_START_EPOCH="$(date +%s)"
@@ -125,7 +172,7 @@ IPA_VERIFY_SECONDS="$(elapsed_seconds "$IPA_VERIFY_START_EPOCH")"
 TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
 
 {
-  echo "StS2 Launcher iOS — Steps 43–52 guarded direct main-menu startup ladder"
+  echo "StS2 Launcher iOS — Steps 43–52 physically closed stabilization"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"
@@ -142,6 +189,10 @@ TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
   echo "Timing — iOS publish/package preparation: ${IOS_BUILD_SECONDS}s"
   echo "Timing — IPA verification: ${IPA_VERIFY_SECONDS}s"
   echo "Timing — total canonical pipeline: ${TOTAL_SECONDS}s"
+  echo "AOT assemblies reported up-to-date: $AOT_UPTODATE_COUNT"
+  echo "LLVM opt executions: $LLVM_OPT_COUNT"
+  echo "LLVM llc executions: $LLVM_LLC_COUNT"
+  echo "Missing AOTCompileInputs.cache.uptodate diagnostics: $AOT_SENTINEL_MISSING_COUNT"
   echo "Physically proven Step 22.2 Core behavior: byte-for-byte protected by manifest"
   echo "Device text reports: Documents/StS2Launcher/Reports/*.txt"
   echo "Step 23 production behavior: first real sts2.dll CLR load is available only as an explicit on-device gate; build/CI never bundles or loads game payload"

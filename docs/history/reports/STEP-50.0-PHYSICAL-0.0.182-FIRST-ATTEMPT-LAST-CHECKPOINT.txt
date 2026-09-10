@@ -1,0 +1,6 @@
+StS2 Launcher — Step 50 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706
+Journal: Step50-CrashCheckpoint-20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706.txt
+Static map: Step50-MainMenuFrameInput-StaticMap-20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706.txt
+2026-09-10T18:50:10.7923480+00:00 | run=20260910T1850079688990Z-pid12492-76aafd53a7924fd999e5c958ea403706 | pid=12492 | managedThread=19 | RUN_END — Step-50 UI operation ended normally; Step 50 always leaves rendering frozen. If the pulse was armed, never retry Step 50 in-process.

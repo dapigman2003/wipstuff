@@ -1,12 +1,12 @@
-## Current frontier — Steps 43–52 / 0.0.182
+## Current frontier — Steps 43–52 / 0.0.183
 
-The active candidate is **0.0.182 / sequential startup ladder Steps 43–52**, with engineering changes intentionally limited to Steps 49–52. Physical 0.0.181 closed Step 48 at 4/4. Step 49 Gate A/B then passed, the exact null `NGame.RootSceneContainer` property was repaired to the retained `/Game/RootSceneContainer` child with zero context/native drift, and frozen `AddChild(NMainMenu)` advanced into post-admission verification. The only observed failure was the historical Step-39 whole-NGame graph helper exceeding its 256-node diagnostic ceiling after menu lifecycle expansion; rendering stayed frozen.
+The active candidate is **0.0.183 / physically closed stabilization through Step 52**. Physical authority has reached Step 52. The supplied first 0.0.182 Step-50 attempt proved successful renderer start/refreeze and failed only on a 2526 ms cold managed-continuation return versus the old 2000 ms evidence ceiling; the user then reported a fresh rerun with Steps 50–52 each 4/4. Successful rerun report files were not supplied and are not fabricated.
 
-0.0.182 does not broaden runtime behavior. Step 49.1 verifies retained RootSceneContainer authority from immediate NGame children only and adds post-AddChild durable checkpoints. Steps 50 and 52 use a separate bounded 4,096-node menu-only diagnostic traversal rather than the immutable Step-39 helper. Step 50 remains the short audited render/refreeze pulse, Step 51 remains non-invoking single-player frontier mapping, and Step 52 remains the 1.5-second audited render residency/refreeze. Any failure stops the ladder.
+0.0.183 opens no new runtime behavior. It adds a fresh-process one-button runner that reuses the exact existing closed steps through 52 (Step 15 A–C, Step 35 MODEL-BOOTSTRAP, 36, 37, skip 38, then 39–52), calibrates only Step 50's evidence ceiling to 4000 ms while preserving the 100 ms target/refreeze semantics, and completes the existing Codemagic AOT cache with the missing dependency sentinel files identified in the supplied 3250-second build artifact. Step 53 remains unopened.
 
 Original whole `GameStartup`, original `LaunchMainMenu`, single-player handler invocation, cloud/platform initialization, deferred startup, external Steamworks/native Steam, and FMOD/Spine native game extensions remain separate future boundaries.
 
-Resumption sources: `docs/CURRENT-STATUS.md` is the runtime frontier authority, `docs/REGRESSION-CONTRACTS.md` preserves protected historical contracts, and `docs/history/INDEX.md` indexes design/evidence provenance.
+Resumption sources: `docs/CURRENT-STATUS.md` is runtime-frontier authority, `docs/REGRESSION-CONTRACTS.md` preserves protected historical contracts, and `docs/history/INDEX.md` indexes design/evidence provenance.
 
 ## Product objective
 
@@ -284,6 +284,6 @@ Step 36.0 is separately gated. It advances only to exact transformed static para
 
 ## Current frontier — Step 41.0
 
-Physical 0.0.170 closed Step 39 at 4/4. Physical 0.0.171 then closed Step 40 at 4/4 on a successful second run: the real in-tree hierarchy passed its frame/input audit, the Godot renderer started, stopped again at 103.3 ms, and frozen NGame/state/native confinement held. That result advanced the project to Step 41; Step 41 and Step 42 have since physically closed 4/4, and the current frontier is the 0.0.182 Steps 43–52 guarded direct-main-menu ladder described at the top of this plan.
+Physical 0.0.170 closed Step 39 at 4/4. Physical 0.0.171 then closed Step 40 at 4/4 on a successful second run: the real in-tree hierarchy passed its frame/input audit, the Godot renderer started, stopped again at 103.3 ms, and frozen NGame/state/native confinement held. That result advanced the project to Step 41; Step 41 and Step 42 have since physically closed 4/4, and the current frontier is the 0.0.183 physically closed stabilization through Step 52 described at the top of this plan.
 
 Step 41.0 is the mandatory map-before-enable GameStartup step. Rendering stays frozen and the existing inert `GameStartupWrapper` is preserved. The launcher maps exact `NGame.GameStartup`, its compiler-generated async state machine and `MoveNext` IL, then traverses the same-sts2 closure and records path-qualified platform/Steam/main-menu/deferred/FMOD/Spine/Sentry/native-facing boundaries. No GameStartup execution, platform initialization, Steam initialization, main-menu launch, deferred startup, or render restart is authorized. The resulting physical static map will define the next narrow partial-startup boundary.

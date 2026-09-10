@@ -34,6 +34,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string MainMenuSingleplayerButtonPressedMethodName = "SingleplayerButtonPressed";
     private const string MainMenuOpenSingleplayerSubmenuMethodName = "OpenSingleplayerSubmenu";
     private const string PlatformSetRichPresenceMethodName = "SetRichPresence";
+    public const int Step50RenderPulseEvidenceCeilingMilliseconds = 4_000;
     public const int Step52SustainedRenderTargetMilliseconds = 1_500;
     public const int Step52SustainedRenderEvidenceCeilingMilliseconds = 6_000;
 
@@ -1107,7 +1108,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         if (_step50PulseStarted)
             throw new InvalidOperationException("Step 50.0 render pulse is one-shot in-process.");
         _step50PulseStarted = true;
-        Checkpoint(checkpoint, $"M50_C_PULSE_ARMED — first/only direct-main-menu render pulse authorized; requested stop delay={Step40RenderPulseTargetMilliseconds}ms; evidence ceiling={Step40RenderPulseMaximumMilliseconds}ms. First managed continuation must StopRendering before telemetry.");
+        Checkpoint(checkpoint, $"M50_C_PULSE_ARMED — first/only direct-main-menu render pulse authorized; requested stop delay={Step40RenderPulseTargetMilliseconds}ms; evidence ceiling={Step50RenderPulseEvidenceCeilingMilliseconds}ms. First managed continuation must StopRendering before telemetry.");
     }
 
     public TransformedRealStS2StartupLadderGateResult RunStep50BoundedRenderPulseEvidence(
@@ -1133,8 +1134,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidOperationException($"Step 50.0 StartRendering failed. returned={startReturned}; activeAfterStart={renderingActiveAfterStart}.");
             if (!stopReturned || renderingActiveAfterStop)
                 throw new InvalidOperationException($"Step 50.0 StopRendering failed to refreeze synchronously. returned={stopReturned}; activeAfterStop={renderingActiveAfterStop}.");
-            if (elapsedMilliseconds < Step40RenderPulseTargetMilliseconds || elapsedMilliseconds > Step40RenderPulseMaximumMilliseconds)
-                throw new InvalidOperationException($"Step 50.0 post-stop evidence outside accepted window. target={Step40RenderPulseTargetMilliseconds}; ceiling={Step40RenderPulseMaximumMilliseconds}; observed={elapsedMilliseconds:F1}.");
+            if (elapsedMilliseconds < Step40RenderPulseTargetMilliseconds || elapsedMilliseconds > Step50RenderPulseEvidenceCeilingMilliseconds)
+                throw new InvalidOperationException($"Step 50.0 post-stop evidence outside accepted window. target={Step40RenderPulseTargetMilliseconds}; ceiling={Step50RenderPulseEvidenceCeilingMilliseconds}; observed={elapsedMilliseconds:F1}.");
             if (_step48MainMenuInstance is null || RequireZeroArgBoolMethod(_step48MainMenuInstance.GetType(), "IsInsideTree").Invoke(_step48MainMenuInstance, null) is not true)
                 throw new InvalidDataException("Step 50.0 NMainMenu left the SceneTree during render pulse.");
             if (context.InitializerBearingRequests.Count != baseline.InitializerCount || context.RejectedManagedRequests.Count != baseline.RejectedCount || context.NativeLoadAttempts.Count != baseline.NativeCount)

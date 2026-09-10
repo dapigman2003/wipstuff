@@ -1,22 +1,16 @@
 # Current status
 
-## Active candidate — Steps 43–52 guarded direct main-menu ladder / 0.0.182 (182)
+## Active candidate — Steps 43–52 physically closed stabilization / 0.0.183 (183)
 
-Runtime authority has advanced to **Step 48 closed 4/4**, with Step 49 localized to a launcher verification ceiling. Physical 0.0.181 Step 49 Gate A accepted same-process Step-48 4/4 authority. Gate B resolved the exact retained `/Game/RootSceneContainer`, observed the NGame property null, token-matched `set_RootSceneContainer` at `0x06001B9B`, and proved a four-instruction/zero-call/one-field trivial assignment. Gate C repaired the property to the exact retained child with zero context/native drift and invoked frozen `RootSceneContainer.AddChild(NMainMenu)`.
+Runtime authority now reaches **Step 52** on the current same-process direct-main-menu route. Physical 0.0.182 closed Step 49. The supplied first Step-50 attempt then passed Gate A/B, mapped 1,075 in-tree nodes / 94 managed node types / 24 frame-input roots / 149 immediate methods with zero forbidden/unresolved references, successfully started rendering, and synchronously stopped it with rendering inactive; the only rejection was a cold ~2526 ms first managed continuation beyond the old 2000 ms classification ceiling. The user subsequently reported a fresh-process rerun where **Steps 50, 51 and 52 each passed 4/4**. Successful rerun report files were not supplied, so that closure is recorded as user-reported physical authority rather than fabricated evidence.
 
-**Physical 0.0.181 / Step 48 — CLOSED POSITIVE 4/4.** Step 49 Gate A is the authoritative same-process proof: real `NMainMenu` was retained off-tree, rendering was stopped, NGame state was 2, and Step-48 closure was accepted before Step 49 began.
+**0.0.183 is stabilization only; Step 53 remains unopened.** It adds a fresh-process one-shot convenience runner over the already-closed route, a Step-50-specific 4000 ms evidence ceiling while preserving the 100 ms target and stop-before-telemetry/refreeze semantics, and a Codemagic AOT cache correction/telemetry package based on the supplied 3250-second build artifact.
 
-**Physical 0.0.181 / Step 49 — SAFE 2/4 POST-ADMISSION-DIAGNOSTIC STOP.** Gate A and Gate B passed. Gate C repaired `NGame.RootSceneContainer` successfully and then started the one-shot frozen `AddChild(NMainMenu)`. The failure stack is in the *post-AddChild* `RequireStartupLadderRootSceneContainerPropertyIdentity` call, whose old implementation traversed the whole NGame tree via `EnumerateStep39NodeGraph`. That historical helper aborts at 256 nodes. Because the source reaches this property check only after the reflected AddChild call, `NMainMenu.IsInsideTree=true`, and exact-parent validation, the physical result strongly localizes the failure to diagnostic verification after menu lifecycle expansion, not to the AddChild invocation itself. Rendering remained frozen and the UI operation ended normally.
+The Codemagic artifact localizes **3195/3250 seconds** to iOS publish/package. Existing cache restoration was healthy (2.9 GB iOS obj and 1092 AOT outputs), but the MSBuild binlog reported missing `AOTCompileInputs.cache.uptodate` while LLVM `opt`/`llc` still ran broadly. 0.0.183 keeps workflow `ios-canonical`, M2, pinned .NET/Xcode, and existing caches, then adds only the two tiny AOT dependency sentinel files plus exact pre/post and opt/llc telemetry. The first 0.0.183 build seeds those new cache paths; the following warm build is the decisive performance test.
 
-**0.0.182 / Step 49.1 correction.** RootSceneContainer identity is now resolved only from immediate NGame children, requiring exactly one child named `RootSceneContainer`, exact managed `NSceneContainer` type, `IsInsideTree=true`, exact direct NGame parent, and property consistency. No admitted-menu descendants are traversed for this authority check. Gate C now emits durable checkpoints immediately after AddChild returns, after `IsInsideTree=true`, after exact-parent verification, and after the observed RootSceneContainer child count. Steps 50 and 52 use a separate menu-only breadth-first diagnostic traversal with a 4,096-node ceiling; the historical Step-39 256-node helper is unchanged.
+The multi-rung safety discipline remains unchanged: the convenience runner calls existing numbered methods rather than bypassing them, checks exact closure after each return, explicitly skips Step 38, stops on first failure, and never auto-runs Step 15 Gate D.
 
-**Physical 0.0.178 / Step 45 — CLOSED POSITIVE 4/4.** Step 46 Gate A accepted same-process Step-45 local-save authority with state 2, renderer stopped, selected compatibility bytes unchanged, and zero post-Step-45 resolver/host/private/initializer/rejected/native drift. Step 46 Gate B also mapped exact original `NGame.LaunchMainMenu(bool)` token `0x06001BDF`, async state machine `NGame/<LaunchMainMenu>d__131`, `MoveNext` token `0x06001C3D`, 336 IL instructions, zero external Cecil resolution. Original `LaunchMainMenu` remains uninvoked.
-
-**Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4.** Exact `NGame.InitPools()` mapped to a 22-method zero-boundary closure and executed once on retained real NGame with state 2, renderer frozen, and zero resolver/host/private/initializer/rejected/native deltas.
-
-Earlier physical Step 39/40/41 authorities remain closed. **Step 38 must still be skipped** in the process used for Steps 39 onward.
-
-The multi-rung packaging discipline remains unchanged: every rung has independent four-gate state, exact same-process prerequisite authority, step-distinct durable checkpoint/static-map/final-report evidence, and stop-on-first-failure behavior. Never attempt a later rung after a failed prerequisite. Never retry an armed one-shot boundary in-process.
+Retained prior physical authority: **Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4.** Exact `NGame.InitPools()` retained its **22-method zero-boundary closure**, the **renderer frozen** throughout, with **zero resolver/host/private/initializer/rejected/native deltas**. Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains uninvoked**. The current same-process path must **skip Step 38** before Step 39.
 
 ## Step 43.0 — concrete Null platform authority
 
@@ -54,42 +48,37 @@ In the one-shot frozen Gate C, if and only if the property is null, it assigns t
 
 Reports: `Step49-CrashCheckpoint-<RunId>.txt`, `Step49-MainMenuAdmission-StaticMap-<RunId>.txt`, `Step49-LastCheckpoint.txt`, `Step49-TransformedRealStS2MainMenuFrozenAdmission.txt`.
 
-## Step 50.0 — in-tree menu frame/input audit + short bounded render pulse
+## Step 50.0 — in-tree menu frame/input audit + short bounded render pulse — physically closed
 
-Requires Step 49 4/4. Reuses current Step-48 runtime guards for the actual in-tree callback audit. The exact map is durable before one-shot `StartRendering()`. It requests the proven 100 ms pulse and calls `StopRendering()` at the first managed continuation **before post-stop telemetry/file I/O**. Gate D requires rendering frozen again and retained menu/NGame authority.
+Requires Step 49 4/4. 0.0.183 retains the 100 ms requested stop and uses a Step-50-specific 4000 ms evidence ceiling; StopRendering remains first managed-continuation work before telemetry. Historical Step40 stays 2000 ms.  Reuses current Step-48 runtime guards for the actual in-tree callback audit. The exact map is durable before one-shot `StartRendering()`. It requests the proven 100 ms pulse and calls `StopRendering()` at the first managed continuation **before post-stop telemetry/file I/O**. Gate D requires rendering frozen again and retained menu/NGame authority.
 
-## Step 51.0 — non-invoking single-player frontier map
+## Step 51.0 — non-invoking single-player frontier map — physically closed
 
 Requires Step 50 4/4/refrozen authority. Binds exact `NMainMenu.SingleplayerButtonPressed` and `NMainMenu.OpenSingleplayerSubmenu`, records direct IL, and builds an execution/deferred frontier using the retained runtime guards. This step **never invokes either handler and never renders**. Classified boundaries are retained as evidence for the next design decision; unresolved same-sts2 references or external Cecil resolution fail.
 
 Reports: `Step51-CrashCheckpoint-<RunId>.txt`, `Step51-SingleplayerFrontier-StaticMap-<RunId>.txt`, `Step51-LastCheckpoint.txt`, `Step51-TransformedRealStS2SingleplayerFrontier.txt`.
 
-## Step 52.0 — sustained real-menu render residency + synchronous refreeze
+## Step 52.0 — sustained real-menu render residency + synchronous refreeze — physically closed
 
 Requires Step 51 4/4 durable map authority. Runs a fresh actual in-tree frame/input audit, durably writes it, then arms one render residency. `StartRendering()` runs once; target residency is **1500 ms** with a **6000 ms** post-stop evidence ceiling; the first managed continuation calls `StopRendering()` before any telemetry/file I/O. Success requires retained in-tree NMainMenu, zero initializer/rejected/native escape during the residency, and no further context drift after the captured post-pulse baseline. Step 52 always leaves rendering frozen.
 
 Reports: `Step52-CrashCheckpoint-<RunId>.txt`, `Step52-MainMenuSustainedFrameInput-StaticMap-<RunId>.txt`, `Step52-LastCheckpoint.txt`, `Step52-TransformedRealStS2MainMenuSustainedRender.txt`.
 
-## Physical sequence for 0.0.182
+## Physical sequence for 0.0.183
 
-1. Fresh process → Step 15 A-C.
-2. Step 35.0.32 MODEL-BOOTSTRAP → require 4/4.
-3. Step 36.0.5 → require 4/4.
-4. Step 37.0.1 → require 4/4.
-5. **Skip Step 38 in this process.**
-6. Step 39.0 A-D once → require 4/4, renderer frozen.
-7. Step 40.1 A-D once → require 4/4, renderer frozen.
-8. Step 41.0 A-D once → require 4/4; GameStartup remains uninvoked.
-9. Step 42.0 A-D once → require 4/4; InitPools returns once, renderer frozen.
-10. Step 43 → continue only on 4/4.
-11. Step 44 → continue only on 4/4/no legacy data.
-12. Step 45 once → continue only on 4/4; never retry after arm.
-13. Step 46.1 → non-invoking map; continue only on 4/4.
-14. Step 47 once → resource prep/load; continue only on 4/4; never retry after arm.
-15. Step 48.2 once → physically closed design; re-establish same-process off-tree authority and continue only on 4/4; never retry after arm.
-16. Step 49.1 once → frozen SceneTree admission with direct-child root verification; continue only on 4/4; never retry after arm.
-17. Step 50 once → short audited render pulse/refreeze; continue only on 4/4.
-18. Step 51 → non-invoking single-player frontier map; continue only on 4/4.
-19. Step 52 once → sustained audited render residency/refreeze; preserve reports/visual observations and relaunch afterward.
+Preferred: fresh process → press the new **Physically Closed Path** button once. It executes:
 
-Still globally forbidden in 0.0.182 unless explicitly authorized above: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, trusted-install mutation, and any single-player handler invocation. **Only Steps 50 and 52 may restart rendering; both must synchronously refreeze before success evaluation.**
+1. Step 15 A–C only.
+2. Step 35.0.32 MODEL-BOOTSTRAP.
+3. Step 36.0.5.
+4. Step 37.0.1.
+5. **Skip Step 38.**
+6. Step 39.
+7. Step 40.1.
+8. Step 41.
+9. Step 42.
+10. Steps 43 → 52 in order.
+
+The runner verifies each existing exact pass/closure predicate before advancing, stops on first failure, preserves all normal reports, and leaves rendering frozen after Step 52. Step 15 Gate D is intentionally not run. Manual controls remain available for diagnosis using the same sequence.
+
+Still globally forbidden in 0.0.183: Step 53+, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, trusted-install mutation, and any single-player handler invocation. Only physically closed Steps 50 and 52 may restart rendering, and both synchronously refreeze before success evaluation.

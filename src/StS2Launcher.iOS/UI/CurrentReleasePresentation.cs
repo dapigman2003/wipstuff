@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER";
+        "STEPS 43–52 — PHYSICALLY CLOSED STABILIZATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 37–48 CLOSED POSITIVE • STEP 49 SAFE POST-ADMISSION DIAGNOSTIC STOP • STEPS 49.1–52 ACTIVE — STOP ON FIRST FAILURE";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–52 PHYSICALLY CLOSED • 0.0.183 STABILIZATION — STEP 53 UNOPENED";
 
     public const string Summary =
-        "Physical 0.0.181 closed Step 48 at 4/4, then Step 49 Gate A/B passed, exact null NGame.RootSceneContainer repair succeeded with zero context/native drift, and frozen RootSceneContainer.AddChild(NMainMenu) was invoked once. The run stopped only when post-AddChild verification reused the historical Step-39 whole-NGame traversal and hit its 256-node diagnostic ceiling after the menu lifecycle expanded the tree. 0.0.182 stays focused on Steps 49–52: exact retained RootSceneContainer authority is now resolved from immediate NGame children only, Step 49 writes durable post-AddChild return/inside-tree/parent/child-count checkpoints, and Steps 50/52 use a separate 4,096-node menu-only diagnostic traversal. No runtime frontier is broadened.";
+        "Physical 0.0.182 closed Step 49 and, on a fresh rerun reported by the user, Steps 50–52 each reached 4/4. The supplied first Step-50 attempt already proved a clean 1,075-node frame/input map plus successful StartRendering/StopRendering and failed only because a cold first managed continuation arrived at 2526 ms beyond the old 2000 ms evidence ceiling. 0.0.183 opens no new runtime frontier: it adds a fresh-process one-button reproof of the already-closed path through Step 52, gives Step 50 its own 4000 ms evidence ceiling while retaining the 100 ms stop target and synchronous refreeze, and completes Codemagic caching of the missing .NET iOS AOT dependency sentinels identified in the supplied 3250-second build artifact.";
 
     public const string InitialStatus =
-        "Status: Steps 39–48 are physically closed. Physical 0.0.181 proves Step 49 reached exact trivial RootSceneContainer property repair and invoked frozen AddChild(NMainMenu), then stopped only on the old 256-node verification ceiling; rendering stayed frozen. For 0.0.182 run the existing prerequisite chain through 48, then focus on 49 → 50 → 51 → 52. Step 49.1 uses direct-child RootSceneContainer identity checks and richer post-AddChild checkpoints. Step 50 and Step 52 retain their existing render/refreeze contracts but their menu audits use a separate bounded 4,096-node diagnostic traversal. Step 51 remains non-invoking.";
+        "Status: Steps 35–52 are physically closed under the current same-process route. 0.0.183 is a stabilization/ergonomics/CI build only. Use the new fresh-process Physically Closed Path button to reprove Step 15 A–C, Step 35 MODEL-BOOTSTRAP, 36, 37, skip 38, then 39–52 with exact stop-on-first-failure predicates. The runner leaves rendering frozen after Step 52. Step 53 and all later gameplay/Steam/cloud/native-extension frontiers remain unopened.";
 
-    public const string ExpectedDisplayVersion = "0.0.182";
-    public const string ExpectedBuildVersion = "182";
+    public const string ExpectedDisplayVersion = "0.0.183";
+    public const string ExpectedBuildVersion = "183";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -63,7 +63,7 @@ internal static class CurrentReleasePresentation
         "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4: exact NGame.InitPools token 0x06001BFA -> 3 direct IL instructions -> 22-method transitive same-sts2 closure -> zero classified/unresolved/external Cecil boundaries -> durable pre-invocation static map -> one exact MethodInfo.Invoke(instance,null) returned -> state 2 preserved -> frozen post-InitPools NGame confinement with resolver/host/private/initializer/rejected/native deltas all zero; GameStartup/migrations/cloud/platform/Steam/main-menu/deferred remained unopened";
 
     public const string StartupLadderImplementationMarker =
-        "physical 0.0.181 closes Step48 4/4 -> Step49 Gate A/B pass -> exact set_RootSceneContainer token 0x06001B9B trivial zero-call one-field repair succeeds with zero context/native drift -> frozen RootSceneContainer.AddChild(NMainMenu) invoked once -> post-AddChild verification alone stops on immutable historical Step39 256-node whole-NGame diagnostic ceiling -> 0.0.182 Step49.1 resolves exact retained RootSceneContainer from immediate NGame children only and adds durable AddChild-return/inside-tree/parent/child-count checkpoints -> Steps50/52 use separate 4096-node menu-only diagnostic traversal while Step39 helper stays unchanged -> Step50 short audited pulse/refreeze, Step51 non-invoking single-player frontier map, Step52 1500ms sustained audited pulse/refreeze; whole GameStartup/original LaunchMainMenu/single-player handler invocation/DoCloudSync/migration mutation/InitializePlatform/LoadDeferredStartupAssets/ExecuteDeferred/external Steamworks/FMOD/Spine native extensions remain unopened";
+        "physical 0.0.182 closes Step49 4/4 and user-reported fresh rerun closes Steps50-52 4/4 -> supplied first Step50 attempt maps 1075 in-tree nodes/94 managed types/24 frame-input roots/149 immediate methods with zero forbidden/unresolved, StartRendering succeeds and StopRendering synchronously refreezes but 2526ms first continuation exceeds old 2000ms classifier -> 0.0.183 keeps 100ms requested stop and raises only Step50 evidence ceiling to 4000ms -> fresh-process one-shot physically closed-path runner invokes existing Step15 A-C then Step35 MODEL-BOOTSTRAP, Step36, Step37, explicitly skips Step38, then Steps39-52 and verifies exact closure after every return -> Codemagic ios-canonical cache adds only AOTCompileInputs.cache and AOTCompileInputs.cache.uptodate plus opt/llc telemetry after supplied 3250s build localized 3195s to iOS publish; Step53 remains unopened";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

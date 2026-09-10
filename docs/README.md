@@ -1,14 +1,14 @@
-# Documentation index — active Steps 43–52 / 0.0.182
+# Documentation index — active Steps 43–52 / 0.0.183
 
-Active candidate: **0.0.182 (182)** — guarded direct main-menu ladder; current engineering changes are limited to Steps 49–52.
+Active candidate: **0.0.183 (183)** — physically closed stabilization. Step 53 remains unopened.
 
 Primary authority:
 
-- `CURRENT-STATUS.md` — current physical frontier, rung contracts, and device sequence.
+- `CURRENT-STATUS.md` — current physical frontier, closed-path runner contract, and device sequence.
 - `MASTER-PLAN.md` — product objective and architectural roadmap.
 - `TESTING.md` — validation/device procedure for the active candidate.
 - `RELEASE-CHECKLIST.md` — release-quality and packaging requirements.
 - `REGRESSION-CONTRACTS.md` — protected historical contracts.
 - `history/INDEX.md` — evidence/design provenance index.
 
-Physical 0.0.181 closed Step 48 4/4 and localized Step 49 to the historical Step-39 256-node diagnostic ceiling after frozen menu admission had already advanced into post-AddChild verification. 0.0.182 keeps the same Steps 48–52 scope: Step 49 uses immediate-child RootSceneContainer authority and richer post-AddChild evidence; Steps 50/52 use a separate 4,096-node menu-only diagnostic traversal; Step 51 remains non-invoking.
+Physical authority now reaches Step 52. 0.0.183 adds no new runtime frontier: it adds a fresh-process one-button reproof through Step 52, calibrates only Step 50's post-stop evidence ceiling to 4000 ms while retaining the 100 ms target/refreeze semantics, and completes/observes the existing Codemagic AOT cache by persisting the missing AOT dependency sentinel files.

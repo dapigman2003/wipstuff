@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>182</ApplicationVersion>" in project_text, "build version is 182")
-require("<ApplicationDisplayVersion>0.0.182</ApplicationDisplayVersion>" in project_text, "display version is 0.0.182")
-require(plist.get("CFBundleVersion") == "182", "Info.plist build version is 182")
-require(plist.get("CFBundleShortVersionString") == "0.0.182", "Info.plist display version is 0.0.182")
+require("<ApplicationVersion>183</ApplicationVersion>" in project_text, "build version is 183")
+require("<ApplicationDisplayVersion>0.0.183</ApplicationDisplayVersion>" in project_text, "display version is 0.0.183")
+require(plist.get("CFBundleVersion") == "183", "Info.plist build version is 183")
+require(plist.get("CFBundleShortVersionString") == "0.0.183", "Info.plist display version is 0.0.183")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,13 +198,13 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER" in release_presentation, "top launcher banner identifies the active Steps 43–52 guarded direct main-menu ladder")
-require("Physical 0.0.181 closed Step 48 at 4/4" in release_presentation and "STEPS 49.1–52 ACTIVE" in release_presentation, "top launcher presentation records physical Step-48 closure, Step-49 diagnostic localization, and the focused Step-49.1–52 frontier")
-require("Active candidate: **0.0.182 (182)**" in read("README.md") and "Active candidate: **0.0.182 (182)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.182 (182) release identity")
-require("active candidate is **0.0.182 / sequential startup ladder Steps 43–52**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.182 / Steps 43–52 frontier")
-require(all(marker in release_presentation for marker in ["STEPS 37–48 CLOSED POSITIVE", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "NMainMenu", "Steam", "Step 49.1", "Step 50", "Step 52"]), "top launcher banner preserves closed runtime authority and identifies the focused Step-49.1–52 ladder")
+require("STEPS 43–52 — PHYSICALLY CLOSED STABILIZATION" in release_presentation, "top launcher banner identifies the active Steps 43–52 physically closed stabilization")
+require("Physical 0.0.182 closed Step 49" in release_presentation and "Steps 50–52 each reached 4/4" in release_presentation and "STEP 53 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 52 and keeps Step 53 unopened")
+require("Active candidate: **0.0.183 (183)**" in read("README.md") and "Active candidate: **0.0.183 (183)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.183 (183) release identity")
+require("active candidate is **0.0.183 / physically closed stabilization through Step 52**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.183 / closed-through-52 frontier")
+require(all(marker in release_presentation for marker in ["STEPS 35–52 PHYSICALLY CLOSED", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "Steam", "Step 50", "Step 52", "Step 53"]), "top launcher banner preserves historical authority and identifies closed-through-52 stabilization")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.182"' in release_presentation and 'ExpectedBuildVersion = "182"' in release_presentation, "startup-ladder source pins expected 0.0.182 bundle release identity")
+require('ExpectedDisplayVersion = "0.0.183"' in release_presentation and 'ExpectedBuildVersion = "183"' in release_presentation, "startup-ladder source pins expected 0.0.183 bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -332,6 +332,31 @@ ui_files = sorted((ROOT / "src/StS2Launcher.iOS/UI").glob("RootViewController*.c
 require(len(ui_files) >= 8, "RootViewController remains split into focused partial files")
 large_ui = [(p.name, p.stat().st_size) for p in ui_files if p.stat().st_size > 50_000]
 require(not large_ui, "no RootViewController partial exceeds 50 KB", ", ".join(f"{n}={s}" for n, s in large_ui))
+closed_path_file = ROOT / "src/StS2Launcher.iOS/UI/RootViewController.PhysicallyClosedPath.cs"
+require(closed_path_file.is_file(), "physically closed-path runner lives in a dedicated RootViewController partial")
+closed_path = closed_path_file.read_text() if closed_path_file.is_file() else ""
+require("AddPhysicallyClosedPathControls(content);" in root_ui_text, "RootViewController exposes the physically closed-path runner adjacent to Step 15")
+closed_order = [
+    "RunGodotFoundationGatesABCAsync",
+    "RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility)",
+    "RunTransformedRealStS2EssentialInitializationAsync",
+    "RunTransformedRealStS2GameSceneAdmissionAsync",
+    "RunTransformedRealStS2SceneTreeAdmissionAsync",
+    "RunTransformedRealStS2RenderPulseAsync",
+    "RunTransformedRealStS2GameStartupFrontierAsync",
+    "RunTransformedRealStS2GameStartupInitPoolsAsync",
+    *[f"RunStep{step}StartupLadderAsync" for step in range(43, 53)],
+]
+positions = [closed_path.find(value) for value in closed_order]
+require(all(pos >= 0 for pos in positions) and positions == sorted(positions), "closed-path runner calls Step15 A-C, 35-37, 39-52 in exact physical order")
+require("RunTransformedRealStS2GameLifecycleEntryAsync" not in closed_path and "Step 38 SKIPPED by contract" in closed_path, "closed-path runner explicitly skips Step 38")
+require("VerifyGodotFoundationGateDAsync" not in closed_path and "Step 15 Gate D" in closed_path, "closed-path runner never auto-runs Step 15 Gate D")
+require(all(value in closed_path for value in ["_physicallyClosedPathStarted", "IsFreshProcessForPhysicallyClosedPath", "_physicallyClosedPathButton.Enabled = false", "RunClosedPhysicalStageAsync", "if (!passed())", "No later stage was invoked", "PhysicallyClosedPath-ToStep52.txt"]), "closed-path runner is fresh-process-only, one-shot, fail-closed, and has a convenience report")
+require("DisableClosedPhysicalPathManualControls" in closed_path and "_step38LifecycleButton.Enabled = false" in closed_path and closed_path.count("DisableClosedPhysicalPathManualControls();") >= 2, "closed-path runner prevents manual-rung races and explicitly disables Step 38 while armed")
+for step in list(range(36, 38)) + list(range(39, 53)):
+    require(f"ExactStep{step}ClosurePassed" in closed_path, f"closed-path runner requires exact Step {step} Core closure before advancing")
+require("EssentialCompatibilityAuthorityPassed" in closed_path and "GodotCoreModelBootstrapCompatibility" in closed_path, "closed-path runner requires the physically closed Step35 MODEL-BOOTSTRAP authority")
+require("GodotStep15NativeBridge.IsRenderingActive" in closed_path and "final renderer state to be frozen" in closed_path, "closed-path runner requires rendering frozen after Step 52")
 require("public sealed partial class RootViewController" in read("src/StS2Launcher.iOS/UI/RootViewController.cs"), "RootViewController retains sealed partial structure")
 
 active_scripts = {p.name for p in (ROOT / "scripts").glob("*.sh")}
@@ -345,8 +370,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-43-52.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.182",
-    "STS2_BUILD_VERSION": "182",
+    "STS2_DISPLAY_VERSION": "0.0.183",
+    "STS2_BUILD_VERSION": "183",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -699,7 +724,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Steps 43–52 guarded direct-main-menu ladder IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Steps-43–52 guarded direct-menu candidate rather than retired Step 27")
+require("Steps 43–52 physically closed stabilization IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Steps-43–52 stabilization candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -1677,10 +1702,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Steps 43–52 guarded direct main-menu ladder / 0.0.182 (182)", "Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "Physical 0.0.178 / Step 45 — CLOSED POSITIVE 4/4", "Physical 0.0.181 / Step 48 — CLOSED POSITIVE 4/4", "Physical 0.0.181 / Step 49 — SAFE 2/4 POST-ADMISSION-DIAGNOSTIC STOP", "Step 49.1", "4,096-node", "Step 52.0", "stop-on-first-failure", "Step 38 must still be skipped"]), "current status records Step-48 physical closure, Step-49 256-node diagnostic stop, and active focused Steps-49.1–52 correction")
+require(all(marker in current_status for marker in ["Active candidate — Steps 43–52 physically closed stabilization / 0.0.183 (183)", "Runtime authority now reaches **Step 52**", "Physical 0.0.182 closed Step 49", "Steps 50, 51 and 52 each passed 4/4", "4000 ms evidence ceiling", "3195/3250 seconds", "AOTCompileInputs.cache.uptodate", "Step 53 remains unopened", "skip Step 38", "Step 15 Gate D"]), "current status records closure through Step 52, stabilization-only scope, fast path, and AOT cache diagnosis")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.182 (182)" in testing_doc and "0.0.182 (182)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.182 (182) release identity")
+require("0.0.183 (183)" in testing_doc and "0.0.183 (183)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.183 (183) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -1780,18 +1805,24 @@ for cache_path in [
     "$HOME/.cache/sts2launcher/godot-step15",
     "$HOME/.dotnet",
     "$CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64",
+    "$CM_BUILD_DIR/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache",
+    "$CM_BUILD_DIR/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache.uptodate",
 ]:
     require(cache_path in codemagic, f"Codemagic preserves canonical cache path: {cache_path}")
+require("instance_type: mac_mini_m2" in codemagic and "ios-canonical:" in codemagic, "Codemagic keeps the cache-bearing ios-canonical workflow and M2 machine stable")
+require("bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache" in codemagic and "bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache.uptodate" in codemagic, "Codemagic caches the two missing AOT dependency sentinels")
+require("- $CM_BUILD_DIR/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64\n" not in codemagic, "Codemagic does not cache the entire iOS bin tree")
 cm_script = read("scripts/codemagic.sh")
 require(all(marker in cm_script for marker in ["Pinned .NET SDK/workloads", ".sts2launcher-ios-workload-set", "workload list", "Using verified cached iOS workload set", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE=1"]), "Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation")
-require("Steps 43–52 guarded direct-main-menu ladder host regression tests" in read("scripts/test.sh"), "host-test report heading identifies the Steps 43–52 guarded direct-menu ladder")
+require("Steps 43–52 physically closed stabilization host regression tests" in read("scripts/test.sh"), "host-test report heading identifies the Steps 43–52 stabilization candidate")
 require("LogFileName=steps43-52.trx" in read("scripts/test.sh") and "artifacts/test-results/steps43-52.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Steps 43–50")
-require("Steps 43–52 guarded direct main-menu startup ladder build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Steps 43–52 guarded direct-menu candidate")
+require("Steps 43–52 physically closed stabilization build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Steps 43–52 stabilization candidate")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
 require(all(marker in read("scripts/codemagic.sh") for marker in ["SDK_SECONDS", "VALIDATE_SECONDS", "HOST_TEST_SECONDS", "WORKLOAD_SECONDS", "IOS_BUILD_SECONDS", "IPA_VERIFY_SECONDS", "TOTAL_SECONDS"]), "maintenance Codemagic summary records per-stage and total elapsed time")
 require(all(marker in read("scripts/codemagic.sh") for marker in ["cache-state.txt", "AOT_CACHE_DIR", "AOT output files before build", "AOT output files after build"]), "Codemagic records cache-hit/size telemetry without bypassing the canonical build")
+require(all(marker in read("scripts/codemagic.sh") for marker in ["AOT_INPUT_CACHE", "AOT_UPTODATE_MARKER", "cache_file_line", "sha256=", "LLVM_OPT_COUNT", "LLVM_LLC_COUNT", "AOT_UPTODATE_COUNT", "AOT_SENTINEL_MISSING_COUNT", "Executing opt:", "Executing llc:"]), "Codemagic reports AOT sentinel identity and LLVM incremental-work counters")
 require("history" not in codemagic.lower(), "Codemagic workflow has no history dependency")
 
 build_ios = read("scripts/build-ios.sh")
@@ -1799,14 +1830,14 @@ verify_ipa = read("scripts/verify-ipa.sh")
 require('source scripts/lib/current-release.sh' in build_ios, "iOS build sources canonical release configuration")
 require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical project variable")
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
-require("Publishing Steps 43–52 guarded direct main-menu startup ladder..." in build_ios, "iOS publish presentation identifies the active Steps 43–52 guarded direct-menu ladder")
-require(all(value in codemagic for value in ["name: Steps 43-52 - guarded direct main-menu startup ladder", "name: Validate, test, build, and verify Steps 43-52 guarded direct main-menu startup ladder"]), "Codemagic workflow presentation identifies the active Steps 43–52 guarded direct-menu ladder")
+require("Publishing Steps 43–52 physically closed stabilization..." in build_ios, "iOS publish presentation identifies the active Steps 43–52 stabilization candidate")
+require(all(value in codemagic for value in ["name: Steps 43-52 - physically closed stabilization + warm AOT cache", "name: Validate, test, build, and verify Steps 43-52 physically closed stabilization"]), "Codemagic workflow presentation identifies the active Steps 43–52 stabilization candidate")
 codemagic_script = read("scripts/codemagic.sh")
-require(all(value in codemagic_script for value in ["Codemagic cache state before Steps 43–52 guarded direct-main-menu ladder build", "StS2 Launcher iOS — Steps 43–52 guarded direct main-menu startup ladder"]), "Codemagic report headings identify the active Steps 43–52 guarded direct-menu ladder")
+require(all(value in codemagic_script for value in ["Codemagic cache state before Steps 43–52 physically closed stabilization build", "StS2 Launcher iOS — Steps 43–52 physically closed stabilization"]), "Codemagic report headings identify the active Steps 43–52 stabilization candidate")
 require("The active candidate is **0.0.173 / Step 41.0**" not in read("docs/MASTER-PLAN.md"), "master plan contains no stale Step-41 active-candidate claim")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER" in verify_ipa and "steps43-52-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Steps-43–52 guarded direct-menu candidate")
+require("Expected device UI: STEPS 43–52 — PHYSICALLY CLOSED STABILIZATION" in verify_ipa and "steps43-52-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Steps-43–52 stabilization candidate")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
@@ -2280,7 +2311,7 @@ require(not any(call in step41_core for call in [".GameStartup(", ".InitializePl
 require(not any(call in step41_ui for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 41 UI never directly invokes startup/platform/main-menu/deferred methods")
 require(all(value in step41_ui for value in ["Step41-CrashCheckpoint-", "Step41-GameStartupFrontier-StaticMap-", "Step41-LastCheckpoint.txt", "Step41-TransformedRealStS2GameStartupFrontier.txt", "K_C_STATIC_MAP_WRITE_RETURNED"]), "Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts")
 require("AddTransformedRealStS2GameStartupFrontierControls(content);" in step41_root_ui and "ResetStep41State();" in step40_core, "RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "Physical 0.0.181", "RootSceneContainer", "256-node", "4,096-node", "Step42ImplementationMarker", "StartupLadderImplementationMarker"]), "active release presentation preserves Step-42 authority and the physical 0.0.181 Step-49 diagnostic localization")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "Physical 0.0.182 closed Step 49", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "Step 53"]), "active release presentation preserves Step-42 authority and current physical closure through Step 52")
 require(all(value in step41_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "GameStartupAsyncStateMachineMap", "FrozenNoInvocationConfinement"]), "Step 41 host regressions pin gate sequencing and stable ordinals")
 require("Earlier physical Step 39/40/41 authorities remain closed" in current_status and "GameStartup remains uninvoked" in current_status, "current status preserves physical Step-41 no-invocation authority")
 
@@ -2345,7 +2376,7 @@ require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.182\"", "ExpectedBuildVersion = \"182\"", "STEPS 43–52 — GUARDED DIRECT MAIN-MENU LADDER"]), "active release presentation pins physical closure and Steps-43–52 / 0.0.182 identity")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.183\"", "ExpectedBuildVersion = \"183\"", "STEPS 43–52 — PHYSICALLY CLOSED STABILIZATION"]), "active release presentation pins physical closure and Steps-43–52 / 0.0.183 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "22-method zero-boundary closure", "renderer frozen", "zero resolver/host/private/initializer/rejected/native deltas"]), "current status pins the physically closed Step-42 InitPools authority")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
@@ -2531,6 +2562,8 @@ step50_ui_start = direct_ui.find("private async Task RunStep50StartupLadderAsync
 step50_ui_method = direct_ui[step50_ui_start:] if step50_ui_start >= 0 else ""
 require(all(value in step50_ui_method for value in ["_step50PulseUiStarted", "BeginStep50BoundedRenderPulse", "Task.Delay(TransformedRealStS2VeryEarlyInitialization.Step40RenderPulseTargetMilliseconds)", "elapsedBeforeStop", "M50_C_STOP_RENDERING_RETURNED", "RunStep50BoundedRenderPulseEvidence", "RunStep50FrozenPostPulseConfinement", "RUN_STEP50_4OF4"]), "Step 50 UI is one-shot, requests the proven 100 ms pulse, and evaluates frozen evidence")
 require(step50_ui_method.find("var stopReturned = GodotStep15NativeBridge.StopRendering();") < step50_ui_method.find("WriteStartupLadderCheckpoint(step, $\"M50_C_STOP_RENDERING_RETURNED"), "Step 50 stops rendering before post-stop telemetry/file I/O")
+require("Step50RenderPulseEvidenceCeilingMilliseconds = 4_000" in direct_core and "elapsedMilliseconds > Step50RenderPulseEvidenceCeilingMilliseconds" in direct_core, "Step 50 uses a dedicated 4000 ms evidence ceiling")
+require("Step40RenderPulseMaximumMilliseconds = 2000" in scene_tree_core.replace("TransformedRealStS2SceneTreeAdmission", "") if False else read("src/StS2Launcher.Core/Runtime/TransformedRealStS2RenderPulse.cs"), "historical Step 40 2000 ms evidence ceiling remains unchanged")
 
 # Step 51: exact single-player handler frontier map, evidence only and no handler invocation.
 require(all(value in continuation_core for value in ["RunStep51ClosedStep50Authority", "RunStep51SingleplayerHandlerBinding", "RunStep51SingleplayerFrontierMap", "RunStep51FrozenNoInvocationConfinement", "SingleplayerButtonPressed", "OpenSingleplayerSubmenu", "Handler invocation: NO", "Rendering restarted: NO"]), "Step 51 binds/maps exact single-player handler frontiers without invocation or rendering")
@@ -2548,6 +2581,7 @@ require(step52_ui_method.find("var stopReturned = GodotStep15NativeBridge.StopRe
 require(all(value in continuation_core for value in ["initializerDelta != 0 || rejectedDelta != 0 || nativeDelta != 0", "_step52PostPulseBaseline = CaptureStartupLadderBaseline", "RequireStartupLadderBaselineUnchanged(context, post, \"Step 52 Gate D\")"]), "Step 52 forbids initializer/rejected/native escape and freezes the post-pulse baseline")
 
 # Cross-rung restrictions and distinct evidence surfaces.
+require("RunStep53" not in startup_ui_all and "ExactStep53" not in (direct_core + continuation_core + read("src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadder.cs")), "Step 53 remains unopened in active source")
 require(".GameStartup(" not in startup_ui_all and ".LaunchMainMenu(" not in startup_ui_all and ".DoCloudSync(" not in startup_ui_all and ".InitializePlatform(" not in startup_ui_all and ".ExecuteDeferred(" not in startup_ui_all, "iOS ladder UI has no direct GameStartup/original LaunchMainMenu/cloud/platform/deferred call")
 require("RunDeprecatedStep47" not in startup_ui_all and "ControlledLaunchMainMenu" not in startup_ui_all, "iOS ladder has no stale original live-launch control path")
 for step, map_stem, report in [
@@ -2582,6 +2616,8 @@ if startup_manifest.is_file():
         "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2StartupLadder.cs",
         "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2DirectMainMenuLadder.cs",
         "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2DirectMainMenuContinuation.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.PhysicallyClosedPath.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.cs",
         "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs", "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj", "src/StS2Launcher.iOS/Info.plist",
         "scripts/lib/current-release.sh", "scripts/build-ios.sh", "scripts/test.sh", "scripts/codemagic.sh", "scripts/verify-ipa.sh", "codemagic.yaml", "tools/validate_current.py",
         "README.md", "docs/README.md", "docs/CURRENT-STATUS.md", "docs/MASTER-PLAN.md", "docs/TESTING.md", "docs/RELEASE-CHECKLIST.md", "docs/history/INDEX.md",
@@ -2589,6 +2625,13 @@ if startup_manifest.is_file():
         "docs/history/steps/STEP-48.1-52.0-GUARDED-DIRECT-MAIN-MENU-CONTINUATION.md",
         "docs/history/steps/STEP-48.2-52.0-ROOT-CONTAINER-AUTHORITY-CORRECTION.md",
         "docs/history/steps/STEP-49.1-52.0-POST-ADMISSION-NODE-GRAPH-DIAGNOSTIC-CORRECTION.md",
+        "docs/history/steps/STEP-50-52-PHYSICAL-0.0.182-CLOSURE-NOTE.md",
+        "docs/history/steps/STEP-43-52-0.0.183-STABILIZATION-FAST-PATH-AOT-CACHE.md",
+        "docs/history/reports/CODEMAGIC-0.0.182-BUILD-PERFORMANCE-ANALYSIS.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-REPORT.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-CHECKPOINT.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-STATIC-MAP.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-LAST-CHECKPOINT.txt",
         "docs/history/reports/STEP-49.0-PHYSICAL-0.0.181-REPORT.txt",
         "docs/history/reports/STEP-49.0-PHYSICAL-0.0.181-CHECKPOINT.txt",
         "docs/history/reports/STEP-49.0-PHYSICAL-0.0.181-STATIC-MAP.txt",
@@ -2614,6 +2657,51 @@ if startup_manifest.is_file():
         digest, relative = line.split("  ",1); path=ROOT/relative
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
     require(not mismatches, "Steps 43-52 guarded direct-main-menu active files are hash-pinned", ", ".join(mismatches))
+
+# Focused 0.0.183 stabilization/ergonomics/CI manifest. This is intentionally
+# separate from the guarded direct-menu provenance manifest so later releases can
+# preserve the exact build-performance and convenience-runner contract.
+stabilization_manifest = ROOT / "tools/validation/candidate-steps43-52-physically-closed-stabilization.sha256"
+require(stabilization_manifest.is_file(), "Steps 43-52 physically closed stabilization candidate hash manifest exists")
+if stabilization_manifest.is_file():
+    stabilization_manifest_text = stabilization_manifest.read_text()
+    required_stabilization_manifest_paths = [
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2DirectMainMenuLadder.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.PhysicallyClosedPath.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.cs",
+        "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs",
+        "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
+        "src/StS2Launcher.iOS/Info.plist",
+        "scripts/lib/current-release.sh",
+        "scripts/build-ios.sh",
+        "scripts/test.sh",
+        "scripts/codemagic.sh",
+        "scripts/verify-ipa.sh",
+        "codemagic.yaml",
+        "tools/validate_current.py",
+        "README.md",
+        "docs/README.md",
+        "docs/CURRENT-STATUS.md",
+        "docs/MASTER-PLAN.md",
+        "docs/TESTING.md",
+        "docs/REPORTS.md",
+        "docs/RELEASE-CHECKLIST.md",
+        "docs/history/INDEX.md",
+        "docs/history/steps/STEP-50-52-PHYSICAL-0.0.182-CLOSURE-NOTE.md",
+        "docs/history/steps/STEP-43-52-0.0.183-STABILIZATION-FAST-PATH-AOT-CACHE.md",
+        "docs/history/reports/CODEMAGIC-0.0.182-BUILD-PERFORMANCE-ANALYSIS.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-REPORT.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-CHECKPOINT.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-STATIC-MAP.txt",
+        "docs/history/reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-LAST-CHECKPOINT.txt",
+    ]
+    require(all(f"  {relative}" in stabilization_manifest_text for relative in required_stabilization_manifest_paths), "Steps 43-52 stabilization manifest pins fast-path UI, Step-50 calibration, AOT-cache wiring, release docs, and supplied physical/CI evidence")
+    mismatches=[]
+    for line in stabilization_manifest.read_text().splitlines():
+        if not line.strip(): continue
+        digest, relative = line.split("  ",1); path=ROOT/relative
+        if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
+    require(not mismatches, "Steps 43-52 physically closed stabilization active files are hash-pinned", ", ".join(mismatches))
 
 
 # ---------------------------------------------------------------------------

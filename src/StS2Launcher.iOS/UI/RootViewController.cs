@@ -508,6 +508,8 @@ public sealed partial class RootViewController : UIViewController
         _godotFoundationGateDButton.TouchUpInside += async (_, _) => await VerifyGodotFoundationGateDAsync();
         content.AddArrangedSubview(_godotFoundationGateDButton);
 
+        AddPhysicallyClosedPathControls(content);
+
         content.AddArrangedSubview(Separator());
 
         content.AddArrangedSubview(Label(

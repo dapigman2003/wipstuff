@@ -1,6 +1,6 @@
 workflows:
   ios-canonical:
-    name: Steps 43-52 - guarded direct main-menu startup ladder
+    name: Steps 43-52 - physically closed stabilization + warm AOT cache
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -29,8 +29,16 @@ workflows:
         # MSBuild remains responsible for invalidating inputs that actually changed.
         - $CM_BUILD_DIR/src/StS2Launcher.iOS/obj/Release/net9.0-ios/ios-arm64
 
+        # .NET iOS Mono AOT incremental dependency sentinels. The 0.0.182
+        # binlog proved that the large obj/AOT cache restored correctly, but
+        # AOTCompileInputs.cache.uptodate was absent, so LLVM opt/llc still
+        # reran across the AOT set. Cache only these tiny dependency markers,
+        # not the whole bin tree; MSBuild remains the invalidation authority.
+        - $CM_BUILD_DIR/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache
+        - $CM_BUILD_DIR/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache.uptodate
+
     scripts:
-      - name: Validate, test, build, and verify Steps 43-52 guarded direct main-menu startup ladder
+      - name: Validate, test, build, and verify Steps 43-52 physically closed stabilization
         script: |
           set -euo pipefail
           chmod +x scripts/*.sh

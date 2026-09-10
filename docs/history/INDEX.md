@@ -479,3 +479,13 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-49.0-PHYSICAL-0.0.181-STATIC-MAP.txt` — exact retained RootSceneContainer authority and trivial setter token `0x06001B9B`; rendering/original LaunchMainMenu remained unopened while the map was built.
 - `reports/STEP-49.0-PHYSICAL-0.0.181-LAST-CHECKPOINT.txt` — normal frozen process end after the one-shot Step-49 attempt.
 - `steps/STEP-49.1-52.0-POST-ADMISSION-NODE-GRAPH-DIAGNOSTIC-CORRECTION.md` — 0.0.182 focused correction: immediate-child RootSceneContainer identity lookup, post-AddChild durable checkpoints, and separate 4,096-node menu-only diagnostic traversal for Steps 50/52; no frontier expansion.
+
+## Steps 49–52 physical closure / 0.0.183 stabilization and CI acceleration
+
+- `reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-REPORT.txt` — supplied first Step-50 attempt: safe 2/4 timing-classification stop after successful StartRendering/StopRendering; observed first managed continuation ~2526 ms exceeded the old 2000 ms evidence ceiling.
+- `reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-CHECKPOINT.txt` — proves Step 49 had closed 4/4, Step-50 frame/input Gate B passed, rendering started and synchronously refroze before the timing-only rejection.
+- `reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-STATIC-MAP.txt` — actual in-tree menu map: 1,075 nodes, 94 managed node types, 24 frame/input roots, 149 immediate closure methods, zero forbidden immediate boundaries, zero unresolved references.
+- `reports/STEP-50.0-PHYSICAL-0.0.182-FIRST-ATTEMPT-LAST-CHECKPOINT.txt` — normal frozen run end after the timing-classification stop.
+- `steps/STEP-50-52-PHYSICAL-0.0.182-CLOSURE-NOTE.md` — records the user-reported fresh rerun in which Steps 50, 51 and 52 all passed 4/4; successful rerun report files were not supplied and are not fabricated.
+- `reports/CODEMAGIC-0.0.182-BUILD-PERFORMANCE-ANALYSIS.txt` — non-secret summary of the supplied Codemagic artifact: 3195/3250 seconds in iOS publish/package, restored AOT obj cache, missing AOTCompileInputs up-to-date sentinel, and repeated LLVM opt/llc work.
+- `steps/STEP-43-52-0.0.183-STABILIZATION-FAST-PATH-AOT-CACHE.md` — 0.0.183 design: fresh-process one-button reproof through Step 52, Step-50-specific 4000 ms evidence ceiling, and completion/telemetry of the existing AOT cache; Step 53 stays unopened.

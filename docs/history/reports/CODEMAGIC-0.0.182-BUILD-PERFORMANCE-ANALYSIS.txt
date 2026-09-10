@@ -1,0 +1,39 @@
+StS2 Launcher — Codemagic 0.0.182 build-performance analysis
+Source: user-supplied Codemagic artifact wipstuff_13_artifacts.zip
+Artifact is not repackaged here; this text is a provenance summary of non-secret timing/cache/binlog evidence.
+
+Canonical build summary
+- Commit: 3ba7227f237a79c151a019945e9878d6240e5e62
+- Xcode: 26.5 (17F42)
+- .NET SDK: 9.0.314
+- iOS workload: 9.0.314.3
+- Static validation: PASS
+- Host tests: PASS
+- IPA verification: PASS
+- .NET SDK setup: 0 s
+- static validation: 23 s
+- host tests + fixtures: 21 s
+- iOS workload: 1 s
+- iOS publish/package: 3195 s
+- IPA verification: 7 s
+- total canonical pipeline: 3250 s
+
+Restored cache evidence before publish
+- Home NuGet: 151 MB
+- isolated iOS NuGet: 41 MB
+- Godot Step 15: 180 MB
+- pinned .NET SDK/workloads: 2.7 GB
+- iOS arm64 obj: 2.9 GB
+- AOT output files: 1092
+
+Post-publish cache evidence
+- iOS arm64 obj: 3.0 GB
+- AOT output files: 1092
+
+MSBuild binary-log localization
+- The log contains many "The AOT-compiled code for ... is up-to-date" messages.
+- The log also records that bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache.uptodate does not exist.
+- Despite the restored AOT object set, approximately 182 LLVM opt and approximately 182 LLVM llc executions are present.
+
+Conclusion used by 0.0.183
+The dominant 3195-second phase is the .NET iOS publish/AOT/native pipeline, not validation, tests, SDK setup, workload setup, Godot build, or IPA verification. 0.0.183 preserves the existing 2.9–3.0 GB obj cache and adds only the two small MSBuild AOT dependency files AOTCompileInputs.cache and AOTCompileInputs.cache.uptodate to the same stable ios-canonical workflow cache. MSBuild remains the invalidation authority. Build telemetry is extended to record pre/post marker hashes and opt/llc/up-to-date counts. The first successful build with this change may still be cold for the newly added marker paths; the following warm build is the meaningful performance test.
