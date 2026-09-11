@@ -1,0 +1,35 @@
+StS2 Launcher — Step 53.0 Singleplayer Open Frontier
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-11T04:10:45.1517540+00:00
+
+RESULT
+STEP 53.0 SINGLEPLAYER OPEN FRONTIER FAIL — 1/4
+
+METADATA
+App version: 0.0.184 (184)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: initialization
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 53.0 requires zero-arg void OpenSingleplayerSubmenu; observed params=0; return=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep53SingleplayerOpenBinding(System.Action`1[System.String])
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep53SingleplayerOpenBinding(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 53.0 requires zero-arg void OpenSingleplayerSubmenu; observed params=0; return=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep53SingleplayerOpenBinding(System.Action`1[System.String])
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep53SingleplayerOpenBinding(Action`1 checkpoint)
+
+END OF REPORT

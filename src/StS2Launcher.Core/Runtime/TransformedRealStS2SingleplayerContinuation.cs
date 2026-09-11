@@ -206,8 +206,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var mainMenu = RequireStartupLadderType(allTypes, MainMenuManagedRootTypeFullName, step);
             var open = RequireUniqueStartupLadderNamedMethod(mainMenu, MainMenuOpenSingleplayerSubmenuMethodName, step);
             var pressed = RequireUniqueStartupLadderNamedMethod(mainMenu, MainMenuSingleplayerButtonPressedMethodName, step);
-            if (open.Parameters.Count != 0 || open.ReturnType.FullName != "System.Void")
-                throw new InvalidDataException($"Step 53.0 requires zero-arg void OpenSingleplayerSubmenu; observed params={open.Parameters.Count}; return={open.ReturnType.FullName}.");
+            if (open.Parameters.Count != 0 || open.ReturnType.FullName != SingleplayerSubmenuManagedTypeFullName)
+                throw new InvalidDataException($"Step 53.0 requires zero-arg OpenSingleplayerSubmenu returning exact {SingleplayerSubmenuManagedTypeFullName}; observed params={open.Parameters.Count}; return={open.ReturnType.FullName}.");
             if (resolver.Requests.Count != 0)
                 throw new InvalidDataException("Step 53.0 binding unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             _step53OpenMethodToken = open.MetadataToken.ToUInt32();
@@ -223,7 +223,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 53 Gate B");
             Checkpoint(checkpoint, $"M53_B_PASS — exact OpenSingleplayerSubmenu bound; token=0x{_step53OpenMethodToken:X8}; IL={open.Body.Instructions.Count}; SingleplayerButtonPressed remains evidence-only; externalResolution=0; invocation=NO.");
             return StartupLadderPass(step, Step53Name, gate,
-                "Exact zero-arg void OpenSingleplayerSubmenu binding and IL recorded without invocation. SingleplayerButtonPressed remains unopened.");
+                $"Exact zero-arg OpenSingleplayerSubmenu returning {SingleplayerSubmenuManagedTypeFullName} was bound and its IL recorded without invocation. SingleplayerButtonPressed remains unopened.");
         }
         catch (Exception ex)
         {
@@ -338,7 +338,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var context = RequireStep54Prerequisite("Step 54 Gate B entry");
             var baseline = _step54Baseline ?? throw new InvalidOperationException("Step 54.0 Gate A must pass before Gate B.");
             var menu = RequireRetainedInTreeMainMenu(step);
-            var open = RequireRuntimeDeclaredZeroArgVoidMethod(menu.GetType(), MainMenuOpenSingleplayerSubmenuMethodName, step);
+            var open = RequireRuntimeDeclaredZeroArgSingleplayerSubmenuMethod(menu.GetType(), step);
             if (unchecked((uint)open.MetadataToken) != _step53OpenMethodToken)
                 throw new InvalidDataException($"Step 54.0 runtime OpenSingleplayerSubmenu token drifted: expected=0x{_step53OpenMethodToken:X8}; actual=0x{unchecked((uint)open.MetadataToken):X8}.");
             var field = menu.GetType().GetField(MainMenuSingleplayerFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -389,16 +389,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidOperationException("Step 54.0 OpenSingleplayerSubmenu is one-shot in-process.");
             var menu = RequireRetainedInTreeMainMenu(step);
             var submenu = _step54SingleplayerSubmenu ?? throw new InvalidOperationException("Step 54.0 retained NSingleplayerSubmenu binding absent.");
-            var open = RequireRuntimeDeclaredZeroArgVoidMethod(menu.GetType(), MainMenuOpenSingleplayerSubmenuMethodName, step);
+            var open = RequireRuntimeDeclaredZeroArgSingleplayerSubmenuMethod(menu.GetType(), step);
             if (unchecked((uint)open.MetadataToken) != _step53OpenMethodToken)
                 throw new InvalidDataException("Step 54.0 OpenSingleplayerSubmenu runtime token changed before invocation.");
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 54 Gate C preinvoke");
             RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 54 Gate C guard recheck", requirePreAdmissionCounts: false);
             _step54OpenStarted = true;
             Checkpoint(checkpoint, $"M54_C_INVOKE_START — invoking exact NMainMenu.OpenSingleplayerSubmenu token=0x{_step53OpenMethodToken:X8} once while rendering remains frozen; SingleplayerButtonPressed remains uninvoked.");
+            object? returnedSubmenu;
             try
             {
-                open.Invoke(menu, null);
+                returnedSubmenu = open.Invoke(menu, null);
             }
             catch (TargetInvocationException tie) when (tie.InnerException is not null)
             {
@@ -409,6 +410,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 ?? throw new MissingFieldException(menu.GetType().FullName, MainMenuSingleplayerFieldName);
             if (!ReferenceEquals(field.GetValue(menu), submenu))
                 throw new InvalidDataException("Step 54.0 NMainMenu._singleplayerSubmenu identity changed across open invocation.");
+            if (!ReferenceEquals(returnedSubmenu, submenu))
+                throw new InvalidDataException("Step 54.0 OpenSingleplayerSubmenu return identity did not match the retained NMainMenu._singleplayerSubmenu authority.");
             var inside = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsInsideTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
             var visible = RequireRuntimeBoolProperty(submenu, "Visible", step);
             var visibleInTree = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsVisibleInTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
@@ -947,13 +950,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return submenu;
     }
 
-    private static MethodInfo RequireRuntimeDeclaredZeroArgVoidMethod(Type type, string name, int step)
+    private static MethodInfo RequireRuntimeDeclaredZeroArgSingleplayerSubmenuMethod(Type type, int step)
     {
-        var candidates = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
-            .Where(method => method.Name == name && !method.IsGenericMethod && method.GetParameters().Length == 0 && method.ReturnType == typeof(void))
+        var namedCandidates = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
+            .Where(method => method.Name == MainMenuOpenSingleplayerSubmenuMethodName && !method.IsGenericMethod)
             .ToArray();
-        return candidates.SingleOrDefault()
-            ?? throw new MissingMethodException(type.FullName, $"{name}(); Step {step}.0 candidates={string.Join(" | ", candidates.Select(method => method.ToString()))}");
+        var exactCandidates = namedCandidates
+            .Where(method => method.GetParameters().Length == 0 && method.ReturnType.FullName == SingleplayerSubmenuManagedTypeFullName)
+            .ToArray();
+        return exactCandidates.SingleOrDefault()
+            ?? throw new MissingMethodException(type.FullName,
+                $"{MainMenuOpenSingleplayerSubmenuMethodName}() -> {SingleplayerSubmenuManagedTypeFullName}; Step {step}.0 candidates={string.Join(" | ", namedCandidates.Select(method => method.ToString()))}");
     }
 
     private static bool RequireRuntimeBoolProperty(object instance, string propertyName, int step)

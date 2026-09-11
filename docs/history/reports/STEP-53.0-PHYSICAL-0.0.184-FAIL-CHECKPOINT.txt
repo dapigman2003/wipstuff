@@ -1,0 +1,16 @@
+StS2 Launcher — Step 53.0 Single-player submenu-open frontier checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4
+Initialized UTC: 2026-09-11T04:10:45.0789810+00:00
+Process ID: 1058
+App version: 0.0.184 (184)
+Candidate: STEPS 43–57 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–57 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.
+Global policy: physical authority through Step 52 remains the baseline. Steps 53–54/56–57 keep rendering frozen; Step 55 alone adds one bounded single-player-submenu render residency and synchronously refreezes. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, native game GDExtensions, and character-select execution remain unopened.
+
+2026-09-11T04:10:45.0870560+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-11T04:10:45.0883280+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=1 | RUN_START — Step 53.0 exact OpenSingleplayerSubmenu frontier map started from physically closed/refrozen Step-52 authority. No single-player handler is invoked.
+2026-09-11T04:10:45.1067100+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=1 | M53_A_PASS — Step-52 4/4 sustained main-menu authority retained; NMainMenu in-tree; renderingStopped=True; no single-player handler invoked.
+2026-09-11T04:10:45.1316930+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=1 | M53_B_FAIL — stage=initialization; System.IO.InvalidDataException: Step 53.0 requires zero-arg void OpenSingleplayerSubmenu; observed params=0; return=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu.
+2026-09-11T04:10:45.1513850+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. Step 53 never invokes a menu handler or restarts rendering.
+2026-09-11T04:10:45.1523030+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=17 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-11T04:10:45.1634890+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=17 | RUN_END — Step-53 UI operation ended normally; Step 53 never invokes a menu handler or restarts rendering.

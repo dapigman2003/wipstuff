@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>184</ApplicationVersion>" in project_text, "build version is 184")
-require("<ApplicationDisplayVersion>0.0.184</ApplicationDisplayVersion>" in project_text, "display version is 0.0.184")
-require(plist.get("CFBundleVersion") == "184", "Info.plist build version is 184")
-require(plist.get("CFBundleShortVersionString") == "0.0.184", "Info.plist display version is 0.0.184")
+require("<ApplicationVersion>185</ApplicationVersion>" in project_text, "build version is 185")
+require("<ApplicationDisplayVersion>0.0.185</ApplicationDisplayVersion>" in project_text, "display version is 0.0.185")
+require(plist.get("CFBundleVersion") == "185", "Info.plist build version is 185")
+require(plist.get("CFBundleShortVersionString") == "0.0.185", "Info.plist display version is 0.0.185")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -199,12 +199,12 @@ release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresen
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
 require("STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION" in release_presentation, "top launcher banner identifies the active Steps 53–57 single-player submenu continuation")
-require("STEPS 35–52 PHYSICALLY CLOSED" in release_presentation and "0.0.184 STEPS 53–57 ACTIVE" in release_presentation and "STEP 58 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 52, active Steps 53–57, and Step 58 unopened")
-require("Active candidate: **0.0.184 (184)**" in read("README.md") and "Active candidate: **0.0.184 (184)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.184 (184) release identity")
-require("active candidate is **0.0.184 / single-player submenu continuation through Step 57**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.184 / Steps 53–57 frontier")
+require("STEPS 35–52 PHYSICALLY CLOSED" in release_presentation and "0.0.185 STEPS 53–57 ACTIVE" in release_presentation and "STEP 58 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 52, active Steps 53–57, and Step 58 unopened")
+require("Active candidate: **0.0.185 (185)**" in read("README.md") and "Active candidate: **0.0.185 (185)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.185 (185) release identity")
+require("active candidate is **0.0.185 / single-player submenu continuation through Step 57**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.185 / Steps 53–57 frontier")
 require(all(marker in release_presentation for marker in ["STEPS 35–52 PHYSICALLY CLOSED", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "Steam", "Step 53", "Step 55", "Step57", "Step 58"]), "top launcher banner preserves historical authority and identifies closed-through-52 stabilization")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.184"' in release_presentation and 'ExpectedBuildVersion = "184"' in release_presentation, "startup-ladder source pins expected 0.0.184 bundle release identity")
+require('ExpectedDisplayVersion = "0.0.185"' in release_presentation and 'ExpectedBuildVersion = "185"' in release_presentation, "startup-ladder source pins expected 0.0.185 bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -370,8 +370,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-53-57.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.184",
-    "STS2_BUILD_VERSION": "184",
+    "STS2_DISPLAY_VERSION": "0.0.185",
+    "STS2_BUILD_VERSION": "185",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1702,10 +1702,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Steps 53–57 single-player submenu continuation / 0.0.184 (184)", "physically closed through **Step 52**", "Steps 50, 51 and 52 each passed 4/4", "Step 53.0 — exact single-player submenu-open frontier", "Step 54.0 — one-shot frozen real NSingleplayerSubmenu open", "Step 55.0 — actual single-player submenu render residency", "Step 56.0 — exact character-select frontier map", "Step 57.0 — exact character-select PCK resource preflight", "Step 58 remains unopened", "skip Step 38", "Step 15 Gate D"]), "current status records physical closure through Step 52 and exact Steps 53–57 active boundaries")
+require(all(marker in current_status for marker in ["Active candidate — Steps 53–57 single-player submenu continuation / 0.0.185 (185)", "physically closed through **Step 52**", "Steps 50, 51 and 52 each passed 4/4", "Physical 0.0.184 Step 53 localization — safe Gate-B stop", "Step 53.0 — exact single-player submenu-open frontier", "Step 54.0 — one-shot frozen real NSingleplayerSubmenu open", "Step 55.0 — actual single-player submenu render residency", "Step 56.0 — exact character-select frontier map", "Step 57.0 — exact character-select PCK resource preflight", "Step 58 remains unopened", "skip Step 38", "Step 15 Gate D"]), "current status records physical closure through Step 52 and exact Steps 53–57 active boundaries")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.184 (184)" in testing_doc and "0.0.184 (184)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.184 (184) release identity")
+require("0.0.185 (185)" in testing_doc and "0.0.185 (185)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.185 (185) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -2376,7 +2376,7 @@ require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.184\"", "ExpectedBuildVersion = \"184\"", "STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION"]), "active release presentation pins physical closure and Steps-53–57 / 0.0.184 identity")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.185\"", "ExpectedBuildVersion = \"185\"", "STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION"]), "active release presentation pins physical closure and Steps-53–57 / 0.0.185 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "22-method zero-boundary closure", "renderer frozen", "zero resolver/host/private/initializer/rejected/native deltas"]), "current status pins the physically closed Step-42 InitPools authority")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
@@ -2591,7 +2591,7 @@ require("AddSingleplayerContinuationControls(content);" in startup_ui and ">= 53
 step53_core_start = singleplayer_core.find("RunStep53ClosedStep52Authority")
 step54_core_start = singleplayer_core.find("RunStep54ClosedStep53Authority")
 step53_core = singleplayer_core[step53_core_start:step54_core_start] if step53_core_start >= 0 and step54_core_start > step53_core_start else ""
-require(all(value in step53_core for value in ["OpenSingleplayerSubmenu", "SingleplayerButtonPressed", "AuditStartupLadderInvocationFrontier([open]", "RequireImmediateFrontierAdmissible", "_step53OpenAdmissible = true", "Handler invocation: NO", "Rendering restarted: NO"]), "Step 53 audits only exact OpenSingleplayerSubmenu and requires its immediate frontier admissible without invocation")
+require(all(value in step53_core for value in ["OpenSingleplayerSubmenu", "SingleplayerButtonPressed", "open.Parameters.Count != 0 || open.ReturnType.FullName != SingleplayerSubmenuManagedTypeFullName", "AuditStartupLadderInvocationFrontier([open]", "RequireImmediateFrontierAdmissible", "_step53OpenAdmissible = true", "Handler invocation: NO", "Rendering restarted: NO"]), "Step 53 pins zero args + exact NSingleplayerSubmenu return and audits only OpenSingleplayerSubmenu without invocation")
 require(".Invoke(" not in step53_core, "Step 53 Core performs no runtime handler invocation")
 step53_ui_start = singleplayer_ui.find("private async Task RunStep53StartupLadderAsync()")
 step54_ui_start = singleplayer_ui.find("private async Task RunStep54StartupLadderAsync()")
@@ -2602,7 +2602,7 @@ require(all(value in step53_ui for value in ["RunStep53SingleplayerOpenBinding",
 step54_core_start = singleplayer_core.find("RunStep54ClosedStep53Authority")
 step55_core_start = singleplayer_core.find("RunStep55ClosedStep54Authority")
 step54_core = singleplayer_core[step54_core_start:step55_core_start] if step54_core_start >= 0 and step55_core_start > step54_core_start else ""
-require(all(value in step54_core for value in ["MainMenuSingleplayerFieldName", "_singleplayerSubmenu", "unchecked((uint)open.MetadataToken) != _step53OpenMethodToken", "_step54OpenStarted", "open.Invoke(menu, null)", "ReferenceEquals(field.GetValue(menu), submenu)", "IsVisibleInTree", "RequireRuntimeBoolProperty(submenu, \"Visible\"", "CaptureStartupLadderBaseline", "ExceptionDispatchInfo.Capture"]), "Step 54 token-matches and invokes only exact OpenSingleplayerSubmenu once, retaining exact visible/in-tree submenu authority")
+require(all(value in step54_core for value in ["MainMenuSingleplayerFieldName", "_singleplayerSubmenu", "RequireRuntimeDeclaredZeroArgSingleplayerSubmenuMethod", "unchecked((uint)open.MetadataToken) != _step53OpenMethodToken", "_step54OpenStarted", "returnedSubmenu = open.Invoke(menu, null)", "ReferenceEquals(field.GetValue(menu), submenu)", "ReferenceEquals(returnedSubmenu, submenu)", "IsVisibleInTree", "RequireRuntimeBoolProperty(submenu, \"Visible\"", "CaptureStartupLadderBaseline", "ExceptionDispatchInfo.Capture"]), "Step 54 token-matches exact zero-arg/NSingleplayerSubmenu-return method, invokes once, and requires field+return identity for visible/in-tree submenu authority")
 require("SingleplayerButtonPressed.Invoke" not in step54_core and "pressed.Invoke" not in step54_core, "Step 54 never invokes the broad SingleplayerButtonPressed handler")
 step54_ui_start = singleplayer_ui.find("private async Task RunStep54StartupLadderAsync()")
 step55_ui_start = singleplayer_ui.find("private async Task RunStep55StartupLadderAsync()")
@@ -2775,7 +2775,7 @@ if stabilization_manifest.is_file():
     require(not mismatches, "Steps 43-52 physically closed stabilization active files are hash-pinned", ", ".join(mismatches))
 
 
-# Dedicated 0.0.184 Steps 53-57 single-player continuation manifest. This pins
+# Dedicated 0.0.185 Steps 53-57 single-player continuation manifest. This pins
 # the new runtime/UI surface separately from the physically closed-through-52
 # manifests, which continue to preserve their historical/current-wiring scope.
 singleplayer_manifest = ROOT / "tools/validation/candidate-steps53-57-singleplayer-continuation.sha256"
@@ -2808,6 +2808,10 @@ if singleplayer_manifest.is_file():
         "docs/RELEASE-CHECKLIST.md",
         "docs/history/INDEX.md",
         "docs/history/steps/STEP-53-57-SINGLEPLAYER-SUBMENU-CONTINUATION.md",
+        "docs/history/steps/STEP-53.0-RETURN-TYPE-CORRECTION-0.0.185.md",
+        "docs/history/reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-REPORT.txt",
+        "docs/history/reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-CHECKPOINT.txt",
+        "docs/history/reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-LAST-CHECKPOINT.txt",
         "docs/history/steps/STEP-50-52-PHYSICAL-0.0.182-CLOSURE-NOTE.md",
         "docs/history/steps/STEP-43-52-0.0.183-STABILIZATION-FAST-PATH-AOT-CACHE.md",
     ]

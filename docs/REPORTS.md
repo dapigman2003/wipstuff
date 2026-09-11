@@ -16,6 +16,8 @@ If the main thread never yields, no managed timing ceiling can force `StopRender
 
 ## Steps 53–57 evidence contract
 
+Physical 0.0.184 reached Step 53 Gate A and then failed safely at Gate B because the candidate assumed a `void` return. The actual zero-argument method returns exact `NSingleplayerSubmenu`; no handler was invoked, rendering remained frozen, and Step 54 was never armed. 0.0.185 pins that return type and requires Step 54 invocation-return identity to match the retained `_singleplayerSubmenu`.
+
 Step 53: `Step53-CrashCheckpoint-<RunId>.txt`, `Step53-SingleplayerOpen-StaticMap-<RunId>.txt`, `Step53-LastCheckpoint.txt`, `Step53-TransformedRealStS2SingleplayerOpenFrontier.txt`.
 
 Step 54: `Step54-CrashCheckpoint-<RunId>.txt`, `Step54-SingleplayerSubmenuOpen-StaticMap-<RunId>.txt`, `Step54-LastCheckpoint.txt`, `Step54-TransformedRealStS2SingleplayerSubmenuFrozenOpen.txt`. Gate C is one-shot after the binding map is durable.

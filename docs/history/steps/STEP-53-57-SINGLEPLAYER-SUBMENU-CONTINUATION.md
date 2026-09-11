@@ -1,5 +1,7 @@
 # Steps 53–57 — single-player submenu continuation / 0.0.184
 
+> **Historical note:** Physical 0.0.184 later stopped safely at Step 53 Gate B: the design assumed `OpenSingleplayerSubmenu()` returned `void`, while the real method returns `NSingleplayerSubmenu`. No handler was invoked and rendering stayed frozen. See `STEP-53.0-RETURN-TYPE-CORRECTION-0.0.185.md`.
+
 Physical authority is closed through Step 52. The user subsequently confirmed the 0.0.183 app works; no new Step-52 device report files were supplied, so 0.0.184 does not fabricate additional physical artifacts. The existing fresh-process closed-path runner remains intentionally capped at Step 52 and is the preferred way to reconstruct the known same-process authority before the new rungs.
 
 0.0.184 opens only the next UI layer. **Step 53** isolates exact zero-argument `NMainMenu.OpenSingleplayerSubmenu()` from the broader Step-51 evidence. It records exact IL/token identity and runs the execution-opcode-qualified immediate/deferred audit under the already-physically-proven runtime guards. Unlike Step 51, Step 53 requires every immediate classified boundary to be admissible before it closes. `SingleplayerButtonPressed` remains evidence-only and is never invoked.

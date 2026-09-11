@@ -48,7 +48,7 @@ public sealed partial class RootViewController
             "Step 53.0 — isolate exact OpenSingleplayerSubmenu execution frontier (NO invocation)",
             "Run Step 53.0 A–D — MAP ONLY",
             "SINGLEPLAYER OPEN FRONTIER: LOCKED",
-            "Requires Step 52.0 4/4/refrozen. Binds zero-arg void NMainMenu.OpenSingleplayerSubmenu, audits only that method under retained runtime guards, and requires every immediate boundary admissible. SingleplayerButtonPressed remains evidence-only and uninvoked.");
+            "Requires Step 52.0 4/4/refrozen. Binds zero-arg NMainMenu.OpenSingleplayerSubmenu returning exact NSingleplayerSubmenu, audits only that method under retained runtime guards, and requires every immediate boundary admissible. SingleplayerButtonPressed remains evidence-only and uninvoked.");
         _step53Button.TouchUpInside += async (_, _) => await RunStep53StartupLadderAsync();
 
         (_step54Button, _step54ResultLabel, _step54DetailLabel) = AddStartupLadderStepControls(

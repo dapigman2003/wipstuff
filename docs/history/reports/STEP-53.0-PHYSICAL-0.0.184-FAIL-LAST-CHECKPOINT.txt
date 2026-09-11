@@ -1,0 +1,6 @@
+StS2 Launcher — Step 53 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4
+Journal: Step53-CrashCheckpoint-20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4.txt
+Static map: Step53-SingleplayerOpen-StaticMap-20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4.txt
+2026-09-11T04:10:45.1634890+00:00 | run=20260911T0410450789810Z-pid1058-263ae1f2ec844ceca2bdcef1970dcbb4 | pid=1058 | managedThread=17 | RUN_END — Step-53 UI operation ended normally; Step 53 never invokes a menu handler or restarts rendering.

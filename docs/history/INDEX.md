@@ -492,3 +492,9 @@ The current architecture and plan always live one level up in `docs/`.
 
 ## Steps 53–57 single-player submenu continuation / 0.0.184
 - `steps/STEP-53-57-SINGLEPLAYER-SUBMENU-CONTINUATION.md` — 0.0.184 design: isolate and one-shot-open the exact single-player submenu, audit/render/refreeze it, then map and read-only-preflight character select without loading or invoking that transition.
+
+## Step 53 physical return-type localization / 0.0.185 focused correction
+- `reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-REPORT.txt` — physical 0.0.184 Step 53 result: Gate A passed, Gate B safely failed because the real zero-arg `OpenSingleplayerSubmenu` returns `NSingleplayerSubmenu` rather than `void`; no invocation occurred.
+- `reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-CHECKPOINT.txt` — run-correlated journal proving frozen Step-52 authority, Gate-A pass, Gate-B return-type localization, and normal frozen end.
+- `reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-LAST-CHECKPOINT.txt` — durable run pointer confirming Step 53 ended normally without handler invocation or render restart.
+- `steps/STEP-53.0-RETURN-TYPE-CORRECTION-0.0.185.md` — focused 0.0.185 correction: exact `NSingleplayerSubmenu` return contract plus Step-54 invocation-return identity check; no frontier expansion.

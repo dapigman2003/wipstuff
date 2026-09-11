@@ -1,10 +1,12 @@
-# Testing — Steps 53–57 single-player submenu continuation / 0.0.184
+# Testing — Steps 53–57 single-player submenu continuation / 0.0.185
 
-Active candidate: `0.0.184 (184)`, IPA `StS2-Launcher-Steps-53-57.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.185 (185)`, IPA `StS2-Launcher-Steps-53-57.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, exact hashes, fail-stop sequencing, one-shot guards, report surfaces, release identity, provenance, cache configuration and payload/security policy. Codemagic remains compile/AOT/link/package authority. Physical iPhone reports remain runtime authority.
 
 ## Physical sequence
+
+0.0.185 is the focused correction after physical 0.0.184 safely stopped at Step 53 Gate B on a return-type assumption. The corrected contract is zero args + exact `NSingleplayerSubmenu` return; Step 54 additionally requires the returned object to be the same retained submenu instance.
 
 Start from a **fresh process** and press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52**. It must end 4/4 with rendering frozen. The runner does not execute Step 15 Gate D or Step 38 and remains capped at the physically closed frontier.
 
