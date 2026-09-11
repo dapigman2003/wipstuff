@@ -31,7 +31,12 @@ public sealed class TransformedRealStS2StartupLadderTests
             (49, "MAIN MENU FROZEN SCENETREE ADMISSION"),
             (50, "MAIN MENU CONTROLLED RENDER PULSE"),
             (51, "SINGLEPLAYER FRONTIER MAP"),
-            (52, "MAIN MENU SUSTAINED RENDER RESIDENCY")
+            (52, "MAIN MENU SUSTAINED RENDER RESIDENCY"),
+            (53, "SINGLEPLAYER OPEN FRONTIER"),
+            (54, "SINGLEPLAYER SUBMENU FROZEN OPEN"),
+            (55, "SINGLEPLAYER SUBMENU RENDER RESIDENCY"),
+            (56, "CHARACTER SELECT FRONTIER MAP"),
+            (57, "CHARACTER SELECT RESOURCE PREFLIGHT")
         };
 
         var summaries = new HashSet<string>(StringComparer.Ordinal);
@@ -47,7 +52,7 @@ public sealed class TransformedRealStS2StartupLadderTests
             Assert.IsTrue(summaries.Add(snapshot.Summary));
         }
 
-        Assert.AreEqual(6, summaries.Count);
+        Assert.AreEqual(11, summaries.Count);
     }
 
     [TestMethod]

@@ -1,14 +1,14 @@
 # Current status
 
-## Active candidate — Steps 43–52 physically closed stabilization / 0.0.183 (183)
+## Active candidate — Steps 53–57 single-player submenu continuation / 0.0.184 (184)
 
-Runtime authority now reaches **Step 52** on the current same-process direct-main-menu route. Physical 0.0.182 closed Step 49. The supplied first Step-50 attempt then passed Gate A/B, mapped 1,075 in-tree nodes / 94 managed node types / 24 frame-input roots / 149 immediate methods with zero forbidden/unresolved references, successfully started rendering, and synchronously stopped it with rendering inactive; the only rejection was a cold ~2526 ms first managed continuation beyond the old 2000 ms classification ceiling. The user subsequently reported a fresh-process rerun where **Steps 50, 51 and 52 each passed 4/4**. Successful rerun report files were not supplied, so that closure is recorded as user-reported physical authority rather than fabricated evidence.
+Runtime authority is physically closed through **Step 52** on the same-process direct-main-menu route. Physical 0.0.182 closed Step 49; the user subsequently reran and reported **Steps 50, 51 and 52 each passed 4/4**, and then tested the 0.0.183 app successfully. Successful rerun report files were not supplied, so that closure remains recorded as user-reported physical authority rather than fabricated evidence.
 
-**0.0.183 is stabilization only; Step 53 remains unopened.** It adds a fresh-process one-shot convenience runner over the already-closed route, a Step-50-specific 4000 ms evidence ceiling while preserving the 100 ms target and stop-before-telemetry/refreeze semantics, and a Codemagic AOT cache correction/telemetry package based on the supplied 3250-second build artifact.
+**0.0.184 opens only Steps 53–57.** The existing fresh-process **Physically Closed Path** runner remains intentionally capped at Step 52 and is the preferred way to reconstruct known authority. From that frozen Step-52 state, Step 53 isolates exact `NMainMenu.OpenSingleplayerSubmenu()` without invocation; Step 54 invokes only that exact admissible method once while frozen; Step 55 audits and briefly renders/refreezes the real `NSingleplayerSubmenu`; Steps 56–57 map and read-only-preflight the exact `OpenCharacterSelect` resource boundary without invoking or loading character select. Step 58 remains unopened.
 
-The Codemagic artifact localizes **3195/3250 seconds** to iOS publish/package. Existing cache restoration was healthy (2.9 GB iOS obj and 1092 AOT outputs), but the MSBuild binlog reported missing `AOTCompileInputs.cache.uptodate` while LLVM `opt`/`llc` still ran broadly. 0.0.183 keeps workflow `ios-canonical`, M2, pinned .NET/Xcode, and existing caches, then adds only the two tiny AOT dependency sentinel files plus exact pre/post and opt/llc telemetry. The first 0.0.183 build seeds those new cache paths; the following warm build is the decisive performance test.
+The 0.0.183 Codemagic AOT cache/sentinel experiment is retained unchanged in 0.0.184. It is not required for the runtime experiment and can be evaluated from a later warm-build artifact without changing this candidate.
 
-The multi-rung safety discipline remains unchanged: the convenience runner calls existing numbered methods rather than bypassing them, checks exact closure after each return, explicitly skips Step 38, stops on first failure, and never auto-runs Step 15 Gate D.
+The multi-rung safety discipline remains unchanged: **the unit of safety remains one gate at a time; the unit of packaging becomes multiple gates per build.** The closed-path convenience runner calls existing numbered methods rather than bypassing them, checks exact closure after each return, explicitly skips Step 38, stops on first failure, and never auto-runs Step 15 Gate D. Steps 53–57 remain manual and each later rung requires the prior exact same-process 4/4 authority.
 
 Retained prior physical authority: **Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4.** Exact `NGame.InitPools()` retained its **22-method zero-boundary closure**, the **renderer frozen** throughout, with **zero resolver/host/private/initializer/rejected/native deltas**. Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains uninvoked**. The current same-process path must **skip Step 38** before Step 39.
 
@@ -64,21 +64,46 @@ Requires Step 51 4/4 durable map authority. Runs a fresh actual in-tree frame/in
 
 Reports: `Step52-CrashCheckpoint-<RunId>.txt`, `Step52-MainMenuSustainedFrameInput-StaticMap-<RunId>.txt`, `Step52-LastCheckpoint.txt`, `Step52-TransformedRealStS2MainMenuSustainedRender.txt`.
 
-## Physical sequence for 0.0.183
+## Step 53.0 — exact single-player submenu-open frontier, no invocation
 
-Preferred: fresh process → press the new **Physically Closed Path** button once. It executes:
+Requires Step 52 4/4/refrozen authority. Binds exact zero-argument void `NMainMenu.OpenSingleplayerSubmenu()`, records the broader `SingleplayerButtonPressed` only as evidence, and audits **only** `OpenSingleplayerSubmenu` using the execution-opcode-qualified frontier plus retained Step-48 runtime guards. Every immediate classified boundary must be admissible; unresolved same-StS2 references or external Cecil resolution fail. The exact map is durably written before Gate D. No handler is invoked and rendering remains frozen.
 
-1. Step 15 A–C only.
-2. Step 35.0.32 MODEL-BOOTSTRAP.
-3. Step 36.0.5.
-4. Step 37.0.1.
-5. **Skip Step 38.**
-6. Step 39.
-7. Step 40.1.
-8. Step 41.
-9. Step 42.
-10. Steps 43 → 52 in order.
+Reports: `Step53-CrashCheckpoint-<RunId>.txt`, `Step53-SingleplayerOpen-StaticMap-<RunId>.txt`, `Step53-LastCheckpoint.txt`, `Step53-TransformedRealStS2SingleplayerOpenFrontier.txt`.
 
-The runner verifies each existing exact pass/closure predicate before advancing, stops on first failure, preserves all normal reports, and leaves rendering frozen after Step 52. Step 15 Gate D is intentionally not run. Manual controls remain available for diagnosis using the same sequence.
+## Step 54.0 — one-shot frozen real NSingleplayerSubmenu open
 
-Still globally forbidden in 0.0.183: Step 53+, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, trusted-install mutation, and any single-player handler invocation. Only physically closed Steps 50 and 52 may restart rendering, and both synchronously refreeze before success evaluation.
+Requires Step 53 4/4 admissible authority. Token-matches the exact runtime `OpenSingleplayerSubmenu()` and binds exact `NMainMenu._singleplayerSubmenu` as `NSingleplayerSubmenu`. The binding map is durable before mutation. Gate C is one-shot and invokes **only** exact `OpenSingleplayerSubmenu()` once while rendering stays frozen; `SingleplayerButtonPressed` remains uninvoked. Success requires the same submenu object inside the SceneTree with `Visible=true` and `IsVisibleInTree=true`, and it must not already have been fully visible before the open. Selected-image/load-context/native authority must remain unchanged.
+
+Reports: `Step54-CrashCheckpoint-<RunId>.txt`, `Step54-SingleplayerSubmenuOpen-StaticMap-<RunId>.txt`, `Step54-LastCheckpoint.txt`, `Step54-TransformedRealStS2SingleplayerSubmenuFrozenOpen.txt`.
+
+## Step 55.0 — actual single-player submenu render residency
+
+Requires Step 54 4/4. Audits the actual visible `NSingleplayerSubmenu` subtree with the bounded menu traversal and physically proven frame/input callback surface. The execution-qualified frontier must be admissible and the exact map durable before rendering. One render residency is authorized: requested target **750 ms**, post-stop evidence ceiling **5000 ms**. The first managed continuation synchronously calls `StopRendering()` before telemetry/file I/O. Gate D requires the real submenu still visible/in-tree and rendering frozen.
+
+Reports: `Step55-CrashCheckpoint-<RunId>.txt`, `Step55-SingleplayerSubmenuFrameInput-StaticMap-<RunId>.txt`, `Step55-LastCheckpoint.txt`, `Step55-TransformedRealStS2SingleplayerSubmenuRender.txt`.
+
+## Step 56.0 — exact character-select frontier map, no invocation
+
+Requires Step 55 4/4/refrozen authority. Binds exact zero-argument void `NSingleplayerSubmenu.OpenCharacterSelect()`, records its IL, maps the execution/deferred frontier, and collects every `res://` string literal in the immediate same-module closure. Character-select `.tscn` candidates are recorded separately. Classified boundaries remain evidence only at this rung; unresolved same-StS2 references or external Cecil resolution fail. `OpenCharacterSelect` is never invoked and rendering remains frozen.
+
+Reports: `Step56-CrashCheckpoint-<RunId>.txt`, `Step56-CharacterSelectFrontier-StaticMap-<RunId>.txt`, `Step56-LastCheckpoint.txt`, `Step56-TransformedRealStS2CharacterSelectFrontier.txt`.
+
+## Step 57.0 — exact character-select PCK resource preflight, read-only
+
+Requires Step 56 4/4. Selects exactly one character-select TSCN candidate (or one unambiguous `character_select`/`characterselect` candidate), reads only that exact entry from the receipt-backed PCK, refuses encryption/oversize/header drift, validates the directory MD5, records SHA-256/size/flags, decodes strict UTF-8 text, lists referenced `res://` paths, and counts textual Spine/FMOD/`.gdextension`/`.dylib`/`.dll` risk tokens. Risk findings authorize nothing. No `OpenCharacterSelect`, `ResourceLoader`, `PackedScene`, character-select execution, or rendering occurs.
+
+Reports: `Step57-CrashCheckpoint-<RunId>.txt`, `Step57-CharacterSelectResource-StaticMap-<RunId>.txt`, `Step57-LastCheckpoint.txt`, `Step57-TransformedRealStS2CharacterSelectResourcePreflight.txt`.
+
+## Physical sequence for 0.0.184
+
+Preferred: fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. It reconstructs the known same-process authority and leaves rendering frozen after Step 52. Step 15 Gate D is intentionally not run. Then run the new rungs manually in order:
+
+1. Step 53 — if 4/4, continue.
+2. Step 54 — one-shot once Gate C arms; never retry in-process after an armed failure.
+3. Step 55 — one-shot render residency once armed; always refreezes before evaluation.
+4. Step 56 — non-invoking character-select frontier map.
+5. Step 57 — read-only exact PCK resource preflight.
+
+Stop at the first failure and preserve that rung's checkpoint/static-map/final report.
+
+Still globally forbidden in 0.0.184: Step 58+, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character-select handler invocation/resource loading/instantiation/admission, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, and trusted-install mutation. Physically closed Steps 50/52 and active Step 55 are the only render rungs; each synchronously refreezes before success evaluation.

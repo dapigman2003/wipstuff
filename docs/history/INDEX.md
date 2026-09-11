@@ -489,3 +489,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-50-52-PHYSICAL-0.0.182-CLOSURE-NOTE.md` — records the user-reported fresh rerun in which Steps 50, 51 and 52 all passed 4/4; successful rerun report files were not supplied and are not fabricated.
 - `reports/CODEMAGIC-0.0.182-BUILD-PERFORMANCE-ANALYSIS.txt` — non-secret summary of the supplied Codemagic artifact: 3195/3250 seconds in iOS publish/package, restored AOT obj cache, missing AOTCompileInputs up-to-date sentinel, and repeated LLVM opt/llc work.
 - `steps/STEP-43-52-0.0.183-STABILIZATION-FAST-PATH-AOT-CACHE.md` — 0.0.183 design: fresh-process one-button reproof through Step 52, Step-50-specific 4000 ms evidence ceiling, and completion/telemetry of the existing AOT cache; Step 53 stays unopened.
+
+## Steps 53–57 single-player submenu continuation / 0.0.184
+- `steps/STEP-53-57-SINGLEPLAYER-SUBMENU-CONTINUATION.md` — 0.0.184 design: isolate and one-shot-open the exact single-player submenu, audit/render/refreeze it, then map and read-only-preflight character select without loading or invoking that transition.

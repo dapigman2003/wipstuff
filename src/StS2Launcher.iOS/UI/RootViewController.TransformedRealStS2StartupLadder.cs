@@ -63,11 +63,11 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Steps 43–52 — sequential startup ladder (stop on first failure)",
+            "Steps 43–57 — sequential startup ladder (stop on first failure)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Steps 43–49 and Step 51 keep rendering frozen. Step 46 maps original LaunchMainMenu without invoking or authorizing it. Steps 47–49 use a separate exact PCK direct-menu path with a private Spine-neutral background derivative. Step 48.1 rehearses exact runtime guards before lifecycle admission. Step 50 performs a short render pulse; Step 51 maps the single-player button frontier without invoking it; Step 52 performs a longer bounded render residency pulse. Both render steps synchronously refreeze before evaluation.",
+            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Physical authority through Step 52 remains the closed baseline. Steps 53–57 continue only from that exact same-process authority: isolate/open/render the real single-player submenu, then map and read-only-preflight character select without invoking it. Original GameStartup/LaunchMainMenu, Steam startup, deferred startup and native game extensions remain unopened. Only Steps 50, 52 and 55 may restart rendering, and each synchronously refreezes before evaluation.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel));
 
@@ -150,6 +150,7 @@ public sealed partial class RootViewController
             "MAIN MENU SUSTAINED RENDER RESIDENCY: LOCKED",
             "Requires Step 51.0 4/4. Re-audits the actual in-tree frame/input surface under retained runtime guards, writes a fresh pre-render map, then runs one ~1.5 s render residency pulse and synchronously StopRendering before telemetry. Final state must remain frozen with no initializer/rejected/native escape.");
         _step52Button.TouchUpInside += async (_, _) => await RunStep52StartupLadderAsync();
+        AddSingleplayerContinuationControls(content);
     }
 
     private (UIButton Button, UILabel Result, UILabel Detail) AddStartupLadderStepControls(
@@ -404,7 +405,7 @@ public sealed partial class RootViewController
         }
         if (GodotStep15NativeBridge.IsRenderingActive)
         {
-            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Only Steps 50 and 52 may restart rendering, and only after their exact frame/input maps are durably written.");
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Only Steps 50, 52 and 55 may restart rendering, and only after their exact frame/input maps are durably written.");
             return false;
         }
         return true;
@@ -423,6 +424,7 @@ public sealed partial class RootViewController
             50 => (_step50Button!, _step50ResultLabel!, _step50DetailLabel!),
             51 => (_step51Button!, _step51ResultLabel!, _step51DetailLabel!),
             52 => (_step52Button!, _step52ResultLabel!, _step52DetailLabel!),
+            >= 53 and <= 57 => GetSingleplayerContinuationControls(step),
             _ => throw new ArgumentOutOfRangeException(nameof(step)),
         };
 
@@ -522,8 +524,8 @@ public sealed partial class RootViewController
                     $"Initialized UTC: {now:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
-                    "Candidate: STEPS 43–52 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; LATER RUNGS REQUIRE SAME-PROCESS PRIOR 4/4 AUTHORITY.\n" +
-                    "Global policy: Steps 43–49 keep rendering frozen. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, and native game GDExtensions remain unopened. Steps 47–49 use the direct main-menu resource/scene route; Step 50 alone may run one audited bounded render pulse and must synchronously refreeze.\n\n");
+                    "Candidate: STEPS 43–57 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–57 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.\n" +
+                    "Global policy: physical authority through Step 52 remains the baseline. Steps 53–54/56–57 keep rendering frozen; Step 55 alone adds one bounded single-player-submenu render residency and synchronously refreezes. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, native game GDExtensions, and character-select execution remain unopened.\n\n");
                 WriteStartupLadderCheckpoint(step, "RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.");
                 return true;
             }

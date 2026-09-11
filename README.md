@@ -1,17 +1,19 @@
-# StS2 Launcher — Steps 43–52 physically closed stabilization
+# StS2 Launcher — Steps 53–57 single-player submenu continuation
 
-Active candidate: **0.0.183 (183)** — stabilization/ergonomics/CI only. **Step 53 remains unopened.**
+Active candidate: **0.0.184 (184)**. Physical runtime authority remains closed through **Step 52 4/4**; this build opens only the next single-player menu layer and keeps Step 58+ unopened.
 
-Physical authority now reaches **Step 52 4/4** on the current same-process route. The supplied first 0.0.182 Step-50 attempt proved a clean 1,075-node in-tree frame/input map and successful renderer start/refreeze, then failed only because its first managed continuation arrived at ~2526 ms beyond the old 2000 ms evidence ceiling. The user subsequently reported a fresh rerun with **Steps 50, 51 and 52 all 4/4**; successful rerun report files were not supplied, so history records that closure explicitly as user-reported physical authority rather than fabricating artifacts.
+Use the existing **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** button from a fresh process to reconstruct the known authority. It still stops at Step 52 with rendering frozen. Then run Steps **53 → 54 → 55 → 56 → 57** manually, stopping at the first failure.
 
-0.0.183 does not broaden runtime authorization. It makes the already-closed path easier and the CI build more measurable:
+The new ladder is intentionally narrow:
 
-- a **fresh-process, one-shot Physically Closed Path button** runs Step 15 A–C → Step 35.0.32 MODEL-BOOTSTRAP → 36 → 37 → **skips 38** → 39 through 52, calling the existing step implementations and requiring each exact pass/closure predicate before advancing;
-- Step 50 keeps its exact **100 ms requested stop delay** and synchronous stop-before-telemetry behavior, but uses a Step-50-specific **4000 ms evidence ceiling** to cover the physically observed cold-frame 2526 ms return. Historical Step 40 stays 2000 ms; Step 52 stays 1500/6000 ms;
-- Codemagic keeps workflow `ios-canonical` and the existing caches, but now also caches the two tiny .NET iOS AOT dependency sentinels `AOTCompileInputs.cache` and `AOTCompileInputs.cache.uptodate`, plus reports pre/post marker hashes and LLVM `opt`/`llc` counts. The supplied 0.0.182 artifact localized **3195 of 3250 seconds** to iOS publish/package despite 2.9 GB of restored iOS obj/AOT cache and 1092 cached AOT outputs.
+- **Step 53** isolates exact zero-arg `NMainMenu.OpenSingleplayerSubmenu()` and requires its execution-qualified frontier to be admissible without invoking it. The broader `SingleplayerButtonPressed` remains uninvoked.
+- **Step 54** token-matches that exact runtime method plus `NMainMenu._singleplayerSubmenu`, writes the binding map, then invokes only `OpenSingleplayerSubmenu()` once while rendering is frozen. The real `NSingleplayerSubmenu` must become visible/in-tree with zero context/native drift.
+- **Step 55** audits the actual visible submenu frame/input callbacks, writes the map, then performs one bounded **750 ms** render residency and synchronously refreezes before telemetry.
+- **Step 56** maps exact zero-arg `NSingleplayerSubmenu.OpenCharacterSelect()` plus execution/deferred frontiers and `res://` resource literals. It never invokes that method.
+- **Step 57** reads only the discovered exact character-select `.tscn` entry from the receipt-backed PCK, validates PCK MD5/SHA-256, lists referenced resources, and reports textual Spine/FMOD/GDExtension/native-risk tokens. No `ResourceLoader`, `PackedScene`, character-select invocation, or rendering occurs.
 
-Every existing step keeps its independent reports/checkpoints and fail-closed behavior. The convenience runner stops at the first non-closed return and requires a process relaunch; it does not run Step 15 Gate D and it never invokes Step 38. Rendering must be frozen after Step 52.
+The 0.0.183 Codemagic AOT-cache telemetry/caches are retained unchanged. If a future Codemagic run is available, its cache report can be compared without changing this runtime experiment.
 
-Original whole `GameStartup`, original `LaunchMainMenu`, single-player handler invocation, `DoCloudSync`, migration mutation, `InitializePlatform`, deferred startup/`ExecuteDeferred`, external/native Steam, and native FMOD/Spine remain unopened.
+Still forbidden here: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external/native Steam, deferred startup/`ExecuteDeferred`, character-select loading/instantiation/admission, native FMOD/Spine game extensions, and trusted-install mutation.
 
-Authoritative status and exact physical sequence: `docs/CURRENT-STATUS.md`.
+Authoritative status and device sequence: `docs/CURRENT-STATUS.md`.

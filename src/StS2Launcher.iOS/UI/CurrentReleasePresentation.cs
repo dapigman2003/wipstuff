@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEPS 43–52 — PHYSICALLY CLOSED STABILIZATION";
+        "STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–52 PHYSICALLY CLOSED • 0.0.183 STABILIZATION — STEP 53 UNOPENED";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–52 PHYSICALLY CLOSED • 0.0.184 STEPS 53–57 ACTIVE — STEP 58 UNOPENED";
 
     public const string Summary =
-        "Physical 0.0.182 closed Step 49 and, on a fresh rerun reported by the user, Steps 50–52 each reached 4/4. The supplied first Step-50 attempt already proved a clean 1,075-node frame/input map plus successful StartRendering/StopRendering and failed only because a cold first managed continuation arrived at 2526 ms beyond the old 2000 ms evidence ceiling. 0.0.183 opens no new runtime frontier: it adds a fresh-process one-button reproof of the already-closed path through Step 52, gives Step 50 its own 4000 ms evidence ceiling while retaining the 100 ms stop target and synchronous refreeze, and completes Codemagic caching of the missing .NET iOS AOT dependency sentinels identified in the supplied 3250-second build artifact.";
+        "Physical authority is closed through Step 52. 0.0.184 opens only the next single-player menu layer: Step 53 isolates exact OpenSingleplayerSubmenu and must prove that direct frontier admissible without invocation; Step 54 may invoke only that exact token-matched method once while frozen; Step 55 audits and briefly renders the real visible NSingleplayerSubmenu then synchronously refreezes. Steps 56–57 keep character select non-invoking: they map exact NSingleplayerSubmenu.OpenCharacterSelect, discover its res:// scene literals, and inspect only the exact trusted-PCK character-select resource bytes for Spine/FMOD/GDExtension/native risk. No character-select ResourceLoader/PackedScene execution exists in this candidate.";
 
     public const string InitialStatus =
-        "Status: Steps 35–52 are physically closed under the current same-process route. 0.0.183 is a stabilization/ergonomics/CI build only. Use the new fresh-process Physically Closed Path button to reprove Step 15 A–C, Step 35 MODEL-BOOTSTRAP, 36, 37, skip 38, then 39–52 with exact stop-on-first-failure predicates. The runner leaves rendering frozen after Step 52. Step 53 and all later gameplay/Steam/cloud/native-extension frontiers remain unopened.";
+        "Status: Steps 35–52 remain physically closed under the current same-process route. Use the Physically Closed Path button to reprove the known path through Step 52, then run Steps 53→57 manually and stop at the first failure. Only Step 55 may newly restart rendering and it must synchronously refreeze. Original GameStartup/LaunchMainMenu, Steam/native startup, deferred startup, character-select loading/execution and Step 58+ remain unopened.";
 
-    public const string ExpectedDisplayVersion = "0.0.183";
-    public const string ExpectedBuildVersion = "183";
+    public const string ExpectedDisplayVersion = "0.0.184";
+    public const string ExpectedBuildVersion = "184";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -63,7 +63,7 @@ internal static class CurrentReleasePresentation
         "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4: exact NGame.InitPools token 0x06001BFA -> 3 direct IL instructions -> 22-method transitive same-sts2 closure -> zero classified/unresolved/external Cecil boundaries -> durable pre-invocation static map -> one exact MethodInfo.Invoke(instance,null) returned -> state 2 preserved -> frozen post-InitPools NGame confinement with resolver/host/private/initializer/rejected/native deltas all zero; GameStartup/migrations/cloud/platform/Steam/main-menu/deferred remained unopened";
 
     public const string StartupLadderImplementationMarker =
-        "physical 0.0.182 closes Step49 4/4 and user-reported fresh rerun closes Steps50-52 4/4 -> supplied first Step50 attempt maps 1075 in-tree nodes/94 managed types/24 frame-input roots/149 immediate methods with zero forbidden/unresolved, StartRendering succeeds and StopRendering synchronously refreezes but 2526ms first continuation exceeds old 2000ms classifier -> 0.0.183 keeps 100ms requested stop and raises only Step50 evidence ceiling to 4000ms -> fresh-process one-shot physically closed-path runner invokes existing Step15 A-C then Step35 MODEL-BOOTSTRAP, Step36, Step37, explicitly skips Step38, then Steps39-52 and verifies exact closure after every return -> Codemagic ios-canonical cache adds only AOTCompileInputs.cache and AOTCompileInputs.cache.uptodate plus opt/llc telemetry after supplied 3250s build localized 3195s to iOS publish; Step53 remains unopened";
+        "physical authority closes through Step52 -> 0.0.183 retains one-button reproof through Step52 and AOT-cache telemetry -> 0.0.184 Step53 isolates zero-arg void NMainMenu.OpenSingleplayerSubmenu and requires execution-qualified admissibility under retained runtime guards with SingleplayerButtonPressed uninvoked -> Step54 token-matches runtime method + exact _singleplayerSubmenu and invokes only OpenSingleplayerSubmenu once while renderer frozen, requiring real NSingleplayerSubmenu visible/in-tree with zero drift -> Step55 audits actual submenu frame/input callbacks then runs one bounded 750ms residency and synchronously refreezes -> Step56 maps exact zero-arg void NSingleplayerSubmenu.OpenCharacterSelect plus immediate/deferred frontier and res:// character-select TSCN literals without invocation -> Step57 reads only the selected receipt-backed PCK resource, validates MD5/SHA and textual Spine/FMOD/GDExtension/native risk with no ResourceLoader/PackedScene/character-select execution; Step58 remains unopened";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

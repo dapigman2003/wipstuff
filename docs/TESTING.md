@@ -1,32 +1,25 @@
-# Testing — Steps 43–52 physically closed stabilization / 0.0.183
+# Testing — Steps 53–57 single-player submenu continuation / 0.0.184
 
-Active candidate: `0.0.183 (183)`, IPA `StS2-Launcher-Steps-43-52.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.184 (184)`, IPA `StS2-Launcher-Steps-53-57.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, exact hashes, fail-stop sequencing, one-shot guards, report surfaces, release identity, provenance, cache configuration and payload/security policy. Codemagic remains compile/AOT/link/package authority. Physical iPhone reports remain runtime authority.
 
-## Preferred physical reproof
+## Physical sequence
 
-Start from a **fresh process** and press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52**. The runner invokes the existing implementations in exactly that order and checks the exact per-step pass/closure predicate after every return. It stops immediately at the first non-closed return. Never retry an armed runner or failed one-shot rung in-process; force-quit/relaunch.
+Start from a **fresh process** and press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52**. It must end 4/4 with rendering frozen. The runner does not execute Step 15 Gate D or Step 38 and remains capped at the physically closed frontier.
 
-The runner intentionally does **not** execute Step 15 Gate D and does **not** execute Step 38. It preserves every normal per-step report/checkpoint and adds `PhysicallyClosedPath-ToStep52.txt` as convenience state. A successful run must end with rendering frozen after Step 52.
+Then run manually, stopping immediately on the first failure:
 
-Manual per-step controls remain available for diagnosis. When diagnosing manually, use the same proven order and stop-on-first-failure discipline.
+1. Step 53 — exact `OpenSingleplayerSubmenu` map only.
+2. Step 54 — one-shot frozen exact `OpenSingleplayerSubmenu` invocation.
+3. Step 55 — actual submenu callback audit + bounded 750 ms render/refreeze.
+4. Step 56 — exact `OpenCharacterSelect` frontier/resource-literal map only.
+5. Step 57 — read-only exact PCK character-select resource preflight.
 
-## Step 50 timing contract
+Never retry Step 54 or Step 55 in-process after their one-shot boundary is armed. Steps 53, 54, 56 and 57 must keep rendering frozen. Step 55 must call `StopRendering()` on the first managed continuation before post-stop telemetry/file I/O and end frozen.
 
-Step 50 still requests 100 ms. On the first managed continuation it must synchronously call `StopRendering()` before post-stop telemetry/file I/O. 0.0.183 changes only Step 50's evidence classification ceiling from 2000 ms to **4000 ms**, covering the supplied cold-frame observation of ~2526 ms. Historical Step 40 remains 100/2000 ms. Step 52 remains 1500/6000 ms.
+Step 56/57 must never call `OpenCharacterSelect`, `ResourceLoader`, `PackedScene.Instantiate`, or character-select admission. Risk findings in Step 57 are evidence only and authorize nothing.
 
-## Codemagic performance check
+## Codemagic performance telemetry
 
-The first successful 0.0.183 build may still be long because previous workflow caches never contained the newly declared `AOTCompileInputs.cache` / `.uptodate` files. Inspect `artifacts/reports/cache-state.txt` and `build-summary.txt` for:
-
-- AOT input cache/sentinel present before build;
-- AOT assemblies reported up-to-date;
-- LLVM `opt` execution count;
-- LLVM `llc` execution count;
-- missing-sentinel diagnostic count;
-- iOS publish/package seconds.
-
-The **following warm build** is the decisive cache-speed comparison. Do not change the pinned SDK/workload/Xcode based on CI timing alone.
-
-Step 53 and later gameplay/Steam/cloud/native-extension boundaries remain unopened.
+The 0.0.183 cache experiment is retained unchanged. `artifacts/reports/cache-state.txt` and `build-summary.txt` continue to report AOT sentinel presence plus LLVM `opt`/`llc` counts. CI performance changes are not required to run Steps 53–57.

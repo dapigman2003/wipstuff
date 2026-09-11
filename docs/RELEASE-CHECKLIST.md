@@ -1,15 +1,19 @@
-# Release checklist — Steps 43–52 physically closed stabilization / 0.0.183
+# Release checklist — Steps 53–57 single-player submenu continuation / 0.0.184
 
-Release identity: display/build `0.0.183 (183)`, IPA `StS2-Launcher-Steps-43-52.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.184 (184)`, IPA `StS2-Launcher-Steps-53-57.ipa`, workflow `ios-canonical`.
 
-Require the current physical status to state that Step 49 is closed and Steps 50–52 are user-reported 4/4 on a fresh rerun; do not fabricate missing successful rerun report files. Seal the supplied first Step-50 checkpoint/static-map/final-report/last-checkpoint as the durable timing-only failure evidence.
+Require physical authority through Step 52 to remain unchanged. The Physically Closed Path button must remain fresh-process-only, one-shot, and capped at Step 52 using the proven Step 15 A–C → 35 MODEL-BOOTSTRAP → 36 → 37 → skip 38 → 39–52 sequence.
 
-Require the Physically Closed Path control to be fresh-process-only and one-shot. It must call existing implementations in this exact order: Step 15 A–C; Step 35.0.32 MODEL-BOOTSTRAP; 36; 37; explicit skip of 38; 39; 40.1; 41; 42; 43 through 52. It must require each exact pass/closure predicate before advancing, stop immediately on failure, preserve normal per-step reports, write `PhysicallyClosedPath-ToStep52.txt`, and require final rendering frozen. Step 15 Gate D must not be auto-run.
+Require Step 53 to bind/audit only exact zero-arg void `NMainMenu.OpenSingleplayerSubmenu`, keep `SingleplayerButtonPressed` uninvoked, require immediate-frontier admissibility under retained runtime guards, and write its map before closure.
 
-Require Step 50 target to remain 100 ms and stop-before-telemetry ordering unchanged. Require a Step-50-specific evidence ceiling of exactly 4000 ms. Require historical Step 40 maximum to remain exactly 2000 ms and Step 52 to remain exactly 1500/6000 ms.
+Require Step 54 to token-match the Step-53 runtime method and exact `NMainMenu._singleplayerSubmenu` type before one-shot invocation. The binding map must be durable before invocation; rendering must remain frozen; success requires the same real `NSingleplayerSubmenu` visible/in-tree and zero context/native drift. No in-process retry after arm.
 
-Require Codemagic workflow ID `ios-canonical` and `mac_mini_m2` to remain stable. Keep existing NuGet/Godot/.NET/obj caches and add only canonical `bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache` and `AOTCompileInputs.cache.uptodate`, not the whole bin tree. Require pre/post marker hash/size/mtime telemetry and post-publish binlog counts for AOT-up-to-date messages, LLVM opt, LLVM llc, and missing-sentinel diagnostics.
+Require Step 55 to audit the actual submenu subtree callbacks before rendering; persist the map first; allow exactly one `StartRendering`; request exactly 750 ms; use a 5000 ms post-stop evidence ceiling; synchronously call `StopRendering()` before telemetry; and require frozen retained submenu authority afterward.
 
-Require no Step 53+ implementation or UI control. Original whole `GameStartup`, original `LaunchMainMenu`, single-player handler invocation, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, deferred startup/`ExecuteDeferred`, external/native Steam, and native FMOD/Spine remain unopened.
+Require Step 56 to map exact zero-arg void `NSingleplayerSubmenu.OpenCharacterSelect` without invocation, record execution/deferred frontiers, unresolved/external-resolution failures, and resource-string/character-select-TSCN candidates.
 
-Require exact version/build `0.0.183/183` in csproj/plist/release presentation/current-release shell constants; active candidate manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload; exact `history.zip`; final ZIP integrity clean; canonical validator green from both the release tree and a completely fresh extraction.
+Require Step 57 to perform read-only receipt-backed PCK extraction only. It must validate directory MD5, report SHA-256/size/flags/referenced resources and textual Spine/FMOD/GDExtension/dylib/dll occurrences, and never invoke `OpenCharacterSelect`, `ResourceLoader`, `PackedScene`, or rendering.
+
+Keep original `GameStartup`, original `LaunchMainMenu`, cloud, migration mutation, platform initialization, external/native Steam, deferred startup, character-select loading/admission, native FMOD/Spine, trusted-install mutation, and Step 58+ unopened.
+
+Keep the 0.0.183 AOT cache/sentinel telemetry and stable `ios-canonical` workflow unchanged. Require exact 0.0.184/184 source/plist/release/shell identity; active manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload; exact `history.zip`; final ZIP integrity clean; canonical validator green in release tree and fresh extraction.

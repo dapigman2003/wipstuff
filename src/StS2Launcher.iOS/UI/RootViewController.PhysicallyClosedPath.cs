@@ -32,7 +32,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_physicallyClosedPathResultLabel);
 
         _physicallyClosedPathDetailLabel = Label(
-            "Convenience runner only. It calls the existing physically closed step implementations in their proven order, preserves every normal per-step report/checkpoint, verifies exact closure after each return, explicitly skips Step 38, and stops at the first failure. Step 15 Gate D is not part of this same-process execution prerequisite. Once armed, never retry this runner or any failed one-shot rung in-process; relaunch instead. Step 53 remains unopened.",
+            "Convenience runner only. It calls the existing physically closed step implementations in their proven order, preserves every normal per-step report/checkpoint, verifies exact closure after each return, explicitly skips Step 38, and stops at the first failure. Step 15 Gate D is not part of this same-process execution prerequisite. Once armed, never retry this runner or any failed one-shot rung in-process; relaunch instead. After a successful closed-path reproof, Step 53 is the active frontier and may be run manually.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_physicallyClosedPathDetailLabel);
@@ -154,8 +154,8 @@ public sealed partial class RootViewController
             SetPhysicallyClosedPathUi(
                 "PHYSICALLY CLOSED PATH PASS — THROUGH STEP 52",
                 UIColor.Label,
-                "All physically closed same-process gates returned their exact pass/closure authority. Step 38 was skipped by contract, Step 15 Gate D was not run, rendering is frozen after Step 52, and Step 53 remains unopened.");
-            _statusLabel.Text = "PASS: PHYSICALLY CLOSED PATH THROUGH STEP 52. Renderer is frozen; current frontier remains after Step 52.";
+                "All physically closed same-process gates returned their exact pass/closure authority. Step 38 was skipped by contract, Step 15 Gate D was not run, rendering is frozen after Step 52, and Step 53 is unlocked as the active manual frontier.");
+            _statusLabel.Text = "PASS: PHYSICALLY CLOSED PATH THROUGH STEP 52. Renderer is frozen; current frontier is Step 53.";
             _statusLabel.TextColor = UIColor.Label;
         }
         catch (Exception ex)
