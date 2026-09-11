@@ -1,0 +1,35 @@
+StS2 Launcher — Step 54.0 Singleplayer Submenu Frozen Open
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-11T06:56:03.4947980+00:00
+
+RESULT
+STEP 54.0 SINGLEPLAYER SUBMENU FROZEN OPEN FAIL — 1/4
+
+METADATA
+App version: 0.0.185 (185)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: initialization
+Exception depth 0: System.MissingFieldException
+  Message: MissingField_Name, MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu, _singleplayerSubmenu
+  HResult: 0x80131511
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep54SingleplayerSubmenuRuntimeBinding(System.Action`1[System.String])
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep54SingleplayerSubmenuRuntimeBinding(Action`1 checkpoint)
+Base exception: System.MissingFieldException: MissingField_Name, MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu, _singleplayerSubmenu
+Base HResult: 0x80131511
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep54SingleplayerSubmenuRuntimeBinding(System.Action`1[System.String])
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep54SingleplayerSubmenuRuntimeBinding(Action`1 checkpoint)
+
+END OF REPORT

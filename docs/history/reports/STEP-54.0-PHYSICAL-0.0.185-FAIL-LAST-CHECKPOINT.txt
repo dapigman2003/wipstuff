@@ -1,0 +1,6 @@
+StS2 Launcher — Step 54 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260911T0656034466360Z-pid2298-ac2e8a920e8c4d248c19bf6cad697223
+Journal: Step54-CrashCheckpoint-20260911T0656034466360Z-pid2298-ac2e8a920e8c4d248c19bf6cad697223.txt
+Static map: Step54-SingleplayerSubmenuOpen-StaticMap-20260911T0656034466360Z-pid2298-ac2e8a920e8c4d248c19bf6cad697223.txt
+2026-09-11T06:56:03.5092480+00:00 | run=20260911T0656034466360Z-pid2298-ac2e8a920e8c4d248c19bf6cad697223 | pid=2298 | managedThread=11 | RUN_END — Step-54 UI operation ended normally; If the one-shot submenu-open boundary was armed, never retry Step 54 in-process.

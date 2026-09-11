@@ -27,6 +27,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string Step56Name = "CHARACTER SELECT FRONTIER MAP";
     private const string Step57Name = "CHARACTER SELECT RESOURCE PREFLIGHT";
     private const string SingleplayerSubmenuManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu";
+    private const string MainMenuSubmenuStackManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack";
+    private const string MainMenuSubmenuStackPropertyName = "SubmenuStack";
     private const string MainMenuSingleplayerFieldName = "_singleplayerSubmenu";
     private const string SingleplayerOpenCharacterSelectMethodName = "OpenCharacterSelect";
 
@@ -61,7 +63,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private bool _exactStep57ClosurePassed;
     private uint _step53OpenMethodToken;
     private uint _step56OpenCharacterSelectToken;
+    private object? _step54SubmenuStack;
     private object? _step54SingleplayerSubmenu;
+    private bool _step54SubmenuExistedBefore;
+    private bool _step54SubmenuInsideTreeBefore;
     private bool _step54SubmenuVisibleBefore;
     private bool _step54SubmenuVisibleInTreeBefore;
     private string[] _step56CharacterSelectSceneCandidates = [];
@@ -108,7 +113,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _exactStep57ClosurePassed = false;
         _step53OpenMethodToken = 0;
         _step56OpenCharacterSelectToken = 0;
+        _step54SubmenuStack = null;
         _step54SingleplayerSubmenu = null;
+        _step54SubmenuExistedBefore = false;
+        _step54SubmenuInsideTreeBefore = false;
         _step54SubmenuVisibleBefore = false;
         _step54SubmenuVisibleInTreeBefore = false;
         _step56CharacterSelectSceneCandidates = [];
@@ -341,30 +349,37 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var open = RequireRuntimeDeclaredZeroArgSingleplayerSubmenuMethod(menu.GetType(), step);
             if (unchecked((uint)open.MetadataToken) != _step53OpenMethodToken)
                 throw new InvalidDataException($"Step 54.0 runtime OpenSingleplayerSubmenu token drifted: expected=0x{_step53OpenMethodToken:X8}; actual=0x{unchecked((uint)open.MetadataToken):X8}.");
-            var field = menu.GetType().GetField(MainMenuSingleplayerFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                ?? throw new MissingFieldException(menu.GetType().FullName, MainMenuSingleplayerFieldName);
-            if (field.FieldType.FullName != SingleplayerSubmenuManagedTypeFullName)
-                throw new InvalidDataException($"Step 54.0 {MainMenuSingleplayerFieldName} type drifted: {field.FieldType.FullName}.");
-            var submenu = field.GetValue(menu) ?? throw new InvalidDataException("Step 54.0 NMainMenu._singleplayerSubmenu is null.");
-            if (submenu.GetType().FullName != SingleplayerSubmenuManagedTypeFullName)
+
+            // The real game owns _singleplayerSubmenu on NMainMenuSubmenuStack, not NMainMenu.
+            // The stack lazily spawns submenu instances, so Gate B binds the exact property/field
+            // metadata and records any pre-existing value without forcing one to exist.
+            var submenuStack = RequireRuntimeExactObjectProperty(menu, MainMenuSubmenuStackPropertyName, MainMenuSubmenuStackManagedTypeFullName, step);
+            var field = RequireRuntimeExactInstanceField(submenuStack.GetType(), MainMenuSingleplayerFieldName, SingleplayerSubmenuManagedTypeFullName, step);
+            var submenu = field.GetValue(submenuStack);
+            if (submenu is not null && submenu.GetType().FullName != SingleplayerSubmenuManagedTypeFullName)
                 throw new InvalidDataException($"Step 54.0 runtime submenu type drifted: {submenu.GetType().FullName}.");
+
+            _step54SubmenuStack = submenuStack;
             _step54SingleplayerSubmenu = submenu;
-            _step54SubmenuVisibleBefore = RequireRuntimeBoolProperty(submenu, "Visible", step);
-            _step54SubmenuVisibleInTreeBefore = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsVisibleInTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
-            var inside = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsInsideTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
+            _step54SubmenuExistedBefore = submenu is not null;
+            _step54SubmenuInsideTreeBefore = submenu is not null && Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsInsideTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
+            _step54SubmenuVisibleBefore = submenu is not null && RequireRuntimeBoolProperty(submenu, "Visible", step);
+            _step54SubmenuVisibleInTreeBefore = submenu is not null && Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsVisibleInTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
             _step54StaticMap =
                 "StS2 Launcher — Step 54.0 frozen single-player submenu runtime binding map\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
                 $"OpenSingleplayerSubmenu runtime token=0x{unchecked((uint)open.MetadataToken):X8}; exact Step-53 token match=True\n" +
-                $"NMainMenu field: {MainMenuSingleplayerFieldName}; fieldType={field.FieldType.FullName}; runtimeType={submenu.GetType().FullName}\n" +
-                $"Submenu inside tree before open: {inside}\n" +
+                $"NMainMenu property: {MainMenuSubmenuStackPropertyName}; propertyType={submenuStack.GetType().FullName}\n" +
+                $"NMainMenuSubmenuStack field: {MainMenuSingleplayerFieldName}; fieldType={field.FieldType.FullName}\n" +
+                $"Submenu existed before open: {_step54SubmenuExistedBefore}\n" +
+                $"Submenu inside tree before open: {_step54SubmenuInsideTreeBefore}\n" +
                 $"Submenu Visible before open: {_step54SubmenuVisibleBefore}\n" +
                 $"Submenu IsVisibleInTree before open: {_step54SubmenuVisibleInTreeBefore}\n" +
                 "SingleplayerButtonPressed invoked: NO\nOpenSingleplayerSubmenu invoked: NO\nRendering restarted: NO\n";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 54 Gate B");
-            Checkpoint(checkpoint, $"M54_B_PASS — exact runtime OpenSingleplayerSubmenu token matched 0x{_step53OpenMethodToken:X8}; retained NSingleplayerSubmenu bound; insideTree={inside}; visible={_step54SubmenuVisibleBefore}; visibleInTree={_step54SubmenuVisibleInTreeBefore}; invocation=NO.");
+            Checkpoint(checkpoint, $"M54_B_PASS — exact runtime OpenSingleplayerSubmenu token matched 0x{_step53OpenMethodToken:X8}; NMainMenu.SubmenuStack -> NMainMenuSubmenuStack._singleplayerSubmenu metadata bound; preexistingSubmenu={_step54SubmenuExistedBefore}; insideTree={_step54SubmenuInsideTreeBefore}; visible={_step54SubmenuVisibleBefore}; visibleInTree={_step54SubmenuVisibleInTreeBefore}; invocation=NO.");
             return StartupLadderPass(step, Step54Name, gate,
-                "Exact runtime OpenSingleplayerSubmenu and retained NSingleplayerSubmenu were bound with Step-53 token identity; no invocation or rendering yet.");
+                "Exact runtime OpenSingleplayerSubmenu plus the real SubmenuStack lazy _singleplayerSubmenu slot were bound with Step-53 token identity; no invocation or rendering yet.");
         }
         catch (Exception ex)
         {
@@ -388,14 +403,22 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (_step54OpenStarted)
                 throw new InvalidOperationException("Step 54.0 OpenSingleplayerSubmenu is one-shot in-process.");
             var menu = RequireRetainedInTreeMainMenu(step);
-            var submenu = _step54SingleplayerSubmenu ?? throw new InvalidOperationException("Step 54.0 retained NSingleplayerSubmenu binding absent.");
             var open = RequireRuntimeDeclaredZeroArgSingleplayerSubmenuMethod(menu.GetType(), step);
             if (unchecked((uint)open.MetadataToken) != _step53OpenMethodToken)
                 throw new InvalidDataException("Step 54.0 OpenSingleplayerSubmenu runtime token changed before invocation.");
+
+            var submenuStack = RequireRuntimeExactObjectProperty(menu, MainMenuSubmenuStackPropertyName, MainMenuSubmenuStackManagedTypeFullName, step);
+            if (!ReferenceEquals(submenuStack, _step54SubmenuStack))
+                throw new InvalidDataException("Step 54.0 NMainMenu.SubmenuStack identity changed between Gate B and Gate C.");
+            var field = RequireRuntimeExactInstanceField(submenuStack.GetType(), MainMenuSingleplayerFieldName, SingleplayerSubmenuManagedTypeFullName, step);
+            var fieldBefore = field.GetValue(submenuStack);
+            if (!ReferenceEquals(fieldBefore, _step54SingleplayerSubmenu))
+                throw new InvalidDataException("Step 54.0 NMainMenuSubmenuStack._singleplayerSubmenu identity changed before the one-shot open.");
+
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 54 Gate C preinvoke");
             RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 54 Gate C guard recheck", requirePreAdmissionCounts: false);
             _step54OpenStarted = true;
-            Checkpoint(checkpoint, $"M54_C_INVOKE_START — invoking exact NMainMenu.OpenSingleplayerSubmenu token=0x{_step53OpenMethodToken:X8} once while rendering remains frozen; SingleplayerButtonPressed remains uninvoked.");
+            Checkpoint(checkpoint, $"M54_C_INVOKE_START — invoking exact NMainMenu.OpenSingleplayerSubmenu token=0x{_step53OpenMethodToken:X8} once while rendering remains frozen; preexistingSubmenu={_step54SubmenuExistedBefore}; SingleplayerButtonPressed remains uninvoked.");
             object? returnedSubmenu;
             try
             {
@@ -406,12 +429,21 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 ExceptionDispatchInfo.Capture(tie.InnerException).Throw();
                 throw; // unreachable; satisfies flow analysis
             }
-            var field = menu.GetType().GetField(MainMenuSingleplayerFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                ?? throw new MissingFieldException(menu.GetType().FullName, MainMenuSingleplayerFieldName);
-            if (!ReferenceEquals(field.GetValue(menu), submenu))
-                throw new InvalidDataException("Step 54.0 NMainMenu._singleplayerSubmenu identity changed across open invocation.");
-            if (!ReferenceEquals(returnedSubmenu, submenu))
-                throw new InvalidDataException("Step 54.0 OpenSingleplayerSubmenu return identity did not match the retained NMainMenu._singleplayerSubmenu authority.");
+
+            if (returnedSubmenu is null)
+                throw new InvalidDataException("Step 54.0 OpenSingleplayerSubmenu returned null.");
+            if (returnedSubmenu.GetType().FullName != SingleplayerSubmenuManagedTypeFullName)
+                throw new InvalidDataException($"Step 54.0 OpenSingleplayerSubmenu runtime return type drifted: {returnedSubmenu.GetType().FullName}.");
+            var fieldAfter = field.GetValue(submenuStack) ?? throw new InvalidDataException("Step 54.0 NMainMenuSubmenuStack._singleplayerSubmenu remained null after OpenSingleplayerSubmenu returned.");
+            if (fieldAfter.GetType().FullName != SingleplayerSubmenuManagedTypeFullName)
+                throw new InvalidDataException($"Step 54.0 post-open submenu field type drifted: {fieldAfter.GetType().FullName}.");
+            if (!ReferenceEquals(returnedSubmenu, fieldAfter))
+                throw new InvalidDataException("Step 54.0 OpenSingleplayerSubmenu return identity did not match NMainMenu.SubmenuStack._singleplayerSubmenu.");
+            if (_step54SubmenuExistedBefore && !ReferenceEquals(fieldAfter, _step54SingleplayerSubmenu))
+                throw new InvalidDataException("Step 54.0 pre-existing NMainMenuSubmenuStack._singleplayerSubmenu identity changed across open invocation.");
+
+            _step54SingleplayerSubmenu = fieldAfter;
+            var submenu = fieldAfter;
             var inside = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsInsideTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
             var visible = RequireRuntimeBoolProperty(submenu, "Visible", step);
             var visibleInTree = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsVisibleInTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
@@ -423,9 +455,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 54 Gate C postinvoke guard recheck", requirePreAdmissionCounts: false);
             _step54PostOpenBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
             _step54OpenPassed = true;
-            Checkpoint(checkpoint, $"M54_C_PASS — exact OpenSingleplayerSubmenu returned once; NSingleplayerSubmenu insideTree={inside}; visible={visible}; visibleInTree={visibleInTree}; renderingStopped=True; resolver/host/private/initializer/rejected/native drift=0.");
+            Checkpoint(checkpoint, $"M54_C_PASS — exact OpenSingleplayerSubmenu returned once; return identity matches NMainMenu.SubmenuStack._singleplayerSubmenu; lazilyCreated={!_step54SubmenuExistedBefore}; NSingleplayerSubmenu insideTree={inside}; visible={visible}; visibleInTree={visibleInTree}; renderingStopped=True; resolver/host/private/initializer/rejected/native drift=0.");
             return StartupLadderPass(step, Step54Name, gate,
-                "Exact OpenSingleplayerSubmenu returned once while frozen and the retained real NSingleplayerSubmenu became visible in-tree with zero context/native drift.");
+                "Exact OpenSingleplayerSubmenu returned once while frozen and its returned object is the real SubmenuStack-retained NSingleplayerSubmenu, visible in-tree with zero context/native drift.");
         }
         catch (Exception ex)
         {
@@ -961,6 +993,33 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return exactCandidates.SingleOrDefault()
             ?? throw new MissingMethodException(type.FullName,
                 $"{MainMenuOpenSingleplayerSubmenuMethodName}() -> {SingleplayerSubmenuManagedTypeFullName}; Step {step}.0 candidates={string.Join(" | ", namedCandidates.Select(method => method.ToString()))}");
+    }
+
+    private static object RequireRuntimeExactObjectProperty(object instance, string propertyName, string expectedTypeFullName, int step)
+    {
+        PropertyInfo? property = null;
+        for (var type = instance.GetType(); type is not null && property is null; type = type.BaseType)
+            property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+        if (property is null)
+            throw new MissingMemberException(instance.GetType().FullName, propertyName);
+        if (property.GetIndexParameters().Length != 0 || property.GetMethod is null || property.PropertyType.FullName != expectedTypeFullName)
+            throw new InvalidDataException($"Step {step}.0 property {instance.GetType().FullName}.{propertyName} is not a readable non-indexed {expectedTypeFullName} property; observed={property.PropertyType.FullName}.");
+        var value = property.GetValue(instance) ?? throw new InvalidDataException($"Step {step}.0 property {propertyName} returned null.");
+        if (value.GetType().FullName != expectedTypeFullName)
+            throw new InvalidDataException($"Step {step}.0 property {propertyName} runtime type drifted: {value.GetType().FullName}.");
+        return value;
+    }
+
+    private static FieldInfo RequireRuntimeExactInstanceField(Type runtimeType, string fieldName, string expectedTypeFullName, int step)
+    {
+        FieldInfo? field = null;
+        for (var type = runtimeType; type is not null && field is null; type = type.BaseType)
+            field = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+        if (field is null)
+            throw new MissingFieldException(runtimeType.FullName, fieldName);
+        if (field.IsStatic || field.FieldType.FullName != expectedTypeFullName)
+            throw new InvalidDataException($"Step {step}.0 field {runtimeType.FullName}.{fieldName} is not an instance {expectedTypeFullName} field; observed={field.FieldType.FullName}; static={field.IsStatic}.");
+        return field;
     }
 
     private static bool RequireRuntimeBoolProperty(object instance, string propertyName, int step)

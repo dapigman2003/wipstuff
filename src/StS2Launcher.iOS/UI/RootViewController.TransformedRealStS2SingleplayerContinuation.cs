@@ -56,7 +56,7 @@ public sealed partial class RootViewController
             "Step 54.0 — one-shot frozen OpenSingleplayerSubmenu + visible real submenu authority",
             "Run Step 54.0 A–D — OPEN ONCE",
             "SINGLEPLAYER SUBMENU FROZEN OPEN: LOCKED",
-            "Requires Step 53.0 4/4 admissible direct-open authority. Token-matches the runtime method, binds exact NMainMenu._singleplayerSubmenu, writes that map, then invokes only OpenSingleplayerSubmenu once while rendering stays stopped. Success requires the exact retained NSingleplayerSubmenu to become visible in-tree with zero context/native drift.");
+            "Requires Step 53.0 4/4 admissible direct-open authority. Token-matches the runtime method, binds exact NMainMenu.SubmenuStack and its lazy NMainMenuSubmenuStack._singleplayerSubmenu slot, writes that map, then invokes only OpenSingleplayerSubmenu once while rendering stays stopped. Success requires the returned object to be the exact stack-retained NSingleplayerSubmenu and become visible in-tree with zero context/native drift.");
         _step54Button.TouchUpInside += async (_, _) => await RunStep54StartupLadderAsync();
 
         (_step55Button, _step55ResultLabel, _step55DetailLabel) = AddStartupLadderStepControls(
@@ -160,7 +160,7 @@ public sealed partial class RootViewController
             if (!RecordStartupLadderGate(_step54Gates, _transformedRealStS2VeryEarlyInitialization.RunStep54SingleplayerSubmenuRuntimeBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 54 runtime binding map write failed before one-shot submenu open: " + mapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep54StaticMapDurablyWritten();
-            WriteStartupLadderCheckpoint(step, "M54_B_STATIC_MAP_WRITE_RETURNED — runtime token/submenu identity map durably written before exact OpenSingleplayerSubmenu invocation.");
+            WriteStartupLadderCheckpoint(step, "M54_B_STATIC_MAP_WRITE_RETURNED — runtime token/SubmenuStack lazy-slot identity map durably written before exact OpenSingleplayerSubmenu invocation.");
             _step54OpenUiStarted = true;
             button.Enabled = false;
             WriteStartupLadderCheckpoint(step, "M54_C_UI_ARMED — first/only exact OpenSingleplayerSubmenu invocation authorized; no in-process retry after this checkpoint.");

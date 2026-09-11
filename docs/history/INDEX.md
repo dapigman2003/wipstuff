@@ -498,3 +498,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-CHECKPOINT.txt` — run-correlated journal proving frozen Step-52 authority, Gate-A pass, Gate-B return-type localization, and normal frozen end.
 - `reports/STEP-53.0-PHYSICAL-0.0.184-FAIL-LAST-CHECKPOINT.txt` — durable run pointer confirming Step 53 ended normally without handler invocation or render restart.
 - `steps/STEP-53.0-RETURN-TYPE-CORRECTION-0.0.185.md` — focused 0.0.185 correction: exact `NSingleplayerSubmenu` return contract plus Step-54 invocation-return identity check; no frontier expansion.
+
+## Step 54 physical submenu-stack localization / 0.0.186 focused correction
+
+- `reports/STEP-54.0-PHYSICAL-0.0.185-FAIL-REPORT.txt` — physical 0.0.185 Step 54 report: Gate A passed; Gate B stopped on missing `NMainMenu._singleplayerSubmenu`; 1/4; no one-shot invocation armed.
+- `reports/STEP-54.0-PHYSICAL-0.0.185-FAIL-CHECKPOINT.txt` — run-correlated checkpoint proving frozen rendering and pre-arm Gate-B failure.
+- `reports/STEP-54.0-PHYSICAL-0.0.185-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same physical localization.
+- `steps/STEP-54.0-SUBMENU-STACK-LAZY-BINDING-CORRECTION-0.0.186.md` — focused 0.0.186 correction: bind `NMainMenu.SubmenuStack` and its lazy `_singleplayerSubmenu` slot, then require post-open return/field identity; no frontier expansion.
