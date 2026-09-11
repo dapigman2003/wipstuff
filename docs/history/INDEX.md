@@ -512,3 +512,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-56.0-PHYSICAL-0.0.186-FAIL-CHECKPOINT.txt` — run-correlated journal proving Step-55 authority, Gate-A pass, exact `params=1; return=System.Void` localization, frozen renderer, and normal end.
 - `reports/STEP-56.0-PHYSICAL-0.0.186-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same physical localization.
 - `steps/STEP-56.0-NBUTTON-SIGNATURE-CORRECTION-0.0.187.md` — focused 0.0.187 correction: exact `NButton` callback parameter plus `void` return pinned at Step-56 Gate B and Gate C; no frontier expansion.
+
+## Step 57 physical scene-discovery localization / 0.0.188 focused correction
+
+- `reports/STEP-57.0-PHYSICAL-0.0.187-FAIL-REPORT.txt` — physical 0.0.187 Step 57 result: safe Gate-A `observed=none` stop after same-process Step-56 4/4 closure; no PCK resource extraction, ResourceLoader, PackedScene, character-select invocation, or rendering.
+- `reports/STEP-57.0-PHYSICAL-0.0.187-FAIL-CHECKPOINT.txt` — run-correlated journal proving Step-57 read-only entry, Gate-A scene-candidate localization, frozen renderer, and normal end.
+- `reports/STEP-57.0-PHYSICAL-0.0.187-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same physical localization.
+- `steps/STEP-57.0-SCENE-HINT-PCK-RESOLUTION-CORRECTION-0.0.188.md` — focused 0.0.188 correction: preserve exact `screens/character_select_screen` managed hint, canonicalize only its exact supported full path, and require one receipt-backed PCK directory match before read-only extraction; physical closure advances through Step 56.

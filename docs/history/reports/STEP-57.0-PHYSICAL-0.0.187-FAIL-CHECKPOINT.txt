@@ -1,0 +1,15 @@
+StS2 Launcher — Step 57.0 Character-select exact PCK resource preflight checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260911T1010244017490Z-pid4678-5bdc8216701a4865a8d38c08f6c42cad
+Initialized UTC: 2026-09-11T10:10:24.4017490+00:00
+Process ID: 4678
+App version: 0.0.187 (187)
+Candidate: STEPS 43–57 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–57 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.
+Global policy: physical authority through Step 52 remains the baseline. Steps 53–54/56–57 keep rendering frozen; Step 55 alone adds one bounded single-player-submenu render residency and synchronously refreezes. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, native game GDExtensions, and character-select execution remain unopened.
+
+2026-09-11T10:10:24.4090430+00:00 | run=20260911T1010244017490Z-pid4678-5bdc8216701a4865a8d38c08f6c42cad | pid=4678 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-11T10:10:24.4106630+00:00 | run=20260911T1010244017490Z-pid4678-5bdc8216701a4865a8d38c08f6c42cad | pid=4678 | managedThread=1 | RUN_START — Step 57.0 read-only exact character-select PCK resource preflight started. OpenCharacterSelect/ResourceLoader/PackedScene/rendering remain unopened.
+2026-09-11T10:10:24.4256620+00:00 | run=20260911T1010244017490Z-pid4678-5bdc8216701a4865a8d38c08f6c42cad | pid=4678 | managedThread=1 | M57_A_FAIL — stage=initialization; System.IO.InvalidDataException: Step 57.0 requires exactly one character-select TSCN candidate. observed=none
+2026-09-11T10:10:24.4477920+00:00 | run=20260911T1010244017490Z-pid4678-5bdc8216701a4865a8d38c08f6c42cad | pid=4678 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. Step 57 is read-only: no OpenCharacterSelect, ResourceLoader, PackedScene instantiation, or rendering.
+2026-09-11T10:10:24.4492830+00:00 | run=20260911T1010244017490Z-pid4678-5bdc8216701a4865a8d38c08f6c42cad | pid=4678 | managedThread=7 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-11T10:10:24.4650740+00:00 | run=20260911T1010244017490Z-pid4678-5bdc8216701a4865a8d38c08f6c42cad | pid=4678 | managedThread=7 | RUN_END — Step-57 UI operation ended normally; Step 57 is read-only: no OpenCharacterSelect, ResourceLoader, PackedScene instantiation, or rendering.

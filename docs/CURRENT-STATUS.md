@@ -1,12 +1,12 @@
 # Current status
 
-## Active candidate — Steps 53–57 single-player submenu continuation / 0.0.187 (187)
+## Active candidate — Steps 53–57 single-player submenu continuation / 0.0.188 (188)
 
-The stable direct-main-menu baseline remains physically closed through **Step 52**. Physical 0.0.186 then progressed through Steps 53, 54 and 55 in the same process and reached Step 56 Gate A with retained **Step-55 4/4 rendered/refrozen authority**, so physical runtime authority is now closed through **Step 55**. The one-button physically closed path intentionally remains capped at Step 52.
+The stable direct-main-menu baseline remains physically closed through **Step 52**. Physical 0.0.187 progressed through Steps 53–56 in the same process and entered Step 57, so physical runtime authority is now closed through **Step 56 4/4/frozen**. Step 57 Gate A then stopped safely on the old full-path-only scene-candidate rule before any PCK entry extraction. The one-button physically closed path intentionally remains capped at Step 52.
 
-**0.0.187 keeps Steps 53–55 unchanged and corrects only the Step-56 callback signature.** From a fresh process, use the capped **Physically Closed Path** through Step 52, then rerun Steps 53–55 manually to reconstruct the physically proven extension. Step 56 now maps exact `void NSingleplayerSubmenu.OpenCharacterSelect(MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton)` without invocation; Step 57 remains read-only PCK preflight only. Step 58 remains unopened.
+**0.0.188 keeps Steps 53–56 execution authority unchanged and corrects only the Step-56→57 scene-identity handoff.** From a fresh process, use the capped **Physically Closed Path** through Step 52, then rerun Steps 53–56 manually to reconstruct the physically proven extension. Step 56 preserves the exact managed hint `screens/character_select_screen` (or the exact full resource form); Step 57 canonicalizes only that identity to `res://scenes/screens/character_select_screen.tscn` and requires exactly one matching receipt-backed PCK directory entry before read-only extraction. Step 58 remains unopened.
 
-The 0.0.183 Codemagic AOT cache/sentinel experiment is retained unchanged in 0.0.187. It is not required for the runtime experiment and can be evaluated from a later warm-build artifact without changing this candidate.
+The 0.0.183 Codemagic AOT cache/sentinel experiment is retained unchanged in 0.0.188. It is not required for the runtime experiment and can be evaluated from a later warm-build artifact without changing this candidate.
 
 The multi-rung safety discipline remains unchanged: **the unit of safety remains one gate at a time; the unit of packaging becomes multiple gates per build.** The closed-path convenience runner calls existing numbered methods rather than bypassing them, checks exact closure after each return, explicitly skips Step 38, stops on first failure, and never auto-runs Step 15 Gate D. Steps 53–57 remain manual and each later rung requires the prior exact same-process 4/4 authority.
 
@@ -89,6 +89,16 @@ Because Step 56 Gate A requires and observed exact Step-55 4/4/refrozen authorit
 
 Retained evidence: `STEP-56.0-PHYSICAL-0.0.186-FAIL-REPORT.txt`, `STEP-56.0-PHYSICAL-0.0.186-FAIL-CHECKPOINT.txt`, `STEP-56.0-PHYSICAL-0.0.186-FAIL-LAST-CHECKPOINT.txt`.
 
+## Physical 0.0.187 Step 57 localization — safe Gate-A stop after Step 56 closure
+
+The supplied physical 0.0.187 run entered Step 57 only after exact same-process Step-56 4/4 authority had closed. Step 57 then failed at Gate A with `observed=none` because the 0.0.187 discovery pipeline promoted only immediate-closure strings already shaped as full `res://...*.tscn` paths. The run ended normally with rendering frozen; no `OpenCharacterSelect`, `ResourceLoader`, `PackedScene`, PCK scene extraction, or character-select execution occurred.
+
+The selected game image carries the shorter exact scene identity `screens/character_select_screen`; the supplied PCK path inventory shows the corresponding exact entry `res://scenes/screens/character_select_screen.tscn`. 0.0.188 does not trust that inventory at runtime: Step 56 preserves only the exact supported short/full scene hint, and Step 57 Gate A canonicalizes only that identity and performs a read-only receipt-backed PCK directory scan requiring exactly one matching entry. Gate B remains the first byte-extraction point.
+
+Because Step 57 requires Step 56 4/4 before entry, physical closure is now recorded through **Step 56**.
+
+Retained evidence: `STEP-57.0-PHYSICAL-0.0.187-FAIL-REPORT.txt`, `STEP-57.0-PHYSICAL-0.0.187-FAIL-CHECKPOINT.txt`, `STEP-57.0-PHYSICAL-0.0.187-FAIL-LAST-CHECKPOINT.txt`.
+
 ## Step 53.0 — exact single-player submenu-open frontier, no invocation
 
 Requires Step 52 4/4/refrozen authority. Binds exact zero-argument `NMainMenu.OpenSingleplayerSubmenu()` returning `NSingleplayerSubmenu`, records the broader `SingleplayerButtonPressed` only as evidence, and audits **only** `OpenSingleplayerSubmenu` using the execution-opcode-qualified frontier plus retained Step-48 runtime guards. Every immediate classified boundary must be admissible; unresolved same-StS2 references or external Cecil resolution fail. The exact map is durably written before Gate D. No handler is invoked and rendering remains frozen.
@@ -109,17 +119,17 @@ Reports: `Step55-CrashCheckpoint-<RunId>.txt`, `Step55-SingleplayerSubmenuFrameI
 
 ## Step 56.0 — exact character-select frontier map, no invocation
 
-Requires Step 55 4/4/refrozen authority. Binds exact `void NSingleplayerSubmenu.OpenCharacterSelect(MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton)`, records its IL, rechecks that exact signature before frontier mapping, and collects every `res://` string literal in the immediate same-module closure. Character-select `.tscn` candidates are recorded separately. Classified boundaries remain evidence only at this rung; unresolved same-StS2 references or external Cecil resolution fail. `OpenCharacterSelect` is never invoked and rendering remains frozen.
+Requires Step 55 4/4/refrozen authority. Binds exact `void NSingleplayerSubmenu.OpenCharacterSelect(MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton)`, records its IL, rechecks that exact signature before frontier mapping, and maps the same immediate/deferred closure without invocation. Full `res://` literals remain evidence, while the Step-56→57 handoff preserves only the exact supported character-select scene identity `screens/character_select_screen` or `res://scenes/screens/character_select_screen.tscn`. Classified boundaries remain evidence only at this rung; unresolved same-StS2 references or external Cecil resolution fail. `OpenCharacterSelect` is never invoked and rendering remains frozen. Physical 0.0.187 closed this rung 4/4.
 
 Reports: `Step56-CrashCheckpoint-<RunId>.txt`, `Step56-CharacterSelectFrontier-StaticMap-<RunId>.txt`, `Step56-LastCheckpoint.txt`, `Step56-TransformedRealStS2CharacterSelectFrontier.txt`.
 
 ## Step 57.0 — exact character-select PCK resource preflight, read-only
 
-Requires Step 56 4/4. Selects exactly one character-select TSCN candidate (or one unambiguous `character_select`/`characterselect` candidate), reads only that exact entry from the receipt-backed PCK, refuses encryption/oversize/header drift, validates the directory MD5, records SHA-256/size/flags, decodes strict UTF-8 text, lists referenced `res://` paths, and counts textual Spine/FMOD/`.gdextension`/`.dylib`/`.dll` risk tokens. Risk findings authorize nothing. No `OpenCharacterSelect`, `ResourceLoader`, `PackedScene`, character-select execution, or rendering occurs.
+Requires Step 56 4/4. Gate A accepts only the exact Step-56 scene hint in short or full form, canonicalizes it to `res://scenes/screens/character_select_screen.tscn`, and scans only the receipt-backed PCK directory to require exactly one matching entry under the sealed PCK header/count authority. Gate B then reads only that exact entry, refuses encryption/oversize/header drift, validates the directory MD5, records SHA-256/size/flags, decodes strict UTF-8 text, lists referenced `res://` paths, and counts textual Spine/FMOD/`.gdextension`/`.dylib`/`.dll` risk tokens. Risk findings authorize nothing. No `OpenCharacterSelect`, `ResourceLoader`, `PackedScene`, character-select execution, or rendering occurs.
 
 Reports: `Step57-CrashCheckpoint-<RunId>.txt`, `Step57-CharacterSelectResource-StaticMap-<RunId>.txt`, `Step57-LastCheckpoint.txt`, `Step57-TransformedRealStS2CharacterSelectResourcePreflight.txt`.
 
-## Physical sequence for 0.0.187
+## Physical sequence for 0.0.188
 
 Preferred: fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. It reconstructs the known same-process authority and leaves rendering frozen after Step 52. Step 15 Gate D is intentionally not run. Then run the new rungs manually in order:
 
@@ -131,4 +141,4 @@ Preferred: fresh process → press **Run Physically Closed Path — Step 15 A–
 
 Stop at the first failure and preserve that rung's checkpoint/static-map/final report.
 
-Still globally forbidden in 0.0.187: Step 58+, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character-select handler invocation/resource loading/instantiation/admission, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, and trusted-install mutation. Physically closed Steps 50/52 and active Step 55 are the only render rungs; each synchronously refreezes before success evaluation.
+Still globally forbidden in 0.0.188: Step 58+, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character-select handler invocation/resource loading/instantiation/admission, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, and trusted-install mutation. Physically closed Steps 50/52 and active Step 55 are the only render rungs; each synchronously refreezes before success evaluation.

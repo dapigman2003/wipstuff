@@ -32,6 +32,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string MainMenuSingleplayerFieldName = "_singleplayerSubmenu";
     private const string SingleplayerOpenCharacterSelectMethodName = "OpenCharacterSelect";
     private const string SingleplayerOpenCharacterSelectParameterTypeFullName = "MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton";
+    private const string CharacterSelectSceneShortHint = "screens/character_select_screen";
+    private const string CharacterSelectSceneResourcePath = "res://scenes/screens/character_select_screen.tscn";
 
     private StartupLadderBaseline? _step53Baseline;
     private StartupLadderBaseline? _step54Baseline;
@@ -746,29 +748,34 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException("Step 56.0 frontier unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             var methodsByToken = allMethods.Values.GroupBy(method => method.MetadataToken.ToUInt32()).ToDictionary(group => group.Key, group => group.First());
             var literals = new SortedSet<string>(StringComparer.Ordinal);
+            var sceneHints = new SortedSet<string>(StringComparer.Ordinal);
             foreach (var item in audit.ImmediateClosureMethods)
             {
                 if (!methodsByToken.TryGetValue(item.Token, out var method) || !method.HasBody)
                     continue;
                 foreach (var instruction in method.Body.Instructions)
                 {
-                    if (instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string text && text.StartsWith("res://", StringComparison.Ordinal))
-                        literals.Add(text.Replace('\\', '/'));
+                    if (instruction.OpCode.Code != Code.Ldstr || instruction.Operand is not string text)
+                        continue;
+                    var normalized = text.Replace('\\', '/');
+                    if (normalized.StartsWith("res://", StringComparison.Ordinal))
+                        literals.Add(normalized);
+                    if (string.Equals(normalized, CharacterSelectSceneShortHint, StringComparison.Ordinal) ||
+                        string.Equals(normalized, CharacterSelectSceneResourcePath, StringComparison.Ordinal))
+                        sceneHints.Add(normalized);
                 }
             }
-            _step56CharacterSelectSceneCandidates = literals
-                .Where(path => path.EndsWith(".tscn", StringComparison.OrdinalIgnoreCase) && path.Contains("character", StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+            _step56CharacterSelectSceneCandidates = sceneHints.ToArray();
             _step56StaticMap += BuildStartupLadderInvocationFrontierAppendix(audit) +
                 "\n[RESOURCE STRING LITERALS FROM IMMEDIATE CLOSURE]\n" +
                 (literals.Count == 0 ? "  - none\n" : string.Join("\n", literals.Select(value => "  - " + value)) + "\n") +
-                "[CHARACTER-SELECT TSCN CANDIDATES]\n" +
+                "[CHARACTER-SELECT SCENE HINTS FROM IMMEDIATE CLOSURE]\n" +
                 (_step56CharacterSelectSceneCandidates.Length == 0 ? "  - none\n" : string.Join("\n", _step56CharacterSelectSceneCandidates.Select(value => "  - " + value)) + "\n");
             _step56FrontierMapped = true;
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 56 Gate C");
-            Checkpoint(checkpoint, $"M56_C_PASS — OpenCharacterSelect frontier mapped without invocation; closureMethods={audit.ImmediateClosureMethods.Length}; immediateBoundaryRefs={audit.ImmediateBoundaries.Length}; guardedFrontiers={audit.GuardedMethodFrontiers.Length}; deferredFrontiers={audit.DeferredMethodFrontiers.Length}; characterSelectTscnCandidates={_step56CharacterSelectSceneCandidates.Length}; unresolved/external=0.");
+            Checkpoint(checkpoint, $"M56_C_PASS — OpenCharacterSelect frontier mapped without invocation; closureMethods={audit.ImmediateClosureMethods.Length}; immediateBoundaryRefs={audit.ImmediateBoundaries.Length}; guardedFrontiers={audit.GuardedMethodFrontiers.Length}; deferredFrontiers={audit.DeferredMethodFrontiers.Length}; characterSelectSceneHints={_step56CharacterSelectSceneCandidates.Length}; unresolved/external=0.");
             return StartupLadderPass(step, Step56Name, gate,
-                $"OpenCharacterSelect frontier and resource literals mapped as evidence only: immediate methods={audit.ImmediateClosureMethods.Length}; classified boundaries={audit.ImmediateBoundaries.Length}; character-select TSCN candidates={_step56CharacterSelectSceneCandidates.Length}; invocation=NO.");
+                $"OpenCharacterSelect frontier and resource literals mapped as evidence only: immediate methods={audit.ImmediateClosureMethods.Length}; classified boundaries={audit.ImmediateBoundaries.Length}; character-select scene hints={_step56CharacterSelectSceneCandidates.Length}; invocation=NO.");
         }
         catch (Exception ex)
         {
@@ -792,7 +799,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 56 Gate D");
             RequireVisibleSingleplayerSubmenu(step);
             _exactStep56ClosurePassed = true;
-            Checkpoint(checkpoint, $"M56_D_PASS — character-select frontier durable; OpenCharacterSelect invocation=NO; characterSelectTscnCandidates={_step56CharacterSelectSceneCandidates.Length}; renderingStopped=True; drift=0.");
+            Checkpoint(checkpoint, $"M56_D_PASS — character-select frontier durable; OpenCharacterSelect invocation=NO; characterSelectSceneHints={_step56CharacterSelectSceneCandidates.Length}; renderingStopped=True; drift=0.");
             return StartupLadderPass(step, Step56Name, gate,
                 "Durable non-invoking character-select frontier authority closed. Step 57 may inspect the discovered exact PCK resource boundary without Godot loading or handler invocation.");
         }
@@ -834,8 +841,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var selected = RequireStartupLadderSelectedAuthority(step);
             _step57Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
             RequireStartupLadderBaselineUnchanged(context, _step57Baseline, "Step 57 Gate A");
-            _step57CharacterSelectResourcePath = SelectExactCharacterSelectSceneCandidate(_step56CharacterSelectSceneCandidates);
-            Checkpoint(checkpoint, $"M57_A_PASS — Step-56 4/4 non-invoking frontier retained; exact character-select resource candidate='{_step57CharacterSelectResourcePath}'; renderingStopped=True; Godot resource load=NO.");
+            var pck = RequireEssentialResourcePackHandoff().PackAbsolutePath;
+            _step57CharacterSelectResourcePath = SelectExactCharacterSelectSceneCandidate(_step56CharacterSelectSceneCandidates, pck);
+            Checkpoint(checkpoint, $"M57_A_PASS — Step-56 4/4 non-invoking frontier retained; exact managed scene hint resolved through receipt-backed PCK directory to resource='{_step57CharacterSelectResourcePath}'; renderingStopped=True; Godot resource load=NO.");
             return StartupLadderPass(step, Step57Name, gate,
                 $"Step-56 frontier retained and one exact character-select TSCN candidate selected for read-only PCK inspection: {_step57CharacterSelectResourcePath}.");
         }
@@ -1059,18 +1067,69 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             throw new InvalidDataException($"{boundary} escaped managed/native confinement. initializer={initializerDelta}; rejected={rejectedDelta}; native={nativeDelta}.");
     }
 
-    private static string SelectExactCharacterSelectSceneCandidate(IEnumerable<string> candidates)
+    private static string SelectExactCharacterSelectSceneCandidate(IEnumerable<string> candidates, string pckPath)
     {
-        var all = candidates.Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal).ToArray();
-        if (all.Length == 1)
-            return all[0];
-        var preferred = all.Where(value =>
-                value.Contains("character_select", StringComparison.OrdinalIgnoreCase) ||
-                value.Contains("characterselect", StringComparison.OrdinalIgnoreCase))
+        var observed = candidates
+            .Select(value => value.Replace('\\', '/'))
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(value => value, StringComparer.Ordinal)
             .ToArray();
-        if (preferred.Length == 1)
-            return preferred[0];
-        throw new InvalidDataException("Step 57.0 requires exactly one character-select TSCN candidate. observed=" + (all.Length == 0 ? "none" : string.Join(" | ", all)));
+        var canonical = observed
+            .Select(value => value switch
+            {
+                CharacterSelectSceneShortHint => CharacterSelectSceneResourcePath,
+                CharacterSelectSceneResourcePath => CharacterSelectSceneResourcePath,
+                _ => string.Empty,
+            })
+            .Where(value => value.Length != 0)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        if (canonical.Length != 1)
+            throw new InvalidDataException("Step 57.0 requires the exact character-select scene hint from Step 56. observed=" + (observed.Length == 0 ? "none" : string.Join(" | ", observed)));
+        RequireExactPckDirectoryResource(pckPath, canonical[0], 57);
+        return canonical[0];
+    }
+
+    private static void RequireExactPckDirectoryResource(string pckPath, string resourcePath, int step)
+    {
+        using var stream = new FileStream(pckPath, FileMode.Open, FileAccess.Read, FileShare.Read, 16 * 1024, FileOptions.SequentialScan);
+        using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+        var magic = reader.ReadUInt32();
+        if (magic != 0x43504447)
+            throw new InvalidDataException($"Step {step}.0 expected standalone Godot PCK magic 0x43504447; observed 0x{magic:X8}.");
+        var format = reader.ReadUInt32();
+        var major = reader.ReadUInt32();
+        var minor = reader.ReadUInt32();
+        var patch = reader.ReadUInt32();
+        var flags = reader.ReadUInt32();
+        _ = reader.ReadUInt64(); // fileBase; directory-only identity proof does not read entry bytes.
+        if (format != ClosedPckFormat || major != ClosedPckEngineMajor || minor != ClosedPckEngineMinor || patch != ClosedPckEnginePatch || flags != ClosedPckFlags)
+            throw new InvalidDataException($"Step {step}.0 PCK header drifted: format={format}; engine={major}.{minor}.{patch}; flags=0x{flags:X8}.");
+        var directoryOffset = reader.ReadUInt64();
+        if (directoryOffset >= (ulong)stream.Length)
+            throw new InvalidDataException($"Step {step}.0 PCK directory offset {directoryOffset} exceeds file length {stream.Length}.");
+        stream.Seek(checked((long)directoryOffset), SeekOrigin.Begin);
+        var count = reader.ReadUInt32();
+        if (count != ClosedPckDirectoryEntries)
+            throw new InvalidDataException($"Step {step}.0 PCK directory count drifted: {count}.");
+        var matches = 0;
+        for (var i = 0u; i < count; i++)
+        {
+            var pathLength = reader.ReadUInt32();
+            if (pathLength == 0 || pathLength > 1_048_576)
+                throw new InvalidDataException($"Step {step}.0 PCK directory path length is invalid at entry {i}: {pathLength}.");
+            var pathBytes = ReadExactlyStep37(reader, checked((int)pathLength));
+            var storedPath = Encoding.UTF8.GetString(pathBytes).TrimEnd('\0').Replace('\\', '/');
+            _ = reader.ReadUInt64(); // offset
+            _ = reader.ReadUInt64(); // size
+            _ = ReadExactlyStep37(reader, 16); // directory MD5
+            _ = reader.ReadUInt32(); // entry flags
+            var normalized = storedPath.StartsWith("res://", StringComparison.Ordinal) ? storedPath : "res://" + storedPath.TrimStart('/');
+            if (string.Equals(normalized, resourcePath, StringComparison.Ordinal))
+                matches++;
+        }
+        if (matches != 1)
+            throw new InvalidDataException($"Step {step}.0 requires exactly one exact PCK directory entry for {resourcePath}; observed={matches}.");
     }
 
     private static ExtractedPckEntry ExtractStartupLadderPckEntryUnpinned(string pckPath, string resourcePath, int step)
