@@ -961,7 +961,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         PropertyInfo? property = null;
         for (var type = instance.GetType(); type is not null && property is null; type = type.BaseType)
             property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-        property ??= throw new MissingMemberException(instance.GetType().FullName, propertyName);
+        if (property is null)
+            throw new MissingMemberException(instance.GetType().FullName, propertyName);
         if (property.PropertyType != typeof(bool) || property.GetIndexParameters().Length != 0 || property.GetMethod is null)
             throw new InvalidDataException($"Step {step}.0 property {instance.GetType().FullName}.{propertyName} is not a readable non-indexed bool.");
         return (bool)(property.GetValue(instance) ?? throw new InvalidDataException($"Step {step}.0 property {propertyName} returned null."));
@@ -969,7 +970,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private static void RequireNoInitializerRejectedNativeEscape(Step35ExecutionLoadContext context, StartupLadderBaseline baseline, string boundary)
     {
-        var initializerDelta = context.InitializerBearingManagedRequests.Count - baseline.InitializerCount;
+        var initializerDelta = context.InitializerBearingRequests.Count - baseline.InitializerCount;
         var rejectedDelta = context.RejectedManagedRequests.Count - baseline.RejectedCount;
         var nativeDelta = context.NativeLoadAttempts.Count - baseline.NativeCount;
         if (initializerDelta != 0 || rejectedDelta != 0 || nativeDelta != 0)
