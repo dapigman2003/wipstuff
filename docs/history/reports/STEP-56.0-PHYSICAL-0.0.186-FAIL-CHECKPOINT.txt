@@ -1,0 +1,16 @@
+StS2 Launcher — Step 56.0 Character-select transition frontier checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd
+Initialized UTC: 2026-09-11T07:53:57.1491260+00:00
+Process ID: 3092
+App version: 0.0.186 (186)
+Candidate: STEPS 43–57 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–57 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.
+Global policy: physical authority through Step 52 remains the baseline. Steps 53–54/56–57 keep rendering frozen; Step 55 alone adds one bounded single-player-submenu render residency and synchronously refreezes. Original GameStartup/LaunchMainMenu, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, native game GDExtensions, and character-select execution remain unopened.
+
+2026-09-11T07:53:57.1575070+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-11T07:53:57.1591090+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=1 | RUN_START — Step 56.0 exact NSingleplayerSubmenu.OpenCharacterSelect frontier/resource-literal map started. OpenCharacterSelect is not invoked.
+2026-09-11T07:53:57.1743730+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=1 | M56_A_PASS — Step-55 4/4 rendered/refrozen NSingleplayerSubmenu authority retained; OpenCharacterSelect remains uninvoked.
+2026-09-11T07:53:57.2167700+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=1 | M56_B_FAIL — stage=initialization; System.IO.InvalidDataException: Step 56.0 requires zero-arg void OpenCharacterSelect; observed params=1; return=System.Void.
+2026-09-11T07:53:57.2259660+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. Step 56 never invokes OpenCharacterSelect or restarts rendering.
+2026-09-11T07:53:57.2268870+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=11 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-11T07:53:57.2366980+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=11 | RUN_END — Step-56 UI operation ended normally; Step 56 never invokes OpenCharacterSelect or restarts rendering.

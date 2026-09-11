@@ -1,12 +1,12 @@
 # Current status
 
-## Active candidate — Steps 53–57 single-player submenu continuation / 0.0.186 (186)
+## Active candidate — Steps 53–57 single-player submenu continuation / 0.0.187 (187)
 
-Runtime authority is physically closed through **Step 52** on the same-process direct-main-menu route. Physical 0.0.182 closed Step 49; the user subsequently reran and reported **Steps 50, 51 and 52 each passed 4/4**, and then tested the 0.0.183 app successfully. Successful rerun report files were not supplied, so that closure remains recorded as user-reported physical authority rather than fabricated evidence.
+The stable direct-main-menu baseline remains physically closed through **Step 52**. Physical 0.0.186 then progressed through Steps 53, 54 and 55 in the same process and reached Step 56 Gate A with retained **Step-55 4/4 rendered/refrozen authority**, so physical runtime authority is now closed through **Step 55**. The one-button physically closed path intentionally remains capped at Step 52.
 
-**0.0.186 opens only Steps 53–57.** The existing fresh-process **Physically Closed Path** runner remains intentionally capped at Step 52 and is the preferred way to reconstruct known authority. From that frozen Step-52 state, Step 53 isolates exact `NMainMenu.OpenSingleplayerSubmenu()` without invocation; Step 54 invokes only that exact admissible method once while frozen; Step 55 audits and briefly renders/refreezes the real `NSingleplayerSubmenu`; Steps 56–57 map and read-only-preflight the exact `OpenCharacterSelect` resource boundary without invoking or loading character select. Step 58 remains unopened.
+**0.0.187 keeps Steps 53–55 unchanged and corrects only the Step-56 callback signature.** From a fresh process, use the capped **Physically Closed Path** through Step 52, then rerun Steps 53–55 manually to reconstruct the physically proven extension. Step 56 now maps exact `void NSingleplayerSubmenu.OpenCharacterSelect(MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton)` without invocation; Step 57 remains read-only PCK preflight only. Step 58 remains unopened.
 
-The 0.0.183 Codemagic AOT cache/sentinel experiment is retained unchanged in 0.0.186. It is not required for the runtime experiment and can be evaluated from a later warm-build artifact without changing this candidate.
+The 0.0.183 Codemagic AOT cache/sentinel experiment is retained unchanged in 0.0.187. It is not required for the runtime experiment and can be evaluated from a later warm-build artifact without changing this candidate.
 
 The multi-rung safety discipline remains unchanged: **the unit of safety remains one gate at a time; the unit of packaging becomes multiple gates per build.** The closed-path convenience runner calls existing numbered methods rather than bypassing them, checks exact closure after each return, explicitly skips Step 38, stops on first failure, and never auto-runs Step 15 Gate D. Steps 53–57 remain manual and each later rung requires the prior exact same-process 4/4 authority.
 
@@ -79,6 +79,16 @@ The supplied physical 0.0.185 run passed Step 54 Gate A from exact Step-53 autho
 
 Retained evidence: `STEP-54.0-PHYSICAL-0.0.185-FAIL-REPORT.txt`, `STEP-54.0-PHYSICAL-0.0.185-FAIL-CHECKPOINT.txt`, `STEP-54.0-PHYSICAL-0.0.185-FAIL-LAST-CHECKPOINT.txt`.
 
+## Physical 0.0.186 Step 56 localization — safe Gate-B stop after Step 55 closure
+
+The supplied physical 0.0.186 run reached Step 56 from exact same-process Step-55 authority. Gate A passed with the real `NSingleplayerSubmenu` retained after its rendered/refrozen Step-55 closure. Gate B then failed before any character-select invocation because the candidate required zero parameters, while the selected real method has **one parameter and returns `System.Void`**. Rendering remained frozen and the run ended normally.
+
+The supplied trusted `sts2.dll` (SHA-256 `e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18`) resolves the exact parameter type as `MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton`, yielding exact signature `void NSingleplayerSubmenu.OpenCharacterSelect(NButton)`. 0.0.187 pins that exact parameter/return contract at both Gate B and Gate C before frontier mapping. No character-select execution is authorized.
+
+Because Step 56 Gate A requires and observed exact Step-55 4/4/refrozen authority, Steps 53–55 are now recorded physically closed. The convenience closed-path runner remains capped at Step 52, so those three rungs must still be rerun in the same fresh process before Step 56.
+
+Retained evidence: `STEP-56.0-PHYSICAL-0.0.186-FAIL-REPORT.txt`, `STEP-56.0-PHYSICAL-0.0.186-FAIL-CHECKPOINT.txt`, `STEP-56.0-PHYSICAL-0.0.186-FAIL-LAST-CHECKPOINT.txt`.
+
 ## Step 53.0 — exact single-player submenu-open frontier, no invocation
 
 Requires Step 52 4/4/refrozen authority. Binds exact zero-argument `NMainMenu.OpenSingleplayerSubmenu()` returning `NSingleplayerSubmenu`, records the broader `SingleplayerButtonPressed` only as evidence, and audits **only** `OpenSingleplayerSubmenu` using the execution-opcode-qualified frontier plus retained Step-48 runtime guards. Every immediate classified boundary must be admissible; unresolved same-StS2 references or external Cecil resolution fail. The exact map is durably written before Gate D. No handler is invoked and rendering remains frozen.
@@ -99,7 +109,7 @@ Reports: `Step55-CrashCheckpoint-<RunId>.txt`, `Step55-SingleplayerSubmenuFrameI
 
 ## Step 56.0 — exact character-select frontier map, no invocation
 
-Requires Step 55 4/4/refrozen authority. Binds exact zero-argument void `NSingleplayerSubmenu.OpenCharacterSelect()`, records its IL, maps the execution/deferred frontier, and collects every `res://` string literal in the immediate same-module closure. Character-select `.tscn` candidates are recorded separately. Classified boundaries remain evidence only at this rung; unresolved same-StS2 references or external Cecil resolution fail. `OpenCharacterSelect` is never invoked and rendering remains frozen.
+Requires Step 55 4/4/refrozen authority. Binds exact `void NSingleplayerSubmenu.OpenCharacterSelect(MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton)`, records its IL, rechecks that exact signature before frontier mapping, and collects every `res://` string literal in the immediate same-module closure. Character-select `.tscn` candidates are recorded separately. Classified boundaries remain evidence only at this rung; unresolved same-StS2 references or external Cecil resolution fail. `OpenCharacterSelect` is never invoked and rendering remains frozen.
 
 Reports: `Step56-CrashCheckpoint-<RunId>.txt`, `Step56-CharacterSelectFrontier-StaticMap-<RunId>.txt`, `Step56-LastCheckpoint.txt`, `Step56-TransformedRealStS2CharacterSelectFrontier.txt`.
 
@@ -109,16 +119,16 @@ Requires Step 56 4/4. Selects exactly one character-select TSCN candidate (or on
 
 Reports: `Step57-CrashCheckpoint-<RunId>.txt`, `Step57-CharacterSelectResource-StaticMap-<RunId>.txt`, `Step57-LastCheckpoint.txt`, `Step57-TransformedRealStS2CharacterSelectResourcePreflight.txt`.
 
-## Physical sequence for 0.0.186
+## Physical sequence for 0.0.187
 
 Preferred: fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. It reconstructs the known same-process authority and leaves rendering frozen after Step 52. Step 15 Gate D is intentionally not run. Then run the new rungs manually in order:
 
 1. Step 53 — if 4/4, continue.
 2. Step 54 — one-shot once Gate C arms; never retry in-process after an armed failure.
 3. Step 55 — one-shot render residency once armed; always refreezes before evaluation.
-4. Step 56 — non-invoking character-select frontier map.
+4. Step 56 — non-invoking exact `OpenCharacterSelect(NButton) -> void` frontier map.
 5. Step 57 — read-only exact PCK resource preflight.
 
 Stop at the first failure and preserve that rung's checkpoint/static-map/final report.
 
-Still globally forbidden in 0.0.186: Step 58+, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character-select handler invocation/resource loading/instantiation/admission, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, and trusted-install mutation. Physically closed Steps 50/52 and active Step 55 are the only render rungs; each synchronously refreezes before success evaluation.
+Still globally forbidden in 0.0.187: Step 58+, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character-select handler invocation/resource loading/instantiation/admission, FMOD/Spine native game extensions, explicit `_ExitTree`, `RemoveChild`/`Free`, state reset, and trusted-install mutation. Physically closed Steps 50/52 and active Step 55 are the only render rungs; each synchronously refreezes before success evaluation.

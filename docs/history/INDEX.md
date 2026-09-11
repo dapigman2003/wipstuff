@@ -505,3 +505,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-54.0-PHYSICAL-0.0.185-FAIL-CHECKPOINT.txt` — run-correlated checkpoint proving frozen rendering and pre-arm Gate-B failure.
 - `reports/STEP-54.0-PHYSICAL-0.0.185-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same physical localization.
 - `steps/STEP-54.0-SUBMENU-STACK-LAZY-BINDING-CORRECTION-0.0.186.md` — focused 0.0.186 correction: bind `NMainMenu.SubmenuStack` and its lazy `_singleplayerSubmenu` slot, then require post-open return/field identity; no frontier expansion.
+
+## Step 56 physical callback-signature localization / 0.0.187 focused correction
+
+- `reports/STEP-56.0-PHYSICAL-0.0.186-FAIL-REPORT.txt` — physical 0.0.186 Step 56 result: Gate A passed from retained Step-55 4/4/refrozen authority; Gate B stopped safely on the old zero-parameter assumption; no character-select invocation occurred.
+- `reports/STEP-56.0-PHYSICAL-0.0.186-FAIL-CHECKPOINT.txt` — run-correlated journal proving Step-55 authority, Gate-A pass, exact `params=1; return=System.Void` localization, frozen renderer, and normal end.
+- `reports/STEP-56.0-PHYSICAL-0.0.186-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same physical localization.
+- `steps/STEP-56.0-NBUTTON-SIGNATURE-CORRECTION-0.0.187.md` — focused 0.0.187 correction: exact `NButton` callback parameter plus `void` return pinned at Step-56 Gate B and Gate C; no frontier expansion.

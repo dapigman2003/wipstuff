@@ -2,6 +2,7 @@
 
 > **Historical note:** Physical 0.0.184 later stopped safely at Step 53 Gate B: the design assumed `OpenSingleplayerSubmenu()` returned `void`, while the real method returns `NSingleplayerSubmenu`. No handler was invoked and rendering stayed frozen. See `STEP-53.0-RETURN-TYPE-CORRECTION-0.0.185.md`.
 > **Follow-up:** Physical 0.0.185 then passed Step 54 Gate A and stopped safely at Gate B before arming the one-shot because `_singleplayerSubmenu` belongs to `NMainMenuSubmenuStack`, not `NMainMenu`, and is lazily spawned. See `STEP-54.0-SUBMENU-STACK-LAZY-BINDING-CORRECTION-0.0.186.md`.
+> **Follow-up:** Physical 0.0.186 then closed Steps 54–55 and reached Step 56 Gate B, where the old zero-argument `OpenCharacterSelect` assumption failed safely. The real callback is `void OpenCharacterSelect(MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton)`. See `STEP-56.0-NBUTTON-SIGNATURE-CORRECTION-0.0.187.md`.
 
 Physical authority is closed through Step 52. The user subsequently confirmed the 0.0.183 app works; no new Step-52 device report files were supplied, so 0.0.184 does not fabricate additional physical artifacts. The existing fresh-process closed-path runner remains intentionally capped at Step 52 and is the preferred way to reconstruct the known same-process authority before the new rungs.
 

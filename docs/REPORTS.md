@@ -16,7 +16,7 @@ If the main thread never yields, no managed timing ceiling can force `StopRender
 
 ## Steps 53–57 evidence contract
 
-Physical 0.0.184 reached Step 53 Gate A and then failed safely at Gate B because the candidate assumed a `void` return. The actual zero-argument method returns exact `NSingleplayerSubmenu`; no handler was invoked, rendering remained frozen, and Step 54 was never armed. 0.0.185 pinned that return type. Physical 0.0.185 then reached Step 54 Gate B and safely proved that `_singleplayerSubmenu` is not owned directly by `NMainMenu`; 0.0.186 binds `NMainMenu.SubmenuStack` and its lazy `NMainMenuSubmenuStack._singleplayerSubmenu` slot, then requires invocation-return identity to that slot after the one-shot open.
+Physical 0.0.184 reached Step 53 Gate A and then failed safely at Gate B because the candidate assumed a `void` return. The actual zero-argument method returns exact `NSingleplayerSubmenu`; no handler was invoked, rendering remained frozen, and Step 54 was never armed. 0.0.185 pinned that return type. Physical 0.0.185 then reached Step 54 Gate B and safely proved that `_singleplayerSubmenu` is not owned directly by `NMainMenu`; 0.0.186 corrected that ownership, then physically advanced through Step 55 4/4/refrozen and reached Step 56 Gate B. That Gate-B stop proved `OpenCharacterSelect` is `void OpenCharacterSelect(MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton)`, not zero-argument; no character-select invocation occurred. 0.0.187 pins that exact signature.
 
 Step 53: `Step53-CrashCheckpoint-<RunId>.txt`, `Step53-SingleplayerOpen-StaticMap-<RunId>.txt`, `Step53-LastCheckpoint.txt`, `Step53-TransformedRealStS2SingleplayerOpenFrontier.txt`.
 
@@ -24,9 +24,11 @@ Step 54: `Step54-CrashCheckpoint-<RunId>.txt`, `Step54-SingleplayerSubmenuOpen-S
 
 Step 55: `Step55-CrashCheckpoint-<RunId>.txt`, `Step55-SingleplayerSubmenuFrameInput-StaticMap-<RunId>.txt`, `Step55-LastCheckpoint.txt`, `Step55-TransformedRealStS2SingleplayerSubmenuRender.txt`. Requested residency is 750 ms with 5000 ms post-stop evidence ceiling; `StopRendering()` is first managed-continuation work before telemetry.
 
-Step 56: `Step56-CrashCheckpoint-<RunId>.txt`, `Step56-CharacterSelectFrontier-StaticMap-<RunId>.txt`, `Step56-LastCheckpoint.txt`, `Step56-TransformedRealStS2CharacterSelectFrontier.txt`. No character-select invocation.
+Step 56: `Step56-CrashCheckpoint-<RunId>.txt`, `Step56-CharacterSelectFrontier-StaticMap-<RunId>.txt`, `Step56-LastCheckpoint.txt`, `Step56-TransformedRealStS2CharacterSelectFrontier.txt`. Exact callback contract is one `NButton` parameter and `void` return. No character-select invocation.
 
 Step 57: `Step57-CrashCheckpoint-<RunId>.txt`, `Step57-CharacterSelectResource-StaticMap-<RunId>.txt`, `Step57-LastCheckpoint.txt`, `Step57-TransformedRealStS2CharacterSelectResourcePreflight.txt`. Exact PCK bytes are read-only evidence; no ResourceLoader/PackedScene/character-select execution.
 
 
 Physical 0.0.185 Step 54 localization evidence is retained as `STEP-54.0-PHYSICAL-0.0.185-FAIL-REPORT.txt`, `STEP-54.0-PHYSICAL-0.0.185-FAIL-CHECKPOINT.txt`, and `STEP-54.0-PHYSICAL-0.0.185-FAIL-LAST-CHECKPOINT.txt`.
+
+Physical 0.0.186 Step 56 localization evidence is retained as `STEP-56.0-PHYSICAL-0.0.186-FAIL-REPORT.txt`, `STEP-56.0-PHYSICAL-0.0.186-FAIL-CHECKPOINT.txt`, and `STEP-56.0-PHYSICAL-0.0.186-FAIL-LAST-CHECKPOINT.txt`.

@@ -72,7 +72,7 @@ public sealed partial class RootViewController
             "Step 56.0 — exact NSingleplayerSubmenu.OpenCharacterSelect frontier + resource-literal discovery",
             "Run Step 56.0 A–D — MAP ONLY",
             "CHARACTER SELECT FRONTIER MAP: LOCKED",
-            "Requires Step 55.0 4/4/refrozen. Binds exact zero-arg void OpenCharacterSelect, records IL, maps its execution/deferred frontier without invocation, and records res:// string literals / character-select .tscn candidates from the immediate closure. Classified boundaries are evidence only.");
+            "Requires Step 55.0 4/4/refrozen. Binds exact void OpenCharacterSelect(NButton), records IL, maps its execution/deferred frontier without invocation, and records res:// string literals / character-select .tscn candidates from the immediate closure. Classified boundaries are evidence only.");
         _step56Button.TouchUpInside += async (_, _) => await RunStep56StartupLadderAsync();
 
         (_step57Button, _step57ResultLabel, _step57DetailLabel) = AddStartupLadderStepControls(

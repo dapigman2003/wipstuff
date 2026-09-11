@@ -1,0 +1,35 @@
+StS2 Launcher — Step 56.0 Character Select Frontier Map
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-11T07:53:57.2263440+00:00
+
+RESULT
+STEP 56.0 CHARACTER SELECT FRONTIER MAP FAIL — 1/4
+
+METADATA
+App version: 0.0.186 (186)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: initialization
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 56.0 requires zero-arg void OpenCharacterSelect; observed params=1; return=System.Void.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep56CharacterSelectBinding(System.Action`1[System.String])
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep56CharacterSelectBinding(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 56.0 requires zero-arg void OpenCharacterSelect; observed params=1; return=System.Void.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep56CharacterSelectBinding(System.Action`1[System.String])
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep56CharacterSelectBinding(Action`1 checkpoint)
+
+END OF REPORT

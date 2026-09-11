@@ -31,6 +31,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string MainMenuSubmenuStackPropertyName = "SubmenuStack";
     private const string MainMenuSingleplayerFieldName = "_singleplayerSubmenu";
     private const string SingleplayerOpenCharacterSelectMethodName = "OpenCharacterSelect";
+    private const string SingleplayerOpenCharacterSelectParameterTypeFullName = "MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton";
 
     private StartupLadderBaseline? _step53Baseline;
     private StartupLadderBaseline? _step54Baseline;
@@ -695,8 +696,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
             var submenuType = RequireStartupLadderType(allTypes, SingleplayerSubmenuManagedTypeFullName, step);
             var open = RequireUniqueStartupLadderNamedMethod(submenuType, SingleplayerOpenCharacterSelectMethodName, step);
-            if (open.Parameters.Count != 0 || open.ReturnType.FullName != "System.Void")
-                throw new InvalidDataException($"Step 56.0 requires zero-arg void OpenCharacterSelect; observed params={open.Parameters.Count}; return={open.ReturnType.FullName}.");
+            RequireExactStep56OpenCharacterSelectSignature(open);
             if (resolver.Requests.Count != 0)
                 throw new InvalidDataException("Step 56.0 binding unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             _step56OpenCharacterSelectToken = open.MetadataToken.ToUInt32();
@@ -704,13 +704,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 "StS2 Launcher — Step 56.0 exact character-select frontier map\n" +
                 "Evidence-only; OpenCharacterSelect is never invoked in Steps 56-57.\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                $"NSingleplayerSubmenu.OpenCharacterSelect token=0x{_step56OpenCharacterSelectToken:X8}; params={open.Parameters.Count}; return={open.ReturnType.FullName}; IL={open.Body.Instructions.Count}\n" +
+                $"NSingleplayerSubmenu.OpenCharacterSelect token=0x{_step56OpenCharacterSelectToken:X8}; params={open.Parameters.Count}; parameter0={open.Parameters[0].ParameterType.FullName}; return={open.ReturnType.FullName}; IL={open.Body.Instructions.Count}\n" +
                 "Rendering restarted: NO\nOpenCharacterSelect invoked: NO\n" +
                 "[OPENCHARACTERSELECT IL]\n" + string.Join("\n", open.Body.Instructions.Select(instruction => "  " + FormatStep41Instruction(instruction))) + "\n";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 56 Gate B");
             Checkpoint(checkpoint, $"M56_B_PASS — exact OpenCharacterSelect bound token=0x{_step56OpenCharacterSelectToken:X8}; IL={open.Body.Instructions.Count}; externalResolution=0; invocation=NO.");
             return StartupLadderPass(step, Step56Name, gate,
-                "Exact zero-arg void NSingleplayerSubmenu.OpenCharacterSelect binding/IL recorded without invocation.");
+                "Exact void NSingleplayerSubmenu.OpenCharacterSelect(NButton) binding/IL recorded without invocation.");
         }
         catch (Exception ex)
         {
@@ -735,6 +735,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var allMethods = BuildStartupLadderMethodMap(allTypes);
             var submenuType = RequireStartupLadderType(allTypes, SingleplayerSubmenuManagedTypeFullName, step);
             var open = RequireUniqueStartupLadderNamedMethod(submenuType, SingleplayerOpenCharacterSelectMethodName, step);
+            RequireExactStep56OpenCharacterSelectSignature(open);
             if (open.MetadataToken.ToUInt32() != _step56OpenCharacterSelectToken)
                 throw new InvalidDataException("Step 56.0 OpenCharacterSelect token drifted between Gate B and Gate C.");
             var guards = _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 56.0 requires retained Step-48 runtime guards.");
@@ -799,6 +800,21 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         {
             Checkpoint(checkpoint, $"M56_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
             return StartupLadderFail(step, Step56Name, gate, stage, ex);
+        }
+    }
+
+    private static void RequireExactStep56OpenCharacterSelectSignature(MethodDefinition open)
+    {
+        if (open.Parameters.Count != 1 ||
+            open.Parameters[0].ParameterType.FullName != SingleplayerOpenCharacterSelectParameterTypeFullName ||
+            open.ReturnType.FullName != "System.Void")
+        {
+            var parameterTypes = open.Parameters.Count == 0
+                ? "none"
+                : string.Join(",", open.Parameters.Select(parameter => parameter.ParameterType.FullName));
+            throw new InvalidDataException(
+                $"Step 56.0 requires void OpenCharacterSelect({SingleplayerOpenCharacterSelectParameterTypeFullName}); " +
+                $"observed params={open.Parameters.Count}; parameterTypes={parameterTypes}; return={open.ReturnType.FullName}.");
         }
     }
 

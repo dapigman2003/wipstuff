@@ -1,0 +1,6 @@
+StS2 Launcher — Step 56 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd
+Journal: Step56-CrashCheckpoint-20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd.txt
+Static map: Step56-CharacterSelectFrontier-StaticMap-20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd.txt
+2026-09-11T07:53:57.2366980+00:00 | run=20260911T0753571491260Z-pid3092-2634c9b807294a3b820cab3b9d28becd | pid=3092 | managedThread=11 | RUN_END — Step-56 UI operation ended normally; Step 56 never invokes OpenCharacterSelect or restarts rendering.
