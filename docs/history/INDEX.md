@@ -519,3 +519,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-57.0-PHYSICAL-0.0.187-FAIL-CHECKPOINT.txt` — run-correlated journal proving Step-57 read-only entry, Gate-A scene-candidate localization, frozen renderer, and normal end.
 - `reports/STEP-57.0-PHYSICAL-0.0.187-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same physical localization.
 - `steps/STEP-57.0-SCENE-HINT-PCK-RESOLUTION-CORRECTION-0.0.188.md` — focused 0.0.188 correction: preserve exact `screens/character_select_screen` managed hint, canonicalize only its exact supported full path, and require one receipt-backed PCK directory match before read-only extraction; physical closure advances through Step 56.
+
+## Step 57 physical retained-PackedScene localization / 0.0.189 focused correction
+
+- `reports/STEP-57.0-PHYSICAL-0.0.188-FAIL-REPORT.txt` — physical 0.0.188 Step 57 result: safe Gate-A `observed=none` stop after same-process Step-56 4/4 closure; the attempted Step-56 literal-hint handoff supplied no authority.
+- `reports/STEP-57.0-PHYSICAL-0.0.188-FAIL-CHECKPOINT.txt` — run-correlated journal proving the failure occurred before any PCK entry extraction, with rendering frozen and no character-select loading/invocation.
+- `reports/STEP-57.0-PHYSICAL-0.0.188-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same read-only localization.
+- `steps/STEP-57.0-RETAINED-PACKEDSCENE-IDENTITY-CORRECTION-0.0.189.md` — focused 0.0.189 correction: bind the actual retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, read only its existing `ResourcePath`, require the exact receipt-backed PCK directory entry, and leave physical closure through Step 56 unchanged.

@@ -30,6 +30,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string MainMenuSubmenuStackManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack";
     private const string MainMenuSubmenuStackPropertyName = "SubmenuStack";
     private const string MainMenuSingleplayerFieldName = "_singleplayerSubmenu";
+    private const string MainMenuCharacterSelectSceneFieldName = "_characterSelectScreenScene";
+    private const string PackedSceneManagedTypeFullName = "Godot.PackedScene";
+    private const string GodotResourcePathPropertyName = "ResourcePath";
     private const string SingleplayerOpenCharacterSelectMethodName = "OpenCharacterSelect";
     private const string SingleplayerOpenCharacterSelectParameterTypeFullName = "MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton";
     private const string CharacterSelectSceneShortHint = "screens/character_select_screen";
@@ -839,13 +842,43 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (!renderingStopped)
                 throw new InvalidOperationException("Step 57.0 is read-only and requires rendering frozen.");
             var selected = RequireStartupLadderSelectedAuthority(step);
-            _step57Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step57Baseline, "Step 57 Gate A");
+            var baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
+            _step57Baseline = baseline;
+            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 57 Gate A");
+
+            // Do not infer the character-select scene identity from incidental ldstr literals.
+            // The retained real NMainMenuSubmenuStack owns the exported PackedScene that the game
+            // will use for this transition. Gate A proves that field in both selected sts2 metadata
+            // and the live retained stack, then reads only the already-loaded ResourcePath string.
+            using var resolver = new RejectingAssemblyResolver();
+            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
+            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
+            var stackType = RequireStartupLadderType(allTypes, MainMenuSubmenuStackManagedTypeFullName, step);
+            var sceneFields = stackType.Fields.Where(field => field.Name == MainMenuCharacterSelectSceneFieldName).ToArray();
+            if (sceneFields.Length != 1)
+                throw new InvalidDataException($"Step 57.0 requires exactly one {MainMenuSubmenuStackManagedTypeFullName}.{MainMenuCharacterSelectSceneFieldName} field; observed={sceneFields.Length}.");
+            var sceneFieldDefinition = sceneFields[0];
+            if (sceneFieldDefinition.IsStatic || sceneFieldDefinition.FieldType.FullName != PackedSceneManagedTypeFullName)
+                throw new InvalidDataException($"Step 57.0 requires instance {PackedSceneManagedTypeFullName} {MainMenuSubmenuStackManagedTypeFullName}.{MainMenuCharacterSelectSceneFieldName}; observedType={sceneFieldDefinition.FieldType.FullName}; static={sceneFieldDefinition.IsStatic}.");
+            if (resolver.Requests.Count != 0)
+                throw new InvalidDataException("Step 57.0 character-select scene-field binding unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+
+            var submenuStack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 57.0 requires the retained real NMainMenuSubmenuStack from Step 54.");
+            if (submenuStack.GetType().FullName != MainMenuSubmenuStackManagedTypeFullName)
+                throw new InvalidDataException($"Step 57.0 retained submenu-stack runtime type drifted: {submenuStack.GetType().FullName}.");
+            var runtimeSceneField = RequireRuntimeExactInstanceField(submenuStack.GetType(), MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step);
+            var packedScene = runtimeSceneField.GetValue(submenuStack) ?? throw new InvalidDataException($"Step 57.0 retained {MainMenuCharacterSelectSceneFieldName} is null.");
+            var resourcePath = RequireRuntimeStringProperty(packedScene, GodotResourcePathPropertyName, step).Replace('\\', '/');
+            if (!string.Equals(resourcePath, CharacterSelectSceneResourcePath, StringComparison.Ordinal))
+                throw new InvalidDataException($"Step 57.0 retained character-select PackedScene ResourcePath drifted: expected={CharacterSelectSceneResourcePath}; observed={resourcePath}.");
+
             var pck = RequireEssentialResourcePackHandoff().PackAbsolutePath;
-            _step57CharacterSelectResourcePath = SelectExactCharacterSelectSceneCandidate(_step56CharacterSelectSceneCandidates, pck);
-            Checkpoint(checkpoint, $"M57_A_PASS — Step-56 4/4 non-invoking frontier retained; exact managed scene hint resolved through receipt-backed PCK directory to resource='{_step57CharacterSelectResourcePath}'; renderingStopped=True; Godot resource load=NO.");
+            RequireExactPckDirectoryResource(pck, resourcePath, step);
+            _step57CharacterSelectResourcePath = resourcePath;
+            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 57 Gate A postbinding");
+            Checkpoint(checkpoint, $"M57_A_PASS — Step-56 4/4 non-invoking frontier retained; exact {MainMenuSubmenuStackManagedTypeFullName}.{MainMenuCharacterSelectSceneFieldName}:{PackedSceneManagedTypeFullName} bound in selected metadata and retained runtime stack; existing ResourcePath='{_step57CharacterSelectResourcePath}' matched exactly one receipt-backed PCK directory entry; renderingStopped=True; ResourceLoader=NO; PackedScene instantiation=NO.");
             return StartupLadderPass(step, Step57Name, gate,
-                $"Step-56 frontier retained and one exact character-select TSCN candidate selected for read-only PCK inspection: {_step57CharacterSelectResourcePath}.");
+                $"Step-56 frontier retained and the already-loaded main-menu character-select PackedScene field proved one exact PCK resource for read-only inspection: {_step57CharacterSelectResourcePath}.");
         }
         catch (Exception ex)
         {
@@ -872,6 +905,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 "StS2 Launcher — Step 57.0 character-select exact PCK resource preflight\n" +
                 "Read-only PCK evidence. This step never calls ResourceLoader, PackedScene.Instantiate, or OpenCharacterSelect.\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
+                $"Resource source: {MainMenuSubmenuStackManagedTypeFullName}.{MainMenuCharacterSelectSceneFieldName}.{GodotResourcePathPropertyName}\n" +
                 $"Resource path: {_step57CharacterSelectResourcePath}\n" +
                 $"Bytes: {entry.Bytes.Length}\n" +
                 $"SHA-256: {sha}\n" +
@@ -1058,6 +1092,18 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return (bool)(property.GetValue(instance) ?? throw new InvalidDataException($"Step {step}.0 property {propertyName} returned null."));
     }
 
+    private static string RequireRuntimeStringProperty(object instance, string propertyName, int step)
+    {
+        PropertyInfo? property = null;
+        for (var type = instance.GetType(); type is not null && property is null; type = type.BaseType)
+            property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+        if (property is null)
+            throw new MissingMemberException(instance.GetType().FullName, propertyName);
+        if (property.PropertyType != typeof(string) || property.GetIndexParameters().Length != 0 || property.GetMethod is null)
+            throw new InvalidDataException($"Step {step}.0 property {instance.GetType().FullName}.{propertyName} is not a readable non-indexed string.");
+        return (string?)property.GetValue(instance) ?? throw new InvalidDataException($"Step {step}.0 property {propertyName} returned null.");
+    }
+
     private static void RequireNoInitializerRejectedNativeEscape(Step35ExecutionLoadContext context, StartupLadderBaseline baseline, string boundary)
     {
         var initializerDelta = context.InitializerBearingRequests.Count - baseline.InitializerCount;
@@ -1065,29 +1111,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         var nativeDelta = context.NativeLoadAttempts.Count - baseline.NativeCount;
         if (initializerDelta != 0 || rejectedDelta != 0 || nativeDelta != 0)
             throw new InvalidDataException($"{boundary} escaped managed/native confinement. initializer={initializerDelta}; rejected={rejectedDelta}; native={nativeDelta}.");
-    }
-
-    private static string SelectExactCharacterSelectSceneCandidate(IEnumerable<string> candidates, string pckPath)
-    {
-        var observed = candidates
-            .Select(value => value.Replace('\\', '/'))
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(value => value, StringComparer.Ordinal)
-            .ToArray();
-        var canonical = observed
-            .Select(value => value switch
-            {
-                CharacterSelectSceneShortHint => CharacterSelectSceneResourcePath,
-                CharacterSelectSceneResourcePath => CharacterSelectSceneResourcePath,
-                _ => string.Empty,
-            })
-            .Where(value => value.Length != 0)
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
-        if (canonical.Length != 1)
-            throw new InvalidDataException("Step 57.0 requires the exact character-select scene hint from Step 56. observed=" + (observed.Length == 0 ? "none" : string.Join(" | ", observed)));
-        RequireExactPckDirectoryResource(pckPath, canonical[0], 57);
-        return canonical[0];
     }
 
     private static void RequireExactPckDirectoryResource(string pckPath, string resourcePath, int step)

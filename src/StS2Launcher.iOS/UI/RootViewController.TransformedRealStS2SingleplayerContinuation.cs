@@ -39,7 +39,7 @@ public sealed partial class RootViewController
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Physical authority through Step 52 remains unchanged. Step 53 isolates only exact OpenSingleplayerSubmenu and must prove that direct frontier admissible before Step 54 may invoke it once while frozen. Step 55 audits/renders the resulting real submenu and refreezes. Steps 56–57 map the exact OpenCharacterSelect transition and inspect its discovered PCK resource bytes without invoking or loading character select. No Step 58+ behavior is present in this candidate.",
+            "Physical authority through Step 52 remains unchanged. Step 53 isolates only exact OpenSingleplayerSubmenu and must prove that direct frontier admissible before Step 54 may invoke it once while frozen. Step 55 audits/renders the resulting real submenu and refreezes. Step 56 maps exact OpenCharacterSelect without invocation; Step 57 proves the actual retained character-select PackedScene ResourcePath and inspects only that exact PCK entry without loading or executing character select. No Step 58+ behavior is present in this candidate.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel));
 
@@ -69,10 +69,10 @@ public sealed partial class RootViewController
 
         (_step56Button, _step56ResultLabel, _step56DetailLabel) = AddStartupLadderStepControls(
             content,
-            "Step 56.0 — exact NSingleplayerSubmenu.OpenCharacterSelect frontier + resource-literal discovery",
+            "Step 56.0 — exact NSingleplayerSubmenu.OpenCharacterSelect non-invoking frontier",
             "Run Step 56.0 A–D — MAP ONLY",
             "CHARACTER SELECT FRONTIER MAP: LOCKED",
-            "Requires Step 55.0 4/4/refrozen. Binds exact void OpenCharacterSelect(NButton), records IL, maps its execution/deferred frontier without invocation, and records res:// string literals / character-select .tscn candidates from the immediate closure. Classified boundaries are evidence only.");
+            "Requires Step 55.0 4/4/refrozen. Binds exact void OpenCharacterSelect(NButton), records IL, and maps its execution/deferred frontier without invocation. Any resource strings found in the immediate closure are diagnostic only; Step 57 binds the actual retained main-menu PackedScene field instead of trusting incidental literals.");
         _step56Button.TouchUpInside += async (_, _) => await RunStep56StartupLadderAsync();
 
         (_step57Button, _step57ResultLabel, _step57DetailLabel) = AddStartupLadderStepControls(
@@ -80,7 +80,7 @@ public sealed partial class RootViewController
             "Step 57.0 — exact character-select PCK resource preflight (NO ResourceLoader)",
             "Run Step 57.0 A–D — READ-ONLY PREFLIGHT",
             "CHARACTER SELECT RESOURCE PREFLIGHT: LOCKED",
-            "Requires Step 56.0 4/4 and exactly one character-select .tscn candidate. Reads only that entry from the receipt-backed PCK, validates directory MD5, records SHA-256 and referenced res:// paths, and scans textual Spine/FMOD/GDExtension/native tokens. It never calls OpenCharacterSelect, ResourceLoader, PackedScene.Instantiate, or rendering.");
+            "Requires Step 56.0 4/4. Gate A binds exact NMainMenuSubmenuStack._characterSelectScreenScene as the already-loaded Godot.PackedScene on the retained real stack, reads only its existing ResourcePath, requires res://scenes/screens/character_select_screen.tscn exactly, and requires one exact receipt-backed PCK directory match. Later gates read only that entry, validate directory MD5, record SHA-256/referenced res:// paths, and scan textual Spine/FMOD/GDExtension/native tokens. It never calls OpenCharacterSelect, ResourceLoader, PackedScene.Instantiate, or rendering.");
         _step57Button.TouchUpInside += async (_, _) => await RunStep57StartupLadderAsync();
     }
 
@@ -266,18 +266,18 @@ public sealed partial class RootViewController
         _step56Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START — Step 56.0 exact NSingleplayerSubmenu.OpenCharacterSelect frontier/resource-literal map started. OpenCharacterSelect is not invoked.");
+            WriteStartupLadderCheckpoint(step, "RUN_START — Step 56.0 exact NSingleplayerSubmenu.OpenCharacterSelect non-invoking frontier map started. Resource literals are diagnostic only; OpenCharacterSelect is not invoked.");
             if (!RecordStartupLadderGate(_step56Gates, _transformedRealStS2VeryEarlyInitialization.RunStep56ClosedStep55Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step56Gates, _transformedRealStS2VeryEarlyInitialization.RunStep56CharacterSelectBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step56Gates, _transformedRealStS2VeryEarlyInitialization.RunStep56CharacterSelectFrontierMap(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 56 character-select frontier map write failed: " + mapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep56StaticMapDurablyWritten();
-            WriteStartupLadderCheckpoint(step, "M56_C_STATIC_MAP_WRITE_RETURNED — exact OpenCharacterSelect IL/frontier/resource-literal evidence durably written; invocation remains NO.");
+            WriteStartupLadderCheckpoint(step, "M56_C_STATIC_MAP_WRITE_RETURNED — exact OpenCharacterSelect IL/frontier evidence and diagnostic resource literals durably written; invocation remains NO.");
             if (!RecordStartupLadderGate(_step56Gates, _transformedRealStS2VeryEarlyInitialization.RunStep56FrozenNoInvocationConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             CompleteStartupLadderStep(step, _step56Gates, resultLabel, detailLabel,
-                "CHARACTER-SELECT FRONTIER MAP CLOSED 4/4. OpenCharacterSelect remains uninvoked; exact resource-string evidence is durable. Step 57 may inspect only the selected PCK resource.");
+                "CHARACTER-SELECT FRONTIER MAP CLOSED 4/4. OpenCharacterSelect remains uninvoked; frontier evidence is durable. Step 57 may bind the retained main-menu character-select PackedScene field and inspect only its exact PCK resource.");
             button.Enabled = false;
-            WriteStartupLadderCheckpoint(step, "RUN_STEP56_4OF4 — non-invoking character-select frontier/resource discovery closed; Step 57 read-only PCK preflight unlocked.");
+            WriteStartupLadderCheckpoint(step, "RUN_STEP56_4OF4 — non-invoking character-select frontier closed; Step 57 retained-PackedScene/PCK read-only preflight unlocked.");
         }
         catch (Exception ex)
         {
@@ -294,7 +294,7 @@ public sealed partial class RootViewController
     {
         const int step = 57;
         if (!TryPrepareStartupLadderStep(step, _step56Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep56ClosurePassed,
-                "Step 57.0 requires Step 56.0 4/4 durable non-invoking character-select frontier/resource discovery authority in this same process.", out var button, out var resultLabel, out var detailLabel))
+                "Step 57.0 requires Step 56.0 4/4 durable non-invoking character-select frontier authority in this same process; Gate A then proves the retained character-select PackedScene resource identity.", out var button, out var resultLabel, out var detailLabel))
             return;
         if (!TryInitializeStartupLadderTelemetry(step, "Character-select exact PCK resource preflight", "Step57-CharacterSelectResource-StaticMap", out var error))
         {
@@ -305,7 +305,7 @@ public sealed partial class RootViewController
         _step57Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START — Step 57.0 read-only exact character-select PCK resource preflight started. OpenCharacterSelect/ResourceLoader/PackedScene/rendering remain unopened.");
+            WriteStartupLadderCheckpoint(step, "RUN_START — Step 57.0 read-only retained character-select PackedScene identity + exact PCK resource preflight started. Existing PackedScene.ResourcePath inspection only; OpenCharacterSelect/ResourceLoader/PackedScene.Instantiate/rendering remain unopened.");
             if (!RecordStartupLadderGate(_step57Gates, _transformedRealStS2VeryEarlyInitialization.RunStep57ClosedStep56Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step57Gates, _transformedRealStS2VeryEarlyInitialization.RunStep57CharacterSelectPckExtraction(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step57Gates, _transformedRealStS2VeryEarlyInitialization.RunStep57CharacterSelectResourceRiskMap(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
