@@ -6,158 +6,124 @@ using Mono.Cecil.Cil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Steps 58-64 continue only from physically closed Step-57 authority. They decompose the exact
-/// OpenCharacterSelect(NButton) body already mapped by Step 56 into independently gated operations:
-/// GetSubmenuType&lt;NCharacterSelectScreen&gt; factory mapping/creation, InitializeSingleplayer mapping/
-/// execution, NSubmenuStack.Push mapping/frozen admission, and finally one bounded rendered residency.
-/// The original OpenCharacterSelect handler is never invoked by these steps.
+/// Steps 58-62 pivot from decomposing character-select internals to adopting the state the real Godot game
+/// already owns. Physical 0.0.191 proved that _characterSelectSubmenu may already be in the SceneTree before
+/// Step 58. Step 58 therefore audits the actual cache/tree state and the exact OpenCharacterSelect(NButton)
+/// handler without requiring an artificial null/off-tree state. Step 59 invokes that original handler once
+/// only when the transition is not already visibly complete. Steps 60-62 then audit the actual active screen
+/// and run bounded visible render residencies. Character choice, confirm/embark, run start and Step 63 remain unopened.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
 {
-    public const int Step64CharacterSelectRenderTargetMilliseconds = 750;
-    public const int Step64CharacterSelectRenderEvidenceCeilingMilliseconds = 5_000;
+    public const int Step61CharacterSelectRenderTargetMilliseconds = 2_000;
+    public const int Step61CharacterSelectRenderEvidenceCeilingMilliseconds = 10_000;
+    public const int Step62CharacterSelectSustainedRenderTargetMilliseconds = 10_000;
+    public const int Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds = 30_000;
 
-    private const string Step58Name = "CHARACTER SELECT FACTORY FRONTIER";
-    private const string Step59Name = "CHARACTER SELECT FROZEN OFF-TREE ACQUISITION";
-    private const string Step60Name = "CHARACTER SELECT INITIALIZE FRONTIER";
-    private const string Step61Name = "CHARACTER SELECT OFF-TREE INITIALIZATION";
-    private const string Step62Name = "CHARACTER SELECT PUSH FRONTIER";
-    private const string Step63Name = "CHARACTER SELECT FROZEN SCENETREE ADMISSION";
-    private const string Step64Name = "CHARACTER SELECT RENDER RESIDENCY";
+    private const string Step58Name = "CHARACTER SELECT RUNTIME OWNERSHIP AUDIT";
+    private const string Step59Name = "REAL OPENCHARACTERSELECT FROZEN TRANSITION";
+    private const string Step60Name = "ACTIVE CHARACTER SELECT SURFACE AUDIT";
+    private const string Step61Name = "CHARACTER SELECT SHORT RENDER RESIDENCY";
+    private const string Step62Name = "CHARACTER SELECT SUSTAINED RENDER RESIDENCY";
 
     private const string CharacterSelectScreenManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen";
-    private const string SubmenuManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu";
     private const string SubmenuStackManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack";
     private const string MainMenuCharacterSelectSubmenuFieldName = "_characterSelectSubmenu";
     private const string SubmenuStackFieldName = "_stack";
-    private const string GetSubmenuTypeMethodName = "GetSubmenuType";
-    private const string CharacterSelectInitializeSingleplayerMethodName = "InitializeSingleplayer";
-    private const string SubmenuStackPushMethodName = "Push";
 
     private StartupLadderBaseline? _step58Baseline;
     private StartupLadderBaseline? _step59Baseline;
-    private StartupLadderBaseline? _step59PostCreationBaseline;
+    private StartupLadderBaseline? _step59PostTransitionBaseline;
     private StartupLadderBaseline? _step60Baseline;
     private StartupLadderBaseline? _step61Baseline;
-    private StartupLadderBaseline? _step61PostInitializationBaseline;
+    private StartupLadderBaseline? _step61PostPulseBaseline;
     private StartupLadderBaseline? _step62Baseline;
-    private StartupLadderBaseline? _step63Baseline;
-    private StartupLadderBaseline? _step63PostAdmissionBaseline;
-    private StartupLadderBaseline? _step64Baseline;
-    private StartupLadderBaseline? _step64PostPulseBaseline;
+    private StartupLadderBaseline? _step62PostPulseBaseline;
 
     private string _step58StaticMap = string.Empty;
     private string _step59StaticMap = string.Empty;
     private string _step60StaticMap = string.Empty;
     private string _step61StaticMap = string.Empty;
     private string _step62StaticMap = string.Empty;
-    private string _step63StaticMap = string.Empty;
-    private string _step64StaticMap = string.Empty;
 
-    private bool _step58FactoryMapped;
+    private bool _step58OwnershipMapped;
     private bool _step58StaticMapDurablyWritten;
-    private bool _step59CreationStarted;
-    private bool _step59CreationPassed;
+    private bool _step59TransitionBound;
+    private bool _step59TransitionStarted;
+    private bool _step59TransitionPassed;
     private bool _step59StaticMapDurablyWritten;
-    private bool _step60InitializeMapped;
+    private bool _step60SurfaceMapped;
     private bool _step60StaticMapDurablyWritten;
-    private bool _step61InitializationStarted;
-    private bool _step61InitializationPassed;
     private bool _step61StaticMapDurablyWritten;
-    private bool _step62PushMapped;
+    private bool _step61PulseStarted;
+    private bool _step61PulsePassed;
     private bool _step62StaticMapDurablyWritten;
-    private bool _step63AdmissionStarted;
-    private bool _step63AdmissionPassed;
-    private bool _step63StaticMapDurablyWritten;
-    private bool _step64StaticMapDurablyWritten;
-    private bool _step64PulseStarted;
-    private bool _step64PulsePassed;
+    private bool _step62PulseStarted;
+    private bool _step62PulsePassed;
 
     private bool _exactStep58ClosurePassed;
     private bool _exactStep59ClosurePassed;
     private bool _exactStep60ClosurePassed;
     private bool _exactStep61ClosurePassed;
     private bool _exactStep62ClosurePassed;
-    private bool _exactStep63ClosurePassed;
-    private bool _exactStep64ClosurePassed;
 
-    private uint _step58FactoryMethodToken;
-    private uint _step60InitializeMethodToken;
-    private uint _step62PushMethodToken;
-    private MethodInfo? _step58RuntimeFactoryDefinition;
-    private MethodInfo? _step60RuntimeInitializeMethod;
-    private MethodInfo? _step62RuntimePushMethod;
+    private uint _step58OpenCharacterSelectToken;
+    private MethodInfo? _step58RuntimeOpenCharacterSelect;
+    private object? _step58ObservedCharacterSelect;
+    private CharacterSelectRuntimeState? _step58ObservedState;
+    private bool _step58TransitionAlreadyComplete;
     private object? _step59CharacterSelectScreen;
-    private bool _step58CharacterSelectCachePreexisting;
-    private int _step63StackChildrenBefore;
 
     public bool ExactStep58ClosurePassed => _exactStep58ClosurePassed;
     public bool ExactStep59ClosurePassed => _exactStep59ClosurePassed;
     public bool ExactStep60ClosurePassed => _exactStep60ClosurePassed;
     public bool ExactStep61ClosurePassed => _exactStep61ClosurePassed;
     public bool ExactStep62ClosurePassed => _exactStep62ClosurePassed;
-    public bool ExactStep63ClosurePassed => _exactStep63ClosurePassed;
-    public bool ExactStep64ClosurePassed => _exactStep64ClosurePassed;
-    public bool Step59CreationStarted => _step59CreationStarted;
-    public bool Step59FactoryInvocationRequired => !_step58CharacterSelectCachePreexisting;
-    public bool Step61InitializationStarted => _step61InitializationStarted;
-    public bool Step63AdmissionStarted => _step63AdmissionStarted;
-    public bool Step64PulseStarted => _step64PulseStarted;
+    public bool Step59TransitionStarted => _step59TransitionStarted;
+    public bool Step59HandlerInvocationRequired => !_step58TransitionAlreadyComplete;
+    public bool Step61PulseStarted => _step61PulseStarted;
+    public bool Step62PulseStarted => _step62PulseStarted;
 
     private void ResetCharacterSelectContinuationState()
     {
         _step58Baseline = null;
         _step59Baseline = null;
-        _step59PostCreationBaseline = null;
+        _step59PostTransitionBaseline = null;
         _step60Baseline = null;
         _step61Baseline = null;
-        _step61PostInitializationBaseline = null;
+        _step61PostPulseBaseline = null;
         _step62Baseline = null;
-        _step63Baseline = null;
-        _step63PostAdmissionBaseline = null;
-        _step64Baseline = null;
-        _step64PostPulseBaseline = null;
+        _step62PostPulseBaseline = null;
         _step58StaticMap = string.Empty;
         _step59StaticMap = string.Empty;
         _step60StaticMap = string.Empty;
         _step61StaticMap = string.Empty;
         _step62StaticMap = string.Empty;
-        _step63StaticMap = string.Empty;
-        _step64StaticMap = string.Empty;
-        _step58FactoryMapped = false;
+        _step58OwnershipMapped = false;
         _step58StaticMapDurablyWritten = false;
-        _step59CreationStarted = false;
-        _step59CreationPassed = false;
+        _step59TransitionBound = false;
+        _step59TransitionStarted = false;
+        _step59TransitionPassed = false;
         _step59StaticMapDurablyWritten = false;
-        _step60InitializeMapped = false;
+        _step60SurfaceMapped = false;
         _step60StaticMapDurablyWritten = false;
-        _step61InitializationStarted = false;
-        _step61InitializationPassed = false;
         _step61StaticMapDurablyWritten = false;
-        _step62PushMapped = false;
+        _step61PulseStarted = false;
+        _step61PulsePassed = false;
         _step62StaticMapDurablyWritten = false;
-        _step63AdmissionStarted = false;
-        _step63AdmissionPassed = false;
-        _step63StaticMapDurablyWritten = false;
-        _step64StaticMapDurablyWritten = false;
-        _step64PulseStarted = false;
-        _step64PulsePassed = false;
+        _step62PulseStarted = false;
+        _step62PulsePassed = false;
         _exactStep58ClosurePassed = false;
         _exactStep59ClosurePassed = false;
         _exactStep60ClosurePassed = false;
         _exactStep61ClosurePassed = false;
         _exactStep62ClosurePassed = false;
-        _exactStep63ClosurePassed = false;
-        _exactStep64ClosurePassed = false;
-        _step58FactoryMethodToken = 0;
-        _step60InitializeMethodToken = 0;
-        _step62PushMethodToken = 0;
-        _step58RuntimeFactoryDefinition = null;
-        _step60RuntimeInitializeMethod = null;
-        _step62RuntimePushMethod = null;
+        _step58OpenCharacterSelectToken = 0;
+        _step58RuntimeOpenCharacterSelect = null;
+        _step58ObservedCharacterSelect = null;
+        _step58ObservedState = null;
+        _step58TransitionAlreadyComplete = false;
         _step59CharacterSelectScreen = null;
-        _step58CharacterSelectCachePreexisting = false;
-        _step63StackChildrenBefore = 0;
     }
 
     public string GetVerifiedCharacterSelectContinuationStaticMap(int step)
@@ -168,94 +134,58 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             60 when !string.IsNullOrWhiteSpace(_step60StaticMap) => _step60StaticMap,
             61 when !string.IsNullOrWhiteSpace(_step61StaticMap) => _step61StaticMap,
             62 when !string.IsNullOrWhiteSpace(_step62StaticMap) => _step62StaticMap,
-            63 when !string.IsNullOrWhiteSpace(_step63StaticMap) => _step63StaticMap,
-            64 when !string.IsNullOrWhiteSpace(_step64StaticMap) => _step64StaticMap,
-            _ => throw new InvalidOperationException($"Step {step}.0 has not produced a verified character-select continuation static map."),
+            _ => throw new InvalidOperationException($"Step {step}.0 has not produced a verified character-select ownership static map."),
         };
 
     public void MarkStep58StaticMapDurablyWritten()
     {
-        if (!_step58FactoryMapped || string.IsNullOrWhiteSpace(_step58StaticMap))
-            throw new InvalidOperationException("Step 58.0 factory map is incomplete.");
+        if (!_step58OwnershipMapped || string.IsNullOrWhiteSpace(_step58StaticMap)) throw new InvalidOperationException("Step 58.0 ownership map is incomplete.");
         _step58StaticMapDurablyWritten = true;
     }
-
     public void MarkStep59StaticMapDurablyWritten()
     {
-        if (!_step59CreationPassed || string.IsNullOrWhiteSpace(_step59StaticMap))
-            throw new InvalidOperationException("Step 59.0 actual off-tree acquisition/lifecycle map is incomplete.");
+        if (!_step59TransitionPassed || string.IsNullOrWhiteSpace(_step59StaticMap)) throw new InvalidOperationException("Step 59.0 transition map is incomplete.");
         _step59StaticMapDurablyWritten = true;
     }
-
     public void MarkStep60StaticMapDurablyWritten()
     {
-        if (!_step60InitializeMapped || string.IsNullOrWhiteSpace(_step60StaticMap))
-            throw new InvalidOperationException("Step 60.0 InitializeSingleplayer frontier map is incomplete.");
+        if (!_step60SurfaceMapped || string.IsNullOrWhiteSpace(_step60StaticMap)) throw new InvalidOperationException("Step 60.0 active-surface map is incomplete.");
         _step60StaticMapDurablyWritten = true;
     }
-
     public void MarkStep61StaticMapDurablyWritten()
     {
-        if (!_step61InitializationPassed || string.IsNullOrWhiteSpace(_step61StaticMap))
-            throw new InvalidOperationException("Step 61.0 initialization observation map is incomplete.");
+        if (string.IsNullOrWhiteSpace(_step61StaticMap)) throw new InvalidOperationException("Step 61.0 render preflight map is absent.");
         _step61StaticMapDurablyWritten = true;
     }
-
     public void MarkStep62StaticMapDurablyWritten()
     {
-        if (!_step62PushMapped || string.IsNullOrWhiteSpace(_step62StaticMap))
-            throw new InvalidOperationException("Step 62.0 Push frontier map is incomplete.");
+        if (string.IsNullOrWhiteSpace(_step62StaticMap)) throw new InvalidOperationException("Step 62.0 sustained-render preflight map is absent.");
         _step62StaticMapDurablyWritten = true;
     }
 
-    public void MarkStep63StaticMapDurablyWritten()
-    {
-        if (!_step63AdmissionPassed || string.IsNullOrWhiteSpace(_step63StaticMap))
-            throw new InvalidOperationException("Step 63.0 frozen character-select admission map is incomplete.");
-        _step63StaticMapDurablyWritten = true;
-    }
-
-    public void MarkStep64StaticMapDurablyWritten()
-    {
-        if (string.IsNullOrWhiteSpace(_step64StaticMap))
-            throw new InvalidOperationException("Step 64.0 frame/input map is absent.");
-        _step64StaticMapDurablyWritten = true;
-    }
-
-    // STEP 58 — isolate the exact GetSubmenuType<NCharacterSelectScreen>() factory used by OpenCharacterSelect.
-
+    // STEP 58 — adopt the runtime state the game actually owns; do not require null/off-tree cache state.
     public TransformedRealStS2StartupLadderGateResult RunStep58ClosedStep57Authority(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 58;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
+        const int step = 58; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority; var stage = "initialization";
         try
         {
             ThrowIfDisposed();
             var context = RequireStep58Prerequisite("Step 58 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 58.0 is non-invoking and requires rendering frozen.");
+            if (!renderingStopped) throw new InvalidOperationException("Step 58.0 is observational and requires rendering frozen.");
             var selected = RequireStartupLadderSelectedAuthority(step);
             _step58Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
             RequireStartupLadderBaselineUnchanged(context, _step58Baseline, "Step 58 Gate A");
             RequireVisibleSingleplayerSubmenu(step);
-            RequireRetainedCharacterSelectPackedScene(step);
-            Checkpoint(checkpoint, "M58_A_PASS — Step-57 4/4 exact retained PackedScene/PCK authority retained; NSingleplayerSubmenu visible; renderer stopped; character-select factory not invoked.");
-            return StartupLadderPass(step, Step58Name, gate,
-                "Physically closed Step-57 authority retained. The exact generic character-select submenu factory may now be isolated without invoking it.");
+            RequireRetainedCharacterSelectPackedSceneForOwnership(step);
+            Checkpoint(checkpoint, "M58_A_PASS — Step-57 4/4 retained PackedScene/PCK authority preserved; renderer stopped; runtime character-select ownership may be observed without mutation.");
+            return StartupLadderPass(step, Step58Name, gate, "Closed Step-57 authority retained; Step 58 may observe the actual game-owned character-select cache/tree state and re-audit the real handler without invoking it.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M58_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step58Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M58_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step58Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep58CharacterSelectFactoryBinding(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep58RuntimeOwnershipBinding(Action<string>? checkpoint = null)
     {
-        const int step = 58;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
+        const int step = 58; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding; var stage = "initialization";
         try
         {
             ThrowIfDisposed();
@@ -267,81 +197,52 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var submenuType = RequireStartupLadderType(allTypes, SingleplayerSubmenuManagedTypeFullName, step);
             var open = RequireUniqueStartupLadderNamedMethod(submenuType, SingleplayerOpenCharacterSelectMethodName, step);
             RequireExactStep56OpenCharacterSelectSignature(open);
-            var genericCall = FindExactCharacterSelectFactoryCall(open, step);
-            var concreteFactory = RequireConcreteCharacterSelectFactoryDefinition(allTypes, step);
-            _step58FactoryMethodToken = concreteFactory.MetadataToken.ToUInt32();
+            if (ReadsFirstExplicitParameter(open)) throw new InvalidDataException("Step 58.0 refuses null-button handler invocation because OpenCharacterSelect reads its NButton parameter in the selected assembly.");
+            _step58OpenCharacterSelectToken = open.MetadataToken.ToUInt32();
 
-            var characterType = RequireStartupLadderType(allTypes, CharacterSelectScreenManagedTypeFullName, step);
-            var stackType = RequireStartupLadderType(allTypes, MainMenuSubmenuStackManagedTypeFullName, step);
-            var cacheField = RequireUniqueExactInstanceField(stackType, MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            var sceneField = RequireUniqueExactInstanceField(stackType, MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step);
+            var submenu = _step54SingleplayerSubmenu ?? throw new InvalidOperationException("Step 58.0 requires retained NSingleplayerSubmenu authority.");
+            _step58RuntimeOpenCharacterSelect = RequireRuntimeMethodByTokenForOwnership(submenu.GetType(), _step58OpenCharacterSelectToken, SingleplayerOpenCharacterSelectMethodName, step, 1, "System.Void");
+            var runtimeParam = _step58RuntimeOpenCharacterSelect.GetParameters()[0].ParameterType.FullName;
+            if (runtimeParam != SingleplayerOpenCharacterSelectParameterTypeFullName) throw new InvalidDataException($"Step 58.0 runtime handler parameter drifted: {runtimeParam}.");
 
-            var runtimeStack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 58.0 requires retained NMainMenuSubmenuStack.");
-            var runtimeCharacterType = RequireAdmission().Assembly.GetType(CharacterSelectScreenManagedTypeFullName, true, false)!;
-            var runtimeFactory = RequireRuntimeGenericMethodDefinitionByToken(runtimeStack.GetType(), _step58FactoryMethodToken, GetSubmenuTypeMethodName, step);
-            var closedRuntimeFactory = runtimeFactory.MakeGenericMethod(runtimeCharacterType);
-            if (closedRuntimeFactory.GetParameters().Length != 0 || closedRuntimeFactory.ReturnType != runtimeCharacterType)
-                throw new InvalidDataException($"Step 58.0 closed runtime factory signature drifted: {closedRuntimeFactory}.");
-            _step58RuntimeFactoryDefinition = runtimeFactory;
-
-            var runtimeCache = RequireRuntimeExactInstanceField(runtimeStack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            var cachedScreen = runtimeCache.GetValue(runtimeStack);
-            var cacheState = "NULL";
-            if (cachedScreen is not null)
+            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 58.0 retained submenu stack is absent.");
+            var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
+            var screen = cache.GetValue(stack);
+            CharacterSelectRuntimeState state;
+            if (screen is null)
             {
-                if (cachedScreen.GetType().FullName != CharacterSelectScreenManagedTypeFullName)
-                    throw new InvalidDataException($"Step 58.0 pre-existing character-select cache has unexpected type {cachedScreen.GetType().FullName}.");
-                if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(cachedScreen.GetType().Assembly), context))
-                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache is not owned by the exact private load context.");
-                if (RequireZeroArgBoolMethod(cachedScreen.GetType(), "IsInsideTree").Invoke(cachedScreen, null) is not false)
-                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache is already inside the SceneTree; stop before any new character-select operation.");
-                var cachedStackField = RequireRuntimeExactInstanceField(cachedScreen.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
-                if (!ReferenceEquals(cachedStackField.GetValue(cachedScreen), runtimeStack))
-                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache does not retain the exact submenu stack in NSubmenu._stack.");
-                _step58CharacterSelectCachePreexisting = true;
-                _step59CharacterSelectScreen = cachedScreen;
-                cacheState = "EXISTING_OFF_TREE";
+                state = CharacterSelectRuntimeState.Absent;
             }
             else
             {
-                _step58CharacterSelectCachePreexisting = false;
-                _step59CharacterSelectScreen = null;
+                RequireCharacterSelectIdentity(screen, stack, context, step);
+                state = CaptureCharacterSelectRuntimeState(screen, stack, step);
             }
-            var runtimeScene = RequireRuntimeExactInstanceField(runtimeStack.GetType(), MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step);
-            var packedScene = runtimeScene.GetValue(runtimeStack) ?? throw new InvalidDataException("Step 58.0 retained character-select PackedScene is null.");
-            var resourcePath = RequireRuntimeStringProperty(packedScene, GodotResourcePathPropertyName, step).Replace('\\', '/');
-            if (!string.Equals(resourcePath, CharacterSelectSceneResourcePath, StringComparison.Ordinal))
-                throw new InvalidDataException($"Step 58.0 retained character-select ResourcePath drifted: {resourcePath}.");
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 58.0 binding unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+            _step58ObservedCharacterSelect = screen;
+            _step58ObservedState = state;
+            _step58TransitionAlreadyComplete = screen is not null && state.InsideTree && state.Visible && state.VisibleInTree;
 
             _step58StaticMap =
-                "StS2 Launcher — Step 58.0 exact character-select factory frontier\n" +
-                "Evidence-only. GetSubmenuType<NCharacterSelectScreen>() is not invoked by Step 58.\n" +
+                "StS2 Launcher — Step 58.0 real character-select runtime ownership audit\n" +
+                "Evidence-only. Step 58 does not invoke OpenCharacterSelect or mutate the SceneTree.\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                $"OpenCharacterSelect generic call: {genericCall.FullName}\n" +
-                $"Concrete runtime factory token: 0x{_step58FactoryMethodToken:X8}; {concreteFactory.FullName}\n" +
-                $"Character-select cache field: {cacheField.FullName}; initial runtime value={cacheState}\n" +
-                $"Character-select scene field: {sceneField.FullName}; ResourcePath={resourcePath}\n" +
-                "Rendering restarted: NO\nFactory invoked: NO\n" +
-                "[CONCRETE FACTORY IL]\n" + string.Join("\n", concreteFactory.Body.Instructions.Select(instruction => "  " + FormatStep41Instruction(instruction))) + "\n";
+                $"OpenCharacterSelect token=0x{_step58OpenCharacterSelectToken:X8}; params=1; parameter0={SingleplayerOpenCharacterSelectParameterTypeFullName}; return=System.Void\n" +
+                "NButton parameter read by IL: NO\n" +
+                $"Observed cache state: {state}\n" +
+                $"Transition already visibly complete: {_step58TransitionAlreadyComplete}\n" +
+                "Rendering restarted: NO\nOpenCharacterSelect invoked: NO\n" +
+                "[OPENCHARACTERSELECT IL]\n" + string.Join("\n", open.Body.Instructions.Select(instruction => "  " + FormatStep41Instruction(instruction))) + "\n";
+            if (resolver.Requests.Count != 0) throw new InvalidDataException("Step 58.0 binding attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 58 Gate B");
-            Checkpoint(checkpoint, $"M58_B_PASS — exact generic factory isolated from OpenCharacterSelect; concreteToken=0x{_step58FactoryMethodToken:X8}; cache={cacheState}; scenePath='{resourcePath}'; invocation=NO; externalResolution=0.");
-            return StartupLadderPass(step, Step58Name, gate,
-                "Exact concrete GetSubmenuType<T> implementation and current character-select cache state were bound; the retained PackedScene identity still matches Step 57. A pre-existing cache is accepted only when it is the exact off-tree retained NCharacterSelectScreen. No factory invocation occurred.");
+            Checkpoint(checkpoint, $"M58_B_PASS — exact OpenCharacterSelect token=0x{_step58OpenCharacterSelectToken:X8}; NButtonUnused=True; observedState={SanitizeCheckpoint(state.ToString())}; transitionAlreadyComplete={_step58TransitionAlreadyComplete}; invocation=NO.");
+            return StartupLadderPass(step, Step58Name, gate, "Exact handler and actual runtime-owned character-select cache/tree state bound without imposing a null/off-tree prediction.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M58_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step58Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M58_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step58Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep58CharacterSelectFactoryFrontierMap(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep58OpenCharacterSelectFrontierAudit(Action<string>? checkpoint = null)
     {
-        const int step = 58;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
+        const int step = 58; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction; var stage = "initialization";
         try
         {
             ThrowIfDisposed();
@@ -351,1218 +252,409 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
             var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
             var allMethods = BuildStartupLadderMethodMap(allTypes);
-            var factory = FindMethodByToken(module, _step58FactoryMethodToken);
-            RequireCharacterSelectFactoryShape(factory, step);
-            var audit = AuditStartupLadderInvocationFrontier([factory], allTypes, allMethods,
+            var open = FindMethodByToken(module, _step58OpenCharacterSelectToken);
+            RequireExactStep56OpenCharacterSelectSignature(open);
+            var audit = AuditStartupLadderInvocationFrontier([open], allTypes, allMethods,
                 _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 58.0 requires retained Step-48 runtime guards."));
-            if (audit.UnresolvedSameAssemblyReferences.Length != 0)
-                throw new InvalidDataException("Step 58.0 factory frontier has unresolved same-sts2 references: " + string.Join(" | ", audit.UnresolvedSameAssemblyReferences));
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 58.0 factory audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            var instantiateRefs = factory.Body.Instructions
-                .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt)
-                .Select(instruction => instruction.Operand)
-                .OfType<MethodReference>()
-                .Where(method => method.Name == "Instantiate" && method.DeclaringType.FullName == PackedSceneManagedTypeFullName)
-                .ToArray();
-            if (instantiateRefs.Length != 1)
-                throw new InvalidDataException($"Step 58.0 requires exactly one PackedScene.Instantiate call in concrete character-select factory; observed={instantiateRefs.Length}.");
-            var sceneFieldRefs = factory.Body.Instructions.Select(instruction => instruction.Operand).OfType<FieldReference>()
-                .Count(field => field.Name == MainMenuCharacterSelectSceneFieldName && field.DeclaringType.FullName == MainMenuSubmenuStackManagedTypeFullName);
-            var cacheFieldRefs = factory.Body.Instructions.Select(instruction => instruction.Operand).OfType<FieldReference>()
-                .Count(field => field.Name == MainMenuCharacterSelectSubmenuFieldName && field.DeclaringType.FullName == MainMenuSubmenuStackManagedTypeFullName);
-            if (sceneFieldRefs == 0 || cacheFieldRefs == 0)
-                throw new InvalidDataException($"Step 58.0 concrete factory must reference both character-select scene/cache fields; sceneRefs={sceneFieldRefs}; cacheRefs={cacheFieldRefs}.");
-            _step58StaticMap += BuildStartupLadderInvocationFrontierAppendix(audit) +
-                $"\n[CHARACTER-SELECT FACTORY SHAPE]\n  PackedScene.Instantiate refs: {instantiateRefs.Length}\n  _characterSelectScreenScene refs: {sceneFieldRefs}\n  _characterSelectSubmenu refs: {cacheFieldRefs}\n";
-            _step58FactoryMapped = true;
+            RequireImmediateFrontierAdmissible(audit, "Step 58.0 exact OpenCharacterSelect frontier under retained runtime guards");
+            if (resolver.Requests.Count != 0) throw new InvalidDataException("Step 58.0 handler frontier audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+            _step58StaticMap += BuildStartupLadderInvocationFrontierAppendix(audit);
+            _step58OwnershipMapped = true;
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 58 Gate C");
-            Checkpoint(checkpoint, $"M58_C_PASS — concrete factory frontier mapped; closureMethods={audit.ImmediateClosureMethods.Length}; boundaries={audit.ImmediateBoundaries.Length}; guarded={audit.GuardedMethodFrontiers.Length}; deferred={audit.DeferredMethodFrontiers.Length}; instantiateRefs=1; scene/cache refs={sceneFieldRefs}/{cacheFieldRefs}; invocation=NO.");
-            return StartupLadderPass(step, Step58Name, gate,
-                "Concrete character-select factory implementation is mapped with one PackedScene.Instantiate reference and exact retained scene/cache fields. No factory invocation occurred.");
+            Checkpoint(checkpoint, $"M58_C_PASS — real OpenCharacterSelect frontier mapped without invocation; closure={audit.ImmediateClosureMethods.Length}; boundaries={audit.ImmediateBoundaries.Length}; guarded={audit.GuardedMethodFrontiers.Length}; deferred={audit.DeferredMethodFrontiers.Length}; unresolved/external=0.");
+            return StartupLadderPass(step, Step58Name, gate, "The real handler is re-audited as one game-owned transition. No internal create/init/push milestone is forced by the launcher.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M58_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step58Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M58_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step58Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep58FrozenNoCreationConfinement(bool renderingStopped, Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep58FrozenOwnershipConfinement(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 58;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
+        const int step = 58; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep58Prerequisite("Step 58 Gate D entry");
-            var baseline = _step58Baseline ?? throw new InvalidOperationException("Step 58.0 baseline absent.");
-            if (!_step58FactoryMapped || !_step58StaticMapDurablyWritten || !renderingStopped)
-                throw new InvalidOperationException("Step 58.0 Gate D requires durable non-invoking factory evidence with rendering frozen.");
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 58.0 retained submenu stack absent.");
-            var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            var currentCache = cache.GetValue(stack);
-            if (_step58CharacterSelectCachePreexisting)
-            {
-                var retained = RequireRetainedOffTreeCharacterSelect(step);
-                if (!ReferenceEquals(currentCache, retained))
-                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache identity changed before Step 59 authorization.");
-            }
-            else if (currentCache is not null)
-            {
-                throw new InvalidDataException("Step 58.0 character-select cache changed from null before Step 59 authorization.");
-            }
+            ThrowIfDisposed(); var context = RequireStep58Prerequisite("Step 58 Gate D entry"); var baseline = _step58Baseline ?? throw new InvalidOperationException("Step 58.0 baseline absent.");
+            if (!_step58OwnershipMapped || !_step58StaticMapDurablyWritten || !renderingStopped) throw new InvalidOperationException("Step 58.0 Gate D requires durable ownership evidence with rendering frozen.");
+            RequireStep58ObservedStateUnchanged(context, step);
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 58 Gate D");
-            RequireVisibleSingleplayerSubmenu(step);
             _exactStep58ClosurePassed = true;
-            Checkpoint(checkpoint, $"M58_D_PASS — factory evidence durable; character-select cache={(_step58CharacterSelectCachePreexisting ? "EXISTING_OFF_TREE" : "NULL")}; factory invocation=NO; renderingStopped=True; drift=0.");
-            return StartupLadderPass(step, Step58Name, gate,
-                "Character-select factory frontier closed 4/4 without creation. Step 59 will reuse the exact pre-existing off-tree cache when present, otherwise it may invoke only the exact closed generic factory once while frozen.");
+            Checkpoint(checkpoint, "M58_D_PASS — actual runtime ownership state retained unchanged; handler invocation=NO; renderingStopped=True; drift=0.");
+            return StartupLadderPass(step, Step58Name, gate, "Runtime ownership audit closed 4/4. Step 59 may let the real handler complete the transition only if the game has not already done so.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M58_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step58Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M58_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step58Name, gate, stage, ex); }
     }
 
-    // STEP 59 — acquire the exact retained off-tree NCharacterSelectScreen. Reuse a pre-existing exact cache; invoke the factory only when the cache is null.
-
+    // STEP 59 — use the original game handler as the transition owner, but only when it is still needed.
     public TransformedRealStS2StartupLadderGateResult RunStep59ClosedStep58Authority(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 59;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
+        const int step = 59; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep59Prerequisite("Step 59 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 59.0 requires rendering frozen before off-tree acquisition; a factory call is one-shot only on the null-cache path.");
-            var selected = RequireStartupLadderSelectedAuthority(step);
-            _step59Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step59Baseline, "Step 59 Gate A");
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 retained submenu stack absent.");
-            var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            var currentCache = cache.GetValue(stack);
-            if (_step58CharacterSelectCachePreexisting)
-            {
-                var retained = RequireRetainedOffTreeCharacterSelect(step);
-                if (!ReferenceEquals(currentCache, retained))
-                    throw new InvalidDataException("Step 59.0 pre-existing character-select cache identity drifted after Step 58.");
-            }
-            else if (currentCache is not null)
-            {
-                throw new InvalidDataException("Step 59.0 character-select cache became non-null after Step 58 without authorization.");
-            }
-            Checkpoint(checkpoint, $"M59_A_PASS — Step-58 4/4 factory authority retained; cache={(_step58CharacterSelectCachePreexisting ? "EXISTING_OFF_TREE" : "NULL")}; renderingStopped=True; factory invocation not armed.");
-            return StartupLadderPass(step, Step59Name, gate,
-                _step58CharacterSelectCachePreexisting
-                    ? "Exact pre-existing off-tree NCharacterSelectScreen cache authority retained with frozen rendering; Step 59 will audit/adopt it without invoking the factory."
-                    : "Exact non-invoking factory authority retained with null character-select cache and frozen rendering.");
+            ThrowIfDisposed(); var context = RequireStep59Prerequisite("Step 59 Gate A entry"); if (!renderingStopped) throw new InvalidOperationException("Step 59.0 requires rendering frozen.");
+            var selected = RequireStartupLadderSelectedAuthority(step); _step59Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context); RequireStartupLadderBaselineUnchanged(context, _step59Baseline, "Step 59 Gate A");
+            RequireStep58ObservedStateUnchanged(context, step);
+            Checkpoint(checkpoint, $"M59_A_PASS — Step-58 4/4 ownership authority retained; transitionAlreadyComplete={_step58TransitionAlreadyComplete}; renderer stopped; handler not armed.");
+            return StartupLadderPass(step, Step59Name, gate, _step58TransitionAlreadyComplete ? "The game already owns a visible/in-tree character-select screen; Step 59 will adopt it without re-invoking the handler." : "The transition is not yet visibly complete; Step 59 may invoke the exact real OpenCharacterSelect handler once while rendering is frozen.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M59_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step59Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M59_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep59CharacterSelectCreationBinding(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerBinding(Action<string>? checkpoint = null)
     {
-        const int step = 59;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
+        const int step = 59; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep59Prerequisite("Step 59 Gate B entry");
-            var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 Gate A must pass before Gate B.");
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 retained submenu stack absent.");
-            var runtimeFactory = _step58RuntimeFactoryDefinition ?? throw new InvalidOperationException("Step 59.0 retained Step-58 runtime factory definition absent.");
-            if ((uint)runtimeFactory.MetadataToken != _step58FactoryMethodToken)
-                throw new InvalidDataException("Step 59.0 runtime factory token drifted from Step 58.");
-            var characterType = RequireAdmission().Assembly.GetType(CharacterSelectScreenManagedTypeFullName, true, false)!;
-            var closed = runtimeFactory.MakeGenericMethod(characterType);
-            var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            var currentCache = cache.GetValue(stack);
-            if (_step58CharacterSelectCachePreexisting)
-            {
-                var retained = RequireRetainedOffTreeCharacterSelect(step);
-                if (!ReferenceEquals(currentCache, retained))
-                    throw new InvalidDataException("Step 59.0 pre-existing character-select cache identity drifted before acquisition audit.");
-            }
-            else if (currentCache is not null)
-            {
-                throw new InvalidDataException("Step 59.0 character-select cache became non-null before authorization.");
-            }
-            var acquisitionMode = _step58CharacterSelectCachePreexisting ? "REUSE_EXISTING_OFF_TREE_CACHE" : "FACTORY_IF_NULL";
-            _step59StaticMap =
-                "StS2 Launcher — Step 59.0 frozen character-select off-tree acquisition\n" +
-                "Pre-action binding map; actual hierarchy/lifecycle evidence is appended after acquisition.\n" +
-                $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                $"Closed runtime factory: {closed}\n" +
-                $"Factory token: 0x{_step58FactoryMethodToken:X8}\n" +
-                $"Acquisition mode: {acquisitionMode}\n" +
-                $"Cache before Gate C: {(_step58CharacterSelectCachePreexisting ? "EXISTING_OFF_TREE" : "NULL")}\n" +
-                "Rendering restarted: NO\nInitializeSingleplayer invoked: NO\nPush invoked: NO\n";
+            ThrowIfDisposed(); var context = RequireStep59Prerequisite("Step 59 Gate B entry"); var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 Gate A must pass before Gate B.");
+            var submenu = _step54SingleplayerSubmenu ?? throw new InvalidOperationException("Step 59.0 retained NSingleplayerSubmenu is absent.");
+            _step58RuntimeOpenCharacterSelect = RequireRuntimeMethodByTokenForOwnership(submenu.GetType(), _step58OpenCharacterSelectToken, SingleplayerOpenCharacterSelectMethodName, step, 1, "System.Void");
+            _step59TransitionBound = true;
+            var before = CaptureCurrentCharacterSelectState(step, context);
+            _step59StaticMap = "StS2 Launcher — Step 59.0 real OpenCharacterSelect frozen transition\n" +
+                $"Handler token: 0x{_step58OpenCharacterSelectToken:X8}\n" +
+                $"Handler invocation required: {!_step58TransitionAlreadyComplete}\n" +
+                $"Before transition: {before.State}\n" +
+                "Rendering active before transition: NO\n";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate B");
-            Checkpoint(checkpoint, $"M59_B_PASS — exact closed runtime factory rebound token=0x{_step58FactoryMethodToken:X8}; acquisitionMode={acquisitionMode}; renderingStopped=True; factoryInvocation=NO.");
-            return StartupLadderPass(step, Step59Name, gate,
-                _step58CharacterSelectCachePreexisting
-                    ? "Exact pre-existing off-tree NCharacterSelectScreen cache rebound and will be adopted without factory invocation at Gate C."
-                    : "Exact closed GetSubmenuType<NCharacterSelectScreen>() runtime method rebound with cache still null. One-shot creation is not armed until Gate C.");
+            Checkpoint(checkpoint, $"M59_B_PASS — exact runtime OpenCharacterSelect rebound; invocationRequired={!_step58TransitionAlreadyComplete}; beforeState={SanitizeCheckpoint(before.State.ToString())}.");
+            return StartupLadderPass(step, Step59Name, gate, "Exact real handler is bound. If the transition is already visibly complete it will be skipped; otherwise only this one game-owned handler call is authorized.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M59_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step59Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M59_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep59FrozenCharacterSelectCreation(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerTransition(Action<string>? checkpoint = null)
     {
-        const int step = 59;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
+        const int step = 59; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep59Prerequisite("Step 59 Gate C entry");
-            var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 baseline absent.");
-            if (_step59CreationStarted)
-                throw new InvalidOperationException("Step 59.0 character-select factory boundary is one-shot in-process.");
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 retained submenu stack absent.");
-            var runtimeFactory = _step58RuntimeFactoryDefinition ?? throw new InvalidOperationException("Step 59.0 runtime factory definition absent.");
-            var characterType = RequireAdmission().Assembly.GetType(CharacterSelectScreenManagedTypeFullName, true, false)!;
-            var closed = runtimeFactory.MakeGenericMethod(characterType);
-            var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 59 Gate C immediately before acquisition", requirePreAdmissionCounts: false);
-            var initializerBefore = context.InitializerBearingRequests.Count;
-            var rejectedBefore = context.RejectedManagedRequests.Count;
-            var nativeBefore = context.NativeLoadAttempts.Count;
-            object created;
-            if (_step58CharacterSelectCachePreexisting)
+            ThrowIfDisposed(); var context = RequireStep59Prerequisite("Step 59 Gate C entry"); var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 baseline absent.");
+            if (!_step59TransitionBound) throw new InvalidOperationException("Step 59.0 exact handler must be rebound before Gate C.");
+            if (!_step58TransitionAlreadyComplete)
             {
-                stage = "frozen pre-existing character-select cache adoption";
-                created = RequireRetainedOffTreeCharacterSelect(step);
-                Checkpoint(checkpoint, "M59_C_EXISTING_CACHE_ADOPTED — exact pre-existing off-tree NCharacterSelectScreen cache adopted without invoking GetSubmenuType. InitializeSingleplayer, Push, OpenCharacterSelect, and rendering remain unauthorized.");
+                if (_step59TransitionStarted) throw new InvalidOperationException("Step 59.0 real handler transition is one-shot in-process.");
+                _step59TransitionStarted = true;
+                Checkpoint(checkpoint, "M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with null NButton; selected IL proved the parameter unused; rendering remains frozen.");
+                try { _step58RuntimeOpenCharacterSelect!.Invoke(_step54SingleplayerSubmenu, new object?[] { null }); }
+                catch (TargetInvocationException tie) when (tie.InnerException is not null) { throw tie.InnerException; }
             }
             else
             {
-                if (cache.GetValue(stack) is not null)
-                    throw new InvalidDataException("Step 59.0 cache must still be null immediately before the one-shot factory call.");
-                _step59CreationStarted = true;
-                Checkpoint(checkpoint, "M59_C_FACTORY_ARMED — first/only GetSubmenuType<NCharacterSelectScreen>() invocation authorized while renderer remains frozen. No InitializeSingleplayer, Push, or OpenCharacterSelect call is authorized.");
-                stage = "frozen character-select factory invocation";
-                created = InvokeStartupLadderMethod(closed, stack, null, "Step 59 GetSubmenuType<NCharacterSelectScreen>")
-                    ?? throw new InvalidDataException("Step 59.0 character-select factory returned null.");
+                Checkpoint(checkpoint, "M59_C_HANDLER_SKIPPED — character select was already visible/in-tree at Step 58; adopting the game-owned state without duplicate handler invocation.");
             }
-            if (created.GetType().FullName != CharacterSelectScreenManagedTypeFullName)
-                throw new InvalidDataException($"Step 59.0 acquired unexpected type {created.GetType().FullName}.");
-            if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(created.GetType().Assembly), context))
-                throw new InvalidDataException("Step 59.0 character-select instance is not owned by the exact private load context.");
-            if (!ReferenceEquals(cache.GetValue(stack), created))
-                throw new InvalidDataException("Step 59.0 acquired character-select instance is not the exact stack cache object.");
-            if (RequireZeroArgBoolMethod(created.GetType(), "IsInsideTree").Invoke(created, null) is not false)
-                throw new InvalidDataException("Step 59.0 character-select root unexpectedly entered the SceneTree during acquisition.");
-            var stackField = RequireRuntimeExactInstanceField(created.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
-            if (!ReferenceEquals(stackField.GetValue(created), stack))
-                throw new InvalidDataException("Step 59.0 acquired character-select root does not retain the exact submenu stack in NSubmenu._stack.");
-            RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, _step58CharacterSelectCachePreexisting ? "Step 59 existing-cache adoption" : "Step 59 factory invocation");
-            _step59CharacterSelectScreen = created;
-            _step59PostCreationBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
 
-            stage = "actual off-tree character-select hierarchy/lifecycle audit";
-            var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
-            var nodeType = godotAssembly.GetType("Godot.Node", true, false)!;
-            var nodes = EnumerateStep39NodeGraph(created, nodeType);
-            var managedTypes = GetSelectedManagedNodeTypeNames(nodes, created.GetType().Assembly, context);
-            using var resolver = new RejectingAssemblyResolver();
-            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
-            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
-            var allMethods = BuildStartupLadderMethodMap(allTypes);
-            var lifecycleRoots = CollectStartupLadderActualNodeCallbackRoots(managedTypes, allTypes, new[] { "_EnterTree", "_Ready", "_Notification" });
-            var audit = AuditStartupLadderInvocationFrontier(lifecycleRoots, allTypes, allMethods,
-                _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 59.0 requires retained Step-48 runtime guards."));
-            RequireImmediateFrontierAdmissible(audit, "Step 59.0 actual character-select lifecycle frontier under retained runtime guards");
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 59.0 lifecycle audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            _step59StaticMap += $"Factory invoked by Step 59: {(_step58CharacterSelectCachePreexisting ? "NO — pre-existing exact cache reused" : "YES — one-shot cache-null factory path")}\n" +
-                BuildCharacterSelectNodeAuditAppendix("ACTUAL OFF-TREE CHARACTER-SELECT HIERARCHY", nodes, managedTypes, lifecycleRoots, audit);
-            _step59CreationPassed = true;
-            Checkpoint(checkpoint, $"M59_C_PASS — exact character-select root acquired and retained off-tree; source={(_step58CharacterSelectCachePreexisting ? "existing-cache" : "one-shot-factory")}; nodes={nodes.Count}; managedTypes={managedTypes.Length}; lifecycleRoots={lifecycleRoots.Length}; closure={audit.ImmediateClosureMethods.Length}; guarded={audit.GuardedMethodFrontiers.Length}; cacheIdentity=True; stackIdentity=True; insideTree=False; native/context drift=0.");
-            return StartupLadderPass(step, Step59Name, gate,
-                $"Real NCharacterSelectScreen acquired from the exact game cache/factory path and retained off-tree. Actual lifecycle surface is admissible: nodes={nodes.Count}; managed types={managedTypes.Length}; lifecycle roots={lifecycleRoots.Length}; no native/context escape.");
+            var current = CaptureCurrentCharacterSelectState(step, context);
+            var screen = current.Screen ?? throw new InvalidDataException("Step 59.0 transition completed without a retained character-select cache.");
+            if (!current.State.InsideTree || !current.State.Visible || !current.State.VisibleInTree)
+                throw new InvalidDataException($"Step 59.0 requires the game-owned character-select screen to be visible/in-tree after transition; observed={current.State}.");
+            if (!current.State.ParentIsExactStack)
+                throw new InvalidDataException("Step 59.0 character-select screen is visible/in-tree but its parent is not the retained submenu stack.");
+            _step59CharacterSelectScreen = screen;
+            _step59StaticMap += $"Handler invoked: {!_step58TransitionAlreadyComplete}\nAfter transition: {current.State}\n";
+            _step59PostTransitionBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
+            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate C");
+            _step59TransitionPassed = true;
+            Checkpoint(checkpoint, $"M59_C_PASS — game-owned character-select transition complete; handlerInvoked={!_step58TransitionAlreadyComplete}; insideTree=True; visible=True; visibleInTree=True; parentExactStack=True; renderingStopped=True; drift=0.");
+            return StartupLadderPass(step, Step59Name, gate, _step58TransitionAlreadyComplete ? "Existing game-owned visible character-select state adopted without duplicate handler invocation." : "Original OpenCharacterSelect handler executed once while frozen and produced the expected visible/in-tree game-owned screen.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M59_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step59Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M59_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep59FrozenOffTreeConfinement(bool renderingStopped, Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep59FrozenPostTransitionConfinement(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 59;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
+        const int step = 59; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep59Prerequisite("Step 59 Gate D entry");
-            var post = _step59PostCreationBaseline ?? throw new InvalidOperationException("Step 59.0 post-acquisition baseline absent.");
-            if (!_step59CreationPassed || !_step59StaticMapDurablyWritten || !renderingStopped)
-                throw new InvalidOperationException("Step 59.0 Gate D requires successful off-tree acquisition, durable map, and frozen rendering.");
-            var screen = RequireRetainedOffTreeCharacterSelect(step);
-            RequireStartupLadderBaselineUnchanged(context, post, "Step 59 Gate D");
-            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 59 Gate D", requirePreAdmissionCounts: false);
+            ThrowIfDisposed(); var context = RequireStep59Prerequisite("Step 59 Gate D entry"); var post = _step59PostTransitionBaseline ?? throw new InvalidOperationException("Step 59.0 post-transition baseline absent.");
+            if (!_step59TransitionPassed || !_step59StaticMapDurablyWritten || !renderingStopped) throw new InvalidOperationException("Step 59.0 Gate D requires durable successful transition evidence with rendering frozen.");
+            RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, post, "Step 59 Gate D");
             _exactStep59ClosurePassed = true;
-            Checkpoint(checkpoint, $"M59_D_PASS — NCharacterSelectScreen retained off-tree; type={screen.GetType().FullName}; source={(_step58CharacterSelectCachePreexisting ? "existing-cache" : "one-shot-factory")}; renderingStopped=True; InitializeSingleplayer/Push invocation=NO; drift=0.");
-            return StartupLadderPass(step, Step59Name, gate,
-                "Frozen off-tree character-select acquisition closed 4/4. Step 60 may isolate InitializeSingleplayer without invoking it.");
+            Checkpoint(checkpoint, "M59_D_PASS — real character-select screen retained visible/in-tree under the exact submenu stack; renderingStopped=True; drift=0.");
+            return StartupLadderPass(step, Step59Name, gate, "Real handler/state transition closed 4/4. Step 60 may audit the actual active screen instead of reproducing internal lifecycle milestones.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M59_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step59Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M59_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
     }
 
-    // STEP 60 — isolate and audit exact NCharacterSelectScreen.InitializeSingleplayer() without invoking it.
-
+    // STEP 60 — audit the active visible screen and its immediate frame/input surface.
     public TransformedRealStS2StartupLadderGateResult RunStep60ClosedStep59Authority(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 60;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
+        const int step = 60; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep60Prerequisite("Step 60 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 60.0 is non-invoking and requires rendering frozen.");
-            var selected = RequireStartupLadderSelectedAuthority(step);
-            _step60Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step60Baseline, "Step 60 Gate A");
-            RequireRetainedOffTreeCharacterSelect(step);
-            Checkpoint(checkpoint, "M60_A_PASS — Step-59 4/4 exact off-tree NCharacterSelectScreen authority retained; renderingStopped=True; InitializeSingleplayer not invoked.");
-            return StartupLadderPass(step, Step60Name, gate,
-                "Off-tree character-select authority retained. The exact InitializeSingleplayer method may be mapped without invocation.");
+            ThrowIfDisposed(); var context = RequireStep60Prerequisite("Step 60 Gate A entry"); if (!renderingStopped) throw new InvalidOperationException("Step 60.0 requires rendering frozen.");
+            var selected = RequireStartupLadderSelectedAuthority(step); _step60Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context); RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, _step60Baseline, "Step 60 Gate A");
+            Checkpoint(checkpoint, "M60_A_PASS — Step-59 visible/in-tree real character-select authority retained; renderingStopped=True.");
+            return StartupLadderPass(step, Step60Name, gate, "The actual active character-select subtree may now be audited for frame/input work before rendering is restarted.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M60_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step60Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M60_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step60Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep60InitializeSingleplayerBinding(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep60ActiveFrameInputAudit(Action<string>? checkpoint = null)
     {
-        const int step = 60;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
+        const int step = 60; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep60Prerequisite("Step 60 Gate B entry");
-            var baseline = _step60Baseline ?? throw new InvalidOperationException("Step 60.0 Gate A must pass before Gate B.");
-            using var resolver = new RejectingAssemblyResolver();
-            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
-            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
-            var characterType = RequireStartupLadderType(allTypes, CharacterSelectScreenManagedTypeFullName, step);
-            var initialize = RequireUniqueStartupLadderNamedMethod(characterType, CharacterSelectInitializeSingleplayerMethodName, step);
-            RequireZeroArgVoidMethod(initialize, step, CharacterSelectInitializeSingleplayerMethodName);
-            _step60InitializeMethodToken = initialize.MetadataToken.ToUInt32();
-            var screen = RequireRetainedOffTreeCharacterSelect(step);
-            var runtime = RequireRuntimeDeclaredMethodByToken(screen.GetType(), _step60InitializeMethodToken, CharacterSelectInitializeSingleplayerMethodName, step, parameterCount: 0, returnTypeFullName: "System.Void");
-            _step60RuntimeInitializeMethod = runtime;
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 60.0 binding unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            _step60StaticMap =
-                "StS2 Launcher — Step 60.0 exact character-select InitializeSingleplayer frontier\n" +
-                "Evidence-only. InitializeSingleplayer is not invoked by Step 60.\n" +
+            ThrowIfDisposed(); var context = RequireStep60Prerequisite("Step 60 Gate B entry"); var baseline = _step60Baseline ?? throw new InvalidOperationException("Step 60.0 Gate A must pass before Gate B.");
+            var screen = RequireVisibleInTreeCharacterSelectForOwnership(step, context);
+            var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
+            var nodeType = godotAssembly.GetType("Godot.Node", true, false)!;
+            var nodes = EnumerateStep39NodeGraph(screen, nodeType);
+            var managedTypes = GetSelectedManagedNodeTypeNamesForOwnership(nodes, screen.GetType().Assembly, context);
+            using var resolver = new RejectingAssemblyResolver(); using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
+            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal); var allMethods = BuildStartupLadderMethodMap(allTypes);
+            var roots = CollectStartupLadderActualNodeCallbackRoots(managedTypes, allTypes, Step40ImmediateFrameMethodNames);
+            var audit = AuditStartupLadderInvocationFrontier(roots, allTypes, allMethods, _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 60.0 requires retained Step-48 runtime guards."));
+            RequireImmediateFrontierAdmissible(audit, "Step 60.0 actual active character-select frame/input frontier under retained runtime guards");
+            if (resolver.Requests.Count != 0) throw new InvalidDataException("Step 60.0 frame/input audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+            _step60StaticMap = "StS2 Launcher — Step 60.0 active character-select surface audit\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                $"InitializeSingleplayer token=0x{_step60InitializeMethodToken:X8}; params=0; return=System.Void; IL={initialize.Body.Instructions.Count}\n" +
-                "Rendering restarted: NO\nInitializeSingleplayer invoked: NO\nPush invoked: NO\n" +
-                "[INITIALIZESINGLEPLAYER IL]\n" + string.Join("\n", initialize.Body.Instructions.Select(instruction => "  " + FormatStep41Instruction(instruction))) + "\n";
+                BuildCharacterSelectNodeAuditAppendixForOwnership("ACTUAL ACTIVE CHARACTER-SELECT FRAME/INPUT SURFACE", nodes, managedTypes, roots, audit) +
+                "Rendering restarted while map built: NO\nCharacter choice/confirm/run start authorized: NO\n";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 60 Gate B");
-            Checkpoint(checkpoint, $"M60_B_PASS — exact InitializeSingleplayer bound token=0x{_step60InitializeMethodToken:X8}; IL={initialize.Body.Instructions.Count}; invocation=NO; externalResolution=0.");
-            return StartupLadderPass(step, Step60Name, gate,
-                "Exact zero-argument void NCharacterSelectScreen.InitializeSingleplayer binding and IL recorded without invocation.");
+            Checkpoint(checkpoint, $"M60_B_PASS — activeNodes={nodes.Count}; managedTypes={managedTypes.Length}; frameInputRoots={roots.Length}; closure={audit.ImmediateClosureMethods.Length}; boundaries={audit.ImmediateBoundaries.Length}; guarded={audit.GuardedMethodFrontiers.Length}; deferred={audit.DeferredMethodFrontiers.Length}; immediate frontier admissible.");
+            return StartupLadderPass(step, Step60Name, gate, "Actual active character-select frame/input callback surface is admissible under retained runtime guards.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M60_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step60Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M60_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step60Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep60InitializeSingleplayerFrontierMap(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep60SceneConnectionInventory(Action<string>? checkpoint = null)
     {
-        const int step = 60;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
+        const int step = 60; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep60Prerequisite("Step 60 Gate C entry");
-            var baseline = _step60Baseline ?? throw new InvalidOperationException("Step 60.0 baseline absent.");
-            using var resolver = new RejectingAssemblyResolver();
-            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
-            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
-            var allMethods = BuildStartupLadderMethodMap(allTypes);
-            var initialize = FindMethodByToken(module, _step60InitializeMethodToken);
-            RequireZeroArgVoidMethod(initialize, step, CharacterSelectInitializeSingleplayerMethodName);
-            var audit = AuditStartupLadderInvocationFrontier([initialize], allTypes, allMethods,
-                _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 60.0 requires retained Step-48 runtime guards."));
-            RequireImmediateFrontierAdmissible(audit, "Step 60.0 exact InitializeSingleplayer frontier under retained runtime guards");
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 60.0 frontier audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            _step60StaticMap += BuildStartupLadderInvocationFrontierAppendix(audit);
-            _step60InitializeMapped = true;
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 60 Gate C");
-            Checkpoint(checkpoint, $"M60_C_PASS — InitializeSingleplayer frontier mapped without invocation; closureMethods={audit.ImmediateClosureMethods.Length}; boundaries={audit.ImmediateBoundaries.Length}; guarded={audit.GuardedMethodFrontiers.Length}; deferred={audit.DeferredMethodFrontiers.Length}; unresolved/external=0.");
-            return StartupLadderPass(step, Step60Name, gate,
-                $"InitializeSingleplayer execution-qualified frontier mapped without invocation: closure={audit.ImmediateClosureMethods.Length}; all immediate boundaries admissible under retained guards; deferred frontiers recorded separately.");
+            ThrowIfDisposed(); var context = RequireStep60Prerequisite("Step 60 Gate C entry"); var baseline = _step60Baseline ?? throw new InvalidOperationException("Step 60.0 baseline absent.");
+            if (string.IsNullOrWhiteSpace(_step60StaticMap)) throw new InvalidOperationException("Step 60.0 frame/input map absent.");
+            var pck = RequireEssentialResourcePackHandoff().PackAbsolutePath; var entry = ExtractStartupLadderPckEntryUnpinned(pck, _step57CharacterSelectResourcePath, step);
+            var text = new System.Text.UTF8Encoding(false, true).GetString(entry.Bytes).Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
+            var connections = text.Split('\n').Where(line => line.StartsWith("[connection ", StringComparison.Ordinal)).ToArray();
+            _step60StaticMap += "\n[TSCN SIGNAL CONNECTION INVENTORY — EVIDENCE ONLY]\n" + $"Connection records: {connections.Length}\n" + string.Join("\n", connections.Select(line => "  " + line)) + "\n";
+            _step60SurfaceMapped = true; RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, baseline, "Step 60 Gate C");
+            Checkpoint(checkpoint, $"M60_C_PASS — exact character-select TSCN connection inventory appended; connectionRecords={connections.Length}; no Godot load or handler invocation.");
+            return StartupLadderPass(step, Step60Name, gate, "Exact active subtree audit plus exact TSCN signal-connection inventory are now durable evidence for rendering; interaction remains unopened.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M60_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step60Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M60_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step60Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep60FrozenNoInitializationConfinement(bool renderingStopped, Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep60FrozenSurfaceConfinement(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 60;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
+        const int step = 60; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep60Prerequisite("Step 60 Gate D entry");
-            var baseline = _step60Baseline ?? throw new InvalidOperationException("Step 60.0 baseline absent.");
-            if (!_step60InitializeMapped || !_step60StaticMapDurablyWritten || !renderingStopped)
-                throw new InvalidOperationException("Step 60.0 Gate D requires durable non-invoking InitializeSingleplayer evidence with rendering frozen.");
-            RequireRetainedOffTreeCharacterSelect(step);
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 60 Gate D");
-            _exactStep60ClosurePassed = true;
-            Checkpoint(checkpoint, "M60_D_PASS — InitializeSingleplayer frontier durable; invocation=NO; NCharacterSelectScreen remains off-tree; renderingStopped=True; drift=0.");
-            return StartupLadderPass(step, Step60Name, gate,
-                "InitializeSingleplayer frontier closed 4/4 without invocation. Step 61 may invoke only this exact method once while the screen remains off-tree and rendering frozen.");
+            ThrowIfDisposed(); var context = RequireStep60Prerequisite("Step 60 Gate D entry"); var baseline = _step60Baseline ?? throw new InvalidOperationException("Step 60.0 baseline absent.");
+            if (!_step60SurfaceMapped || !_step60StaticMapDurablyWritten || !renderingStopped) throw new InvalidOperationException("Step 60.0 Gate D requires durable active-surface evidence with rendering frozen.");
+            RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, baseline, "Step 60 Gate D"); _exactStep60ClosurePassed = true;
+            Checkpoint(checkpoint, "M60_D_PASS — active character-select surface evidence durable; screen visible/in-tree; renderingStopped=True; drift=0.");
+            return StartupLadderPass(step, Step60Name, gate, "Active screen audit closed 4/4. Step 61 may perform a short visible render/refreeze without authorizing interaction.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M60_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step60Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M60_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step60Name, gate, stage, ex); }
     }
 
-    // STEP 61 — invoke exact InitializeSingleplayer once while the character-select screen remains off-tree.
-
+    // STEP 61 — short visible render residency, no intentional interaction.
     public TransformedRealStS2StartupLadderGateResult RunStep61ClosedStep60Authority(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 61;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
+        const int step = 61; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep61Prerequisite("Step 61 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 61.0 requires rendering frozen before one-shot initialization.");
-            var selected = RequireStartupLadderSelectedAuthority(step);
-            _step61Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step61Baseline, "Step 61 Gate A");
-            RequireRetainedOffTreeCharacterSelect(step);
-            Checkpoint(checkpoint, "M61_A_PASS — Step-60 4/4 InitializeSingleplayer frontier authority retained; character-select root off-tree; renderingStopped=True; one-shot initialization not armed.");
-            return StartupLadderPass(step, Step61Name, gate,
-                "Exact InitializeSingleplayer authority retained with the real character-select root still off-tree and rendering frozen.");
+            ThrowIfDisposed(); var context = RequireStep61Prerequisite("Step 61 Gate A entry"); if (!renderingStopped) throw new InvalidOperationException("Step 61.0 requires rendering frozen at entry.");
+            var selected = RequireStartupLadderSelectedAuthority(step); _step61Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context); RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, _step61Baseline, "Step 61 Gate A");
+            Checkpoint(checkpoint, "M61_A_PASS — Step-60 audited active character-select authority retained; renderer stopped; short render not armed.");
+            return StartupLadderPass(step, Step61Name, gate, "Audited active character-select state retained for one short visible render/refreeze residency.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M61_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step61Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M61_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step61Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep61InitializationRuntimeBinding(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep61RenderPreflight(Action<string>? checkpoint = null)
     {
-        const int step = 61;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
+        const int step = 61; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep61Prerequisite("Step 61 Gate B entry");
-            var baseline = _step61Baseline ?? throw new InvalidOperationException("Step 61.0 Gate A must pass before Gate B.");
-            var screen = RequireRetainedOffTreeCharacterSelect(step);
-            var runtime = RequireRuntimeDeclaredMethodByToken(screen.GetType(), _step60InitializeMethodToken, CharacterSelectInitializeSingleplayerMethodName, step, 0, "System.Void");
-            _step60RuntimeInitializeMethod = runtime;
-            _step61StaticMap =
-                "StS2 Launcher — Step 61.0 one-shot off-tree InitializeSingleplayer observation\n" +
-                $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                $"Runtime method: {runtime}; token=0x{runtime.MetadataToken:X8}\n" +
-                "Character-select inside tree before invocation: NO\nRendering restarted: NO\nPush invoked: NO\n";
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 61 Gate B");
-            Checkpoint(checkpoint, $"M61_B_PASS — exact runtime InitializeSingleplayer rebound token=0x{runtime.MetadataToken:X8}; screen off-tree; renderingStopped=True; invocation=NO.");
-            return StartupLadderPass(step, Step61Name, gate,
-                "Exact runtime InitializeSingleplayer method rebound against the retained off-tree screen. One-shot invocation remains unarmed until Gate C.");
+            ThrowIfDisposed(); var context = RequireStep61Prerequisite("Step 61 Gate B entry"); var baseline = _step61Baseline ?? throw new InvalidOperationException("Step 61.0 baseline absent."); var state = CaptureCurrentCharacterSelectState(step, context);
+            if (state.Screen is null || !state.State.InsideTree || !state.State.Visible || !state.State.VisibleInTree) throw new InvalidDataException($"Step 61.0 requires visible/in-tree screen before render; observed={state.State}.");
+            _step61StaticMap = "StS2 Launcher — Step 61.0 short character-select render preflight\n" + $"Before render: {state.State}\n" + $"Target residency ms: {Step61CharacterSelectRenderTargetMilliseconds}\n" + "Intentional user interaction authorized: NO\n";
+            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 61 Gate B"); Checkpoint(checkpoint, "M61_B_PASS — short render preflight complete; visible/in-tree screen retained; interaction remains unauthorized.");
+            return StartupLadderPass(step, Step61Name, gate, "Short-render preflight recorded without restarting rendering.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M61_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step61Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M61_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step61Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep61OffTreeInitialization(Action<string>? checkpoint = null)
+    public void BeginStep61BoundedRenderPulse(Action<string>? checkpoint = null)
     {
-        const int step = 61;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep61Prerequisite("Step 61 Gate C entry");
-            var baseline = _step61Baseline ?? throw new InvalidOperationException("Step 61.0 baseline absent.");
-            if (_step61InitializationStarted)
-                throw new InvalidOperationException("Step 61.0 InitializeSingleplayer boundary is one-shot in-process.");
-            var screen = RequireRetainedOffTreeCharacterSelect(step);
-            var runtime = _step60RuntimeInitializeMethod ?? throw new InvalidOperationException("Step 61.0 runtime InitializeSingleplayer binding absent.");
-            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 61 Gate C immediately before InitializeSingleplayer", requirePreAdmissionCounts: false);
-            var initializerBefore = context.InitializerBearingRequests.Count;
-            var rejectedBefore = context.RejectedManagedRequests.Count;
-            var nativeBefore = context.NativeLoadAttempts.Count;
-            _step61InitializationStarted = true;
-            Checkpoint(checkpoint, "M61_C_INITIALIZE_ARMED — first/only NCharacterSelectScreen.InitializeSingleplayer() invocation authorized off-tree with renderer frozen. Push/OpenCharacterSelect/rendering remain unauthorized.");
-            stage = "off-tree InitializeSingleplayer invocation";
-            InvokeStartupLadderMethod(runtime, screen, null, "Step 61 NCharacterSelectScreen.InitializeSingleplayer");
-            if (RequireZeroArgBoolMethod(screen.GetType(), "IsInsideTree").Invoke(screen, null) is not false)
-                throw new InvalidDataException("Step 61.0 InitializeSingleplayer unexpectedly admitted character select to the SceneTree.");
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 61.0 retained submenu stack absent.");
-            var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            if (!ReferenceEquals(cache.GetValue(stack), screen))
-                throw new InvalidDataException("Step 61.0 character-select cache identity drifted during initialization.");
-            RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 61 InitializeSingleplayer");
-            _step61PostInitializationBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
-            _step61InitializationPassed = true;
-            _step61StaticMap +=
-                "Initialization returned: YES\n" +
-                "Character-select inside tree after invocation: NO\n" +
-                "Character-select cache identity retained: YES\n" +
-                "Managed resolver/host/private/initializer/rejected/native escape: 0\n";
-            Checkpoint(checkpoint, "M61_C_PASS — InitializeSingleplayer returned once; character-select root remains off-tree; cache identity retained; resolver/native escape=0; Push/OpenCharacterSelect/rendering=NO.");
-            return StartupLadderPass(step, Step61Name, gate,
-                "Exact InitializeSingleplayer executed once off-tree and returned without tree admission or dynamic/native escape. Character-select root remains retained for a separately audited Push boundary.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M61_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step61Name, gate, stage, ex);
-        }
+        ThrowIfDisposed(); RequireStep61Prerequisite("Step 61 Gate C pulse start"); if (!_step61StaticMapDurablyWritten) throw new InvalidOperationException("Step 61.0 requires durable preflight before rendering."); if (_step61PulseStarted) throw new InvalidOperationException("Step 61.0 render residency is one-shot in-process.");
+        _step61PulseStarted = true; Checkpoint(checkpoint, $"M61_C_PULSE_ARMED — short character-select render residency authorized; target={Step61CharacterSelectRenderTargetMilliseconds}ms; ceiling={Step61CharacterSelectRenderEvidenceCeilingMilliseconds}ms; interaction remains unauthorized.");
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep61FrozenPostInitializationConfinement(bool renderingStopped, Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep61RenderPulseEvidence(bool startReturned, bool activeAfterStart, bool stopReturned, bool activeAfterStop, double elapsedMilliseconds, Action<string>? checkpoint = null)
+        => AcceptCharacterSelectRenderEvidence(61, Step61Name, _step61Baseline, ref _step61PostPulseBaseline, _step61PulseStarted, ref _step61PulsePassed, Step61CharacterSelectRenderTargetMilliseconds, Step61CharacterSelectRenderEvidenceCeilingMilliseconds, startReturned, activeAfterStart, stopReturned, activeAfterStop, elapsedMilliseconds, checkpoint);
+
+    public TransformedRealStS2StartupLadderGateResult RunStep61FrozenPostResidencyConfinement(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 61;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
+        const int step = 61; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep61Prerequisite("Step 61 Gate D entry");
-            var post = _step61PostInitializationBaseline ?? throw new InvalidOperationException("Step 61.0 post-initialization baseline absent.");
-            if (!_step61InitializationPassed || !_step61StaticMapDurablyWritten || !renderingStopped)
-                throw new InvalidOperationException("Step 61.0 Gate D requires successful one-shot initialization, durable observation map, and frozen rendering.");
-            RequireRetainedOffTreeCharacterSelect(step);
-            RequireStartupLadderBaselineUnchanged(context, post, "Step 61 Gate D");
-            _exactStep61ClosurePassed = true;
-            Checkpoint(checkpoint, "M61_D_PASS — initialized NCharacterSelectScreen retained off-tree; renderingStopped=True; Push invocation=NO; post-initialization drift=0.");
-            return StartupLadderPass(step, Step61Name, gate,
-                "Off-tree InitializeSingleplayer execution closed 4/4. Step 62 may map the exact NSubmenuStack.Push admission frontier without invoking it.");
+            ThrowIfDisposed(); var context = RequireStep61Prerequisite("Step 61 Gate D entry"); var post = _step61PostPulseBaseline ?? throw new InvalidOperationException("Step 61.0 post-pulse baseline absent."); if (!_step61PulsePassed || !renderingStopped) throw new InvalidOperationException("Step 61.0 Gate D requires successful short residency and rendering stopped.");
+            RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, post, "Step 61 Gate D"); _exactStep61ClosurePassed = true; Checkpoint(checkpoint, "M61_D_PASS — short visible render residency closed; screen retained visible/in-tree; renderingStopped=True; drift=0.");
+            return StartupLadderPass(step, Step61Name, gate, "Short visible render/refreeze closed 4/4. Step 62 may run a sustained observation residency so the real UI is plainly visible.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M61_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step61Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M61_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step61Name, gate, stage, ex); }
     }
 
-    // STEP 62 — isolate exact NSubmenuStack.Push(NSubmenu) plus actual initialized character-select lifecycle callbacks.
-
+    // STEP 62 — sustained visible render residency, still observational/no intentional input.
     public TransformedRealStS2StartupLadderGateResult RunStep62ClosedStep61Authority(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 62;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
+        const int step = 62; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep62Prerequisite("Step 62 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 62.0 is non-invoking and requires rendering frozen.");
-            var selected = RequireStartupLadderSelectedAuthority(step);
-            _step62Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step62Baseline, "Step 62 Gate A");
-            RequireRetainedOffTreeCharacterSelect(step);
-            Checkpoint(checkpoint, "M62_A_PASS — Step-61 4/4 initialized off-tree NCharacterSelectScreen authority retained; renderingStopped=True; Push not invoked.");
-            return StartupLadderPass(step, Step62Name, gate,
-                "Initialized off-tree character-select authority retained. The exact Push/tree-admission frontier may now be mapped without invocation.");
+            ThrowIfDisposed(); var context = RequireStep62Prerequisite("Step 62 Gate A entry"); if (!renderingStopped) throw new InvalidOperationException("Step 62.0 requires rendering frozen at entry.");
+            var selected = RequireStartupLadderSelectedAuthority(step); _step62Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context); RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, _step62Baseline, "Step 62 Gate A");
+            Checkpoint(checkpoint, "M62_A_PASS — Step-61 short render/refreeze authority retained; sustained residency not armed."); return StartupLadderPass(step, Step62Name, gate, "Stable short-render authority retained for a longer visible observation residency.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M62_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step62Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M62_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step62Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep62PushBinding(Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep62SustainedRenderPreflight(Action<string>? checkpoint = null)
     {
-        const int step = 62;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
+        const int step = 62; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep62Prerequisite("Step 62 Gate B entry");
-            var baseline = _step62Baseline ?? throw new InvalidOperationException("Step 62.0 Gate A must pass before Gate B.");
-            using var resolver = new RejectingAssemblyResolver();
-            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
-            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
-            var submenuType = RequireStartupLadderType(allTypes, SingleplayerSubmenuManagedTypeFullName, step);
-            var open = RequireUniqueStartupLadderNamedMethod(submenuType, SingleplayerOpenCharacterSelectMethodName, step);
-            var pushReference = FindExactCharacterSelectPushCall(open, step);
-            var pushDefinition = pushReference.Resolve() ?? throw new InvalidDataException("Step 62.0 Push reference did not resolve to a MethodDef.");
-            RequirePushDefinitionShape(pushDefinition, step);
-            _step62PushMethodToken = pushDefinition.MetadataToken.ToUInt32();
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 62.0 retained submenu stack absent.");
-            var runtimePush = RequireRuntimeMethodByToken(stack.GetType(), _step62PushMethodToken, SubmenuStackPushMethodName, step, parameterCount: 1, returnTypeFullName: "System.Void");
-            if (runtimePush.GetParameters()[0].ParameterType.FullName != SubmenuManagedTypeFullName)
-                throw new InvalidDataException($"Step 62.0 runtime Push parameter drifted: {runtimePush.GetParameters()[0].ParameterType.FullName}.");
-            _step62RuntimePushMethod = runtimePush;
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 62.0 Push binding unexpectedly attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            _step62StaticMap =
-                "StS2 Launcher — Step 62.0 exact character-select Push frontier\n" +
-                "Evidence-only. NSubmenuStack.Push is not invoked by Step 62.\n" +
-                $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                $"OpenCharacterSelect Push call: {pushReference.FullName}\n" +
-                $"Push token=0x{_step62PushMethodToken:X8}; IL={pushDefinition.Body.Instructions.Count}; runtime={runtimePush}\n" +
-                "Rendering restarted: NO\nPush invoked: NO\n" +
-                "[PUSH IL]\n" + string.Join("\n", pushDefinition.Body.Instructions.Select(instruction => "  " + FormatStep41Instruction(instruction))) + "\n";
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 62 Gate B");
-            Checkpoint(checkpoint, $"M62_B_PASS — exact Push bound token=0x{_step62PushMethodToken:X8}; IL={pushDefinition.Body.Instructions.Count}; invocation=NO; externalResolution=0.");
-            return StartupLadderPass(step, Step62Name, gate,
-                "Exact NSubmenuStack.Push(NSubmenu) call used by OpenCharacterSelect is rebound to the retained runtime stack without invocation.");
+            ThrowIfDisposed(); var context = RequireStep62Prerequisite("Step 62 Gate B entry"); var baseline = _step62Baseline ?? throw new InvalidOperationException("Step 62.0 baseline absent."); var screen = RequireVisibleInTreeCharacterSelectForOwnership(step, context);
+            var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly; var nodeType = godotAssembly.GetType("Godot.Node", true, false)!; var nodes = EnumerateStep39NodeGraph(screen, nodeType);
+            _step62StaticMap = "StS2 Launcher — Step 62.0 sustained character-select render preflight\n" + $"Visible subtree nodes before sustained render: {nodes.Count}\n" + $"Target residency ms: {Step62CharacterSelectSustainedRenderTargetMilliseconds}\n" + "Intentional user interaction authorized: NO\n" + "If this closes physically, the next candidate may move to continuous/interactive Godot ownership rather than more screen-by-screen reconstruction.\n";
+            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 62 Gate B"); Checkpoint(checkpoint, $"M62_B_PASS — sustained render preflight complete; nodes={nodes.Count}; interaction remains unauthorized."); return StartupLadderPass(step, Step62Name, gate, "Sustained visible render preflight recorded without restarting rendering.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M62_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step62Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M62_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step62Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep62PushAndLifecycleFrontierMap(Action<string>? checkpoint = null)
+    public void BeginStep62SustainedRenderPulse(Action<string>? checkpoint = null)
     {
-        const int step = 62;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
+        ThrowIfDisposed(); RequireStep62Prerequisite("Step 62 Gate C pulse start"); if (!_step62StaticMapDurablyWritten) throw new InvalidOperationException("Step 62.0 requires durable preflight before rendering."); if (_step62PulseStarted) throw new InvalidOperationException("Step 62.0 sustained render residency is one-shot in-process.");
+        _step62PulseStarted = true; Checkpoint(checkpoint, $"M62_C_PULSE_ARMED — sustained character-select render residency authorized; target={Step62CharacterSelectSustainedRenderTargetMilliseconds}ms; ceiling={Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds}ms; observation only, no intentional interaction.");
+    }
+
+    public TransformedRealStS2StartupLadderGateResult RunStep62SustainedRenderEvidence(bool startReturned, bool activeAfterStart, bool stopReturned, bool activeAfterStop, double elapsedMilliseconds, Action<string>? checkpoint = null)
+        => AcceptCharacterSelectRenderEvidence(62, Step62Name, _step62Baseline, ref _step62PostPulseBaseline, _step62PulseStarted, ref _step62PulsePassed, Step62CharacterSelectSustainedRenderTargetMilliseconds, Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds, startReturned, activeAfterStart, stopReturned, activeAfterStop, elapsedMilliseconds, checkpoint);
+
+    public TransformedRealStS2StartupLadderGateResult RunStep62FrozenPostResidencyConfinement(bool renderingStopped, Action<string>? checkpoint = null)
+    {
+        const int step = 62; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep62Prerequisite("Step 62 Gate C entry");
-            var baseline = _step62Baseline ?? throw new InvalidOperationException("Step 62.0 baseline absent.");
-            var screen = RequireRetainedOffTreeCharacterSelect(step);
-            using var resolver = new RejectingAssemblyResolver();
-            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
-            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
-            var allMethods = BuildStartupLadderMethodMap(allTypes);
-            var push = FindMethodByToken(module, _step62PushMethodToken);
-            RequirePushDefinitionShape(push, step);
-            var guards = _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 62.0 requires retained Step-48 runtime guards.");
-            var pushAudit = AuditStartupLadderInvocationFrontier([push], allTypes, allMethods, guards);
-            RequireImmediateFrontierAdmissible(pushAudit, "Step 62.0 exact Push frontier under retained runtime guards");
-
-            var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
-            var nodeType = godotAssembly.GetType("Godot.Node", true, false)!;
-            var nodes = EnumerateStep39NodeGraph(screen, nodeType);
-            var managedTypes = GetSelectedManagedNodeTypeNames(nodes, screen.GetType().Assembly, context);
-            var lifecycleRoots = CollectStartupLadderActualNodeCallbackRoots(managedTypes, allTypes, new[] { "_EnterTree", "_Ready", "_Notification" });
-            var lifecycleAudit = AuditStartupLadderInvocationFrontier(lifecycleRoots, allTypes, allMethods, guards);
-            RequireImmediateFrontierAdmissible(lifecycleAudit, "Step 62.0 initialized character-select lifecycle frontier under retained runtime guards");
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 62.0 Push/lifecycle audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            _step62StaticMap += "\n[PUSH EXECUTION FRONTIER]\n" + BuildStartupLadderInvocationFrontierAppendix(pushAudit) +
-                BuildCharacterSelectNodeAuditAppendix("INITIALIZED OFF-TREE CHARACTER-SELECT LIFECYCLE PRE-ADMISSION", nodes, managedTypes, lifecycleRoots, lifecycleAudit);
-            _step62PushMapped = true;
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 62 Gate C");
-            Checkpoint(checkpoint, $"M62_C_PASS — Push + initialized character-select lifecycle frontiers mapped without invocation; pushClosure={pushAudit.ImmediateClosureMethods.Length}; lifecycleRoots={lifecycleRoots.Length}; lifecycleClosure={lifecycleAudit.ImmediateClosureMethods.Length}; all immediate boundaries admissible; externalResolution=0.");
-            return StartupLadderPass(step, Step62Name, gate,
-                "Exact Push frontier and the actual initialized character-select lifecycle surface are both admissible under retained runtime guards. Push remains uninvoked.");
+            ThrowIfDisposed(); var context = RequireStep62Prerequisite("Step 62 Gate D entry"); var post = _step62PostPulseBaseline ?? throw new InvalidOperationException("Step 62.0 post-pulse baseline absent."); if (!_step62PulsePassed || !renderingStopped) throw new InvalidOperationException("Step 62.0 Gate D requires successful sustained residency and rendering stopped.");
+            RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, post, "Step 62 Gate D"); _exactStep62ClosurePassed = true; Checkpoint(checkpoint, "M62_D_PASS — sustained visible character-select residency closed and synchronously refroze; renderingStopped=True; drift=0.");
+            return StartupLadderPass(step, Step62Name, gate, "Sustained real character-select rendering closed 4/4. This candidate stops here; Step 63/continuous interactive ownership remains unopened.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M62_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step62Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M62_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step62Name, gate, stage, ex); }
     }
 
-    public TransformedRealStS2StartupLadderGateResult RunStep62FrozenNoAdmissionConfinement(bool renderingStopped, Action<string>? checkpoint = null)
+    private TransformedRealStS2StartupLadderGateResult AcceptCharacterSelectRenderEvidence(int step, string name, StartupLadderBaseline? baselineValue, ref StartupLadderBaseline? postBaseline, bool armed, ref bool passed, int targetMs, int ceilingMs, bool startReturned, bool activeAfterStart, bool stopReturned, bool activeAfterStop, double elapsedMilliseconds, Action<string>? checkpoint)
     {
-        const int step = 62;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
+        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction; var stage = "initialization";
         try
         {
-            ThrowIfDisposed();
-            var context = RequireStep62Prerequisite("Step 62 Gate D entry");
-            var baseline = _step62Baseline ?? throw new InvalidOperationException("Step 62.0 baseline absent.");
-            if (!_step62PushMapped || !_step62StaticMapDurablyWritten || !renderingStopped)
-                throw new InvalidOperationException("Step 62.0 Gate D requires durable Push/lifecycle evidence with rendering frozen.");
-            RequireRetainedOffTreeCharacterSelect(step);
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 62 Gate D");
-            _exactStep62ClosurePassed = true;
-            Checkpoint(checkpoint, "M62_D_PASS — Push/lifecycle frontier durable; NCharacterSelectScreen remains off-tree; Push invocation=NO; renderingStopped=True; drift=0.");
-            return StartupLadderPass(step, Step62Name, gate,
-                "Character-select Push frontier closed 4/4 without admission. Step 63 may invoke only the exact Push once while rendering remains frozen.");
+            ThrowIfDisposed(); var context = step == 61 ? RequireStep61Prerequisite($"Step {step} Gate C evidence") : RequireStep62Prerequisite($"Step {step} Gate C evidence"); var baseline = baselineValue ?? throw new InvalidOperationException($"Step {step}.0 baseline absent.");
+            if (!armed) throw new InvalidOperationException($"Step {step}.0 render evidence cannot be accepted before the one-shot residency is armed.");
+            if (!startReturned || !activeAfterStart || !stopReturned || activeAfterStop) throw new InvalidOperationException($"Step {step}.0 render state mismatch: startReturned={startReturned}; activeAfterStart={activeAfterStart}; stopReturned={stopReturned}; activeAfterStop={activeAfterStop}.");
+            if (elapsedMilliseconds < targetMs || elapsedMilliseconds > ceilingMs) throw new InvalidOperationException($"Step {step}.0 post-stop evidence outside accepted window. target={targetMs}; ceiling={ceilingMs}; observed={elapsedMilliseconds:F1}.");
+            RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, baseline, $"Step {step} Gate C post-stop"); postBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context); passed = true;
+            Checkpoint(checkpoint, $"M{step}_C_PASS — character-select render residency completed and synchronously refroze; elapsedMs={elapsedMilliseconds:F1}; visible/inTree=True; drift=0.");
+            return StartupLadderPass(step, name, gate, $"Real character-select UI rendered for {elapsedMilliseconds:F1} ms and synchronously refroze.");
         }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M62_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step62Name, gate, stage, ex);
-        }
-    }
-
-    // STEP 63 — invoke exact Push once while frozen and prove the real character-select screen is admitted/visible.
-
-    public TransformedRealStS2StartupLadderGateResult RunStep63ClosedStep62Authority(bool renderingStopped, Action<string>? checkpoint = null)
-    {
-        const int step = 63;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep63Prerequisite("Step 63 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 63.0 requires rendering frozen before one-shot Push admission.");
-            var selected = RequireStartupLadderSelectedAuthority(step);
-            _step63Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step63Baseline, "Step 63 Gate A");
-            RequireRetainedOffTreeCharacterSelect(step);
-            Checkpoint(checkpoint, "M63_A_PASS — Step-62 4/4 Push/lifecycle authority retained; character-select root off-tree; renderingStopped=True; Push not armed.");
-            return StartupLadderPass(step, Step63Name, gate,
-                "Exact Push/lifecycle authority retained with the initialized real character-select root still off-tree and rendering frozen.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M63_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step63Name, gate, stage, ex);
-        }
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep63FrozenAdmissionBinding(Action<string>? checkpoint = null)
-    {
-        const int step = 63;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep63Prerequisite("Step 63 Gate B entry");
-            var baseline = _step63Baseline ?? throw new InvalidOperationException("Step 63.0 Gate A must pass before Gate B.");
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 63.0 retained submenu stack absent.");
-            var screen = RequireRetainedOffTreeCharacterSelect(step);
-            var push = RequireRuntimeMethodByToken(stack.GetType(), _step62PushMethodToken, SubmenuStackPushMethodName, step, 1, "System.Void");
-            if (push.GetParameters()[0].ParameterType.FullName != SubmenuManagedTypeFullName || !push.GetParameters()[0].ParameterType.IsAssignableFrom(screen.GetType()))
-                throw new InvalidDataException($"Step 63.0 runtime Push parameter is not compatible with retained character-select root: {push}.");
-            _step62RuntimePushMethod = push;
-            _step63StackChildrenBefore = GetStartupLadderChildCount(stack);
-            _step63StaticMap =
-                "StS2 Launcher — Step 63.0 frozen character-select SceneTree admission\n" +
-                $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                $"Runtime Push: {push}; token=0x{push.MetadataToken:X8}\n" +
-                $"Retained stack children before Push: {_step63StackChildrenBefore}\n" +
-                "Character-select inside tree before Push: NO\nRendering restarted: NO\nOpenCharacterSelect invoked: NO\n";
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 63 Gate B");
-            Checkpoint(checkpoint, $"M63_B_PASS — exact runtime Push rebound token=0x{push.MetadataToken:X8}; stackChildrenBefore={_step63StackChildrenBefore}; screenOffTree=True; admission=NO; renderingStopped=True.");
-            return StartupLadderPass(step, Step63Name, gate,
-                "Exact runtime Push binding and pre-admission stack shape captured. One-shot tree admission remains unarmed until Gate C.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M63_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step63Name, gate, stage, ex);
-        }
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep63FrozenCharacterSelectAdmission(Action<string>? checkpoint = null)
-    {
-        const int step = 63;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep63Prerequisite("Step 63 Gate C entry");
-            var baseline = _step63Baseline ?? throw new InvalidOperationException("Step 63.0 baseline absent.");
-            if (_step63AdmissionStarted)
-                throw new InvalidOperationException("Step 63.0 Push admission boundary is one-shot in-process.");
-            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 63.0 retained submenu stack absent.");
-            var screen = RequireRetainedOffTreeCharacterSelect(step);
-            var push = _step62RuntimePushMethod ?? throw new InvalidOperationException("Step 63.0 runtime Push binding absent.");
-            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 63 Gate C immediately before Push", requirePreAdmissionCounts: false);
-            var initializerBefore = context.InitializerBearingRequests.Count;
-            var rejectedBefore = context.RejectedManagedRequests.Count;
-            var nativeBefore = context.NativeLoadAttempts.Count;
-            _step63AdmissionStarted = true;
-            Checkpoint(checkpoint, $"M63_C_PUSH_ARMED — first/only NSubmenuStack.Push(characterSelect) authorized while renderer remains frozen; stackChildrenBefore={_step63StackChildrenBefore}. Automatic audited lifecycle only; OpenCharacterSelect/rendering remain unauthorized.");
-            stage = "frozen NSubmenuStack.Push(characterSelect)";
-            InvokeStartupLadderMethod(push, stack, new object?[] { screen }, "Step 63 NSubmenuStack.Push(characterSelect)");
-            if (RequireZeroArgBoolMethod(screen.GetType(), "IsInsideTree").Invoke(screen, null) is not true)
-                throw new InvalidDataException("Step 63.0 Push returned but character-select root reports IsInsideTree=false.");
-            var getParent = RequireZeroArgRuntimeMethod(screen.GetType(), "GetParent", step);
-            var parent = InvokeStartupLadderMethod(getParent, screen, null, "Step 63 character-select GetParent");
-            if (!ReferenceEquals(parent, stack))
-                throw new InvalidDataException($"Step 63.0 character-select parent is not the exact retained submenu stack; observed={parent?.GetType().FullName ?? "null"}.");
-            if (!RequireRuntimeBoolProperty(screen, "Visible", step) || RequireZeroArgBoolMethod(screen.GetType(), "IsVisibleInTree").Invoke(screen, null) is not true)
-                throw new InvalidDataException("Step 63.0 admitted character-select root is not visible/in-tree after Push.");
-            var childrenAfter = GetStartupLadderChildCount(stack);
-            if (childrenAfter < _step63StackChildrenBefore + 1)
-                throw new InvalidDataException($"Step 63.0 Push did not increase retained stack child count as expected; before={_step63StackChildrenBefore}; after={childrenAfter}.");
-            RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 63 Push admission");
-            _step63PostAdmissionBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
-            _step63AdmissionPassed = true;
-            _step63StaticMap +=
-                $"Retained stack children after Push: {childrenAfter}\n" +
-                "Character-select inside tree after Push: YES\n" +
-                "Character-select parent is exact retained stack: YES\n" +
-                "Character-select Visible/IsVisibleInTree: YES/YES\n" +
-                "Managed resolver/host/private/initializer/rejected/native escape: 0\n";
-            Checkpoint(checkpoint, $"M63_C_PASS — exact initialized NCharacterSelectScreen admitted once through Push; parentExactStack=True; visible/inTree=True; stackChildren={_step63StackChildrenBefore}->{childrenAfter}; renderingStopped=True; context/native drift=0.");
-            return StartupLadderPass(step, Step63Name, gate,
-                "Real initialized NCharacterSelectScreen was admitted once through the exact audited Push boundary and is visible/in-tree while rendering remains frozen.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M63_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step63Name, gate, stage, ex);
-        }
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep63FrozenPostAdmissionConfinement(bool renderingStopped, Action<string>? checkpoint = null)
-    {
-        const int step = 63;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep63Prerequisite("Step 63 Gate D entry");
-            var post = _step63PostAdmissionBaseline ?? throw new InvalidOperationException("Step 63.0 post-admission baseline absent.");
-            if (!_step63AdmissionPassed || !_step63StaticMapDurablyWritten || !renderingStopped)
-                throw new InvalidOperationException("Step 63.0 Gate D requires successful frozen admission, durable map, and rendering stopped.");
-            RequireVisibleInTreeCharacterSelect(step);
-            RequireStartupLadderBaselineUnchanged(context, post, "Step 63 Gate D");
-            _exactStep63ClosurePassed = true;
-            Checkpoint(checkpoint, "M63_D_PASS — real NCharacterSelectScreen retained visible/in-tree under exact submenu stack; renderingStopped=True; Push one-shot complete; drift=0.");
-            return StartupLadderPass(step, Step63Name, gate,
-                "Frozen character-select SceneTree admission closed 4/4. Step 64 may audit the actual frame/input surface and perform one bounded render/refreeze residency.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M63_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step63Name, gate, stage, ex);
-        }
-    }
-
-    // STEP 64 — audit the actual in-tree character-select frame/input surface, then render once and refreeze.
-
-    public TransformedRealStS2StartupLadderGateResult RunStep64ClosedStep63Authority(bool renderingStopped, Action<string>? checkpoint = null)
-    {
-        const int step = 64;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep64Prerequisite("Step 64 Gate A entry");
-            if (!renderingStopped)
-                throw new InvalidOperationException("Step 64.0 requires rendering frozen before frame/input audit.");
-            var selected = RequireStartupLadderSelectedAuthority(step);
-            _step64Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step64Baseline, "Step 64 Gate A");
-            RequireVisibleInTreeCharacterSelect(step);
-            Checkpoint(checkpoint, "M64_A_PASS — Step-63 4/4 frozen character-select admission retained; real NCharacterSelectScreen visible/in-tree; renderer stopped; pulse not armed.");
-            return StartupLadderPass(step, Step64Name, gate,
-                "Frozen real character-select admission retained. Its actual frame/input callback surface may now be audited before any render restart.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M64_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step64Name, gate, stage, ex);
-        }
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep64CharacterSelectFrameInputAudit(Action<string>? checkpoint = null)
-    {
-        const int step = 64;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep64Prerequisite("Step 64 Gate B entry");
-            var baseline = _step64Baseline ?? throw new InvalidOperationException("Step 64.0 Gate A must pass before Gate B.");
-            var screen = RequireVisibleInTreeCharacterSelect(step);
-            var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("GodotSharp handoff absent.")).GodotSharpAssembly;
-            var nodeType = godotAssembly.GetType("Godot.Node", true, false)!;
-            var nodes = EnumerateStep39NodeGraph(screen, nodeType);
-            var managedTypes = GetSelectedManagedNodeTypeNames(nodes, screen.GetType().Assembly, context);
-            using var resolver = new RejectingAssemblyResolver();
-            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
-            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
-            var allMethods = BuildStartupLadderMethodMap(allTypes);
-            var roots = CollectStartupLadderActualNodeCallbackRoots(managedTypes, allTypes, Step40ImmediateFrameMethodNames);
-            var audit = AuditStartupLadderInvocationFrontier(roots, allTypes, allMethods,
-                _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 64.0 requires retained Step-48 runtime guards."));
-            RequireImmediateFrontierAdmissible(audit, "Step 64.0 actual in-tree character-select frame/input frontier under retained runtime guards");
-            if (resolver.Requests.Count != 0)
-                throw new InvalidDataException("Step 64.0 frame/input audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            _step64StaticMap =
-                "StS2 Launcher — Step 64.0 actual character-select frame/input render map\n" +
-                $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
-                BuildCharacterSelectNodeAuditAppendix("ACTUAL IN-TREE CHARACTER-SELECT FRAME/INPUT SURFACE", nodes, managedTypes, roots, audit) +
-                "Rendering restarted while map built: NO\nOpenCharacterSelect invoked: NO\n";
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 64 Gate B");
-            Checkpoint(checkpoint, $"M64_B_PASS — inTreeCharacterSelectNodes={nodes.Count}; managedTypes={managedTypes.Length}; frameInputRoots={roots.Length}; closure={audit.ImmediateClosureMethods.Length}; boundaries={audit.ImmediateBoundaries.Length}; guarded={audit.GuardedMethodFrontiers.Length}; deferred={audit.DeferredMethodFrontiers.Length}; all immediate boundaries admissible; rendering remains stopped.");
-            return StartupLadderPass(step, Step64Name, gate,
-                $"Actual in-tree character-select frame/input surface mapped: nodes={nodes.Count}; managed types={managedTypes.Length}; immediate roots={roots.Length}; closure={audit.ImmediateClosureMethods.Length}; render pulse not yet started.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M64_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step64Name, gate, stage, ex);
-        }
-    }
-
-    public void BeginStep64BoundedRenderPulse(Action<string>? checkpoint = null)
-    {
-        ThrowIfDisposed();
-        RequireStep64Prerequisite("Step 64 Gate C pulse start");
-        if (!_step64StaticMapDurablyWritten || string.IsNullOrWhiteSpace(_step64StaticMap))
-            throw new InvalidOperationException("Step 64.0 requires its exact frame/input map durably written before rendering starts.");
-        if (_step64PulseStarted)
-            throw new InvalidOperationException("Step 64.0 render pulse is one-shot in-process.");
-        _step64PulseStarted = true;
-        Checkpoint(checkpoint, $"M64_C_PULSE_ARMED — first/only character-select render residency authorized; requested stop delay={Step64CharacterSelectRenderTargetMilliseconds}ms; evidence ceiling={Step64CharacterSelectRenderEvidenceCeilingMilliseconds}ms. First managed continuation must StopRendering before telemetry.");
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep64CharacterSelectRenderPulseEvidence(bool startReturned, bool activeAfterStart, bool stopReturned, bool activeAfterStop, double elapsedMilliseconds, Action<string>? checkpoint = null)
-    {
-        const int step = 64;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep64Prerequisite("Step 64 Gate C evidence");
-            var baseline = _step64Baseline ?? throw new InvalidOperationException("Step 64.0 baseline absent.");
-            if (!_step64PulseStarted)
-                throw new InvalidOperationException("Step 64.0 render pulse evidence cannot be accepted before the one-shot pulse is armed.");
-            if (!startReturned || !activeAfterStart || !stopReturned || activeAfterStop)
-                throw new InvalidOperationException($"Step 64.0 render pulse state mismatch: startReturned={startReturned}; activeAfterStart={activeAfterStart}; stopReturned={stopReturned}; activeAfterStop={activeAfterStop}.");
-            if (elapsedMilliseconds < Step64CharacterSelectRenderTargetMilliseconds || elapsedMilliseconds > Step64CharacterSelectRenderEvidenceCeilingMilliseconds)
-                throw new InvalidOperationException($"Step 64.0 post-stop evidence outside accepted window. target={Step64CharacterSelectRenderTargetMilliseconds}; ceiling={Step64CharacterSelectRenderEvidenceCeilingMilliseconds}; observed={elapsedMilliseconds:F1}.");
-            RequireVisibleInTreeCharacterSelect(step);
-            RequireStartupLadderBaselineUnchanged(context, baseline, "Step 64 Gate C post-stop");
-            _step64PostPulseBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
-            _step64PulsePassed = true;
-            Checkpoint(checkpoint, $"M64_C_PASS — character-select render residency completed and synchronously refroze; elapsedMs={elapsedMilliseconds:F1}; start/active/stop/frozen=True/True/True/True; characterSelectVisible=True; drift=0.");
-            return StartupLadderPass(step, Step64Name, gate,
-                $"Real character-select UI rendered for {elapsedMilliseconds:F1} ms and synchronously refroze inside the accepted evidence window.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M64_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step64Name, gate, stage, ex);
-        }
-    }
-
-    public TransformedRealStS2StartupLadderGateResult RunStep64FrozenPostResidencyConfinement(bool renderingStopped, Action<string>? checkpoint = null)
-    {
-        const int step = 64;
-        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PostActionConfinement;
-        var stage = "initialization";
-        try
-        {
-            ThrowIfDisposed();
-            var context = RequireStep64Prerequisite("Step 64 Gate D entry");
-            var post = _step64PostPulseBaseline ?? throw new InvalidOperationException("Step 64.0 post-pulse baseline absent.");
-            if (!_step64PulsePassed || !renderingStopped)
-                throw new InvalidOperationException("Step 64.0 Gate D requires successful bounded render residency and rendering stopped.");
-            RequireVisibleInTreeCharacterSelect(step);
-            RequireStartupLadderBaselineUnchanged(context, post, "Step 64 Gate D");
-            _exactStep64ClosurePassed = true;
-            Checkpoint(checkpoint, "M64_D_PASS — real NCharacterSelectScreen retained visible/in-tree after bounded render residency; renderingStopped=True; post-pulse drift=0.");
-            return StartupLadderPass(step, Step64Name, gate,
-                "Character-select render residency closed 4/4 with synchronous refreeze and retained visible/in-tree authority. No run-start/embark action is opened by this candidate.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M64_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-            return StartupLadderFail(step, Step64Name, gate, stage, ex);
-        }
+        catch (Exception ex) { Checkpoint(checkpoint, $"M{step}_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, name, gate, stage, ex); }
     }
 
     private Step35ExecutionLoadContext RequireStep58Prerequisite(string boundary)
     {
-        var context = RequireStep57Prerequisite(boundary);
-        if (!_exactStep57ClosurePassed || !_step57PreflightMapped || !_step57StaticMapDurablyWritten)
-            throw new InvalidOperationException(boundary + " requires same-process Step-57 4/4 durable retained-PackedScene/PCK character-select preflight authority.");
-        return context;
+        var context = RequireStep57Prerequisite(boundary); if (!_exactStep57ClosurePassed || !_step57PreflightMapped || !_step57StaticMapDurablyWritten) throw new InvalidOperationException(boundary + " requires same-process Step-57 4/4 durable retained-PackedScene/PCK authority."); return context;
     }
-
     private Step35ExecutionLoadContext RequireStep59Prerequisite(string boundary)
     {
-        var context = RequireStep58Prerequisite(boundary);
-        if (!_exactStep58ClosurePassed || !_step58FactoryMapped || !_step58StaticMapDurablyWritten)
-            throw new InvalidOperationException(boundary + " requires same-process Step-58 4/4 durable non-invoking character-select factory authority.");
-        return context;
+        var context = RequireStep58Prerequisite(boundary); if (!_exactStep58ClosurePassed || !_step58OwnershipMapped || !_step58StaticMapDurablyWritten) throw new InvalidOperationException(boundary + " requires same-process Step-58 4/4 durable runtime-ownership authority."); return context;
     }
-
     private Step35ExecutionLoadContext RequireStep60Prerequisite(string boundary)
     {
-        var context = RequireStep59Prerequisite(boundary);
-        if (!_exactStep59ClosurePassed || !_step59CreationPassed || !_step59StaticMapDurablyWritten)
-            throw new InvalidOperationException(boundary + " requires same-process Step-59 4/4 exact off-tree NCharacterSelectScreen creation authority.");
-        return context;
+        var context = RequireStep59Prerequisite(boundary); if (!_exactStep59ClosurePassed || !_step59TransitionPassed || !_step59StaticMapDurablyWritten) throw new InvalidOperationException(boundary + " requires same-process Step-59 4/4 visible/in-tree game-owned character-select authority."); return context;
     }
-
     private Step35ExecutionLoadContext RequireStep61Prerequisite(string boundary)
     {
-        var context = RequireStep60Prerequisite(boundary);
-        if (!_exactStep60ClosurePassed || !_step60InitializeMapped || !_step60StaticMapDurablyWritten)
-            throw new InvalidOperationException(boundary + " requires same-process Step-60 4/4 durable non-invoking InitializeSingleplayer authority.");
-        return context;
+        var context = RequireStep60Prerequisite(boundary); if (!_exactStep60ClosurePassed || !_step60SurfaceMapped || !_step60StaticMapDurablyWritten) throw new InvalidOperationException(boundary + " requires same-process Step-60 4/4 durable active character-select surface audit."); return context;
     }
-
     private Step35ExecutionLoadContext RequireStep62Prerequisite(string boundary)
     {
-        var context = RequireStep61Prerequisite(boundary);
-        if (!_exactStep61ClosurePassed || !_step61InitializationPassed || !_step61StaticMapDurablyWritten)
-            throw new InvalidOperationException(boundary + " requires same-process Step-61 4/4 initialized off-tree NCharacterSelectScreen authority.");
-        return context;
+        var context = RequireStep61Prerequisite(boundary); if (!_exactStep61ClosurePassed || !_step61PulsePassed) throw new InvalidOperationException(boundary + " requires same-process Step-61 4/4 short visible render/refreeze authority."); return context;
     }
 
-    private Step35ExecutionLoadContext RequireStep63Prerequisite(string boundary)
+    private object RequireRetainedCharacterSelectPackedSceneForOwnership(int step)
     {
-        var context = RequireStep62Prerequisite(boundary);
-        if (!_exactStep62ClosurePassed || !_step62PushMapped || !_step62StaticMapDurablyWritten)
-            throw new InvalidOperationException(boundary + " requires same-process Step-62 4/4 durable Push/lifecycle frontier authority.");
-        return context;
+        var stack = _step54SubmenuStack ?? throw new InvalidOperationException($"Step {step}.0 retained submenu stack is absent."); var sceneField = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step); var packedScene = sceneField.GetValue(stack) ?? throw new InvalidDataException($"Step {step}.0 retained character-select PackedScene is null.");
+        var resourcePath = RequireRuntimeStringProperty(packedScene, GodotResourcePathPropertyName, step).Replace('\\', '/'); if (!string.Equals(resourcePath, CharacterSelectSceneResourcePath, StringComparison.Ordinal)) throw new InvalidDataException($"Step {step}.0 retained character-select PackedScene path drifted: {resourcePath}."); return packedScene;
     }
 
-    private Step35ExecutionLoadContext RequireStep64Prerequisite(string boundary)
+    private (object? Screen, CharacterSelectRuntimeState State) CaptureCurrentCharacterSelectState(int step, Step35ExecutionLoadContext context)
     {
-        var context = RequireStep63Prerequisite(boundary);
-        if (!_exactStep63ClosurePassed || !_step63AdmissionPassed || !_step63StaticMapDurablyWritten)
-            throw new InvalidOperationException(boundary + " requires same-process Step-63 4/4 frozen visible/in-tree NCharacterSelectScreen authority.");
-        return context;
+        var stack = _step54SubmenuStack ?? throw new InvalidOperationException($"Step {step}.0 retained submenu stack is absent."); var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step); var screen = cache.GetValue(stack); if (screen is null) return (null, CharacterSelectRuntimeState.Absent); RequireCharacterSelectIdentity(screen, stack, context, step); return (screen, CaptureCharacterSelectRuntimeState(screen, stack, step));
     }
 
-    private object RequireRetainedCharacterSelectPackedScene(int step)
+    private void RequireStep58ObservedStateUnchanged(Step35ExecutionLoadContext context, int step)
     {
-        var stack = _step54SubmenuStack ?? throw new InvalidOperationException($"Step {step}.0 retained NMainMenuSubmenuStack is absent.");
-        var sceneField = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step);
-        var packedScene = sceneField.GetValue(stack) ?? throw new InvalidDataException($"Step {step}.0 retained character-select PackedScene is null.");
-        var resourcePath = RequireRuntimeStringProperty(packedScene, GodotResourcePathPropertyName, step).Replace('\\', '/');
-        if (!string.Equals(resourcePath, CharacterSelectSceneResourcePath, StringComparison.Ordinal))
-            throw new InvalidDataException($"Step {step}.0 retained character-select PackedScene path drifted: {resourcePath}.");
-        return packedScene;
+        var current = CaptureCurrentCharacterSelectState(step, context); if (!ReferenceEquals(current.Screen, _step58ObservedCharacterSelect)) throw new InvalidDataException($"Step {step}.0 character-select cache identity changed during non-mutating Step 58."); if (_step58ObservedState is null || !current.State.Equals(_step58ObservedState.Value)) throw new InvalidDataException($"Step {step}.0 character-select runtime state changed during non-mutating Step 58. before={_step58ObservedState}; after={current.State}.");
     }
 
-    private object RequireRetainedOffTreeCharacterSelect(int step)
+    private object RequireVisibleInTreeCharacterSelectForOwnership(int step, Step35ExecutionLoadContext context)
     {
-        var screen = _step59CharacterSelectScreen ?? throw new InvalidOperationException($"Step {step}.0 retained NCharacterSelectScreen is absent.");
-        if (screen.GetType().FullName != CharacterSelectScreenManagedTypeFullName)
-            throw new InvalidDataException($"Step {step}.0 retained character-select type drifted: {screen.GetType().FullName}.");
-        if (RequireZeroArgBoolMethod(screen.GetType(), "IsInsideTree").Invoke(screen, null) is not false)
-            throw new InvalidDataException($"Step {step}.0 requires retained NCharacterSelectScreen to remain off-tree.");
-        var stack = _step54SubmenuStack ?? throw new InvalidOperationException($"Step {step}.0 retained submenu stack is absent.");
-        var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-        if (!ReferenceEquals(cache.GetValue(stack), screen))
-            throw new InvalidDataException($"Step {step}.0 retained character-select cache identity drifted.");
-        return screen;
+        var current = CaptureCurrentCharacterSelectState(step, context); var screen = current.Screen ?? throw new InvalidOperationException($"Step {step}.0 retained character-select screen is absent."); if (!current.State.InsideTree || !current.State.Visible || !current.State.VisibleInTree || !current.State.ParentIsExactStack) throw new InvalidDataException($"Step {step}.0 requires visible/in-tree character-select authority under exact stack; observed={current.State}."); _step59CharacterSelectScreen = screen; return screen;
     }
 
-    private object RequireVisibleInTreeCharacterSelect(int step)
+    private static void RequireCharacterSelectIdentity(object screen, object stack, AssemblyLoadContext context, int step)
     {
-        var screen = _step59CharacterSelectScreen ?? throw new InvalidOperationException($"Step {step}.0 retained NCharacterSelectScreen is absent.");
-        if (screen.GetType().FullName != CharacterSelectScreenManagedTypeFullName)
-            throw new InvalidDataException($"Step {step}.0 retained character-select type drifted: {screen.GetType().FullName}.");
-        if (RequireZeroArgBoolMethod(screen.GetType(), "IsInsideTree").Invoke(screen, null) is not true ||
-            RequireZeroArgBoolMethod(screen.GetType(), "IsVisibleInTree").Invoke(screen, null) is not true ||
-            !RequireRuntimeBoolProperty(screen, "Visible", step))
-            throw new InvalidDataException($"Step {step}.0 requires retained visible/in-tree NCharacterSelectScreen authority.");
-        var stack = _step54SubmenuStack ?? throw new InvalidOperationException($"Step {step}.0 retained submenu stack is absent.");
-        var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-        if (!ReferenceEquals(cache.GetValue(stack), screen))
-            throw new InvalidDataException($"Step {step}.0 retained character-select cache identity drifted.");
-        return screen;
+        if (screen.GetType().FullName != CharacterSelectScreenManagedTypeFullName) throw new InvalidDataException($"Step {step}.0 character-select cache type drifted: {screen.GetType().FullName}.");
+        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(screen.GetType().Assembly), context)) throw new InvalidDataException($"Step {step}.0 character-select cache is not owned by the exact private load context.");
+        var stackField = RequireRuntimeExactInstanceField(screen.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step); if (!ReferenceEquals(stackField.GetValue(screen), stack)) throw new InvalidDataException($"Step {step}.0 character-select NSubmenu._stack identity drifted.");
     }
 
-    private static GenericInstanceMethod FindExactCharacterSelectFactoryCall(MethodDefinition open, int step)
+    private static CharacterSelectRuntimeState CaptureCharacterSelectRuntimeState(object screen, object stack, int step)
     {
-        var calls = open.Body.Instructions
-            .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt)
-            .Select(instruction => instruction.Operand)
-            .OfType<GenericInstanceMethod>()
-            .Where(method => method.Name == GetSubmenuTypeMethodName && method.GenericArguments.Count == 1 &&
-                             method.GenericArguments[0].FullName == CharacterSelectScreenManagedTypeFullName)
-            .ToArray();
-        return calls.SingleOrDefault()
-            ?? throw new InvalidDataException($"Step {step}.0 requires exactly one GetSubmenuType<{CharacterSelectScreenManagedTypeFullName}> call in OpenCharacterSelect; observed={calls.Length}.");
-    }
-
-    private static MethodReference FindExactCharacterSelectPushCall(MethodDefinition open, int step)
-    {
-        var calls = open.Body.Instructions
-            .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt)
-            .Select(instruction => instruction.Operand)
-            .OfType<MethodReference>()
-            .Where(method => method.Name == SubmenuStackPushMethodName && method.Parameters.Count == 1 &&
-                             method.Parameters[0].ParameterType.FullName == SubmenuManagedTypeFullName &&
-                             method.ReturnType.FullName == "System.Void")
-            .ToArray();
-        return calls.SingleOrDefault()
-            ?? throw new InvalidDataException($"Step {step}.0 requires exactly one void Push({SubmenuManagedTypeFullName}) call in OpenCharacterSelect; observed={calls.Length}.");
-    }
-
-    private static MethodDefinition RequireConcreteCharacterSelectFactoryDefinition(IReadOnlyDictionary<string, TypeDefinition> allTypes, int step)
-    {
-        var stack = RequireStartupLadderType(allTypes, MainMenuSubmenuStackManagedTypeFullName, step);
-        var candidates = stack.Methods.Where(method => method.Name == GetSubmenuTypeMethodName && method.GenericParameters.Count == 1 && method.Parameters.Count == 0).ToArray();
-        var method = candidates.SingleOrDefault()
-            ?? throw new InvalidDataException($"Step {step}.0 requires exactly one concrete {MainMenuSubmenuStackManagedTypeFullName}.{GetSubmenuTypeMethodName}<T>(); observed={candidates.Length}.");
-        RequireCharacterSelectFactoryShape(method, step);
-        return method;
-    }
-
-    private static void RequireCharacterSelectFactoryShape(MethodDefinition method, int step)
-    {
-        if (method.IsStatic || !method.HasBody || method.GenericParameters.Count != 1 || method.Parameters.Count != 0 || method.ReturnType is not GenericParameter)
-            throw new InvalidDataException($"Step {step}.0 character-select factory shape drifted: {method.FullName}.");
-    }
-
-    private static FieldDefinition RequireUniqueExactInstanceField(TypeDefinition type, string fieldName, string expectedTypeFullName, int step)
-    {
-        var fields = type.Fields.Where(field => field.Name == fieldName).ToArray();
-        var field = fields.SingleOrDefault()
-            ?? throw new InvalidDataException($"Step {step}.0 requires exactly one {type.FullName}.{fieldName}; observed={fields.Length}.");
-        if (field.IsStatic || field.FieldType.FullName != expectedTypeFullName)
-            throw new InvalidDataException($"Step {step}.0 field {field.FullName} must be instance {expectedTypeFullName}; static={field.IsStatic}; observed={field.FieldType.FullName}.");
-        return field;
-    }
-
-    private static MethodInfo RequireRuntimeGenericMethodDefinitionByToken(Type runtimeType, uint token, string methodName, int step)
-    {
-        var methods = EnumerateRuntimeMethods(runtimeType)
-            .Where(method => method.Name == methodName && method.IsGenericMethodDefinition && method.GetGenericArguments().Length == 1 && method.GetParameters().Length == 0 && (uint)method.MetadataToken == token)
-            .ToArray();
-        return methods.SingleOrDefault()
-            ?? throw new MissingMethodException(runtimeType.FullName, $"Step {step}.0 {methodName}<T>() token=0x{token:X8}; candidates={string.Join(" | ", EnumerateRuntimeMethods(runtimeType).Where(method => method.Name == methodName).Select(method => $"0x{method.MetadataToken:X8}:{method}"))}");
-    }
-
-    private static MethodInfo RequireRuntimeDeclaredMethodByToken(Type runtimeType, uint token, string methodName, int step, int parameterCount, string returnTypeFullName)
-    {
-        var methods = runtimeType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
-            .Where(method => method.Name == methodName && !method.IsGenericMethod && method.GetParameters().Length == parameterCount && method.ReturnType.FullName == returnTypeFullName && (uint)method.MetadataToken == token)
-            .ToArray();
-        return methods.SingleOrDefault()
-            ?? throw new MissingMethodException(runtimeType.FullName, $"Step {step}.0 {methodName} token=0x{token:X8}");
-    }
-
-    private static MethodInfo RequireRuntimeMethodByToken(Type runtimeType, uint token, string methodName, int step, int parameterCount, string returnTypeFullName)
-    {
-        var methods = EnumerateRuntimeMethods(runtimeType)
-            .Where(method => method.Name == methodName && !method.IsGenericMethod && method.GetParameters().Length == parameterCount && method.ReturnType.FullName == returnTypeFullName && (uint)method.MetadataToken == token)
-            .ToArray();
-        return methods.SingleOrDefault()
-            ?? throw new MissingMethodException(runtimeType.FullName, $"Step {step}.0 {methodName} token=0x{token:X8}; candidates={string.Join(" | ", EnumerateRuntimeMethods(runtimeType).Where(method => method.Name == methodName).Select(method => $"0x{method.MetadataToken:X8}:{method}"))}");
-    }
-
-    private static IEnumerable<MethodInfo> EnumerateRuntimeMethods(Type type)
-    {
-        for (var current = type; current is not null; current = current.BaseType)
+        var inside = Convert.ToBoolean(RequireZeroArgBoolMethod(screen.GetType(), "IsInsideTree").Invoke(screen, null), System.Globalization.CultureInfo.InvariantCulture); var visible = RequireRuntimeBoolProperty(screen, "Visible", step); var visibleInTree = Convert.ToBoolean(RequireZeroArgBoolMethod(screen.GetType(), "IsVisibleInTree").Invoke(screen, null), System.Globalization.CultureInfo.InvariantCulture);
+        var parentIsStack = false; string parentType = "<none>";
+        if (inside)
         {
-            foreach (var method in current.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                yield return method;
+            var getParent = RequireZeroArgRuntimeMethodForOwnership(screen.GetType(), "GetParent", step); var parent = InvokeStartupLadderMethod(getParent, screen, null, $"Step {step} character-select GetParent"); parentIsStack = ReferenceEquals(parent, stack); parentType = parent?.GetType().FullName ?? "<null>";
         }
+        return new CharacterSelectRuntimeState(true, inside, visible, visibleInTree, parentIsStack, parentType);
     }
 
-    private static MethodInfo RequireZeroArgRuntimeMethod(Type type, string name, int step)
+    private static bool ReadsFirstExplicitParameter(MethodDefinition method)
     {
-        var candidates = EnumerateRuntimeMethods(type).Where(method => method.Name == name && !method.IsGenericMethod && method.GetParameters().Length == 0).ToArray();
-        return candidates.SingleOrDefault()
-            ?? throw new MissingMethodException(type.FullName, $"Step {step}.0 {name}(); candidates={string.Join(" | ", candidates.Select(method => method.ToString()))}");
-    }
-
-    private static void RequireZeroArgVoidMethod(MethodDefinition method, int step, string name)
-    {
-        if (method.IsStatic || !method.HasBody || method.Parameters.Count != 0 || method.ReturnType.FullName != "System.Void")
-            throw new InvalidDataException($"Step {step}.0 requires instance zero-arg void {name}; observed={method.FullName}.");
-    }
-
-    private static void RequirePushDefinitionShape(MethodDefinition method, int step)
-    {
-        if (method.IsStatic || !method.HasBody || method.Parameters.Count != 1 || method.Parameters[0].ParameterType.FullName != SubmenuManagedTypeFullName || method.ReturnType.FullName != "System.Void")
-            throw new InvalidDataException($"Step {step}.0 requires instance void Push({SubmenuManagedTypeFullName}); observed={method.FullName}.");
-    }
-
-    private static string[] GetSelectedManagedNodeTypeNames(IReadOnlyList<Step39NodeObservation> nodes, Assembly selectedAssembly, AssemblyLoadContext context)
-        => nodes.Select(item => item.Node.GetType())
-            .Where(type => ReferenceEquals(type.Assembly, selectedAssembly) && ReferenceEquals(AssemblyLoadContext.GetLoadContext(type.Assembly), context))
-            .Select(type => type.FullName)
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Cast<string>()
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .ToArray();
-
-    private static string BuildCharacterSelectNodeAuditAppendix(
-        string heading,
-        IReadOnlyList<Step39NodeObservation> nodes,
-        IReadOnlyList<string> managedTypes,
-        IReadOnlyList<MethodDefinition> roots,
-        StartupLadderInvocationFrontierAudit audit)
-    {
-        var lines = new List<string>
+        foreach (var instruction in method.Body.Instructions)
         {
-            string.Empty,
-            "[" + heading + "]",
-            $"Nodes: {nodes.Count}",
-            $"Selected managed node types: {managedTypes.Count}",
-            $"Immediate callback roots: {roots.Count}",
-            $"Invocation-qualified closure methods: {audit.ImmediateClosureMethods.Length}",
-            $"Immediate classified boundaries: {audit.ImmediateBoundaries.Length}",
-            $"Runtime-guarded immediate frontiers: {audit.GuardedMethodFrontiers.Length}",
-            $"Deferred method frontiers: {audit.DeferredMethodFrontiers.Length}",
-            "Forbidden immediate boundaries: 0",
-            "Unresolved same-sts2 references: 0",
-        };
-        foreach (var node in nodes)
-            lines.Add($"  node: {node.Path} | {node.Node.GetType().FullName}");
-        lines.Add("[SELECTED MANAGED TYPES]");
-        foreach (var type in managedTypes)
-            lines.Add("  - " + type);
-        lines.Add("[CALLBACK ROOTS]");
-        foreach (var root in roots)
-            lines.Add($"  - token=0x{root.MetadataToken.ToUInt32():X8}; {root.FullName}");
-        lines.Add(BuildStartupLadderInvocationFrontierAppendix(audit));
-        return string.Join("\n", lines) + "\n";
+            if (instruction.OpCode.Code == Code.Ldarg_1 || instruction.OpCode.Code == Code.Ldarga_S && instruction.Operand is ParameterDefinition p1 && p1.Index == 0 || instruction.OpCode.Code == Code.Ldarg_S && instruction.Operand is ParameterDefinition p2 && p2.Index == 0 || instruction.OpCode.Code == Code.Ldarg && instruction.Operand is ParameterDefinition p3 && p3.Index == 0 || instruction.OpCode.Code == Code.Ldarga && instruction.Operand is ParameterDefinition p4 && p4.Index == 0) return true;
+        }
+        return false;
+    }
+
+    private static MethodInfo RequireRuntimeMethodByTokenForOwnership(Type runtimeType, uint token, string methodName, int step, int parameterCount, string returnTypeFullName)
+    {
+        var methods = EnumerateRuntimeMethodsForOwnership(runtimeType).Where(method => method.Name == methodName && !method.IsGenericMethod && method.GetParameters().Length == parameterCount && method.ReturnType.FullName == returnTypeFullName && (uint)method.MetadataToken == token).ToArray();
+        return methods.SingleOrDefault() ?? throw new MissingMethodException(runtimeType.FullName, $"Step {step}.0 {methodName} token=0x{token:X8}");
+    }
+
+    private static IEnumerable<MethodInfo> EnumerateRuntimeMethodsForOwnership(Type type)
+    {
+        for (var current = type; current is not null; current = current.BaseType) foreach (var method in current.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)) yield return method;
+    }
+
+    private static MethodInfo RequireZeroArgRuntimeMethodForOwnership(Type type, string name, int step)
+    {
+        var candidates = EnumerateRuntimeMethodsForOwnership(type).Where(method => method.Name == name && !method.IsGenericMethod && method.GetParameters().Length == 0).ToArray(); return candidates.SingleOrDefault() ?? throw new MissingMethodException(type.FullName, $"Step {step}.0 {name}()");
+    }
+
+    private static string[] GetSelectedManagedNodeTypeNamesForOwnership(IReadOnlyList<Step39NodeObservation> nodes, Assembly selectedAssembly, AssemblyLoadContext context)
+        => nodes.Select(item => item.Node.GetType()).Where(type => ReferenceEquals(type.Assembly, selectedAssembly) && ReferenceEquals(AssemblyLoadContext.GetLoadContext(type.Assembly), context)).Select(type => type.FullName).Where(name => !string.IsNullOrWhiteSpace(name)).Cast<string>().Distinct(StringComparer.Ordinal).OrderBy(name => name, StringComparer.Ordinal).ToArray();
+
+    private static string BuildCharacterSelectNodeAuditAppendixForOwnership(string heading, IReadOnlyList<Step39NodeObservation> nodes, IReadOnlyList<string> managedTypes, IReadOnlyList<MethodDefinition> roots, StartupLadderInvocationFrontierAudit audit)
+    {
+        var lines = new List<string> { string.Empty, "[" + heading + "]", $"Nodes: {nodes.Count}", $"Selected managed node types: {managedTypes.Count}", $"Immediate callback roots: {roots.Count}", $"Invocation-qualified closure methods: {audit.ImmediateClosureMethods.Length}", $"Immediate classified boundaries: {audit.ImmediateBoundaries.Length}", $"Runtime-guarded immediate frontiers: {audit.GuardedMethodFrontiers.Length}", $"Deferred method frontiers: {audit.DeferredMethodFrontiers.Length}", "Forbidden immediate boundaries: 0", "Unresolved same-sts2 references: 0" };
+        foreach (var node in nodes) lines.Add($"  node: {node.Path} | {node.Node.GetType().FullName}"); lines.Add("[SELECTED MANAGED TYPES]"); foreach (var type in managedTypes) lines.Add("  - " + type); lines.Add("[CALLBACK ROOTS]"); foreach (var root in roots) lines.Add($"  - token=0x{root.MetadataToken.ToUInt32():X8}; {root.FullName}"); lines.Add(BuildStartupLadderInvocationFrontierAppendix(audit)); return string.Join("\n", lines) + "\n";
+    }
+
+    private readonly record struct CharacterSelectRuntimeState(bool Present, bool InsideTree, bool Visible, bool VisibleInTree, bool ParentIsExactStack, string ParentType)
+    {
+        public static CharacterSelectRuntimeState Absent => new(false, false, false, false, false, "<none>");
+        public override string ToString() => Present ? $"present=True; insideTree={InsideTree}; visible={Visible}; visibleInTree={VisibleInTree}; parentExactStack={ParentIsExactStack}; parentType={ParentType}" : "present=False";
     }
 }

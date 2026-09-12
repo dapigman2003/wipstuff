@@ -63,11 +63,11 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Steps 43–64 — sequential startup ladder (stop on first failure)",
+            "Steps 43–62 — sequential startup ladder (stop on first failure)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Physical authority through Step 57 is now the proven extension beyond the Step-52 closed-path baseline. Steps 58–64 decompose the already-mapped character-select transition into factory creation, InitializeSingleplayer, Push admission, and one bounded render/refreeze. Original whole GameStartup/LaunchMainMenu/OpenCharacterSelect, Steam startup, deferred startup, native game extensions, character choice/embark/run-start remain unopened. Only Steps 50, 52, 55 and 64 may restart rendering, and each synchronously refreezes before evaluation.",
+            "Each rung is independently gated and reportable. Later rungs remain locked until the prior rung is 4/4 in the same process. Physical authority through Step 57 is now the proven extension beyond the Step-52 closed-path baseline. Steps 58–62 pivot to real game ownership: adopt the actual character-select state, let original OpenCharacterSelect run only when still needed, audit the active subtree, then perform short and sustained visible render/refreeze trials. Original whole GameStartup/LaunchMainMenu, Steam startup, deferred startup, native game extensions, character choice/embark/run-start remain unopened. Only Steps 50, 52, 55, 61 and 62 may restart rendering, and each synchronously refreezes before evaluation.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel));
 
@@ -406,7 +406,7 @@ public sealed partial class RootViewController
         }
         if (GodotStep15NativeBridge.IsRenderingActive)
         {
-            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Only Steps 50, 52, 55 and 64 may restart rendering, and only after their exact frame/input maps are durably written.");
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", $"Step {step}.0 requires rendering stopped at entry. Only Steps 50, 52, 55, 61 and 62 may restart rendering, and only after their exact preflight maps are durably written.");
             return false;
         }
         return true;
@@ -426,7 +426,7 @@ public sealed partial class RootViewController
             51 => (_step51Button!, _step51ResultLabel!, _step51DetailLabel!),
             52 => (_step52Button!, _step52ResultLabel!, _step52DetailLabel!),
             >= 53 and <= 57 => GetSingleplayerContinuationControls(step),
-            >= 58 and <= 64 => GetCharacterSelectContinuationControls(step),
+            >= 58 and <= 62 => GetCharacterSelectContinuationControls(step),
             _ => throw new ArgumentOutOfRangeException(nameof(step)),
         };
 
@@ -526,8 +526,8 @@ public sealed partial class RootViewController
                     $"Initialized UTC: {now:O}\n" +
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
-                    "Candidate: STEPS 43–64 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–64 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.\n" +
-                    "Global policy: physical authority through Step 57 is the baseline extension. Steps 58/60/62 are non-invoking maps; Steps 59/61/63 each authorize one exact character-select sub-operation while rendering stays frozen; Step 64 alone adds one bounded character-select render residency and synchronously refreezes. Original whole GameStartup/LaunchMainMenu/OpenCharacterSelect, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, native game GDExtensions, character choice/embark/run-start, and Step 65+ remain unopened.\n\n");
+                    "Candidate: STEPS 43–62 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–62 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.\n" +
+                    "Global policy: physical authority through Step 57 is the baseline extension. Step 58 adopts/audits actual runtime ownership without mutation. Step 59 may invoke original OpenCharacterSelect once only when the transition is not already visibly complete. Step 60 audits the active screen. Steps 61–62 add short and sustained visible render residencies and synchronously refreeze. Character choice/embark/run-start, continuous interactive ownership, and Step 63+ remain unopened.\n\n");
                 WriteStartupLadderCheckpoint(step, "RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.");
                 return true;
             }

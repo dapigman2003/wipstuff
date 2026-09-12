@@ -1,0 +1,16 @@
+StS2 Launcher — Step 58.0 Character-select generic factory frontier checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d
+Initialized UTC: 2026-09-12T07:29:47.9546810+00:00
+Process ID: 12960
+App version: 0.0.191 (191)
+Candidate: STEPS 43–64 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–64 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.
+Global policy: physical authority through Step 57 is the baseline extension. Steps 58/60/62 are non-invoking maps; Steps 59/61/63 each authorize one exact character-select sub-operation while rendering stays frozen; Step 64 alone adds one bounded character-select render residency and synchronously refreezes. Original whole GameStartup/LaunchMainMenu/OpenCharacterSelect, DoCloudSync, migration mutation, InitializePlatform, native Steamworks, ExecuteDeferred, native game GDExtensions, character choice/embark/run-start, and Step 65+ remain unopened.
+
+2026-09-12T07:29:47.9631970+00:00 | run=20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d | pid=12960 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-12T07:29:47.9654030+00:00 | run=20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d | pid=12960 | managedThread=1 | RUN_START — Step 58.0 exact GetSubmenuType<NCharacterSelectScreen>() non-invoking factory map started from closed Step-57 authority.
+2026-09-12T07:29:47.9809710+00:00 | run=20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d | pid=12960 | managedThread=1 | M58_A_PASS — Step-57 4/4 exact retained PackedScene/PCK authority retained; NSingleplayerSubmenu visible; renderer stopped; character-select factory not invoked.
+2026-09-12T07:29:48.0150830+00:00 | run=20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d | pid=12960 | managedThread=1 | M58_B_FAIL — stage=initialization; System.IO.InvalidDataException: Step 58.0 pre-existing character-select cache is already inside the SceneTree; stop before any new character-select operation.
+2026-09-12T07:29:48.0240080+00:00 | run=20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d | pid=12960 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. Step 58 never creates character select or restarts rendering.
+2026-09-12T07:29:48.0249450+00:00 | run=20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d | pid=12960 | managedThread=14 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-12T07:29:48.0342270+00:00 | run=20260912T0729479546810Z-pid12960-3aad07ea993a4b41813c29c2fa6e627d | pid=12960 | managedThread=14 | RUN_END — Step-58 UI operation ended normally; Step 58 never creates character select or restarts rendering.

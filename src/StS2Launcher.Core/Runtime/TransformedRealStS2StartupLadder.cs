@@ -94,7 +94,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             51 when !string.IsNullOrWhiteSpace(_step51DirectStaticMap) => _step51DirectStaticMap,
             52 when !string.IsNullOrWhiteSpace(_step52DirectStaticMap) => _step52DirectStaticMap,
             >= 53 and <= 57 => GetVerifiedSingleplayerContinuationStaticMap(step),
-            >= 58 and <= 64 => GetVerifiedCharacterSelectContinuationStaticMap(step),
+            >= 58 and <= 62 => GetVerifiedCharacterSelectContinuationStaticMap(step),
             _ => throw new InvalidOperationException($"Step {step}.0 has not produced a verified startup-ladder static map."),
         };
 

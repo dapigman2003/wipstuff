@@ -1,10 +1,10 @@
-## Current frontier — Steps 58–64 / 0.0.191
+## Current frontier — Steps 58–62 / 0.0.192
 
-The active candidate is **0.0.191 / character-select admission/render continuation through Step 64**. Physical runtime authority is closed through Step 57 4/4/frozen. The fresh-process convenience route remains capped at Step 52; Steps 53–57 must be reconstructed manually before the new block.
+The active candidate is **0.0.192 / real character-select ownership and visible-render trial through Step 62**. Physical runtime authority is closed through Step 57 4/4/frozen. Physical 0.0.191 further proved that the real cached `NCharacterSelectScreen` can already be inside the SceneTree before Step 58 performs a new operation. The fresh-process convenience route remains capped at Step 52; Steps 53–57 must be reconstructed manually before the new block.
 
-Steps 58–64 decompose the exact physically mapped `OpenCharacterSelect(NButton)` body into separately gated sub-operations: factory/cache map → exact off-tree `NCharacterSelectScreen` acquisition (reuse existing cache or one-shot factory only if null) → `InitializeSingleplayer` map → one-shot off-tree initialization → `NSubmenuStack.Push` map → one-shot frozen SceneTree admission → audited 750 ms rendered residency/refreeze. The original handler itself remains unopened, as do character choice/embark/run-start and Step 65+.
+The architecture now pivots away from reproducing the game's internal create/init/push state machine. Step 58 audits the actual runtime ownership state and the exact real `OpenCharacterSelect(NButton)` frontier. Step 59 invokes that real handler once only when the active screen still needs the transition; otherwise it adopts the exact already-visible screen. Step 60 audits the resulting live frame/input surface. Steps 61 and 62 visibly render the real character-select screen for 2 seconds and 10 seconds respectively, synchronously refreezing after each trial. Character choice/embark/run-start and Step 63+ remain unopened.
 
-Physical 0.0.189 Step 57 is the authority anchor: exact retained `_characterSelectScreenScene.ResourcePath`, exact trusted-PCK character-select entry, 16,015-byte SHA-256/MD5 evidence, zero textual native-extension risk tokens, no loader/instantiation/handler/rendering, zero drift.
+Physical 0.0.189 Step 57 remains the authority anchor: exact retained `_characterSelectScreenScene.ResourcePath`, exact trusted-PCK character-select entry, 16,015-byte SHA-256/MD5 evidence, zero textual native-extension risk tokens, no loader/instantiation/handler/rendering, zero drift.
 
 Resume from `docs/CURRENT-STATUS.md`, enforce `docs/REGRESSION-CONTRACTS.md`, and use `docs/history/INDEX.md` for evidence/design provenance.
 

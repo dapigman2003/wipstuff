@@ -38,16 +38,18 @@ Physical 0.0.187 Step 57 localization evidence is retained as `STEP-57.0-PHYSICA
 Physical 0.0.188 Step 57 retained-hint localization evidence is retained as `STEP-57.0-PHYSICAL-0.0.188-FAIL-REPORT.txt`, `STEP-57.0-PHYSICAL-0.0.188-FAIL-CHECKPOINT.txt`, and `STEP-57.0-PHYSICAL-0.0.188-FAIL-LAST-CHECKPOINT.txt`.
 
 
-## Steps 58–64 evidence contract
+## Steps 58–62 evidence contract
 
-Each rung has a distinct report/static-map/checkpoint surface. Steps 58/60/62 are mapping-only. Physical 0.0.190 proved Step 58 can encounter an exact pre-existing off-tree `_characterSelectSubmenu`; 0.0.191 records that cache state and lets Step 59 reuse/audit it without a factory call. Step 59 is one-shot only when its null-cache factory path is armed. Steps 61/63 remain frozen one-shot sub-operation invocations; Step 64 is the only new render rung.
+Physical 0.0.190 proved Step 58 may see a non-null game-owned character-select cache. Physical 0.0.191 then proved that exact cached `NCharacterSelectScreen` may already be **inside the live SceneTree** before Step 58 performs any new operation. Both runs ended frozen and Step 58 itself created nothing. 0.0.192 therefore adopts real runtime ownership instead of requiring launcher-controlled off-tree lifecycle milestones.
 
-- Step 58: `Step58-CharacterSelectFactory-StaticMap-<RunId>.txt`, `Step58-TransformedRealStS2CharacterSelectFactoryFrontier.txt`.
-- Step 59: `Step59-CharacterSelectOffTree-StaticMap-<RunId>.txt`, `Step59-TransformedRealStS2CharacterSelectOffTree.txt`.
-- Step 60: `Step60-CharacterSelectInitialize-StaticMap-<RunId>.txt`, `Step60-TransformedRealStS2CharacterSelectInitializeFrontier.txt`.
-- Step 61: `Step61-CharacterSelectInitializedOffTree-StaticMap-<RunId>.txt`, `Step61-TransformedRealStS2CharacterSelectInitializeOffTree.txt`.
-- Step 62: `Step62-CharacterSelectPush-StaticMap-<RunId>.txt`, `Step62-TransformedRealStS2CharacterSelectPushFrontier.txt`.
-- Step 63: `Step63-CharacterSelectAdmission-StaticMap-<RunId>.txt`, `Step63-TransformedRealStS2CharacterSelectFrozenAdmission.txt`.
-- Step 64: `Step64-CharacterSelectFrameInput-StaticMap-<RunId>.txt`, `Step64-TransformedRealStS2CharacterSelectRender.txt`.
+Each rung has a distinct report/static-map/checkpoint surface:
 
-Step 59's factory path and Steps 61/63/64 are one-shot. A Step-59 existing-cache acquisition does not arm the factory boundary. Step 64's static map must be durable before `StartRendering`; `StopRendering` must precede post-stop telemetry. Physical 0.0.190 Step-58 failure artifacts are retained in `docs/history/reports/` as the provenance for this ownership correction.
+- Step 58: `Step58-CharacterSelectOwnership-StaticMap-<RunId>.txt`, `Step58-TransformedRealStS2CharacterSelectOwnership.txt`.
+- Step 59: `Step59-RealOpenCharacterSelect-StaticMap-<RunId>.txt`, `Step59-TransformedRealStS2OpenCharacterSelectFrozen.txt`.
+- Step 60: `Step60-CharacterSelectActiveSurface-StaticMap-<RunId>.txt`, `Step60-TransformedRealStS2CharacterSelectActiveSurface.txt`.
+- Step 61: `Step61-CharacterSelectShortRender-StaticMap-<RunId>.txt`, `Step61-TransformedRealStS2CharacterSelectShortRender.txt`.
+- Step 62: `Step62-CharacterSelectSustainedRender-StaticMap-<RunId>.txt`, `Step62-TransformedRealStS2CharacterSelectSustainedRender.txt`.
+
+Step 58 is observation/audit only. Step 59 skips duplicate handler invocation when the exact screen is already visible/in-tree; otherwise its handler path is one-shot. Step 60 is audit only. Steps 61/62 must write their static evidence before `StartRendering`; `StopRendering()` must precede all post-stop telemetry. Step 61 targets 2 seconds with a 10-second evidence ceiling. Step 62 targets 10 seconds with a 30-second evidence ceiling. Neither render rung authorizes intentional interaction.
+
+Physical 0.0.190 and 0.0.191 Step-58 failure artifacts are retained in `docs/history/reports/` as the provenance for this ownership pivot. Step 63 remains unopened.

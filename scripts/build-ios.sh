@@ -66,7 +66,7 @@ done
 
 bash scripts/build-godot.sh
 
-echo "Publishing Steps 58–64 character-select admission/render continuation..."
+echo "Publishing Steps 58–62 real character-select ownership / visible-render trial..."
 set +e
 dotnet publish "$PROJECT" --no-restore -c Release -f net9.0-ios -r ios-arm64 \
   -p:BuildIpa=false -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" \

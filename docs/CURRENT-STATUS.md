@@ -1,12 +1,14 @@
 # Current status
 
-## Active candidate — Steps 58–64 character-select admission/render continuation / 0.0.191 (191)
+## Active candidate — Steps 58–62 real character-select ownership / visible-render trial / 0.0.192 (192)
 
-Physical runtime authority is now closed through **Step 57 4/4/frozen**. Physical 0.0.189 proved the retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, exact `ResourcePath = res://scenes/screens/character_select_screen.tscn`, one exact receipt-backed PCK entry, and read-only resource/risk evidence with zero drift. `OpenCharacterSelect`, `ResourceLoader`, `PackedScene.Instantiate`, and rendering all remained unopened during Step 57.
+Physical runtime authority is closed through **Step 57 4/4/frozen**. Physical 0.0.189 proved the retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, exact `ResourcePath = res://scenes/screens/character_select_screen.tscn`, one exact receipt-backed PCK entry, and read-only resource/risk evidence with zero drift. `OpenCharacterSelect`, `ResourceLoader`, `PackedScene.Instantiate`, and rendering all remained unopened during Step 57.
 
-The one-button **Physically Closed Path** intentionally remains capped at Step 52. A fresh 0.0.191 process must reprove through Step 52 and then manually reconstruct Steps 53–57 before the new block can run. The safety unit remains one gate at a time while the packaging unit is multiple rungs per build.
+The one-button **Physically Closed Path** intentionally remains capped at Step 52. A fresh 0.0.192 process must reprove through Step 52 and then manually reconstruct Steps 53–57 before the new block can run.
 
-**0.0.191 packages corrected Steps 58–64.** Steps 58/60/62 are non-invoking maps. Step 59 acquires the exact off-tree character-select screen: it reuses the game's already-retained cache without invoking the factory when present, and only a null cache may arm one exact factory call. Steps 61/63 invoke exactly one already-proven sub-operation while rendering remains frozen. Step 64 alone adds one bounded 750 ms character-select render residency and synchronously refreezes. Steps 61/63/64 are always one-shot; Step 59 is one-shot only if its factory path is armed. The original `OpenCharacterSelect(NButton)` handler is still never invoked by this candidate.
+Physical 0.0.190 proved the game-owned `_characterSelectSubmenu` can already be non-null before Step 58. Physical 0.0.191 went further: the exact cached `NCharacterSelectScreen` was already **inside the live SceneTree**, while Step 58 itself had performed no new character-select operation and rendering remained frozen. That invalidates the launcher-owned off-tree create → initialize → push decomposition.
+
+**0.0.192 therefore pivots to real game ownership.** Step 58 audits the actual runtime state plus the exact real `OpenCharacterSelect(NButton)` frontier. Step 59 invokes that real handler once only if the transition is not already visibly complete; otherwise it adopts the game's exact visible/in-tree screen without duplicate invocation. Step 60 audits the real active frame/input surface and exact TSCN connection inventory. Step 61 visibly renders the real screen for 2 seconds and refreezes. Step 62 visibly renders it for 10 seconds and refreezes. Intentional interaction and Step 63 remain unopened.
 
 The 0.0.183 Codemagic AOT cache/sentinel experiment remains retained and independent of this runtime experiment.
 
@@ -136,55 +138,48 @@ Requires Step 56 4/4. Gate A binds exact selected-metadata and retained-runtime 
 Reports: `Step57-CrashCheckpoint-<RunId>.txt`, `Step57-CharacterSelectResource-StaticMap-<RunId>.txt`, `Step57-LastCheckpoint.txt`, `Step57-TransformedRealStS2CharacterSelectResourcePreflight.txt`.
 
 
-## Physical 0.0.190 Step 58 localization — pre-existing exact cache, safe Gate-B stop
+## Physical Step 58 localization — 0.0.190 and 0.0.191
 
-The supplied physical 0.0.190 run retained Step-57 4/4 authority and passed Step 58 Gate A. Gate B then stopped before any factory invocation because the candidate incorrectly required `_characterSelectSubmenu` to be null. The real retained `NMainMenuSubmenuStack` already held a non-null character-select cache. Rendering remained stopped, no factory/initializer/push/render boundary was armed, and the run ended normally.
+Physical 0.0.190 retained Step-57 4/4 authority and passed Step 58 Gate A, then stopped safely because `_characterSelectSubmenu` was already non-null before any Step-58 factory invocation. Rendering remained stopped and no new character-select operation armed.
 
-The game's XML documentation states that `NMainMenuSubmenuStack` lazily spawns submenus only when requested. 0.0.191 therefore treats the cache as real game-owned state: Step 58 accepts a non-null value only when it is the exact private-context `NCharacterSelectScreen`, still off-tree, with exact inherited `NSubmenu._stack` identity. Step 59 reuses and audits that exact object without invoking `GetSubmenuType`; the one-shot factory path remains available only when Step 58 observed a null cache. Physical authority remains closed through Step 57; Step 58 remains the active frontier.
+Physical 0.0.191 retained the same Step-57 authority and again passed Step 58 Gate A. Gate B then proved the pre-existing exact character-select cache was already **inside the SceneTree**. Step 58 never created character select or restarted rendering, and the process ended normally frozen. This is the evidence that triggers the 0.0.192 ownership pivot.
 
-Retained evidence: `STEP-58.0-PHYSICAL-0.0.190-FAIL-REPORT.txt`, `STEP-58.0-PHYSICAL-0.0.190-FAIL-CHECKPOINT.txt`, and `STEP-58.0-PHYSICAL-0.0.190-FAIL-LAST-CHECKPOINT.txt`.
+Retained evidence includes the 0.0.190 and 0.0.191 Step-58 report/checkpoint/last-checkpoint sets under `docs/history/reports/`, plus `docs/history/steps/STEP-58.0-RUNTIME-OWNERSHIP-PIVOT-0.0.192.md`.
 
-## Step 58.0 — exact character-select factory frontier, no invocation
+## Step 58.0 — runtime ownership + real OpenCharacterSelect frontier audit
 
-Requires Step 57 4/4/frozen. Binds the exact closed generic call used by the proven Step-56 IL: `NSubmenuStack.GetSubmenuType<NCharacterSelectScreen>()`. It token/signature-checks the factory definition, maps its execution-qualified frontier, writes a durable map, and performs no factory invocation. The real `_characterSelectSubmenu` cache may be null or already populated; a non-null value is admissible only when it is the exact selected/private-context `NCharacterSelectScreen`, still off-tree, retaining the exact submenu stack.
+Requires Step 57 4/4/frozen. Binds exact `NSingleplayerSubmenu.OpenCharacterSelect(NButton)`, token/signature-checks it against the selected assembly, requires selected IL to prove the explicit `NButton` parameter is unread before any null-button invocation can ever be authorized, and audits the whole handler frontier under the retained runtime guards. It also observes the actual `_characterSelectSubmenu` state as absent, off-tree, hidden in-tree, or visible in-tree, requiring exact selected/private-context type plus exact inherited submenu-stack identity whenever present. No handler invocation, rendering, or interaction occurs.
 
-## Step 59.0 — frozen off-tree character-select acquisition
+Reports: `Step58-CrashCheckpoint-<RunId>.txt`, `Step58-CharacterSelectOwnership-StaticMap-<RunId>.txt`, `Step58-LastCheckpoint.txt`, `Step58-TransformedRealStS2CharacterSelectOwnership.txt`.
 
-Requires Step 58 4/4. Rechecks exact stack/factory/cache identity. If Step 58 retained an exact pre-existing off-tree cache, Step 59 adopts and audits that object without invoking the factory. If and only if the cache was null, Step 59 may one-shot invoke `GetSubmenuType<NCharacterSelectScreen>()` while rendering remains stopped. Either path must end with the exact cached `NCharacterSelectScreen` retained off-tree with an admissible durable hierarchy/lifecycle map. Never retry in-process after the factory path arms.
+## Step 59.0 — one-shot real OpenCharacterSelect transition when needed
 
-## Step 60.0 — exact InitializeSingleplayer frontier, no invocation
+Requires Step 58 4/4/frozen. If the exact cached `NCharacterSelectScreen` is already visible/in-tree under the retained stack, Step 59 adopts that game-owned state and does not invoke the handler. Otherwise it may arm and invoke exact real `OpenCharacterSelect(NButton)` once while frozen, passing null only because Step 58 proved the parameter unread. The game therefore owns its normal cache/create → `InitializeSingleplayer()` → `Push()` sequence. Success requires the exact cached screen visible/in-tree under the retained stack with zero disallowed drift. Never retry after handler invocation arms.
 
-Requires Step 59 4/4. Binds exact zero-argument `void NCharacterSelectScreen.InitializeSingleplayer()` on the retained off-tree screen, maps its immediate/deferred execution frontier under existing runtime guards, and writes the map without invoking it.
+Reports: `Step59-CrashCheckpoint-<RunId>.txt`, `Step59-RealOpenCharacterSelect-StaticMap-<RunId>.txt`, `Step59-LastCheckpoint.txt`, `Step59-TransformedRealStS2OpenCharacterSelectFrozen.txt`.
 
-## Step 61.0 — one-shot frozen off-tree InitializeSingleplayer
+## Step 60.0 — actual active character-select surface audit
 
-Requires Step 60 4/4. One-shot invokes only the exact token-matched `InitializeSingleplayer()` on the retained off-tree screen while rendering remains stopped. Success requires the same screen identity to remain off-tree, retained, and confined with zero resolver/initializer/rejected/native escape. Never retry in-process after arm.
+Requires Step 59 4/4/frozen. Audits the actual active character-select subtree's managed frame/input roots and execution-qualified frontiers under retained runtime guards. It also reads the exact Step-57 PCK TSCN bytes read-only and records its signal `[connection ...]` lines as evidence. No rendering, input, character choice, or game transition is authorized.
 
-## Step 62.0 — exact NSubmenuStack.Push frontier, no invocation
+Reports: `Step60-CrashCheckpoint-<RunId>.txt`, `Step60-CharacterSelectActiveSurface-StaticMap-<RunId>.txt`, `Step60-LastCheckpoint.txt`, `Step60-TransformedRealStS2CharacterSelectActiveSurface.txt`.
 
-Requires Step 61 4/4. Binds the exact `void NSubmenuStack.Push(NSubmenu)` call used by Step-56 IL, audits the retained initialized character-select screen's tree-entry lifecycle/frontier, and writes durable evidence without pushing it into the live tree.
+## Step 61.0 — short visible character-select render residency
 
-## Step 63.0 — one-shot frozen character-select SceneTree admission
+Requires Step 60 4/4/frozen. Writes durable pre-render evidence, starts real Godot rendering once, targets **2,000 ms** of visible observation with a **10,000 ms** post-stop evidence ceiling, and synchronously calls `StopRendering()` before post-stop telemetry/file I/O. No intentional taps or interaction are authorized. Gate D requires the same exact active screen authority with rendering frozen. Never retry after render arm.
 
-Requires Step 62 4/4. One-shot invokes only exact `Push` with the retained initialized `NCharacterSelectScreen` while rendering stays stopped. Success requires the exact screen visible/in-tree, parented by the retained submenu stack, with expected child-count/identity authority and zero context/native drift. Never retry in-process after arm.
+Reports: `Step61-CrashCheckpoint-<RunId>.txt`, `Step61-CharacterSelectShortRender-StaticMap-<RunId>.txt`, `Step61-LastCheckpoint.txt`, `Step61-TransformedRealStS2CharacterSelectShortRender.txt`.
 
-## Step 64.0 — actual character-select frame/input audit + bounded render residency
+## Step 62.0 — sustained visible character-select render residency
 
-Requires Step 63 4/4/frozen. Audits the actual in-tree character-select subtree's frame/input callbacks and makes that map durable before rendering. Then exactly one `StartRendering()` is authorized, target residency **750 ms**, evidence ceiling **5000 ms**; the first managed continuation synchronously calls `StopRendering()` before post-stop telemetry. Gate D requires the same visible/in-tree screen authority with rendering frozen. No character choice, confirm/embark, or run-start behavior is opened.
+Requires Step 61 4/4/refrozen. Rechecks the same active-screen authority, then starts real Godot rendering once for a target **10,000 ms** visible observation with a **30,000 ms** evidence ceiling, and synchronously refreezes before success evaluation. No intentional interaction is authorized. If this physically closes, the next design may consider continuous/interactive Godot ownership rather than another internal lifecycle ladder. Never retry after render arm.
 
-## Physical sequence for 0.0.191
+Reports: `Step62-CrashCheckpoint-<RunId>.txt`, `Step62-CharacterSelectSustainedRender-StaticMap-<RunId>.txt`, `Step62-LastCheckpoint.txt`, `Step62-TransformedRealStS2CharacterSelectSustainedRender.txt`.
 
-Fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. Require Step 52 4/4/frozen. Then run manually in order:
+## Physical sequence for 0.0.192
 
-1. Steps 53 → 57 — reconstruct the physically closed extension.
-2. Step 58 — map only; if 4/4 continue.
-3. Step 59 — acquire the exact off-tree screen; reuse an existing exact cache without factory invocation, otherwise one-shot factory creation; if the factory path arms, never retry in-process.
-4. Step 60 — map only.
-5. Step 61 — one-shot off-tree `InitializeSingleplayer`; if armed, never retry in-process.
-6. Step 62 — map only.
-7. Step 63 — one-shot frozen `Push`; if armed, never retry in-process.
-8. Step 64 — one-shot bounded render/refreeze; if armed, never retry in-process.
+Fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. Require Step 52 4/4/frozen. Then manually run **53 → 54 → 55 → 56 → 57**. Continue **58 → 59 → 60 → 61 → 62**, stopping immediately at the first failure.
 
-Stop immediately at the first failure and preserve that rung's checkpoint/static-map/final report. If all seven new rungs close 4/4, stop after Step 64. **No Step 65 behavior exists in 0.0.191.**
+Step 59 is one-shot only if it actually arms the real handler invocation. Steps 61 and 62 are one-shot after render arm. If all five new rungs close 4/4, stop after Step 62 and preserve its evidence. **Step 63 has no behavior in 0.0.192.**
 
-Still globally forbidden in 0.0.191: original `OpenCharacterSelect`, whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character-choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 65+. Render rungs remain Step 50, Step 52, Step 55, and Step 64; each synchronously refreezes before success evaluation.
+Still globally forbidden in 0.0.192: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 63+. Render rungs are Step 50, Step 52, Step 55, Step 61, and Step 62; each bounded rung synchronously refreezes before success evaluation.

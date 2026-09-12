@@ -1,19 +1,17 @@
-# Release checklist — Steps 58–64 character-select admission/render continuation / 0.0.191
+# Release checklist — Steps 58–62 real character-select ownership / visible-render trial / 0.0.192
 
-Release identity: display/build `0.0.191 (191)`, IPA `StS2-Launcher-Steps-58-64.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.192 (192)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
-Require physical authority through **Step 57 4/4/frozen** to be preserved, including the final 0.0.188 Step-56 and 0.0.189 Step-57 pass artifacts. The Physically Closed Path remains fresh-process-only and capped at Step 52.
+Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190 and 0.0.191 Step-58 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
 Require the new block to preserve exact sequencing and authority:
 
-- Step 58 maps exact closed generic `GetSubmenuType<NCharacterSelectScreen>()`; no invocation; current cache may be null or exact/off-tree/private-context with exact stack identity.
-- Step 59 reuses/audits an exact pre-existing off-tree cache without factory invocation; only if Step 58 observed null may Step 59 invoke that exact factory once while frozen. Both paths prove exact retained screen/cache/stack identity plus actual lifecycle map.
-- Step 60 maps exact zero-arg `void InitializeSingleplayer()`; no invocation.
-- Step 61 invokes only that exact method once on the retained off-tree screen while frozen; zero escape/drift.
-- Step 62 maps exact `void NSubmenuStack.Push(NSubmenu)` plus actual tree-entry lifecycle; no push.
-- Step 63 invokes only exact Push once while frozen and proves exact visible/in-tree parent/identity authority.
-- Step 64 audits actual in-tree frame/input callbacks, writes the map before rendering, authorizes exactly one 750 ms render residency with 5000 ms evidence ceiling, stops rendering before telemetry, and ends frozen.
+- Step 58 performs a non-mutating runtime ownership audit: exact handler/signature/token/IL, proof the explicit `NButton` parameter is unread, whole-handler admissibility under retained guards, and exact cache/type/load-context/stack/tree observations.
+- Step 59 adopts an already-visible exact cached screen without duplicate invocation, or—only when transition is still needed—arms and invokes exact real `OpenCharacterSelect(NButton)` once while frozen. Postcondition is the exact cache visible/in-tree under the retained submenu stack with zero disallowed drift.
+- Step 60 audits the actual active screen's frame/input callbacks and exact trusted-PCK TSCN connection inventory without rendering or interaction.
+- Step 61 authorizes exactly one 2-second visible render residency, evidence ceiling 10 seconds, then synchronously refreezes before success evaluation.
+- Step 62 authorizes exactly one 10-second visible render residency, evidence ceiling 30 seconds, then synchronously refreezes before success evaluation.
 
-Steps 59/61/63/64 must be one-shot with no in-process retry after arm. Original `OpenCharacterSelect`, character choice/confirm/embark/run-start, whole `GameStartup`/original `LaunchMainMenu`, cloud/migration/platform/Steam/deferred startup, native game extensions, trusted-install mutation, and Step 65+ remain unopened.
+Step 59 is one-shot only when handler invocation arms. Steps 61/62 are always one-shot after render arm. Character choice/confirm/embark/run-start, whole `GameStartup`/original `LaunchMainMenu`, cloud/migration/platform/Steam/deferred startup, native game extensions, trusted-install mutation, and Step 63+ remain unopened.
 
-Require exact 0.0.191 source/plist/release/shell identity; current active manifests regenerated; protected manifests unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
+Require exact 0.0.192 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.

@@ -534,9 +534,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-56.0-PHYSICAL-0.0.188-PASS-*` — supplied Step-56 4/4 report/checkpoint/static-map/last-checkpoint.
 - `reports/STEP-57.0-PHYSICAL-0.0.189-PASS-*` — supplied Step-57 4/4 report/checkpoint/static-map/last-checkpoint.
 
-## Step 58 physical pre-existing-cache localization / 0.0.191 focused correction
+## Step 58 physical runtime-ownership localization / 0.0.192 pivot
 
 - `reports/STEP-58.0-PHYSICAL-0.0.190-FAIL-REPORT.txt` — physical 0.0.190 Step 58 result: Gate A passed from closed Step-57 authority; Gate B stopped safely because `_characterSelectSubmenu` was already non-null; no factory invocation occurred.
-- `reports/STEP-58.0-PHYSICAL-0.0.190-FAIL-CHECKPOINT.txt` — run-correlated checkpoint proving the pre-existing-cache localization, frozen renderer, and normal end before any Step-59/initializer/push/render boundary.
-- `reports/STEP-58.0-PHYSICAL-0.0.190-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same safe localization.
-- `steps/STEP-58.0-PREEXISTING-CACHE-CORRECTION-0.0.191.md` — focused correction: characterize/adopt an exact pre-existing off-tree cache; invoke the factory only on the null-cache path.
+- `reports/STEP-58.0-PHYSICAL-0.0.190-FAIL-CHECKPOINT.txt` / `...-LAST-CHECKPOINT.txt` — frozen, normal end before any new character-select operation.
+- `reports/STEP-58.0-PHYSICAL-0.0.191-FAIL-REPORT.txt` — physical 0.0.191 Step 58 result: Gate A passed; Gate B proved the exact pre-existing character-select cache was already inside the live SceneTree before Step 58 did anything new.
+- `reports/STEP-58.0-PHYSICAL-0.0.191-FAIL-CHECKPOINT.txt` / `...-LAST-CHECKPOINT.txt` — rendering stayed frozen; Step 58 never created character select or restarted rendering; normal end.
+- `steps/STEP-58.0-RUNTIME-OWNERSHIP-PIVOT-0.0.192.md` — 0.0.192 architectural pivot: audit/adopt actual game-owned state, invoke real `OpenCharacterSelect(NButton)` only when needed, then audit and visibly render the real active screen; Step 63 remains unopened.
