@@ -1,6 +1,6 @@
-# Testing — Steps 58–64 character-select admission/render continuation / 0.0.190
+# Testing — Steps 58–64 character-select admission/render continuation / 0.0.191
 
-Active candidate: `0.0.190 (190)`, IPA `StS2-Launcher-Steps-58-64.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.191 (191)`, IPA `StS2-Launcher-Steps-58-64.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -20,7 +20,7 @@ Continue, stopping immediately on the first failure:
 
 Never retry Steps **59, 61, 63, or 64** in-process after their one-shot boundary is armed. Steps 58/60/62 and all pre-action gates keep rendering frozen. Step 64 must write its map before `StartRendering()`, and `StopRendering()` must occur on the first managed continuation before post-stop telemetry/file I/O.
 
-The original `OpenCharacterSelect(NButton)` handler must not be invoked anywhere in 0.0.190. No character selection/confirm/embark/run-start or Step 65 behavior is authorized.
+The original `OpenCharacterSelect(NButton)` handler must not be invoked anywhere in 0.0.191. Step 58 must accept a non-null cache only when it is the exact private-context `NCharacterSelectScreen`, still off-tree, with exact `NSubmenu._stack` identity. Step 59 must reuse that object without factory invocation; the factory path is permitted only when Step 58 observed a null cache. No character selection/confirm/embark/run-start or Step 65 behavior is authorized.
 
 ## Expected evidence surfaces
 

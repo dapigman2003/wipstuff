@@ -1,0 +1,35 @@
+StS2 Launcher — Step 58.0 Character Select Factory Frontier
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-12T04:15:52.6947070+00:00
+
+RESULT
+STEP 58.0 CHARACTER SELECT FACTORY FRONTIER FAIL — 1/4
+
+METADATA
+App version: 0.0.190 (190)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: initialization
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 58.0 requires character-select submenu cache to be null before first factory invocation.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep58CharacterSelectFactoryBinding(System.Action`1[System.String])
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep58CharacterSelectFactoryBinding(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 58.0 requires character-select submenu cache to be null before first factory invocation.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::StS2Launcher.Core.TransformedRealStS2StartupLadderGateResult RunStep58CharacterSelectFactoryBinding(System.Action`1[System.String])
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep58CharacterSelectFactoryBinding(Action`1 checkpoint)
+
+END OF REPORT

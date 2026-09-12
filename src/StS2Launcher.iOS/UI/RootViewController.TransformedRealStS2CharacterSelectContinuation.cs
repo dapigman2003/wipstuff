@@ -8,7 +8,7 @@ namespace StS2Launcher.iOS;
 public sealed partial class RootViewController
 {
     private readonly TransformedRealStS2StartupLadderGateSequence _step58Gates = new(58, "CHARACTER SELECT FACTORY FRONTIER");
-    private readonly TransformedRealStS2StartupLadderGateSequence _step59Gates = new(59, "CHARACTER SELECT FROZEN OFF-TREE CREATION");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step59Gates = new(59, "CHARACTER SELECT FROZEN OFF-TREE ACQUISITION");
     private readonly TransformedRealStS2StartupLadderGateSequence _step60Gates = new(60, "CHARACTER SELECT INITIALIZE FRONTIER");
     private readonly TransformedRealStS2StartupLadderGateSequence _step61Gates = new(61, "CHARACTER SELECT OFF-TREE INITIALIZATION");
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT PUSH FRONTIER");
@@ -45,7 +45,7 @@ public sealed partial class RootViewController
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label(
-            "Steps 58–64 — character-select creation, admission, and bounded render (stop on first failure)",
+            "Steps 58–64 — character-select acquisition, admission, and bounded render (stop on first failure)",
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
         content.AddArrangedSubview(Label(
@@ -58,15 +58,15 @@ public sealed partial class RootViewController
             "Step 58.0 — isolate exact GetSubmenuType<NCharacterSelectScreen>() factory (NO invocation)",
             "Run Step 58.0 A–D — MAP FACTORY",
             "CHARACTER SELECT FACTORY FRONTIER: LOCKED",
-            "Requires Step 57.0 4/4. Re-derives the exact generic factory call from OpenCharacterSelect, binds the concrete NMainMenuSubmenuStack implementation, proves _characterSelectSubmenu is still null and _characterSelectScreenScene still points at the exact Step-57 resource, then maps the factory frontier without creating the screen.");
+            "Requires Step 57.0 4/4. Re-derives the exact generic factory call from OpenCharacterSelect, binds the concrete NMainMenuSubmenuStack implementation, records whether _characterSelectSubmenu is null or an exact off-tree retained NCharacterSelectScreen, and proves _characterSelectScreenScene still points at the exact Step-57 resource. No factory invocation occurs.");
         _step58Button.TouchUpInside += async (_, _) => await RunStep58StartupLadderAsync();
 
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(
             content,
-            "Step 59.0 — one-shot frozen character-select factory creation + actual off-tree lifecycle audit",
-            "Run Step 59.0 A–D — CREATE OFF-TREE ONCE",
-            "CHARACTER SELECT FROZEN OFF-TREE CREATION: LOCKED",
-            "Requires Step 58.0 4/4. Invokes only exact GetSubmenuType<NCharacterSelectScreen>() once while frozen. Success requires exact cache/stack identity, IsInsideTree=false, zero managed/native escape, and an admissible actual off-tree hierarchy/lifecycle map. InitializeSingleplayer and Push remain unopened.");
+            "Step 59.0 — frozen character-select cache/factory acquisition + actual off-tree lifecycle audit",
+            "Run Step 59.0 A–D — ACQUIRE OFF-TREE",
+            "CHARACTER SELECT FROZEN OFF-TREE ACQUISITION: LOCKED",
+            "Requires Step 58.0 4/4. If the real stack already retains an exact off-tree NCharacterSelectScreen, Step 59 adopts and audits that object without invoking the factory. Only when the cache is null may it invoke exact GetSubmenuType<NCharacterSelectScreen>() once while frozen. Success requires exact cache/stack identity, IsInsideTree=false, zero managed/native escape, and an admissible actual off-tree hierarchy/lifecycle map. InitializeSingleplayer and Push remain unopened.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(
@@ -141,9 +141,9 @@ public sealed partial class RootViewController
             _transformedRealStS2VeryEarlyInitialization.MarkStep58StaticMapDurablyWritten();
             WriteStartupLadderCheckpoint(step, "M58_C_STATIC_MAP_WRITE_RETURNED — exact non-invoking character-select factory map durably written.");
             if (!RecordStartupLadderGate(_step58Gates, _transformedRealStS2VeryEarlyInitialization.RunStep58FrozenNoCreationConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            CompleteStartupLadderStep(step, _step58Gates, resultLabel, detailLabel, "CHARACTER-SELECT FACTORY FRONTIER CLOSED 4/4. Cache remains null; Step 59 may create the real screen once off-tree.");
+            CompleteStartupLadderStep(step, _step58Gates, resultLabel, detailLabel, "CHARACTER-SELECT FACTORY FRONTIER CLOSED 4/4. Exact current cache state is confined; Step 59 may acquire the real off-tree screen without unnecessary re-creation.");
             button.Enabled = false;
-            WriteStartupLadderCheckpoint(step, "RUN_STEP58_4OF4 — exact non-invoking character-select factory authority closed; Step 59 one-shot off-tree creation unlocked.");
+            WriteStartupLadderCheckpoint(step, "RUN_STEP58_4OF4 — exact non-invoking character-select factory/cache authority closed; Step 59 off-tree acquisition unlocked.");
         }
         catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: false); }
         finally { await FinishStartupLadderStepAsync(step, "Step58-TransformedRealStS2CharacterSelectFactoryFrontier.txt", "StS2 Launcher — Step 58.0 Character Select Factory Frontier", resultLabel, detailLabel, "Step 58 never creates character select or restarts rendering."); }
@@ -155,34 +155,34 @@ public sealed partial class RootViewController
         if (_step59CreationUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59CreationStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "ONE-SHOT ALREADY ARMED", "Step 59 character-select factory invocation was already armed in this process. Preserve reports and relaunch; never retry it in-process."); return; }
         if (!TryPrepareStartupLadderStep(step, _step58Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep58ClosurePassed,
                 "Step 59.0 requires Step 58.0 4/4 durable character-select factory authority in this same process.", out var button, out var resultLabel, out var detailLabel)) return;
-        if (!TryInitializeStartupLadderTelemetry(step, "Frozen character-select off-tree creation", "Step59-CharacterSelectOffTree-StaticMap", out var error)) { SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return; }
+        if (!TryInitializeStartupLadderTelemetry(step, "Frozen character-select off-tree acquisition", "Step59-CharacterSelectOffTree-StaticMap", out var error)) { SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return; }
         BeginSteamOperation(allowCancel: false);
         _step59Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START — Step 59.0 one-shot frozen GetSubmenuType<NCharacterSelectScreen>() creation + actual off-tree lifecycle audit started.");
+            WriteStartupLadderCheckpoint(step, "RUN_START — Step 59.0 exact off-tree NCharacterSelectScreen acquisition + actual lifecycle audit started. Reuse an exact pre-existing off-tree cache when present; invoke GetSubmenuType only if the cache is null.");
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59CharacterSelectCreationBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            _step59CreationUiStarted = true;
+            _step59CreationUiStarted = _transformedRealStS2VeryEarlyInitialization.Step59FactoryInvocationRequired;
             button.Enabled = false;
             var gateC = _transformedRealStS2VeryEarlyInitialization.RunStep59FrozenCharacterSelectCreation(d => WriteStartupLadderCheckpoint(step, d));
             if (!RecordStartupLadderGate(_step59Gates, gateC, resultLabel, detailLabel)) return;
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59 actual off-tree character-select map write failed: " + mapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten();
-            WriteStartupLadderCheckpoint(step, "M59_C_STATIC_MAP_WRITE_RETURNED — actual off-tree character-select hierarchy/lifecycle evidence durably written after the one-shot factory returned.");
+            WriteStartupLadderCheckpoint(step, "M59_C_STATIC_MAP_WRITE_RETURNED — actual off-tree character-select hierarchy/lifecycle evidence durably written after exact cache/factory acquisition.");
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59FrozenOffTreeConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            CompleteStartupLadderStep(step, _step59Gates, resultLabel, detailLabel, "REAL NCharacterSelectScreen OFF-TREE CREATION CLOSED 4/4. InitializeSingleplayer remains uninvoked; Step 60 mapping is unlocked.");
-            WriteStartupLadderCheckpoint(step, "RUN_STEP59_4OF4 — exact game factory created/retained character select off-tree once; Step 60 InitializeSingleplayer map unlocked.");
+            CompleteStartupLadderStep(step, _step59Gates, resultLabel, detailLabel, "REAL NCharacterSelectScreen OFF-TREE ACQUISITION CLOSED 4/4. InitializeSingleplayer remains uninvoked; Step 60 mapping is unlocked.");
+            WriteStartupLadderCheckpoint(step, "RUN_STEP59_4OF4 — exact game cache/factory path acquired and retained character select off-tree; Step 60 InitializeSingleplayer map unlocked.");
         }
         catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step59CreationUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59CreationStarted); }
-        finally { await FinishStartupLadderStepAsync(step, "Step59-TransformedRealStS2CharacterSelectOffTree.txt", "StS2 Launcher — Step 59.0 Character Select Frozen Off-Tree Creation", resultLabel, detailLabel, "Step 59 leaves rendering frozen. If the factory was armed, never retry Step 59 in-process."); }
+        finally { await FinishStartupLadderStepAsync(step, "Step59-TransformedRealStS2CharacterSelectOffTree.txt", "StS2 Launcher — Step 59.0 Character Select Frozen Off-Tree Acquisition", resultLabel, detailLabel, "Step 59 leaves rendering frozen. If the factory path was armed, never retry Step 59 in-process; a pre-existing exact cache path does not invoke the factory."); }
     }
 
     private async Task RunStep60StartupLadderAsync()
     {
         const int step = 60;
         if (!TryPrepareStartupLadderStep(step, _step59Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep59ClosurePassed,
-                "Step 60.0 requires Step 59.0 4/4 exact off-tree NCharacterSelectScreen authority in this same process.", out var button, out var resultLabel, out var detailLabel)) return;
+                "Step 60.0 requires Step 59.0 4/4 exact acquired off-tree NCharacterSelectScreen authority in this same process.", out var button, out var resultLabel, out var detailLabel)) return;
         if (!TryInitializeStartupLadderTelemetry(step, "Character-select InitializeSingleplayer frontier", "Step60-CharacterSelectInitialize-StaticMap", out var error)) { SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return; }
         BeginSteamOperation(allowCancel: false);
         _step60Gates.Reset();

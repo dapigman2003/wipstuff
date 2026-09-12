@@ -1,0 +1,6 @@
+StS2 Launcher — Step 58 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260912T0415526181400Z-pid11238-48353e4c8e814a598171c589a2c96643
+Journal: Step58-CrashCheckpoint-20260912T0415526181400Z-pid11238-48353e4c8e814a598171c589a2c96643.txt
+Static map: Step58-CharacterSelectFactory-StaticMap-20260912T0415526181400Z-pid11238-48353e4c8e814a598171c589a2c96643.txt
+2026-09-12T04:15:52.7047740+00:00 | run=20260912T0415526181400Z-pid11238-48353e4c8e814a598171c589a2c96643 | pid=11238 | managedThread=7 | RUN_END — Step-58 UI operation ended normally; Step 58 never creates character select or restarts rendering.

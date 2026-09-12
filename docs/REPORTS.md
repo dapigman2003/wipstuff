@@ -40,7 +40,7 @@ Physical 0.0.188 Step 57 retained-hint localization evidence is retained as `STE
 
 ## Steps 58–64 evidence contract
 
-Each rung has a distinct report/static-map/checkpoint surface. Steps 58/60/62 are mapping-only; Steps 59/61/63 are frozen one-shot sub-operation invocations; Step 64 is the only new render rung.
+Each rung has a distinct report/static-map/checkpoint surface. Steps 58/60/62 are mapping-only. Physical 0.0.190 proved Step 58 can encounter an exact pre-existing off-tree `_characterSelectSubmenu`; 0.0.191 records that cache state and lets Step 59 reuse/audit it without a factory call. Step 59 is one-shot only when its null-cache factory path is armed. Steps 61/63 remain frozen one-shot sub-operation invocations; Step 64 is the only new render rung.
 
 - Step 58: `Step58-CharacterSelectFactory-StaticMap-<RunId>.txt`, `Step58-TransformedRealStS2CharacterSelectFactoryFrontier.txt`.
 - Step 59: `Step59-CharacterSelectOffTree-StaticMap-<RunId>.txt`, `Step59-TransformedRealStS2CharacterSelectOffTree.txt`.
@@ -50,4 +50,4 @@ Each rung has a distinct report/static-map/checkpoint surface. Steps 58/60/62 ar
 - Step 63: `Step63-CharacterSelectAdmission-StaticMap-<RunId>.txt`, `Step63-TransformedRealStS2CharacterSelectFrozenAdmission.txt`.
 - Step 64: `Step64-CharacterSelectFrameInput-StaticMap-<RunId>.txt`, `Step64-TransformedRealStS2CharacterSelectRender.txt`.
 
-Steps 59/61/63/64 are one-shot. Step 64's static map must be durable before `StartRendering`; `StopRendering` must precede post-stop telemetry.
+Step 59's factory path and Steps 61/63/64 are one-shot. A Step-59 existing-cache acquisition does not arm the factory boundary. Step 64's static map must be durable before `StartRendering`; `StopRendering` must precede post-stop telemetry. Physical 0.0.190 Step-58 failure artifacts are retained in `docs/history/reports/` as the provenance for this ownership correction.

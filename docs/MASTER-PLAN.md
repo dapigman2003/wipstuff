@@ -1,8 +1,8 @@
-## Current frontier — Steps 58–64 / 0.0.190
+## Current frontier — Steps 58–64 / 0.0.191
 
-The active candidate is **0.0.190 / character-select admission/render continuation through Step 64**. Physical runtime authority is closed through Step 57 4/4/frozen. The fresh-process convenience route remains capped at Step 52; Steps 53–57 must be reconstructed manually before the new block.
+The active candidate is **0.0.191 / character-select admission/render continuation through Step 64**. Physical runtime authority is closed through Step 57 4/4/frozen. The fresh-process convenience route remains capped at Step 52; Steps 53–57 must be reconstructed manually before the new block.
 
-Steps 58–64 decompose the exact physically mapped `OpenCharacterSelect(NButton)` body into separately gated sub-operations: factory map → one-shot off-tree `NCharacterSelectScreen` creation → `InitializeSingleplayer` map → one-shot off-tree initialization → `NSubmenuStack.Push` map → one-shot frozen SceneTree admission → audited 750 ms rendered residency/refreeze. The original handler itself remains unopened, as do character choice/embark/run-start and Step 65+.
+Steps 58–64 decompose the exact physically mapped `OpenCharacterSelect(NButton)` body into separately gated sub-operations: factory/cache map → exact off-tree `NCharacterSelectScreen` acquisition (reuse existing cache or one-shot factory only if null) → `InitializeSingleplayer` map → one-shot off-tree initialization → `NSubmenuStack.Push` map → one-shot frozen SceneTree admission → audited 750 ms rendered residency/refreeze. The original handler itself remains unopened, as do character choice/embark/run-start and Step 65+.
 
 Physical 0.0.189 Step 57 is the authority anchor: exact retained `_characterSelectScreenScene.ResourcePath`, exact trusted-PCK character-select entry, 16,015-byte SHA-256/MD5 evidence, zero textual native-extension risk tokens, no loader/instantiation/handler/rendering, zero drift.
 

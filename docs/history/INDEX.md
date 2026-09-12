@@ -533,3 +533,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `steps/STEP-58-64-CHARACTER-SELECT-ADMISSION-RENDER.md` — 0.0.190 multi-rung character-select continuation design.
 - `reports/STEP-56.0-PHYSICAL-0.0.188-PASS-*` — supplied Step-56 4/4 report/checkpoint/static-map/last-checkpoint.
 - `reports/STEP-57.0-PHYSICAL-0.0.189-PASS-*` — supplied Step-57 4/4 report/checkpoint/static-map/last-checkpoint.
+
+## Step 58 physical pre-existing-cache localization / 0.0.191 focused correction
+
+- `reports/STEP-58.0-PHYSICAL-0.0.190-FAIL-REPORT.txt` — physical 0.0.190 Step 58 result: Gate A passed from closed Step-57 authority; Gate B stopped safely because `_characterSelectSubmenu` was already non-null; no factory invocation occurred.
+- `reports/STEP-58.0-PHYSICAL-0.0.190-FAIL-CHECKPOINT.txt` — run-correlated checkpoint proving the pre-existing-cache localization, frozen renderer, and normal end before any Step-59/initializer/push/render boundary.
+- `reports/STEP-58.0-PHYSICAL-0.0.190-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same safe localization.
+- `steps/STEP-58.0-PREEXISTING-CACHE-CORRECTION-0.0.191.md` — focused correction: characterize/adopt an exact pre-existing off-tree cache; invoke the factory only on the null-cache path.

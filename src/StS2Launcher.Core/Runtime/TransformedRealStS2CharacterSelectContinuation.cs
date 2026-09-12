@@ -18,7 +18,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const int Step64CharacterSelectRenderEvidenceCeilingMilliseconds = 5_000;
 
     private const string Step58Name = "CHARACTER SELECT FACTORY FRONTIER";
-    private const string Step59Name = "CHARACTER SELECT FROZEN OFF-TREE CREATION";
+    private const string Step59Name = "CHARACTER SELECT FROZEN OFF-TREE ACQUISITION";
     private const string Step60Name = "CHARACTER SELECT INITIALIZE FRONTIER";
     private const string Step61Name = "CHARACTER SELECT OFF-TREE INITIALIZATION";
     private const string Step62Name = "CHARACTER SELECT PUSH FRONTIER";
@@ -88,6 +88,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private MethodInfo? _step60RuntimeInitializeMethod;
     private MethodInfo? _step62RuntimePushMethod;
     private object? _step59CharacterSelectScreen;
+    private bool _step58CharacterSelectCachePreexisting;
     private int _step63StackChildrenBefore;
 
     public bool ExactStep58ClosurePassed => _exactStep58ClosurePassed;
@@ -98,6 +99,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public bool ExactStep63ClosurePassed => _exactStep63ClosurePassed;
     public bool ExactStep64ClosurePassed => _exactStep64ClosurePassed;
     public bool Step59CreationStarted => _step59CreationStarted;
+    public bool Step59FactoryInvocationRequired => !_step58CharacterSelectCachePreexisting;
     public bool Step61InitializationStarted => _step61InitializationStarted;
     public bool Step63AdmissionStarted => _step63AdmissionStarted;
     public bool Step64PulseStarted => _step64PulseStarted;
@@ -154,6 +156,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step60RuntimeInitializeMethod = null;
         _step62RuntimePushMethod = null;
         _step59CharacterSelectScreen = null;
+        _step58CharacterSelectCachePreexisting = false;
         _step63StackChildrenBefore = 0;
     }
 
@@ -180,7 +183,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public void MarkStep59StaticMapDurablyWritten()
     {
         if (!_step59CreationPassed || string.IsNullOrWhiteSpace(_step59StaticMap))
-            throw new InvalidOperationException("Step 59.0 actual off-tree creation/lifecycle map is incomplete.");
+            throw new InvalidOperationException("Step 59.0 actual off-tree acquisition/lifecycle map is incomplete.");
         _step59StaticMapDurablyWritten = true;
     }
 
@@ -282,8 +285,28 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             _step58RuntimeFactoryDefinition = runtimeFactory;
 
             var runtimeCache = RequireRuntimeExactInstanceField(runtimeStack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            if (runtimeCache.GetValue(runtimeStack) is not null)
-                throw new InvalidDataException("Step 58.0 requires character-select submenu cache to be null before first factory invocation.");
+            var cachedScreen = runtimeCache.GetValue(runtimeStack);
+            var cacheState = "NULL";
+            if (cachedScreen is not null)
+            {
+                if (cachedScreen.GetType().FullName != CharacterSelectScreenManagedTypeFullName)
+                    throw new InvalidDataException($"Step 58.0 pre-existing character-select cache has unexpected type {cachedScreen.GetType().FullName}.");
+                if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(cachedScreen.GetType().Assembly), context))
+                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache is not owned by the exact private load context.");
+                if (RequireZeroArgBoolMethod(cachedScreen.GetType(), "IsInsideTree").Invoke(cachedScreen, null) is not false)
+                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache is already inside the SceneTree; stop before any new character-select operation.");
+                var cachedStackField = RequireRuntimeExactInstanceField(cachedScreen.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
+                if (!ReferenceEquals(cachedStackField.GetValue(cachedScreen), runtimeStack))
+                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache does not retain the exact submenu stack in NSubmenu._stack.");
+                _step58CharacterSelectCachePreexisting = true;
+                _step59CharacterSelectScreen = cachedScreen;
+                cacheState = "EXISTING_OFF_TREE";
+            }
+            else
+            {
+                _step58CharacterSelectCachePreexisting = false;
+                _step59CharacterSelectScreen = null;
+            }
             var runtimeScene = RequireRuntimeExactInstanceField(runtimeStack.GetType(), MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step);
             var packedScene = runtimeScene.GetValue(runtimeStack) ?? throw new InvalidDataException("Step 58.0 retained character-select PackedScene is null.");
             var resourcePath = RequireRuntimeStringProperty(packedScene, GodotResourcePathPropertyName, step).Replace('\\', '/');
@@ -298,14 +321,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
                 $"OpenCharacterSelect generic call: {genericCall.FullName}\n" +
                 $"Concrete runtime factory token: 0x{_step58FactoryMethodToken:X8}; {concreteFactory.FullName}\n" +
-                $"Character-select cache field: {cacheField.FullName}; initial runtime value=NULL\n" +
+                $"Character-select cache field: {cacheField.FullName}; initial runtime value={cacheState}\n" +
                 $"Character-select scene field: {sceneField.FullName}; ResourcePath={resourcePath}\n" +
                 "Rendering restarted: NO\nFactory invoked: NO\n" +
                 "[CONCRETE FACTORY IL]\n" + string.Join("\n", concreteFactory.Body.Instructions.Select(instruction => "  " + FormatStep41Instruction(instruction))) + "\n";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 58 Gate B");
-            Checkpoint(checkpoint, $"M58_B_PASS — exact generic factory isolated from OpenCharacterSelect; concreteToken=0x{_step58FactoryMethodToken:X8}; cache=NULL; scenePath='{resourcePath}'; invocation=NO; externalResolution=0.");
+            Checkpoint(checkpoint, $"M58_B_PASS — exact generic factory isolated from OpenCharacterSelect; concreteToken=0x{_step58FactoryMethodToken:X8}; cache={cacheState}; scenePath='{resourcePath}'; invocation=NO; externalResolution=0.");
             return StartupLadderPass(step, Step58Name, gate,
-                "Exact concrete GetSubmenuType<T> implementation and null character-select cache were bound; the retained PackedScene identity still matches Step 57. No factory invocation occurred.");
+                "Exact concrete GetSubmenuType<T> implementation and current character-select cache state were bound; the retained PackedScene identity still matches Step 57. A pre-existing cache is accepted only when it is the exact off-tree retained NCharacterSelectScreen. No factory invocation occurred.");
         }
         catch (Exception ex)
         {
@@ -379,14 +402,23 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidOperationException("Step 58.0 Gate D requires durable non-invoking factory evidence with rendering frozen.");
             var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 58.0 retained submenu stack absent.");
             var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            if (cache.GetValue(stack) is not null)
-                throw new InvalidDataException("Step 58.0 character-select cache changed before Step 59 authorization.");
+            var currentCache = cache.GetValue(stack);
+            if (_step58CharacterSelectCachePreexisting)
+            {
+                var retained = RequireRetainedOffTreeCharacterSelect(step);
+                if (!ReferenceEquals(currentCache, retained))
+                    throw new InvalidDataException("Step 58.0 pre-existing character-select cache identity changed before Step 59 authorization.");
+            }
+            else if (currentCache is not null)
+            {
+                throw new InvalidDataException("Step 58.0 character-select cache changed from null before Step 59 authorization.");
+            }
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 58 Gate D");
             RequireVisibleSingleplayerSubmenu(step);
             _exactStep58ClosurePassed = true;
-            Checkpoint(checkpoint, "M58_D_PASS — factory evidence durable; character-select cache still NULL; factory invocation=NO; renderingStopped=True; drift=0.");
+            Checkpoint(checkpoint, $"M58_D_PASS — factory evidence durable; character-select cache={(_step58CharacterSelectCachePreexisting ? "EXISTING_OFF_TREE" : "NULL")}; factory invocation=NO; renderingStopped=True; drift=0.");
             return StartupLadderPass(step, Step58Name, gate,
-                "Character-select factory frontier closed 4/4 without creation. Step 59 may invoke only the exact closed generic factory once while frozen.");
+                "Character-select factory frontier closed 4/4 without creation. Step 59 will reuse the exact pre-existing off-tree cache when present, otherwise it may invoke only the exact closed generic factory once while frozen.");
         }
         catch (Exception ex)
         {
@@ -395,7 +427,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         }
     }
 
-    // STEP 59 — invoke only GetSubmenuType<NCharacterSelectScreen>() once, retaining the result off-tree.
+    // STEP 59 — acquire the exact retained off-tree NCharacterSelectScreen. Reuse a pre-existing exact cache; invoke the factory only when the cache is null.
 
     public TransformedRealStS2StartupLadderGateResult RunStep59ClosedStep58Authority(bool renderingStopped, Action<string>? checkpoint = null)
     {
@@ -407,17 +439,28 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep59Prerequisite("Step 59 Gate A entry");
             if (!renderingStopped)
-                throw new InvalidOperationException("Step 59.0 requires rendering frozen before one-shot factory creation.");
+                throw new InvalidOperationException("Step 59.0 requires rendering frozen before off-tree acquisition; a factory call is one-shot only on the null-cache path.");
             var selected = RequireStartupLadderSelectedAuthority(step);
             _step59Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
             RequireStartupLadderBaselineUnchanged(context, _step59Baseline, "Step 59 Gate A");
             var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 retained submenu stack absent.");
             var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            if (cache.GetValue(stack) is not null)
-                throw new InvalidDataException("Step 59.0 requires character-select cache null before the one-shot factory invocation.");
-            Checkpoint(checkpoint, "M59_A_PASS — Step-58 4/4 factory authority retained; cache=NULL; renderingStopped=True; one-shot factory not armed.");
+            var currentCache = cache.GetValue(stack);
+            if (_step58CharacterSelectCachePreexisting)
+            {
+                var retained = RequireRetainedOffTreeCharacterSelect(step);
+                if (!ReferenceEquals(currentCache, retained))
+                    throw new InvalidDataException("Step 59.0 pre-existing character-select cache identity drifted after Step 58.");
+            }
+            else if (currentCache is not null)
+            {
+                throw new InvalidDataException("Step 59.0 character-select cache became non-null after Step 58 without authorization.");
+            }
+            Checkpoint(checkpoint, $"M59_A_PASS — Step-58 4/4 factory authority retained; cache={(_step58CharacterSelectCachePreexisting ? "EXISTING_OFF_TREE" : "NULL")}; renderingStopped=True; factory invocation not armed.");
             return StartupLadderPass(step, Step59Name, gate,
-                "Exact non-invoking factory authority retained with null character-select cache and frozen rendering.");
+                _step58CharacterSelectCachePreexisting
+                    ? "Exact pre-existing off-tree NCharacterSelectScreen cache authority retained with frozen rendering; Step 59 will audit/adopt it without invoking the factory."
+                    : "Exact non-invoking factory authority retained with null character-select cache and frozen rendering.");
         }
         catch (Exception ex)
         {
@@ -443,19 +486,33 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var characterType = RequireAdmission().Assembly.GetType(CharacterSelectScreenManagedTypeFullName, true, false)!;
             var closed = runtimeFactory.MakeGenericMethod(characterType);
             var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            if (cache.GetValue(stack) is not null)
+            var currentCache = cache.GetValue(stack);
+            if (_step58CharacterSelectCachePreexisting)
+            {
+                var retained = RequireRetainedOffTreeCharacterSelect(step);
+                if (!ReferenceEquals(currentCache, retained))
+                    throw new InvalidDataException("Step 59.0 pre-existing character-select cache identity drifted before acquisition audit.");
+            }
+            else if (currentCache is not null)
+            {
                 throw new InvalidDataException("Step 59.0 character-select cache became non-null before authorization.");
+            }
+            var acquisitionMode = _step58CharacterSelectCachePreexisting ? "REUSE_EXISTING_OFF_TREE_CACHE" : "FACTORY_IF_NULL";
             _step59StaticMap =
-                "StS2 Launcher — Step 59.0 frozen character-select off-tree creation\n" +
-                "Pre-action binding map; actual hierarchy/lifecycle evidence is appended after one-shot factory invocation.\n" +
+                "StS2 Launcher — Step 59.0 frozen character-select off-tree acquisition\n" +
+                "Pre-action binding map; actual hierarchy/lifecycle evidence is appended after acquisition.\n" +
                 $"Selected compatibility SHA-256: {baseline.SelectedSha256}\n" +
                 $"Closed runtime factory: {closed}\n" +
                 $"Factory token: 0x{_step58FactoryMethodToken:X8}\n" +
-                "Cache before invocation: NULL\nRendering restarted: NO\nInitializeSingleplayer invoked: NO\nPush invoked: NO\n";
+                $"Acquisition mode: {acquisitionMode}\n" +
+                $"Cache before Gate C: {(_step58CharacterSelectCachePreexisting ? "EXISTING_OFF_TREE" : "NULL")}\n" +
+                "Rendering restarted: NO\nInitializeSingleplayer invoked: NO\nPush invoked: NO\n";
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate B");
-            Checkpoint(checkpoint, $"M59_B_PASS — exact closed runtime factory rebound token=0x{_step58FactoryMethodToken:X8}; cache=NULL; renderingStopped=True; creation=NO.");
+            Checkpoint(checkpoint, $"M59_B_PASS — exact closed runtime factory rebound token=0x{_step58FactoryMethodToken:X8}; acquisitionMode={acquisitionMode}; renderingStopped=True; factoryInvocation=NO.");
             return StartupLadderPass(step, Step59Name, gate,
-                "Exact closed GetSubmenuType<NCharacterSelectScreen>() runtime method rebound with cache still null. One-shot creation is not armed until Gate C.");
+                _step58CharacterSelectCachePreexisting
+                    ? "Exact pre-existing off-tree NCharacterSelectScreen cache rebound and will be adopted without factory invocation at Gate C."
+                    : "Exact closed GetSubmenuType<NCharacterSelectScreen>() runtime method rebound with cache still null. One-shot creation is not armed until Gate C.");
         }
         catch (Exception ex)
         {
@@ -481,29 +538,39 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var characterType = RequireAdmission().Assembly.GetType(CharacterSelectScreenManagedTypeFullName, true, false)!;
             var closed = runtimeFactory.MakeGenericMethod(characterType);
             var cache = RequireRuntimeExactInstanceField(stack.GetType(), MainMenuCharacterSelectSubmenuFieldName, CharacterSelectScreenManagedTypeFullName, step);
-            if (cache.GetValue(stack) is not null)
-                throw new InvalidDataException("Step 59.0 cache must still be null immediately before the one-shot factory call.");
-            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 59 Gate C immediately before factory", requirePreAdmissionCounts: false);
+            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 59 Gate C immediately before acquisition", requirePreAdmissionCounts: false);
             var initializerBefore = context.InitializerBearingRequests.Count;
             var rejectedBefore = context.RejectedManagedRequests.Count;
             var nativeBefore = context.NativeLoadAttempts.Count;
-            _step59CreationStarted = true;
-            Checkpoint(checkpoint, "M59_C_FACTORY_ARMED — first/only GetSubmenuType<NCharacterSelectScreen>() invocation authorized while renderer remains frozen. No InitializeSingleplayer, Push, or OpenCharacterSelect call is authorized.");
-            stage = "frozen character-select factory invocation";
-            var created = InvokeStartupLadderMethod(closed, stack, null, "Step 59 GetSubmenuType<NCharacterSelectScreen>")
-                ?? throw new InvalidDataException("Step 59.0 character-select factory returned null.");
+            object created;
+            if (_step58CharacterSelectCachePreexisting)
+            {
+                stage = "frozen pre-existing character-select cache adoption";
+                created = RequireRetainedOffTreeCharacterSelect(step);
+                Checkpoint(checkpoint, "M59_C_EXISTING_CACHE_ADOPTED — exact pre-existing off-tree NCharacterSelectScreen cache adopted without invoking GetSubmenuType. InitializeSingleplayer, Push, OpenCharacterSelect, and rendering remain unauthorized.");
+            }
+            else
+            {
+                if (cache.GetValue(stack) is not null)
+                    throw new InvalidDataException("Step 59.0 cache must still be null immediately before the one-shot factory call.");
+                _step59CreationStarted = true;
+                Checkpoint(checkpoint, "M59_C_FACTORY_ARMED — first/only GetSubmenuType<NCharacterSelectScreen>() invocation authorized while renderer remains frozen. No InitializeSingleplayer, Push, or OpenCharacterSelect call is authorized.");
+                stage = "frozen character-select factory invocation";
+                created = InvokeStartupLadderMethod(closed, stack, null, "Step 59 GetSubmenuType<NCharacterSelectScreen>")
+                    ?? throw new InvalidDataException("Step 59.0 character-select factory returned null.");
+            }
             if (created.GetType().FullName != CharacterSelectScreenManagedTypeFullName)
-                throw new InvalidDataException($"Step 59.0 factory returned unexpected type {created.GetType().FullName}.");
+                throw new InvalidDataException($"Step 59.0 acquired unexpected type {created.GetType().FullName}.");
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(created.GetType().Assembly), context))
                 throw new InvalidDataException("Step 59.0 character-select instance is not owned by the exact private load context.");
             if (!ReferenceEquals(cache.GetValue(stack), created))
-                throw new InvalidDataException("Step 59.0 returned character-select instance is not the exact stack cache object.");
+                throw new InvalidDataException("Step 59.0 acquired character-select instance is not the exact stack cache object.");
             if (RequireZeroArgBoolMethod(created.GetType(), "IsInsideTree").Invoke(created, null) is not false)
-                throw new InvalidDataException("Step 59.0 character-select root unexpectedly entered the SceneTree during factory creation.");
+                throw new InvalidDataException("Step 59.0 character-select root unexpectedly entered the SceneTree during acquisition.");
             var stackField = RequireRuntimeExactInstanceField(created.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
             if (!ReferenceEquals(stackField.GetValue(created), stack))
-                throw new InvalidDataException("Step 59.0 created character-select root does not retain the exact submenu stack in NSubmenu._stack.");
-            RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, "Step 59 factory invocation");
+                throw new InvalidDataException("Step 59.0 acquired character-select root does not retain the exact submenu stack in NSubmenu._stack.");
+            RequireNoForbiddenStep37Escape(context, initializerBefore, rejectedBefore, nativeBefore, _step58CharacterSelectCachePreexisting ? "Step 59 existing-cache adoption" : "Step 59 factory invocation");
             _step59CharacterSelectScreen = created;
             _step59PostCreationBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
 
@@ -522,11 +589,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             RequireImmediateFrontierAdmissible(audit, "Step 59.0 actual character-select lifecycle frontier under retained runtime guards");
             if (resolver.Requests.Count != 0)
                 throw new InvalidDataException("Step 59.0 lifecycle audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
-            _step59StaticMap += BuildCharacterSelectNodeAuditAppendix("ACTUAL OFF-TREE CHARACTER-SELECT HIERARCHY", nodes, managedTypes, lifecycleRoots, audit);
+            _step59StaticMap += $"Factory invoked by Step 59: {(_step58CharacterSelectCachePreexisting ? "NO — pre-existing exact cache reused" : "YES — one-shot cache-null factory path")}\n" +
+                BuildCharacterSelectNodeAuditAppendix("ACTUAL OFF-TREE CHARACTER-SELECT HIERARCHY", nodes, managedTypes, lifecycleRoots, audit);
             _step59CreationPassed = true;
-            Checkpoint(checkpoint, $"M59_C_PASS — exact character-select root created once and retained off-tree; nodes={nodes.Count}; managedTypes={managedTypes.Length}; lifecycleRoots={lifecycleRoots.Length}; closure={audit.ImmediateClosureMethods.Length}; guarded={audit.GuardedMethodFrontiers.Length}; cacheIdentity=True; stackIdentity=True; insideTree=False; native/context drift=0.");
+            Checkpoint(checkpoint, $"M59_C_PASS — exact character-select root acquired and retained off-tree; source={(_step58CharacterSelectCachePreexisting ? "existing-cache" : "one-shot-factory")}; nodes={nodes.Count}; managedTypes={managedTypes.Length}; lifecycleRoots={lifecycleRoots.Length}; closure={audit.ImmediateClosureMethods.Length}; guarded={audit.GuardedMethodFrontiers.Length}; cacheIdentity=True; stackIdentity=True; insideTree=False; native/context drift=0.");
             return StartupLadderPass(step, Step59Name, gate,
-                $"Real NCharacterSelectScreen created once through the exact game factory and retained off-tree. Actual lifecycle surface is admissible: nodes={nodes.Count}; managed types={managedTypes.Length}; lifecycle roots={lifecycleRoots.Length}; no native/context escape.");
+                $"Real NCharacterSelectScreen acquired from the exact game cache/factory path and retained off-tree. Actual lifecycle surface is admissible: nodes={nodes.Count}; managed types={managedTypes.Length}; lifecycle roots={lifecycleRoots.Length}; no native/context escape.");
         }
         catch (Exception ex)
         {
@@ -544,16 +612,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         {
             ThrowIfDisposed();
             var context = RequireStep59Prerequisite("Step 59 Gate D entry");
-            var post = _step59PostCreationBaseline ?? throw new InvalidOperationException("Step 59.0 post-creation baseline absent.");
+            var post = _step59PostCreationBaseline ?? throw new InvalidOperationException("Step 59.0 post-acquisition baseline absent.");
             if (!_step59CreationPassed || !_step59StaticMapDurablyWritten || !renderingStopped)
-                throw new InvalidOperationException("Step 59.0 Gate D requires successful one-shot off-tree creation, durable map, and frozen rendering.");
+                throw new InvalidOperationException("Step 59.0 Gate D requires successful off-tree acquisition, durable map, and frozen rendering.");
             var screen = RequireRetainedOffTreeCharacterSelect(step);
             RequireStartupLadderBaselineUnchanged(context, post, "Step 59 Gate D");
             RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 59 Gate D", requirePreAdmissionCounts: false);
             _exactStep59ClosurePassed = true;
-            Checkpoint(checkpoint, $"M59_D_PASS — NCharacterSelectScreen retained off-tree; type={screen.GetType().FullName}; renderingStopped=True; creation one-shot complete; InitializeSingleplayer/Push invocation=NO; drift=0.");
+            Checkpoint(checkpoint, $"M59_D_PASS — NCharacterSelectScreen retained off-tree; type={screen.GetType().FullName}; source={(_step58CharacterSelectCachePreexisting ? "existing-cache" : "one-shot-factory")}; renderingStopped=True; InitializeSingleplayer/Push invocation=NO; drift=0.");
             return StartupLadderPass(step, Step59Name, gate,
-                "Frozen off-tree character-select creation closed 4/4. Step 60 may isolate InitializeSingleplayer without invoking it.");
+                "Frozen off-tree character-select acquisition closed 4/4. Step 60 may isolate InitializeSingleplayer without invoking it.");
         }
         catch (Exception ex)
         {
