@@ -1,0 +1,7 @@
+# Steps 56–57 physical closure — 0.0.188 / 0.0.189
+
+Physical 0.0.188 closed Step 56 at 4/4 while rendering remained frozen. The exact method is `void NSingleplayerSubmenu.OpenCharacterSelect(NButton)`, token `0x06003F71`; it was never invoked. The durable static map proves its body obtains `NCharacterSelectScreen` through `_stack.GetSubmenuType<NCharacterSelectScreen>()`, then calls `InitializeSingleplayer()`, then `_stack.Push(...)`. The immediate closure contains no character-select resource literal or scene hint.
+
+Physical 0.0.189 then closed Step 57 at 4/4 while rendering remained frozen. The retained runtime `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene` exposed exact `ResourcePath = res://scenes/screens/character_select_screen.tscn`; that path matched exactly one receipt-backed PCK entry. The read-only extraction was 16,015 bytes with SHA-256 `3d2305fdddae6f432e52ac4b8ea5035c5cecfd26fbc30c319f09b1cd4a05eb1e` and PCK MD5 `164a8ee7ae95a8c407a4745361b1bf16`. The textual native-risk scan found zero Spine, FMOD/Fmod, `.gdextension`, `.dylib`, and `.dll` occurrences.
+
+This closes physical authority through **Step 57**. It does not authorize the original `OpenCharacterSelect` handler, `ResourceLoader`, arbitrary `PackedScene.Instantiate`, character choice, embark/run-start behavior, whole `GameStartup`/`LaunchMainMenu`, Steam/native startup, deferred startup, or native game extensions.

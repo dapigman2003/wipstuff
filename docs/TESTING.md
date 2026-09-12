@@ -1,27 +1,31 @@
-# Testing — Steps 53–57 single-player submenu continuation / 0.0.189
+# Testing — Steps 58–64 character-select admission/render continuation / 0.0.190
 
-Active candidate: `0.0.189 (189)`, IPA `StS2-Launcher-Steps-53-57.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.190 (190)`, IPA `StS2-Launcher-Steps-58-64.ipa`, workflow `ios-canonical`.
 
-Static/container validation proves source wiring, exact hashes, fail-stop sequencing, one-shot guards, report surfaces, release identity, provenance, cache configuration and payload/security policy. Codemagic remains compile/AOT/link/package authority. Physical iPhone reports remain runtime authority.
+Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
 ## Physical sequence
 
-0.0.189 retains the physical 0.0.184 Step-53 return-type correction, physical 0.0.185 Step-54 ownership correction, physical 0.0.186 Step-56 callback-signature localization, and physical 0.0.187 Step-56 4/4/frozen closure. Physical 0.0.188 re-entered Step 57 and stopped safely at Gate A with `observed=none`, proving immediate-closure scene literals are not a valid identity handoff. 0.0.189 instead proves the actual retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, reads only its existing `ResourcePath`, and verifies that exact path against the receipt-backed PCK directory before read-only extraction.
+Start from a **fresh process** and run **Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52**. Require 4/4 with rendering frozen. Then run **53 → 54 → 55 → 56 → 57** to reconstruct the physically closed Step-57 authority.
 
-Start from a **fresh process** and press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52**. It must end 4/4 with rendering frozen. The runner does not execute Step 15 Gate D or Step 38 and remains capped at the physically closed frontier.
+Continue, stopping immediately on the first failure:
 
-Then run manually, stopping immediately on the first failure:
+1. **58** — exact `GetSubmenuType<NCharacterSelectScreen>()` factory map; no invocation.
+2. **59** — one-shot frozen off-tree factory invocation + actual off-tree hierarchy/lifecycle audit.
+3. **60** — exact zero-arg `InitializeSingleplayer()` map; no invocation.
+4. **61** — one-shot frozen off-tree `InitializeSingleplayer()` invocation.
+5. **62** — exact `NSubmenuStack.Push(NSubmenu)` + tree-entry lifecycle map; no push.
+6. **63** — one-shot frozen exact `Push` admission; require visible/in-tree exact screen.
+7. **64** — actual in-tree frame/input audit + one bounded 750 ms render residency + synchronous refreeze.
 
-1. Step 53 — exact `OpenSingleplayerSubmenu` map only.
-2. Step 54 — one-shot frozen exact `OpenSingleplayerSubmenu` invocation.
-3. Step 55 — actual submenu callback audit + bounded 750 ms render/refreeze.
-4. Step 56 — physically closed non-invoking `OpenCharacterSelect(NButton) -> void` frontier; any resource literals are diagnostic only.
-5. Step 57 — retained `_characterSelectScreenScene : Godot.PackedScene` metadata/runtime identity → existing `ResourcePath` → exact PCK-directory proof, then exact PCK resource preflight.
+Never retry Steps **59, 61, 63, or 64** in-process after their one-shot boundary is armed. Steps 58/60/62 and all pre-action gates keep rendering frozen. Step 64 must write its map before `StartRendering()`, and `StopRendering()` must occur on the first managed continuation before post-stop telemetry/file I/O.
 
-Never retry Step 54 or Step 55 in-process after their one-shot boundary is armed. Steps 53, 54, 56 and 57 must keep rendering frozen. Step 55 must call `StopRendering()` on the first managed continuation before post-stop telemetry/file I/O and end frozen.
+The original `OpenCharacterSelect(NButton)` handler must not be invoked anywhere in 0.0.190. No character selection/confirm/embark/run-start or Step 65 behavior is authorized.
 
-Step 56/57 must never call `OpenCharacterSelect`, `ResourceLoader`, `PackedScene.Instantiate`, or character-select admission. Risk findings in Step 57 are evidence only and authorize nothing.
+## Expected evidence surfaces
+
+Every rung writes `StepNN-CrashCheckpoint-<RunId>.txt`, a distinct `StepNN-...-StaticMap-<RunId>.txt`, `StepNN-LastCheckpoint.txt`, and a final `StepNN-TransformedRealStS2....txt` report. Preserve all four for the first failure, and preserve Step 64's four files if the entire block succeeds.
 
 ## Codemagic performance telemetry
 
-The 0.0.183 cache experiment is retained unchanged. `artifacts/reports/cache-state.txt` and `build-summary.txt` continue to report AOT sentinel presence plus LLVM `opt`/`llc` counts. CI performance changes are not required to run Steps 53–57.
+The 0.0.183 AOT cache/sentinel telemetry remains unchanged. It is independent of the Steps 58–64 runtime experiment.

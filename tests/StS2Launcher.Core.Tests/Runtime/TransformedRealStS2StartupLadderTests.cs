@@ -36,7 +36,14 @@ public sealed class TransformedRealStS2StartupLadderTests
             (54, "SINGLEPLAYER SUBMENU FROZEN OPEN"),
             (55, "SINGLEPLAYER SUBMENU RENDER RESIDENCY"),
             (56, "CHARACTER SELECT FRONTIER MAP"),
-            (57, "CHARACTER SELECT RESOURCE PREFLIGHT")
+            (57, "CHARACTER SELECT RESOURCE PREFLIGHT"),
+            (58, "CHARACTER SELECT FACTORY FRONTIER"),
+            (59, "CHARACTER SELECT FROZEN OFF-TREE CREATION"),
+            (60, "CHARACTER SELECT INITIALIZE FRONTIER"),
+            (61, "CHARACTER SELECT OFF-TREE INITIALIZATION"),
+            (62, "CHARACTER SELECT PUSH FRONTIER"),
+            (63, "CHARACTER SELECT FROZEN SCENETREE ADMISSION"),
+            (64, "CHARACTER SELECT RENDER RESIDENCY")
         };
 
         var summaries = new HashSet<string>(StringComparer.Ordinal);
@@ -52,7 +59,7 @@ public sealed class TransformedRealStS2StartupLadderTests
             Assert.IsTrue(summaries.Add(snapshot.Summary));
         }
 
-        Assert.AreEqual(11, summaries.Count);
+        Assert.AreEqual(18, summaries.Count);
     }
 
     [TestMethod]

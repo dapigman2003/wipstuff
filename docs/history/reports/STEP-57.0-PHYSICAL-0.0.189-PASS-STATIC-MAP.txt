@@ -1,0 +1,42 @@
+StS2 Launcher — Step 57.0 character-select exact PCK resource preflight
+Read-only PCK evidence. This step never calls ResourceLoader, PackedScene.Instantiate, or OpenCharacterSelect.
+Selected compatibility SHA-256: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a
+Resource source: MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack._characterSelectScreenScene.ResourcePath
+Resource path: res://scenes/screens/character_select_screen.tscn
+Bytes: 16015
+SHA-256: 3d2305fdddae6f432e52ac4b8ea5035c5cecfd26fbc30c319f09b1cd4a05eb1e
+PCK MD5: 164a8ee7ae95a8c407a4745361b1bf16
+PCK entry flags: 0x00000000
+UTF-8 text decode: PASS
+Godot resource load: NO
+OpenCharacterSelect invoked: NO
+Rendering restarted: NO
+[TEXTUAL NATIVE/EXTENSION RISK SCAN]
+Spine token occurrences: 0
+FMOD/Fmod token occurrences: 0
+.gdextension occurrences: 0
+.dylib occurrences: 0
+.dll occurrences: 0
+Combined textual native-risk occurrences: 0
+Risk tokens are evidence only and authorize nothing.
+[REFERENCED RES:// PATHS]
+  - res://addons/mega_text/MegaLabel.cs
+  - res://addons/mega_text/MegaRichTextLabel.cs
+  - res://images/atlases/compressed.sprites/back_button_x.tres
+  - res://images/atlases/ui_atlas.sprites/top_bar/top_bar_gold.tres
+  - res://images/atlases/ui_atlas.sprites/top_bar/top_bar_heart.tres
+  - res://images/debug/placeholder_64.png
+  - res://images/ui/fuzzy_nine_patch_char_select.png
+  - res://scenes/screens/ascension_panel.tscn
+  - res://scenes/screens/char_select/char_select_act_dropdown.tscn
+  - res://scenes/screens/char_select/char_select_button.tscn
+  - res://scenes/screens/remote_player_container.tscn
+  - res://scenes/ui/back_button.tscn
+  - res://scenes/ui/confirm_button.tscn
+  - res://shaders/hsv.gdshader
+  - res://src/Core/Nodes/Screens/CharacterSelect/NCharacterSelectScreen.cs
+  - res://src/Core/Nodes/Screens/CharacterSelect/NCharacterSelectScreenBg.cs
+  - res://themes/kreon_bold_glyph_space_two.tres
+  - res://themes/kreon_bold_shared.tres
+  - res://themes/kreon_regular_shared.tres
+  - res://themes/spectral_glphy_space_two.tres

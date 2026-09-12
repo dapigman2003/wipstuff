@@ -127,6 +127,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step54SubmenuVisibleInTreeBefore = false;
         _step56CharacterSelectSceneCandidates = [];
         _step57CharacterSelectResourcePath = string.Empty;
+        ResetCharacterSelectContinuationState();
     }
 
     public string GetVerifiedSingleplayerContinuationStaticMap(int step)

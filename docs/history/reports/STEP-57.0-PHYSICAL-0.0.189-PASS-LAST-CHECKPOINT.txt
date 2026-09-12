@@ -1,0 +1,6 @@
+StS2 Launcher — Step 57 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260911T2235410217100Z-pid8428-cbb508aa8227470bb178b1f10d46d208
+Journal: Step57-CrashCheckpoint-20260911T2235410217100Z-pid8428-cbb508aa8227470bb178b1f10d46d208.txt
+Static map: Step57-CharacterSelectResource-StaticMap-20260911T2235410217100Z-pid8428-cbb508aa8227470bb178b1f10d46d208.txt
+2026-09-11T22:35:41.1070170+00:00 | run=20260911T2235410217100Z-pid8428-cbb508aa8227470bb178b1f10d46d208 | pid=8428 | managedThread=4 | RUN_END — Step-57 UI operation ended normally; Step 57 is read-only: no OpenCharacterSelect, ResourceLoader, PackedScene instantiation, or rendering.

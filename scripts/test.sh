@@ -17,7 +17,7 @@ STEP28_AHEAD_OF_LOAD_DIR="artifacts/host-step28-ahead-of-load-fixture"
 
 command -v dotnet >/dev/null 2>&1 || { echo "ERROR: dotnet is required to run host tests."; exit 2; }
 
-echo "StS2 Launcher — Steps 53–57 single-player submenu continuation host regression tests"
+echo "StS2 Launcher — Steps 58–64 character-select admission/render continuation host regression tests"
 echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo ".NET: $(dotnet --version)"
 

@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>189</ApplicationVersion>" in project_text, "build version is 189")
-require("<ApplicationDisplayVersion>0.0.189</ApplicationDisplayVersion>" in project_text, "display version is 0.0.189")
-require(plist.get("CFBundleVersion") == "189", "Info.plist build version is 189")
-require(plist.get("CFBundleShortVersionString") == "0.0.189", "Info.plist display version is 0.0.189")
+require("<ApplicationVersion>190</ApplicationVersion>" in project_text, "build version is 190")
+require("<ApplicationDisplayVersion>0.0.190</ApplicationDisplayVersion>" in project_text, "display version is 0.0.190")
+require(plist.get("CFBundleVersion") == "190", "Info.plist build version is 190")
+require(plist.get("CFBundleShortVersionString") == "0.0.190", "Info.plist display version is 0.0.190")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -198,13 +198,13 @@ require("namespace StS2Launcher.iOS" in ios_text, "live iOS source uses canonica
 release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs"
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
-require("STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION" in release_presentation, "top launcher banner identifies the active Steps 53–57 single-player submenu continuation")
-require("STEPS 35–56 PHYSICALLY CLOSED" in release_presentation and "0.0.189 STEP 57 ACTIVE" in release_presentation and "STEP 58 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 56, active Step 57, and Step 58 unopened")
-require("Active candidate: **0.0.189 (189)**" in read("README.md") and "Active candidate: **0.0.189 (189)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.189 (189) release identity")
-require("active candidate is **0.0.189 / single-player submenu continuation through Step 57**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.189 / Steps 53–57 frontier")
-require(all(marker in release_presentation for marker in ["STEPS 35–56 PHYSICALLY CLOSED", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "Steam", "Steps 53", "Step 56", "Step57", "Step 58"]), "top launcher banner preserves historical authority and identifies the active closed-through-56 frontier")
+require("STEPS 58–64 — CHARACTER-SELECT ADMISSION / RENDER CONTINUATION" in release_presentation, "top launcher banner identifies the active Steps 58–64 character-select continuation")
+require("STEPS 35–57 PHYSICALLY CLOSED" in release_presentation and "0.0.190 STEPS 58–64 ACTIVE" in release_presentation and "STEP 65 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 57, active Steps 58–64, and Step 65 unopened")
+require("Active candidate: **0.0.190 (190)**" in read("README.md") and "Active candidate: **0.0.190 (190)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.190 (190) release identity")
+require("active candidate is **0.0.190 / character-select admission/render continuation through Step 64**" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.190 / Steps 58–64 frontier")
+require(all(marker in release_presentation for marker in ["STEPS 35–57 PHYSICALLY CLOSED", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "Steam", "Steps 53", "Step 57", "Steps 58", "Step 64", "Step 65"]), "top launcher banner preserves historical authority and identifies the active closed-through-57 frontier")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.189"' in release_presentation and 'ExpectedBuildVersion = "189"' in release_presentation, "startup-ladder source pins expected 0.0.189 bundle release identity")
+require('ExpectedDisplayVersion = "0.0.190"' in release_presentation and 'ExpectedBuildVersion = "190"' in release_presentation, "startup-ladder source pins expected 0.0.190 bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -369,9 +369,9 @@ release_config = release_config_path.read_text() if release_config_path.is_file(
 for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
-    "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-53-57.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.189",
-    "STS2_BUILD_VERSION": "189",
+    "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-58-64.ipa",
+    "STS2_DISPLAY_VERSION": "0.0.190",
+    "STS2_BUILD_VERSION": "190",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -724,7 +724,7 @@ test_script_text = read("scripts/test.sh")
 for marker in ["Harmony-Fat", "STS2_STEP27", "STEP27_INTERPRETED", "Step27InterpretedPatchFixture", "host-step27"]:
     require(marker not in test_script_text + build_ios_text + verify_ipa_text + test_project_text, f"active CI/IPA/project graph has no retired Step-27 dependency: {marker}")
 require("curl" not in test_script_text and "unzip" not in test_script_text, "host tests no longer perform the retired Harmony release network acquisition")
-require("Steps 53–57 single-player submenu continuation IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Steps-53–57 continuation candidate rather than retired Step 27")
+require("Steps 58–64 character-select admission/render continuation IPA verification passed." in verify_ipa_text and "Step 27 IPA verification passed." not in verify_ipa_text, "IPA verification summary identifies the active Steps-58–64 continuation candidate rather than retired Step 27")
 require("StS2Launcher.Step27.InterpretedPatchFixture" not in project_text and "StS2Launcher.Step27.InterpretedPatchFixture" not in test_project_text, "retired Step-27 fixture is absent from iOS and host-test project graphs")
 require("Step 27 is physically closed as a **negative architecture result** by 0.0.108" in read("docs/REGRESSION-CONTRACTS.md"), "active regression contracts preserve the decisive Step-27 negative architecture result")
 require("closed runtime Harmony/MonoMod replacement as a negative architecture result" in read("docs/MASTER-PLAN.md"), "master plan continues to retire runtime Harmony/MonoMod replacement")
@@ -1702,10 +1702,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Steps 53–57 single-player submenu continuation / 0.0.189 (189)", "physically closed through **Step 52**", "closed through **Step 56 4/4/frozen**", "Physical 0.0.184 Step 53 localization — safe Gate-B stop", "Physical 0.0.185 Step 54 localization — safe Gate-B stop", "Physical 0.0.186 Step 56 localization — safe Gate-B stop after Step 55 closure", "Physical 0.0.187 Step 57 localization — safe Gate-A stop after Step 56 closure", "Physical 0.0.188 Step 57 localization — retained hint absent, still read-only", "Step 53.0 — exact single-player submenu-open frontier", "Step 54.0 — one-shot frozen real NSingleplayerSubmenu open", "Step 55.0 — actual single-player submenu render residency", "Step 56.0 — exact character-select frontier map", "OpenCharacterSelect(NButton)", "_characterSelectScreenScene", "Godot.PackedScene", "res://scenes/screens/character_select_screen.tscn", "Step 57.0 — exact character-select PCK resource preflight", "Step 58 remains unopened", "skip Step 38", "Step 15 Gate D"]), "current status records stable Step-52 baseline, physical closure through Step 56, and corrected read-only Step-57 boundary")
+require(all(marker in current_status for marker in ["Active candidate — Steps 58–64 character-select admission/render continuation / 0.0.190 (190)", "capped at Step 52", "closed through **Step 57 4/4/frozen**", "Physical 0.0.184 Step 53 localization — safe Gate-B stop", "Physical 0.0.185 Step 54 localization — safe Gate-B stop", "Physical 0.0.186 Step 56 localization — safe Gate-B stop after Step 55 closure", "Physical 0.0.187 Step 57 localization — safe Gate-A stop after Step 56 closure", "Physical 0.0.188 Step 57 localization — retained hint absent, still read-only", "Step 53.0 — exact single-player submenu-open frontier", "Step 57.0 — exact character-select PCK resource preflight", "Step 58.0 — exact character-select factory frontier", "Step 64.0 — actual character-select frame/input audit + bounded render residency", "OpenCharacterSelect(NButton)", "_characterSelectScreenScene", "Godot.PackedScene", "res://scenes/screens/character_select_screen.tscn", "No Step 65 behavior exists", "skip Step 38", "Step 15 Gate D"]), "current status records stable Step-52 baseline, physical closure through Step 57, and active Steps 58-64")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.189 (189)" in testing_doc and "0.0.189 (189)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.189 (189) release identity")
+require("0.0.190 (190)" in testing_doc and "0.0.190 (190)" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.190 (190) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -1814,9 +1814,9 @@ require("bin/Release/net9.0-ios/ios-arm64/AOTCompileInputs.cache" in codemagic a
 require("- $CM_BUILD_DIR/src/StS2Launcher.iOS/bin/Release/net9.0-ios/ios-arm64\n" not in codemagic, "Codemagic does not cache the entire iOS bin tree")
 cm_script = read("scripts/codemagic.sh")
 require(all(marker in cm_script for marker in ["Pinned .NET SDK/workloads", ".sts2launcher-ios-workload-set", "workload list", "Using verified cached iOS workload set", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE=1"]), "Codemagic verifies the exact cached .NET/iOS workload before skipping network workload installation")
-require("Steps 53–57 single-player submenu continuation host regression tests" in read("scripts/test.sh"), "host-test report heading identifies the Steps 53–57 continuation candidate")
+require("Steps 58–64 character-select admission/render continuation host regression tests" in read("scripts/test.sh"), "host-test report heading identifies the Steps 58–64 continuation candidate")
 require("LogFileName=steps43-52.trx" in read("scripts/test.sh") and "artifacts/test-results/steps43-52.trx" in read("scripts/test.sh"), "host-test TRX artifact identifies Steps 43–50")
-require("Steps 53–57 single-player submenu continuation build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Steps 53–57 continuation candidate")
+require("Steps 58–64 character-select admission/render continuation build environment" in read("scripts/codemagic.sh"), "Codemagic build-environment report heading identifies the Steps 58–64 continuation candidate")
 workflow_count = len(re.findall(r'^  ios-[^:]+:', codemagic, re.M))
 require(workflow_count == 1, "Codemagic contains one active launcher workflow")
 require("scripts/codemagic.sh" in codemagic, "Codemagic calls the consolidated build entry point")
@@ -1830,14 +1830,14 @@ verify_ipa = read("scripts/verify-ipa.sh")
 require('source scripts/lib/current-release.sh' in build_ios, "iOS build sources canonical release configuration")
 require('PROJECT="$STS2_IOS_PROJECT"' in build_ios, "iOS build uses canonical project variable")
 require("bash scripts/build-godot.sh" in build_ios, "iOS build uses canonical Godot wrapper")
-require("Publishing Steps 53–57 single-player submenu continuation..." in build_ios, "iOS publish presentation identifies the active Steps 53–57 continuation candidate")
-require(all(value in codemagic for value in ["name: Steps 53-57 - single-player submenu continuation", "name: Validate, test, build, and verify Steps 53-57 single-player submenu continuation"]), "Codemagic workflow presentation identifies the active Steps 53–57 continuation candidate")
+require("Publishing Steps 58–64 character-select admission/render continuation..." in build_ios, "iOS publish presentation identifies the active Steps 58–64 continuation candidate")
+require(all(value in codemagic for value in ["name: Steps 58-64 - character-select admission/render continuation", "name: Validate, test, build, and verify Steps 58-64 character-select admission/render continuation"]), "Codemagic workflow presentation identifies the active Steps 58–64 continuation candidate")
 codemagic_script = read("scripts/codemagic.sh")
-require(all(value in codemagic_script for value in ["Codemagic cache state before Steps 53–57 single-player submenu continuation build", "StS2 Launcher iOS — Steps 53–57 single-player submenu continuation"]), "Codemagic report headings identify the active Steps 53–57 continuation candidate")
+require(all(value in codemagic_script for value in ["Codemagic cache state before Steps 58–64 character-select admission/render continuation build", "StS2 Launcher iOS — Steps 58–64 character-select admission/render continuation"]), "Codemagic report headings identify the active Steps 58–64 continuation candidate")
 require("The active candidate is **0.0.173 / Step 41.0**" not in read("docs/MASTER-PLAN.md"), "master plan contains no stale Step-41 active-candidate claim")
 require('source scripts/lib/current-release.sh' in verify_ipa and '"$VERSION" == "$STS2_DISPLAY_VERSION"' in verify_ipa and '"$BUILD_VERSION" == "$STS2_BUILD_VERSION"' in verify_ipa, "IPA verifier enforces release-config version")
 require("src/StS2Launcher.iOS/Platform/GodotStep15NativeBridge.cs" in verify_ipa, "IPA verifier reads native bridge from canonical project path")
-require("Expected device UI: STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION" in verify_ipa and "steps53-57-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Steps-43–52 stabilization candidate")
+require("Expected device UI: STEPS 58–64 — CHARACTER-SELECT ADMISSION / RENDER CONTINUATION" in verify_ipa and "steps58-64-ipa-verification-summary.log" in verify_ipa, "IPA verifier advertises the active Steps-58–64 continuation candidate")
 
 # Fixture isolation: external IL fixtures remain post-publish data, never iOS project inputs.
 require("StS2Launcher.Step20.DynamicFixture" not in project_text and "StS2Launcher.Step20.DependencyFixture" not in project_text and "StS2Launcher.Step20.RootFixture" not in project_text, "Step 20 dynamic fixtures remain absent from iOS build inputs")
@@ -2311,7 +2311,7 @@ require(not any(call in step41_core for call in [".GameStartup(", ".InitializePl
 require(not any(call in step41_ui for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 41 UI never directly invokes startup/platform/main-menu/deferred methods")
 require(all(value in step41_ui for value in ["Step41-CrashCheckpoint-", "Step41-GameStartupFrontier-StaticMap-", "Step41-LastCheckpoint.txt", "Step41-TransformedRealStS2GameStartupFrontier.txt", "K_C_STATIC_MAP_WRITE_RETURNED"]), "Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts")
 require("AddTransformedRealStS2GameStartupFrontierControls(content);" in step41_root_ui and "ResetStep41State();" in step40_core, "RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "STEPS 35–56 PHYSICALLY CLOSED", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "Step53", "Step57", "Step58"]), "active release presentation preserves Step-42 authority, physical closure through Step 56, and active Step 57")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "STEPS 35–57 PHYSICALLY CLOSED", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "Step 57", "Steps 58", "Step 64", "Step 65"]), "active release presentation preserves Step-42 authority, physical closure through Step 57, and active Steps 58-64")
 require(all(value in step41_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "GameStartupAsyncStateMachineMap", "FrozenNoInvocationConfinement"]), "Step 41 host regressions pin gate sequencing and stable ordinals")
 require("Earlier physical Step 39/40/41 authorities remain closed" in current_status and "GameStartup remains uninvoked" in current_status, "current status preserves physical Step-41 no-invocation authority")
 
@@ -2376,7 +2376,7 @@ require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.189\"", "ExpectedBuildVersion = \"189\"", "STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION"]), "active release presentation pins physical closure and Steps-53–57 / 0.0.189 identity")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.190\"", "ExpectedBuildVersion = \"190\"", "STEPS 58–64 — CHARACTER-SELECT ADMISSION / RENDER CONTINUATION"]), "active release presentation pins physical closure and Steps-58–64 / 0.0.190 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "22-method zero-boundary closure", "renderer frozen", "zero resolver/host/private/initializer/rejected/native deltas"]), "current status pins the physically closed Step-42 InitPools authority")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
@@ -2449,12 +2449,14 @@ direct_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2
 continuation_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2DirectMainMenuContinuation.cs")
 singleplayer_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2SingleplayerContinuation.cs")
 singleplayer_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2SingleplayerContinuation.cs")
-startup_ui_all = startup_ui + "\n" + direct_ui + "\n" + continuation_ui + "\n" + singleplayer_ui
+character_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2CharacterSelectContinuation.cs")
+character_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectContinuation.cs")
+startup_ui_all = startup_ui + "\n" + direct_ui + "\n" + continuation_ui + "\n" + singleplayer_ui + "\n" + character_ui
 require(all(text for text in [startup_core, direct_core, continuation_core, singleplayer_core, startup_gate, startup_result, startup_sequence, startup_summary, startup_tests, startup_ui, direct_ui, continuation_ui, singleplayer_ui]), "Steps 43-57 Core/test/UI surfaces exist")
 require(all(value in startup_gate for value in ["PrerequisiteAuthority = 1", "StaticAuditOrBinding = 2", "ControlledAction = 3", "PostActionConfinement = 4"]), "startup-ladder gate ordinals retain exact four-gate diagnosability")
 require(all(value in startup_sequence for value in ["result.Step != _step", "result.StepName, _stepName", "var expected =", "cannot advance after a failed gate"]), "startup-ladder sequence binds every gate to one exact rung and stops after failure")
 require(all(value in startup_summary for value in ["Gates.Count == 4", "Gates.All(gate => gate.Passed)", "COMPLETE — 4/4"]), "startup-ladder summary closes only exact four-of-four rungs")
-require(all(value in startup_tests for value in ["GateOrdinalsAreStable", "GateSequenceRejectsOutOfOrderAdvance", "GateSequenceRejectsWrongStepOrName", "GateSequenceRejectsAdvanceAfterFailure", "STEP 46.0 LAUNCHMAINMENU IMMEDIATE FRONTIER MAP COMPLETE — 4/4", "DirectMainMenuRungNamesProduceDistinctFourOfFourSummaries", "MAIN MENU CONTROLLED RENDER PULSE", "SINGLEPLAYER FRONTIER MAP", "MAIN MENU SUSTAINED RENDER RESIDENCY", "Assert.AreEqual(11, summaries.Count)"]), "startup-ladder host regressions pin 43-57 sequencing, identity, fail-stop behavior, and distinct summaries")
+require(all(value in startup_tests for value in ["GateOrdinalsAreStable", "GateSequenceRejectsOutOfOrderAdvance", "GateSequenceRejectsWrongStepOrName", "GateSequenceRejectsAdvanceAfterFailure", "STEP 46.0 LAUNCHMAINMENU IMMEDIATE FRONTIER MAP COMPLETE — 4/4", "DirectMainMenuRungNamesProduceDistinctFourOfFourSummaries", "MAIN MENU CONTROLLED RENDER PULSE", "SINGLEPLAYER FRONTIER MAP", "MAIN MENU SUSTAINED RENDER RESIDENCY", "CHARACTER SELECT RENDER RESIDENCY", "Assert.AreEqual(18, summaries.Count)"]), "startup-ladder host regressions pin 43-64 sequencing, identity, fail-stop behavior, and distinct summaries")
 require("AddTransformedRealStS2StartupLadderControls(content);" in root_ui_text, "RootViewController exposes the Steps 43-57 ladder after the closed Step-42 surface")
 require("ResetStartupLadderState();" in step42_core, "rerunning/resetting Step 42 invalidates all later ladder authority")
 
@@ -2583,9 +2585,9 @@ require(step52_ui_method.find("var stopReturned = GodotStep15NativeBridge.StopRe
 require(all(value in continuation_core for value in ["initializerDelta != 0 || rejectedDelta != 0 || nativeDelta != 0", "_step52PostPulseBaseline = CaptureStartupLadderBaseline", "RequireStartupLadderBaselineUnchanged(context, post, \"Step 52 Gate D\")"]), "Step 52 forbids initializer/rejected/native escape and freezes the post-pulse baseline")
 
 # Steps 53-57: narrow single-player submenu continuation. Physical closure remains through Step 52.
-require(all(value in startup_core for value in [">= 53 and <= 57 => GetVerifiedSingleplayerContinuationStaticMap(step)", "ResetSingleplayerContinuationState();"]), "startup ladder routes/reset-invalidates Steps 53-57 continuation authority")
-require(all(value in startup_tests for value in ["SINGLEPLAYER OPEN FRONTIER", "SINGLEPLAYER SUBMENU FROZEN OPEN", "SINGLEPLAYER SUBMENU RENDER RESIDENCY", "CHARACTER SELECT FRONTIER MAP", "CHARACTER SELECT RESOURCE PREFLIGHT", "Assert.AreEqual(11, summaries.Count)"]), "host regressions include distinct Steps 53-57 four-of-four summaries")
-require("AddSingleplayerContinuationControls(content);" in startup_ui and ">= 53 and <= 57 => GetSingleplayerContinuationControls(step)" in startup_ui, "startup UI exposes Steps 53-57 after the physically closed Step-52 surface")
+require(all(value in startup_core for value in [">= 53 and <= 57 => GetVerifiedSingleplayerContinuationStaticMap(step)", ">= 58 and <= 64 => GetVerifiedCharacterSelectContinuationStaticMap(step)", "ResetSingleplayerContinuationState();"]) and "ResetCharacterSelectContinuationState();" in singleplayer_core, "startup ladder routes Steps 53-64 and reset-invalidates character-select continuation authority")
+require(all(value in startup_tests for value in ["SINGLEPLAYER OPEN FRONTIER", "SINGLEPLAYER SUBMENU FROZEN OPEN", "SINGLEPLAYER SUBMENU RENDER RESIDENCY", "CHARACTER SELECT FRONTIER MAP", "CHARACTER SELECT RESOURCE PREFLIGHT", "CHARACTER SELECT FACTORY FRONTIER", "CHARACTER SELECT FROZEN OFF-TREE CREATION", "CHARACTER SELECT INITIALIZE FRONTIER", "CHARACTER SELECT OFF-TREE INITIALIZATION", "CHARACTER SELECT PUSH FRONTIER", "CHARACTER SELECT FROZEN SCENETREE ADMISSION", "CHARACTER SELECT RENDER RESIDENCY", "Assert.AreEqual(18, summaries.Count)"]), "host regressions include distinct Steps 53-64 four-of-four summaries")
+require("AddSingleplayerContinuationControls(content);" in startup_ui and ">= 53 and <= 57 => GetSingleplayerContinuationControls(step)" in startup_ui and "AddCharacterSelectContinuationControls(content);" in startup_ui and ">= 58 and <= 64 => GetCharacterSelectContinuationControls(step)" in startup_ui, "startup UI exposes Steps 53-64 after the physically closed Step-52 surface")
 
 # Step 53: exact direct submenu-open frontier, admissible and non-invoking.
 step53_core_start = singleplayer_core.find("RunStep53ClosedStep52Authority")
@@ -2686,11 +2688,45 @@ step57_ui = singleplayer_ui[step57_ui_start:] if step57_ui_start >= 0 else ""
 require(all(value in singleplayer_ui for value in ["_characterSelectScreenScene", "Godot.PackedScene", "ResourcePath", "res://scenes/screens/character_select_screen.tscn"]) and all(value in step57_ui for value in ["retained character-select PackedScene", "PackedScene.ResourcePath", "RunStep57CharacterSelectPckExtraction", "RunStep57CharacterSelectResourceRiskMap", "MarkStep57StaticMapDurablyWritten", "RunStep57FrozenReadOnlyConfinement", "RUN_STEP57_4OF4"]), "Step 57 UI describes retained PackedScene identity and persists exact read-only PCK preflight evidence before closure")
 require("StartRendering()" not in step57_ui and "ResourceLoader" in step57_ui and "PackedScene.Instantiate" in step57_ui and "no OpenCharacterSelect" in step57_ui, "Step 57 UI explicitly remains non-rendering/non-loading/non-instantiating/non-invoking")
 
-# Rendering stays limited to the physically closed main-menu rungs and new Step 55.
-require(direct_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and continuation_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and singleplayer_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and startup_ui.count("GodotStep15NativeBridge.StartRendering()") == 0, "only Steps 50, 52 and 55 have StartRendering call sites across the active ladder")
+# Final physical Step-56/57 closure evidence supplied after the 0.0.189 run.
+step56_188_pass_report = read("docs/history/reports/STEP-56.0-PHYSICAL-0.0.188-PASS-REPORT.txt")
+step56_188_pass_checkpoint = read("docs/history/reports/STEP-56.0-PHYSICAL-0.0.188-PASS-CHECKPOINT.txt")
+step56_188_pass_map = read("docs/history/reports/STEP-56.0-PHYSICAL-0.0.188-PASS-STATIC-MAP.txt")
+step57_189_pass_report = read("docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-REPORT.txt")
+step57_189_pass_checkpoint = read("docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-CHECKPOINT.txt")
+step57_189_pass_map = read("docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-STATIC-MAP.txt")
+require(all(v in step56_188_pass_report for v in ["App version: 0.0.188 (188)", "STEP 56.0 CHARACTER SELECT FRONTIER MAP COMPLETE — 4/4"]), "physical 0.0.188 closes Step 56 4/4")
+require(all(v in step56_188_pass_checkpoint for v in ["M56_A_PASS", "M56_B_PASS", "M56_C_PASS", "M56_D_PASS", "RUN_STEP56_4OF4", "renderingActive=False"]), "physical 0.0.188 Step-56 checkpoint proves all four gates and frozen completion")
+require(all(v in step56_188_pass_map for v in ["token=0x06003F71", "NButton", "GetSubmenuType<MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen>()", "InitializeSingleplayer()", "NSubmenuStack::Push", "OpenCharacterSelect invoked: NO", "Rendering restarted: NO", "[CHARACTER-SELECT SCENE HINTS FROM IMMEDIATE CLOSURE]", "  - none"]), "physical Step-56 map pins the exact sub-operation sequence and absence of literal scene hints")
+require(all(v in step57_189_pass_report for v in ["App version: 0.0.189 (189)", "STEP 57.0 CHARACTER SELECT RESOURCE PREFLIGHT COMPLETE — 4/4"]), "physical 0.0.189 closes Step 57 4/4")
+require(all(v in step57_189_pass_checkpoint for v in ["M57_A_PASS", "M57_B_PASS", "M57_C_PASS", "M57_D_PASS", "RUN_STEP57_4OF4", "renderingActive=False"]), "physical 0.0.189 Step-57 checkpoint proves all four gates and frozen completion")
+require(all(v in step57_189_pass_map for v in ["Resource source: MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack._characterSelectScreenScene.ResourcePath", "Resource path: res://scenes/screens/character_select_screen.tscn", "Bytes: 16015", "SHA-256: 3d2305fdddae6f432e52ac4b8ea5035c5cecfd26fbc30c319f09b1cd4a05eb1e", "PCK MD5: 164a8ee7ae95a8c407a4745361b1bf16", "Combined textual native-risk occurrences: 0", "Godot resource load: NO", "OpenCharacterSelect invoked: NO", "Rendering restarted: NO"]), "physical Step-57 map pins exact retained PackedScene/PCK identity and zero textual native-risk evidence")
+require(all(v in read("docs/history/steps/STEP-56-57-PHYSICAL-CLOSURE-0.0.189.md") for v in ["closes physical authority through **Step 57**", "16,015 bytes", "OpenCharacterSelect"]), "Step-56/57 physical closure note records the new baseline")
+
+# Steps 58-64: exact character-select sub-operations, never original OpenCharacterSelect.
+require(all(v in character_core for v in ["Steps 58-64 continue only from physically closed Step-57 authority", "GetSubmenuType&lt;NCharacterSelectScreen&gt;", "The original OpenCharacterSelect handler is never invoked", "Step64CharacterSelectRenderTargetMilliseconds = 750", "Step64CharacterSelectRenderEvidenceCeilingMilliseconds = 5_000"]), "character-select continuation declares the Step-57 prerequisite, proven sub-operation decomposition and bounded render constants")
+require(all(v in character_core for v in ["RunStep58ClosedStep57Authority", "RunStep58CharacterSelectFactoryBinding", "RunStep58CharacterSelectFactoryFrontierMap", "RunStep58FrozenNoCreationConfinement"]), "Step 58 maps the exact character-select factory without creation")
+require(all(v in character_core for v in ["RunStep59ClosedStep58Authority", "RunStep59CharacterSelectCreationBinding", "RunStep59FrozenCharacterSelectCreation", "RunStep59FrozenOffTreeConfinement", "_step59CreationStarted"]), "Step 59 is a distinct one-shot frozen off-tree creation rung")
+require(all(v in character_core for v in ["RunStep60ClosedStep59Authority", "RunStep60InitializeSingleplayerBinding", "RunStep60InitializeSingleplayerFrontierMap", "RunStep60FrozenNoInitializationConfinement"]), "Step 60 maps InitializeSingleplayer without invocation")
+require(all(v in character_core for v in ["RunStep61ClosedStep60Authority", "RunStep61InitializationRuntimeBinding", "RunStep61OffTreeInitialization", "RunStep61FrozenPostInitializationConfinement", "_step61InitializationStarted"]), "Step 61 is a distinct one-shot frozen off-tree InitializeSingleplayer rung")
+require(all(v in character_core for v in ["RunStep62ClosedStep61Authority", "RunStep62PushBinding", "RunStep62PushAndLifecycleFrontierMap", "RunStep62FrozenNoAdmissionConfinement"]), "Step 62 maps exact Push and tree-entry lifecycle without admission")
+require(all(v in character_core for v in ["RunStep63ClosedStep62Authority", "RunStep63FrozenAdmissionBinding", "RunStep63FrozenCharacterSelectAdmission", "RunStep63FrozenPostAdmissionConfinement", "_step63AdmissionStarted"]), "Step 63 is a distinct one-shot frozen Push admission rung")
+require(all(v in character_core for v in ["RunStep64ClosedStep63Authority", "RunStep64CharacterSelectFrameInputAudit", "BeginStep64BoundedRenderPulse", "RunStep64CharacterSelectRenderPulseEvidence", "RunStep64FrozenPostResidencyConfinement", "_step64PulseStarted"]), "Step 64 audits actual callbacks then performs bounded render/refreeze evidence")
+require("OpenCharacterSelect" in character_core and ".OpenCharacterSelect(" not in character_core and "OpenCharacterSelect.Invoke" not in character_core, "Steps 58-64 never invoke the original OpenCharacterSelect handler")
+require("StartRendering" not in character_core and character_ui.count("GodotStep15NativeBridge.StartRendering()") == 1, "Core never starts rendering and Step 64 UI owns the sole new render start")
+require(all(v in character_ui for v in ["_step59CreationUiStarted", "_step61InitializationUiStarted", "_step63AdmissionUiStarted", "_step64PulseUiStarted", "ONE-SHOT ALREADY ARMED"]), "mutating Steps 59/61/63/64 expose explicit one-shot UI guards")
+require(character_ui.find("MarkStep64StaticMapDurablyWritten") < character_ui.find("BeginStep64BoundedRenderPulse") < character_ui.find("GodotStep15NativeBridge.StartRendering()"), "Step 64 makes the actual callback map durable before arming/rendering")
+step64_ui_start = character_ui.find("private async Task RunStep64StartupLadderAsync()")
+step64_ui = character_ui[step64_ui_start:] if step64_ui_start >= 0 else ""
+require(step64_ui.find("var stopReturned = GodotStep15NativeBridge.StopRendering();") < step64_ui.find("M64_C_STOP_RENDERING_RETURNED"), "Step 64 synchronously stops rendering before post-stop telemetry")
+require("No Step 65 behavior exists in this candidate" in character_ui and "RunStep65" not in startup_ui_all, "Step 65 remains explicitly unopened")
+require(all(v in read("docs/history/steps/STEP-58-64-CHARACTER-SELECT-ADMISSION-RENDER.md") for v in ["58 — factory frontier", "59 — frozen off-tree creation", "60 — initialization frontier", "61 — frozen initialization", "62 — push frontier", "63 — frozen SceneTree admission", "64 — render residency", "Step 65 is deliberately absent"]), "history records the complete Steps 58-64 design and Step-65 stop boundary")
+
+# Rendering stays limited to the physically closed main-menu rungs plus Steps 55 and 64.
+require(direct_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and continuation_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and singleplayer_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and character_ui.count("GodotStep15NativeBridge.StartRendering()") == 1 and startup_ui.count("GodotStep15NativeBridge.StartRendering()") == 0, "only Steps 50, 52, 55 and 64 have StartRendering call sites across the active ladder")
 
 # Cross-rung restrictions and distinct evidence surfaces.
-require("RunStep58" not in startup_ui_all and "ExactStep58" not in (startup_core + direct_core + continuation_core + singleplayer_core), "Step 58 remains unopened in active source")
+require("RunStep58" in character_core and "ExactStep64ClosurePassed" in character_core and "Step 65" in character_ui and "RunStep65" not in startup_ui_all and "ExactStep65" not in (startup_core + direct_core + continuation_core + singleplayer_core + character_core), "Steps 58-64 are opened as the active continuation while Step 65 remains unopened")
 require(".GameStartup(" not in startup_ui_all and ".LaunchMainMenu(" not in startup_ui_all and ".DoCloudSync(" not in startup_ui_all and ".InitializePlatform(" not in startup_ui_all and ".ExecuteDeferred(" not in startup_ui_all, "iOS ladder UI has no direct GameStartup/original LaunchMainMenu/cloud/platform/deferred call")
 require("RunDeprecatedStep47" not in startup_ui_all and "ControlledLaunchMainMenu" not in startup_ui_all, "iOS ladder has no stale original live-launch control path")
 for step, map_stem, report in [
@@ -2709,6 +2745,13 @@ for step, map_stem, report in [
     (55, "Step55-SingleplayerSubmenuFrameInput-StaticMap", "Step55-TransformedRealStS2SingleplayerSubmenuRender.txt"),
     (56, "Step56-CharacterSelectFrontier-StaticMap", "Step56-TransformedRealStS2CharacterSelectFrontier.txt"),
     (57, "Step57-CharacterSelectResource-StaticMap", "Step57-TransformedRealStS2CharacterSelectResourcePreflight.txt"),
+    (58, "Step58-CharacterSelectFactory-StaticMap", "Step58-TransformedRealStS2CharacterSelectFactoryFrontier.txt"),
+    (59, "Step59-CharacterSelectOffTree-StaticMap", "Step59-TransformedRealStS2CharacterSelectOffTree.txt"),
+    (60, "Step60-CharacterSelectInitialize-StaticMap", "Step60-TransformedRealStS2CharacterSelectInitializeFrontier.txt"),
+    (61, "Step61-CharacterSelectInitializedOffTree-StaticMap", "Step61-TransformedRealStS2CharacterSelectInitializeOffTree.txt"),
+    (62, "Step62-CharacterSelectPush-StaticMap", "Step62-TransformedRealStS2CharacterSelectPushFrontier.txt"),
+    (63, "Step63-CharacterSelectAdmission-StaticMap", "Step63-TransformedRealStS2CharacterSelectFrozenAdmission.txt"),
+    (64, "Step64-CharacterSelectFrameInput-StaticMap", "Step64-TransformedRealStS2CharacterSelectRender.txt"),
 ]:
     require(map_stem in startup_ui_all and report in startup_ui_all, f"Step {step} has distinct static-map/report evidence surface")
 require('$"Step{step}-CrashCheckpoint-{runId}.txt"' in startup_ui and '$"Step{step}-LastCheckpoint.txt"' in startup_ui, "all ladder rungs share run-correlated but step-distinct checkpoint/last-checkpoint naming")
@@ -2881,6 +2924,58 @@ if singleplayer_manifest.is_file():
         digest, relative = line.split("  ",1); path=ROOT/relative
         if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
     require(not mismatches, "Steps 53-57 single-player continuation active files are hash-pinned", ", ".join(mismatches))
+
+
+# Dedicated 0.0.190 Steps 58-64 character-select continuation manifest.
+character_manifest = ROOT / "tools/validation/candidate-steps58-64-character-select-continuation.sha256"
+require(character_manifest.is_file(), "Steps 58-64 character-select continuation candidate hash manifest exists")
+if character_manifest.is_file():
+    character_manifest_text = character_manifest.read_text()
+    required_character_manifest_paths = [
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2CharacterSelectContinuation.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2SingleplayerContinuation.cs",
+        "src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadder.cs",
+        "tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2StartupLadderTests.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectContinuation.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2SingleplayerContinuation.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2StartupLadder.cs",
+        "src/StS2Launcher.iOS/UI/RootViewController.PhysicallyClosedPath.cs",
+        "src/StS2Launcher.iOS/UI/CurrentReleasePresentation.cs",
+        "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
+        "src/StS2Launcher.iOS/Info.plist",
+        "scripts/lib/current-release.sh",
+        "scripts/build-ios.sh",
+        "scripts/test.sh",
+        "scripts/codemagic.sh",
+        "scripts/verify-ipa.sh",
+        "codemagic.yaml",
+        "tools/validate_current.py",
+        "README.md",
+        "docs/README.md",
+        "docs/CURRENT-STATUS.md",
+        "docs/MASTER-PLAN.md",
+        "docs/TESTING.md",
+        "docs/REPORTS.md",
+        "docs/RELEASE-CHECKLIST.md",
+        "docs/history/INDEX.md",
+        "docs/history/steps/STEP-56-57-PHYSICAL-CLOSURE-0.0.189.md",
+        "docs/history/steps/STEP-58-64-CHARACTER-SELECT-ADMISSION-RENDER.md",
+        "docs/history/reports/STEP-56.0-PHYSICAL-0.0.188-PASS-REPORT.txt",
+        "docs/history/reports/STEP-56.0-PHYSICAL-0.0.188-PASS-CHECKPOINT.txt",
+        "docs/history/reports/STEP-56.0-PHYSICAL-0.0.188-PASS-STATIC-MAP.txt",
+        "docs/history/reports/STEP-56.0-PHYSICAL-0.0.188-PASS-LAST-CHECKPOINT.txt",
+        "docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-REPORT.txt",
+        "docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-CHECKPOINT.txt",
+        "docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-STATIC-MAP.txt",
+        "docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-LAST-CHECKPOINT.txt",
+    ]
+    require(all(f"  {relative}" in character_manifest_text for relative in required_character_manifest_paths), "Steps 58-64 manifest pins new Core/UI/tests/release/docs design and final Step-56/57 physical closure evidence")
+    mismatches=[]
+    for line in character_manifest.read_text().splitlines():
+        if not line.strip(): continue
+        digest, relative = line.split("  ",1); path=ROOT/relative
+        if not path.is_file() or sha256(path)!=digest: mismatches.append(relative)
+    require(not mismatches, "Steps 58-64 character-select continuation active files are hash-pinned", ", ".join(mismatches))
 
 
 # ---------------------------------------------------------------------------

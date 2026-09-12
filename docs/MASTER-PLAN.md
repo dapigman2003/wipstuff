@@ -1,12 +1,12 @@
-## Current frontier — Steps 53–57 / 0.0.189
+## Current frontier — Steps 58–64 / 0.0.190
 
-The active candidate is **0.0.189 / single-player submenu continuation through Step 57**. Physical runtime authority is now closed through Step 56; the existing fresh-process one-button route intentionally remains capped at Step 52 and reconstructs the stable baseline before Steps 53–56 are rerun manually in the same process.
+The active candidate is **0.0.190 / character-select admission/render continuation through Step 64**. Physical runtime authority is closed through Step 57 4/4/frozen. The fresh-process convenience route remains capped at Step 52; Steps 53–57 must be reconstructed manually before the new block.
 
-Physical 0.0.187 closed Step 56 non-invoking and entered Step 57. Physical 0.0.188 then proved the attempted short/full Step-56 literal-hint handoff still yields `observed=none` at Step-57 Gate A before any PCK extraction. 0.0.189 keeps Steps 53–56 unchanged and makes Step 57 derive resource identity from the actual retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`: selected metadata and the live retained field must agree, its existing `ResourcePath` must be exact `res://scenes/screens/character_select_screen.tscn`, and the receipt-backed PCK directory must contain exactly one matching entry before Step 57 reads bytes. Step 58 and character-select execution remain unopened.
+Steps 58–64 decompose the exact physically mapped `OpenCharacterSelect(NButton)` body into separately gated sub-operations: factory map → one-shot off-tree `NCharacterSelectScreen` creation → `InitializeSingleplayer` map → one-shot off-tree initialization → `NSubmenuStack.Push` map → one-shot frozen SceneTree admission → audited 750 ms rendered residency/refreeze. The original handler itself remains unopened, as do character choice/embark/run-start and Step 65+.
 
-Original whole `GameStartup`, original `LaunchMainMenu`, broad single-player button-handler invocation, character-select loading/instantiation/admission, cloud/platform initialization, deferred startup, external Steamworks/native Steam, and FMOD/Spine native game extensions remain separate future boundaries. The 0.0.183 Codemagic AOT cache/sentinel experiment is retained unchanged and is not part of the runtime proof.
+Physical 0.0.189 Step 57 is the authority anchor: exact retained `_characterSelectScreenScene.ResourcePath`, exact trusted-PCK character-select entry, 16,015-byte SHA-256/MD5 evidence, zero textual native-extension risk tokens, no loader/instantiation/handler/rendering, zero drift.
 
-Resumption sources: `docs/CURRENT-STATUS.md` is runtime-frontier authority, `docs/REGRESSION-CONTRACTS.md` preserves protected historical contracts, and `docs/history/INDEX.md` indexes design/evidence provenance.
+Resume from `docs/CURRENT-STATUS.md`, enforce `docs/REGRESSION-CONTRACTS.md`, and use `docs/history/INDEX.md` for evidence/design provenance.
 
 ## Product objective
 

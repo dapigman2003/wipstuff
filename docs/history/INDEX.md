@@ -526,3 +526,10 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-57.0-PHYSICAL-0.0.188-FAIL-CHECKPOINT.txt` — run-correlated journal proving the failure occurred before any PCK entry extraction, with rendering frozen and no character-select loading/invocation.
 - `reports/STEP-57.0-PHYSICAL-0.0.188-FAIL-LAST-CHECKPOINT.txt` — durable normal-run-end pointer for the same read-only localization.
 - `steps/STEP-57.0-RETAINED-PACKEDSCENE-IDENTITY-CORRECTION-0.0.189.md` — focused 0.0.189 correction: bind the actual retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, read only its existing `ResourcePath`, require the exact receipt-backed PCK directory entry, and leave physical closure through Step 56 unchanged.
+
+## Current character-select closure/continuation
+
+- `steps/STEP-56-57-PHYSICAL-CLOSURE-0.0.189.md` — final physical Step-56/57 closure evidence and boundary.
+- `steps/STEP-58-64-CHARACTER-SELECT-ADMISSION-RENDER.md` — 0.0.190 multi-rung character-select continuation design.
+- `reports/STEP-56.0-PHYSICAL-0.0.188-PASS-*` — supplied Step-56 4/4 report/checkpoint/static-map/last-checkpoint.
+- `reports/STEP-57.0-PHYSICAL-0.0.189-PASS-*` — supplied Step-57 4/4 report/checkpoint/static-map/last-checkpoint.

@@ -39,7 +39,7 @@ public sealed partial class RootViewController
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Physical authority through Step 52 remains unchanged. Step 53 isolates only exact OpenSingleplayerSubmenu and must prove that direct frontier admissible before Step 54 may invoke it once while frozen. Step 55 audits/renders the resulting real submenu and refreezes. Step 56 maps exact OpenCharacterSelect without invocation; Step 57 proves the actual retained character-select PackedScene ResourcePath and inspects only that exact PCK entry without loading or executing character select. No Step 58+ behavior is present in this candidate.",
+            "Physical authority through Step 52 remains unchanged. Step 53 isolates only exact OpenSingleplayerSubmenu and must prove that direct frontier admissible before Step 54 may invoke it once while frozen. Step 55 audits/renders the resulting real submenu and refreezes. Step 56 maps exact OpenCharacterSelect without invocation; Step 57 proves the actual retained character-select PackedScene ResourcePath and inspects only that exact PCK entry without loading or executing character select. Steps 58–64 continue in the separate character-select admission/render section and require this Step-57 authority.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel));
 
@@ -316,7 +316,7 @@ public sealed partial class RootViewController
             CompleteStartupLadderStep(step, _step57Gates, resultLabel, detailLabel,
                 "CHARACTER-SELECT RESOURCE PREFLIGHT CLOSED 4/4. Exact trusted-PCK resource/native-risk evidence is durable; character select itself remains completely uninvoked/unloaded for the next dedicated iteration.");
             button.Enabled = false;
-            WriteStartupLadderCheckpoint(step, "RUN_STEP57_4OF4 — read-only character-select resource preflight closed; preserve Step-56/57 maps for the next design. No Step 58 behavior exists in this candidate.");
+            WriteStartupLadderCheckpoint(step, "RUN_STEP57_4OF4 — read-only character-select resource preflight closed; Steps 58–64 may continue from this same-process authority in the dedicated character-select continuation.");
         }
         catch (Exception ex)
         {

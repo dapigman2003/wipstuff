@@ -39,7 +39,7 @@ cache_file_line() {
   fi
 }
 {
-  echo "StS2 Launcher — Codemagic cache state before Steps 53–57 single-player submenu continuation build"
+  echo "StS2 Launcher — Codemagic cache state before Steps 58–64 character-select admission/render continuation build"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   cache_path_line "Home NuGet" "$HOME/.nuget/packages"
   cache_path_line "Isolated iOS NuGet" "$ROOT/.nuget/packages"
@@ -62,7 +62,7 @@ elapsed_seconds() {
 }
 
 {
-  echo "StS2 Launcher — Steps 53–57 single-player submenu continuation build environment"
+  echo "StS2 Launcher — Steps 58–64 character-select admission/render continuation build environment"
   date -u
   uname -a
   xcodebuild -version
@@ -172,7 +172,7 @@ IPA_VERIFY_SECONDS="$(elapsed_seconds "$IPA_VERIFY_START_EPOCH")"
 TOTAL_SECONDS="$(elapsed_seconds "$BUILD_START_EPOCH")"
 
 {
-  echo "StS2 Launcher iOS — Steps 53–57 single-player submenu continuation"
+  echo "StS2 Launcher iOS — Steps 58–64 character-select admission/render continuation"
   echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "Commit: ${CM_COMMIT:-unknown}"
   echo "Branch: ${CM_BRANCH:-unknown}"

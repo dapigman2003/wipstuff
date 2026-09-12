@@ -5,10 +5,10 @@ using Mono.Cecil.Cil;
 namespace StS2Launcher.Core;
 
 /// <summary>
-/// Steps 43-57 are packaged together as an explicitly sequential startup ladder. Every rung keeps
+/// Steps 43-64 are packaged together as an explicitly sequential startup ladder. Every rung keeps
 /// its own four-gate authority and later rungs require the exact same-process closure of the prior
 /// rung. Step 46 maps the real LaunchMainMenu immediate/deferred frontier without invoking it;
-/// Steps 47-57 use a separate guarded direct main-menu and single-player continuation path so original GameStartup,
+/// Steps 47-64 use a separate guarded direct main-menu, single-player, and character-select continuation path so original GameStartup,
 /// LaunchMainMenu, ExecuteDeferred, Steam startup, and native game extensions remain unopened.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
@@ -94,6 +94,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             51 when !string.IsNullOrWhiteSpace(_step51DirectStaticMap) => _step51DirectStaticMap,
             52 when !string.IsNullOrWhiteSpace(_step52DirectStaticMap) => _step52DirectStaticMap,
             >= 53 and <= 57 => GetVerifiedSingleplayerContinuationStaticMap(step),
+            >= 58 and <= 64 => GetVerifiedCharacterSelectContinuationStaticMap(step),
             _ => throw new InvalidOperationException($"Step {step}.0 has not produced a verified startup-ladder static map."),
         };
 

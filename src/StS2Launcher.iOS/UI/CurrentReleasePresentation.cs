@@ -10,19 +10,19 @@ namespace StS2Launcher.iOS;
 internal static class CurrentReleasePresentation
 {
     public const string StepTitle =
-        "STEPS 53–57 — SINGLE-PLAYER SUBMENU CONTINUATION";
+        "STEPS 58–64 — CHARACTER-SELECT ADMISSION / RENDER CONTINUATION";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–56 PHYSICALLY CLOSED • 0.0.189 STEP 57 ACTIVE — STEP 58 UNOPENED";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–57 PHYSICALLY CLOSED • 0.0.190 STEPS 58–64 ACTIVE — STEP 65 UNOPENED";
 
     public const string Summary =
-        "Physical authority remains closed through Step 56. Physical 0.0.188 re-entered Step 57 and stopped safely at Gate A because the Step-56 immediate-closure literal pipeline still supplied no character-select scene hint. 0.0.189 instead binds the actual retained NMainMenuSubmenuStack._characterSelectScreenScene as Godot.PackedScene, reads only its existing ResourcePath, requires exact res://scenes/screens/character_select_screen.tscn plus one receipt-backed PCK directory match, then performs the existing read-only byte preflight. OpenCharacterSelect remains uninvoked; ResourceLoader/PackedScene.Instantiate/character-select execution remain unopened.";
+        "Physical 0.0.189 closed Step 57 4/4/frozen: the retained NMainMenuSubmenuStack._characterSelectScreenScene ResourcePath matched the exact trusted-PCK character-select resource and the read-only byte/risk preflight completed with zero drift. 0.0.190 decomposes the already-proven OpenCharacterSelect(NButton) IL into seven separately gated rungs: exact GetSubmenuType<NCharacterSelectScreen>() mapping and one-shot off-tree creation, exact InitializeSingleplayer mapping and one-shot off-tree execution, exact NSubmenuStack.Push mapping and one-shot frozen tree admission, then an audited 750 ms rendered residency with synchronous refreeze. The original OpenCharacterSelect handler remains uninvoked; no character choice, embark, run start, whole GameStartup/LaunchMainMenu, Steam/native startup, deferred startup, or Step 65 behavior is authorized.";
 
     public const string InitialStatus =
-        "Status: Steps 35–56 are physically closed, while the one-button Physically Closed Path intentionally remains capped at Step 52. From a fresh process, reprove through Step 52, then run Steps 53→56 to reconstruct the physically proven extension before Step 57 binds the retained character-select PackedScene field and performs its read-only PCK preflight. Only Step 55 may newly restart rendering and it must synchronously refreeze. Original GameStartup/LaunchMainMenu, Steam/native startup, deferred startup, character-select loading/execution and Step 58+ remain unopened.";
+        "Status: Steps 35–57 are physically closed; the one-button Physically Closed Path intentionally remains capped at Step 52. From a fresh process, reprove through Step 52, then rerun Steps 53→57 to reconstruct the physically proven extension. Continue Steps 58→64 strictly in order and stop on the first failure. Steps 59, 61, 63 and 64 are one-shot boundaries; never retry an armed rung in-process. Steps 58/60/62 are mapping-only, Steps 59/61/63 keep rendering frozen, and Step 64 alone adds one bounded 750 ms character-select render residency followed by synchronous refreeze. Step 65 remains unopened.";
 
-    public const string ExpectedDisplayVersion = "0.0.189";
-    public const string ExpectedBuildVersion = "189";
+    public const string ExpectedDisplayVersion = "0.0.190";
+    public const string ExpectedBuildVersion = "190";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =
@@ -63,7 +63,7 @@ internal static class CurrentReleasePresentation
         "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4: exact NGame.InitPools token 0x06001BFA -> 3 direct IL instructions -> 22-method transitive same-sts2 closure -> zero classified/unresolved/external Cecil boundaries -> durable pre-invocation static map -> one exact MethodInfo.Invoke(instance,null) returned -> state 2 preserved -> frozen post-InitPools NGame confinement with resolver/host/private/initializer/rejected/native deltas all zero; GameStartup/migrations/cloud/platform/Steam/main-menu/deferred remained unopened";
 
     public const string StartupLadderImplementationMarker =
-        "physical authority closes through Step56 -> 0.0.183 retains one-button reproof through Step52 and AOT-cache telemetry -> physical 0.0.184 Step53 localizes exact NSingleplayerSubmenu return -> 0.0.185 closes Step53 and localizes Step54 stack ownership -> 0.0.186 binds exact lazy submenu stack, closes Step54/55, and localizes OpenCharacterSelect(NButton) -> 0.0.187 pins that signature and closes Step56 non-invoking -> physical 0.0.188 Step57 Gate A safely proves the immediate-closure literal-hint pipeline still yields observed=none -> 0.0.189 binds selected-metadata + retained-runtime NMainMenuSubmenuStack._characterSelectScreenScene:Godot.PackedScene, reads only its existing ResourcePath, requires exact res://scenes/screens/character_select_screen.tscn and one receipt-backed PCK directory entry, then Step57 reads only that exact entry and validates MD5/SHA/textual native-risk evidence with no ResourceLoader/PackedScene.Instantiate/character-select execution; Step58 remains unopened";
+        "physical authority closes through Step56 -> 0.0.183 retains one-button reproof through Step52 and AOT-cache telemetry -> physical 0.0.184 Step53 localizes exact NSingleplayerSubmenu return -> 0.0.185 closes Step53 and localizes Step54 stack ownership -> 0.0.186 binds exact lazy submenu stack, closes Step54/55, and localizes OpenCharacterSelect(NButton) -> 0.0.187 pins that signature and closes Step56 non-invoking -> physical 0.0.188 Step57 Gate A safely proves the immediate-closure literal-hint pipeline still yields observed=none -> 0.0.189 binds selected-metadata + retained-runtime NMainMenuSubmenuStack._characterSelectScreenScene:Godot.PackedScene, reads only its existing ResourcePath, requires exact res://scenes/screens/character_select_screen.tscn and one receipt-backed PCK directory entry, then physical 0.0.189 closes Step57 4/4/frozen with exact retained PackedScene/PCK identity and read-only risk evidence -> 0.0.190 opens only the proven sub-operations GetSubmenuType<NCharacterSelectScreen>(), InitializeSingleplayer(), and NSubmenuStack.Push as separately gated mapping/one-shot rungs before one bounded character-select render/refreeze; original OpenCharacterSelect and Step65 remain unopened";
 
     public static string DisplayVersion =>
         NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString() ?? "unknown";

@@ -1,0 +1,22 @@
+StS2 Launcher — Step 57.0 Character Select Resource Preflight
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-11T22:35:41.1048850+00:00
+
+RESULT
+STEP 57.0 CHARACTER SELECT RESOURCE PREFLIGHT COMPLETE — 4/4
+
+METADATA
+App version: 0.0.189 (189)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+CHARACTER-SELECT RESOURCE PREFLIGHT CLOSED 4/4. Exact trusted-PCK resource/native-risk evidence is durable; character select itself remains completely uninvoked/unloaded for the next dedicated iteration.
+
+END OF REPORT

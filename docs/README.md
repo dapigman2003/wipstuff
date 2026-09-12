@@ -1,14 +1,15 @@
-# Documentation index — active Steps 53–57 / 0.0.189
+# Documentation index — active Steps 58–64 / 0.0.190
 
-Active candidate: **0.0.189 (189)**. Physical authority is closed through Step 56; Step 57 is the active read-only character-select resource preflight. Step 58 remains unopened.
+Active candidate: **0.0.190 (190)**. Physical authority is closed through Step 57; Steps 58–64 are the active character-select admission/render continuation. Step 65 remains unopened.
 
 Primary authority:
 
 - `CURRENT-STATUS.md` — current physical frontier and exact device sequence.
-- `MASTER-PLAN.md` — product objective and architecture.
-- `TESTING.md` — validation/device procedure for 0.0.189.
+- `MASTER-PLAN.md` — product objective, authority model, and roadmap.
+- `TESTING.md` — static/Codemagic/device procedure for 0.0.190.
 - `RELEASE-CHECKLIST.md` — release-quality and packaging requirements.
+- `REPORTS.md` — evidence surface contracts.
 - `REGRESSION-CONTRACTS.md` — protected historical contracts.
 - `history/INDEX.md` — evidence/design provenance.
 
-0.0.189 leaves the one-button physically closed reproof capped at Step 52. Physical 0.0.188 re-entered Step 57 from closed Step-56 authority and again stopped safely at Gate A with `observed=none`, proving the Step-56 immediate-closure literal pipeline supplies no scene-identity authority. 0.0.189 instead binds the retained real `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, reads only its existing `ResourcePath`, proves that exact path in the receipt-backed PCK directory, and keeps Step 57 strictly read-only.
+Physical 0.0.189 closed Step 57 4/4/frozen. The exact retained `_characterSelectScreenScene : Godot.PackedScene` matched `res://scenes/screens/character_select_screen.tscn`, and its exact trusted-PCK bytes/risk map were recorded without resource loading, instantiation, handler execution, or rendering. 0.0.190 opens only the exact sub-operations already proven by Step-56 IL and keeps the original `OpenCharacterSelect` handler unopened.
