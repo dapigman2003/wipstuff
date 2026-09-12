@@ -541,3 +541,9 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-58.0-PHYSICAL-0.0.191-FAIL-REPORT.txt` — physical 0.0.191 Step 58 result: Gate A passed; Gate B proved the exact pre-existing character-select cache was already inside the live SceneTree before Step 58 did anything new.
 - `reports/STEP-58.0-PHYSICAL-0.0.191-FAIL-CHECKPOINT.txt` / `...-LAST-CHECKPOINT.txt` — rendering stayed frozen; Step 58 never created character select or restarted rendering; normal end.
 - `steps/STEP-58.0-RUNTIME-OWNERSHIP-PIVOT-0.0.192.md` — 0.0.192 architectural pivot: audit/adopt actual game-owned state, invoke real `OpenCharacterSelect(NButton)` only when needed, then audit and visibly render the real active screen; Step 63 remains unopened.
+
+## Step 58 physical logical-stack localization / 0.0.193 correction
+- `reports/STEP-58.0-PHYSICAL-0.0.192-FAIL-REPORT.txt` — 0.0.192 Gate-B localization: cached real character-select screen exists but `NSubmenu._stack` did not match the retained stack; no mutation/render.
+- `reports/STEP-58.0-PHYSICAL-0.0.192-FAIL-CHECKPOINT.txt` — durable checkpoint for the same safe stop.
+- `reports/STEP-58.0-PHYSICAL-0.0.192-FAIL-LAST-CHECKPOINT.txt` — last durable checkpoint.
+- `steps/STEP-58.0-LOGICAL-STACK-BINDING-CORRECTION-0.0.193.md` — separates SceneTree attachment from logical submenu-stack binding; null pre-push `_stack` is admissible, foreign non-null stack remains rejected.

@@ -1,0 +1,16 @@
+StS2 Launcher — Step 58.0 Character-select runtime ownership audit checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2
+Initialized UTC: 2026-09-12T16:44:45.6372800+00:00
+Process ID: 14960
+App version: 0.0.192 (192)
+Candidate: STEPS 43–62 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–62 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.
+Global policy: physical authority through Step 57 is the baseline extension. Step 58 adopts/audits actual runtime ownership without mutation. Step 59 may invoke original OpenCharacterSelect once only when the transition is not already visibly complete. Step 60 audits the active screen. Steps 61–62 add short and sustained visible render residencies and synchronously refreeze. Character choice/embark/run-start, continuous interactive ownership, and Step 63+ remain unopened.
+
+2026-09-12T16:44:45.6447910+00:00 | run=20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2 | pid=14960 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-12T16:44:45.6462910+00:00 | run=20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2 | pid=14960 | managedThread=1 | RUN_START — Step 58.0 actual game-owned character-select state + real OpenCharacterSelect frontier audit started; no mutation/rendering.
+2026-09-12T16:44:45.6624210+00:00 | run=20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2 | pid=14960 | managedThread=1 | M58_A_PASS — Step-57 4/4 retained PackedScene/PCK authority preserved; renderer stopped; runtime character-select ownership may be observed without mutation.
+2026-09-12T16:44:45.7019150+00:00 | run=20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2 | pid=14960 | managedThread=1 | M58_B_FAIL — stage=initialization; System.IO.InvalidDataException: Step 58.0 character-select NSubmenu._stack identity drifted.
+2026-09-12T16:44:45.7142840+00:00 | run=20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2 | pid=14960 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. Step 58 never invokes OpenCharacterSelect or restarts rendering.
+2026-09-12T16:44:45.7152030+00:00 | run=20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2 | pid=14960 | managedThread=18 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-12T16:44:45.7266270+00:00 | run=20260912T1644456372800Z-pid14960-8588e10cd9f841b3bfc0b801d4a153e2 | pid=14960 | managedThread=18 | RUN_END — Step-58 UI operation ended normally; Step 58 never invokes OpenCharacterSelect or restarts rendering.

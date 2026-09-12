@@ -8,7 +8,9 @@ namespace StS2Launcher.Core;
 /// <summary>
 /// Steps 58-62 pivot from decomposing character-select internals to adopting the state the real Godot game
 /// already owns. Physical 0.0.191 proved that _characterSelectSubmenu may already be in the SceneTree before
-/// Step 58. Step 58 therefore audits the actual cache/tree state and the exact OpenCharacterSelect(NButton)
+/// Step 58. Physical 0.0.193 then proved that an in-tree cached screen may still have an unbound/null
+/// NSubmenu._stack before the actual push transition. Step 58 therefore audits cache/tree/logical-stack state
+/// independently and the exact OpenCharacterSelect(NButton)
 /// handler without requiring an artificial null/off-tree state. Step 59 invokes that original handler once
 /// only when the transition is not already visibly complete. Steps 60-62 then audit the actual active screen
 /// and run bounded visible render residencies. Character choice, confirm/embark, run start and Step 63 remain unopened.
@@ -220,7 +222,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             }
             _step58ObservedCharacterSelect = screen;
             _step58ObservedState = state;
-            _step58TransitionAlreadyComplete = screen is not null && state.InsideTree && state.Visible && state.VisibleInTree;
+            _step58TransitionAlreadyComplete = screen is not null && state.InsideTree && state.Visible && state.VisibleInTree && state.StackIsExactRetainedStack;
 
             _step58StaticMap =
                 "StS2 Launcher — Step 58.0 real character-select runtime ownership audit\n" +
@@ -344,14 +346,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var screen = current.Screen ?? throw new InvalidDataException("Step 59.0 transition completed without a retained character-select cache.");
             if (!current.State.InsideTree || !current.State.Visible || !current.State.VisibleInTree)
                 throw new InvalidDataException($"Step 59.0 requires the game-owned character-select screen to be visible/in-tree after transition; observed={current.State}.");
-            if (!current.State.ParentIsExactStack)
-                throw new InvalidDataException("Step 59.0 character-select screen is visible/in-tree but its parent is not the retained submenu stack.");
+            if (!current.State.StackIsExactRetainedStack)
+                throw new InvalidDataException($"Step 59.0 character-select screen is visible/in-tree but NSubmenu._stack is not the exact retained submenu stack; observed={current.State}.");
             _step59CharacterSelectScreen = screen;
             _step59StaticMap += $"Handler invoked: {!_step58TransitionAlreadyComplete}\nAfter transition: {current.State}\n";
             _step59PostTransitionBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate C");
             _step59TransitionPassed = true;
-            Checkpoint(checkpoint, $"M59_C_PASS — game-owned character-select transition complete; handlerInvoked={!_step58TransitionAlreadyComplete}; insideTree=True; visible=True; visibleInTree=True; parentExactStack=True; renderingStopped=True; drift=0.");
+            Checkpoint(checkpoint, $"M59_C_PASS — game-owned character-select transition complete; handlerInvoked={!_step58TransitionAlreadyComplete}; insideTree=True; visible=True; visibleInTree=True; logicalStackExactRetained=True; renderingStopped=True; drift=0.");
             return StartupLadderPass(step, Step59Name, gate, _step58TransitionAlreadyComplete ? "Existing game-owned visible character-select state adopted without duplicate handler invocation." : "Original OpenCharacterSelect handler executed once while frozen and produced the expected visible/in-tree game-owned screen.");
         }
         catch (Exception ex) { Checkpoint(checkpoint, $"M59_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
@@ -366,7 +368,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (!_step59TransitionPassed || !_step59StaticMapDurablyWritten || !renderingStopped) throw new InvalidOperationException("Step 59.0 Gate D requires durable successful transition evidence with rendering frozen.");
             RequireVisibleInTreeCharacterSelectForOwnership(step, context); RequireStartupLadderBaselineUnchanged(context, post, "Step 59 Gate D");
             _exactStep59ClosurePassed = true;
-            Checkpoint(checkpoint, "M59_D_PASS — real character-select screen retained visible/in-tree under the exact submenu stack; renderingStopped=True; drift=0.");
+            Checkpoint(checkpoint, "M59_D_PASS — real character-select screen retained visible/in-tree and logically bound to the exact submenu stack; renderingStopped=True; drift=0.");
             return StartupLadderPass(step, Step59Name, gate, "Real handler/state transition closed 4/4. Step 60 may audit the actual active screen instead of reproducing internal lifecycle milestones.");
         }
         catch (Exception ex) { Checkpoint(checkpoint, $"M59_D_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
@@ -597,25 +599,41 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private object RequireVisibleInTreeCharacterSelectForOwnership(int step, Step35ExecutionLoadContext context)
     {
-        var current = CaptureCurrentCharacterSelectState(step, context); var screen = current.Screen ?? throw new InvalidOperationException($"Step {step}.0 retained character-select screen is absent."); if (!current.State.InsideTree || !current.State.Visible || !current.State.VisibleInTree || !current.State.ParentIsExactStack) throw new InvalidDataException($"Step {step}.0 requires visible/in-tree character-select authority under exact stack; observed={current.State}."); _step59CharacterSelectScreen = screen; return screen;
+        var current = CaptureCurrentCharacterSelectState(step, context); var screen = current.Screen ?? throw new InvalidOperationException($"Step {step}.0 retained character-select screen is absent."); if (!current.State.InsideTree || !current.State.Visible || !current.State.VisibleInTree || !current.State.StackIsExactRetainedStack) throw new InvalidDataException($"Step {step}.0 requires visible/in-tree character-select authority logically bound to the exact retained submenu stack; observed={current.State}."); _step59CharacterSelectScreen = screen; return screen;
     }
 
     private static void RequireCharacterSelectIdentity(object screen, object stack, AssemblyLoadContext context, int step)
     {
         if (screen.GetType().FullName != CharacterSelectScreenManagedTypeFullName) throw new InvalidDataException($"Step {step}.0 character-select cache type drifted: {screen.GetType().FullName}.");
         if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(screen.GetType().Assembly), context)) throw new InvalidDataException($"Step {step}.0 character-select cache is not owned by the exact private load context.");
-        var stackField = RequireRuntimeExactInstanceField(screen.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step); if (!ReferenceEquals(stackField.GetValue(screen), stack)) throw new InvalidDataException($"Step {step}.0 character-select NSubmenu._stack identity drifted.");
+        var stackField = RequireRuntimeExactInstanceField(screen.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
+        var logicalStack = stackField.GetValue(screen);
+        // An instantiated/cached submenu may already be attached to the SceneTree before NSubmenuStack.Push
+        // has logically bound it with NSubmenu.SetStack. Null is therefore a legitimate pre-push state.
+        // A non-null stack must still be the exact retained main-menu stack; foreign ownership is rejected.
+        if (logicalStack is not null && !ReferenceEquals(logicalStack, stack))
+            throw new InvalidDataException($"Step {step}.0 character-select NSubmenu._stack points to a foreign submenu stack: {logicalStack.GetType().FullName}.");
     }
 
     private static CharacterSelectRuntimeState CaptureCharacterSelectRuntimeState(object screen, object stack, int step)
     {
-        var inside = Convert.ToBoolean(RequireZeroArgBoolMethod(screen.GetType(), "IsInsideTree").Invoke(screen, null), System.Globalization.CultureInfo.InvariantCulture); var visible = RequireRuntimeBoolProperty(screen, "Visible", step); var visibleInTree = Convert.ToBoolean(RequireZeroArgBoolMethod(screen.GetType(), "IsVisibleInTree").Invoke(screen, null), System.Globalization.CultureInfo.InvariantCulture);
+        var inside = Convert.ToBoolean(RequireZeroArgBoolMethod(screen.GetType(), "IsInsideTree").Invoke(screen, null), System.Globalization.CultureInfo.InvariantCulture);
+        var visible = RequireRuntimeBoolProperty(screen, "Visible", step);
+        var visibleInTree = Convert.ToBoolean(RequireZeroArgBoolMethod(screen.GetType(), "IsVisibleInTree").Invoke(screen, null), System.Globalization.CultureInfo.InvariantCulture);
+        var stackField = RequireRuntimeExactInstanceField(screen.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
+        var logicalStack = stackField.GetValue(screen);
+        var stackIsNull = logicalStack is null;
+        var stackIsExact = ReferenceEquals(logicalStack, stack);
+        var logicalStackType = logicalStack?.GetType().FullName ?? "<null>";
         var parentIsStack = false; string parentType = "<none>";
         if (inside)
         {
-            var getParent = RequireZeroArgRuntimeMethodForOwnership(screen.GetType(), "GetParent", step); var parent = InvokeStartupLadderMethod(getParent, screen, null, $"Step {step} character-select GetParent"); parentIsStack = ReferenceEquals(parent, stack); parentType = parent?.GetType().FullName ?? "<null>";
+            var getParent = RequireZeroArgRuntimeMethodForOwnership(screen.GetType(), "GetParent", step);
+            var parent = InvokeStartupLadderMethod(getParent, screen, null, $"Step {step} character-select GetParent");
+            parentIsStack = ReferenceEquals(parent, stack);
+            parentType = parent?.GetType().FullName ?? "<null>";
         }
-        return new CharacterSelectRuntimeState(true, inside, visible, visibleInTree, parentIsStack, parentType);
+        return new CharacterSelectRuntimeState(true, inside, visible, visibleInTree, stackIsNull, stackIsExact, logicalStackType, parentIsStack, parentType);
     }
 
     private static bool ReadsFirstExplicitParameter(MethodDefinition method)
@@ -652,9 +670,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         foreach (var node in nodes) lines.Add($"  node: {node.Path} | {node.Node.GetType().FullName}"); lines.Add("[SELECTED MANAGED TYPES]"); foreach (var type in managedTypes) lines.Add("  - " + type); lines.Add("[CALLBACK ROOTS]"); foreach (var root in roots) lines.Add($"  - token=0x{root.MetadataToken.ToUInt32():X8}; {root.FullName}"); lines.Add(BuildStartupLadderInvocationFrontierAppendix(audit)); return string.Join("\n", lines) + "\n";
     }
 
-    private readonly record struct CharacterSelectRuntimeState(bool Present, bool InsideTree, bool Visible, bool VisibleInTree, bool ParentIsExactStack, string ParentType)
+    private readonly record struct CharacterSelectRuntimeState(bool Present, bool InsideTree, bool Visible, bool VisibleInTree, bool StackIsNull, bool StackIsExactRetainedStack, string LogicalStackType, bool ParentIsExactStack, string ParentType)
     {
-        public static CharacterSelectRuntimeState Absent => new(false, false, false, false, false, "<none>");
-        public override string ToString() => Present ? $"present=True; insideTree={InsideTree}; visible={Visible}; visibleInTree={VisibleInTree}; parentExactStack={ParentIsExactStack}; parentType={ParentType}" : "present=False";
+        public static CharacterSelectRuntimeState Absent => new(false, false, false, false, true, false, "<null>", false, "<none>");
+        public override string ToString() => Present ? $"present=True; insideTree={InsideTree}; visible={Visible}; visibleInTree={VisibleInTree}; logicalStackNull={StackIsNull}; logicalStackExactRetained={StackIsExactRetainedStack}; logicalStackType={LogicalStackType}; parentExactStack={ParentIsExactStack}; parentType={ParentType}" : "present=False";
     }
 }

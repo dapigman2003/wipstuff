@@ -1,6 +1,6 @@
-# Release checklist — Steps 58–62 real character-select ownership / visible-render trial / 0.0.192
+# Release checklist — Steps 58–62 real character-select ownership / visible-render trial / 0.0.193
 
-Release identity: display/build `0.0.192 (192)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.193 (193)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190 and 0.0.191 Step-58 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -14,4 +14,4 @@ Require the new block to preserve exact sequencing and authority:
 
 Step 59 is one-shot only when handler invocation arms. Steps 61/62 are always one-shot after render arm. Character choice/confirm/embark/run-start, whole `GameStartup`/original `LaunchMainMenu`, cloud/migration/platform/Steam/deferred startup, native game extensions, trusted-install mutation, and Step 63+ remain unopened.
 
-Require exact 0.0.192 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
+Require exact 0.0.193 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.

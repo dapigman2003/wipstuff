@@ -1,14 +1,16 @@
 # Current status
 
-## Active candidate — Steps 58–62 real character-select ownership / visible-render trial / 0.0.192 (192)
+## Active candidate — Steps 58–62 real character-select ownership / visible-render trial / 0.0.193 (193)
 
 Physical runtime authority is closed through **Step 57 4/4/frozen**. Physical 0.0.189 proved the retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, exact `ResourcePath = res://scenes/screens/character_select_screen.tscn`, one exact receipt-backed PCK entry, and read-only resource/risk evidence with zero drift. `OpenCharacterSelect`, `ResourceLoader`, `PackedScene.Instantiate`, and rendering all remained unopened during Step 57.
 
-The one-button **Physically Closed Path** intentionally remains capped at Step 52. A fresh 0.0.192 process must reprove through Step 52 and then manually reconstruct Steps 53–57 before the new block can run.
+The one-button **Physically Closed Path** intentionally remains capped at Step 52. A fresh 0.0.193 process must reprove through Step 52 and then manually reconstruct Steps 53–57 before the new block can run.
 
 Physical 0.0.190 proved the game-owned `_characterSelectSubmenu` can already be non-null before Step 58. Physical 0.0.191 went further: the exact cached `NCharacterSelectScreen` was already **inside the live SceneTree**, while Step 58 itself had performed no new character-select operation and rendering remained frozen. That invalidates the launcher-owned off-tree create → initialize → push decomposition.
 
-**0.0.192 therefore pivots to real game ownership.** Step 58 audits the actual runtime state plus the exact real `OpenCharacterSelect(NButton)` frontier. Step 59 invokes that real handler once only if the transition is not already visibly complete; otherwise it adopts the game's exact visible/in-tree screen without duplicate invocation. Step 60 audits the real active frame/input surface and exact TSCN connection inventory. Step 61 visibly renders the real screen for 2 seconds and refreezes. Step 62 visibly renders it for 10 seconds and refreezes. Intentional interaction and Step 63 remain unopened.
+Physical 0.0.192 then localized one remaining ownership assumption: the cached in-tree screen can still have `NSubmenu._stack` unbound before the real push transition. 0.0.193 therefore separates SceneTree attachment from logical stack binding; null is allowed pre-push, while any foreign non-null stack remains a hard failure.
+
+**0.0.193 retains the real-game ownership pivot and corrects logical-stack binding.** Step 58 audits the actual runtime state plus the exact real `OpenCharacterSelect(NButton)` frontier. Step 59 invokes that real handler once only if the transition is not already visibly complete; otherwise it adopts the game's exact visible/in-tree screen without duplicate invocation. Step 60 audits the real active frame/input surface and exact TSCN connection inventory. Step 61 visibly renders the real screen for 2 seconds and refreezes. Step 62 visibly renders it for 10 seconds and refreezes. Intentional interaction and Step 63 remain unopened.
 
 The 0.0.183 Codemagic AOT cache/sentinel experiment remains retained and independent of this runtime experiment.
 
@@ -142,9 +144,9 @@ Reports: `Step57-CrashCheckpoint-<RunId>.txt`, `Step57-CharacterSelectResource-S
 
 Physical 0.0.190 retained Step-57 4/4 authority and passed Step 58 Gate A, then stopped safely because `_characterSelectSubmenu` was already non-null before any Step-58 factory invocation. Rendering remained stopped and no new character-select operation armed.
 
-Physical 0.0.191 retained the same Step-57 authority and again passed Step 58 Gate A. Gate B then proved the pre-existing exact character-select cache was already **inside the SceneTree**. Step 58 never created character select or restarted rendering, and the process ended normally frozen. This is the evidence that triggers the 0.0.192 ownership pivot.
+Physical 0.0.191 retained the same Step-57 authority and again passed Step 58 Gate A. Gate B then proved the pre-existing exact character-select cache was already **inside the SceneTree**. Step 58 never created character select or restarted rendering, and the process ended normally frozen. This is the evidence that triggers the 0.0.193 ownership pivot.
 
-Retained evidence includes the 0.0.190 and 0.0.191 Step-58 report/checkpoint/last-checkpoint sets under `docs/history/reports/`, plus `docs/history/steps/STEP-58.0-RUNTIME-OWNERSHIP-PIVOT-0.0.192.md`.
+Retained evidence includes the 0.0.190 and 0.0.191 Step-58 report/checkpoint/last-checkpoint sets under `docs/history/reports/`, plus `docs/history/steps/STEP-58.0-RUNTIME-OWNERSHIP-PIVOT-0.0.193.md`.
 
 ## Step 58.0 — runtime ownership + real OpenCharacterSelect frontier audit
 
@@ -176,10 +178,10 @@ Requires Step 61 4/4/refrozen. Rechecks the same active-screen authority, then s
 
 Reports: `Step62-CrashCheckpoint-<RunId>.txt`, `Step62-CharacterSelectSustainedRender-StaticMap-<RunId>.txt`, `Step62-LastCheckpoint.txt`, `Step62-TransformedRealStS2CharacterSelectSustainedRender.txt`.
 
-## Physical sequence for 0.0.192
+## Physical sequence for 0.0.193
 
 Fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. Require Step 52 4/4/frozen. Then manually run **53 → 54 → 55 → 56 → 57**. Continue **58 → 59 → 60 → 61 → 62**, stopping immediately at the first failure.
 
-Step 59 is one-shot only if it actually arms the real handler invocation. Steps 61 and 62 are one-shot after render arm. If all five new rungs close 4/4, stop after Step 62 and preserve its evidence. **Step 63 has no behavior in 0.0.192.**
+Step 59 is one-shot only if it actually arms the real handler invocation. Steps 61 and 62 are one-shot after render arm. If all five new rungs close 4/4, stop after Step 62 and preserve its evidence. **Step 63 has no behavior in 0.0.193.**
 
-Still globally forbidden in 0.0.192: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 63+. Render rungs are Step 50, Step 52, Step 55, Step 61, and Step 62; each bounded rung synchronously refreezes before success evaluation.
+Still globally forbidden in 0.0.193: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 63+. Render rungs are Step 50, Step 52, Step 55, Step 61, and Step 62; each bounded rung synchronously refreezes before success evaluation.

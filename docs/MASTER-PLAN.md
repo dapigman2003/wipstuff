@@ -1,6 +1,8 @@
-## Current frontier — Steps 58–62 / 0.0.192
+## Current frontier — Steps 58–62 / 0.0.193
 
-The active candidate is **0.0.192 / real character-select ownership and visible-render trial through Step 62**. Physical runtime authority is closed through Step 57 4/4/frozen. Physical 0.0.191 further proved that the real cached `NCharacterSelectScreen` can already be inside the SceneTree before Step 58 performs a new operation. The fresh-process convenience route remains capped at Step 52; Steps 53–57 must be reconstructed manually before the new block.
+The active candidate is **0.0.193 / real character-select ownership and visible-render trial through Step 62**. Physical runtime authority is closed through Step 57 4/4/frozen. Physical 0.0.191 further proved that the real cached `NCharacterSelectScreen` can already be inside the SceneTree before Step 58 performs a new operation. The fresh-process convenience route remains capped at Step 52; Steps 53–57 must be reconstructed manually before the new block.
+
+Physical 0.0.192 then localized one remaining ownership assumption: the cached in-tree screen can still have `NSubmenu._stack` unbound before the real push transition. 0.0.193 therefore separates SceneTree attachment from logical stack binding; null is allowed pre-push, while any foreign non-null stack remains a hard failure.
 
 The architecture now pivots away from reproducing the game's internal create/init/push state machine. Step 58 audits the actual runtime ownership state and the exact real `OpenCharacterSelect(NButton)` frontier. Step 59 invokes that real handler once only when the active screen still needs the transition; otherwise it adopts the exact already-visible screen. Step 60 audits the resulting live frame/input surface. Steps 61 and 62 visibly render the real character-select screen for 2 seconds and 10 seconds respectively, synchronously refreezing after each trial. Character choice/embark/run-start and Step 63+ remain unopened.
 

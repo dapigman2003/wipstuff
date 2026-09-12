@@ -40,7 +40,9 @@ Physical 0.0.188 Step 57 retained-hint localization evidence is retained as `STE
 
 ## Steps 58–62 evidence contract
 
-Physical 0.0.190 proved Step 58 may see a non-null game-owned character-select cache. Physical 0.0.191 then proved that exact cached `NCharacterSelectScreen` may already be **inside the live SceneTree** before Step 58 performs any new operation. Both runs ended frozen and Step 58 itself created nothing. 0.0.192 therefore adopts real runtime ownership instead of requiring launcher-controlled off-tree lifecycle milestones.
+Physical 0.0.190 proved Step 58 may see a non-null game-owned character-select cache. Physical 0.0.191 then proved that exact cached `NCharacterSelectScreen` may already be **inside the live SceneTree** before Step 58 performs any new operation. Both runs ended frozen and Step 58 itself created nothing. 0.0.193 therefore adopts real runtime ownership instead of requiring launcher-controlled off-tree lifecycle milestones.
+
+Physical 0.0.192 then localized one remaining ownership assumption: the cached in-tree screen can still have `NSubmenu._stack` unbound before the real push transition. 0.0.193 therefore separates SceneTree attachment from logical stack binding; null is allowed pre-push, while any foreign non-null stack remains a hard failure.
 
 Each rung has a distinct report/static-map/checkpoint surface:
 

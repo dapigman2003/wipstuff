@@ -1,0 +1,37 @@
+StS2 Launcher — Step 58.0 Character Select Runtime Ownership Audit
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-12T16:44:45.7146580+00:00
+
+RESULT
+STEP 58.0 CHARACTER SELECT RUNTIME OWNERSHIP AUDIT FAIL — 1/4
+
+METADATA
+App version: 0.0.192 (192)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: initialization
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 58.0 character-select NSubmenu._stack identity drifted.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::Void RequireCharacterSelectIdentity(System.Object, System.Object, System.Runtime.Loader.AssemblyLoadContext, Int32)
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireCharacterSelectIdentity(Object screen, Object stack, AssemblyLoadContext context, Int32 step)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep58RuntimeOwnershipBinding(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 58.0 character-select NSubmenu._stack identity drifted.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::Void RequireCharacterSelectIdentity(System.Object, System.Object, System.Runtime.Loader.AssemblyLoadContext, Int32)
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RequireCharacterSelectIdentity(Object screen, Object stack, AssemblyLoadContext context, Int32 step)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep58RuntimeOwnershipBinding(Action`1 checkpoint)
+
+END OF REPORT

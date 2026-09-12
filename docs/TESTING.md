@@ -1,6 +1,6 @@
-# Testing — Steps 58–62 real character-select ownership / visible-render trial / 0.0.192
+# Testing — Steps 58–62 real character-select ownership / visible-render trial / 0.0.193
 
-Active candidate: `0.0.192 (192)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.193 (193)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
