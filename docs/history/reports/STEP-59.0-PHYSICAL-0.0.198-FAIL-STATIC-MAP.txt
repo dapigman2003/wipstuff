@@ -1,0 +1,186 @@
+StS2 Launcher — Step 59.0 character-select ready-binding forensics + game-owned transition
+NSubmenuStack.Push token: 0x06003FBE; parameter=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu
+Single-player logical stack before repair: MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack
+Navigation repair required: False
+OpenCharacterSelect token: 0x06003F71
+OpenCharacterSelect invocation required: True
+Real standard button type: MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuButton
+Before character-select transition: present=True; insideTree=True; visible=False; visibleInTree=False; logicalStackNull=True; logicalStackExactRetained=False; logicalStackType=<null>; parentExactStack=True; parentType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack
+Forensic preflight: character=[present=True; insideTree=True; visible=False; visibleInTree=False; logicalStackNull=True; logicalStackExactRetained=False; logicalStackType=<null>; parentExactStack=True; parentType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack; nodeReady=True; fields=_charButtonContainer=Godot.HBoxContainer,_ascensionPanel=NULL,_actDropdown=NULL,_actDropdownLabel=MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel,_remotePlayerContainer=MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer,_readyAndWaitingContainer=Godot.Control,_backButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NBackButton,_unreadyButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NBackButton,_embarkButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton,_randomCharacterButton=NULL]; ascension=[nodeReady=False; fields=]; nGame=[HotkeyManager=MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager,InputManager=MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager,RemoteCursorContainer=MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer,ReactionContainer=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer,TimeoutOverlay=NULL,RootSceneContainer=MegaCrit.Sts2.Core.Nodes.NSceneContainer]; save=Progress:MegaCrit.Sts2.Core.Saves.ProgressState,Epochs:System.Collections.Generic.List`1[[MegaCrit.Sts2.Core.Saves.SerializableEpoch, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null]],EncounterStats:System.Collections.Generic.Dictionary`2[[MegaCrit.Sts2.Core.Models.ModelId, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null],[MegaCrit.Sts2.Core.Saves.EncounterStats, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null]]; rootCurrentScene=NULL; lobby=NULL; lobbyPlayers=n/a; requiredFailures=character-select _ascensionPanel=NULL | character-select _actDropdown=NULL | character-select _randomCharacterButton=NULL | NGame.TimeoutOverlay=NULL
+Ready-binding handler authorization: False
+Ready-binding blocker: character-select _ascensionPanel=NULL | character-select _actDropdown=NULL | character-select _randomCharacterButton=NULL | NGame.TimeoutOverlay=NULL
+[READY-BINDING DIAGNOSTICS]
+Selected _Ready token=0x0600443B; IL=192; charButtonStoreIndex=67; ascensionStringIndex=70; ascensionStoreIndex=73.
+[SELECTED _READY ASCENSION LOOKUP WINDOW]
+  IL_00E9: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_00EE: call !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+  IL_00F3: stfld Godot.Control MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_charButtonContainer
+  IL_00F8: ldarg.0
+  IL_00F9: ldarg.0
+  IL_00FA: ldstr "%AscensionPanel"
+  IL_00FF: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_0104: call !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel>(Godot.NodePath)
+  IL_0109: stfld MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_ascensionPanel
+  IL_010E: ldarg.0
+  IL_010F: ldarg.0
+  IL_0110: ldstr "%ActDropdown"
+Live character-select descendant nodes=95; ascension-like candidates=5.
+[LIVE ASCENSION-LIKE NODES]
+  path=/Game/AscensionPanel; name=AscensionPanel; type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=character-select-root
+  path=/Game/AscensionPanel/HBoxContainer/AscensionIconContainer; name=AscensionIconContainer; type=Godot.Control; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  path=/Game/AscensionPanel/HBoxContainer/AscensionDescription; name=AscensionDescription; type=Godot.Control; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  path=/Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon; name=AscensionIcon; type=Godot.TextureRect; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  path=/Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon/AscensionLevel; name=AscensionLevel; type=MegaCrit.Sts2.addons.mega_text.MegaLabel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+[LIVE CHARACTER-SELECT NODE TYPES AROUND ASCENSION]
+  /Game/AscensionPanel | MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  /Game/AscensionPanel/Background | Godot.NinePatchRect
+  /Game/AscensionPanel/HBoxContainer | Godot.HBoxContainer
+  /Game/AscensionPanel/HBoxContainer/LeftTriggerIcon | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/LeftArrowContainer | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/AscensionIconContainer | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/AscensionDescription | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/RightArrowContainer | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/RightTriggerIcon | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/LeftArrowContainer/LeftArrow | MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton
+  /Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/AscensionDescription/Description | MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel
+  /Game/AscensionPanel/HBoxContainer/RightArrowContainer/RightArrow | MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton
+  /Game/AscensionPanel/HBoxContainer/LeftArrowContainer/LeftArrow/TextureRect | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon/AscensionLevel | MegaCrit.Sts2.addons.mega_text.MegaLabel
+  /Game/AscensionPanel/HBoxContainer/RightArrowContainer/RightArrow/TextureRect | Godot.TextureRect
+Character-select TSCN bytes=16015; sha256=3d2305fdddae6f432e52ac4b8ea5035c5cecfd26fbc30c319f09b1cd4a05eb1e.
+Ascension-panel TSCN bytes=8192; sha256=71c3b9dba2fe053be1c70159ebee3e1757c035dd7e5ef8a4dbd91b7eb1d02c26.
+[CHARACTER-SELECT TSCN ASCENSION CONTEXT]
+  L311: script = ExtResource("4_36sm0")
+  L312: MinFontSize = 12
+  L313: MaxFontSize = 24
+  L314: 
+  L315: [node name="AscensionPanel" parent="." instance=ExtResource("12_gxq8b")]
+  L316: unique_name_in_owner = true
+  L317: layout_mode = 1
+  L318: offset_left = -317.0
+  L319: offset_top = -342.0
+[ASCENSION-PANEL TSCN ROOT CONTEXT]
+  L35: shader_parameter/v = 1.0
+  L36: 
+  L37: [node name="AscensionPanel" type="Control"]
+  L38: layout_mode = 3
+  L39: anchors_preset = 7
+  L51: script = ExtResource("1_0jdvo")
+  L52: 
+  L53: [node name="Background" type="NinePatchRect" parent="."]
+  L54: modulate = Color(0, 0, 0, 0.470588)
+  L55: layout_mode = 0
+  L64: patch_margin_bottom = 12
+  L65: 
+  L66: [node name="HBoxContainer" type="HBoxContainer" parent="."]
+  L67: layout_mode = 1
+  L68: anchors_preset = 15
+  L75: alignment = 1
+  L76: 
+  L77: [node name="LeftTriggerIcon" type="TextureRect" parent="HBoxContainer"]
+  L78: unique_name_in_owner = true
+  L79: custom_minimum_size = Vector2(64, 64)
+  L85: stretch_mode = 4
+  L86: 
+  L87: [node name="LeftArrowContainer" type="Control" parent="HBoxContainer"]
+  L88: custom_minimum_size = Vector2(80, 64)
+  L89: layout_mode = 2
+  L90: mouse_filter = 2
+  L91: 
+  L92: [node name="LeftArrow" type="Control" parent="HBoxContainer/LeftArrowContainer"]
+  L93: layout_mode = 1
+  L94: anchors_preset = 15
+  L99: script = ExtResource("2_nikwq")
+  L100: 
+  L101: [node name="TextureRect" type="TextureRect" parent="HBoxContainer/LeftArrowContainer/LeftArrow"]
+  L102: material = SubResource("ShaderMaterial_qf22s")
+  L103: custom_minimum_size = Vector2(64, 64)
+  L120: stretch_mode = 5
+  L121: 
+  L122: [node name="AscensionIconContainer" type="Control" parent="HBoxContainer"]
+  L123: custom_minimum_size = Vector2(64, 64)
+  L124: layout_mode = 2
+[UNIQUE-NAME PROVENANCE DIAGNOSTICS]
+Purpose: distinguish serialized SceneState loss, PackedScene instantiation loss, live-tree/owner loss, and managed %Name lookup failure without mutating retained game state.
+[CHARACTER-SELECT PACKEDSCENE SCENESTATE]
+sceneStateType=Godot.SceneState; nodeCount=38
+name=AscensionPanel; path=./AscensionPanel; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ActDropdown; path=./ActDropdown; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+[CHARACTER-SELECT TEMPORARY OFF-TREE INSTANCE]
+AscensionPanel: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ActDropdown: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[CHARACTER-SELECT RETAINED LIVE INSTANCE]
+AscensionPanel: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ActDropdown: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[GAME PACKEDSCENE SCENESTATE]
+sceneStateType=Godot.SceneState; nodeCount=40
+name=InputManager; path=./InputManager; ownerPath=.; type=Node; instance=NO; properties=[unique_name_in_owner=True,script=True]
+name=HotkeyManager; path=./HotkeyManager; ownerPath=.; type=Node; instance=NO; properties=[unique_name_in_owner=True,script=True]
+name=RootSceneContainer; path=./RootSceneContainer; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ReactionWheel; path=./ReactionWheel; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ReactionContainer; path=./ReactionContainer; ownerPath=.; type=Control; instance=NO; properties=[unique_name_in_owner=True,script=True]
+name=MultiplayerTimeoutOverlay; path=./MultiplayerTimeoutOverlay; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=WorldEnvironment; path=./WorldEnvironment; ownerPath=.; type=WorldEnvironment; instance=NO; properties=[unique_name_in_owner=True]
+[GAME TEMPORARY OFF-TREE INSTANCE]
+InputManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+HotkeyManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+RootSceneContainer: type=MegaCrit.Sts2.Core.Nodes.NSceneContainer; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionWheel: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionContainer: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+MultiplayerTimeoutOverlay: type=MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+WorldEnvironment: type=Godot.WorldEnvironment; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[GAME RETAINED LIVE INSTANCE]
+InputManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+HotkeyManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+RootSceneContainer: type=MegaCrit.Sts2.Core.Nodes.NSceneContainer; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionWheel: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionContainer: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+MultiplayerTimeoutOverlay: type=MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+WorldEnvironment: direct/find=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[MAIN-MENU PACKEDSCENE SCENESTATE]
+sceneStateType=Godot.SceneState; nodeCount=41
+name=MainMenuBg; path=./MainMenuBg; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ContinueRunInfo; path=./MainMenuTextButtons/ContinueButton/ContinueRunInfo; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=PatchNotesScreen; path=./PatchNotesScreen; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=Submenus; path=./Submenus; ownerPath=.; type=Control; instance=NO; properties=[unique_name_in_owner=True,script=True]
+[MAIN-MENU RETAINED LIVE INSTANCE]
+Submenus: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+MainMenuBg: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuBg; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ContinueRunInfo: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NContinueRunInfo; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+PatchNotesScreen: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NPatchNotesScreen; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Rendering active before transition: NO
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 9
+Compiler state-machine MoveNext expansions reached from immediate edges: 0
+Immediate classified boundary references: 0
+Deferred/non-executing method-reference frontiers: 2
+Runtime-guarded immediate frontiers: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06003783; System.Void MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::Update()
+  - token=0x06003784; MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::get_Instance()
+  - token=0x06003788; System.Void MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::.ctor()
+  - token=0x06003E1E; Godot.Control MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::get_BlurBackstop()
+  - token=0x06003E2A; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::EnableBackstop()
+  - token=0x06003E6A; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuBg::HideLogo()
+  - token=0x06003F88; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu::SetStack(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack)
+  - token=0x06003F8E; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu::OnSubmenuOpened()
+  - token=0x06003FBE; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack::Push(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu)
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - none
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderLod(System.Single); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack::Push(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::EnableBackstop() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderLod(System.Single)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderMix(System.Single); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack::Push(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::EnableBackstop() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderMix(System.Single)
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - none
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - none

@@ -1,6 +1,6 @@
 # Testing — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Active candidate: `0.0.198 (198)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.199 (199)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -54,3 +54,25 @@ Temporary diagnostic PackedScene instances must never be added to the SceneTree 
 No `SetUniqueNameInOwner`, live owner mutation, direct `_ascensionPanel` write, manual `_Ready`, Push, or
 `OpenCharacterSelect` is authorized when the existing ready blocker remains. Do not proceed to Step 60 unless Step 59
 closes 4/4.
+
+
+## 0.0.199 PackedScene compatibility expectations
+
+The active model-bootstrap path now selects the verified GodotSharp compatibility derivative rather than exact
+prepared GodotSharp bytes. During GodotSharp load, the checkpoint must include
+`GODOT_PACKEDSCENE_UNIQUE_NAME_COMPAT_ARMED`.
+
+Reconstruct from a **fresh process**. Earlier rungs may now observe healthier normal game lifecycle state because the
+compatibility correction applies from the first real PackedScene instantiation. Stop on the first failure and preserve
+that rung's evidence.
+
+If execution reaches Step 59, `M59_B_UNIQUE_NAME_PROVENANCE` should show:
+
+- character-select SceneState `AscensionPanel=True` / temporary instance `UniqueNameInOwner=True` / live `true`;
+- character-select `ActDropdown` likewise `true`;
+- game instanced roots such as `RootSceneContainer` and `MultiplayerTimeoutOverlay` `true`;
+- ordinary-node controls remain unchanged;
+- `_ascensionPanel`, `_actDropdown`, and `NGame.TimeoutOverlay` should no longer be null if their managed Ready
+  callbacks complete normally.
+
+Only then may Step 59 authorize the original game-owned transition. Do not retry an armed Step 59 in-process.

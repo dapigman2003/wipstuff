@@ -1,6 +1,6 @@
 # Release checklist — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Release identity: display/build `0.0.198 (198)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.199 (199)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190–0.0.192 Step-58 localization evidence and physical 0.0.193 Step-59 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -44,3 +44,18 @@ Require exact 0.0.197 source/plist/release/shell identity; current active manife
 - Compare direct/non-generic node lookup and `%Name` lookup identity on the same live graph.
 - No setter for `UniqueNameInOwner`, no owner mutation, no direct game-field repair and no explicit `_Ready()` call.
 - Existing unhealthy prerequisites still block Gate C before one-shot Push/OpenCharacterSelect arm.
+
+
+## 0.0.199 central PackedScene compatibility requirements
+
+- The exact prepared/trusted GodotSharp file is never modified in place.
+- The selected derivative preserves GodotSharp assembly identity and MVID.
+- `PackedScene.Instantiate(GenEditState)` contains exactly one compatibility callback invocation after native
+  instantiation and before return.
+- The callback considers only SceneState nodes with non-null `GetNodeInstance(index)` and exact
+  `unique_name_in_owner=true`.
+- Ordinary/non-instanced nodes are not written.
+- Runtime nodes are matched by serialized relative path using `GetChildren()`/`Name`; the correction does not depend
+  on the reflection-time `Godot.NodePath` lookup that produced diagnostic TypeLoad noise in 0.0.198.
+- No StS2 private UI/game field is written and no `_Ready()` method is manually invoked.
+- Physical 0.0.198 report/checkpoint/static-map/last-checkpoint evidence is retained in history.

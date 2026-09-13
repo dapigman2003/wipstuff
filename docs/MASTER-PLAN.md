@@ -1,21 +1,24 @@
-## Current frontier — Steps 58–62 / 0.0.198
+## Current frontier — Steps 58–62 / 0.0.199
 
-**Active candidate — 0.0.198 unique-name provenance forensics.** Physical authority remains formally closed through
-Step 57 4/4/frozen. Physical 0.0.197 produced the first direct mechanism for the character-select Ready failure:
-the exact live `AscensionPanel` exists with the selected `NAscensionPanel` type, correct character-select owner,
-and `IsNodeReady()==true`, but its live `UniqueNameInOwner` is false while the exact parent
-`character_select_screen.tscn` declares `unique_name_in_owner = true`. A nested unique node declared inside the
-AscensionPanel subscene remains true.
+**Active candidate — 0.0.199 global PackedScene instanced-root unique-name compatibility.** Physical authority remains
+formally closed through Step 57 4/4/frozen. Physical 0.0.198 proves exact TSCN and retained `PackedScene.GetState()`
+data preserve `unique_name_in_owner=true`, while a fresh off-tree `PackedScene.Instantiate(GenEditState)` loses that
+property specifically on roots of instanced subscenes. Ordinary nodes in the same scenes preserve the property, and
+retained live nodes match the temporary instances. The defect therefore occurs during scene instantiation/property
+application, before SceneTree admission and before StS2 managed `_Ready()` callbacks.
 
-This moves the investigation from a character-specific null toward a likely **scene compatibility boundary**.
-0.0.198 compares the exact TSCN, retained `PackedScene.GetState()` properties, a temporary off-tree instance,
-the retained live node, and direct-path versus `%Name` lookup behavior. Representative NGame and main-menu nodes
-are included to determine whether parent-scene unique-name overrides on instantiated subscene roots are being lost
-systemically.
+0.0.199 moves the correction into the **private Godot managed compatibility boundary**. A separately verified
+GodotSharp derivative wraps `PackedScene.Instantiate(GenEditState)` and reconciles only SceneState entries that are
+both instanced-subscene roots and explicitly `unique_name_in_owner=true`, before the new scene root is returned.
+No StS2 field, scene owner, `_Ready()` callback, TSCN/PCK byte, or trusted runtime file is patched.
 
-No live flag is repaired in this candidate. If the systemic hypothesis is confirmed, the long-term fix belongs in
-the ahead-of-load resource/scene compatibility layer **before managed `_Ready()` callbacks run**, not in
-screen-specific field patches. This directly follows the launcher/product separation in this plan.
+Step 59 retains the full ready/provenance audit as post-correction proof. If the prior metadata loss is fixed, normal
+NGame/main-menu/character-select lifecycle should populate the fields that were previously null and the original
+game-owned character-select transition can proceed. If a different earlier lifecycle boundary appears, the ladder
+still stops on that first failure.
+
+This is the desired long-term direction: fix a proven host/runtime semantic mismatch once beneath the game, then let
+the original StS2/Godot lifecycle own scene state and navigation.
 
 ## Strategic architecture revision — startup convergence
 

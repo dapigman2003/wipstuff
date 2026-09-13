@@ -6,7 +6,7 @@ Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains 
 
 Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-## Active candidate — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198 (198)
+## Active candidate — Steps 58–62 global PackedScene unique-name compatibility / visible-render trial / 0.0.199 (199)
 
 Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
@@ -23,6 +23,24 @@ Physical runtime authority remains closed through **Step 57 4/4/frozen**. The on
 
 Static analysis now proves that character-select cache state is **normal game preload behavior**: `NMainMenuSubmenuStack._Ready()` pre-instantiates character select, hides it, and adds it as a child, while `NSubmenu._stack` remains null until `Push()`. It is no longer treated as an anomalous state.
 
+
+
+### What physical 0.0.198 changed
+
+Physical 0.0.198 makes the unique-name loss location conclusive. The exact `SceneState` still contains
+`unique_name_in_owner=True` for instanced roots such as character-select `AscensionPanel`/`ActDropdown`, game
+`RootSceneContainer`/`ReactionWheel`/`MultiplayerTimeoutOverlay`, and main-menu `MainMenuBg`. A fresh temporary **off-tree** `PackedScene.Instantiate()` already reports those runtime nodes as `UniqueNameInOwner=false`.
+
+Ordinary nodes in the same scenes (`InputManager`, `HotkeyManager`, `ReactionContainer`, `WorldEnvironment`,
+`Submenus`) preserve `true`. The live retained tree matches the temporary instance. The defect is therefore the
+application of parent-scene overrides to instanced-subscene roots during PackedScene instantiation, not parsing,
+resource caching, SceneTree admission, owner mutation, or a character-select-specific bug.
+
+0.0.199 selects a hash-pinned private GodotSharp compatibility derivative for the active model-bootstrap path.
+Its `PackedScene.Instantiate` epilogue calls a host compatibility callback before returning the new root. The callback
+reapplies only exact SceneState `unique_name_in_owner=true` values for instanced roots, verifies each write, and
+otherwise leaves the new hierarchy untouched. The Step-59 forensic snapshot then proves whether normal StS2 Ready
+bindings recover.
 
 ### What physical 0.0.197 changed
 

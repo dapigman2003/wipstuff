@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Security.Cryptography;
@@ -36,9 +37,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
     private const string DiagnosticCloneFileName = "sts2.step35.0.27.instrumented.dll";
     private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step39.1.lifecycle-admission.dll";
-    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step35.0.27.instrumented.dll";
+    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step59.5.unique-name-compat.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
+    internal const string GodotSharpPackedSceneCompatibilityCallbackFieldName = "PackedSceneInstantiateCompatibilityCallback";
     internal const string NullPlatformTypeFullName = "MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy";
     internal const string NullPlatformConstructorFullName = "System.Void MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy::.ctor()";
     internal const string CommandLineHelperTypeFullName = "MegaCrit.Sts2.Core.Helpers.CommandLineHelper";
@@ -87,7 +89,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
 
     private bool IsModelBootstrapCompatibilityMode => DiagnosticMode == Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility;
 
-    private bool UsesExactPreparedGodotSharp => IsExactAuthorityMode || IsModelBootstrapCompatibilityMode;
+    private bool UsesExactPreparedGodotSharp => IsExactAuthorityMode;
 
     public bool EssentialCompatibilityAuthorityPassed => _exactStep35CoreClosurePassed &&
         DiagnosticMode is Step35DiagnosticMode.GodotCoreExactClosure or Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility;
@@ -304,19 +306,19 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                     (initializerBearing.Length == 0 ? "<none>" : string.Join(" | ", initializerBearing.Select(item => item.Plan.AssemblyFullName))));
             }
 
-            stage = "GodotSharp diagnostic clone + installed-bundle native reconnaissance";
+            stage = "GodotSharp PackedScene compatibility derivative + installed-bundle native reconnaissance";
             var preparedGodotSharp = prepared.SingleOrDefault(item => !item.Plan.IsPrimary && string.Equals(item.AssemblyName.Name, "GodotSharp", StringComparison.OrdinalIgnoreCase))
-                ?? throw new InvalidDataException("Step-35.0.22 comprehensive reconnaissance requires the exact prepared GodotSharp private dependency.");
+                ?? throw new InvalidDataException("Step-35.0.22 compatibility preparation requires the exact prepared GodotSharp private dependency.");
             if (preparedGodotSharp.ModuleInitializerCount != 0)
-                throw new InvalidDataException("Step-35.0.22 refuses to create a runtime diagnostic derivative from initializer-bearing GodotSharp metadata.");
+                throw new InvalidDataException("Step-35.0.22 refuses to create a runtime compatibility derivative from initializer-bearing GodotSharp metadata.");
             var godotSharpDiagnosticPath = Path.Combine(diagnosticRoot, GodotSharpDiagnosticCloneFileName);
             var godotSharpDiagnostic = CreateInstrumentedGodotSharpDiagnosticClone(preparedGodotSharp.PreparedPath, godotSharpDiagnosticPath);
             if (!godotSharpDiagnostic.AssemblyIdentity.Equals(preparedGodotSharp.Plan.AssemblyFullName, StringComparison.Ordinal))
-                throw new InvalidDataException($"Step-35.0.22 GodotSharp diagnostic identity drifted from prepared plan: {godotSharpDiagnostic.AssemblyIdentity} != {preparedGodotSharp.Plan.AssemblyFullName}.");
-            VerifyFileLength(preparedGodotSharp.PreparedPath, preparedGodotSharp.Plan.Length, "prepared GodotSharp after diagnostic-clone emission");
+                throw new InvalidDataException($"Step-35.0.22 GodotSharp compatibility identity drifted from prepared plan: {godotSharpDiagnostic.AssemblyIdentity} != {preparedGodotSharp.Plan.AssemblyFullName}.");
+            VerifyFileLength(preparedGodotSharp.PreparedPath, preparedGodotSharp.Plan.Length, "prepared GodotSharp after compatibility-derivative emission");
             var godotSourceSha1AfterDiagnostic = ComputeSha1Hex(preparedGodotSharp.PreparedPath);
             if (!godotSourceSha1AfterDiagnostic.Equals(preparedGodotSharp.Plan.Sha1Hex, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35.0.22 GodotSharp diagnostic-clone emission changed the exact prepared source; refusing to continue.");
+                throw new InvalidDataException("Step-35.0.22 GodotSharp compatibility-derivative emission changed the exact prepared source; refusing to continue.");
 
             var offlineForRecon = await _offlineInspection.RunAsync(progress: null, cancellationToken).ConfigureAwait(false);
             if (!offlineForRecon.Success || !offlineForRecon.ExactManagedTreeVerified || string.IsNullOrWhiteSpace(offlineForRecon.ManagedInstallRelativePath))
@@ -325,7 +327,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             var godotReconnaissanceReport = Step35GodotReconnaissance.BuildReport(managedInstallRoot, preparedGodotSharp.PreparedPath);
 
             progress?.Report(new(gate, 7, 8, godotSharpDiagnosticPath,
-                $"Prepared runtime-binding plan requalified; emitted a separately hash-pinned GodotSharp diagnostic clone with {godotSharpDiagnostic.MarkerCount:N0} entry-only markers, and completed read-only Mach-O/native + GodotSharp IL reconnaissance over the exact OfflineReady tree. No prepared/native image was executed."));
+                $"Prepared runtime-binding plan requalified; emitted a separately hash-pinned GodotSharp compatibility derivative with {godotSharpDiagnostic.MarkerCount:N0} entry-only markers plus the PackedScene unique-name reconciliation hook, and completed read-only Mach-O/native + GodotSharp IL reconnaissance over the exact OfflineReady tree. No prepared/native image was executed."));
 
             _preflight = new ExecutionPreflightSnapshot(
                 transformedPath,
@@ -468,11 +470,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             var diagnosticImmediateSha256 = ComputeSha256Hex(preflight.DiagnosticPath);
             if (!diagnosticImmediateSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Step-35 diagnostic clone changed between Gate A instrumentation and Gate B CLR admission.");
-            VerifyFileLength(preflight.GodotSharpDiagnostic.Path, preflight.GodotSharpDiagnostic.Length, "Step-35 GodotSharp diagnostic clone");
+            VerifyFileLength(preflight.GodotSharpDiagnostic.Path, preflight.GodotSharpDiagnostic.Length, "Step-35 GodotSharp compatibility derivative");
             var immediateGodotSha256 = ComputeSha256Hex(preflight.GodotSharpDiagnostic.Path);
             if (!immediateGodotSha256.Equals(preflight.GodotSharpDiagnostic.Sha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("Step-35 GodotSharp diagnostic clone changed between Gate A instrumentation and Gate B admission preparation.");
-            Checkpoint(crashCheckpoint, $"B_HASH_PASS — exact transformed source matched {exactImmediateSha256}; sts2 diagnostic clone matched {diagnosticImmediateSha256}; GodotSharp diagnostic derivative matched {immediateGodotSha256}.");
+                throw new InvalidDataException("Step-35 GodotSharp compatibility derivative changed between Gate A preparation and Gate B admission preparation.");
+            Checkpoint(crashCheckpoint, $"B_HASH_PASS — exact transformed source matched {exactImmediateSha256}; sts2 diagnostic clone matched {diagnosticImmediateSha256}; GodotSharp compatibility derivative matched {immediateGodotSha256}.");
 
             stage = "execution-capable strict AssemblyLoadContext construction";
             Checkpoint(crashCheckpoint, $"B_ALC_CONSTRUCT_START — constructing strict Step-35 execution AssemblyLoadContext; exactAuthority={IsExactAuthorityMode}.");
@@ -2786,6 +2788,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 actionStringType);
             bridge.Fields.Add(callbackField);
 
+            var (actionObjectObjectType, actionObjectObjectInvoke) = CreateDiagnosticActionObjectObjectInvokeReference(module, systemRuntime);
+            var packedSceneCompatibilityCallbackField = new FieldDefinition(
+                GodotSharpPackedSceneCompatibilityCallbackFieldName,
+                Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static,
+                actionObjectObjectType);
+            bridge.Fields.Add(packedSceneCompatibilityCallbackField);
+
             var emit = new MethodDefinition(
                 "Emit",
                 Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
@@ -2817,7 +2826,57 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 InsertEntryMarker(method, emitReference, item.Marker);
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(diagnosticPath) ?? throw new InvalidOperationException("GodotSharp diagnostic clone path has no parent."));
+            var packedSceneType = EnumerateTypes(module.Types).SingleOrDefault(type => type.FullName == "Godot.PackedScene")
+                ?? throw new MissingMemberException("Godot.PackedScene");
+            var packedSceneInstantiate = packedSceneType.Methods.SingleOrDefault(method =>
+                method.Name == "Instantiate" &&
+                !method.IsStatic &&
+                !method.HasGenericParameters &&
+                method.Parameters.Count == 1 &&
+                method.ReturnType.FullName == "Godot.Node" &&
+                method.HasBody)
+                ?? throw new MissingMethodException("Godot.PackedScene", "Instantiate(GenEditState)");
+            var originalReturns = packedSceneInstantiate.Body.Instructions.Where(instruction => instruction.OpCode.Code == Code.Ret).ToArray();
+            if (originalReturns.Length == 0 || originalReturns.Length > 8)
+                throw new InvalidDataException($"Step-59.5 Godot.PackedScene.Instantiate return-site count was implausible: {originalReturns.Length}.");
+
+            packedSceneInstantiate.Body.InitLocals = true;
+            var compatibilityResult = new VariableDefinition(packedSceneInstantiate.ReturnType);
+            packedSceneInstantiate.Body.Variables.Add(compatibilityResult);
+            var instantiateIl = packedSceneInstantiate.Body.GetILProcessor();
+
+            foreach (var originalReturn in originalReturns)
+            {
+                // Keep each original return instruction object as the control-flow target by converting
+                // it to the first epilogue instruction. Existing branches-to-ret therefore cannot skip
+                // the compatibility callback.
+                originalReturn.OpCode = OpCodes.Stloc;
+                originalReturn.Operand = compatibilityResult;
+
+                var haveCompatibilityCallback = Instruction.Create(OpCodes.Nop);
+                var afterCompatibilityCallback = Instruction.Create(OpCodes.Nop);
+                var cursor = originalReturn;
+                void AppendAfter(Instruction instruction)
+                {
+                    instantiateIl.InsertAfter(cursor, instruction);
+                    cursor = instruction;
+                }
+
+                AppendAfter(Instruction.Create(OpCodes.Ldsfld, packedSceneCompatibilityCallbackField));
+                AppendAfter(Instruction.Create(OpCodes.Dup));
+                AppendAfter(Instruction.Create(OpCodes.Brtrue, haveCompatibilityCallback));
+                AppendAfter(Instruction.Create(OpCodes.Pop));
+                AppendAfter(Instruction.Create(OpCodes.Br, afterCompatibilityCallback));
+                AppendAfter(haveCompatibilityCallback);
+                AppendAfter(Instruction.Create(OpCodes.Ldarg_0));
+                AppendAfter(Instruction.Create(OpCodes.Ldloc, compatibilityResult));
+                AppendAfter(Instruction.Create(OpCodes.Callvirt, actionObjectObjectInvoke));
+                AppendAfter(afterCompatibilityCallback);
+                AppendAfter(Instruction.Create(OpCodes.Ldloc, compatibilityResult));
+                AppendAfter(Instruction.Create(OpCodes.Ret));
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(diagnosticPath) ?? throw new InvalidOperationException("GodotSharp compatibility derivative path has no parent."));
             module.Write(diagnosticPath, new WriterParameters { WriteSymbols = false });
             resolver.ValidateWriteRequests();
             writeResolutionRequestCount = resolver.Requests.Count;
@@ -2842,6 +2901,31 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             ?? throw new MissingMemberException(GodotSharpDiagnosticBridgeTypeFullName);
         var callback = bridgeType.Fields.SingleOrDefault(field => field.Name == GodotSharpDiagnosticBridgeCallbackFieldName)
             ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpDiagnosticBridgeCallbackFieldName);
+        var packedSceneCompatibilityCallback = bridgeType.Fields.SingleOrDefault(field => field.Name == GodotSharpPackedSceneCompatibilityCallbackFieldName)
+            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpPackedSceneCompatibilityCallbackFieldName);
+        if (packedSceneCompatibilityCallback.FieldType.FullName != "System.Action`2<System.Object,System.Object>")
+            throw new InvalidDataException($"Step-59.5 GodotSharp compatibility callback field type drifted: {packedSceneCompatibilityCallback.FieldType.FullName}.");
+
+        var verifyPackedScene = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == "Godot.PackedScene")
+            ?? throw new MissingMemberException("Godot.PackedScene");
+        var verifyInstantiate = verifyPackedScene.Methods.SingleOrDefault(method =>
+            method.Name == "Instantiate" && !method.IsStatic && method.Parameters.Count == 1 &&
+            method.ReturnType.FullName == "Godot.Node" && method.HasBody)
+            ?? throw new MissingMethodException("Godot.PackedScene", "Instantiate(GenEditState)");
+        var compatibilityFieldLoads = verifyInstantiate.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Ldsfld &&
+            instruction.Operand is FieldReference field &&
+            field.Name == GodotSharpPackedSceneCompatibilityCallbackFieldName &&
+            field.DeclaringType.FullName == GodotSharpDiagnosticBridgeTypeFullName);
+        var compatibilityInvokes = verifyInstantiate.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Callvirt &&
+            instruction.Operand is MethodReference method &&
+            method.Name == "Invoke" &&
+            method.DeclaringType.FullName == "System.Action`2<System.Object,System.Object>");
+        var serializedReturnSites = verifyInstantiate.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Ret);
+        if (compatibilityFieldLoads == 0 || compatibilityFieldLoads != compatibilityInvokes || compatibilityFieldLoads != serializedReturnSites)
+            throw new InvalidDataException($"Step-59.5 PackedScene.Instantiate compatibility hook drifted after serialization: fieldLoads={compatibilityFieldLoads}; invokes={compatibilityInvokes}; returns={serializedReturnSites}.");
+
         var bridgeEmit = bridgeType.Methods.SingleOrDefault(method => method.Name == "Emit" && method.HasBody)
             ?? throw new MissingMethodException(GodotSharpDiagnosticBridgeTypeFullName, "Emit");
         if (callback.FieldType.FullName != "System.Action`1<System.String>" || bridgeEmit.Parameters.Count != 1 || bridgeEmit.Parameters[0].ParameterType.FullName != "System.String")
@@ -2994,6 +3078,35 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         };
         invoke.Parameters.Add(new ParameterDefinition(actionTypeParameter));
         return (actionStringType, invoke);
+    }
+
+    internal static (GenericInstanceType ActionObjectObjectType, MethodReference InvokeReference) CreateDiagnosticActionObjectObjectInvokeReference(
+        ModuleDefinition module,
+        IMetadataScope systemRuntime)
+    {
+        ArgumentNullException.ThrowIfNull(module);
+        ArgumentNullException.ThrowIfNull(systemRuntime);
+
+        var actionOpen = new TypeReference("System", "Action`2", module, systemRuntime, false);
+        var firstParameter = new GenericParameter("T1", actionOpen);
+        var secondParameter = new GenericParameter("T2", actionOpen);
+        actionOpen.GenericParameters.Add(firstParameter);
+        actionOpen.GenericParameters.Add(secondParameter);
+        var actionObjectObject = new GenericInstanceType(actionOpen);
+        actionObjectObject.GenericArguments.Add(module.TypeSystem.Object);
+        actionObjectObject.GenericArguments.Add(module.TypeSystem.Object);
+
+        // Preserve VAR(0)/VAR(1) in the MemberRef signature, matching the already physically
+        // corrected Action<string>::Invoke(!0) encoding used by the Step-35 checkpoint bridge.
+        var invoke = new MethodReference("Invoke", module.TypeSystem.Void, actionObjectObject)
+        {
+            HasThis = true,
+            ExplicitThis = false,
+            CallingConvention = MethodCallingConvention.Default,
+        };
+        invoke.Parameters.Add(new ParameterDefinition(firstParameter));
+        invoke.Parameters.Add(new ParameterDefinition(secondParameter));
+        return (actionObjectObject, invoke);
     }
 
     internal sealed record DiagnosticCallsiteSweepEntry(
@@ -3875,6 +3988,175 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         IReadOnlyList<string> NativeLoadAttempts,
         IReadOnlyList<string> PrivateContextAssemblies);
 
+    private static void ApplyPackedSceneInstancedRootUniqueNameCompatibility(object packedScene, object sceneRoot)
+    {
+        ArgumentNullException.ThrowIfNull(packedScene);
+        ArgumentNullException.ThrowIfNull(sceneRoot);
+
+        static MethodInfo RequireMethod(Type type, string name, int parameterCount)
+            => type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(method => method.Name == name && !method.IsGenericMethod && method.GetParameters().Length == parameterCount)
+                ?? throw new MissingMethodException(type.FullName, $"{name}({parameterCount} args)");
+
+        static object? Invoke(MethodInfo method, object instance, object?[]? args)
+        {
+            try
+            {
+                return method.Invoke(instance, args);
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException is not null)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw;
+            }
+        }
+
+        static bool VariantAsBool(object? value)
+        {
+            if (value is null) return false;
+            if (value is bool direct) return direct;
+            var asBool = value.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(method => method.Name == "AsBool" && !method.IsGenericMethod && method.GetParameters().Length == 0);
+            if (asBool is not null && Invoke(asBool, value, null) is bool converted)
+                return converted;
+            return bool.TryParse(value.ToString(), out var parsed) && parsed;
+        }
+
+        static string NormalizeSceneStatePath(string? path)
+        {
+            var value = string.IsNullOrWhiteSpace(path) ? "." : path.Trim();
+            if (value == ".") return ".";
+            if (value.StartsWith("./", StringComparison.Ordinal)) return value;
+            if (value.StartsWith("/", StringComparison.Ordinal)) return "." + value;
+            return "./" + value;
+        }
+
+        var getState = RequireMethod(packedScene.GetType(), "GetState", 0);
+        var state = Invoke(getState, packedScene, null)
+            ?? throw new InvalidDataException("Step-59.5 PackedScene compatibility received a null SceneState.");
+        var stateType = state.GetType();
+        var getNodeCount = RequireMethod(stateType, "GetNodeCount", 0);
+        var getPropertyCount = RequireMethod(stateType, "GetNodePropertyCount", 1);
+        var getPropertyName = RequireMethod(stateType, "GetNodePropertyName", 2);
+        var getPropertyValue = RequireMethod(stateType, "GetNodePropertyValue", 2);
+        var getNodeInstance = RequireMethod(stateType, "GetNodeInstance", 1);
+        var getNodePath = stateType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(method => method.Name == "GetNodePath" && !method.IsGenericMethod)
+            .OrderBy(method => method.GetParameters().Length)
+            .FirstOrDefault(method =>
+            {
+                var parameters = method.GetParameters();
+                return parameters.Length is 1 or 2 && parameters[0].ParameterType == typeof(int);
+            }) ?? throw new MissingMethodException(stateType.FullName, "GetNodePath(int[,bool])");
+
+        var countObject = Invoke(getNodeCount, state, null);
+        var count = countObject is int directCount
+            ? directCount
+            : Convert.ToInt32(countObject, System.Globalization.CultureInfo.InvariantCulture);
+
+        var requiredPaths = new HashSet<string>(StringComparer.Ordinal);
+        for (var nodeIndex = 0; nodeIndex < count; nodeIndex++)
+        {
+            // Physical 0.0.198 proves ordinary nodes already preserve this property. The defect is
+            // specifically parent-scene overrides on roots of instanced subscenes, so only those
+            // SceneState entries are candidates for normalization.
+            if (Invoke(getNodeInstance, state, [nodeIndex]) is null)
+                continue;
+
+            var propertyCountObject = Invoke(getPropertyCount, state, [nodeIndex]);
+            var propertyCount = propertyCountObject is int directPropertyCount
+                ? directPropertyCount
+                : Convert.ToInt32(propertyCountObject, System.Globalization.CultureInfo.InvariantCulture);
+            var requiresUniqueName = false;
+            for (var propertyIndex = 0; propertyIndex < propertyCount; propertyIndex++)
+            {
+                var propertyName = Invoke(getPropertyName, state, [nodeIndex, propertyIndex])?.ToString();
+                if (!string.Equals(propertyName, "unique_name_in_owner", StringComparison.Ordinal))
+                    continue;
+                requiresUniqueName = VariantAsBool(Invoke(getPropertyValue, state, [nodeIndex, propertyIndex]));
+                break;
+            }
+            if (!requiresUniqueName)
+                continue;
+
+            var pathParameters = getNodePath.GetParameters();
+            var pathObject = pathParameters.Length == 1
+                ? Invoke(getNodePath, state, [nodeIndex])
+                : Invoke(getNodePath, state, [nodeIndex, false]);
+            requiredPaths.Add(NormalizeSceneStatePath(pathObject?.ToString()));
+        }
+
+        if (requiredPaths.Count == 0)
+            return;
+
+        var godotAssembly = packedScene.GetType().Assembly;
+        var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.Node");
+        if (!nodeType.IsInstanceOfType(sceneRoot))
+            throw new InvalidDataException($"Step-59.5 PackedScene compatibility callback received non-Node root {sceneRoot.GetType().FullName}.");
+
+        // Build a path map without NodePath/GetNode reflection. Physical 0.0.198 showed those
+        // diagnostic reflection calls can hit an unrelated NodePath TypeLoadException, whereas
+        // GetChildren/Name/property reflection is already physically proven.
+        var byPath = new Dictionary<string, object>(StringComparer.Ordinal);
+        var queue = new Queue<(object Node, string Path)>();
+        queue.Enqueue((sceneRoot, "."));
+        while (queue.Count != 0)
+        {
+            if (byPath.Count >= 4096)
+                throw new InvalidDataException("Step-59.5 PackedScene compatibility traversal exceeded 4096 nodes.");
+            var (node, path) = queue.Dequeue();
+            if (!byPath.TryAdd(path, node))
+                throw new InvalidDataException($"Step-59.5 PackedScene compatibility observed duplicate relative node path {path}.");
+
+            var getChildren = node.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(method => method.Name == "GetChildren")
+                .OrderBy(method => method.GetParameters().Length)
+                .FirstOrDefault(method =>
+                {
+                    var parameters = method.GetParameters();
+                    return parameters.Length == 0 || (parameters.Length == 1 && parameters[0].ParameterType == typeof(bool));
+                }) ?? throw new MissingMethodException(node.GetType().FullName, "GetChildren([bool])");
+            var childrenObject = getChildren.GetParameters().Length == 0
+                ? Invoke(getChildren, node, null)
+                : Invoke(getChildren, node, [false]);
+            if (childrenObject is not System.Collections.IEnumerable children)
+                throw new InvalidDataException($"Step-59.5 {node.GetType().FullName}.GetChildren did not return IEnumerable.");
+
+            var fallbackIndex = 0;
+            foreach (var child in children)
+            {
+                if (child is null || !nodeType.IsInstanceOfType(child))
+                    continue;
+                var nameProperty = child.GetType().GetProperty("Name", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var childName = nameProperty?.GetValue(child)?.ToString();
+                if (string.IsNullOrWhiteSpace(childName))
+                    childName = "node" + fallbackIndex.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                fallbackIndex++;
+                var childPath = path == "." ? "./" + childName : path + "/" + childName;
+                queue.Enqueue((child, childPath));
+            }
+        }
+
+        foreach (var path in requiredPaths.OrderBy(value => value, StringComparer.Ordinal))
+        {
+            if (!byPath.TryGetValue(path, out var node))
+                throw new InvalidDataException($"Step-59.5 SceneState requires unique_name_in_owner=true for instanced root {path}, but that relative path is absent from the new runtime instance.");
+
+            var uniqueProperty = node.GetType().GetProperty("UniqueNameInOwner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                ?? throw new MissingMemberException(node.GetType().FullName, "UniqueNameInOwner");
+            if (uniqueProperty.PropertyType != typeof(bool) || !uniqueProperty.CanRead || !uniqueProperty.CanWrite)
+                throw new InvalidDataException($"Step-59.5 {node.GetType().FullName}.UniqueNameInOwner is not a readable/writable bool property.");
+
+            var before = (bool)(uniqueProperty.GetValue(node) ?? false);
+            if (!before)
+                uniqueProperty.SetValue(node, true);
+            var after = (bool)(uniqueProperty.GetValue(node) ?? false);
+            if (!after)
+                throw new InvalidDataException($"Step-59.5 failed to restore UniqueNameInOwner on {path} ({node.GetType().FullName}).");
+        }
+    }
+
     internal sealed class Step35ExecutionLoadContext : AssemblyLoadContext
     {
         private readonly IReadOnlyDictionary<string, PreparedExecutionEntry> _privateBySimpleName;
@@ -4012,6 +4294,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                     if (bridgeField.FieldType != typeof(Action<string>))
                         throw new InvalidDataException($"Step-35 diagnostic private bridge field type drifted for {diagnosticOverride.SimpleName}: {bridgeField.FieldType.FullName}.");
                     bridgeField.SetValue(null, _crashCheckpoint);
+                    if (string.Equals(diagnosticOverride.SimpleName, "GodotSharp", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var compatibilityField = bridgeType.GetField(GodotSharpPackedSceneCompatibilityCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
+                            ?? throw new MissingFieldException(diagnosticOverride.BridgeTypeFullName, GodotSharpPackedSceneCompatibilityCallbackFieldName);
+                        if (compatibilityField.FieldType != typeof(Action<object, object>))
+                            throw new InvalidDataException($"Step-59.5 GodotSharp PackedScene compatibility bridge field type drifted for {diagnosticOverride.SimpleName}: {compatibilityField.FieldType.FullName}.");
+                        compatibilityField.SetValue(null, (Action<object, object>)ApplyPackedSceneInstancedRootUniqueNameCompatibility);
+                        Checkpoint($"GODOT_PACKEDSCENE_UNIQUE_NAME_COMPAT_ARMED — {diagnosticOverride.SimpleName} PackedScene.Instantiate will reconcile only serialized instanced-root unique_name_in_owner=true overrides before returning each scene root.");
+                    }
                     Checkpoint($"GODOT_DIAGNOSTIC_BRIDGE_ARMED — {diagnosticOverride.SimpleName} entry-only callback armed before resolver returned the assembly; markerCount={diagnosticOverride.MarkerCount}.");
                 }
 

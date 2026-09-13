@@ -35,7 +35,7 @@ public sealed partial class RootViewController
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4. Gate B retains the ready-field/IL/TSCN audit and adds unique-name provenance: PackedScene.GetState property evidence, temporary off-tree instantiation, retained live-node flags/owners, and non-generic direct-path versus %Name lookup identity for representative character/game/main-menu nodes. Temporary clones are never added to the SceneTree and are released after inspection. The map is written before Gate C; unhealthy state blocks safely before any Push/OpenCharacterSelect arm. Rendering stays frozen.");
+            "Requires Step 58.0 4/4. Physical 0.0.198 proved parent-scene unique-name overrides are lost during PackedScene instantiation only for roots of instanced subscenes. 0.0.199 applies the global private-GodotSharp Instantiate compatibility hook before any game Ready callback, then Gate B reruns the ready-field + SceneState/off-tree/live provenance audit as proof. Unhealthy state still blocks before any Push/OpenCharacterSelect arm. Rendering stays frozen.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,
