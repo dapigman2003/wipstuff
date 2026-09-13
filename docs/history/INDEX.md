@@ -564,3 +564,9 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-REPORT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-CHECKPOINT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-LAST-CHECKPOINT.txt`
+
+- `steps/STEP-59.4-UNIQUE-NAME-PROVENANCE-FORENSICS-0.0.198.md` — physical 0.0.197 proves parent-scene `unique_name_in_owner=true` on the instantiated AscensionPanel root is false live; 0.0.198 localizes TSCN/SceneState/instantiate/live/lookup provenance.
+- `reports/STEP-59.0-PHYSICAL-0.0.197-READY-BINDING-STATIC-MAP.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.197-FAIL-REPORT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.197-FAIL-CHECKPOINT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.197-FAIL-LAST-CHECKPOINT.txt`

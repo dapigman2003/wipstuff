@@ -35,7 +35,7 @@ public sealed partial class RootViewController
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4. Gate B records all character-select ready fields without short-circuiting, verifies the selected NCharacterSelectScreen._Ready IL order around _charButtonContainer -> %AscensionPanel -> _ascensionPanel, inventories live ascension-like descendants with type/load-context/owner/UniqueNameInOwner evidence, and extracts the exact character-select + ascension-panel TSCN declarations read-only from the sealed PCK. That map is written before Gate C. If the ready binding is unhealthy, Gate C fails safely before any one-shot Push/OpenCharacterSelect arm. Only a clean preflight may invoke the retained real handler; rendering stays frozen.");
+            "Requires Step 58.0 4/4. Gate B retains the ready-field/IL/TSCN audit and adds unique-name provenance: PackedScene.GetState property evidence, temporary off-tree instantiation, retained live-node flags/owners, and non-generic direct-path versus %Name lookup identity for representative character/game/main-menu nodes. Temporary clones are never added to the SceneTree and are released after inspection. The map is written before Gate C; unhealthy state blocks safely before any Push/OpenCharacterSelect arm. Rendering stays frozen.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,

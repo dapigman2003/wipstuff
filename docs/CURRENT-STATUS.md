@@ -6,7 +6,7 @@ Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains 
 
 Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-## Active candidate — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.197 (197)
+## Active candidate — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198 (198)
 
 Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
@@ -23,6 +23,20 @@ Physical runtime authority remains closed through **Step 57 4/4/frozen**. The on
 
 Static analysis now proves that character-select cache state is **normal game preload behavior**: `NMainMenuSubmenuStack._Ready()` pre-instantiates character select, hides it, and adds it as a child, while `NSubmenu._stack` remains null until `Push()`. It is no longer treated as an anomalous state.
 
+
+### What physical 0.0.197 changed
+
+Physical 0.0.197 safely stopped before the one-shot handler and proved the exact live `AscensionPanel` node exists,
+is the selected `NAscensionPanel` type, is inside-tree/ready, and is owned by the character-select root, but reports
+`UniqueNameInOwner=false`. The exact receipt-backed parent TSCN declares the instanced `AscensionPanel` root with
+`unique_name_in_owner=true`. A nested `AscensionIcon` unique node declared inside the subscene remains true.
+
+The same preflight found `_actDropdown=NULL` and `NGame.TimeoutOverlay=NULL`, strengthening the hypothesis that this
+is a systemic parent-scene/instanced-subscene unique-name override problem rather than one bad character-select field.
+
+0.0.198 compares TSCN → PackedScene SceneState → temporary off-tree instance → retained live node → direct-path/%Name
+lookup identity, with representative character-select, NGame and main-menu nodes. Gate C remains blocked on unhealthy
+state and no live field/flag is patched.
 
 ### What physical 0.0.196 changed
 

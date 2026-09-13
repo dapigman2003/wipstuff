@@ -1,6 +1,6 @@
-# Release checklist — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.197
+# Release checklist — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Release identity: display/build `0.0.197 (197)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.198 (198)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190–0.0.192 Step-58 localization evidence and physical 0.0.193 Step-59 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -34,3 +34,13 @@ Require exact 0.0.197 source/plist/release/shell identity; current active manife
 - The obsolete UI gate-constructor literal `FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION` must not remain.
 - Preserve physical 0.0.196 harness-failure evidence.
 - No game-facing 0.0.196 ready-binding diagnostic behavior is broadened in this patch.
+
+## 0.0.198 unique-name provenance requirements
+
+- Preserve the complete physical 0.0.197 Step-59 report/checkpoint/last-checkpoint/static-map evidence.
+- Step 59 must query retained PackedScene `GetState()` node/property data for exact unique-name targets.
+- Step 59 may create only temporary off-tree diagnostic instances; they must never enter the SceneTree and must be released.
+- Compare ordinary unique nodes and instantiated-subscene roots on NGame/main-menu as systemic controls.
+- Compare direct/non-generic node lookup and `%Name` lookup identity on the same live graph.
+- No setter for `UniqueNameInOwner`, no owner mutation, no direct game-field repair and no explicit `_Ready()` call.
+- Existing unhealthy prerequisites still block Gate C before one-shot Push/OpenCharacterSelect arm.

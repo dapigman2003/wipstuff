@@ -1,10 +1,10 @@
 # StS2 Launcher — Steps 58–62 character-select forensic localization / visible-render trial
 
-Active candidate: **0.0.197 (197)**. Physical runtime authority is closed through **Step 57 4/4/frozen**. Physical **0.0.194** reached the original Step-59 `OpenCharacterSelect(NButton)` handler with the retained `NSingleplayerSubmenu` already bound to the exact stack and the real `_standardButton` supplied, yet the handler still raised `NullReferenceException`. **Step 63 is unopened.**
+Active candidate: **0.0.198 (198)**. Physical runtime authority is closed through **Step 57 4/4/frozen**. Physical **0.0.194** reached the original Step-59 `OpenCharacterSelect(NButton)` handler with the retained `NSingleplayerSubmenu` already bound to the exact stack and the real `_standardButton` supplied, yet the handler still raised `NullReferenceException`. **Step 63 is unopened.**
 
 Use **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** from a fresh process. It remains capped at Step 52 and ends frozen. Then manually reconstruct **53 → 54 → 55 → 56 → 57 → 58 → 59**, stopping at the first failure. Steps 60–62 are reached only if Step 59 closes cleanly.
 
-The 0.0.196 block is deliberately forensic rather than reparative. Physical 0.0.195 localized the blocker to the character-select `_Ready()` `%AscensionPanel` binding:
+The 0.0.198 block is deliberately forensic rather than reparative. Physical 0.0.197 proved the exact live `AscensionPanel` object exists with the correct selected managed type and owner, but its live `UniqueNameInOwner` is false even though the exact parent TSCN override is true. 0.0.198 compares serialized SceneState, temporary off-tree instantiation, retained live state, and `%Name` lookup behavior:
 
 - **58 — runtime ownership audit:** bind/audit exact real `OpenCharacterSelect(NButton)` and observe the game-owned character-select preload state without mutation. Static analysis now treats hidden + in-tree + logical `_stack == null` as the normal pre-push state created by `NMainMenuSubmenuStack._Ready()`.
 - **59 — forensic prerequisites + one real handler transition:** before invoking anything, require/prove `NCharacterSelectScreen.IsNodeReady()`, critical `_Ready`-bound fields, `NAscensionPanel.IsNodeReady()`, NGame hotkey/input/remote-cursor/reaction/timeout services, existing SaveManager `Progress/Epochs/EncounterStats`, and record `RootSceneContainer.CurrentScene` identity. If the original handler throws, durably checkpoint its inner `TargetSite` and original stack plus a post-failure lobby/player/screen snapshot. The existing exact game-owned `NSubmenuStack.Push` repair remains available only if the retained single-player logical stack is actually null; no field is written directly.
@@ -19,4 +19,4 @@ Physical Step 57 authority remains exact resource `res://scenes/screens/characte
 Authoritative status/device sequence: `docs/CURRENT-STATUS.md`.
 
 
-0.0.196 never writes `_ascensionPanel` or manually calls `_Ready()`. It first proves why the normal game-owned Ready binding is broken.
+0.0.198 never writes `_ascensionPanel`, never sets `UniqueNameInOwner`, and never manually calls `_Ready()`. Temporary diagnostic clones remain off-tree and are released. It localizes where the normal scene-unique flag is lost before any game handler is armed.

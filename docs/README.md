@@ -1,6 +1,6 @@
 # Documentation index — active Steps 58–62 / 0.0.195
 
-Active candidate: **0.0.197 (197)**. Physical authority is closed through Step 57. Physical **0.0.194** proved the retained single-player submenu was already logically bound and the real standard button was supplied before original `OpenCharacterSelect`, yet the original handler still threw `NullReferenceException`.
+Active candidate: **0.0.198 (198)**. Physical authority is closed through Step 57. Physical **0.0.194** proved the retained single-player submenu was already logically bound and the real standard button was supplied before original `OpenCharacterSelect`, yet the original handler still threw `NullReferenceException`.
 
 Static analysis now proves the cached `NCharacterSelectScreen` being hidden, in-tree, parented by the main-menu stack, and logically unbound is the game's normal preload state. 0.0.195 therefore adds no guessed character-select repair. Step 59 first checkpoints scene readiness, critical character/ascension fields, NGame service nodes, SaveManager progress internals, and RootSceneContainer ownership. On handler failure it records the original inner game TargetSite/stack and post-failure lobby/player/screen state. Steps 60–62 remain unavailable unless the real handler succeeds. Step 63 remains unopened.
 

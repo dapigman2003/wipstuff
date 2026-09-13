@@ -1,23 +1,21 @@
-## Current frontier — Steps 58–62 / 0.0.197
+## Current frontier — Steps 58–62 / 0.0.198
 
-**Active candidate — 0.0.197 ascension ready-binding forensics.** Physical 0.0.196 then exposed only a launcher gate-name mismatch immediately after Gate A; 0.0.197 centralizes that contract and preserves the same ready-binding experiment. Physical authority remains formally closed through
-Step 57 4/4/frozen. Physical 0.0.195 stopped safely in Step 59 Gate B before any handler arm and proved a concrete
-scene-lifecycle break: the cached real `NCharacterSelectScreen` reports `IsNodeReady()==true`, its earlier
-`_charButtonContainer` ready binding is populated, but `_ascensionPanel` is null.
+**Active candidate — 0.0.198 unique-name provenance forensics.** Physical authority remains formally closed through
+Step 57 4/4/frozen. Physical 0.0.197 produced the first direct mechanism for the character-select Ready failure:
+the exact live `AscensionPanel` exists with the selected `NAscensionPanel` type, correct character-select owner,
+and `IsNodeReady()==true`, but its live `UniqueNameInOwner` is false while the exact parent
+`character_select_screen.tscn` declares `unique_name_in_owner = true`. A nested unique node declared inside the
+AscensionPanel subscene remains true.
 
-Trusted game IL now proves `_ascensionPanel` is not an exported scene field; `NCharacterSelectScreen._Ready()` assigns
-it immediately after `_charButtonContainer` by resolving `GetNode<NAscensionPanel>("%AscensionPanel")`. The next
-question is therefore no longer "which InitializeSingleplayer dependency is null?" but **why the normal managed
-character-select Ready callback cannot bind the scene's AscensionPanel node on this host**.
+This moves the investigation from a character-specific null toward a likely **scene compatibility boundary**.
+0.0.198 compares the exact TSCN, retained `PackedScene.GetState()` properties, a temporary off-tree instance,
+the retained live node, and direct-path versus `%Name` lookup behavior. Representative NGame and main-menu nodes
+are included to determine whether parent-scene unique-name overrides on instantiated subscene roots are being lost
+systemically.
 
-0.0.196 does not repair that field. It compares the selected `_Ready()` IL with the live descendant/type/load-context/
-owner/`UniqueNameInOwner` graph and the exact receipt-backed `character_select_screen.tscn` +
-`ascension_panel.tscn` declarations. The map is durable before Gate C. An unhealthy binding blocks Gate C before
-`NSubmenuStack.Push` or `OpenCharacterSelect` can arm.
-
-This directly serves the long-term architecture in this plan: if the node is missing, wrong-type/foreign-context, or
-has broken unique-name ownership, we repair the underlying Godot/script/scene ownership boundary rather than growing
-a launcher-maintained copy of game state.
+No live flag is repaired in this candidate. If the systemic hypothesis is confirmed, the long-term fix belongs in
+the ahead-of-load resource/scene compatibility layer **before managed `_Ready()` callbacks run**, not in
+screen-specific field patches. This directly follows the launcher/product separation in this plan.
 
 ## Strategic architecture revision — startup convergence
 

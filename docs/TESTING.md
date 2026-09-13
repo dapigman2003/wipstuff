@@ -1,6 +1,6 @@
-# Testing — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.197
+# Testing — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Active candidate: `0.0.197 (197)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.198 (198)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -42,3 +42,15 @@ A blocked Gate C in 0.0.196 is **not** a one-shot arm: `Step59TransitionStarted`
 ## 0.0.197 rerun note
 
 0.0.196 did not execute Gate B because of a Core/UI gate-name mismatch. 0.0.197 changes only that harness contract. Re-run Step 59 from a fresh process and expect `M59_B_READY_BINDING_DIAGNOSIS` plus a durable Step-59 static map before any Gate-C block/transition.
+
+## 0.0.198 Step-59 expected evidence
+
+Preserve `M59_B_UNIQUE_NAME_PROVENANCE` and the durable Step-59 static map. The map should contain character-select,
+game and main-menu SceneState/runtime comparisons. In particular, classify `AscensionPanel` across:
+TSCN `unique_name_in_owner=true`, SceneState `unique_name_in_owner`, temporary off-tree clone
+`UniqueNameInOwner`, retained live `UniqueNameInOwner`, direct-path lookup and `%AscensionPanel` lookup.
+
+Temporary diagnostic PackedScene instances must never be added to the SceneTree and must be released after inspection.
+No `SetUniqueNameInOwner`, live owner mutation, direct `_ascensionPanel` write, manual `_Ready`, Push, or
+`OpenCharacterSelect` is authorized when the existing ready blocker remains. Do not proceed to Step 60 unless Step 59
+closes 4/4.

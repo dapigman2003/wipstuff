@@ -58,3 +58,6 @@ Physical 0.0.190–0.0.192 Step-58 artifacts plus the physical 0.0.193 Step-59 r
 
 
 Physical 0.0.195 Step 59 stopped in Gate B with `IsNodeReady()==true` and `_ascensionPanel==null`; 0.0.196 adds selected-IL/live-node/TSCN ready-binding forensics before any handler arm.
+
+
+Physical 0.0.197 proved exact live AscensionPanel type/owner/readiness with `UniqueNameInOwner=false` despite exact TSCN `unique_name_in_owner=true`; 0.0.198 adds SceneState/off-tree/live/direct-vs-%Name provenance evidence before handler arm.

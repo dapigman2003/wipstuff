@@ -17,9 +17,12 @@ namespace StS2Launcher.Core;
 /// NMainMenuSubmenuStack._Ready preload state. Physical 0.0.195 then localized the first concrete broken prerequisite:
 /// NCharacterSelectScreen.IsNodeReady() was true, _charButtonContainer was already populated, but _ascensionPanel was
 /// null. Trusted sts2.dll IL proves _Ready assigns _charButtonContainer immediately before resolving
-/// GetNode<NAscensionPanel>("%AscensionPanel") into _ascensionPanel. Step 59 therefore localizes that exact scene-ready
-/// binding boundary before any real handler arm by comparing selected _Ready IL, the live descendant/type/owner graph,
-/// and receipt-backed character-select/ascension-panel TSCN declarations. Steps 60-62 remain available only after a
+/// GetNode<NAscensionPanel>("%AscensionPanel") into _ascensionPanel. Physical 0.0.197 then proved the exact
+/// AscensionPanel node exists with the selected NAscensionPanel runtime type, correct character-select owner, and
+/// IsNodeReady()==true, while its live UniqueNameInOwner flag is false even though the exact parent TSCN override says
+/// unique_name_in_owner=true. Step 59 now localizes that discrepancy across exact TSCN text, retained PackedScene
+/// SceneState, temporary off-tree instantiation, live node flags/owners, and direct-path versus %Name lookup behavior.
+/// Steps 60-62 remain available only after a
 /// clean original-handler transition and then audit/render the actual active screen
 /// and run bounded visible render residencies. Character choice, confirm/embark, run start and Step 63 remain unopened.
 /// </summary>
@@ -31,7 +34,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const int Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds = 30_000;
 
     private const string Step58Name = "CHARACTER SELECT RUNTIME OWNERSHIP AUDIT";
-    public const string Step59GateName = "CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION";
+    public const string Step59GateName = "UNIQUE-NAME PROVENANCE FORENSICS + REAL TRANSITION";
     private const string Step59Name = Step59GateName;
     private const string Step60Name = "ACTIVE CHARACTER SELECT SURFACE AUDIT";
     private const string Step61Name = "CHARACTER SELECT SHORT RENDER RESIDENCY";
@@ -94,6 +97,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step59FailureSnapshot = string.Empty;
     private string _step59ReadyBindingDiagnostics = string.Empty;
     private string _step59ReadyBindingBlocker = string.Empty;
+    private string _step59UniqueNameProvenanceDiagnostics = string.Empty;
     private bool _step59ReadyBindingPreflightPassed;
     private object? _step58ObservedCharacterSelect;
     private CharacterSelectRuntimeState? _step58ObservedState;
@@ -156,6 +160,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59FailureSnapshot = string.Empty;
         _step59ReadyBindingDiagnostics = string.Empty;
         _step59ReadyBindingBlocker = string.Empty;
+        _step59UniqueNameProvenanceDiagnostics = string.Empty;
         _step59ReadyBindingPreflightPassed = false;
         _step58ObservedCharacterSelect = null;
         _step58ObservedState = null;
@@ -388,16 +393,18 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             try
             {
                 _step59ReadyBindingDiagnostics = BuildStep59ReadyBindingDiagnostics(forensicScreen, context, step, allTypes);
+                _step59UniqueNameProvenanceDiagnostics = BuildStep59UniqueNameProvenanceDiagnostics(forensicScreen, context, step);
             }
             catch (Exception diagnosticEx)
             {
-                _step59ReadyBindingDiagnostics = $"ready-binding-diagnostic-failed={diagnosticEx.GetType().FullName}: {diagnosticEx.Message}";
+                _step59ReadyBindingDiagnostics += $"{(string.IsNullOrWhiteSpace(_step59ReadyBindingDiagnostics) ? string.Empty : "\n")}forensic-diagnostic-failed={diagnosticEx.GetType().FullName}: {diagnosticEx.Message}";
                 if (string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker))
-                    _step59ReadyBindingBlocker = "ready-binding diagnostic itself failed before handler authorization";
+                    _step59ReadyBindingBlocker = "ready/unique-name provenance diagnostic itself failed before handler authorization";
             }
             _step59ReadyBindingPreflightPassed = string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker);
             Checkpoint(checkpoint, "M59_B_FORENSIC_PREFLIGHT — " + SanitizeCheckpoint(_step59PreflightSnapshot));
             Checkpoint(checkpoint, $"M59_B_READY_BINDING_DIAGNOSIS — handlerAuthorized={_step59ReadyBindingPreflightPassed}; blocker={SanitizeCheckpoint(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}; {SanitizeCheckpoint(_step59ReadyBindingDiagnostics)}");
+            Checkpoint(checkpoint, "M59_B_UNIQUE_NAME_PROVENANCE — " + SanitizeCheckpoint(_step59UniqueNameProvenanceDiagnostics));
             _step59TransitionBound = true;
             _step59StaticMap = "StS2 Launcher — Step 59.0 character-select ready-binding forensics + game-owned transition\n" +
                 $"NSubmenuStack.Push token: 0x{_step59SubmenuPushToken:X8}; parameter={SubmenuManagedTypeFullName}\n" +
@@ -411,6 +418,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"Ready-binding handler authorization: {_step59ReadyBindingPreflightPassed}\n" +
                 $"Ready-binding blocker: {(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}\n" +
                 "[READY-BINDING DIAGNOSTICS]\n" + _step59ReadyBindingDiagnostics + "\n" +
+                "[UNIQUE-NAME PROVENANCE DIAGNOSTICS]\n" + _step59UniqueNameProvenanceDiagnostics + "\n" +
                 "Rendering active before transition: NO\n" +
                 BuildStartupLadderInvocationFrontierAppendix(pushAudit);
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate B");
@@ -988,6 +996,369 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         text.AppendLine("[ASCENSION-PANEL TSCN ROOT CONTEXT]");
         text.AppendLine(BuildStep59TscnContext(ascensionText, "[node", 2, maxMatches: 8));
         return text.ToString().TrimEnd();
+    }
+
+
+    private string BuildStep59UniqueNameProvenanceDiagnostics(
+        object liveCharacterScreen,
+        Step35ExecutionLoadContext context,
+        int step)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("Purpose: distinguish serialized SceneState loss, PackedScene instantiation loss, live-tree/owner loss, and managed %Name lookup failure without mutating retained game state.");
+
+        var submenuStack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 unique-name provenance requires retained NMainMenuSubmenuStack.");
+        var characterPackedField = RequireRuntimeExactInstanceField(submenuStack.GetType(), MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step);
+        var characterPacked = characterPackedField.GetValue(submenuStack)
+            ?? throw new InvalidDataException("Step 59.0 retained character-select PackedScene is null during unique-name provenance.");
+
+        text.AppendLine("[CHARACTER-SELECT PACKEDSCENE SCENESTATE]");
+        text.AppendLine(DescribeStep59SceneState(characterPacked, ["AscensionPanel", "ActDropdown"], step));
+
+        text.AppendLine("[CHARACTER-SELECT TEMPORARY OFF-TREE INSTANCE]");
+        object? temporaryCharacter = null;
+        try
+        {
+            temporaryCharacter = InstantiateStep59DiagnosticPackedScene(characterPacked, step, "character-select");
+            text.AppendLine(DescribeStep59LiveUniqueTargets(
+                temporaryCharacter,
+                context,
+                step,
+                [
+                    new Step59UniqueTarget("AscensionPanel", "%AscensionPanel", "AscensionPanel"),
+                    new Step59UniqueTarget("ActDropdown", "%ActDropdown", "ActDropdown")
+                ]));
+        }
+        finally
+        {
+            if (temporaryCharacter is not null)
+                TryReleaseStep39OffTreeInstance(temporaryCharacter, null, "Step59 temporary character-select provenance clone");
+        }
+
+        text.AppendLine("[CHARACTER-SELECT RETAINED LIVE INSTANCE]");
+        text.AppendLine(DescribeStep59LiveUniqueTargets(
+            liveCharacterScreen,
+            context,
+            step,
+            [
+                new Step59UniqueTarget("AscensionPanel", "%AscensionPanel", "AscensionPanel"),
+                new Step59UniqueTarget("ActDropdown", "%ActDropdown", "ActDropdown")
+            ]));
+
+        var gamePacked = _gameScenePackedResource?.Resource
+            ?? throw new InvalidOperationException("Step 59.0 unique-name provenance requires retained Step-37 game PackedScene.");
+        text.AppendLine("[GAME PACKEDSCENE SCENESTATE]");
+        text.AppendLine(DescribeStep59SceneState(
+            gamePacked,
+            ["InputManager", "HotkeyManager", "RootSceneContainer", "ReactionWheel", "ReactionContainer", "MultiplayerTimeoutOverlay", "WorldEnvironment"],
+            step));
+
+        text.AppendLine("[GAME TEMPORARY OFF-TREE INSTANCE]");
+        object? temporaryGame = null;
+        try
+        {
+            temporaryGame = InstantiateStep59DiagnosticPackedScene(gamePacked, step, "game");
+            text.AppendLine(DescribeStep59LiveUniqueTargets(
+                temporaryGame,
+                context,
+                step,
+                [
+                    new Step59UniqueTarget("InputManager", "%InputManager", "InputManager"),
+                    new Step59UniqueTarget("HotkeyManager", "%HotkeyManager", "HotkeyManager"),
+                    new Step59UniqueTarget("RootSceneContainer", "%RootSceneContainer", "RootSceneContainer"),
+                    new Step59UniqueTarget("ReactionWheel", "%ReactionWheel", "ReactionWheel"),
+                    new Step59UniqueTarget("ReactionContainer", "%ReactionContainer", "ReactionContainer"),
+                    new Step59UniqueTarget("MultiplayerTimeoutOverlay", "%MultiplayerTimeoutOverlay", "MultiplayerTimeoutOverlay"),
+                    new Step59UniqueTarget("WorldEnvironment", "%WorldEnvironment", "WorldEnvironment")
+                ]));
+        }
+        finally
+        {
+            if (temporaryGame is not null)
+                TryReleaseStep39OffTreeInstance(temporaryGame, null, "Step59 temporary game provenance clone");
+        }
+
+        var liveGame = _step39NGameInstance ?? throw new InvalidOperationException("Step 59.0 unique-name provenance requires retained live NGame.");
+        text.AppendLine("[GAME RETAINED LIVE INSTANCE]");
+        text.AppendLine(DescribeStep59LiveUniqueTargets(
+            liveGame,
+            context,
+            step,
+            [
+                new Step59UniqueTarget("InputManager", "%InputManager", "InputManager"),
+                new Step59UniqueTarget("HotkeyManager", "%HotkeyManager", "HotkeyManager"),
+                new Step59UniqueTarget("RootSceneContainer", "%RootSceneContainer", "RootSceneContainer"),
+                new Step59UniqueTarget("ReactionWheel", "%ReactionWheel", "ReactionWheel"),
+                new Step59UniqueTarget("ReactionContainer", "%ReactionContainer", "ReactionContainer"),
+                new Step59UniqueTarget("MultiplayerTimeoutOverlay", "%MultiplayerTimeoutOverlay", "MultiplayerTimeoutOverlay"),
+                new Step59UniqueTarget("WorldEnvironment", "%WorldEnvironment", "WorldEnvironment")
+            ]));
+
+        if (_step47MainMenuPackedScene is not null && _step48MainMenuInstance is not null)
+        {
+            text.AppendLine("[MAIN-MENU PACKEDSCENE SCENESTATE]");
+            text.AppendLine(DescribeStep59SceneState(
+                _step47MainMenuPackedScene,
+                ["Submenus", "MainMenuBg", "ContinueRunInfo", "PatchNotesScreen"],
+                step));
+            text.AppendLine("[MAIN-MENU RETAINED LIVE INSTANCE]");
+            text.AppendLine(DescribeStep59LiveUniqueTargets(
+                _step48MainMenuInstance,
+                context,
+                step,
+                [
+                    new Step59UniqueTarget("Submenus", "%Submenus", "Submenus"),
+                    new Step59UniqueTarget("MainMenuBg", "%MainMenuBg", "MainMenuBg"),
+                    new Step59UniqueTarget("ContinueRunInfo", "%ContinueRunInfo", "ContinueRunInfo"),
+                    new Step59UniqueTarget("PatchNotesScreen", "%PatchNotesScreen", "PatchNotesScreen")
+                ]));
+        }
+
+        return text.ToString().TrimEnd();
+    }
+
+    private static string DescribeStep59SceneState(object packedScene, IReadOnlyCollection<string> targetNames, int step)
+    {
+        var getState = packedScene.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == "GetState" && !method.IsGenericMethod && method.GetParameters().Length == 0)
+            ?? throw new MissingMethodException(packedScene.GetType().FullName, "GetState()");
+        var state = InvokeStep59DiagnosticMethod(getState, packedScene, null, step, "PackedScene.GetState")
+            ?? throw new InvalidDataException($"Step {step}.0 PackedScene.GetState returned null.");
+
+        var stateType = state.GetType();
+        var getNodeCount = RequireStep59DiagnosticMethod(stateType, "GetNodeCount", 0);
+        var getNodeName = RequireStep59DiagnosticMethod(stateType, "GetNodeName", 1);
+        var getNodePath = stateType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(method => method.Name == "GetNodePath" && !method.IsGenericMethod)
+            .OrderBy(method => method.GetParameters().Length)
+            .FirstOrDefault(method =>
+            {
+                var parameters = method.GetParameters();
+                return parameters.Length is 1 or 2 && parameters[0].ParameterType == typeof(int);
+            }) ?? throw new MissingMethodException(stateType.FullName, "GetNodePath(int[,bool])");
+        var getOwnerPath = RequireStep59DiagnosticMethod(stateType, "GetNodeOwnerPath", 1);
+        var getNodeType = RequireStep59DiagnosticMethod(stateType, "GetNodeType", 1);
+        var getPropertyCount = RequireStep59DiagnosticMethod(stateType, "GetNodePropertyCount", 1);
+        var getPropertyName = RequireStep59DiagnosticMethod(stateType, "GetNodePropertyName", 2);
+        var getPropertyValue = RequireStep59DiagnosticMethod(stateType, "GetNodePropertyValue", 2);
+        var getNodeInstance = stateType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == "GetNodeInstance" && !method.IsGenericMethod && method.GetParameters().Length == 1);
+
+        var countObj = InvokeStep59DiagnosticMethod(getNodeCount, state, null, step, "SceneState.GetNodeCount");
+        var count = countObj is int c ? c : Convert.ToInt32(countObj, System.Globalization.CultureInfo.InvariantCulture);
+        var lines = new List<string> { $"sceneStateType={stateType.FullName}; nodeCount={count}" };
+        var found = new HashSet<string>(StringComparer.Ordinal);
+
+        for (var i = 0; i < count; i++)
+        {
+            var name = InvokeStep59DiagnosticMethod(getNodeName, state, [i], step, "SceneState.GetNodeName")?.ToString() ?? "<null>";
+            if (!targetNames.Contains(name, StringComparer.Ordinal))
+                continue;
+            found.Add(name);
+            object? pathValue;
+            var pathParameters = getNodePath.GetParameters();
+            pathValue = pathParameters.Length == 1
+                ? InvokeStep59DiagnosticMethod(getNodePath, state, [i], step, "SceneState.GetNodePath")
+                : InvokeStep59DiagnosticMethod(getNodePath, state, [i, false], step, "SceneState.GetNodePath");
+            var ownerPath = InvokeStep59DiagnosticMethod(getOwnerPath, state, [i], step, "SceneState.GetNodeOwnerPath")?.ToString() ?? "<null>";
+            var nodeType = InvokeStep59DiagnosticMethod(getNodeType, state, [i], step, "SceneState.GetNodeType")?.ToString() ?? "<null>";
+            var instance = getNodeInstance is null ? null : InvokeStep59DiagnosticMethod(getNodeInstance, state, [i], step, "SceneState.GetNodeInstance");
+            var propertyCountObj = InvokeStep59DiagnosticMethod(getPropertyCount, state, [i], step, "SceneState.GetNodePropertyCount");
+            var propertyCount = propertyCountObj is int pc ? pc : Convert.ToInt32(propertyCountObj, System.Globalization.CultureInfo.InvariantCulture);
+            var properties = new List<string>();
+            for (var p = 0; p < propertyCount; p++)
+            {
+                var propName = InvokeStep59DiagnosticMethod(getPropertyName, state, [i, p], step, "SceneState.GetNodePropertyName")?.ToString() ?? "<null>";
+                if (!string.Equals(propName, "unique_name_in_owner", StringComparison.Ordinal) &&
+                    !string.Equals(propName, "script", StringComparison.Ordinal))
+                    continue;
+                var propValue = InvokeStep59DiagnosticMethod(getPropertyValue, state, [i, p], step, "SceneState.GetNodePropertyValue");
+                properties.Add(propName + "=" + FormatStep59DiagnosticValue(propValue));
+            }
+            lines.Add($"name={name}; path={pathValue?.ToString() ?? "<null>"}; ownerPath={ownerPath}; type={nodeType}; instance={(instance is null ? "NO" : "YES:" + (instance.GetType().FullName ?? "<unknown>"))}; properties=[{string.Join(",", properties)}]");
+        }
+        foreach (var target in targetNames.Where(target => !found.Contains(target)))
+            lines.Add($"name={target}; SCENESTATE_NODE_NOT_FOUND");
+        return string.Join("\n", lines);
+    }
+
+    private static object InstantiateStep59DiagnosticPackedScene(object packedScene, int step, string scope)
+    {
+        var nodeType = packedScene.GetType().Assembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.Node");
+        var instantiate = RequireStartupLadderInstantiateMethod(packedScene.GetType(), nodeType);
+        var parameterType = instantiate.GetParameters()[0].ParameterType;
+        var disabled = Enum.ToObject(parameterType, 0);
+        return InvokeStep59DiagnosticMethod(instantiate, packedScene, [disabled], step, $"{scope} PackedScene.Instantiate")
+            ?? throw new InvalidDataException($"Step {step}.0 temporary {scope} PackedScene.Instantiate returned null.");
+    }
+
+    private static string DescribeStep59LiveUniqueTargets(
+        object root,
+        Step35ExecutionLoadContext context,
+        int step,
+        IReadOnlyCollection<Step59UniqueTarget> targets)
+    {
+        var lines = new List<string>();
+        foreach (var target in targets)
+        {
+            object? direct = null;
+            try { direct = FindStep59ChildByName(root, target.DirectName); } catch { }
+            var unique = TryStep59NodeLookup(root, target.UniquePath, step, out var uniqueError);
+            var directPathLookup = TryStep59NodeLookup(root, target.DirectPath, step, out var directError);
+            var observed = direct ?? directPathLookup;
+            if (observed is null)
+            {
+                lines.Add($"{target.Label}: direct/find=NULL; percentLookup={(unique is null ? "NULL" : "NONNULL")}; percentError={uniqueError}; directError={directError}");
+                continue;
+            }
+
+            var owner = TryReadStep59Property(observed, "Owner");
+            var uniqueFlag = TryReadStep59UniqueFlag(observed);
+            var insideTree = TryInvokeStep59Bool(observed, "IsInsideTree");
+            var nodeReady = TryInvokeStep59Bool(observed, "IsNodeReady");
+            var loadContext = AssemblyLoadContext.GetLoadContext(observed.GetType().Assembly);
+            var ownerIdentity = owner is null ? "<null>" : ReferenceEquals(owner, root) ? "ROOT" : owner.GetType().FullName ?? "<unknown>";
+            lines.Add(
+                $"{target.Label}: type={observed.GetType().FullName}; selectedContext={ReferenceEquals(loadContext, context)}; " +
+                $"insideTree={insideTree}; nodeReady={nodeReady}; uniqueNameInOwner={uniqueFlag}; owner={ownerIdentity}; " +
+                $"directPathLookup={(directPathLookup is null ? "NULL" : ReferenceEquals(directPathLookup, observed) ? "EXACT" : "OTHER:" + directPathLookup.GetType().FullName)}; " +
+                $"percentLookup={(unique is null ? "NULL" : ReferenceEquals(unique, observed) ? "EXACT" : "OTHER:" + unique.GetType().FullName)}; " +
+                $"percentError={uniqueError}; directError={directError}");
+        }
+        return string.Join("\n", lines);
+    }
+
+    private static object? FindStep59ChildByName(object root, string name)
+    {
+        var findChild = root.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method =>
+            {
+                if (method.Name != "FindChild" || method.IsGenericMethod)
+                    return false;
+                var parameters = method.GetParameters();
+                return parameters.Length == 3 &&
+                       parameters[0].ParameterType == typeof(string) &&
+                       parameters[1].ParameterType == typeof(bool) &&
+                       parameters[2].ParameterType == typeof(bool);
+            });
+        return findChild?.Invoke(root, [name, true, false]);
+    }
+
+    private static object? TryStep59NodeLookup(object root, string path, int step, out string error)
+    {
+        error = "<none>";
+        try
+        {
+            var nodePathType = root.GetType().Assembly.GetType("Godot.NodePath", throwOnError: true, ignoreCase: false)
+                ?? throw new MissingMemberException("Godot.NodePath");
+            var nodePath = Activator.CreateInstance(nodePathType, [path])
+                ?? throw new InvalidOperationException("Godot.NodePath(string) returned null.");
+            var method = root.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(candidate => candidate.Name == "GetNodeOrNull" && !candidate.IsGenericMethod)
+                .SingleOrDefault(candidate =>
+                {
+                    var parameters = candidate.GetParameters();
+                    return parameters.Length == 1 && parameters[0].ParameterType == nodePathType;
+                });
+            if (method is null)
+            {
+                method = root.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                    .Where(candidate => candidate.Name == "GetNode" && !candidate.IsGenericMethod)
+                    .SingleOrDefault(candidate =>
+                    {
+                        var parameters = candidate.GetParameters();
+                        return parameters.Length == 1 && parameters[0].ParameterType == nodePathType;
+                    });
+            }
+            if (method is null)
+                throw new MissingMethodException(root.GetType().FullName, "GetNodeOrNull(NodePath)/GetNode(NodePath)");
+            return InvokeStep59DiagnosticMethod(method, root, [nodePath], step, $"Node lookup '{path}'");
+        }
+        catch (Exception ex)
+        {
+            error = ex.GetType().Name + ":" + ex.Message;
+            return null;
+        }
+    }
+
+    private static MethodInfo RequireStep59DiagnosticMethod(Type type, string name, int parameterCount)
+        => type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(method => method.Name == name && !method.IsGenericMethod && method.GetParameters().Length == parameterCount)
+            ?? throw new MissingMethodException(type.FullName, name);
+
+    private static object? InvokeStep59DiagnosticMethod(MethodInfo method, object? instance, object?[]? arguments, int step, string label)
+    {
+        try
+        {
+            return method.Invoke(instance, arguments);
+        }
+        catch (TargetInvocationException tie) when (tie.InnerException is not null)
+        {
+            throw new InvalidOperationException($"Step {step}.0 {label} threw {tie.InnerException.GetType().FullName}: {tie.InnerException.Message}", tie.InnerException);
+        }
+    }
+
+    private static object? TryReadStep59Property(object instance, string propertyName)
+    {
+        try
+        {
+            return instance.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(instance);
+        }
+        catch { return null; }
+    }
+
+    private static string TryReadStep59UniqueFlag(object instance)
+    {
+        try
+        {
+            var property = instance.GetType().GetProperty("UniqueNameInOwner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (property?.GetValue(instance) is bool value)
+                return value.ToString();
+            var method = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(candidate => candidate.Name == "IsUniqueNameInOwner" && !candidate.IsGenericMethod && candidate.GetParameters().Length == 0);
+            return method?.Invoke(instance, null)?.ToString() ?? "<unreadable>";
+        }
+        catch (Exception ex) { return "<error:" + ex.GetType().Name + ">"; }
+    }
+
+    private static string TryInvokeStep59Bool(object instance, string methodName)
+    {
+        try
+        {
+            var method = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(candidate => candidate.Name == methodName && !candidate.IsGenericMethod && candidate.GetParameters().Length == 0);
+            return method?.Invoke(instance, null)?.ToString() ?? "<unreadable>";
+        }
+        catch (Exception ex) { return "<error:" + ex.GetType().Name + ">"; }
+    }
+
+    private static string FormatStep59DiagnosticValue(object? value)
+    {
+        if (value is null)
+            return "<null>";
+        try
+        {
+            var asBool = value.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .SingleOrDefault(method => method.Name == "AsBool" && !method.IsGenericMethod && method.GetParameters().Length == 0);
+            if (asBool is not null)
+            {
+                try
+                {
+                    var boolValue = asBool.Invoke(value, null);
+                    if (boolValue is bool b)
+                        return b.ToString();
+                }
+                catch { }
+            }
+            return value.ToString() ?? "<null-string>";
+        }
+        catch (Exception ex) { return "<format-error:" + ex.GetType().Name + ">"; }
+    }
+
+    private sealed record Step59UniqueTarget(string Label, string UniquePath, string DirectPath)
+    {
+        public string DirectName => DirectPath.Contains('/') ? DirectPath[(DirectPath.LastIndexOf('/') + 1)..] : DirectPath;
     }
 
     private static string BuildStep59TscnContext(string text, string needle, int radius, int maxMatches = 16)
