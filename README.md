@@ -1,6 +1,6 @@
 # StS2 Launcher — Steps 58–62 character-select forensic localization / visible-render trial
 
-Active candidate: **0.0.196 (196)**. Physical runtime authority is closed through **Step 57 4/4/frozen**. Physical **0.0.194** reached the original Step-59 `OpenCharacterSelect(NButton)` handler with the retained `NSingleplayerSubmenu` already bound to the exact stack and the real `_standardButton` supplied, yet the handler still raised `NullReferenceException`. **Step 63 is unopened.**
+Active candidate: **0.0.197 (197)**. Physical runtime authority is closed through **Step 57 4/4/frozen**. Physical **0.0.194** reached the original Step-59 `OpenCharacterSelect(NButton)` handler with the retained `NSingleplayerSubmenu` already bound to the exact stack and the real `_standardButton` supplied, yet the handler still raised `NullReferenceException`. **Step 63 is unopened.**
 
 Use **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** from a fresh process. It remains capped at Step 52 and ends frozen. Then manually reconstruct **53 → 54 → 55 → 56 → 57 → 58 → 59**, stopping at the first failure. Steps 60–62 are reached only if Step 59 closes cleanly.
 

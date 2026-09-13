@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>196</ApplicationVersion>" in project_text, "build version is 196")
-require("<ApplicationDisplayVersion>0.0.196</ApplicationDisplayVersion>" in project_text, "display version is 0.0.196")
-require(plist.get("CFBundleVersion") == "196", "Info.plist build version is 196")
-require(plist.get("CFBundleShortVersionString") == "0.0.196", "Info.plist display version is 0.0.196")
+require("<ApplicationVersion>197</ApplicationVersion>" in project_text, "build version is 197")
+require("<ApplicationDisplayVersion>0.0.197</ApplicationDisplayVersion>" in project_text, "display version is 0.0.197")
+require(plist.get("CFBundleVersion") == "197", "Info.plist build version is 197")
+require(plist.get("CFBundleShortVersionString") == "0.0.197", "Info.plist display version is 0.0.197")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -199,12 +199,12 @@ release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresen
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
 require("STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL" in release_presentation, "top launcher banner identifies the active Steps 58–62 ownership/render trial")
-require("STEPS 35–57 PHYSICALLY CLOSED" in release_presentation and "0.0.196 STEPS 58–62 ACTIVE" in release_presentation and "STEP 63 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 57, active Steps 58–62, and Step 63 unopened")
-require("Active candidate: **0.0.196 (196)**" in read("README.md") and "Active candidate: **0.0.196 (196)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.196 (196) release identity")
-require("Active candidate — 0.0.196 ascension ready-binding forensics" in read("docs/MASTER-PLAN.md") and 'GetNode<NAscensionPanel>("%AscensionPanel")' in read("docs/MASTER-PLAN.md") and "An unhealthy binding blocks Gate C" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.196 ascension ready-binding forensic frontier")
+require("STEPS 35–57 PHYSICALLY CLOSED" in release_presentation and "0.0.197 STEPS 58–62 ACTIVE" in release_presentation and "STEP 63 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 57, active Steps 58–62, and Step 63 unopened")
+require("Active candidate: **0.0.197 (197)**" in read("README.md") and "Active candidate: **0.0.197 (197)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.196 (196) release identity")
+require("Active candidate — 0.0.197 ascension ready-binding forensics" in read("docs/MASTER-PLAN.md") and 'GetNode<NAscensionPanel>("%AscensionPanel")' in read("docs/MASTER-PLAN.md") and "An unhealthy binding blocks Gate C" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.196 ascension ready-binding forensic frontier")
 require(all(marker in release_presentation for marker in ["STEPS 35–57 PHYSICALLY CLOSED", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "Steam", "Steps 53", "Step 57", "Steps 58", "Step 62", "Step 63"]), "top launcher banner preserves historical authority and identifies the active closed-through-57 frontier")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.196"' in release_presentation and 'ExpectedBuildVersion = "196"' in release_presentation, "startup-ladder source pins expected 0.0.196 bundle release identity")
+require('ExpectedDisplayVersion = "0.0.197"' in release_presentation and 'ExpectedBuildVersion = "197"' in release_presentation, "startup-ladder source pins expected 0.0.196 bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -370,8 +370,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-58-62.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.196",
-    "STS2_BUILD_VERSION": "196",
+    "STS2_DISPLAY_VERSION": "0.0.197",
+    "STS2_BUILD_VERSION": "197",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1702,10 +1702,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.196 (196)", "capped at Step 52", "Step 57 4/4/frozen", "What physical 0.0.195 changed", "NMainMenuSubmenuStack._Ready()", "Step 59.0 — forensic prerequisites + one-shot real OpenCharacterSelect transition", "IsNodeReady", "Progress.Epochs", "Progress.EncounterStats", "RootSceneContainer.CurrentScene", "TargetSite", "ExceptionDispatchInfo", "Step 60.0 — actual active character-select surface audit", "Step 61.0 — short visible character-select render residency", "Step 62.0 — sustained visible character-select render residency", "Step 63", "skip Step 38", "Step 15 Gate D"]), "current status records stable Step-57 baseline, physical 0.0.195 localization, and active 0.0.196 ready-binding forensic Step-59 design")
+require(all(marker in current_status for marker in ["Active candidate — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.197 (197)", "capped at Step 52", "Step 57 4/4/frozen", "What physical 0.0.196 changed", "What physical 0.0.195 changed", "NMainMenuSubmenuStack._Ready()", "Step 59.0 — forensic prerequisites + one-shot real OpenCharacterSelect transition", "IsNodeReady", "Progress.Epochs", "Progress.EncounterStats", "RootSceneContainer.CurrentScene", "TargetSite", "ExceptionDispatchInfo", "Step 60.0 — actual active character-select surface audit", "Step 61.0 — short visible character-select render residency", "Step 62.0 — sustained visible character-select render residency", "Step 63", "skip Step 38", "Step 15 Gate D"]), "current status records stable Step-57 baseline, physical 0.0.195 localization, and active 0.0.196 ready-binding forensic Step-59 design")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.196 (196)" in testing_doc and "0.0.196 (196)" in release_checklist_doc and "0.0.196 is diagnostic" in testing_doc and "Require exact 0.0.196 source/plist/release/shell identity" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.196 (196) release identity")
+require("0.0.197 (197)" in testing_doc and "0.0.197 (197)" in release_checklist_doc and "0.0.196 is diagnostic" in testing_doc and "Require exact 0.0.197 source/plist/release/shell identity" in release_checklist_doc, "testing and release-checklist docs pin the exact 0.0.197 (197) release identity")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -2376,7 +2376,7 @@ require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.196\"", "ExpectedBuildVersion = \"196\"", "STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL"]), "active release presentation pins physical closure and Steps-58–62 / 0.0.194 identity")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.197\"", "ExpectedBuildVersion = \"197\"", "STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL"]), "active release presentation pins physical closure and Steps-58–62 / 0.0.197 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "22-method zero-boundary closure", "renderer frozen", "zero resolver/host/private/initializer/rejected/native deltas"]), "current status pins the physically closed Step-42 InitPools authority")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
@@ -2719,6 +2719,8 @@ require("SetValue(" not in step59_core_slice, "Step 59 never repairs submenu own
 require("throw tie.InnerException" not in step59_core_slice and "throw inner" not in step59_core_slice, "Step 59 does not reset the original inner exception stack at the reflection boundary")
 require(all(v in character_core for v in ["SingleplayerStandardButtonFieldNameForOwnership = \"_standardButton\"", "_step59StandardButton = standardButtonField.GetValue(submenu)", "openParameterType.IsInstanceOfType(_step59StandardButton)"]), "Step 59 binds and type-checks the retained real single-player standard button")
 require(all(v in character_ui for v in ["M59_B_STATIC_MAP_WRITE_RETURNED", "Step59ReadyBindingPreflightPassed", "_step59TransitionUiStarted = true", "RunStep59RealHandlerTransition"]), "Step 59 UI durably writes ready-binding forensics before Gate C and one-shot bookkeeping arms only after a clean preflight")
+require('public const string Step59GateName = "CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION"' in character_core and '_step59Gates = new(59, TransformedRealStS2VeryEarlyInitialization.Step59GateName)' in character_ui, "0.0.197 shares one Step-59 gate-name authority between Core and iOS UI")
+require('_step59Gates = new(59, "FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION")' not in character_ui, "0.0.197 removes the stale Step-59 UI gate-name literal that caused the physical 0.0.196 harness failure")
 require(all(v in character_core for v in ["RunStep60ClosedStep59Authority", "RunStep60ActiveFrameInputAudit", "RunStep60SceneConnectionInventory", "RunStep60FrozenSurfaceConfinement"]), "Step 60 audits the actual active frame/input surface and exact TSCN connection evidence without rendering")
 require(all(v in character_core for v in ["RunStep61ClosedStep60Authority", "RunStep61RenderPreflight", "BeginStep61BoundedRenderPulse", "RunStep61RenderPulseEvidence", "RunStep61FrozenPostResidencyConfinement", "_step61PulseStarted"]), "Step 61 is a distinct 2-second visible render/refreeze rung")
 require(all(v in character_core for v in ["RunStep62ClosedStep61Authority", "RunStep62SustainedRenderPreflight", "BeginStep62SustainedRenderPulse", "RunStep62SustainedRenderEvidence", "RunStep62FrozenPostResidencyConfinement", "_step62PulseStarted"]), "Step 62 is a distinct 10-second visible render/refreeze rung")
@@ -2766,6 +2768,14 @@ require(all(v in step59_195_fail_report for v in ["App version: 0.0.195 (195)", 
 require(all(v in step59_195_fail_checkpoint for v in ["M59_A_PASS", "M59_B_FAIL", "IsNodeReady()=True", "_ascensionPanel is null", "renderingActive=False", "RUN_END"]), "physical 0.0.195 checkpoint proves safe frozen Gate-B localization before handler arm")
 require("Step-59 UI operation ended normally" in step59_195_fail_last, "physical 0.0.195 last checkpoint preserves normal frozen Step-59 end")
 require(all(v in step59_ready_196 for v in ["Physical **0.0.195 (195)**", "%AscensionPanel", "not** a `[Godot.Export]` field", "UniqueNameInOwner", "No launcher code writes `_ascensionPanel`"]), "0.0.196 history note records the exact Ready-binding diagnosis and no-field-patch boundary")
+step59_196_harness_report = read("docs/history/reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-REPORT.txt")
+step59_196_harness_checkpoint = read("docs/history/reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-CHECKPOINT.txt")
+step59_196_harness_last = read("docs/history/reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-LAST-CHECKPOINT.txt")
+step59_gate_197 = read("docs/history/steps/STEP-59.3-GATE-NAME-CONTRACT-CORRECTION-0.0.197.md")
+require(all(v in step59_196_harness_report for v in ["App version: 0.0.196 (196)", "STEP 59.0: EXCEPTION", "gate sequence received a result"]), "physical 0.0.196 report preserves the pre-Gate-B harness-name mismatch")
+require(all(v in step59_196_harness_checkpoint for v in ["M59_A_PASS", "RUN_MANAGED_EXCEPTION", "CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION", "renderingActive=False", "RUN_END"]), "physical 0.0.196 checkpoint proves Gate A passed, no game mutation armed, and the run stayed frozen")
+require("Step-59 UI operation ended normally" in step59_196_harness_last, "physical 0.0.196 last checkpoint preserves normal frozen harness-failure end")
+require(all(v in step59_gate_197 for v in ["Physical **0.0.196 (196)**", "bookkeeping regression", "single public compile-time authority", "experiment is otherwise unchanged"]), "0.0.197 history note records the gate-name contract correction without widening the game experiment")
 require(all(v in step59_193_report for v in ["App version: 0.0.193 (193)", "STEP 59.0 REAL OPENCHARACTERSELECT FROZEN TRANSITION FAIL — 2/4", "System.NullReferenceException"]), "raw physical 0.0.193 report preserves the real-handler Step-59 NRE localization")
 require(all(v in step59_193_checkpoint for v in ["M59_A_PASS", "M59_B_PASS", "logicalStackNull=True", "parentExactStack=True", "M59_C_HANDLER_ARMED", "M59_C_FAIL", "renderingActive=False", "RUN_END"]), "raw physical 0.0.193 checkpoint proves exact pre-state, one-shot handler arm, NRE and frozen normal end")
 require("Step-59 UI operation ended normally" in step59_193_last, "raw physical 0.0.193 last checkpoint preserves normal frozen Step-59 end")
@@ -2972,7 +2982,7 @@ if singleplayer_manifest.is_file():
     require(not mismatches, "Steps 53-57 single-player continuation active files are hash-pinned", ", ".join(mismatches))
 
 
-# Dedicated 0.0.196 Steps 58-62 ready-binding forensic / visible-render candidate manifest.
+# Dedicated 0.0.197 Steps 58-62 ready-binding forensic / visible-render candidate manifest.
 character_manifest = ROOT / "tools/validation/candidate-steps58-62-character-select-ownership.sha256"
 require(character_manifest.is_file(), "Steps 58-62 character-select ownership candidate hash manifest exists")
 if character_manifest.is_file():
@@ -2999,6 +3009,10 @@ if character_manifest.is_file():
         "docs/history/steps/STEP-59.1-FORENSIC-LOCALIZATION-ANALYSIS-0.0.195.md",
         "docs/history/steps/STEP-59.1-FORENSIC-LOCALIZATION-0.0.195.md",
         "docs/history/steps/STEP-59.2-ASCENSION-READY-BINDING-FORENSICS-0.0.196.md",
+        "docs/history/steps/STEP-59.3-GATE-NAME-CONTRACT-CORRECTION-0.0.197.md",
+        "docs/history/reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-REPORT.txt",
+        "docs/history/reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-CHECKPOINT.txt",
+        "docs/history/reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-LAST-CHECKPOINT.txt",
         "docs/history/reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-REPORT.txt",
         "docs/history/reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-CHECKPOINT.txt",
         "docs/history/reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-LAST-CHECKPOINT.txt",

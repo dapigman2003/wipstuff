@@ -559,3 +559,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-REPORT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-CHECKPOINT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-LAST-CHECKPOINT.txt`
+
+- `steps/STEP-59.3-GATE-NAME-CONTRACT-CORRECTION-0.0.197.md` — physical 0.0.196 exposed a Core/UI Step-59 gate-label mismatch before Gate B; 0.0.197 centralizes the gate name and preserves the 0.0.196 experiment unchanged.
+- `reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-REPORT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-CHECKPOINT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.196-HARNESS-FAIL-LAST-CHECKPOINT.txt`

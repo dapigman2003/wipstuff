@@ -1,6 +1,6 @@
-# Release checklist — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.196
+# Release checklist — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.197
 
-Release identity: display/build `0.0.196 (196)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.197 (197)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190–0.0.192 Step-58 localization evidence and physical 0.0.193 Step-59 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -14,7 +14,7 @@ Require the new block to preserve exact sequencing and authority:
 
 Step 59 is one-shot once its navigation repair and/or handler transition arms. Steps 61/62 are always one-shot after render arm. Character choice/confirm/embark/run-start, whole `GameStartup`/original `LaunchMainMenu`, cloud/migration/platform/Steam/deferred startup, native game extensions, trusted-install mutation, and Step 63+ remain unopened.
 
-Require exact 0.0.196 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
+Require exact 0.0.197 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
 
 
 ## 0.0.196 forensic-ready requirements
@@ -26,3 +26,11 @@ Require exact 0.0.196 source/plist/release/shell identity; current active manife
 - Step 59 must read both character-select and ascension-panel TSCN bytes only from the receipt-backed sealed PCK.
 - An unhealthy ready binding must block Gate C before `_step59TransitionStarted` is set.
 - No direct `_ascensionPanel` write and no explicit/manual `_Ready()` invocation is permitted.
+
+
+## 0.0.197 gate-name contract
+
+- Step-59 Core and UI must share `TransformedRealStS2VeryEarlyInitialization.Step59GateName`.
+- The obsolete UI gate-constructor literal `FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION` must not remain.
+- Preserve physical 0.0.196 harness-failure evidence.
+- No game-facing 0.0.196 ready-binding diagnostic behavior is broadened in this patch.

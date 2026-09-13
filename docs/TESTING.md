@@ -1,6 +1,6 @@
-# Testing — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.196
+# Testing — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.197
 
-Active candidate: `0.0.196 (196)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.197 (197)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -37,3 +37,8 @@ prerequisites are unhealthy. Preserve `M59_B_FORENSIC_PREFLIGHT`, `M59_B_READY_B
 
 A blocked Gate C in 0.0.196 is **not** a one-shot arm: `Step59TransitionStarted` must remain false and neither
 `NSubmenuStack.Push` nor `OpenCharacterSelect` may be invoked. Do not proceed to Step 60 unless Step 59 closes 4/4.
+
+
+## 0.0.197 rerun note
+
+0.0.196 did not execute Gate B because of a Core/UI gate-name mismatch. 0.0.197 changes only that harness contract. Re-run Step 59 from a fresh process and expect `M59_B_READY_BINDING_DIAGNOSIS` plus a durable Step-59 static map before any Gate-C block/transition.

@@ -1,0 +1,16 @@
+StS2 Launcher — Step 59.0 Forensic real OpenCharacterSelect frozen transition checkpoint
+Output-only diagnostic; never consumed as trusted runtime input.
+Run ID: 20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351
+Initialized UTC: 2026-09-13T16:06:47.8553560+00:00
+Process ID: 1896
+App version: 0.0.196 (196)
+Candidate: STEPS 43–62 SEQUENTIAL STARTUP LADDER — STOP ON FIRST FAILURE; STEPS 53–62 REQUIRE SAME-PROCESS PHYSICALLY CLOSED STEP-52 AUTHORITY.
+Global policy: physical authority through Step 57 is the baseline extension. Step 58 adopts/audits actual runtime ownership without mutation. Step 59 may invoke original OpenCharacterSelect once only when the transition is not already visibly complete. Step 60 audits the active screen. Steps 61–62 add short and sustained visible render residencies and synchronously refreeze. Character choice/embark/run-start, continuous interactive ownership, and Step 63+ remain unopened.
+
+2026-09-13T16:06:47.8634360+00:00 | run=20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351 | pid=1896 | managedThread=1 | RUN_TELEMETRY_READY — run-correlated ladder journal created and durably flushed before Gate A.
+2026-09-13T16:06:47.8652140+00:00 | run=20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351 | pid=1896 | managedThread=1 | RUN_START — Step 59.0 forensic prerequisite snapshot + original OpenCharacterSelect transition started. No speculative character-select repair is performed; any previously audited submenu Push occurs only if the retained single-player logical stack is actually null.
+2026-09-13T16:06:47.8815700+00:00 | run=20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351 | pid=1896 | managedThread=1 | M59_A_PASS — Step-58 4/4 ownership authority retained; transitionAlreadyComplete=False; renderer stopped; handler not armed.
+2026-09-13T16:06:47.8828120+00:00 | run=20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351 | pid=1896 | managedThread=1 | RUN_MANAGED_EXCEPTION — System.InvalidOperationException: Step 59.0 gate sequence received a result for Step 59.0 / CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION.
+2026-09-13T16:06:47.8849700+00:00 | run=20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351 | pid=1896 | managedThread=1 | RUN_FINALLY_ENTER — managed control reached finally; managedThread=1; isMain=True; renderingActive=False. Step 59 leaves rendering frozen. If the real handler was armed, never retry Step 59 in-process.
+2026-09-13T16:06:47.8868510+00:00 | run=20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351 | pid=1896 | managedThread=15 | RUN_NORMAL_REPORT_RETURNED — step report writer returned.
+2026-09-13T16:06:47.8909990+00:00 | run=20260913T1606478553560Z-pid1896-97923587e1a34d23a1c1ec92efe98351 | pid=1896 | managedThread=15 | RUN_END — Step-59 UI operation ended normally; Step 59 leaves rendering frozen. If the real handler was armed, never retry Step 59 in-process.

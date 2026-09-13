@@ -8,7 +8,7 @@ namespace StS2Launcher.iOS;
 public sealed partial class RootViewController
 {
     private readonly TransformedRealStS2StartupLadderGateSequence _step58Gates = new(58, "CHARACTER SELECT RUNTIME OWNERSHIP AUDIT");
-    private readonly TransformedRealStS2StartupLadderGateSequence _step59Gates = new(59, "FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION");
+    private readonly TransformedRealStS2StartupLadderGateSequence _step59Gates = new(59, TransformedRealStS2VeryEarlyInitialization.Step59GateName);
     private readonly TransformedRealStS2StartupLadderGateSequence _step60Gates = new(60, "ACTIVE CHARACTER SELECT SURFACE AUDIT");
     private readonly TransformedRealStS2StartupLadderGateSequence _step61Gates = new(61, "CHARACTER SELECT SHORT RENDER RESIDENCY");
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT SUSTAINED RENDER RESIDENCY");

@@ -13,10 +13,10 @@ internal static class CurrentReleasePresentation
         "STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–57 PHYSICALLY CLOSED • 0.0.196 STEPS 58–62 ACTIVE — STEP 63 UNOPENED";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–57 PHYSICALLY CLOSED • 0.0.197 STEPS 58–62 ACTIVE — STEP 63 UNOPENED";
 
     public const string Summary =
-        "Physical authority remains closed through Step 57. Physical 0.0.195 localized the current blocker before handler arm: the real NCharacterSelectScreen is ready and its earlier _charButtonContainer binding exists, but _ascensionPanel is null. Trusted sts2.dll IL proves _Ready resolves %AscensionPanel immediately after that earlier binding. 0.0.196 maps the selected _Ready IL, live ascension-like descendant runtime type/load-context/owner/UniqueNameInOwner state, and exact receipt-backed character-select + ascension-panel TSCN declarations before Gate C. If the binding is unhealthy, Gate C stops before Push/OpenCharacterSelect can arm. Steps 60–62 remain available only after a clean original transition. Character choice, deliberate interaction, embark/run start, continuous ownership, and Step 63 remain unopened.";
+        "Physical authority remains closed through Step 57. Physical 0.0.195 localized the current blocker before handler arm: the real NCharacterSelectScreen is ready and its earlier _charButtonContainer binding exists, but _ascensionPanel is null. Trusted sts2.dll IL proves _Ready resolves %AscensionPanel immediately after that earlier binding. 0.0.197 preserves the 0.0.196 ready-binding experiment after correcting a Core/UI gate-name bookkeeping mismatch found physically in 0.0.196. It maps the selected _Ready IL, live ascension-like descendant runtime type/load-context/owner/UniqueNameInOwner state, and exact receipt-backed character-select + ascension-panel TSCN declarations before Gate C. If the binding is unhealthy, Gate C stops before Push/OpenCharacterSelect can arm. Steps 60–62 remain available only after a clean original transition. Character choice, deliberate interaction, embark/run start, continuous ownership, and Step 63 remain unopened.";
 
     public const string InitialStatus =
         "Status: Steps 35–57 are physically closed; the one-button Physically Closed Path remains capped at Step 52. From a fresh process, reprove through Step 52, rerun Steps 53→58, then run forensic Step 59 once and stop on its first failure. Step 59 must checkpoint the pre-handler readiness/service/save/scene-ownership snapshot before invocation and preserve the original inner game exception evidence plus post-failure state if the handler throws. Do not retry Step 59 in-process. Steps 60–62 are reached only if the real handler succeeds; Step 63 and continuous interactive ownership remain unopened.";
@@ -25,8 +25,8 @@ internal static class CurrentReleasePresentation
     public const string HistoricalStartupAuthority =
         "STEP 42 CLOSED POSITIVE 4/4 • physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4 • STEPS 35–57 PHYSICALLY CLOSED • Steps 58 through Step 62 are the active forensic/visible-render continuation • GameStartup remains uninvoked while the engineering ladder is active";
 
-    public const string ExpectedDisplayVersion = "0.0.196";
-    public const string ExpectedBuildVersion = "196";
+    public const string ExpectedDisplayVersion = "0.0.197";
+    public const string ExpectedBuildVersion = "197";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =

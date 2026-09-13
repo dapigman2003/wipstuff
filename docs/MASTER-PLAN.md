@@ -1,6 +1,6 @@
-## Current frontier — Steps 58–62 / 0.0.196
+## Current frontier — Steps 58–62 / 0.0.197
 
-**Active candidate — 0.0.196 ascension ready-binding forensics.** Physical authority remains formally closed through
+**Active candidate — 0.0.197 ascension ready-binding forensics.** Physical 0.0.196 then exposed only a launcher gate-name mismatch immediately after Gate A; 0.0.197 centralizes that contract and preserves the same ready-binding experiment. Physical authority remains formally closed through
 Step 57 4/4/frozen. Physical 0.0.195 stopped safely in Step 59 Gate B before any handler arm and proved a concrete
 scene-lifecycle break: the cached real `NCharacterSelectScreen` reports `IsNodeReady()==true`, its earlier
 `_charButtonContainer` ready binding is populated, but `_ascensionPanel` is null.

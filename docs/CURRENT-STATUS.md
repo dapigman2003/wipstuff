@@ -6,7 +6,7 @@ Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains 
 
 Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-## Active candidate — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.196 (196)
+## Active candidate — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.197 (197)
 
 Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
@@ -23,6 +23,10 @@ Physical runtime authority remains closed through **Step 57 4/4/frozen**. The on
 
 Static analysis now proves that character-select cache state is **normal game preload behavior**: `NMainMenuSubmenuStack._Ready()` pre-instantiates character select, hides it, and adds it as a child, while `NSubmenu._stack` remains null until `Push()`. It is no longer treated as an anomalous state.
 
+
+### What physical 0.0.196 changed
+
+Physical 0.0.196 passed Step-59 Gate A but never entered the new Gate-B ready-binding diagnostics. The generic gate sequencer rejected the result because Core and UI used different Step-59 candidate-name strings. Rendering remained frozen and the real handler was never armed. 0.0.197 centralizes that gate name; the `%AscensionPanel` diagnostic itself is otherwise unchanged.
 
 ### What physical 0.0.195 changed
 

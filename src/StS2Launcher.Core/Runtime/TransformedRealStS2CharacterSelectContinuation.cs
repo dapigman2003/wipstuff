@@ -31,7 +31,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const int Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds = 30_000;
 
     private const string Step58Name = "CHARACTER SELECT RUNTIME OWNERSHIP AUDIT";
-    private const string Step59Name = "CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION";
+    public const string Step59GateName = "CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION";
+    private const string Step59Name = Step59GateName;
     private const string Step60Name = "ACTIVE CHARACTER SELECT SURFACE AUDIT";
     private const string Step61Name = "CHARACTER SELECT SHORT RENDER RESIDENCY";
     private const string Step62Name = "CHARACTER SELECT SUSTAINED RENDER RESIDENCY";

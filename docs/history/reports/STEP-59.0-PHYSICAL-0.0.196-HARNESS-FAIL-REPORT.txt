@@ -1,0 +1,22 @@
+StS2 Launcher — Step 59.0 Forensic Real OpenCharacterSelect Frozen Transition
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-13T16:06:47.8857020+00:00
+
+RESULT
+STEP 59.0: EXCEPTION
+
+METADATA
+App version: 0.0.196 (196)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Unhandled Step 59.0 exception: InvalidOperationException: Step 59.0 gate sequence received a result for Step 59.0 / CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION.
+
+END OF REPORT
