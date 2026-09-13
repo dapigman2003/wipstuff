@@ -42,7 +42,7 @@ Physical 0.0.188 Step 57 retained-hint localization evidence is retained as `STE
 
 Physical 0.0.190 proved Step 58 may see a non-null game-owned character-select cache. Physical 0.0.191 then proved that exact cached `NCharacterSelectScreen` may already be **inside the live SceneTree** before Step 58 performs any new operation. Both runs ended frozen and Step 58 itself created nothing. 0.0.193 therefore adopts real runtime ownership instead of requiring launcher-controlled off-tree lifecycle milestones.
 
-Physical 0.0.192 localized that SceneTree attachment can precede logical stack binding. Physical 0.0.193 then closed Step 58 and reached Step 59 with the cached screen hidden/in-tree/unbound; the original handler faulted immediately after arm. 0.0.194 records this as a missing single-player submenu navigation binding and conditionally repairs it only through exact audited game-owned `NSubmenuStack.Push(NSubmenu)` before original `OpenCharacterSelect` runs.
+Physical 0.0.192 localized that SceneTree attachment can precede logical stack binding. Physical 0.0.193 then closed Step 58 and reached Step 59 with the cached screen hidden/in-tree/unbound; the original handler faulted immediately after arm. 0.0.195 records this as a missing single-player submenu navigation binding and conditionally repairs it only through exact audited game-owned `NSubmenuStack.Push(NSubmenu)` before original `OpenCharacterSelect` runs.
 
 Each rung has a distinct report/static-map/checkpoint surface:
 

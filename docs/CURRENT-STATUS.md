@@ -1,20 +1,46 @@
 # Current status
 
-## Active candidate — Steps 58–62 real character-select ownership / visible-render trial / 0.0.194 (194)
+Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains uninvoked** on the engineering ladder.
 
-Physical runtime authority is closed through **Step 57 4/4/frozen**. Physical 0.0.189 proved the retained `NMainMenuSubmenuStack._characterSelectScreenScene : Godot.PackedScene`, exact `ResourcePath = res://scenes/screens/character_select_screen.tscn`, one exact receipt-backed PCK entry, and read-only resource/risk evidence with zero drift. `OpenCharacterSelect`, `ResourceLoader`, `PackedScene.Instantiate`, and rendering all remained unopened during Step 57.
+### Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4
 
-The one-button **Physically Closed Path** intentionally remains capped at Step 52. A fresh 0.0.194 process must reprove through Step 52 and then manually reconstruct Steps 53–57 before the new block can run.
+Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-Physical 0.0.190 proved the game-owned `_characterSelectSubmenu` can already be non-null before Step 58. Physical 0.0.191 went further: the exact cached `NCharacterSelectScreen` was already **inside the live SceneTree**, while Step 58 itself had performed no new character-select operation and rendering remained frozen. That invalidates the launcher-owned off-tree create → initialize → push decomposition.
+## Active candidate — Steps 58–62 forensic character-select localization / visible-render trial / 0.0.195 (195)
 
-Physical 0.0.192 localized that SceneTree attachment can precede logical `NSubmenu._stack` binding. 0.0.193 then closed Step 58 4/4 and reached Step 59 Gate B with the exact hidden/in-tree character-select cache, `logicalStackNull=True`, and correct Godot parent. The original `OpenCharacterSelect(NButton)` was armed once and immediately threw `NullReferenceException`. The selected Step-56 IL proves its explicit `NButton` parameter is unread and its first operation dereferences `NSingleplayerSubmenu._stack`, exposing the earlier direct Step-54 `OpenSingleplayerSubmenu()` shortcut as the missing navigation lifecycle.
+Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
-**0.0.194 retains real-game ownership and repairs only that skipped logical navigation state.** Step 58 still audits actual runtime ownership. Step 59 rejects a foreign single-player logical stack; if `_stack` is null it invokes exact audited game-owned `NSubmenuStack.Push(NSubmenu)` once on the retained stack with the retained real `NSingleplayerSubmenu`, then requires exact reference-identical binding. Only then may original `OpenCharacterSelect(NButton)` run once, now with the retained real `_standardButton`. Step 60 audits the resulting active frame/input surface and exact TSCN connection inventory. Step 61 visibly renders for 2 seconds and refreezes; Step 62 does the same for 10 seconds. Intentional interaction and Step 63 remain unopened.
+### What physical 0.0.194 changed
 
-The 0.0.183 Codemagic AOT cache/sentinel experiment remains retained and independent of this runtime experiment.
+0.0.194 disproved the remaining simple Step-59 theory. Immediately before original `OpenCharacterSelect(NButton)`:
 
-Retained prior physical authority: **Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4.** Exact `NGame.InitPools()` retained its **22-method zero-boundary closure**, the **renderer frozen** throughout, with **zero resolver/host/private/initializer/rejected/native deltas**. Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains uninvoked**. The current same-process path must **skip Step 38** before Step 39, and the convenience runner never executes Step 15 Gate D.
+- Step 58 had closed 4/4;
+- retained `NSingleplayerSubmenu._stack` was already the exact `NMainMenuSubmenuStack`;
+- the optional navigation-repair Push was skipped;
+- the retained real `_standardButton` was supplied;
+- cached `NCharacterSelectScreen` was present, hidden, in-tree, directly parented by the exact stack, and its own logical `_stack` was null;
+- original `OpenCharacterSelect` then threw `NullReferenceException`; rendering remained frozen.
+
+Static analysis now proves that character-select cache state is **normal game preload behavior**: `NMainMenuSubmenuStack._Ready()` pre-instantiates character select, hides it, and adds it as a child, while `NSubmenu._stack` remains null until `Push()`. It is no longer treated as an anomalous state.
+
+### 0.0.195 Step 59 purpose
+
+0.0.195 is a **forensic localization build**, not another speculative repair. Gate B records before the one-shot handler:
+
+- `NCharacterSelectScreen.IsNodeReady()` and critical `_Ready`-bound fields (`_charButtonContainer`, `_ascensionPanel`, `_actDropdown`, `_actDropdownLabel`, `_remotePlayerContainer`, `_readyAndWaitingContainer`, `_backButton`, `_unreadyButton`, `_embarkButton`, `_randomCharacterButton`);
+- `NAscensionPanel.IsNodeReady()`;
+- NGame `HotkeyManager`, `InputManager`, `RemoteCursorContainer`, `ReactionContainer`, `TimeoutOverlay`, and `RootSceneContainer`;
+- existing production SaveManager `Progress`, `Progress.Epochs`, and `Progress.EncounterStats`;
+- `RootSceneContainer.CurrentScene` identity relative to the retained real main menu;
+- current character `_lobby` state.
+
+If original `OpenCharacterSelect` throws, Step 59 checkpoints the **inner exception type, TargetSite, Source, original StackTrace**, then captures post-failure character/lobby/player state before propagating with `ExceptionDispatchInfo` so the game-side stack is not reset by `throw inner`.
+
+This should distinguish scene-readiness, ascension/hotkey, save/unlock, player-connected, `AfterInitialized`, and later `Push` failures in one device run. Steps 60–62 remain unchanged and are reachable only after Step 59 closes. Step 63, deliberate character input, confirm/embark, run start, and continuous Godot ownership remain unopened.
+
+Long-term direction remains the revised master plan: use this ladder as an engineering harness, then converge toward compatibility-transformed normal `GameStartup`/`LaunchMainMenu` ownership rather than continuing screen-by-screen orchestration.
+
+The 0.0.183 Codemagic AOT cache/sentinel experiment remains retained and independent of this runtime experiment. Earlier physical Step 39/40/41/42 and Step 45+ authorities remain as recorded; **GameStartup remains uninvoked** by this candidate. The current same-process path must **skip Step 38** before Step 39, and the convenience runner never executes Step 15 Gate D.
 
 ## Step 43.0 — concrete Null platform authority
 
@@ -148,9 +174,9 @@ Physical 0.0.191 retained the same Step-57 authority and again passed Step 58 Ga
 
 Retained evidence includes the 0.0.190 and 0.0.191 Step-58 report/checkpoint/last-checkpoint sets under `docs/history/reports/`, plus the 0.0.192 logical-stack localization and ownership-pivot history notes.
 
-## Physical Step 59 localization — 0.0.193
+## Physical Step 59 localization — 0.0.193 and 0.0.194
 
-Physical 0.0.193 closed Step 58 4/4 and reached Step 59 Gate B. Immediately before the real handler, the exact character-select cache was present, in-tree, hidden, directly parented by the retained `NMainMenuSubmenuStack`, and still logically unbound. Step 59 then armed original `OpenCharacterSelect(NButton)` exactly once and immediately received `NullReferenceException` while rendering remained frozen. The selected handler IL proves the explicit button parameter is not read and begins by dereferencing the calling `NSingleplayerSubmenu._stack`; the retained single-player submenu logical binding is therefore the state 0.0.194 must explicitly audit/restore through the game-owned stack operation. Raw report/checkpoint/last-checkpoint evidence is retained under `docs/history/reports/`.
+Physical 0.0.193 first reached the real handler and received `NullReferenceException`. 0.0.194 then tested the logical-stack/button theory directly. It closed Step 58, proved retained `NSingleplayerSubmenu._stack` was already the exact retained main-menu stack, skipped the optional Push repair, supplied the real retained `_standardButton`, and still received `NullReferenceException` immediately from original `OpenCharacterSelect`. Rendering remained frozen. This disproves both the null-button and missing-single-player-stack theories. Raw 0.0.193 and 0.0.194 report/checkpoint/last-checkpoint evidence is retained under `docs/history/reports/`.
 
 ## Step 58.0 — runtime ownership + real OpenCharacterSelect frontier audit
 
@@ -158,9 +184,9 @@ Requires Step 57 4/4/frozen. Binds exact `NSingleplayerSubmenu.OpenCharacterSele
 
 Reports: `Step58-CrashCheckpoint-<RunId>.txt`, `Step58-CharacterSelectOwnership-StaticMap-<RunId>.txt`, `Step58-LastCheckpoint.txt`, `Step58-TransformedRealStS2CharacterSelectOwnership.txt`.
 
-## Step 59.0 — one-shot game-owned submenu Push repair + real OpenCharacterSelect transition
+## Step 59.0 — forensic prerequisites + one-shot real OpenCharacterSelect transition
 
-Requires Step 58 4/4/frozen. If the exact cached `NCharacterSelectScreen` is already visible/in-tree and logically bound to the retained stack, Step 59 adopts it. Otherwise it first inspects the retained real `NSingleplayerSubmenu._stack`: a foreign non-null stack fails; an exact retained stack needs no repair; null permits one exact audited `NSubmenuStack.Push(NSubmenu)` invocation on the retained stack with the retained submenu. Push must bind `_stack` reference-identically before the real handler is allowed. Step 59 then invokes exact real `OpenCharacterSelect(NButton)` once with the retained real `_standardButton`. Success requires the exact cached screen visible/in-tree and logically bound with zero drift. No direct `_stack` write is authorized. Never retry after repair/handler transition arms.
+Requires Step 58 4/4/frozen. Before any handler mutation, Gate B captures a durable prerequisite snapshot proving character-select/ascension `IsNodeReady`, critical character-select `_Ready` fields, NGame hotkey/input/remote-cursor/reaction/timeout/root-scene services, and production SaveManager `Progress/Epochs/EncounterStats`; it also records `RootSceneContainer.CurrentScene` identity and current character `_lobby` state. The retained single-player logical stack is still checked strictly: a foreign stack fails; exact retained needs no repair; null alone permits the previously audited game-owned `NSubmenuStack.Push(NSubmenu)` repair. Then original `OpenCharacterSelect(NButton)` is invoked once with the retained real `_standardButton`. If it throws, Step 59 checkpoints the inner game exception `TargetSite`, `Source`, and original stack trace and captures post-failure lobby/player/screen state before returning failure with the inner stack preserved through `ExceptionDispatchInfo`. No direct field repair, initializer-substage reproduction, `ExecuteDeferred`, or full `GameStartup` call is authorized. Never retry after handler transition arm.
 
 Reports: `Step59-CrashCheckpoint-<RunId>.txt`, `Step59-RealOpenCharacterSelect-StaticMap-<RunId>.txt`, `Step59-LastCheckpoint.txt`, `Step59-TransformedRealStS2OpenCharacterSelectFrozen.txt`.
 
@@ -182,10 +208,10 @@ Requires Step 61 4/4/refrozen. Rechecks the same active-screen authority, then s
 
 Reports: `Step62-CrashCheckpoint-<RunId>.txt`, `Step62-CharacterSelectSustainedRender-StaticMap-<RunId>.txt`, `Step62-LastCheckpoint.txt`, `Step62-TransformedRealStS2CharacterSelectSustainedRender.txt`.
 
-## Physical sequence for 0.0.194
+## Physical sequence for 0.0.195
 
-Fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. Require Step 52 4/4/frozen. Then manually run **53 → 54 → 55 → 56 → 57**. Continue **58 → 59 → 60 → 61 → 62**, stopping immediately at the first failure.
+Fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. Require Step 52 4/4/frozen. Then manually run **53 → 54 → 55 → 56 → 57**. Continue **58 → 59** first, stopping immediately at the first failure. Only if Step 59 closes 4/4 continue **60 → 61 → 62**.
 
-Step 59 is one-shot once it arms the game-owned Push repair and/or real handler transition. Steps 61 and 62 are one-shot after render arm. If all five new rungs close 4/4, stop after Step 62 and preserve its evidence. **Step 63 has no behavior in 0.0.194.**
+Step 59 is one-shot once it arms the real handler transition; preserve the forensic checkpoint journal and final report on any failure. Steps 61 and 62 are one-shot after render arm. If all five new rungs close 4/4, stop after Step 62 and preserve its evidence. **Step 63 has no behavior in 0.0.195.**
 
-Still globally forbidden in 0.0.194: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 63+. Render rungs are Step 50, Step 52, Step 55, Step 61, and Step 62; each bounded rung synchronously refreezes before success evaluation.
+Still globally forbidden in 0.0.195: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 63+. Render rungs are Step 50, Step 52, Step 55, Step 61, and Step 62; each bounded rung synchronously refreezes before success evaluation.

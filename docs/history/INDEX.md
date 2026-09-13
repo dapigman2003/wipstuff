@@ -552,3 +552,5 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.193-FAIL-REPORT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.193-FAIL-CHECKPOINT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.193-FAIL-LAST-CHECKPOINT.txt`
+
+- 0.0.195: Step 59 forensic localization candidate; preserves original inner exception evidence and snapshots readiness/service/save/scene ownership before and after the real handler.

@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.Loader;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -10,11 +11,13 @@ namespace StS2Launcher.Core;
 /// already owns. Physical 0.0.191 proved that _characterSelectSubmenu may already be in the SceneTree before
 /// Step 58. Physical 0.0.192 proved that an in-tree cached screen may still have an unbound/null
 /// NSubmenu._stack before the actual character-select push transition. Physical 0.0.193 then reached the real
-/// OpenCharacterSelect handler and faulted because the retained NSingleplayerSubmenu itself had not been logically
-/// bound through the submenu stack. Step 58 therefore audits cache/tree/logical-stack state independently and the
-/// exact OpenCharacterSelect(NButton) handler. Step 59 conditionally restores only the missing game-owned
-/// NSubmenuStack.Push(NSingleplayerSubmenu) transition before invoking OpenCharacterSelect, and passes the real
-/// retained _standardButton rather than a synthetic/null argument. Steps 60-62 then audit the actual active screen
+/// OpenCharacterSelect handler. Physical 0.0.194 then proved the retained NSingleplayerSubmenu was already logically
+/// bound and the real _standardButton was supplied, yet the original handler still raised NullReferenceException.
+/// Static analysis additionally proved that the cached hidden/in-tree/unbound NCharacterSelectScreen is the normal
+/// NMainMenuSubmenuStack._Ready preload state. Step 59 is therefore a forensic localization boundary: it records the
+/// exact pre-handler scene/service/save/ownership prerequisites, preserves the original inner game exception stack,
+/// and records a post-failure mutation snapshot before returning failure. Steps 60-62 remain available only after a
+/// clean original-handler transition and then audit/render the actual active screen
 /// and run bounded visible render residencies. Character choice, confirm/embark, run start and Step 63 remain unopened.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
@@ -25,7 +28,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const int Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds = 30_000;
 
     private const string Step58Name = "CHARACTER SELECT RUNTIME OWNERSHIP AUDIT";
-    private const string Step59Name = "REAL OPENCHARACTERSELECT FROZEN TRANSITION";
+    private const string Step59Name = "FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION";
     private const string Step60Name = "ACTIVE CHARACTER SELECT SURFACE AUDIT";
     private const string Step61Name = "CHARACTER SELECT SHORT RENDER RESIDENCY";
     private const string Step62Name = "CHARACTER SELECT SUSTAINED RENDER RESIDENCY";
@@ -81,6 +84,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private object? _step59StandardButton;
     private bool _step59NavigationRepairRequired;
     private bool _step59NavigationRepairInvoked;
+    private string _step59PreflightSnapshot = string.Empty;
+    private string _step59FailureSnapshot = string.Empty;
     private object? _step58ObservedCharacterSelect;
     private CharacterSelectRuntimeState? _step58ObservedState;
     private bool _step58TransitionAlreadyComplete;
@@ -137,6 +142,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59StandardButton = null;
         _step59NavigationRepairRequired = false;
         _step59NavigationRepairInvoked = false;
+        _step59PreflightSnapshot = string.Empty;
+        _step59FailureSnapshot = string.Empty;
         _step58ObservedCharacterSelect = null;
         _step58ObservedState = null;
         _step58TransitionAlreadyComplete = false;
@@ -362,8 +369,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (!runtimePushParameter.IsInstanceOfType(submenu))
                 throw new InvalidDataException($"Step 59.0 retained NSingleplayerSubmenu runtime type {submenu.GetType().FullName} is not assignable to Push parameter {runtimePushParameter.FullName}.");
 
-            _step59TransitionBound = true;
             var before = CaptureCurrentCharacterSelectState(step, context);
+            _step59PreflightSnapshot = CaptureStep59ForensicSnapshot(context, step, requireReadyPrerequisites: true);
+            Checkpoint(checkpoint, "M59_B_FORENSIC_PREFLIGHT — " + SanitizeCheckpoint(_step59PreflightSnapshot));
+            _step59TransitionBound = true;
             _step59StaticMap = "StS2 Launcher — Step 59.0 game-owned submenu-stack repair + OpenCharacterSelect frozen transition\n" +
                 $"NSubmenuStack.Push token: 0x{_step59SubmenuPushToken:X8}; parameter={SubmenuManagedTypeFullName}\n" +
                 $"Single-player logical stack before repair: {(logicalStack is null ? "<null>" : logicalStack.GetType().FullName)}\n" +
@@ -372,6 +381,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"OpenCharacterSelect invocation required: {!_step58TransitionAlreadyComplete}\n" +
                 $"Real standard button type: {_step59StandardButton.GetType().FullName}\n" +
                 $"Before character-select transition: {before.State}\n" +
+                $"Forensic preflight: {_step59PreflightSnapshot}\n" +
                 "Rendering active before transition: NO\n" +
                 BuildStartupLadderInvocationFrontierAppendix(pushAudit);
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate B");
@@ -408,7 +418,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                         throw new InvalidDataException("Step 59.0 single-player logical stack became null unexpectedly after Gate B.");
                     Checkpoint(checkpoint, $"M59_C_NAVIGATION_REPAIR_ARMED — retained NSingleplayerSubmenu._stack is null because Step 54 opened the lazy submenu without pushing it; invoking exact game-owned NSubmenuStack.Push token=0x{_step59SubmenuPushToken:X8} once while rendering remains frozen.");
                     try { _step59RuntimeSubmenuPush!.Invoke(stack, new object?[] { submenu }); }
-                    catch (TargetInvocationException tie) when (tie.InnerException is not null) { throw tie.InnerException; }
+                    catch (TargetInvocationException tie) when (tie.InnerException is not null)
+                    {
+                        var inner = tie.InnerException;
+                        Checkpoint(checkpoint, $"M59_C_NAVIGATION_REPAIR_INNER_EXCEPTION — type={SanitizeCheckpoint(inner.GetType().FullName ?? inner.GetType().Name)}; targetSite={SanitizeCheckpoint(inner.TargetSite?.ToString() ?? "<null>")}; source={SanitizeCheckpoint(inner.Source ?? "<null>")}; stack={SanitizeCheckpoint(inner.StackTrace ?? "<null>")}");
+                        ExceptionDispatchInfo.Capture(inner).Throw();
+                        throw new InvalidOperationException("Unreachable after preserved Step-59 navigation-repair exception dispatch.");
+                    }
                     _step59NavigationRepairInvoked = true;
                     var logicalStackAfterRepair = submenuStackField.GetValue(submenu);
                     if (!ReferenceEquals(logicalStackAfterRepair, stack))
@@ -422,7 +438,24 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
                 Checkpoint(checkpoint, $"M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with the real retained _standardButton ({SanitizeCheckpoint(_step59StandardButton?.GetType().FullName ?? "<null>")}); rendering remains frozen.");
                 try { _step58RuntimeOpenCharacterSelect!.Invoke(submenu, new object?[] { _step59StandardButton }); }
-                catch (TargetInvocationException tie) when (tie.InnerException is not null) { throw tie.InnerException; }
+                catch (TargetInvocationException tie) when (tie.InnerException is not null)
+                {
+                    var inner = tie.InnerException;
+                    Checkpoint(checkpoint, $"M59_C_HANDLER_INNER_EXCEPTION — type={SanitizeCheckpoint(inner.GetType().FullName ?? inner.GetType().Name)}; targetSite={SanitizeCheckpoint(inner.TargetSite?.ToString() ?? "<null>")}; source={SanitizeCheckpoint(inner.Source ?? "<null>")}; stack={SanitizeCheckpoint(inner.StackTrace ?? "<null>")}");
+                    try
+                    {
+                        _step59FailureSnapshot = CaptureStep59ForensicSnapshot(context, step, requireReadyPrerequisites: false);
+                        _step59StaticMap += $"Handler inner exception: {inner.GetType().FullName}: {inner.Message}\nTargetSite: {inner.TargetSite}\nOriginal stack: {inner.StackTrace}\nPost-failure forensic snapshot: {_step59FailureSnapshot}\n";
+                        Checkpoint(checkpoint, "M59_C_FORENSIC_POSTFAIL — " + SanitizeCheckpoint(_step59FailureSnapshot));
+                    }
+                    catch (Exception snapshotEx)
+                    {
+                        _step59FailureSnapshot = $"snapshot-failed={snapshotEx.GetType().FullName}: {snapshotEx.Message}";
+                        Checkpoint(checkpoint, "M59_C_FORENSIC_POSTFAIL_SNAPSHOT_FAIL — " + SanitizeCheckpoint(_step59FailureSnapshot));
+                    }
+                    ExceptionDispatchInfo.Capture(inner).Throw();
+                    throw new InvalidOperationException("Unreachable after preserved Step-59 handler exception dispatch.");
+                }
             }
             else
             {
@@ -721,6 +754,116 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             parentType = parent?.GetType().FullName ?? "<null>";
         }
         return new CharacterSelectRuntimeState(true, inside, visible, visibleInTree, stackIsNull, stackIsExact, logicalStackType, parentIsStack, parentType);
+    }
+
+    private string CaptureStep59ForensicSnapshot(Step35ExecutionLoadContext context, int step, bool requireReadyPrerequisites)
+    {
+        var current = CaptureCurrentCharacterSelectState(step, context);
+        var screen = current.Screen ?? throw new InvalidDataException($"Step {step}.0 forensic snapshot requires the cached NCharacterSelectScreen.");
+        var screenReady = InvokeRuntimeBoolForForensics(screen, "IsNodeReady", step);
+        if (requireReadyPrerequisites && !screenReady)
+            throw new InvalidDataException($"Step {step}.0 character-select screen is inside the SceneTree but IsNodeReady() is false; InitializeSingleplayer is not authorized.");
+
+        var requiredScreenFields = new[]
+        {
+            "_charButtonContainer", "_ascensionPanel", "_actDropdown", "_actDropdownLabel",
+            "_remotePlayerContainer", "_readyAndWaitingContainer", "_backButton", "_unreadyButton",
+            "_embarkButton", "_randomCharacterButton"
+        };
+        var fieldStates = new List<string>();
+        object? ascensionPanel = null;
+        foreach (var fieldName in requiredScreenFields)
+        {
+            var field = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), fieldName, step);
+            var value = field.GetValue(screen);
+            fieldStates.Add(fieldName + "=" + (value is null ? "NULL" : value.GetType().FullName));
+            if (fieldName == "_ascensionPanel") ascensionPanel = value;
+            if (requireReadyPrerequisites && value is null)
+                throw new InvalidDataException($"Step {step}.0 character-select IsNodeReady()={screenReady} but required _Ready-bound field {fieldName} is null.");
+        }
+
+        var ascensionReady = ascensionPanel is not null && InvokeRuntimeBoolForForensics(ascensionPanel, "IsNodeReady", step);
+        if (requireReadyPrerequisites && !ascensionReady)
+            throw new InvalidDataException($"Step {step}.0 character-select _ascensionPanel exists but IsNodeReady() is false.");
+
+        var ascensionFieldStates = new List<string>();
+        if (ascensionPanel is not null)
+        {
+            var requiredAscensionFields = new[]
+            {
+                "_leftArrow", "_rightArrow", "_ascensionLevel", "_info",
+                "_leftTriggerIcon", "_rightTriggerIcon", "_iconHsv"
+            };
+            foreach (var fieldName in requiredAscensionFields)
+            {
+                var field = RequireRuntimeInstanceFieldForOwnership(ascensionPanel.GetType(), fieldName, step);
+                var value = field.GetValue(ascensionPanel);
+                ascensionFieldStates.Add(fieldName + "=" + (value is null ? "NULL" : value.GetType().FullName));
+                if (requireReadyPrerequisites && value is null)
+                    throw new InvalidDataException($"Step {step}.0 ascension panel IsNodeReady()={ascensionReady} but required _Ready-bound field {fieldName} is null.");
+            }
+        }
+
+        var nGame = _step39NGameInstance ?? throw new InvalidOperationException($"Step {step}.0 retained NGame instance is absent.");
+        var nGameProperties = new[] { "HotkeyManager", "InputManager", "RemoteCursorContainer", "ReactionContainer", "TimeoutOverlay", "RootSceneContainer" };
+        var nGameStates = new List<string>();
+        object? rootSceneContainer = null;
+        foreach (var propertyName in nGameProperties)
+        {
+            var property = nGame.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                ?? throw new MissingMemberException(nGame.GetType().FullName, propertyName);
+            var value = property.GetValue(nGame);
+            nGameStates.Add(propertyName + "=" + (value is null ? "NULL" : value.GetType().FullName));
+            if (propertyName == "RootSceneContainer") rootSceneContainer = value;
+            if (requireReadyPrerequisites && value is null)
+                throw new InvalidDataException($"Step {step}.0 required NGame.{propertyName} is null before InitializeSingleplayer.");
+        }
+
+        var saveType = screen.GetType().Assembly.GetType(SaveManagerTypeFullName, throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException(SaveManagerTypeFullName);
+        var saveManager = RequireExistingStartupLadderSaveManagerInstance(saveType, step);
+        var progress = RequireStartupLadderPropertyValue(saveManager, "Progress", step);
+        var epochs = RequireStartupLadderPropertyValue(progress, "Epochs", step);
+        var encounterStats = RequireStartupLadderPropertyValue(progress, "EncounterStats", step);
+
+        object? currentScene = null;
+        if (rootSceneContainer is not null)
+        {
+            var currentSceneProperty = rootSceneContainer.GetType().GetProperty("CurrentScene", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            currentScene = currentSceneProperty?.GetValue(rootSceneContainer);
+        }
+        var retainedMainMenu = _step48MainMenuInstance;
+        var currentSceneIdentity = currentScene is null ? "NULL" : ReferenceEquals(currentScene, retainedMainMenu) ? "exact-retained-main-menu" : currentScene.GetType().FullName ?? "<unknown>";
+
+        var lobbyField = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), "_lobby", step);
+        var lobby = lobbyField.GetValue(screen);
+        var playersCount = "n/a";
+        if (lobby is not null)
+        {
+            try
+            {
+                var players = lobby.GetType().GetProperty("Players", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(lobby);
+                var count = players?.GetType().GetProperty("Count", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(players);
+                playersCount = count?.ToString() ?? "unknown";
+            }
+            catch { playersCount = "unreadable"; }
+        }
+
+        return $"character=[{current.State}; nodeReady={screenReady}; fields={string.Join(",", fieldStates)}]; ascension=[nodeReady={ascensionReady}; fields={string.Join(",", ascensionFieldStates)}]; nGame=[{string.Join(",", nGameStates)}]; save=Progress:{progress.GetType().FullName},Epochs:{epochs.GetType().FullName},EncounterStats:{encounterStats.GetType().FullName}; rootCurrentScene={currentSceneIdentity}; lobby={(lobby is null ? "NULL" : lobby.GetType().FullName)}; lobbyPlayers={playersCount}";
+    }
+
+    private static bool InvokeRuntimeBoolForForensics(object instance, string methodName, int step)
+    {
+        var method = RequireZeroArgBoolMethod(instance.GetType(), methodName);
+        try
+        {
+            var value = method.Invoke(instance, null);
+            return value is bool result ? result : throw new InvalidDataException($"Step {step}.0 {instance.GetType().FullName}.{methodName}() did not return bool.");
+        }
+        catch (TargetInvocationException tie) when (tie.InnerException is not null)
+        {
+            throw new InvalidOperationException($"Step {step}.0 {instance.GetType().FullName}.{methodName}() inner exception: {tie.InnerException.GetType().FullName}: {tie.InnerException.Message}", tie.InnerException);
+        }
     }
 
     private static bool ReadsFirstExplicitParameter(MethodDefinition method)
