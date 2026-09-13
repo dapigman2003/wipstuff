@@ -8,11 +8,13 @@ namespace StS2Launcher.Core;
 /// <summary>
 /// Steps 58-62 pivot from decomposing character-select internals to adopting the state the real Godot game
 /// already owns. Physical 0.0.191 proved that _characterSelectSubmenu may already be in the SceneTree before
-/// Step 58. Physical 0.0.193 then proved that an in-tree cached screen may still have an unbound/null
-/// NSubmenu._stack before the actual push transition. Step 58 therefore audits cache/tree/logical-stack state
-/// independently and the exact OpenCharacterSelect(NButton)
-/// handler without requiring an artificial null/off-tree state. Step 59 invokes that original handler once
-/// only when the transition is not already visibly complete. Steps 60-62 then audit the actual active screen
+/// Step 58. Physical 0.0.192 proved that an in-tree cached screen may still have an unbound/null
+/// NSubmenu._stack before the actual character-select push transition. Physical 0.0.193 then reached the real
+/// OpenCharacterSelect handler and faulted because the retained NSingleplayerSubmenu itself had not been logically
+/// bound through the submenu stack. Step 58 therefore audits cache/tree/logical-stack state independently and the
+/// exact OpenCharacterSelect(NButton) handler. Step 59 conditionally restores only the missing game-owned
+/// NSubmenuStack.Push(NSingleplayerSubmenu) transition before invoking OpenCharacterSelect, and passes the real
+/// retained _standardButton rather than a synthetic/null argument. Steps 60-62 then audit the actual active screen
 /// and run bounded visible render residencies. Character choice, confirm/embark, run start and Step 63 remain unopened.
 /// </summary>
 public sealed partial class TransformedRealStS2VeryEarlyInitialization
@@ -31,6 +33,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string CharacterSelectScreenManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen";
     private const string SubmenuStackManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack";
     private const string MainMenuCharacterSelectSubmenuFieldName = "_characterSelectSubmenu";
+    private const string SingleplayerStandardButtonFieldNameForOwnership = "_standardButton";
+    private const string SubmenuManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu";
+    private const string SubmenuStackPushMethodNameForOwnership = "Push";
     private const string SubmenuStackFieldName = "_stack";
 
     private StartupLadderBaseline? _step58Baseline;
@@ -70,7 +75,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private bool _exactStep62ClosurePassed;
 
     private uint _step58OpenCharacterSelectToken;
+    private uint _step59SubmenuPushToken;
     private MethodInfo? _step58RuntimeOpenCharacterSelect;
+    private MethodInfo? _step59RuntimeSubmenuPush;
+    private object? _step59StandardButton;
+    private bool _step59NavigationRepairRequired;
+    private bool _step59NavigationRepairInvoked;
     private object? _step58ObservedCharacterSelect;
     private CharacterSelectRuntimeState? _step58ObservedState;
     private bool _step58TransitionAlreadyComplete;
@@ -121,7 +131,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _exactStep61ClosurePassed = false;
         _exactStep62ClosurePassed = false;
         _step58OpenCharacterSelectToken = 0;
+        _step59SubmenuPushToken = 0;
         _step58RuntimeOpenCharacterSelect = null;
+        _step59RuntimeSubmenuPush = null;
+        _step59StandardButton = null;
+        _step59NavigationRepairRequired = false;
+        _step59NavigationRepairInvoked = false;
         _step58ObservedCharacterSelect = null;
         _step58ObservedState = null;
         _step58TransitionAlreadyComplete = false;
@@ -305,19 +320,63 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         const int step = 59; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.StaticAuditOrBinding; var stage = "initialization";
         try
         {
-            ThrowIfDisposed(); var context = RequireStep59Prerequisite("Step 59 Gate B entry"); var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 Gate A must pass before Gate B.");
+            ThrowIfDisposed();
+            var context = RequireStep59Prerequisite("Step 59 Gate B entry");
+            var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 Gate A must pass before Gate B.");
             var submenu = _step54SingleplayerSubmenu ?? throw new InvalidOperationException("Step 59.0 retained NSingleplayerSubmenu is absent.");
+            var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 retained NMainMenuSubmenuStack is absent.");
+
             _step58RuntimeOpenCharacterSelect = RequireRuntimeMethodByTokenForOwnership(submenu.GetType(), _step58OpenCharacterSelectToken, SingleplayerOpenCharacterSelectMethodName, step, 1, "System.Void");
+            var openParameterType = _step58RuntimeOpenCharacterSelect.GetParameters()[0].ParameterType;
+            var standardButtonField = RequireRuntimeInstanceFieldForOwnership(submenu.GetType(), SingleplayerStandardButtonFieldNameForOwnership, step);
+            _step59StandardButton = standardButtonField.GetValue(submenu) ?? throw new InvalidDataException("Step 59.0 retained NSingleplayerSubmenu._standardButton is null.");
+            if (!openParameterType.IsInstanceOfType(_step59StandardButton))
+                throw new InvalidDataException($"Step 59.0 _standardButton runtime type {_step59StandardButton.GetType().FullName} is not assignable to OpenCharacterSelect parameter {openParameterType.FullName}.");
+
+            var submenuStackField = RequireRuntimeExactInstanceField(submenu.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
+            var logicalStack = submenuStackField.GetValue(submenu);
+            if (logicalStack is not null && !ReferenceEquals(logicalStack, stack))
+                throw new InvalidDataException($"Step 59.0 retained NSingleplayerSubmenu is bound to a foreign logical stack: {logicalStack.GetType().FullName}.");
+            _step59NavigationRepairRequired = logicalStack is null && !_step58TransitionAlreadyComplete;
+
+            using var resolver = new RejectingAssemblyResolver();
+            using var module = OpenStartupLadderModule(baseline.SelectedPath, resolver);
+            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
+            var allMethods = BuildStartupLadderMethodMap(allTypes);
+            var stackType = RequireStartupLadderType(allTypes, SubmenuStackManagedTypeFullName, step);
+            var pushCandidates = stackType.Methods.Where(method => method.Name == SubmenuStackPushMethodNameForOwnership && !method.IsStatic && !method.HasGenericParameters).ToArray();
+            var push = pushCandidates.SingleOrDefault(method =>
+                method.ReturnType.FullName == "System.Void" &&
+                method.Parameters.Count == 1 &&
+                method.Parameters[0].ParameterType.FullName == SubmenuManagedTypeFullName)
+                ?? throw new MissingMethodException(SubmenuStackManagedTypeFullName, $"{SubmenuStackPushMethodNameForOwnership}({SubmenuManagedTypeFullName})");
+            _step59SubmenuPushToken = push.MetadataToken.ToUInt32();
+            var pushAudit = AuditStartupLadderInvocationFrontier([push], allTypes, allMethods,
+                _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 59.0 requires retained Step-48 runtime guards."));
+            RequireImmediateFrontierAdmissible(pushAudit, "Step 59.0 exact NSubmenuStack.Push navigation repair");
+            if (resolver.Requests.Count != 0)
+                throw new InvalidDataException("Step 59.0 NSubmenuStack.Push audit attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+
+            _step59RuntimeSubmenuPush = RequireRuntimeMethodByTokenForOwnership(stack.GetType(), _step59SubmenuPushToken, SubmenuStackPushMethodNameForOwnership, step, 1, "System.Void");
+            var runtimePushParameter = _step59RuntimeSubmenuPush.GetParameters()[0].ParameterType;
+            if (!runtimePushParameter.IsInstanceOfType(submenu))
+                throw new InvalidDataException($"Step 59.0 retained NSingleplayerSubmenu runtime type {submenu.GetType().FullName} is not assignable to Push parameter {runtimePushParameter.FullName}.");
+
             _step59TransitionBound = true;
             var before = CaptureCurrentCharacterSelectState(step, context);
-            _step59StaticMap = "StS2 Launcher — Step 59.0 real OpenCharacterSelect frozen transition\n" +
-                $"Handler token: 0x{_step58OpenCharacterSelectToken:X8}\n" +
-                $"Handler invocation required: {!_step58TransitionAlreadyComplete}\n" +
-                $"Before transition: {before.State}\n" +
-                "Rendering active before transition: NO\n";
+            _step59StaticMap = "StS2 Launcher — Step 59.0 game-owned submenu-stack repair + OpenCharacterSelect frozen transition\n" +
+                $"NSubmenuStack.Push token: 0x{_step59SubmenuPushToken:X8}; parameter={SubmenuManagedTypeFullName}\n" +
+                $"Single-player logical stack before repair: {(logicalStack is null ? "<null>" : logicalStack.GetType().FullName)}\n" +
+                $"Navigation repair required: {_step59NavigationRepairRequired}\n" +
+                $"OpenCharacterSelect token: 0x{_step58OpenCharacterSelectToken:X8}\n" +
+                $"OpenCharacterSelect invocation required: {!_step58TransitionAlreadyComplete}\n" +
+                $"Real standard button type: {_step59StandardButton.GetType().FullName}\n" +
+                $"Before character-select transition: {before.State}\n" +
+                "Rendering active before transition: NO\n" +
+                BuildStartupLadderInvocationFrontierAppendix(pushAudit);
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate B");
-            Checkpoint(checkpoint, $"M59_B_PASS — exact runtime OpenCharacterSelect rebound; invocationRequired={!_step58TransitionAlreadyComplete}; beforeState={SanitizeCheckpoint(before.State.ToString())}.");
-            return StartupLadderPass(step, Step59Name, gate, "Exact real handler is bound. If the transition is already visibly complete it will be skipped; otherwise only this one game-owned handler call is authorized.");
+            Checkpoint(checkpoint, $"M59_B_PASS — exact OpenCharacterSelect and NSubmenuStack.Push rebound; invocationRequired={!_step58TransitionAlreadyComplete}; navigationRepairRequired={_step59NavigationRepairRequired}; singleplayerLogicalStack={(logicalStack is null ? "<null>" : "exact-retained")}; pushToken=0x{_step59SubmenuPushToken:X8}; realStandardButton={SanitizeCheckpoint(_step59StandardButton.GetType().FullName ?? "<unknown>")}; beforeState={SanitizeCheckpoint(before.State.ToString())}.");
+            return StartupLadderPass(step, Step59Name, gate, "Exact game-owned stack Push and character-select handler are bound. A missing single-player logical stack is repaired only through NSubmenuStack.Push before the real OpenCharacterSelect handler runs.");
         }
         catch (Exception ex) { Checkpoint(checkpoint, $"M59_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
     }
@@ -327,19 +386,47 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         const int step = 59; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.ControlledAction; var stage = "initialization";
         try
         {
-            ThrowIfDisposed(); var context = RequireStep59Prerequisite("Step 59 Gate C entry"); var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 baseline absent.");
-            if (!_step59TransitionBound) throw new InvalidOperationException("Step 59.0 exact handler must be rebound before Gate C.");
+            ThrowIfDisposed();
+            var context = RequireStep59Prerequisite("Step 59 Gate C entry");
+            var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 baseline absent.");
+            if (!_step59TransitionBound) throw new InvalidOperationException("Step 59.0 exact handlers must be rebound before Gate C.");
             if (!_step58TransitionAlreadyComplete)
             {
-                if (_step59TransitionStarted) throw new InvalidOperationException("Step 59.0 real handler transition is one-shot in-process.");
+                if (_step59TransitionStarted) throw new InvalidOperationException("Step 59.0 game-owned stack repair + character-select transition is one-shot in-process.");
                 _step59TransitionStarted = true;
-                Checkpoint(checkpoint, "M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with null NButton; selected IL proved the parameter unused; rendering remains frozen.");
-                try { _step58RuntimeOpenCharacterSelect!.Invoke(_step54SingleplayerSubmenu, new object?[] { null }); }
+
+                var submenu = _step54SingleplayerSubmenu ?? throw new InvalidOperationException("Step 59.0 retained NSingleplayerSubmenu is absent.");
+                var stack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 retained NMainMenuSubmenuStack is absent.");
+                var submenuStackField = RequireRuntimeExactInstanceField(submenu.GetType(), SubmenuStackFieldName, SubmenuStackManagedTypeFullName, step);
+                var logicalStackBefore = submenuStackField.GetValue(submenu);
+                if (logicalStackBefore is not null && !ReferenceEquals(logicalStackBefore, stack))
+                    throw new InvalidDataException($"Step 59.0 retained NSingleplayerSubmenu acquired a foreign logical stack before Gate C: {logicalStackBefore.GetType().FullName}.");
+
+                if (logicalStackBefore is null)
+                {
+                    if (!_step59NavigationRepairRequired)
+                        throw new InvalidDataException("Step 59.0 single-player logical stack became null unexpectedly after Gate B.");
+                    Checkpoint(checkpoint, $"M59_C_NAVIGATION_REPAIR_ARMED — retained NSingleplayerSubmenu._stack is null because Step 54 opened the lazy submenu without pushing it; invoking exact game-owned NSubmenuStack.Push token=0x{_step59SubmenuPushToken:X8} once while rendering remains frozen.");
+                    try { _step59RuntimeSubmenuPush!.Invoke(stack, new object?[] { submenu }); }
+                    catch (TargetInvocationException tie) when (tie.InnerException is not null) { throw tie.InnerException; }
+                    _step59NavigationRepairInvoked = true;
+                    var logicalStackAfterRepair = submenuStackField.GetValue(submenu);
+                    if (!ReferenceEquals(logicalStackAfterRepair, stack))
+                        throw new InvalidDataException($"Step 59.0 exact NSubmenuStack.Push returned without binding NSingleplayerSubmenu._stack to the exact retained stack; observed={logicalStackAfterRepair?.GetType().FullName ?? "<null>"}.");
+                    Checkpoint(checkpoint, "M59_C_NAVIGATION_REPAIR_PASS — exact game-owned NSubmenuStack.Push returned; retained NSingleplayerSubmenu._stack is now the exact retained NMainMenuSubmenuStack; renderingStopped=True.");
+                }
+                else
+                {
+                    Checkpoint(checkpoint, "M59_C_NAVIGATION_REPAIR_SKIPPED — retained NSingleplayerSubmenu is already logically bound to the exact main-menu submenu stack.");
+                }
+
+                Checkpoint(checkpoint, $"M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with the real retained _standardButton ({SanitizeCheckpoint(_step59StandardButton?.GetType().FullName ?? "<null>")}); rendering remains frozen.");
+                try { _step58RuntimeOpenCharacterSelect!.Invoke(submenu, new object?[] { _step59StandardButton }); }
                 catch (TargetInvocationException tie) when (tie.InnerException is not null) { throw tie.InnerException; }
             }
             else
             {
-                Checkpoint(checkpoint, "M59_C_HANDLER_SKIPPED — character select was already visible/in-tree at Step 58; adopting the game-owned state without duplicate handler invocation.");
+                Checkpoint(checkpoint, "M59_C_HANDLER_SKIPPED — character select was already visible/in-tree and logically bound at Step 58; adopting the game-owned state without duplicate stack repair or handler invocation.");
             }
 
             var current = CaptureCurrentCharacterSelectState(step, context);
@@ -349,12 +436,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (!current.State.StackIsExactRetainedStack)
                 throw new InvalidDataException($"Step 59.0 character-select screen is visible/in-tree but NSubmenu._stack is not the exact retained submenu stack; observed={current.State}.");
             _step59CharacterSelectScreen = screen;
-            _step59StaticMap += $"Handler invoked: {!_step58TransitionAlreadyComplete}\nAfter transition: {current.State}\n";
+            _step59StaticMap += $"NSubmenuStack.Push navigation repair invoked: {_step59NavigationRepairInvoked}\nOpenCharacterSelect invoked: {!_step58TransitionAlreadyComplete}\nAfter transition: {current.State}\n";
             _step59PostTransitionBaseline = CaptureStartupLadderBaseline(baseline.SelectedPath, baseline.SelectedSha256, context);
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate C");
             _step59TransitionPassed = true;
-            Checkpoint(checkpoint, $"M59_C_PASS — game-owned character-select transition complete; handlerInvoked={!_step58TransitionAlreadyComplete}; insideTree=True; visible=True; visibleInTree=True; logicalStackExactRetained=True; renderingStopped=True; drift=0.");
-            return StartupLadderPass(step, Step59Name, gate, _step58TransitionAlreadyComplete ? "Existing game-owned visible character-select state adopted without duplicate handler invocation." : "Original OpenCharacterSelect handler executed once while frozen and produced the expected visible/in-tree game-owned screen.");
+            Checkpoint(checkpoint, $"M59_C_PASS — game-owned character-select transition complete; navigationRepairInvoked={_step59NavigationRepairInvoked}; handlerInvoked={!_step58TransitionAlreadyComplete}; insideTree=True; visible=True; visibleInTree=True; logicalStackExactRetained=True; renderingStopped=True; drift=0.");
+            return StartupLadderPass(step, Step59Name, gate, _step58TransitionAlreadyComplete ? "Existing game-owned visible character-select state adopted without duplicate handler invocation." : "The missing game-owned submenu-stack Push was restored if needed, then original OpenCharacterSelect executed once with the real retained standard button and produced the expected visible/in-tree game-owned screen.");
         }
         catch (Exception ex) { Checkpoint(checkpoint, $"M59_C_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
     }
@@ -643,6 +730,18 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             if (instruction.OpCode.Code == Code.Ldarg_1 || instruction.OpCode.Code == Code.Ldarga_S && instruction.Operand is ParameterDefinition p1 && p1.Index == 0 || instruction.OpCode.Code == Code.Ldarg_S && instruction.Operand is ParameterDefinition p2 && p2.Index == 0 || instruction.OpCode.Code == Code.Ldarg && instruction.Operand is ParameterDefinition p3 && p3.Index == 0 || instruction.OpCode.Code == Code.Ldarga && instruction.Operand is ParameterDefinition p4 && p4.Index == 0) return true;
         }
         return false;
+    }
+
+    private static FieldInfo RequireRuntimeInstanceFieldForOwnership(Type runtimeType, string fieldName, int step)
+    {
+        FieldInfo? field = null;
+        for (var type = runtimeType; type is not null && field is null; type = type.BaseType)
+            field = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+        if (field is null)
+            throw new MissingFieldException(runtimeType.FullName, fieldName);
+        if (field.IsStatic)
+            throw new InvalidDataException($"Step {step}.0 field {runtimeType.FullName}.{fieldName} unexpectedly became static.");
+        return field;
     }
 
     private static MethodInfo RequireRuntimeMethodByTokenForOwnership(Type runtimeType, uint token, string methodName, int step, int parameterCount, string returnTypeFullName)

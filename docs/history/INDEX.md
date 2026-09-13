@@ -547,3 +547,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-58.0-PHYSICAL-0.0.192-FAIL-CHECKPOINT.txt` — durable checkpoint for the same safe stop.
 - `reports/STEP-58.0-PHYSICAL-0.0.192-FAIL-LAST-CHECKPOINT.txt` — last durable checkpoint.
 - `steps/STEP-58.0-LOGICAL-STACK-BINDING-CORRECTION-0.0.193.md` — separates SceneTree attachment from logical submenu-stack binding; null pre-push `_stack` is admissible, foreign non-null stack remains rejected.
+
+- `steps/STEP-59.0-SUBMENU-PUSH-BINDING-CORRECTION-0.0.194.md` — physical 0.0.193 Step-59 real-handler NRE localization and 0.0.194 exact game-owned `NSubmenuStack.Push` logical-binding correction.
+- `reports/STEP-59.0-PHYSICAL-0.0.193-FAIL-REPORT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.193-FAIL-CHECKPOINT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.193-FAIL-LAST-CHECKPOINT.txt`

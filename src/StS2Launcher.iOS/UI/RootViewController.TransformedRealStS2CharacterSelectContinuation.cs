@@ -23,7 +23,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Requires the physically proven Step 57 extension in the same fresh process. This candidate no longer predicts that character select must be null or off-tree. Step 58 adopts/audits the state the real game already owns. Step 59 invokes the original OpenCharacterSelect(NButton) only if the transition is not already visibly complete; the selected IL proves the NButton argument is unused. Step 60 audits the actual active screen. Steps 61 and 62 render the real UI for 2 seconds and 10 seconds respectively, synchronously refreezing after each. Observation only: do not intentionally interact during these residencies. Step 63/continuous interactive ownership remains unopened.",
+            "Requires the physically proven Step 57 extension in the same fresh process. Step 58 adopts/audits the state the real game already owns. Physical 0.0.193 proved the earlier direct single-player-open shortcut can leave the retained NSingleplayerSubmenu logical stack null. Step 59 therefore restores only that missing navigation state through exact audited game-owned NSubmenuStack.Push when needed, verifies exact binding, then invokes original OpenCharacterSelect with the retained real _standardButton. Step 60 audits the actual active screen. Steps 61 and 62 render the real UI for 2 seconds and 10 seconds respectively, synchronously refreezing after each. Observation only: do not intentionally interact during these residencies. Step 63/continuous interactive ownership remains unopened.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -33,9 +33,9 @@ public sealed partial class RootViewController
         _step58Button.TouchUpInside += async (_, _) => await RunStep58StartupLadderAsync();
 
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
-            "Step 59.0 — let the real OpenCharacterSelect handler own the frozen transition",
+            "Step 59.0 — restore game-owned submenu Push if needed, then real OpenCharacterSelect",
             "Run Step 59.0 A–D — REAL HANDLER", "REAL OPENCHARACTERSELECT FROZEN TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4. If character select is already visible/in-tree, adopts it and skips duplicate invocation. Otherwise invokes the original exact OpenCharacterSelect(NButton) once with null for the proven-unused NButton parameter while rendering remains frozen. Success requires the exact cached screen to be visible/in-tree under the retained submenu stack with zero drift.");
+            "Requires Step 58.0 4/4. If character select is already visible/in-tree and logically bound, adopts it and skips duplicate work. Otherwise Step 59 first inspects the retained NSingleplayerSubmenu logical stack. A foreign stack fails; a null stack permits one exact audited game-owned NSubmenuStack.Push on the retained stack, after which exact binding is mandatory. It then invokes original OpenCharacterSelect(NButton) once with the retained real _standardButton while rendering remains frozen. Success requires the exact cached screen visible/in-tree and logically bound to the retained stack with zero drift.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,
@@ -101,7 +101,7 @@ public sealed partial class RootViewController
         BeginSteamOperation(allowCancel: false); _step59Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START — Step 59.0 game-owned OpenCharacterSelect transition started. Handler is skipped if Step 58 already observed visible/in-tree completion.");
+            WriteStartupLadderCheckpoint(step, "RUN_START — Step 59.0 game-owned navigation repair + OpenCharacterSelect transition started. If needed, exact NSubmenuStack.Push restores the retained single-player submenu logical binding before the real handler runs.");
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (_transformedRealStS2VeryEarlyInitialization.Step59HandlerInvocationRequired) { _step59TransitionUiStarted = true; button.Enabled = false; }
@@ -109,8 +109,8 @@ public sealed partial class RootViewController
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59 transition map write failed: " + mapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten(); WriteStartupLadderCheckpoint(step, "M59_C_STATIC_MAP_WRITE_RETURNED — actual game-owned transition evidence durably written; rendering remains stopped.");
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59FrozenPostTransitionConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            CompleteStartupLadderStep(step, _step59Gates, resultLabel, detailLabel, "REAL CHARACTER-SELECT TRANSITION CLOSED 4/4. The real screen is visible/in-tree; Step 60 active-surface audit is unlocked."); button.Enabled = false;
-            WriteStartupLadderCheckpoint(step, "RUN_STEP59_4OF4 — game-owned character-select transition/adoption closed; Step 60 actual active-screen audit unlocked.");
+            CompleteStartupLadderStep(step, _step59Gates, resultLabel, detailLabel, "GAME-OWNED SUBMENU + CHARACTER-SELECT TRANSITION CLOSED 4/4. The real screen is visible/in-tree and logically bound; Step 60 active-surface audit is unlocked."); button.Enabled = false;
+            WriteStartupLadderCheckpoint(step, "RUN_STEP59_4OF4 — game-owned submenu-stack binding and character-select transition/adoption closed; Step 60 actual active-screen audit unlocked.");
         }
         catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step59TransitionUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted); }
         finally { await FinishStartupLadderStepAsync(step, "Step59-TransformedRealStS2OpenCharacterSelectFrozen.txt", "StS2 Launcher — Step 59.0 Real OpenCharacterSelect Frozen Transition", resultLabel, detailLabel, "Step 59 leaves rendering frozen. If the real handler was armed, never retry Step 59 in-process."); }

@@ -42,7 +42,7 @@ Physical 0.0.188 Step 57 retained-hint localization evidence is retained as `STE
 
 Physical 0.0.190 proved Step 58 may see a non-null game-owned character-select cache. Physical 0.0.191 then proved that exact cached `NCharacterSelectScreen` may already be **inside the live SceneTree** before Step 58 performs any new operation. Both runs ended frozen and Step 58 itself created nothing. 0.0.193 therefore adopts real runtime ownership instead of requiring launcher-controlled off-tree lifecycle milestones.
 
-Physical 0.0.192 then localized one remaining ownership assumption: the cached in-tree screen can still have `NSubmenu._stack` unbound before the real push transition. 0.0.193 therefore separates SceneTree attachment from logical stack binding; null is allowed pre-push, while any foreign non-null stack remains a hard failure.
+Physical 0.0.192 localized that SceneTree attachment can precede logical stack binding. Physical 0.0.193 then closed Step 58 and reached Step 59 with the cached screen hidden/in-tree/unbound; the original handler faulted immediately after arm. 0.0.194 records this as a missing single-player submenu navigation binding and conditionally repairs it only through exact audited game-owned `NSubmenuStack.Push(NSubmenu)` before original `OpenCharacterSelect` runs.
 
 Each rung has a distinct report/static-map/checkpoint surface:
 
@@ -52,6 +52,6 @@ Each rung has a distinct report/static-map/checkpoint surface:
 - Step 61: `Step61-CharacterSelectShortRender-StaticMap-<RunId>.txt`, `Step61-TransformedRealStS2CharacterSelectShortRender.txt`.
 - Step 62: `Step62-CharacterSelectSustainedRender-StaticMap-<RunId>.txt`, `Step62-TransformedRealStS2CharacterSelectSustainedRender.txt`.
 
-Step 58 is observation/audit only. Step 59 skips duplicate handler invocation when the exact screen is already visible/in-tree; otherwise its handler path is one-shot. Step 60 is audit only. Steps 61/62 must write their static evidence before `StartRendering`; `StopRendering()` must precede all post-stop telemetry. Step 61 targets 2 seconds with a 10-second evidence ceiling. Step 62 targets 10 seconds with a 30-second evidence ceiling. Neither render rung authorizes intentional interaction.
+Step 58 is observation/audit only. Step 59 skips work when the exact screen is already visibly/logically complete; otherwise its one-shot path may first invoke exact audited `NSubmenuStack.Push(NSubmenu)` to bind a null retained single-player submenu stack, verifies exact binding, then invokes original `OpenCharacterSelect` with the real retained `_standardButton`. Step 60 is audit only. Steps 61/62 must write their static evidence before `StartRendering`; `StopRendering()` must precede all post-stop telemetry. Step 61 targets 2 seconds with a 10-second evidence ceiling. Step 62 targets 10 seconds with a 30-second evidence ceiling. Neither render rung authorizes intentional interaction.
 
-Physical 0.0.190 and 0.0.191 Step-58 failure artifacts are retained in `docs/history/reports/` as the provenance for this ownership pivot. Step 63 remains unopened.
+Physical 0.0.190–0.0.192 Step-58 artifacts plus the physical 0.0.193 Step-59 report/checkpoint/last-checkpoint are retained in `docs/history/reports/` as provenance for the ownership pivot and exact Push-binding correction. Step 63 remains unopened.
