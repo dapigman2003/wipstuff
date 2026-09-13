@@ -1,6 +1,6 @@
-# Testing — Steps 58–62 forensic character-select localization / visible-render trial / 0.0.195
+# Testing — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.196
 
-Active candidate: `0.0.195 (195)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.196 (196)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -18,7 +18,7 @@ Continue, stopping immediately on the first failure:
 
 Never retry Step **59** after its navigation-repair/handler transition is armed, or Steps **61/62** after their render boundary is armed. Step 58/60 keep rendering frozen. Steps 61/62 must call `StopRendering()` before post-stop telemetry/file I/O.
 
-The original real `OpenCharacterSelect(NButton)` handler is permitted **only in Step 59 and only when the observed screen is not already visibly/logically complete**. 0.0.195 is diagnostic: it must not add character-select field repair or manually invoke `InitializeSingleplayer` substages. A null retained single-player logical stack may still be repaired only through the exact audited game-owned `NSubmenuStack.Push(NSubmenu)` path; direct `_stack` writes are forbidden. The reflection boundary must preserve/log the original inner exception stack rather than `throw inner`. No character choice, confirm, embark, run-start, or Step 63 behavior is authorized.
+The original real `OpenCharacterSelect(NButton)` handler is permitted **only in Step 59 and only when the observed screen is not already visibly/logically complete**. 0.0.196 is diagnostic: it must not add character-select field repair or manually invoke `InitializeSingleplayer` substages. A null retained single-player logical stack may still be repaired only through the exact audited game-owned `NSubmenuStack.Push(NSubmenu)` path; direct `_stack` writes are forbidden. The reflection boundary must preserve/log the original inner exception stack rather than `throw inner`. No character choice, confirm, embark, run-start, or Step 63 behavior is authorized.
 
 ## Expected evidence surfaces
 
@@ -27,3 +27,13 @@ Every rung writes `StepNN-CrashCheckpoint-<RunId>.txt`, a distinct `StepNN-...-S
 ## Codemagic performance telemetry
 
 The 0.0.183 AOT cache/sentinel telemetry remains unchanged and independent of this runtime experiment.
+
+
+## 0.0.196 Step-59 expected evidence
+
+Gate B should now write `Step59-RealOpenCharacterSelect-StaticMap-<RunId>.txt` even when the ready-binding
+prerequisites are unhealthy. Preserve `M59_B_FORENSIC_PREFLIGHT`, `M59_B_READY_BINDING_DIAGNOSIS`,
+`M59_B_STATIC_MAP_WRITE_RETURNED`, and, when blocked, `M59_C_BLOCKED_READY_BINDING`.
+
+A blocked Gate C in 0.0.196 is **not** a one-shot arm: `Step59TransitionStarted` must remain false and neither
+`NSubmenuStack.Push` nor `OpenCharacterSelect` may be invoked. Do not proceed to Step 60 unless Step 59 closes 4/4.

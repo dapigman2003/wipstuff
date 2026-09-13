@@ -1,6 +1,6 @@
-# Release checklist — Steps 58–62 forensic character-select localization / visible-render trial / 0.0.195
+# Release checklist — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.196
 
-Release identity: display/build `0.0.195 (195)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.196 (196)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190–0.0.192 Step-58 localization evidence and physical 0.0.193 Step-59 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -14,4 +14,15 @@ Require the new block to preserve exact sequencing and authority:
 
 Step 59 is one-shot once its navigation repair and/or handler transition arms. Steps 61/62 are always one-shot after render arm. Character choice/confirm/embark/run-start, whole `GameStartup`/original `LaunchMainMenu`, cloud/migration/platform/Steam/deferred startup, native game extensions, trusted-install mutation, and Step 63+ remain unopened.
 
-Require exact 0.0.195 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
+Require exact 0.0.196 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
+
+
+## 0.0.196 forensic-ready requirements
+
+- Preserve the physical 0.0.195 Step-59 failure evidence in history.
+- Selected `_Ready` IL must prove `_charButtonContainer` store precedes `%AscensionPanel`, which precedes
+  `_ascensionPanel` store.
+- Step 59 must collect live ascension-like node type/load-context/owner/UniqueNameInOwner evidence.
+- Step 59 must read both character-select and ascension-panel TSCN bytes only from the receipt-backed sealed PCK.
+- An unhealthy ready binding must block Gate C before `_step59TransitionStarted` is set.
+- No direct `_ascensionPanel` write and no explicit/manual `_Ready()` invocation is permitted.

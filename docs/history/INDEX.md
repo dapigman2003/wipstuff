@@ -554,3 +554,8 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.193-FAIL-LAST-CHECKPOINT.txt`
 
 - 0.0.195: Step 59 forensic localization candidate; preserves original inner exception evidence and snapshots readiness/service/save/scene ownership before and after the real handler.
+
+- `steps/STEP-59.2-ASCENSION-READY-BINDING-FORENSICS-0.0.196.md` — physical 0.0.195 localized the current blocker to `NCharacterSelectScreen._Ready()` failing to bind `%AscensionPanel`; 0.0.196 adds selected-IL/live-node/TSCN forensics and blocks before handler arm.
+- `reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-REPORT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-CHECKPOINT.txt`
+- `reports/STEP-59.0-PHYSICAL-0.0.195-FAIL-LAST-CHECKPOINT.txt`

@@ -1,12 +1,23 @@
-## Current frontier — Steps 58–62 / 0.0.195
+## Current frontier — Steps 58–62 / 0.0.196
 
-**Active candidate — 0.0.195 forensic character-select localization.** Physical runtime authority remains formally closed through Step 57 4/4/frozen. Physical 0.0.194 disproved the remaining null-button and missing-single-player-stack theories: immediately before original `OpenCharacterSelect(NButton)`, the retained `NSingleplayerSubmenu._stack` was already the exact retained `NMainMenuSubmenuStack`, the real retained `_standardButton` was supplied, and the game still raised `NullReferenceException` while rendering remained frozen.
+**Active candidate — 0.0.196 ascension ready-binding forensics.** Physical authority remains formally closed through
+Step 57 4/4/frozen. Physical 0.0.195 stopped safely in Step 59 Gate B before any handler arm and proved a concrete
+scene-lifecycle break: the cached real `NCharacterSelectScreen` reports `IsNodeReady()==true`, its earlier
+`_charButtonContainer` ready binding is populated, but `_ascensionPanel` is null.
 
-Static review of trusted `sts2.dll` now proves that the cached `NCharacterSelectScreen` being hidden, already in-tree, parented to `NMainMenuSubmenuStack`, and still logically unbound (`NSubmenu._stack == null`) is the **normal game preload state** created by `NMainMenuSubmenuStack._Ready()`. 0.0.195 therefore stops treating that state as anomalous and does not add another speculative repair.
+Trusted game IL now proves `_ascensionPanel` is not an exported scene field; `NCharacterSelectScreen._Ready()` assigns
+it immediately after `_charButtonContainer` by resolving `GetNode<NAscensionPanel>("%AscensionPanel")`. The next
+question is therefore no longer "which InitializeSingleplayer dependency is null?" but **why the normal managed
+character-select Ready callback cannot bind the scene's AscensionPanel node on this host**.
 
-Step 59 is now a forensic boundary. Before the one-shot real handler invocation it records character-screen and nested ascension-panel `IsNodeReady()` state, critical `_Ready`-bound fields, NGame service-node properties, existing `SaveManager.Progress` / `Progress.Epochs` / `Progress.EncounterStats`, and `RootSceneContainer.CurrentScene` ownership. If the handler throws, it **preserves/logs the inner game TargetSite/original stack** and captures a post-failure lobby/player/screen snapshot before propagating the same exception with `ExceptionDispatchInfo`. Steps 60–62 remain reachable only after the original handler closes cleanly. Character choice, confirm/embark, run start, continuous interactive ownership, and Step 63 remain unopened.
+0.0.196 does not repair that field. It compares the selected `_Ready()` IL with the live descendant/type/load-context/
+owner/`UniqueNameInOwner` graph and the exact receipt-backed `character_select_screen.tscn` +
+`ascension_panel.tscn` declarations. The map is durable before Gate C. An unhealthy binding blocks Gate C before
+`NSubmenuStack.Push` or `OpenCharacterSelect` can arm.
 
-The fresh-process Physically Closed Path remains capped at Step 52. Reconstruct Steps 53–58 from the same fresh process before Step 59, stop on first failure, and never retry Step 59 in-process after its one-shot transition boundary arms.
+This directly serves the long-term architecture in this plan: if the node is missing, wrong-type/foreign-context, or
+has broken unique-name ownership, we repair the underlying Godot/script/scene ownership boundary rather than growing
+a launcher-maintained copy of game state.
 
 ## Strategic architecture revision — startup convergence
 

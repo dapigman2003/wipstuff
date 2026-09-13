@@ -14,9 +14,12 @@ namespace StS2Launcher.Core;
 /// OpenCharacterSelect handler. Physical 0.0.194 then proved the retained NSingleplayerSubmenu was already logically
 /// bound and the real _standardButton was supplied, yet the original handler still raised NullReferenceException.
 /// Static analysis additionally proved that the cached hidden/in-tree/unbound NCharacterSelectScreen is the normal
-/// NMainMenuSubmenuStack._Ready preload state. Step 59 is therefore a forensic localization boundary: it records the
-/// exact pre-handler scene/service/save/ownership prerequisites, preserves the original inner game exception stack,
-/// and records a post-failure mutation snapshot before returning failure. Steps 60-62 remain available only after a
+/// NMainMenuSubmenuStack._Ready preload state. Physical 0.0.195 then localized the first concrete broken prerequisite:
+/// NCharacterSelectScreen.IsNodeReady() was true, _charButtonContainer was already populated, but _ascensionPanel was
+/// null. Trusted sts2.dll IL proves _Ready assigns _charButtonContainer immediately before resolving
+/// GetNode<NAscensionPanel>("%AscensionPanel") into _ascensionPanel. Step 59 therefore localizes that exact scene-ready
+/// binding boundary before any real handler arm by comparing selected _Ready IL, the live descendant/type/owner graph,
+/// and receipt-backed character-select/ascension-panel TSCN declarations. Steps 60-62 remain available only after a
 /// clean original-handler transition and then audit/render the actual active screen
 /// and run bounded visible render residencies. Character choice, confirm/embark, run start and Step 63 remain unopened.
 /// </summary>
@@ -28,7 +31,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public const int Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds = 30_000;
 
     private const string Step58Name = "CHARACTER SELECT RUNTIME OWNERSHIP AUDIT";
-    private const string Step59Name = "FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION";
+    private const string Step59Name = "CHARACTER SELECT READY-BINDING FORENSICS + REAL TRANSITION";
     private const string Step60Name = "ACTIVE CHARACTER SELECT SURFACE AUDIT";
     private const string Step61Name = "CHARACTER SELECT SHORT RENDER RESIDENCY";
     private const string Step62Name = "CHARACTER SELECT SUSTAINED RENDER RESIDENCY";
@@ -40,6 +43,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string SubmenuManagedTypeFullName = "MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu";
     private const string SubmenuStackPushMethodNameForOwnership = "Push";
     private const string SubmenuStackFieldName = "_stack";
+    private const string AscensionPanelManagedTypeFullNameForForensics = "MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel";
+    private const string AscensionPanelResourcePathForForensics = "res://scenes/screens/ascension_panel.tscn";
 
     private StartupLadderBaseline? _step58Baseline;
     private StartupLadderBaseline? _step59Baseline;
@@ -86,6 +91,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private bool _step59NavigationRepairInvoked;
     private string _step59PreflightSnapshot = string.Empty;
     private string _step59FailureSnapshot = string.Empty;
+    private string _step59ReadyBindingDiagnostics = string.Empty;
+    private string _step59ReadyBindingBlocker = string.Empty;
+    private bool _step59ReadyBindingPreflightPassed;
     private object? _step58ObservedCharacterSelect;
     private CharacterSelectRuntimeState? _step58ObservedState;
     private bool _step58TransitionAlreadyComplete;
@@ -98,6 +106,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public bool ExactStep62ClosurePassed => _exactStep62ClosurePassed;
     public bool Step59TransitionStarted => _step59TransitionStarted;
     public bool Step59HandlerInvocationRequired => !_step58TransitionAlreadyComplete;
+    public bool Step59ReadyBindingPreflightPassed => _step59ReadyBindingPreflightPassed;
     public bool Step61PulseStarted => _step61PulseStarted;
     public bool Step62PulseStarted => _step62PulseStarted;
 
@@ -144,6 +153,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59NavigationRepairInvoked = false;
         _step59PreflightSnapshot = string.Empty;
         _step59FailureSnapshot = string.Empty;
+        _step59ReadyBindingDiagnostics = string.Empty;
+        _step59ReadyBindingBlocker = string.Empty;
+        _step59ReadyBindingPreflightPassed = false;
         _step58ObservedCharacterSelect = null;
         _step58ObservedState = null;
         _step58TransitionAlreadyComplete = false;
@@ -168,7 +180,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
     public void MarkStep59StaticMapDurablyWritten()
     {
-        if (!_step59TransitionPassed || string.IsNullOrWhiteSpace(_step59StaticMap)) throw new InvalidOperationException("Step 59.0 transition map is incomplete.");
+        if (!_step59TransitionBound || string.IsNullOrWhiteSpace(_step59StaticMap)) throw new InvalidOperationException("Step 59.0 forensic/binding map is incomplete.");
         _step59StaticMapDurablyWritten = true;
     }
     public void MarkStep60StaticMapDurablyWritten()
@@ -370,10 +382,23 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new InvalidDataException($"Step 59.0 retained NSingleplayerSubmenu runtime type {submenu.GetType().FullName} is not assignable to Push parameter {runtimePushParameter.FullName}.");
 
             var before = CaptureCurrentCharacterSelectState(step, context);
+            var forensicScreen = before.Screen ?? throw new InvalidDataException("Step 59.0 expected the normal preloaded NCharacterSelectScreen cache before forensic binding.");
             _step59PreflightSnapshot = CaptureStep59ForensicSnapshot(context, step, requireReadyPrerequisites: true);
+            try
+            {
+                _step59ReadyBindingDiagnostics = BuildStep59ReadyBindingDiagnostics(forensicScreen, context, step, allTypes);
+            }
+            catch (Exception diagnosticEx)
+            {
+                _step59ReadyBindingDiagnostics = $"ready-binding-diagnostic-failed={diagnosticEx.GetType().FullName}: {diagnosticEx.Message}";
+                if (string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker))
+                    _step59ReadyBindingBlocker = "ready-binding diagnostic itself failed before handler authorization";
+            }
+            _step59ReadyBindingPreflightPassed = string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker);
             Checkpoint(checkpoint, "M59_B_FORENSIC_PREFLIGHT — " + SanitizeCheckpoint(_step59PreflightSnapshot));
+            Checkpoint(checkpoint, $"M59_B_READY_BINDING_DIAGNOSIS — handlerAuthorized={_step59ReadyBindingPreflightPassed}; blocker={SanitizeCheckpoint(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}; {SanitizeCheckpoint(_step59ReadyBindingDiagnostics)}");
             _step59TransitionBound = true;
-            _step59StaticMap = "StS2 Launcher — Step 59.0 game-owned submenu-stack repair + OpenCharacterSelect frozen transition\n" +
+            _step59StaticMap = "StS2 Launcher — Step 59.0 character-select ready-binding forensics + game-owned transition\n" +
                 $"NSubmenuStack.Push token: 0x{_step59SubmenuPushToken:X8}; parameter={SubmenuManagedTypeFullName}\n" +
                 $"Single-player logical stack before repair: {(logicalStack is null ? "<null>" : logicalStack.GetType().FullName)}\n" +
                 $"Navigation repair required: {_step59NavigationRepairRequired}\n" +
@@ -382,11 +407,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"Real standard button type: {_step59StandardButton.GetType().FullName}\n" +
                 $"Before character-select transition: {before.State}\n" +
                 $"Forensic preflight: {_step59PreflightSnapshot}\n" +
+                $"Ready-binding handler authorization: {_step59ReadyBindingPreflightPassed}\n" +
+                $"Ready-binding blocker: {(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}\n" +
+                "[READY-BINDING DIAGNOSTICS]\n" + _step59ReadyBindingDiagnostics + "\n" +
                 "Rendering active before transition: NO\n" +
                 BuildStartupLadderInvocationFrontierAppendix(pushAudit);
             RequireStartupLadderBaselineUnchanged(context, baseline, "Step 59 Gate B");
-            Checkpoint(checkpoint, $"M59_B_PASS — exact OpenCharacterSelect and NSubmenuStack.Push rebound; invocationRequired={!_step58TransitionAlreadyComplete}; navigationRepairRequired={_step59NavigationRepairRequired}; singleplayerLogicalStack={(logicalStack is null ? "<null>" : "exact-retained")}; pushToken=0x{_step59SubmenuPushToken:X8}; realStandardButton={SanitizeCheckpoint(_step59StandardButton.GetType().FullName ?? "<unknown>")}; beforeState={SanitizeCheckpoint(before.State.ToString())}.");
-            return StartupLadderPass(step, Step59Name, gate, "Exact game-owned stack Push and character-select handler are bound. A missing single-player logical stack is repaired only through NSubmenuStack.Push before the real OpenCharacterSelect handler runs.");
+            Checkpoint(checkpoint, $"M59_B_PASS — exact OpenCharacterSelect and NSubmenuStack.Push rebound; forensicMapComplete=True; handlerAuthorized={_step59ReadyBindingPreflightPassed}; invocationRequired={!_step58TransitionAlreadyComplete}; navigationRepairRequired={_step59NavigationRepairRequired}; singleplayerLogicalStack={(logicalStack is null ? "<null>" : "exact-retained")}; pushToken=0x{_step59SubmenuPushToken:X8}; realStandardButton={SanitizeCheckpoint(_step59StandardButton.GetType().FullName ?? "<unknown>")}; beforeState={SanitizeCheckpoint(before.State.ToString())}.");
+            return StartupLadderPass(step, Step59Name, gate, _step59ReadyBindingPreflightPassed
+                ? "Exact game-owned stack Push/handler are bound and the scene-ready forensic preflight authorizes one original transition while rendering remains frozen."
+                : "Ready-binding forensics localized a pre-handler scene lifecycle blocker. Evidence is complete and must be durably written; Gate C will stop before arming Push/OpenCharacterSelect.");
         }
         catch (Exception ex) { Checkpoint(checkpoint, $"M59_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
     }
@@ -400,6 +430,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var context = RequireStep59Prerequisite("Step 59 Gate C entry");
             var baseline = _step59Baseline ?? throw new InvalidOperationException("Step 59.0 baseline absent.");
             if (!_step59TransitionBound) throw new InvalidOperationException("Step 59.0 exact handlers must be rebound before Gate C.");
+            if (!_step59ReadyBindingPreflightPassed)
+            {
+                Checkpoint(checkpoint, $"M59_C_BLOCKED_READY_BINDING — no mutation/handler arm; blocker={SanitizeCheckpoint(_step59ReadyBindingBlocker)}; renderingStopped=True.");
+                throw new InvalidDataException("Step 59.0 handler intentionally blocked before one-shot arm because ready-binding forensics found: " + _step59ReadyBindingBlocker);
+            }
             if (!_step58TransitionAlreadyComplete)
             {
                 if (_step59TransitionStarted) throw new InvalidOperationException("Step 59.0 game-owned stack repair + character-select transition is one-shot in-process.");
@@ -758,11 +793,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private string CaptureStep59ForensicSnapshot(Step35ExecutionLoadContext context, int step, bool requireReadyPrerequisites)
     {
+        if (requireReadyPrerequisites)
+            _step59ReadyBindingBlocker = string.Empty;
+        var prerequisiteFailures = new List<string>();
         var current = CaptureCurrentCharacterSelectState(step, context);
         var screen = current.Screen ?? throw new InvalidDataException($"Step {step}.0 forensic snapshot requires the cached NCharacterSelectScreen.");
         var screenReady = InvokeRuntimeBoolForForensics(screen, "IsNodeReady", step);
         if (requireReadyPrerequisites && !screenReady)
-            throw new InvalidDataException($"Step {step}.0 character-select screen is inside the SceneTree but IsNodeReady() is false; InitializeSingleplayer is not authorized.");
+            prerequisiteFailures.Add("character-select IsNodeReady()=false");
 
         var requiredScreenFields = new[]
         {
@@ -779,12 +817,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             fieldStates.Add(fieldName + "=" + (value is null ? "NULL" : value.GetType().FullName));
             if (fieldName == "_ascensionPanel") ascensionPanel = value;
             if (requireReadyPrerequisites && value is null)
-                throw new InvalidDataException($"Step {step}.0 character-select IsNodeReady()={screenReady} but required _Ready-bound field {fieldName} is null.");
+                prerequisiteFailures.Add($"character-select {fieldName}=NULL");
         }
 
         var ascensionReady = ascensionPanel is not null && InvokeRuntimeBoolForForensics(ascensionPanel, "IsNodeReady", step);
-        if (requireReadyPrerequisites && !ascensionReady)
-            throw new InvalidDataException($"Step {step}.0 character-select _ascensionPanel exists but IsNodeReady() is false.");
+        if (requireReadyPrerequisites && ascensionPanel is not null && !ascensionReady)
+            prerequisiteFailures.Add("character-select _ascensionPanel IsNodeReady()=false");
 
         var ascensionFieldStates = new List<string>();
         if (ascensionPanel is not null)
@@ -800,7 +838,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 var value = field.GetValue(ascensionPanel);
                 ascensionFieldStates.Add(fieldName + "=" + (value is null ? "NULL" : value.GetType().FullName));
                 if (requireReadyPrerequisites && value is null)
-                    throw new InvalidDataException($"Step {step}.0 ascension panel IsNodeReady()={ascensionReady} but required _Ready-bound field {fieldName} is null.");
+                    prerequisiteFailures.Add($"ascension-panel {fieldName}=NULL");
             }
         }
 
@@ -816,7 +854,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             nGameStates.Add(propertyName + "=" + (value is null ? "NULL" : value.GetType().FullName));
             if (propertyName == "RootSceneContainer") rootSceneContainer = value;
             if (requireReadyPrerequisites && value is null)
-                throw new InvalidDataException($"Step {step}.0 required NGame.{propertyName} is null before InitializeSingleplayer.");
+                prerequisiteFailures.Add($"NGame.{propertyName}=NULL");
         }
 
         var saveType = screen.GetType().Assembly.GetType(SaveManagerTypeFullName, throwOnError: true, ignoreCase: false)
@@ -849,7 +887,124 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             catch { playersCount = "unreadable"; }
         }
 
-        return $"character=[{current.State}; nodeReady={screenReady}; fields={string.Join(",", fieldStates)}]; ascension=[nodeReady={ascensionReady}; fields={string.Join(",", ascensionFieldStates)}]; nGame=[{string.Join(",", nGameStates)}]; save=Progress:{progress.GetType().FullName},Epochs:{epochs.GetType().FullName},EncounterStats:{encounterStats.GetType().FullName}; rootCurrentScene={currentSceneIdentity}; lobby={(lobby is null ? "NULL" : lobby.GetType().FullName)}; lobbyPlayers={playersCount}";
+        if (requireReadyPrerequisites)
+            _step59ReadyBindingBlocker = string.Join(" | ", prerequisiteFailures);
+
+        return $"character=[{current.State}; nodeReady={screenReady}; fields={string.Join(",", fieldStates)}]; ascension=[nodeReady={ascensionReady}; fields={string.Join(",", ascensionFieldStates)}]; nGame=[{string.Join(",", nGameStates)}]; save=Progress:{progress.GetType().FullName},Epochs:{epochs.GetType().FullName},EncounterStats:{encounterStats.GetType().FullName}; rootCurrentScene={currentSceneIdentity}; lobby={(lobby is null ? "NULL" : lobby.GetType().FullName)}; lobbyPlayers={playersCount}; requiredFailures={(prerequisiteFailures.Count == 0 ? "<none>" : string.Join(" | ", prerequisiteFailures))}";
+    }
+
+    private string BuildStep59ReadyBindingDiagnostics(
+        object screen,
+        Step35ExecutionLoadContext context,
+        int step,
+        IReadOnlyDictionary<string, TypeDefinition> allTypes)
+    {
+        var text = new System.Text.StringBuilder();
+        var screenType = RequireStartupLadderType(allTypes, CharacterSelectScreenManagedTypeFullName, step);
+        var ready = screenType.Methods.SingleOrDefault(method =>
+            method.Name == "_Ready" && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody)
+            ?? throw new MissingMethodException(CharacterSelectScreenManagedTypeFullName, "_Ready()");
+        var instructions = ready.Body.Instructions;
+        var charStoreIndex = instructions
+            .Select((instruction, index) => (instruction, index))
+            .Where(item => item.instruction.OpCode.Code == Code.Stfld &&
+                item.instruction.Operand is FieldReference field && field.Name == "_charButtonContainer")
+            .Select(item => item.index).Single();
+        var ascensionStringIndex = instructions
+            .Select((instruction, index) => (instruction, index))
+            .Where(item => item.instruction.OpCode.Code == Code.Ldstr &&
+                item.instruction.Operand is string value && value == "%AscensionPanel")
+            .Select(item => item.index).Single();
+        var ascensionStoreIndex = instructions
+            .Select((instruction, index) => (instruction, index))
+            .Where(item => item.instruction.OpCode.Code == Code.Stfld &&
+                item.instruction.Operand is FieldReference field && field.Name == "_ascensionPanel")
+            .Select(item => item.index).Single();
+        if (!(charStoreIndex < ascensionStringIndex && ascensionStringIndex < ascensionStoreIndex))
+            throw new InvalidDataException($"Step {step}.0 selected NCharacterSelectScreen._Ready ordering drifted around _charButtonContainer/%AscensionPanel/_ascensionPanel.");
+
+        var windowStart = Math.Max(0, ascensionStringIndex - 5);
+        var windowEnd = Math.Min(instructions.Count - 1, ascensionStoreIndex + 3);
+        text.AppendLine($"Selected _Ready token=0x{ready.MetadataToken.ToUInt32():X8}; IL={instructions.Count}; charButtonStoreIndex={charStoreIndex}; ascensionStringIndex={ascensionStringIndex}; ascensionStoreIndex={ascensionStoreIndex}.");
+        text.AppendLine("[SELECTED _READY ASCENSION LOOKUP WINDOW]");
+        for (var i = windowStart; i <= windowEnd; i++)
+            text.AppendLine("  " + FormatStep41Instruction(instructions[i]));
+
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59.0 GodotSharp handoff absent.")).GodotSharpAssembly;
+        var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.Node");
+        var nodes = EnumerateStep39NodeGraph(screen, nodeType);
+        var ascensionCandidates = nodes.Where(item =>
+        {
+            var name = GetStep39NodeName(item.Node, 0);
+            var typeName = item.Node.GetType().FullName ?? string.Empty;
+            return string.Equals(name, "AscensionPanel", StringComparison.Ordinal) ||
+                   string.Equals(typeName, AscensionPanelManagedTypeFullNameForForensics, StringComparison.Ordinal) ||
+                   name.Contains("Ascension", StringComparison.OrdinalIgnoreCase) ||
+                   typeName.Contains("Ascension", StringComparison.OrdinalIgnoreCase);
+        }).ToArray();
+        text.AppendLine($"Live character-select descendant nodes={nodes.Count}; ascension-like candidates={ascensionCandidates.Length}.");
+        text.AppendLine("[LIVE ASCENSION-LIKE NODES]");
+        if (ascensionCandidates.Length == 0)
+        {
+            text.AppendLine("  <none>");
+        }
+        else
+        {
+            foreach (var item in ascensionCandidates)
+            {
+                var node = item.Node;
+                var ownerProperty = node.GetType().GetProperty("Owner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var uniqueProperty = node.GetType().GetProperty("UniqueNameInOwner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                object? owner = null;
+                object? unique = null;
+                try { owner = ownerProperty?.GetValue(node); } catch { }
+                try { unique = uniqueProperty?.GetValue(node); } catch { }
+                var loadContext = AssemblyLoadContext.GetLoadContext(node.GetType().Assembly);
+                var nodeReady = false;
+                var insideTree = false;
+                try { nodeReady = InvokeRuntimeBoolForForensics(node, "IsNodeReady", step); } catch { }
+                try { insideTree = InvokeRuntimeBoolForForensics(node, "IsInsideTree", step); } catch { }
+                text.AppendLine($"  path={item.Path}; name={GetStep39NodeName(node, 0)}; type={node.GetType().FullName}; selectedContext={ReferenceEquals(loadContext, context)}; insideTree={insideTree}; nodeReady={nodeReady}; uniqueNameInOwner={unique?.ToString() ?? "<unreadable/null>"}; owner={(owner is null ? "<null>" : ReferenceEquals(owner, screen) ? "character-select-root" : owner.GetType().FullName)}");
+            }
+        }
+
+        text.AppendLine("[LIVE CHARACTER-SELECT NODE TYPES AROUND ASCENSION]");
+        foreach (var item in nodes.Where(item => item.Path.Contains("Ascension", StringComparison.OrdinalIgnoreCase)).Take(64))
+            text.AppendLine($"  {item.Path} | {item.Node.GetType().FullName}");
+
+        var pck = RequireEssentialResourcePackHandoff().PackAbsolutePath;
+        RequireExactPckDirectoryResource(pck, CharacterSelectSceneResourcePath, step);
+        RequireExactPckDirectoryResource(pck, AscensionPanelResourcePathForForensics, step);
+        var characterEntry = ExtractStartupLadderPckEntryUnpinned(pck, CharacterSelectSceneResourcePath, step);
+        var ascensionEntry = ExtractStartupLadderPckEntryUnpinned(pck, AscensionPanelResourcePathForForensics, step);
+        var characterText = new System.Text.UTF8Encoding(false, true).GetString(characterEntry.Bytes);
+        var ascensionText = new System.Text.UTF8Encoding(false, true).GetString(ascensionEntry.Bytes);
+        text.AppendLine($"Character-select TSCN bytes={characterEntry.Bytes.Length}; sha256={Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(characterEntry.Bytes)).ToLowerInvariant()}.");
+        text.AppendLine($"Ascension-panel TSCN bytes={ascensionEntry.Bytes.Length}; sha256={Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ascensionEntry.Bytes)).ToLowerInvariant()}.");
+        text.AppendLine("[CHARACTER-SELECT TSCN ASCENSION CONTEXT]");
+        text.AppendLine(BuildStep59TscnContext(characterText, "AscensionPanel", 4));
+        text.AppendLine("[ASCENSION-PANEL TSCN ROOT CONTEXT]");
+        text.AppendLine(BuildStep59TscnContext(ascensionText, "[node", 2, maxMatches: 8));
+        return text.ToString().TrimEnd();
+    }
+
+    private static string BuildStep59TscnContext(string text, string needle, int radius, int maxMatches = 16)
+    {
+        var lines = text.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n');
+        var selected = new SortedSet<int>();
+        var matches = 0;
+        for (var i = 0; i < lines.Length && matches < maxMatches; i++)
+        {
+            if (!lines[i].Contains(needle, StringComparison.OrdinalIgnoreCase))
+                continue;
+            matches++;
+            for (var j = Math.Max(0, i - radius); j <= Math.Min(lines.Length - 1, i + radius); j++)
+                selected.Add(j);
+        }
+        if (selected.Count == 0)
+            return "  <no matching lines>";
+        return string.Join("\n", selected.Select(index => $"  L{index + 1}: {lines[index]}"));
     }
 
     private static bool InvokeRuntimeBoolForForensics(object instance, string methodName, int step)

@@ -55,3 +55,6 @@ Each rung has a distinct report/static-map/checkpoint surface:
 Step 58 is observation/audit only. Step 59 skips work when the exact screen is already visibly/logically complete; otherwise its one-shot path may first invoke exact audited `NSubmenuStack.Push(NSubmenu)` to bind a null retained single-player submenu stack, verifies exact binding, then invokes original `OpenCharacterSelect` with the real retained `_standardButton`. Step 60 is audit only. Steps 61/62 must write their static evidence before `StartRendering`; `StopRendering()` must precede all post-stop telemetry. Step 61 targets 2 seconds with a 10-second evidence ceiling. Step 62 targets 10 seconds with a 30-second evidence ceiling. Neither render rung authorizes intentional interaction.
 
 Physical 0.0.190–0.0.192 Step-58 artifacts plus the physical 0.0.193 Step-59 report/checkpoint/last-checkpoint are retained in `docs/history/reports/` as provenance for the ownership pivot and exact Push-binding correction. Step 63 remains unopened.
+
+
+Physical 0.0.195 Step 59 stopped in Gate B with `IsNodeReady()==true` and `_ascensionPanel==null`; 0.0.196 adds selected-IL/live-node/TSCN ready-binding forensics before any handler arm.

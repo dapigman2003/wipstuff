@@ -6,7 +6,7 @@ Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains 
 
 Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-## Active candidate — Steps 58–62 forensic character-select localization / visible-render trial / 0.0.195 (195)
+## Active candidate — Steps 58–62 ascension ready-binding forensics / visible-render trial / 0.0.196 (196)
 
 Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
@@ -23,7 +23,19 @@ Physical runtime authority remains closed through **Step 57 4/4/frozen**. The on
 
 Static analysis now proves that character-select cache state is **normal game preload behavior**: `NMainMenuSubmenuStack._Ready()` pre-instantiates character select, hides it, and adds it as a child, while `NSubmenu._stack` remains null until `Push()`. It is no longer treated as an anomalous state.
 
-### 0.0.195 Step 59 purpose
+
+### What physical 0.0.195 changed
+
+Physical 0.0.195 never armed the real handler. Gate A passed, then Gate B proved
+`NCharacterSelectScreen.IsNodeReady()==true` while `_ascensionPanel==null`; the run remained frozen and ended
+normally. Trusted `sts2.dll` IL places the `%AscensionPanel` lookup immediately after the successfully populated
+`_charButtonContainer`, so the active blocker is now the managed Ready binding itself.
+
+0.0.196 records the complete field state, selected `_Ready` IL window, live ascension-like descendant node/type/load
+context/owner/`UniqueNameInOwner` state, and exact TSCN declaration context. The static map is written before Gate C.
+If the binding is still unhealthy, Gate C intentionally fails before any one-shot mutation.
+
+### 0.0.196 Step 59 purpose
 
 0.0.195 is a **forensic localization build**, not another speculative repair. Gate B records before the one-shot handler:
 

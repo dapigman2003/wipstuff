@@ -1,0 +1,37 @@
+StS2 Launcher — Step 59.0 Forensic Real OpenCharacterSelect Frozen Transition
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-13T05:16:00.3207150+00:00
+
+RESULT
+STEP 59.0 FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION FAIL — 1/4
+
+METADATA
+App version: 0.0.195 (195)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: initialization
+Exception depth 0: System.IO.InvalidDataException
+  Message: Step 59.0 character-select IsNodeReady()=True but required _Ready-bound field _ascensionPanel is null.
+  HResult: 0x80131501
+  Source: StS2Launcher.Core
+  TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::System.String CaptureStep59ForensicSnapshot(Step35ExecutionLoadContext, Int32, Boolean)
+  StackTrace:
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.CaptureStep59ForensicSnapshot(Step35ExecutionLoadContext context, Int32 step, Boolean requireReadyPrerequisites)
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(Action`1 checkpoint)
+Base exception: System.IO.InvalidDataException: Step 59.0 character-select IsNodeReady()=True but required _Ready-bound field _ascensionPanel is null.
+Base HResult: 0x80131501
+Base Source: StS2Launcher.Core
+Base TargetSite: StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization::System.String CaptureStep59ForensicSnapshot(Step35ExecutionLoadContext, Int32, Boolean)
+Base StackTrace:
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.CaptureStep59ForensicSnapshot(Step35ExecutionLoadContext context, Int32 step, Boolean requireReadyPrerequisites)
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(Action`1 checkpoint)
+
+END OF REPORT
