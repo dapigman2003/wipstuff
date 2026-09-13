@@ -63,4 +63,4 @@ Physical 0.0.195 Step 59 stopped in Gate B with `IsNodeReady()==true` and `_asce
 Physical 0.0.197 proved exact live AscensionPanel type/owner/readiness with `UniqueNameInOwner=false` despite exact TSCN `unique_name_in_owner=true`; 0.0.198 adds SceneState/off-tree/live/direct-vs-%Name provenance evidence before handler arm.
 
 
-Physical 0.0.198 proves SceneState=true -> fresh off-tree instanced-subscene root UniqueNameInOwner=false while ordinary nodes preserve true. 0.0.199 moves the correction to a global private GodotSharp PackedScene.Instantiate compatibility hook and retains Step-59 provenance evidence as post-correction verification.
+Physical 0.0.198 proves SceneState=true -> fresh off-tree instanced-subscene root UniqueNameInOwner=false while ordinary nodes preserve true. 0.0.199 moves the correction to a global private GodotSharp PackedScene.Instantiate compatibility hook and retains Step-59 provenance evidence as post-correction verification. 0.0.200 keeps that runtime behavior unchanged and corrects the host synthetic PackedScene fixture plus live authority wording before device reproof.

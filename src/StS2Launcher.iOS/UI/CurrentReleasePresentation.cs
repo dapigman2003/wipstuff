@@ -13,20 +13,20 @@ internal static class CurrentReleasePresentation
         "STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL";
 
     public const string MilestoneLine =
-        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–57 PHYSICALLY CLOSED • 0.0.199 STEPS 58–62 ACTIVE — STEP 63 UNOPENED";
+        "STEPS 01–26 CLOSED • STEP 27 CLOSED NEGATIVE • STEPS 35–57 PHYSICALLY CLOSED • 0.0.200 STEPS 58–62 ACTIVE — STEP 63 UNOPENED";
 
     public const string Summary =
-        "Physical authority remains formally closed through Step 57. Physical 0.0.198 proves exact TSCN/SceneState unique_name_in_owner=true survives parsing but is lost by PackedScene.Instantiate specifically on roots of instanced subscenes; ordinary nodes preserve true. 0.0.199 selects a private hash-pinned GodotSharp compatibility derivative whose PackedScene.Instantiate epilogue reconciles only those exact serialized instanced-root true overrides before returning the new scene. No StS2 field, owner, Ready callback, TSCN/PCK, or trusted runtime file is patched. Step 59 retains the full ready/provenance audit as post-correction proof before original OpenCharacterSelect may run. Steps 60–62 remain available only after a clean real transition. Step 63 remains unopened.";
+        "Physical authority remains formally closed through Step 57. Physical 0.0.198 proves exact TSCN/SceneState unique_name_in_owner=true survives parsing but is lost by PackedScene.Instantiate specifically on roots of instanced subscenes; ordinary nodes preserve true. 0.0.200 retains the 0.0.199 private hash-pinned GodotSharp compatibility derivative whose PackedScene.Instantiate epilogue reconciles only those exact serialized instanced-root true overrides before returning the new scene; 0.0.200 itself changes only host-regression/evidence contracts. No StS2 field, owner, Ready callback, TSCN/PCK, or trusted runtime file is patched. Step 59 retains the full ready/provenance audit as post-correction proof before original OpenCharacterSelect may run. Steps 60–62 remain available only after a clean real transition. Step 63 remains unopened.";
 
     public const string InitialStatus =
-        "Status: Steps 35–57 remain the formal physical baseline. 0.0.199 changes the private Godot scene-instantiation compatibility layer, so use a fresh process and stop on the first changed/failing rung. If the path reaches Step 59, run it once; its provenance map must prove the prior instanced-root UniqueNameInOwner loss is corrected and the Ready-bound fields are healthy before the original handler may arm. Do not retry an armed Step 59 in-process. Step 63 and continuous interactive ownership remain unopened.";
+        "Status: Steps 35–57 remain the formal physical baseline. 0.0.200 retains the 0.0.199 private Godot scene-instantiation compatibility layer after correcting the host regression/evidence contract, so use a fresh process and stop on the first changed/failing rung. If the path reaches Step 59, run it once; its provenance map must prove the prior instanced-root UniqueNameInOwner loss is corrected and the Ready-bound fields are healthy before the original handler may arm. Do not retry an armed Step 59 in-process. Step 63 and continuous interactive ownership remain unopened.";
 
     // Historical physical authority retained in the active candidate contract.
     public const string HistoricalStartupAuthority =
         "STEP 42 CLOSED POSITIVE 4/4 • physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4 • STEPS 35–57 PHYSICALLY CLOSED • Steps 58 through Step 62 are the active forensic/visible-render continuation • GameStartup remains uninvoked while the engineering ladder is active";
 
-    public const string ExpectedDisplayVersion = "0.0.199";
-    public const string ExpectedBuildVersion = "199";
+    public const string ExpectedDisplayVersion = "0.0.200";
+    public const string ExpectedBuildVersion = "200";
     public const string Step28ImplementationMarker =
         "verified post-publish source -> private clone -> Cecil constant rewrite before CLR load -> reopen/hash verify -> transformed-only private AssemblyLoadContext execution";
     public const string Step29ImplementationMarker =

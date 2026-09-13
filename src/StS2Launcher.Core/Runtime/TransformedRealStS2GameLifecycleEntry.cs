@@ -195,7 +195,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var context = RequireStep38Prerequisite("Step 38 Gate B entry");
             _ = RequireStep38StaticAudit();
             var packed = RequireGameScenePackedResource();
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 38.2 exact GodotSharp handoff disappeared.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 38.2 selected GodotSharp bridge handoff disappeared.");
             var godotAssembly = handoff.GodotSharpAssembly;
             var packedSceneType = godotAssembly.GetType("Godot.PackedScene", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.PackedScene");

@@ -1,6 +1,6 @@
 # Testing — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Active candidate: `0.0.199 (199)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.200 (200)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -56,7 +56,9 @@ No `SetUniqueNameInOwner`, live owner mutation, direct `_ascensionPanel` write, 
 closes 4/4.
 
 
-## 0.0.199 PackedScene compatibility expectations
+## 0.0.200 PackedScene compatibility expectations
+
+0.0.200 keeps the 0.0.199 runtime hook unchanged, but the host synthetic GodotSharp fixture must expose `Godot.PackedScene.Instantiate(GenEditState)` and assert the serialized compatibility epilogue before Codemagic may proceed.
 
 The active model-bootstrap path now selects the verified GodotSharp compatibility derivative rather than exact
 prepared GodotSharp bytes. During GodotSharp load, the checkpoint must include

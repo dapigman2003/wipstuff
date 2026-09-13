@@ -1,13 +1,13 @@
-## Current frontier — Steps 58–62 / 0.0.199
+## Current frontier — Steps 58–62 / 0.0.200
 
-**Active candidate — 0.0.199 global PackedScene instanced-root unique-name compatibility.** Physical authority remains
+**Active candidate — 0.0.200 host-regression-corrected PackedScene instanced-root unique-name compatibility.** Physical authority remains
 formally closed through Step 57 4/4/frozen. Physical 0.0.198 proves exact TSCN and retained `PackedScene.GetState()`
 data preserve `unique_name_in_owner=true`, while a fresh off-tree `PackedScene.Instantiate(GenEditState)` loses that
 property specifically on roots of instanced subscenes. Ordinary nodes in the same scenes preserve the property, and
 retained live nodes match the temporary instances. The defect therefore occurs during scene instantiation/property
 application, before SceneTree admission and before StS2 managed `_Ready()` callbacks.
 
-0.0.199 moves the correction into the **private Godot managed compatibility boundary**. A separately verified
+0.0.200 retains the 0.0.199 runtime correction in the **private Godot managed compatibility boundary** and corrects the host fixture/evidence contract without widening runtime behavior. A separately verified
 GodotSharp derivative wraps `PackedScene.Instantiate(GenEditState)` and reconciles only SceneState entries that are
 both instanced-subscene roots and explicitly `unique_name_in_owner=true`, before the new scene root is returned.
 No StS2 field, scene owner, `_Ready()` callback, TSCN/PCK byte, or trusted runtime file is patched.

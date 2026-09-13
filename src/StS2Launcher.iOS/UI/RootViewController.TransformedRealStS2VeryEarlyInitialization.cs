@@ -63,7 +63,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_step35GodotExactClosureButton);
 
         _step35GodotModelBootstrapCompatibilityButton = SystemButton(
-            "Run Step 35.0.32 MODEL-BOOTSTRAP — Step 15 → Dependency-Aware sts2 ModelDb Bootstrap + Exact GodotSharp → Proven Bridge → ExecuteVeryEarly",
+            "Run Step 35.0.32 MODEL-BOOTSTRAP — Step 15 → Dependency-Aware sts2 + Verified GodotSharp Compat → Proven Bridge → ExecuteVeryEarly",
             15);
         _step35GodotModelBootstrapCompatibilityButton.TouchUpInside += async (_, _) => await RunTransformedRealStS2VeryEarlyInitializationAsync(Step35DiagnosticMode.GodotCoreModelBootstrapCompatibility);
         content.AddArrangedSubview(_step35GodotModelBootstrapCompatibilityButton);
@@ -75,7 +75,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationResultLabel);
 
         _transformedRealStS2VeryEarlyInitializationDetailLabel = Label(
-            "Physical 0.0.156 closed localization and exposed a deterministic ModelDb bootstrap-order mismatch: BowlbugsNormal's static initializer requests MONSTER.BOWLBUG_EGG before BowlbugEgg reaches its generated insertion point. MODEL-BOOTSTRAP derives only sts2 from the exact Step-32 authority, pre-injects the dependency closure in dependency order, and repositions the same instances at their original generated-list positions so final ModelDb order remains canonical. Exact prepared GodotSharp and the physically proven Step-15 bridge remain unchanged.",
+            "Physical 0.0.156 closed localization and exposed a deterministic ModelDb bootstrap-order mismatch: BowlbugsNormal's static initializer requests MONSTER.BOWLBUG_EGG before BowlbugEgg reaches its generated insertion point. MODEL-BOOTSTRAP derives only sts2 from the exact Step-32 authority, pre-injects the dependency closure in dependency order, and repositions the same instances at their original generated-list positions so final ModelDb order remains canonical. The selected GodotSharp PackedScene compatibility derivative is separately hash-pinned from exact prepared GodotSharp source authority, and the physically proven Step-15 bridge contract remains unchanged.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_transformedRealStS2VeryEarlyInitializationDetailLabel);
@@ -163,7 +163,7 @@ public sealed partial class RootViewController
 
         try
         {
-            WriteStep35CrashCheckpoint($"RUN_START — Step 35.0.32 run started; mode={diagnosticMode}; callbackHandoffMode={callbackHandoffMode}; exactAuthority={exactAuthorityMode}; modelBootstrap={modelBootstrapMode}; exact transformed source/resolver authority remains frozen. NATURAL/OS-RECON/FORWARD preserve their fresh-process diagnostic contracts. CORE-HANDOFF uses diagnostic CLR inputs after the proven Step-15 bridge. EXACT-CLOSURE uses exact transformed sts2 plus exact prepared GodotSharp. MODEL-BOOTSTRAP uses the bounded ModelDb-bootstrap sts2 derivative plus the same exact prepared GodotSharp and bridge prerequisite.");
+            WriteStep35CrashCheckpoint($"RUN_START — Step 35.0.32 run started; mode={diagnosticMode}; callbackHandoffMode={callbackHandoffMode}; exactAuthority={exactAuthorityMode}; modelBootstrap={modelBootstrapMode}; exact transformed source/resolver authority remains frozen. NATURAL/OS-RECON/FORWARD preserve their fresh-process diagnostic contracts. CORE-HANDOFF uses diagnostic CLR inputs after the proven Step-15 bridge. EXACT-CLOSURE uses exact transformed sts2 plus exact prepared GodotSharp. MODEL-BOOTSTRAP uses the bounded ModelDb-bootstrap sts2 derivative plus the verified GodotSharp PackedScene compatibility derivative; exact prepared GodotSharp remains immutable source authority and the same source-built callback bridge prerequisite applies.");
             var token = _operationCts?.Token ?? CancellationToken.None;
             var progress = new Progress<TransformedRealStS2VeryEarlyInitializationProgress>(value =>
             {
@@ -215,7 +215,7 @@ public sealed partial class RootViewController
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE B RUNNING…";
             _statusLabel.Text = modelBootstrapMode
-                ? "STEP 35.0.32 GATE B — re-hash and CLR-admit only the verified dependency-aware ModelDb bootstrap sts2 derivative; exact prepared GodotSharp remains the bridge dependency and the exact Step-32 source remains untouched."
+                ? "STEP 35.0.32 GATE B — re-hash and CLR-admit only the verified dependency-aware ModelDb bootstrap sts2 derivative; the verified GodotSharp compatibility derivative is the selected bridge dependency, while exact prepared GodotSharp and the exact Step-32 source remain untouched."
                 : exactAuthorityMode
                     ? "STEP 35.0.32 GATE B — re-hash and CLR-admit the exact closed Step-32 transformed sts2 bytes; diagnostic derivatives remain evidence-only and outside the CLR authority path."
                     : "STEP 35.0.32 GATE B — re-hash the exact transformed source, then CLR-admit only the separately verified diagnostic clone and re-check zero-resolution primary admission behavior.";
@@ -235,7 +235,7 @@ public sealed partial class RootViewController
 
             _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: GATE C RUNNING…";
             _statusLabel.Text = modelBootstrapMode
-                ? "STEP 35.0.32 GATE C — invoke unchanged ExecuteVeryEarly once from the verified ModelDb-bootstrap sts2 derivative and await it; exact prepared GodotSharp uses the physically proven bridge. The ModelDb compatibility rewrite is not exercised until Step 36 ExecuteEssential."
+                ? "STEP 35.0.32 GATE C — invoke unchanged ExecuteVeryEarly once from the verified ModelDb-bootstrap sts2 derivative and await it; the verified GodotSharp compatibility derivative uses the physically proven callback bridge. The ModelDb compatibility rewrite is not exercised until Step 36 ExecuteEssential."
                 : exactAuthorityMode
                     ? "STEP 35.0.32 GATE C — invoke the exact closed transformed ExecuteVeryEarly once and await it; exact prepared GodotSharp uses the physically proven bridge. No diagnostic derivative is CLR input."
                     : $"STEP 35.0.32 GATE C — mode={diagnosticMode}; invoke the verified sts2 diagnostic derivative once. CORE-HANDOFF uses the verified GodotSharp diagnostic derivative; native game loads, initializer-bearing and unplanned requests remain fail-closed.";
@@ -290,9 +290,9 @@ public sealed partial class RootViewController
                     {
                         _transformedRealStS2VeryEarlyInitializationResultLabel.Text = "STEP 36 MODEL-BOOTSTRAP AUTHORITY: READY — 4/4";
                         _transformedRealStS2VeryEarlyInitializationDetailLabel.Text = FormatTransformedRealStS2VeryEarlyInitializationDetail(
-                            "All four compatibility-authority gates completed. Gate B admitted the statically verified dependency-aware ModelDb bootstrap derivative while preserving the exact Step-32 source; exact prepared GodotSharp received the physically proven source-built Godot 4.5.1 bridge; unchanged ExecuteVeryEarly returned successfully; Gate D re-proved OfflineReady, hashes, resolver/native confinement, and CLR ownership. Proceed directly to Step 36.0.5 in this same process.");
+                            "All four compatibility-authority gates completed. Gate B admitted the statically verified dependency-aware ModelDb bootstrap derivative while preserving the exact Step-32 source; the verified GodotSharp PackedScene compatibility derivative received the physically proven source-built Godot 4.5.1 bridge while exact prepared GodotSharp remained immutable source authority; unchanged ExecuteVeryEarly returned successfully; Gate D re-proved OfflineReady, hashes, resolver/native confinement, and CLR ownership. Proceed directly to Step 36.0.5 in this same process.");
                         _statusLabel.Text = "MODEL-BOOTSTRAP AUTHORITY READY — 4/4. Run Step 36.0.5 once now; do not re-run Step 35 in this process.";
-                        WriteStep35CrashCheckpoint("RUN_MODEL_BOOTSTRAP_4OF4 — verified dependency-aware ModelDb-bootstrap sts2 authority completed Gates A-D with exact prepared GodotSharp and the proven source-built bridge.");
+                        WriteStep35CrashCheckpoint("RUN_MODEL_BOOTSTRAP_4OF4 — verified dependency-aware ModelDb-bootstrap sts2 authority completed Gates A-D with the verified GodotSharp PackedScene compatibility derivative and proven source-built bridge; exact prepared GodotSharp remained immutable source authority.");
                     }
                     else
                     {

@@ -508,7 +508,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             var selectedLabel = IsModelBootstrapCompatibilityMode ? "verified ModelDb-bootstrap sts2 compatibility authority" : IsExactAuthorityMode ? "exact closed Step-32 transformed sts2 image" : "instrumented diagnostic sts2 clone";
             stage = IsModelBootstrapCompatibilityMode ? "ModelDb-bootstrap sts2.dll LoadFromStream" : IsExactAuthorityMode ? "exact transformed sts2.dll LoadFromStream" : "instrumented diagnostic sts2.dll LoadFromStream";
             Checkpoint(crashCheckpoint, IsModelBootstrapCompatibilityMode
-                ? "B_LOADPRIMARY_START — entering ModelDb-bootstrap compatibility LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched, and exact prepared GodotSharp remains the bridge dependency."
+                ? "B_LOADPRIMARY_START — entering ModelDb-bootstrap compatibility LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched, and the verified GodotSharp compatibility derivative is the selected bridge dependency while exact prepared GodotSharp remains immutable source authority."
                 : IsExactAuthorityMode
                     ? "B_LOADPRIMARY_START — entering exact-authority LoadPrimary/LoadFromStream path with the exact closed Step-32 transformed sts2 bytes; diagnostic sts2/GodotSharp derivatives remain outside the CLR."
                     : "B_LOADPRIMARY_START — entering instrumented diagnostic-clone LoadPrimary/LoadFromStream path; exact closed transformed source remains untouched on disk.");
@@ -1214,8 +1214,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 if (!diagnosticSha256.Equals(preflight.DiagnosticSha256, StringComparison.OrdinalIgnoreCase) ||
                     !admission.ImmediateSha256.Equals(diagnosticSha256, StringComparison.OrdinalIgnoreCase))
                     throw new InvalidDataException("Step-35 ModelDb-bootstrap sts2 compatibility authority changed during ExecuteVeryEarly execution.");
-                godotDiagnosticSha256 = "NOT CLR-LOADED — EXACT PREPARED GODOTSHARP USED";
-                Checkpoint(crashCheckpoint, $"D_MODEL_BOOTSTRAP_REPROOF_PASS — ModelDb-bootstrap CLR authority hash remained {diagnosticSha256}; exact transformed source and exact prepared GodotSharp remained the immutable source/bridge authorities.");
+                godotDiagnosticSha256 = "CLR-LOADED — VERIFIED GODOTSHARP PACKEDSCENE COMPATIBILITY DERIVATIVE";
+                Checkpoint(crashCheckpoint, $"D_MODEL_BOOTSTRAP_REPROOF_PASS — ModelDb-bootstrap CLR authority hash remained {diagnosticSha256}; exact transformed source and exact prepared GodotSharp remained immutable source authorities, and the verified GodotSharp compatibility derivative remained the selected bridge authority.");
             }
             else
             {
@@ -1296,7 +1296,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                     ? $"Godot prerequisite: project-owned Step-15 smoke engine was intentionally live; {(UsesExactPreparedGodotSharp ? "exact prepared GodotSharp" : "GodotSharp diagnostic derivative")} received the exact source-built runtime callback table; native game executable/library loading remained NO.\n"
                     : "Godot/game startup intentionally requested by launcher: NO\n") +
                 (IsModelBootstrapCompatibilityMode
-                    ? "ModelDb-bootstrap authority meaning: only the statically verified dependency-aware sts2 derivative entered the CLR; exact prepared GodotSharp and the proven source-built bridge were retained; unchanged ExecuteVeryEarly returned; final isolation reproof passed; this same process is authorized for the Step 36.0.5 ExecuteEssential attempt."
+                    ? "ModelDb-bootstrap authority meaning: only the statically verified dependency-aware sts2 derivative entered the CLR; the verified GodotSharp compatibility derivative and proven source-built callback bridge were retained while exact prepared GodotSharp remained immutable source authority; unchanged ExecuteVeryEarly returned; final isolation reproof passed; this same process is authorized for the Step 36.0.5 ExecuteEssential attempt."
                     : IsExactAuthorityMode
                         ? "Exact-authority closure meaning: the exact closed Step-32 transformed sts2 image itself entered the CLR, its exact ExecuteVeryEarly returned and awaited successfully, and final isolation reproof passed under the explicitly defined source-built Godot 4.5.1 bridge prerequisite."
                         : "Diagnostic meaning: this derivative result supplies localization evidence only; exact Step 35 remains OPEN."));

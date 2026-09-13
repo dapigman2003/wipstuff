@@ -132,7 +132,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var preflight = _step40Preflight ?? throw new InvalidOperationException("Step 40.1 Gate A must pass before Gate B.");
             var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 40.1 inserted NGame instance is absent.");
             var sceneTreeRoot = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 40.1 live SceneTree root is absent.");
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 40.1 exact GodotSharp handoff disappeared.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 40.1 selected GodotSharp bridge handoff disappeared.");
             var nodeType = handoff.GodotSharpAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.Node");
 

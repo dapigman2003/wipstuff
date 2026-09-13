@@ -572,6 +572,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.197-FAIL-LAST-CHECKPOINT.txt`
 
 - `steps/STEP-59.5-GLOBAL-PACKEDSCENE-UNIQUE-NAME-COMPAT-0.0.199.md` — physical 0.0.198 proves parent-scene unique-name overrides are lost during PackedScene instantiation only on instanced-subscene roots; 0.0.199 centralizes the correction in a private GodotSharp Instantiate hook.
+- `steps/STEP-59.6-HOST-REGRESSION-CONTRACT-0.0.200.md` — retains the 0.0.199 runtime hook unchanged, fixes the synthetic GodotSharp PackedScene host fixture, asserts the serialized compatibility epilogue, and corrects live MODEL-BOOTSTRAP bridge-authority wording.
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-REPORT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-CHECKPOINT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-STATIC-MAP.txt`

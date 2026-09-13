@@ -1025,6 +1025,37 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 module.Types.Add(marshaling);
                 AddMethod(marshaling, "ConvertStringToNative", module.TypeSystem.Object, module.TypeSystem.String);
 
+                // 0.0.200 host-regression contract: the 0.0.199 GodotSharp derivative now
+                // rewrites the real instance PackedScene.Instantiate(GenEditState) return path.
+                // Keep the synthetic GodotSharp fixture representative enough that the clone
+                // emitter and its post-serialization hook verification are exercised in CI.
+                var node = new TypeDefinition("Godot", "Node",
+                    Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
+                    module.TypeSystem.Object);
+                module.Types.Add(node);
+
+                var packedScene = new TypeDefinition("Godot", "PackedScene",
+                    Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
+                    module.TypeSystem.Object);
+                module.Types.Add(packedScene);
+                var systemRuntimeRef = module.AssemblyReferences.Single(reference => reference.Name == "System.Runtime");
+                var genEditState = new TypeDefinition(string.Empty, "GenEditState",
+                    Mono.Cecil.TypeAttributes.NestedPublic | Mono.Cecil.TypeAttributes.Sealed,
+                    new TypeReference("System", "Enum", module, systemRuntimeRef, false));
+                genEditState.Fields.Add(new FieldDefinition("value__",
+                    Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.SpecialName | Mono.Cecil.FieldAttributes.RTSpecialName,
+                    module.TypeSystem.Int32));
+                packedScene.NestedTypes.Add(genEditState);
+
+                var instantiate = new MethodDefinition("Instantiate",
+                    Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig,
+                    node);
+                instantiate.Parameters.Add(new ParameterDefinition("editState", Mono.Cecil.ParameterAttributes.None, genEditState));
+                var instantiateIl = instantiate.Body.GetILProcessor();
+                instantiateIl.Append(instantiateIl.Create(OpCodes.Ldnull));
+                instantiateIl.Append(instantiateIl.Create(OpCodes.Ret));
+                packedScene.Methods.Add(instantiate);
+
                 assembly.Write(source);
             }
 
@@ -1053,7 +1084,27 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             Assert.IsTrue(File.Exists(clone));
 
             using var reopened = AssemblyDefinition.ReadAssembly(clone, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred });
-            Assert.IsNotNull(reopened.MainModule.Types.SingleOrDefault(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName));
+            var serializedBridge = reopened.MainModule.Types.SingleOrDefault(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName);
+            Assert.IsNotNull(serializedBridge);
+            var packedSceneCompatibilityField = serializedBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPackedSceneCompatibilityCallbackFieldName);
+            Assert.IsNotNull(packedSceneCompatibilityField);
+            Assert.AreEqual("System.Action`2<System.Object,System.Object>", packedSceneCompatibilityField.FieldType.FullName);
+
+            var serializedPackedScene = reopened.MainModule.Types.Single(type => type.FullName == "Godot.PackedScene");
+            var serializedInstantiate = serializedPackedScene.Methods.Single(method =>
+                method.Name == "Instantiate" && !method.IsStatic && method.Parameters.Count == 1 && method.ReturnType.FullName == "Godot.Node" && method.HasBody);
+            Assert.AreEqual(1, serializedInstantiate.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code == Code.Ldsfld &&
+                instruction.Operand is FieldReference field &&
+                field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPackedSceneCompatibilityCallbackFieldName &&
+                field.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName));
+            Assert.AreEqual(1, serializedInstantiate.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code == Code.Callvirt &&
+                instruction.Operand is MethodReference method &&
+                method.Name == "Invoke" &&
+                method.DeclaringType.FullName == "System.Action`2<System.Object,System.Object>"));
+            Assert.AreEqual(1, serializedInstantiate.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Ret));
+
             var serializedGodotEntryMarkers = reopened.MainModule.Types
                 .SelectMany(type => type.Methods)
                 .Where(method => method.HasBody && method.Body.Instructions.Count >= 2 &&

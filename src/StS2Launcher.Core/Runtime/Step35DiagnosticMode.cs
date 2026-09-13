@@ -16,7 +16,8 @@ namespace StS2Launcher.Core;
 /// not use either diagnostic derivative as CLR input.
 /// GodotCoreModelBootstrapCompatibility is the Step-36 forward candidate: it derives only sts2 from the exact
 /// closed Step-32 transformed image, applies the physically motivated ModelDb bootstrap-order compatibility rewrite,
-/// keeps exact prepared GodotSharp, and otherwise runs the same proven Step-35 Godot bridge/ExecuteVeryEarly path.
+/// and in the active Step-59.5+ candidate selects the separately hash-pinned GodotSharp PackedScene compatibility
+/// derivative while retaining the exact prepared GodotSharp bytes as immutable source authority.
 /// </summary>
 public enum Step35DiagnosticMode
 {

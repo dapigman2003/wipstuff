@@ -71,7 +71,7 @@ public sealed partial class RootViewController
         {
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: PREREQUISITE NOT MET";
             _step36ResultLabel.TextColor = UIColor.SystemOrange;
-            _step36DetailLabel.Text = "Step 36.0.5 requires the same-process MODEL-BOOTSTRAP Step-35 authority. From a fresh launch run Step 15 Gates A-C, then Step 35.0.32 MODEL-BOOTSTRAP once and require 4/4. That mode loads only the verified dependency-aware sts2 derivative with exact prepared GodotSharp; do not run historical EXACT-CLOSURE first because sts2 CLR identity is process-global for this experiment.";
+            _step36DetailLabel.Text = "Step 36.0.5 requires the same-process MODEL-BOOTSTRAP Step-35 authority. From a fresh launch run Step 15 Gates A-C, then Step 35.0.32 MODEL-BOOTSTRAP once and require 4/4. That mode loads only the verified dependency-aware sts2 derivative with the verified GodotSharp PackedScene compatibility derivative; exact prepared GodotSharp remains immutable source authority. Do not run historical EXACT-CLOSURE first because sts2 CLR identity is process-global for this experiment.";
             _statusLabel.Text = "STEP 36.0.5 REFUSED — same-process MODEL-BOOTSTRAP authority is not present.";
             _statusLabel.TextColor = UIColor.SystemOrange;
             return;
@@ -108,7 +108,7 @@ public sealed partial class RootViewController
             WriteStep36Checkpoint("E_A_STATIC_MAP_WRITE_RETURNED — verified ExecuteEssential static map durably written.");
 
             _step36ResultLabel.Text = "TRANSFORMED REAL STS2 ESSENTIAL INITIALIZATION: GATE B RUNNING…";
-            _statusLabel.Text = "STEP 36.0.5 GATE B — prove MODEL-BOOTSTRAP CLR authority continuity, bind unchanged ExecuteEssential, mount the receipt-backed game PCK additively through exact GodotSharp, and prove res://localization/eng before invocation.";
+            _statusLabel.Text = "STEP 36.0.5 GATE B — prove MODEL-BOOTSTRAP CLR authority continuity, bind unchanged ExecuteEssential, mount the receipt-backed game PCK additively through the selected same-process GodotSharp bridge authority, and prove res://localization/eng before invocation.";
             var gateB = _transformedRealStS2VeryEarlyInitialization.RunEssentialAuthorityBinding(WriteStep36Checkpoint);
             if (!RecordStep36Gate(gateB)) return;
 

@@ -1,6 +1,6 @@
 # Release checklist — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Release identity: display/build `0.0.199 (199)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.200 (200)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190–0.0.192 Step-58 localization evidence and physical 0.0.193 Step-59 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -46,7 +46,10 @@ Require exact 0.0.197 source/plist/release/shell identity; current active manife
 - Existing unhealthy prerequisites still block Gate C before one-shot Push/OpenCharacterSelect arm.
 
 
-## 0.0.199 central PackedScene compatibility requirements
+## 0.0.200 central PackedScene compatibility requirements
+
+- The synthetic GodotSharp host fixture must define the instance `Godot.PackedScene.Instantiate` surface and verify one compatibility field load/invoke/return epilogue.
+- MODEL-BOOTSTRAP live status/checkpoint text must identify the verified GodotSharp compatibility derivative as the selected bridge authority, while exact prepared GodotSharp remains immutable source authority.
 
 - The exact prepared/trusted GodotSharp file is never modified in place.
 - The selected derivative preserves GodotSharp assembly identity and MVID.

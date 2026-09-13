@@ -238,7 +238,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep37Prerequisite("Step 37 Gate C entry");
             var derivative = RequireGameSceneDerivative();
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0.1 requires the exact prepared GodotSharp bridge.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0.1 requires the verified same-process GodotSharp bridge authority.");
             var godotAssembly = handoff.GodotSharpAssembly;
             if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotAssembly), context))
                 throw new InvalidDataException("Step 37.0.1 GodotSharp left the exact Step-35/36 private context before scene loading.");
@@ -250,8 +250,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var hostBefore = context.HostLoads.Count;
             var privateBefore = context.PrivateLoads.Count;
 
-            Checkpoint(checkpoint, $"G_C_ENTRY — binding exact GodotSharp ResourceLoader.Load for copied scene; absolutePath={derivative.AbsolutePath}; cacheMode=IGNORE; no instantiation in Gate C.");
-            stage = "exact GodotSharp ResourceLoader.Load binding";
+            Checkpoint(checkpoint, $"G_C_ENTRY — binding selected GodotSharp bridge ResourceLoader.Load for copied scene; absolutePath={derivative.AbsolutePath}; cacheMode=IGNORE; no instantiation in Gate C.");
+            stage = "selected GodotSharp bridge ResourceLoader.Load binding";
             var resourceLoader = godotAssembly.GetType("Godot.ResourceLoader", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.ResourceLoader");
             var resourceType = godotAssembly.GetType("Godot.Resource", throwOnError: true, ignoreCase: false)
@@ -334,7 +334,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             ThrowIfDisposed();
             var context = RequireStep37Prerequisite("Step 37 Gate D entry");
             var packed = RequireGameScenePackedResource();
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0.1 exact GodotSharp handoff disappeared.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 37.0.1 selected GodotSharp bridge handoff disappeared.");
             var godotAssembly = handoff.GodotSharpAssembly;
             var packedSceneType = godotAssembly.GetType("Godot.PackedScene", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.PackedScene");

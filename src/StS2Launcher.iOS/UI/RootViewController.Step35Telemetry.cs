@@ -39,7 +39,7 @@ public sealed partial class RootViewController
                     $"Process ID: {Environment.ProcessId}\n" +
                     $"App version: {CurrentReleasePresentation.DisplayVersion} ({CurrentReleasePresentation.DisplayBuild})\n" +
                     $"Expected source version: {CurrentReleasePresentation.ExpectedDisplayVersion} ({CurrentReleasePresentation.ExpectedBuildVersion})\n" +
-                    "Candidate: STEP 35.0.32 — MODELDB-BOOTSTRAP COMPATIBILITY + EXACT GODOTSHARP\n" +
+                    "Candidate: STEP 35.0.32 — MODELDB-BOOTSTRAP COMPATIBILITY + VERIFIED PACKEDSCENE-COMPAT GODOTSHARP\n" +
                     $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
                     "Execution policy: exact source transform/resolver/later-game-boundary prohibitions unchanged; Gate A performs read-only bundle-wide native/GodotSharp inspection and emits separately verified sts2 + GodotSharp diagnostic derivatives; GodotSharp probes are entry-only. NATURAL preserves the original Godot dictionary/native path; OS-RECON applies only the bounded four-reference BCL dictionary substitution and keeps Godot.OS natural; FORWARD adds exactly one local new string[0] provider substitution for Godot.OS.GetCmdlineArgs. Those three controls require a fresh process with no Godot state. CORE-HANDOFF is the sole explicit exception: it requires the already-proven Step-15 smoke engine, rejects dotnet-feature or Godot-managed-runtime state, and hands the exact source-built callback table to the private GodotSharp derivative. Native game loading remains forbidden.\n" +
                     $"Implementation: {CurrentReleasePresentation.Step35ImplementationMarker}\n\n");
@@ -76,7 +76,7 @@ public sealed partial class RootViewController
                     $"Godot/native reconnaissance: {godotReconFileName}\n" +
                     $"Last checkpoint: {Step35LastCheckpointFileName}\n" +
                     $"Diagnostic mode: {_transformedRealStS2VeryEarlyInitialization.DiagnosticMode}\n" +
-                    "Candidate: STEP 35.0.32 — MODELDB-BOOTSTRAP COMPATIBILITY + EXACT GODOTSHARP\n");
+                    "Candidate: STEP 35.0.32 — MODELDB-BOOTSTRAP COMPATIBILITY + VERIFIED PACKEDSCENE-COMPAT GODOTSHARP\n");
 
                 _step35RunId = runId;
                 _step35CrashCheckpointPath = crashPath;

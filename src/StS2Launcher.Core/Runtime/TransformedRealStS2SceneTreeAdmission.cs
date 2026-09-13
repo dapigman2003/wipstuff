@@ -205,7 +205,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var context = RequireStep39Prerequisite("Step 39 Gate B entry");
             var preflight = _step39Preflight ?? throw new InvalidOperationException("Step 39.0 Gate A must pass before Gate B.");
             var packed = RequireGameScenePackedResource();
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 39.0 exact GodotSharp handoff disappeared.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 39.0 selected GodotSharp bridge handoff disappeared.");
             var godotAssembly = handoff.GodotSharpAssembly;
             var packedSceneType = godotAssembly.GetType("Godot.PackedScene", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.PackedScene");
@@ -393,7 +393,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var preflight = _step39Preflight ?? throw new InvalidOperationException("Step 39.0 Gate B must pass before Gate C.");
             var instance = _step39NGameInstance ?? throw new InvalidOperationException("Step 39.0 Gate B NGame instance is absent.");
             var sceneTreeRoot = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 39.0 live SceneTree root is absent.");
-            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 39.0 exact GodotSharp handoff disappeared.");
+            var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 39.0 selected GodotSharp bridge handoff disappeared.");
             var godotAssembly = handoff.GodotSharpAssembly;
             var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
                 ?? throw new MissingMemberException("Godot.Node");

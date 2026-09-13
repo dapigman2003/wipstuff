@@ -518,12 +518,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     {
         if (_essentialResourcePackHandoff is not null)
             throw new InvalidOperationException("Step 36.0 game resource pack has already been mounted in this process; no same-process retry is permitted.");
-        var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 36.0 game resource-pack handoff requires the exact prepared GodotSharp bridge from Step 35.");
+        var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 36.0 game resource-pack handoff requires the verified same-process GodotSharp bridge authority from Step 35.");
         var godotAssembly = handoff.GodotSharpAssembly;
         if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(godotAssembly), context))
-            throw new InvalidDataException("Step 36.0 exact GodotSharp assembly left the dedicated Step-35 context before resource-pack handoff.");
+            throw new InvalidDataException("Step 36.0 selected GodotSharp bridge assembly left the dedicated Step-35 context before resource-pack handoff.");
 
-        Checkpoint(checkpoint, $"E_B_PACK_BIND_START — binding exact GodotSharp Godot.ProjectSettings.LoadResourcePack for the receipt-backed PCK; replaceFiles=false; offset=0.");
+        Checkpoint(checkpoint, $"E_B_PACK_BIND_START — binding selected GodotSharp bridge Godot.ProjectSettings.LoadResourcePack for the receipt-backed PCK; replaceFiles=false; offset=0.");
         var projectSettings = godotAssembly.GetType("Godot.ProjectSettings", throwOnError: true, ignoreCase: false)
             ?? throw new MissingMemberException("Godot.ProjectSettings");
         var loadResourcePack = projectSettings.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
@@ -538,7 +538,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                        (parameters[2].ParameterType == typeof(int) || parameters[2].ParameterType == typeof(long));
             })
             ?? throw new MissingMethodException("Godot.ProjectSettings", "LoadResourcePack(string,bool,int/long)");
-        Checkpoint(checkpoint, $"E_B_PACK_BIND_PASS — exact GodotSharp LoadResourcePack bound; token=0x{loadResourcePack.MetadataToken:X8}; offsetType={loadResourcePack.GetParameters()[2].ParameterType.FullName}.");
+        Checkpoint(checkpoint, $"E_B_PACK_BIND_PASS — selected GodotSharp bridge LoadResourcePack bound; token=0x{loadResourcePack.MetadataToken:X8}; offsetType={loadResourcePack.GetParameters()[2].ParameterType.FullName}.");
 
         object offsetArgument = loadResourcePack.GetParameters()[2].ParameterType == typeof(long) ? (object)0L : 0;
         Checkpoint(checkpoint, $"E_B_PACK_LOAD_START — mounting receipt-backed game PCK into the live source-built Godot resource filesystem; path={pack.AbsolutePath}; replaceFiles=false; offset=0.");
@@ -549,7 +549,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         }
         catch (TargetInvocationException ex) when (ex.InnerException is not null)
         {
-            throw new InvalidOperationException($"Exact GodotSharp ProjectSettings.LoadResourcePack threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}", ex.InnerException);
+            throw new InvalidOperationException($"Selected GodotSharp bridge ProjectSettings.LoadResourcePack threw {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}", ex.InnerException);
         }
         Checkpoint(checkpoint, $"E_B_PACK_LOAD_RETURNED — returned={loadReturned}; replaceFiles=false; path={pack.RelativePath}.");
         if (!loadReturned)

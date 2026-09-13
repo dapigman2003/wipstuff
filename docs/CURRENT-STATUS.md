@@ -6,7 +6,7 @@ Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains 
 
 Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-## Active candidate — Steps 58–62 global PackedScene unique-name compatibility / visible-render trial / 0.0.199 (199)
+## Active candidate — Steps 58–62 global PackedScene unique-name compatibility / visible-render trial / 0.0.200 (200)
 
 Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
@@ -36,7 +36,7 @@ Ordinary nodes in the same scenes (`InputManager`, `HotkeyManager`, `ReactionCon
 application of parent-scene overrides to instanced-subscene roots during PackedScene instantiation, not parsing,
 resource caching, SceneTree admission, owner mutation, or a character-select-specific bug.
 
-0.0.199 selects a hash-pinned private GodotSharp compatibility derivative for the active model-bootstrap path.
+0.0.200 retains the 0.0.199 hash-pinned private GodotSharp compatibility derivative for the active model-bootstrap path. The 0.0.200 delta is host-regression/evidence-contract only: the synthetic GodotSharp fixture now contains the PackedScene.Instantiate surface the emitter requires, and live model-bootstrap wording now names the derivative actually selected.
 Its `PackedScene.Instantiate` epilogue calls a host compatibility callback before returning the new root. The callback
 reapplies only exact SceneState `unique_name_in_owner=true` values for instanced roots, verifies each write, and
 otherwise leaves the new hierarchy untouched. The Step-59 forensic snapshot then proves whether normal StS2 Ready
