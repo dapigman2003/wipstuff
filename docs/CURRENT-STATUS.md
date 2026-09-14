@@ -1,8 +1,8 @@
-# 0.0.203 current architecture update
+# 0.0.204 PropertyTweener compatibility frontier
 
-**Active candidate: 0.0.203 (203).** The active ownership path is now **physically closed Step 52 -> current Step 58**, with legacy Steps 53–57 retained as optional regression/history diagnostics rather than mandatory choreography. 0.0.202 is rejected after physical Step 54 regressed inside `NSingleplayerSubmenu.RefreshButtons()` under runtime-wide Step-59 IL instrumentation. 0.0.203 restores `TransformedRealStS2VeryEarlyInitialization.cs` byte-for-byte from 0.0.201, contains no `STEP59TRACE_`/`ConfirmButtonCheckpointBridge`, and adds isolated 59R/59H/59U/59T/59E probes plus the real Step 59 transition in one IPA. Step 63 remains unopened.
+**Active candidate: 0.0.204 (204).** The active ownership path remains **physically closed Step 52 -> current Step 58**, with legacy Steps 53–57 optional. Physical 0.0.203 localized the Step-59 NRE to the managed return from `Tween.TweenProperty`: 59U returned normally; 59T passed modulation, tween kill, and `CreateTween`, then observed `TweenProperty` return null; 59E reproduced the same `NConfirmButton.OnEnable` NRE outside `OpenCharacterSelect`. 0.0.204 preserves the PackedScene compatibility and adds a narrow fallback only in TweenProperty's dedicated one-callsite GodotSharp NativeCalls helper when `UnmanagedGetManaged` returns null for a nonzero native pointer. It retains runtime fallback count/last-pointer evidence and leaves shared fluent helpers natural. Step 63 remains unopened.
 
-Recommended device path: fresh process -> closed path through Step 52 -> Step 58 directly -> one Step-59 branch per fresh process.
+Recommended device path: fresh process -> closed path through Step 52 -> Step 58 -> 59T. If 59T passes, fresh process -> Step 58 -> 59E. If 59E passes, fresh process -> Step 58 -> real Step 59, then continue 60 -> 61 -> 62 on that same successful process.
 
 ---
 

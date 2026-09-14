@@ -588,3 +588,11 @@ The current architecture and plan always live one level up in `docs/`.
 
 - `steps/STEP-59.9-CURRENT-OWNERSHIP-PIVOT-0.0.203.md` — rejects 0.0.202 runtime-wide tracing, restores the 0.0.201 runtime derivative, makes Step 52 -> Step 58 the active ownership path, and adds 59H/59T micro-probes.
 - `reports/STEP-54-PHYSICAL-0.0.202-REGRESSION-*` — physical evidence that 0.0.202 regressed the legacy Step-54 `RefreshButtons()` route.
+
+## Step 59 PropertyTweener return-wrapper localization / 0.0.204 compatibility
+
+- `steps/STEP-59.10-PROPERTYTWEENER-COMPAT-0.0.204.md` — physical 0.0.203 59U/59T/59E localization plus the narrow 0.0.204 `Tween.TweenProperty` dedicated-helper managed-wrapper compatibility.
+- `reports/STEP-59U-PHYSICAL-0.0.203-*` — isolated `UpdateControllerButton()` physical PASS evidence.
+- `reports/STEP-59T-PHYSICAL-0.0.203-*` — stage evidence proving `TweenProperty()` returns null after `CreateTween()` succeeds.
+- `reports/STEP-59E-PHYSICAL-0.0.203-*` — direct `Enable()` reproduction of the `NConfirmButton.OnEnable()` NRE outside `OpenCharacterSelect`.
+- `reports/STEP-35-PHYSICAL-0.0.203-PROPERTYTWEENER-TRACE-EXCERPT.txt` — bounded GodotSharp native/managed wrapper trace around the 59E failure; the full 156 MB journal is intentionally not retained in source history.

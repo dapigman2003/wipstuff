@@ -37,10 +37,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     public const string DiagnosticBridgeCallbackFieldName = "Callback";
     private const string DiagnosticCloneFileName = "sts2.step35.0.27.instrumented.dll";
     private const string ModelBootstrapCompatibilityCloneFileName = "sts2.step39.1.lifecycle-admission.dll";
-    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step59.5.unique-name-compat.dll";
+    private const string GodotSharpDiagnosticCloneFileName = "GodotSharp.step59.6.property-tweener-compat.dll";
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
     internal const string GodotSharpPackedSceneCompatibilityCallbackFieldName = "PackedSceneInstantiateCompatibilityCallback";
+    internal const string GodotSharpPropertyTweenerFallbackCountFieldName = "PropertyTweenerFallbackCount";
+    internal const string GodotSharpPropertyTweenerLastNativePtrFieldName = "PropertyTweenerLastNativePtr";
+    internal const string GodotSharpPropertyTweenerFallbackMethodName = "EnsurePropertyTweenerManagedWrapper";
     internal const string NullPlatformTypeFullName = "MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy";
     internal const string NullPlatformConstructorFullName = "System.Void MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy::.ctor()";
     internal const string CommandLineHelperTypeFullName = "MegaCrit.Sts2.Core.Helpers.CommandLineHelper";
@@ -373,6 +376,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 $"GodotSharp diagnostic clone bytes: {godotSharpDiagnostic.Length:N0}\n" +
                 $"GodotSharp entry-only checkpoint markers: {godotSharpDiagnostic.MarkerCount:N0}\n" +
                 $"GodotSharp MVID preserved: {godotSharpDiagnostic.Mvid}\n" +
+                $"GodotSharp PropertyTweener wrapper compatibility: {godotSharpDiagnostic.PropertyTweenerCompatibilityReport}\n" +
                 $"GodotSharp writer constant-requirement fingerprint SHA-256: {godotSharpDiagnostic.ConstantRequirementFingerprintSha256}\n" +
                 $"GodotSharp writer-only resolution requests / scopes / requirements: {godotSharpDiagnostic.WriteResolutionRequestCount:N0} / {godotSharpDiagnostic.ApprovedConstantScopeCount:N0} / {godotSharpDiagnostic.ApprovedConstantRequirementCount:N0}\n" +
                 "Read-only installed-bundle Mach-O/native reconnaissance: COMPLETE\n" +
@@ -2746,6 +2750,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         int approvedConstantScopeCount;
         int approvedConstantRequirementCount;
         IReadOnlyList<GodotSharpDiagnosticMarker> markerPlan;
+        string propertyTweenerCompatibilityReport;
 
         using var resolver = new SelfAuditingConstantMetadataWriteResolver();
         using (var module = ModuleDefinition.ReadModule(exactPreparedPath, new ReaderParameters
@@ -2876,6 +2881,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                 AppendAfter(Instruction.Create(OpCodes.Ret));
             }
 
+            propertyTweenerCompatibilityReport = ApplyPropertyTweenerManagedWrapperCompatibility(module, bridge, emitReference);
+
             Directory.CreateDirectory(Path.GetDirectoryName(diagnosticPath) ?? throw new InvalidOperationException("GodotSharp compatibility derivative path has no parent."));
             module.Write(diagnosticPath, new WriterParameters { WriteSymbols = false });
             resolver.ValidateWriteRequests();
@@ -2926,6 +2933,45 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         if (compatibilityFieldLoads == 0 || compatibilityFieldLoads != compatibilityInvokes || compatibilityFieldLoads != serializedReturnSites)
             throw new InvalidDataException($"Step-59.5 PackedScene.Instantiate compatibility hook drifted after serialization: fieldLoads={compatibilityFieldLoads}; invokes={compatibilityInvokes}; returns={serializedReturnSites}.");
 
+        var propertyTweenerFallbackCount = bridgeType.Fields.SingleOrDefault(field => field.Name == GodotSharpPropertyTweenerFallbackCountFieldName)
+            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpPropertyTweenerFallbackCountFieldName);
+        var propertyTweenerLastPtr = bridgeType.Fields.SingleOrDefault(field => field.Name == GodotSharpPropertyTweenerLastNativePtrFieldName)
+            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpPropertyTweenerLastNativePtrFieldName);
+        var propertyTweenerFallback = bridgeType.Methods.SingleOrDefault(method => method.Name == GodotSharpPropertyTweenerFallbackMethodName && method.HasBody)
+            ?? throw new MissingMethodException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpPropertyTweenerFallbackMethodName);
+        if (propertyTweenerFallbackCount.FieldType.FullName != "System.Int32" ||
+            propertyTweenerLastPtr.FieldType.FullName != "System.IntPtr" ||
+            propertyTweenerFallback.ReturnType.FullName != "Godot.GodotObject" ||
+            propertyTweenerFallback.Parameters.Count != 2 ||
+            propertyTweenerFallback.Parameters[0].ParameterType.FullName != "Godot.GodotObject" ||
+            propertyTweenerFallback.Parameters[1].ParameterType.FullName != "System.IntPtr" ||
+            !propertyTweenerFallback.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Newobj && instruction.Operand is MethodReference ctor && ctor.DeclaringType.FullName == "Godot.PropertyTweener" && ctor.Name == ".ctor" && ctor.Parameters.Count == 1 && ctor.Parameters[0].ParameterType.FullName == "System.IntPtr"))
+        {
+            throw new InvalidDataException("Step-59.6 serialized PropertyTweener compatibility bridge drifted.");
+        }
+        var verifyTween = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == "Godot.Tween")
+            ?? throw new MissingMemberException("Godot.Tween");
+        var verifyTweenProperty = verifyTween.Methods.SingleOrDefault(method => method.Name == "TweenProperty" && !method.IsStatic && method.Parameters.Count == 4 && method.ReturnType.FullName == "Godot.PropertyTweener" && method.HasBody)
+            ?? throw new MissingMethodException("Godot.Tween", "TweenProperty");
+        var verifyTweenNativeCalls = verifyTweenProperty.Body.Instructions
+            .Where(instruction => (instruction.OpCode.Code is Code.Call or Code.Callvirt) &&
+                                  instruction.Operand is MethodReference called &&
+                                  called.DeclaringType.FullName == "Godot.NativeCalls" &&
+                                  called.ReturnType.FullName == "Godot.GodotObject")
+            .Select(instruction => (MethodReference)instruction.Operand)
+            .ToArray();
+        if (verifyTweenNativeCalls.Length != 1)
+            throw new InvalidDataException($"Step-59.6 serialized Tween.TweenProperty native-helper count drifted: {verifyTweenNativeCalls.Length}.");
+        var verifyNativeHelper = EnumerateTypes(verifyModule.Types).SelectMany(type => type.Methods).SingleOrDefault(method => method.HasBody && method.FullName == verifyTweenNativeCalls[0].FullName)
+            ?? throw new MissingMethodException($"Step-59.6 serialized native helper missing: {verifyTweenNativeCalls[0].FullName}.");
+        var tweenFallbackCalls = verifyNativeHelper.Body.Instructions.Count(instruction =>
+            instruction.OpCode.Code == Code.Call &&
+            instruction.Operand is MethodReference called &&
+            called.DeclaringType.FullName == GodotSharpDiagnosticBridgeTypeFullName &&
+            called.Name == GodotSharpPropertyTweenerFallbackMethodName);
+        if (tweenFallbackCalls != 1 || !propertyTweenerCompatibilityReport.Contains("Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER:", StringComparison.Ordinal))
+            throw new InvalidDataException($"Step-59.6 Tween.TweenProperty dedicated-helper compatibility hook drifted after serialization: fallbackCalls={tweenFallbackCalls}; report={propertyTweenerCompatibilityReport}.");
+
         var bridgeEmit = bridgeType.Methods.SingleOrDefault(method => method.Name == "Emit" && method.HasBody)
             ?? throw new MissingMethodException(GodotSharpDiagnosticBridgeTypeFullName, "Emit");
         if (callback.FieldType.FullName != "System.Action`1<System.String>" || bridgeEmit.Parameters.Count != 1 || bridgeEmit.Parameters[0].ParameterType.FullName != "System.String")
@@ -2963,12 +3009,156 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             sourceMvid,
             markerCount,
             markerMap,
+            propertyTweenerCompatibilityReport,
             constantRequirementFingerprint,
             writeResolutionRequestCount,
             syntheticConstantTypeCount,
             approvedConstantScopeCount,
             approvedConstantRequirementCount,
             writeResolutionIdentities);
+    }
+
+    private static string ApplyPropertyTweenerManagedWrapperCompatibility(
+        ModuleDefinition module,
+        TypeDefinition bridge,
+        MethodReference emitReference)
+    {
+        var allTypes = EnumerateTypes(module.Types).ToArray();
+        var allMethods = allTypes.SelectMany(type => type.Methods).Where(method => method.HasBody).ToArray();
+        var godotObject = allTypes.SingleOrDefault(type => type.FullName == "Godot.GodotObject")
+            ?? throw new MissingMemberException("Godot.GodotObject");
+        var propertyTweener = allTypes.SingleOrDefault(type => type.FullName == "Godot.PropertyTweener")
+            ?? throw new MissingMemberException("Godot.PropertyTweener");
+        var propertyTweenerCtor = propertyTweener.Methods.SingleOrDefault(method =>
+            method.IsConstructor && !method.IsStatic && method.Parameters.Count == 1 &&
+            method.Parameters[0].ParameterType.FullName == "System.IntPtr")
+            ?? throw new MissingMethodException("Godot.PropertyTweener", ".ctor(IntPtr)");
+        var tween = allTypes.SingleOrDefault(type => type.FullName == "Godot.Tween")
+            ?? throw new MissingMemberException("Godot.Tween");
+        var tweenProperty = tween.Methods.SingleOrDefault(method =>
+            method.Name == "TweenProperty" && !method.IsStatic && method.HasBody &&
+            method.Parameters.Count == 4 && method.ReturnType.FullName == "Godot.PropertyTweener")
+            ?? throw new MissingMethodException("Godot.Tween", "TweenProperty");
+
+        if (bridge.Fields.Any(field => field.Name is GodotSharpPropertyTweenerFallbackCountFieldName or GodotSharpPropertyTweenerLastNativePtrFieldName) ||
+            bridge.Methods.Any(method => method.Name == GodotSharpPropertyTweenerFallbackMethodName))
+            throw new InvalidDataException("Step-59.6 PropertyTweener compatibility bridge members already exist in the exact prepared GodotSharp image.");
+
+        var fallbackCountField = new FieldDefinition(
+            GodotSharpPropertyTweenerFallbackCountFieldName,
+            Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static,
+            module.TypeSystem.Int32);
+        var lastNativePtrField = new FieldDefinition(
+            GodotSharpPropertyTweenerLastNativePtrFieldName,
+            Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static,
+            module.TypeSystem.IntPtr);
+        bridge.Fields.Add(fallbackCountField);
+        bridge.Fields.Add(lastNativePtrField);
+
+        var ensure = new MethodDefinition(
+            GodotSharpPropertyTweenerFallbackMethodName,
+            Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+            godotObject);
+        ensure.Parameters.Add(new ParameterDefinition("managed", Mono.Cecil.ParameterAttributes.None, godotObject));
+        ensure.Parameters.Add(new ParameterDefinition("nativePtr", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.IntPtr));
+        bridge.Methods.Add(ensure);
+        ensure.Body.MaxStackSize = 2;
+        var ensureIl = ensure.Body.GetILProcessor();
+        var inspectNativePtr = Instruction.Create(OpCodes.Nop);
+        var constructFallback = Instruction.Create(OpCodes.Nop);
+        ensureIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+        ensureIl.Append(Instruction.Create(OpCodes.Brfalse, inspectNativePtr));
+        ensureIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+        ensureIl.Append(Instruction.Create(OpCodes.Ret));
+        ensureIl.Append(inspectNativePtr);
+        ensureIl.Append(Instruction.Create(OpCodes.Ldarg_1));
+        ensureIl.Append(Instruction.Create(OpCodes.Ldc_I4_0));
+        ensureIl.Append(Instruction.Create(OpCodes.Conv_I));
+        ensureIl.Append(Instruction.Create(OpCodes.Ceq));
+        ensureIl.Append(Instruction.Create(OpCodes.Brfalse, constructFallback));
+        ensureIl.Append(Instruction.Create(OpCodes.Ldnull));
+        ensureIl.Append(Instruction.Create(OpCodes.Ret));
+        ensureIl.Append(constructFallback);
+        ensureIl.Append(Instruction.Create(OpCodes.Ldsfld, fallbackCountField));
+        ensureIl.Append(Instruction.Create(OpCodes.Ldc_I4_1));
+        ensureIl.Append(Instruction.Create(OpCodes.Add));
+        ensureIl.Append(Instruction.Create(OpCodes.Stsfld, fallbackCountField));
+        ensureIl.Append(Instruction.Create(OpCodes.Ldarg_1));
+        ensureIl.Append(Instruction.Create(OpCodes.Stsfld, lastNativePtrField));
+        ensureIl.Append(Instruction.Create(OpCodes.Ldstr, "GODOT_PROPERTY_TWEENER_FALLBACK — Tween.TweenProperty native helper returned managed=null for a nonzero PropertyTweener native pointer; constructing the exact Godot.PropertyTweener(IntPtr) wrapper."));
+        ensureIl.Append(Instruction.Create(OpCodes.Call, emitReference));
+        ensureIl.Append(Instruction.Create(OpCodes.Ldarg_1));
+        ensureIl.Append(Instruction.Create(OpCodes.Newobj, propertyTweenerCtor));
+        ensureIl.Append(Instruction.Create(OpCodes.Ret));
+        var ensureReference = module.ImportReference(ensure);
+
+        // Godot 4.5.1 generated bindings route Tween.TweenProperty through a signature-specific
+        // Godot.NativeCalls helper. Physical 0.0.203 proved that helper reaches
+        // InteropUtils.UnmanagedGetManaged and returns null. Do not patch the shared
+        // InteropUtils method globally: instead, prove the NativeCalls helper selected by
+        // TweenProperty has exactly one callsite in the entire GodotSharp image and patch only
+        // its one native-pointer -> managed-wrapper conversion.
+        var tweenNativeCalls = tweenProperty.Body.Instructions
+            .Where(instruction =>
+                (instruction.OpCode.Code is Code.Call or Code.Callvirt) &&
+                instruction.Operand is MethodReference called &&
+                called.DeclaringType.FullName == "Godot.NativeCalls" &&
+                called.ReturnType.FullName == "Godot.GodotObject")
+            .Select(instruction => (MethodReference)instruction.Operand)
+            .ToArray();
+        if (tweenNativeCalls.Length != 1)
+            throw new InvalidDataException($"Step-59.6 expected exactly one Godot.NativeCalls object-return helper in Tween.TweenProperty; found {tweenNativeCalls.Length}.");
+        var tweenNativeCall = tweenNativeCalls[0];
+        var nativeHelper = allMethods.SingleOrDefault(method => method.FullName == tweenNativeCall.FullName)
+            ?? throw new MissingMethodException($"Step-59.6 could not resolve Tween.TweenProperty native helper {tweenNativeCall.FullName} locally.");
+        var helperCallsites = allMethods
+            .SelectMany(method => method.Body.Instructions.Select(instruction => (Method: method, Instruction: instruction)))
+            .Where(item => (item.Instruction.OpCode.Code is Code.Call or Code.Callvirt) &&
+                           item.Instruction.Operand is MethodReference called && called.FullName == nativeHelper.FullName)
+            .ToArray();
+        if (helperCallsites.Length != 1 || !ReferenceEquals(helperCallsites[0].Method, tweenProperty))
+            throw new InvalidDataException($"Step-59.6 refuses to specialize shared native helper {nativeHelper.FullName}: callsites={helperCallsites.Length}; expected sole caller Tween.TweenProperty.");
+
+        var unmanagedCalls = nativeHelper.Body.Instructions.Where(instruction =>
+            (instruction.OpCode.Code is Code.Call or Code.Callvirt) &&
+            instruction.Operand is MethodReference called &&
+            called.DeclaringType.FullName == "Godot.NativeInterop.InteropUtils" &&
+            called.Name == "UnmanagedGetManaged" &&
+            called.Parameters.Count == 1 &&
+            called.Parameters[0].ParameterType.FullName == "System.IntPtr" &&
+            called.ReturnType.FullName == "Godot.GodotObject").ToArray();
+        if (unmanagedCalls.Length != 1)
+            throw new InvalidDataException($"Step-59.6 expected exactly one UnmanagedGetManaged(IntPtr) call in dedicated helper {nativeHelper.FullName}; found {unmanagedCalls.Length}.");
+        var unmanagedCall = unmanagedCalls[0];
+        if (IsInstructionBranchTarget(nativeHelper, unmanagedCall))
+            throw new InvalidDataException($"Step-59.6 refuses to insert the PropertyTweener fallback around branch-target callsite IL_{unmanagedCall.Offset:X4} in {nativeHelper.FullName}.");
+
+        nativeHelper.Body.InitLocals = true;
+        var nativePtrLocal = new VariableDefinition(module.TypeSystem.IntPtr);
+        nativeHelper.Body.Variables.Add(nativePtrLocal);
+        ReserveLiveStackDiagnosticMarkerSlot(nativeHelper);
+        var helperIl = nativeHelper.Body.GetILProcessor();
+        helperIl.InsertBefore(unmanagedCall, Instruction.Create(OpCodes.Dup));
+        helperIl.InsertBefore(unmanagedCall, Instruction.Create(OpCodes.Stloc, nativePtrLocal));
+        var loadNativePtr = Instruction.Create(OpCodes.Ldloc, nativePtrLocal);
+        helperIl.InsertAfter(unmanagedCall, loadNativePtr);
+        helperIl.InsertAfter(loadNativePtr, Instruction.Create(OpCodes.Call, ensureReference));
+
+        var fluentReport = new List<string>();
+        foreach (var name in new[] { "SetEase", "SetTrans", "FromCurrent" })
+        {
+            var methods = propertyTweener.Methods.Where(method => method.Name == name && !method.IsStatic && method.HasBody && method.ReturnType.FullName == "Godot.PropertyTweener").ToArray();
+            if (methods.Length != 1)
+                throw new InvalidDataException($"Step-59.6 expected exactly one PropertyTweener.{name} returning PropertyTweener; found {methods.Length}.");
+            var nativeCalls = methods[0].Body.Instructions.Where(instruction =>
+                (instruction.OpCode.Code is Code.Call or Code.Callvirt) &&
+                instruction.Operand is MethodReference called && called.DeclaringType.FullName == "Godot.NativeCalls").Select(instruction => (MethodReference)instruction.Operand).ToArray();
+            if (nativeCalls.Length != 1)
+                throw new InvalidDataException($"Step-59.6 expected exactly one NativeCalls helper in PropertyTweener.{name}; found {nativeCalls.Length}.");
+            fluentReport.Add($"Godot.PropertyTweener.{name}=UNCHANGED_SHARED_HELPER:{nativeCalls[0].Name}");
+        }
+
+        return $"Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER:{nativeHelper.Name}; helperCallsites=1; " + string.Join(" | ", fluentReport);
     }
 
     private static IReadOnlyList<GodotSharpDiagnosticMarker> BuildGodotSharpDiagnosticMarkerPlan(ModuleDefinition module)
@@ -3707,6 +3897,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         Guid Mvid,
         int MarkerCount,
         string MarkerMap,
+        string PropertyTweenerCompatibilityReport,
         string ConstantRequirementFingerprintSha256,
         int WriteResolutionRequestCount,
         int SyntheticConstantTypeCount,
@@ -4302,6 +4493,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
                             throw new InvalidDataException($"Step-59.5 GodotSharp PackedScene compatibility bridge field type drifted for {diagnosticOverride.SimpleName}: {compatibilityField.FieldType.FullName}.");
                         compatibilityField.SetValue(null, (Action<object, object>)ApplyPackedSceneInstancedRootUniqueNameCompatibility);
                         Checkpoint($"GODOT_PACKEDSCENE_UNIQUE_NAME_COMPAT_ARMED — {diagnosticOverride.SimpleName} PackedScene.Instantiate will reconcile only serialized instanced-root unique_name_in_owner=true overrides before returning each scene root.");
+                        var fallbackCountField = bridgeType.GetField(GodotSharpPropertyTweenerFallbackCountFieldName, BindingFlags.Static | BindingFlags.Public)
+                            ?? throw new MissingFieldException(diagnosticOverride.BridgeTypeFullName, GodotSharpPropertyTweenerFallbackCountFieldName);
+                        var fallbackPtrField = bridgeType.GetField(GodotSharpPropertyTweenerLastNativePtrFieldName, BindingFlags.Static | BindingFlags.Public)
+                            ?? throw new MissingFieldException(diagnosticOverride.BridgeTypeFullName, GodotSharpPropertyTweenerLastNativePtrFieldName);
+                        var fallbackMethod = bridgeType.GetMethod(GodotSharpPropertyTweenerFallbackMethodName, BindingFlags.Static | BindingFlags.Public)
+                            ?? throw new MissingMethodException(diagnosticOverride.BridgeTypeFullName, GodotSharpPropertyTweenerFallbackMethodName);
+                        if (fallbackCountField.FieldType != typeof(int) || fallbackPtrField.FieldType != typeof(IntPtr) || fallbackMethod.ReturnType.FullName != "Godot.GodotObject")
+                            throw new InvalidDataException("Step-59.6 GodotSharp PropertyTweener compatibility bridge signature drifted at load time.");
+                        Checkpoint($"GODOT_PROPERTY_TWEENER_COMPAT_ARMED — {diagnosticOverride.SimpleName} preserves normal managed returns, but if a PropertyTweener return has managed=null and nativePtr!=0 it constructs the exact internal PropertyTweener(IntPtr) wrapper; fallback counter starts at {fallbackCountField.GetValue(null)}.");
                     }
                     Checkpoint($"GODOT_DIAGNOSTIC_BRIDGE_ARMED — {diagnosticOverride.SimpleName} entry-only callback armed before resolver returned the assembly; markerCount={diagnosticOverride.MarkerCount}.");
                 }

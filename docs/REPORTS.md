@@ -72,3 +72,12 @@ Physical 0.0.198 proves SceneState=true -> fresh off-tree instanced-subscene roo
 The same IPA exposes `Step59R-ControllerSingletonRehearsal`, `Step59H-IsolatedRegisterHotkeys`, `Step59U-IsolatedUpdateControllerButton`, `Step59T-IsolatedConfirmButtonTail`, `Step59E-IsolatedEmbarkEnable`, Step59D, and the real Step59 transition. 59T writes durable `M59T_STAGE_PRE`, `M59T_STAGE_POST`, or `M59T_STAGE_FAIL` boundaries for each post-base visual/tween operation so the exact failing stage survives even when the probe throws.
 
 Physical 0.0.202 Step-54 regression evidence is preserved under `docs/history/reports/STEP-54-PHYSICAL-0.0.202-REGRESSION-*`; it is historical evidence for rejecting runtime-wide tracing, not an active prerequisite.
+
+
+## 0.0.204 PropertyTweener managed-wrapper evidence contract
+
+Physical 0.0.203 established the expected control pattern: 59U returns; 59T fails exactly when `Tween.TweenProperty` returns null after `Node.CreateTween` succeeds; 59E reproduces the same `NConfirmButton.OnEnable` NRE outside the real transition. 0.0.204 keeps those probes and adds `[PROPERTYTWEENER MANAGED-WRAPPER COMPATIBILITY]` state to the Step-59 diagnostic deck and 59T/59E evidence.
+
+For 59T, preserve the Step59 crash checkpoint, `Step59T-IsolatedConfirmButtonTail.txt`, and its static map. The key sequence is `M59T_STAGE_PRE/POST` plus `M59T_PROPERTY_TWEENER_COMPAT`. A successful compatibility run should show `Tween.TweenProperty` returning normally and then naturally reach `PropertyTweener.SetEase`, `SetTrans`, and `FromCurrent`. If fallbackCount increments, lastNativePtr must be nonzero. A true native null must never trigger fallback.
+
+If 59T passes, use a fresh process for 59E and preserve `M59E_PROPERTY_TWEENER_COMPAT`. If 59E passes, use a fresh process for real Step 59. If real Step 59 succeeds, continue through 60/61/62 without a new compilation.

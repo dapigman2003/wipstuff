@@ -1019,11 +1019,105 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 var interopUtils = new TypeDefinition("Godot.NativeInterop", "InteropUtils", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
                 module.Types.Add(interopUtils);
                 AddMethod(interopUtils, "EngineGetSingleton", module.TypeSystem.Object, module.TypeSystem.String);
-                AddMethod(interopUtils, "UnmanagedGetManaged", module.TypeSystem.Object, module.TypeSystem.Object);
+                var unmanagedGetManaged = AddMethod(interopUtils, "UnmanagedGetManaged", godotObject, module.TypeSystem.IntPtr);
+                var tweenPropertyNativeHelper = new MethodDefinition("godot_icall_4_1441",
+                    Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+                    godotObject);
+                tweenPropertyNativeHelper.Parameters.Add(new ParameterDefinition(module.TypeSystem.Object));
+                tweenPropertyNativeHelper.Parameters.Add(new ParameterDefinition(module.TypeSystem.IntPtr));
+                tweenPropertyNativeHelper.Parameters.Add(new ParameterDefinition(module.TypeSystem.IntPtr));
+                tweenPropertyNativeHelper.Parameters.Add(new ParameterDefinition(module.TypeSystem.Object));
+                tweenPropertyNativeHelper.Parameters.Add(new ParameterDefinition(module.TypeSystem.Double));
+                var nativeHelperIl = tweenPropertyNativeHelper.Body.GetILProcessor();
+                nativeHelperIl.Append(nativeHelperIl.Create(OpCodes.Ldc_I4_1));
+                nativeHelperIl.Append(nativeHelperIl.Create(OpCodes.Conv_I));
+                nativeHelperIl.Append(nativeHelperIl.Create(OpCodes.Call, unmanagedGetManaged));
+                nativeHelperIl.Append(nativeHelperIl.Create(OpCodes.Ret));
+                nativeCalls.Methods.Add(tweenPropertyNativeHelper);
+                var propertyTweenerSharedZero = new MethodDefinition("godot_icall_0_63",
+                    Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+                    godotObject);
+                var sharedZeroIl = propertyTweenerSharedZero.Body.GetILProcessor();
+                sharedZeroIl.Append(sharedZeroIl.Create(OpCodes.Ldc_I4_1));
+                sharedZeroIl.Append(sharedZeroIl.Create(OpCodes.Conv_I));
+                sharedZeroIl.Append(sharedZeroIl.Create(OpCodes.Call, unmanagedGetManaged));
+                sharedZeroIl.Append(sharedZeroIl.Create(OpCodes.Ret));
+                nativeCalls.Methods.Add(propertyTweenerSharedZero);
+                var propertyTweenerSharedOne = new MethodDefinition("godot_icall_1_71",
+                    Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+                    godotObject);
+                propertyTweenerSharedOne.Parameters.Add(new ParameterDefinition(module.TypeSystem.Int64));
+                var sharedOneIl = propertyTweenerSharedOne.Body.GetILProcessor();
+                sharedOneIl.Append(sharedOneIl.Create(OpCodes.Ldc_I4_1));
+                sharedOneIl.Append(sharedOneIl.Create(OpCodes.Conv_I));
+                sharedOneIl.Append(sharedOneIl.Create(OpCodes.Call, unmanagedGetManaged));
+                sharedOneIl.Append(sharedOneIl.Create(OpCodes.Ret));
+                nativeCalls.Methods.Add(propertyTweenerSharedOne);
 
                 var marshaling = new TypeDefinition("Godot.NativeInterop", "Marshaling", Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class, module.TypeSystem.Object);
                 module.Types.Add(marshaling);
                 AddMethod(marshaling, "ConvertStringToNative", module.TypeSystem.Object, module.TypeSystem.String);
+
+                // 0.0.204 host-regression contract: physical 59T proved Tween.TweenProperty
+                // returns null after a successful CreateTween/native call. Model the generated
+                // GodotSharp return path so the PropertyTweener nonzero-native-pointer fallback
+                // is serialized and re-opened in CI before a physical build is trusted.
+                var propertyTweener = new TypeDefinition("Godot", "PropertyTweener",
+                    Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
+                    godotObject);
+                module.Types.Add(propertyTweener);
+                var propertyTweenerCtor = new MethodDefinition(".ctor",
+                    Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.HideBySig |
+                    Mono.Cecil.MethodAttributes.SpecialName | Mono.Cecil.MethodAttributes.RTSpecialName,
+                    module.TypeSystem.Void);
+                propertyTweenerCtor.Parameters.Add(new ParameterDefinition("nativePtr", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.IntPtr));
+                propertyTweenerCtor.Body.GetILProcessor().Append(propertyTweenerCtor.Body.GetILProcessor().Create(OpCodes.Ret));
+                propertyTweener.Methods.Add(propertyTweenerCtor);
+
+                static MethodDefinition AddInstanceNativeReturn(
+                    TypeDefinition type,
+                    string name,
+                    TypeReference returnType,
+                    MethodReference nativeHelper,
+                    TypeReference? parameter = null)
+                {
+                    var method = new MethodDefinition(name, Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig, returnType);
+                    if (parameter is not null) method.Parameters.Add(new ParameterDefinition(parameter));
+                    var il = method.Body.GetILProcessor();
+                    if (parameter is not null) il.Append(il.Create(OpCodes.Ldarg_1));
+                    il.Append(il.Create(OpCodes.Call, nativeHelper));
+                    il.Append(il.Create(OpCodes.Isinst, returnType));
+                    il.Append(il.Create(OpCodes.Ret));
+                    type.Methods.Add(method);
+                    return method;
+                }
+                AddInstanceNativeReturn(propertyTweener, "SetEase", propertyTweener, propertyTweenerSharedOne, module.TypeSystem.Int64);
+                AddInstanceNativeReturn(propertyTweener, "SetTrans", propertyTweener, propertyTweenerSharedOne, module.TypeSystem.Int64);
+                AddInstanceNativeReturn(propertyTweener, "FromCurrent", propertyTweener, propertyTweenerSharedZero);
+
+                var tween = new TypeDefinition("Godot", "Tween",
+                    Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
+                    godotObject);
+                module.Types.Add(tween);
+                var tweenProperty = new MethodDefinition("TweenProperty",
+                    Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig,
+                    propertyTweener);
+                tweenProperty.Parameters.Add(new ParameterDefinition("target", Mono.Cecil.ParameterAttributes.None, godotObject));
+                tweenProperty.Parameters.Add(new ParameterDefinition("property", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.Object));
+                tweenProperty.Parameters.Add(new ParameterDefinition("finalValue", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.Object));
+                tweenProperty.Parameters.Add(new ParameterDefinition("duration", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.Double));
+                var tweenPropertyIl = tweenProperty.Body.GetILProcessor();
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Ldnull));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Ldc_I4_0));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Conv_I));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Ldc_I4_0));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Conv_I));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Ldnull));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Ldc_R8, 0.35D));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Call, tweenPropertyNativeHelper));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Isinst, propertyTweener));
+                tweenPropertyIl.Append(tweenPropertyIl.Create(OpCodes.Ret));
+                tween.Methods.Add(tweenProperty);
 
                 // 0.0.200 host-regression contract: the 0.0.199 GodotSharp derivative now
                 // rewrites the real instance PackedScene.Instantiate(GenEditState) return path.
@@ -1089,6 +1183,32 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             var packedSceneCompatibilityField = serializedBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPackedSceneCompatibilityCallbackFieldName);
             Assert.IsNotNull(packedSceneCompatibilityField);
             Assert.AreEqual("System.Action`2<System.Object,System.Object>", packedSceneCompatibilityField.FieldType.FullName);
+            var propertyTweenerFallbackCountField = serializedBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackCountFieldName);
+            var propertyTweenerLastPtrField = serializedBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerLastNativePtrFieldName);
+            var propertyTweenerFallbackMethod = serializedBridge.Methods.SingleOrDefault(method => method.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackMethodName);
+            Assert.IsNotNull(propertyTweenerFallbackCountField);
+            Assert.IsNotNull(propertyTweenerLastPtrField);
+            Assert.IsNotNull(propertyTweenerFallbackMethod);
+            Assert.AreEqual("System.Int32", propertyTweenerFallbackCountField.FieldType.FullName);
+            Assert.AreEqual("System.IntPtr", propertyTweenerLastPtrField.FieldType.FullName);
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER:godot_icall_4_1441");
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetEase=UNCHANGED_SHARED_HELPER:");
+            Assert.IsTrue(propertyTweenerFallbackMethod.Body.Instructions.Any(instruction =>
+                instruction.OpCode.Code == Code.Newobj && instruction.Operand is MethodReference ctorRef &&
+                ctorRef.DeclaringType.FullName == "Godot.PropertyTweener" && ctorRef.Parameters.Count == 1 &&
+                ctorRef.Parameters[0].ParameterType.FullName == "System.IntPtr"));
+
+            var serializedTween = reopened.MainModule.Types.Single(type => type.FullName == "Godot.Tween");
+            var serializedTweenProperty = serializedTween.Methods.Single(method => method.Name == "TweenProperty" && method.Parameters.Count == 4);
+            var serializedTweenNativeCall = serializedTweenProperty.Body.Instructions.Single(instruction =>
+                instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
+                call.DeclaringType.FullName == "Godot.NativeCalls" && call.ReturnType.FullName == "Godot.GodotObject");
+            var serializedTweenNativeRef = (MethodReference)serializedTweenNativeCall.Operand;
+            var serializedTweenNativeHelper = reopened.MainModule.Types.SelectMany(type => type.Methods).Single(method => method.FullName == serializedTweenNativeRef.FullName);
+            Assert.AreEqual(1, serializedTweenNativeHelper.Body.Instructions.Count(instruction =>
+                instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
+                call.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName &&
+                call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackMethodName));
 
             var serializedPackedScene = reopened.MainModule.Types.Single(type => type.FullName == "Godot.PackedScene");
             var serializedInstantiate = serializedPackedScene.Methods.Single(method =>

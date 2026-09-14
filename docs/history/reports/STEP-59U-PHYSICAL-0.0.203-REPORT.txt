@@ -1,0 +1,22 @@
+StS2 Launcher — Step 59U Isolated UpdateControllerButton Probe
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-14T08:06:28.5840250+00:00
+
+RESULT
+STEP 59U: UPDATECONTROLLERBUTTON RETURNED
+
+METADATA
+App version: 0.0.203 (203)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+The isolated UpdateControllerButton path returned. Preserve the report and relaunch before any other Step-59 experiment.
+
+END OF REPORT

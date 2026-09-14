@@ -1,8 +1,12 @@
-# 0.0.203 current-ownership release checklist
+# 0.0.204 PropertyTweener compatibility release checklist
 
-- Bundle identity must be **0.0.203 (203)**.
-- `TransformedRealStS2VeryEarlyInitialization.cs` must match the 0.0.201 proven runtime source byte-for-byte.
+- Bundle identity must be **0.0.204 (204)**.
+- The active VeryEarlyInitialization may change only for the bounded GodotSharp PropertyTweener compatibility; the proven PackedScene compatibility slice is separately hash-pinned unchanged.
 - No `Step59RuntimeTrace`, `ConfirmButtonCheckpointBridge`, or `STEP59TRACE_` runtime instrumentation may exist in active source.
+- The proven PackedScene instanced-root unique-name compatibility implementation must remain byte-identical to 0.0.203.
+- GodotSharp `Tween.TweenProperty` compatibility may specialize only its dedicated one-callsite `Godot.NativeCalls` helper: normal managed return unchanged; native pointer zero remains null; managed-null with nonzero pointer may construct exact `Godot.PropertyTweener(IntPtr)`.
+- Shared `PropertyTweener.SetEase` / `SetTrans` / `FromCurrent` NativeCalls helpers must remain unpatched controls.
+- 59T/59E/static diagnostic state must expose PropertyTweener fallback count and last native pointer.
 - Step 58 must unlock from same-process Step 52 authority and call `RunStep58CurrentOwnershipAcquisition`; legacy Steps 53–57 are not prerequisites.
 - Step 58 acquisition may invoke exact `OpenSingleplayerSubmenu()` once only when the retained submenu is absent/inactive; it must keep rendering frozen and never invoke `OpenCharacterSelect`.
 - Step 59 branches 59D/59R/59H/59U/59T/59E and real 59 must all be present in the same IPA.

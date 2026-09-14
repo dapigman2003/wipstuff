@@ -1,8 +1,12 @@
-# 0.0.203 current-ownership / compilation-efficient testing
+# 0.0.204 PropertyTweener compatibility / compilation-efficient testing
 
-- Bundle identity must be **0.0.203 (203)**.
-- `TransformedRealStS2VeryEarlyInitialization.cs` must match the 0.0.201 proven runtime source byte-for-byte.
+- Bundle identity must be **0.0.204 (204)**.
+- The active VeryEarlyInitialization may change only for the bounded GodotSharp PropertyTweener compatibility; the proven PackedScene compatibility slice is separately hash-pinned unchanged.
 - No `Step59RuntimeTrace`, `ConfirmButtonCheckpointBridge`, or `STEP59TRACE_` runtime instrumentation may exist in active source.
+- The proven PackedScene instanced-root unique-name compatibility implementation must remain byte-identical to 0.0.203.
+- GodotSharp `Tween.TweenProperty` compatibility may specialize only its dedicated one-callsite `Godot.NativeCalls` helper: normal managed return unchanged; native pointer zero remains null; managed-null with nonzero pointer may construct exact `Godot.PropertyTweener(IntPtr)`.
+- Shared `PropertyTweener.SetEase` / `SetTrans` / `FromCurrent` NativeCalls helpers must remain unpatched controls.
+- 59T/59E/static diagnostic state must expose PropertyTweener fallback count and last native pointer.
 - Step 58 must unlock from same-process Step 52 authority and call `RunStep58CurrentOwnershipAcquisition`; legacy Steps 53–57 are not prerequisites.
 - Step 58 acquisition may invoke exact `OpenSingleplayerSubmenu()` once only when the retained submenu is absent/inactive; it must keep rendering frozen and never invoke `OpenCharacterSelect`.
 - Step 59 branches 59D/59R/59H/59U/59T/59E and real 59 must all be present in the same IPA.
@@ -77,7 +81,7 @@ Physical 0.0.200 is the expected baseline: unique-name provenance should already
 
 ### Compilation-efficient phone-run sequence
 
-Use **Step 59D first** after closing Step 58 in a fresh process. Require `RUN_START_DIAGNOSTIC_DECK`, `M59_B_CONFIRM_BUTTON_PREFLIGHT`, the `[COMPILATION-EFFICIENT STEP-59 DIAGNOSTIC DECK]` section, `[LIVE NCONFIRMBUTTON PEER MATRIX — WHOLE RETAINED SCENETREE]`, `[NULL-FIELD LIVE NODE CANDIDATE MATRIX]`, field/call-order sections, and one or more `[TRANSITIVE EXECUTION FRONTIER — ...]` sections. Require `M59D_B_STATIC_MAP_WRITE_RETURNED` and `RUN_STEP59D_COMPLETE`; there must be **no** `M59_C_HANDLER_ARMED`.
+Use **Step 59T first** after closing Step 58 in a fresh process. Physical 0.0.203 already localized the failure to `Tween.TweenProperty()` returning null after `CreateTween()` succeeds. Require stage evidence through TweenProperty plus `M59T_PROPERTY_TWEENER_COMPAT`; if the full tail passes, relaunch for 59E and then real Step 59. Step 59D remains an optional broad forensic control. Require `RUN_START_DIAGNOSTIC_DECK`, `M59_B_CONFIRM_BUTTON_PREFLIGHT`, the `[COMPILATION-EFFICIENT STEP-59 DIAGNOSTIC DECK]` section, `[LIVE NCONFIRMBUTTON PEER MATRIX — WHOLE RETAINED SCENETREE]`, `[NULL-FIELD LIVE NODE CANDIDATE MATRIX]`, field/call-order sections, and one or more `[TRANSITIVE EXECUTION FRONTIER — ...]` sections. Require `M59D_B_STATIC_MAP_WRITE_RETURNED` and `RUN_STEP59D_COMPLETE`; there must be **no** `M59_C_HANDLER_ARMED`.
 
 Only after reviewing Step59D should the normal Step 59 button be used, and then only in a **new process using the same compiled IPA**. If that handler fails, require `M59_C_CONFIRM_BUTTON_POSTFAIL` and `M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED`; the refreshed map must contain `[POST-FAILURE CONFIRM-BUTTON RUNTIME DECK]`. This post-failure deck is evidence only and does not authorize in-process retry.
 
