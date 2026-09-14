@@ -1,10 +1,18 @@
-## Current frontier — Steps 58–62 / 0.0.202
+# 0.0.203 active frontier
 
-**Active candidate — 0.0.202 compilation-efficient Step-59 callsite isolation.** Physical authority remains formally closed through Step 57 4/4/frozen. Physical 0.0.201 confirms the retained embark `NConfirmButton` is ready/in-tree with all audited direct Ready products populated before and after the reproducible `OnEnable()` NullReferenceException. The failed original transition also binds the exact retained submenu stack and creates a one-player `StartRunLobby`.
+**Active candidate — 0.0.203 current-ownership acquisition + compilation-efficient Step-59 isolation.** Physical history through Step 57 remains retained, but the ownership architecture no longer requires legacy Steps 53–57 as procedural prerequisites. Step 58 starts directly from Step 52 and may invoke exact game-owned `OpenSingleplayerSubmenu()` once only when the retained submenu must be materialized/activated. The 0.0.201 `PackedScene.Instantiate(GenEditState)` compatibility boundary is restored unchanged; 0.0.202 shared-method runtime tracing is rejected. One IPA exposes 59D, 59R, 59H `RegisterHotkeys`, 59U `UpdateControllerButton`, 59T post-base visual/tween tail, 59E isolated `Enable`, and the real Step 59 transition. Step 63 remains unopened.
 
-0.0.202 preserves the proven PackedScene compatibility behavior and adds no speculative game repair. Instead, the already-selected private sts2 compatibility derivative receives a synthetic Step-59 trace bridge whose callback is null during normal startup and is armed only around explicit Step-59 experiments. Stack-neutral `STEP59TRACE_*` markers bracket actual calls/returns in `NConfirmButton.OnEnable`, `NButton.OnEnable`, `RegisterHotkeys`, `UpdateControllerButton`, relevant getters, and NGame/hotkey/input/controller helpers.
+Compilation efficiency is a first-class rule: use multiple fresh-process phone experiments per build and avoid shared-method IL instrumentation when isolated probes can answer the same question.
 
-Compilation efficiency is first-class: the same IPA exposes Step 59D, read-only **59R** singleton/icon rehearsal, isolated **59U** `UpdateControllerButton()`, isolated **59E** retained-embark `Enable()`, and the original real Step 59 transition. Mutating micro-probes and the real handler are fresh-process one-shots. The known whole-tree peer-matrix ceiling is raised only for Step-59 peer evidence so another compilation is not needed just to remove that blind spot.
+---
+
+## Current frontier — Steps 58–62 / 0.0.201
+
+**Active candidate — 0.0.201 NConfirmButton OnEnable-preflight PackedScene instanced-root unique-name compatibility.** Physical authority remains formally closed through Step 57 4/4/frozen. Physical 0.0.200 proves the 0.0.199/0.0.200 correction in the **private Godot managed compatibility boundary**: `PackedScene.Instantiate(GenEditState)` now preserves the parent-scene `unique_name_in_owner=true` overrides on instanced-subscene roots, and the formerly missing character-select/NGame Ready-bound fields are populated.
+
+The next failure is later and narrower. Original `OpenCharacterSelect` reaches `NSubmenuStack.Push` → `NCharacterSelectScreen.OnSubmenuOpened()` → `_embarkButton.Enable()` and throws from `NConfirmButton.OnEnable()`. 0.0.201 retains `PackedScene.Instantiate(GenEditState)` compatibility behavior unchanged and adds only a fail-closed pre-handler forensic boundary around that retained `NConfirmButton`: live `_Ready` products (`_outline`, `_buttonImage`, `_viewport`, `_hotkeys`), exact selected IL, child graph, SceneState properties, and exact TSCN context. A definite missing prerequisite blocks before the one-shot handler is armed.
+
+Compilation efficiency is now a first-class constraint. One 0.0.201 IPA must support multiple cheap device experiments: **Step 59D** performs the expanded observational deck and stops before Gate C; the separate normal Step 59 run is used only from a fresh process if the Step59D evidence warrants it. The deck includes full inherited fields, whole-SceneTree confirm-button peers, observational accessors, null-field candidate nodes, Ready/Enable field-call ordering, and transitive frontiers. A failed real handler automatically adds a post-failure runtime deck to the durable map before UI return.
 
 No direct NConfirmButton field write, manual `_Ready()`, scene-owner mutation, StS2 TSCN/PCK mutation, or speculative `OnEnable` bypass is authorized. Steps 60–62 remain available only after a clean original transition. Step 63 remains unopened.
 

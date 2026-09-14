@@ -578,12 +578,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-STATIC-MAP.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-LAST-CHECKPOINT.txt`
 
-## Step 59.8 compilation-efficient callsite isolation / 0.0.202
-
-- `steps/STEP-59.8-COMPILATION-EFFICIENT-CALLSITE-TRACE-0.0.202.md` — records physical 0.0.201 retained-button/post-failure evidence and the compile-once 59D/59R/59U/59E/real-handler trace platform. Formal authority remains Step 57.
-- `reports/STEP-59D-PHYSICAL-0.0.201-PASS-REPORT.txt` / `...STATIC-MAP.txt` / `...CHECKPOINT.txt` — physical Step59D completed with no handler armed and no definite retained-button blocker.
-- `reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-REPORT.txt` / `...STATIC-MAP.txt` / `...CHECKPOINT.txt` / `...LAST-CHECKPOINT.txt` — separate fresh-process real Step 59 reproduces the `NConfirmButton.OnEnable()` NRE, preserves clean retained-button fields, exact stack binding and one-player lobby state.
-
 ## Step 59 physical NConfirmButton OnEnable localization / 0.0.201 preflight
 
 - `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-REPORT.txt` — physical 0.0.200 Step-59 result: PackedScene unique-name compatibility is healthy, then original `OpenCharacterSelect` fails at `NConfirmButton.OnEnable()` through the retained embark button.
@@ -591,3 +585,6 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-STATIC-MAP.txt` — durable SceneState/off-tree/live unique-name proof plus selected Step-59 IL/frontier evidence.
 - `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-LAST-CHECKPOINT.txt` — normal run end with rendering frozen and explicit no-retry-after-arm warning.
 - `steps/STEP-59.7-NCONFIRMBUTTON-ONENABLE-PREFLIGHT-0.0.201.md` — keeps PackedScene compatibility unchanged and adds a fail-closed retained-embark Ready/OnEnable field/IL/node/SceneState/TSCN preflight before any new handler arm.
+
+- `steps/STEP-59.9-CURRENT-OWNERSHIP-PIVOT-0.0.203.md` — rejects 0.0.202 runtime-wide tracing, restores the 0.0.201 runtime derivative, makes Step 52 -> Step 58 the active ownership path, and adds 59H/59T micro-probes.
+- `reports/STEP-54-PHYSICAL-0.0.202-REGRESSION-*` — physical evidence that 0.0.202 regressed the legacy Step-54 `RefreshButtons()` route.

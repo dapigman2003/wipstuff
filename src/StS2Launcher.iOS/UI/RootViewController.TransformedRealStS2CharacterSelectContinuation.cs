@@ -14,12 +14,14 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT SUSTAINED RENDER RESIDENCY");
 
     private UIButton? _step58Button; private UIButton? _step59Button; private UIButton? _step60Button; private UIButton? _step61Button; private UIButton? _step62Button;
-    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
+    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59RegisterHotkeysProbeButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59ConfirmTailProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
     private UILabel? _step58ResultLabel; private UILabel? _step59ResultLabel; private UILabel? _step60ResultLabel; private UILabel? _step61ResultLabel; private UILabel? _step62ResultLabel;
     private UILabel? _step58DetailLabel; private UILabel? _step59DetailLabel; private UILabel? _step60DetailLabel; private UILabel? _step61DetailLabel; private UILabel? _step62DetailLabel;
     private UILabel? _step59DiagnosticDeckResultLabel; private UILabel? _step59DiagnosticDeckDetailLabel;
     private UILabel? _step59ControllerRehearsalResultLabel; private UILabel? _step59ControllerRehearsalDetailLabel;
+    private UILabel? _step59RegisterHotkeysProbeResultLabel; private UILabel? _step59RegisterHotkeysProbeDetailLabel;
     private UILabel? _step59UpdateControllerProbeResultLabel; private UILabel? _step59UpdateControllerProbeDetailLabel;
+    private UILabel? _step59ConfirmTailProbeResultLabel; private UILabel? _step59ConfirmTailProbeDetailLabel;
     private UILabel? _step59IsolatedEnableProbeResultLabel; private UILabel? _step59IsolatedEnableProbeDetailLabel;
     private bool _step59TransitionUiStarted; private bool _step59DiagnosticDeckUiStarted; private bool _step59ControllerRehearsalUiStarted; private bool _step59MutationProbeUiStarted; private bool _step61PulseUiStarted; private bool _step62PulseUiStarted;
 
@@ -28,43 +30,55 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Requires the physically proven Step 57 extension in the same fresh process. Physical 0.0.201 proves the retained embark NConfirmButton is ready/in-tree with its obvious fields populated immediately before and after the reproducible OnEnable NullReferenceException. This 0.0.202 build is compilation-efficient: the private sts2 compatibility derivative now contains an inert Step-59-only callsite trace bridge that is armed only around explicit probes/real handler execution, plus multiple separately runnable phone experiments (59D deep map, 59R controller/singleton rehearsal, 59U isolated UpdateControllerButton, 59E isolated embark Enable, and the normal real Step 59 transition). Use a fresh process for each mutating/real-handler experiment. Steps 60–62 remain locked unless the real handler succeeds. Step 63/continuous interactive ownership remains unopened.",
+            "0.0.203 returns to the physically proven 0.0.201 runtime derivative and removes 0.0.202's runtime-wide Step-59 instrumentation. The current architecture now starts Step 58 directly from the closed Step-52 main-menu baseline: it adopts an existing single-player submenu or, only when needed, invokes the game's own OpenSingleplayerSubmenu once to materialize/activate the retained ownership state, then audits character-select ownership. Legacy Steps 53–57 remain available as historical/optional diagnostics but are no longer prerequisites. The same IPA also contains separately runnable Step-59 branches (59D, 59R, 59H RegisterHotkeys, 59U UpdateControllerButton, 59T post-base confirm-button tail, 59E full isolated Enable, and the real Step 59 transition). Use a fresh process for each mutating/real-handler experiment. Steps 60–62 remain locked unless the real handler succeeds. Step 63 remains unopened.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
             "Step 58.0 — adopt/audit actual game-owned character-select runtime state",
             "Run Step 58.0 A–D — AUDIT OWNERSHIP", "CHARACTER SELECT RUNTIME OWNERSHIP AUDIT: LOCKED",
-            "Requires Step 57.0 4/4. Rebinds exact OpenCharacterSelect(NButton), proves its button parameter is unused, records the actual _characterSelectSubmenu state whether absent/off-tree/in-tree/visible, and re-audits the whole real handler frontier without invoking it. No artificial null/off-tree prerequisite remains.");
+            "Requires Step 52.0 4/4 only. Gate A acquires the current game-owned single-player/character-select ownership surface directly from the retained main menu, adopting a visible submenu if already present or invoking exact game-owned OpenSingleplayerSubmenu once if materialization/activation is required. It then rebinds/audits OpenCharacterSelect and the actual _characterSelectSubmenu state. Steps 53–57 are not prerequisites.");
         _step58Button.TouchUpInside += async (_, _) => await RunStep58StartupLadderAsync();
 
         (_step59DiagnosticDeckButton, _step59DiagnosticDeckResultLabel, _step59DiagnosticDeckDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59D — compilation-efficient deep diagnostic deck (NO HANDLER)",
             "Run Step 59D — DEEP DIAGNOSTICS ONLY", "STEP 59D DEEP DIAGNOSTIC DECK: LOCKED",
-            "Regression/forensic deck. Executes only Step-59 Gates A+B, writes the full ready/unique-name/embark field matrix plus expanded whole-SceneTree NConfirmButton peer comparison, observational accessors, null-field live-node candidates, exact IL field/call order, runtime trace-bridge preflight, and transitive execution frontiers. It intentionally stops before NSubmenuStack.Push/OpenCharacterSelect; no one-shot handler arm, field write, _Ready replay, OnEnable call, render restart, character input, or embark action.");
+            "Regression/forensic deck. Executes only Step-59 Gates A+B, writes the full ready/unique-name/embark field matrix plus expanded whole-SceneTree NConfirmButton peer comparison, observational accessors, null-field live-node candidates, exact IL field/call order, transitive execution frontiers and the expanded peer traversal. It intentionally stops before NSubmenuStack.Push/OpenCharacterSelect; no one-shot handler arm, field write, _Ready replay, OnEnable call, render restart, character input, or embark action.");
         _step59DiagnosticDeckButton.TouchUpInside += async (_, _) => await RunStep59DiagnosticDeckAsync();
 
         (_step59ControllerRehearsalButton, _step59ControllerRehearsalResultLabel, _step59ControllerRehearsalDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59R — controller/hotkey singleton + icon lookup rehearsal (NO HANDLER)",
             "Run Step 59R — CONTROLLER REHEARSAL", "STEP 59R CONTROLLER REHEARSAL: LOCKED",
-            "Recommended first 0.0.202 diagnostic run after Step 58. Repeats Gates A+B, then arms the synthetic Step-59 trace callback only around observational getters/icon lookups. It compares NGame HotkeyManager/InputManager with static singleton getters, resolves ControllerManager/IsUsingController, rehearses controller-icon lookup when a key exists, dumps manager fields/load-context identity, and performs no Enable/OnEnable/RegisterHotkeys/PushHotkey binding/OpenCharacterSelect.");
+            "Recommended first 0.0.203 diagnostic run after Step 58. Repeats Gates A+B, then performs observational getters/icon lookups. It compares NGame HotkeyManager/InputManager with static singleton getters, resolves ControllerManager/IsUsingController, rehearses controller-icon lookup when a key exists, dumps manager fields/load-context identity, and performs no Enable/OnEnable/RegisterHotkeys/PushHotkey binding/OpenCharacterSelect.");
         _step59ControllerRehearsalButton.TouchUpInside += async (_, _) => await RunStep59ControllerRehearsalAsync();
+
+        (_step59RegisterHotkeysProbeButton, _step59RegisterHotkeysProbeResultLabel, _step59RegisterHotkeysProbeDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59H — isolated retained embark RegisterHotkeys probe",
+            "Run Step 59H — REGISTER HOTKEYS ONLY", "STEP 59H REGISTERHOTKEYS PROBE: LOCKED",
+            "Fresh-process one-shot diagnostic. Repeats Gates A+B, then invokes only inherited NButton.RegisterHotkeys() on the retained embark button. It never calls UpdateControllerButton, Enable/OnEnable, submenu Push, or OpenCharacterSelect. It may add hotkey bindings, so terminate/relaunch afterward.");
+        _step59RegisterHotkeysProbeButton.TouchUpInside += async (_, _) => await RunStep59RegisterHotkeysProbeAsync();
 
         (_step59UpdateControllerProbeButton, _step59UpdateControllerProbeResultLabel, _step59UpdateControllerProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59U — isolated retained embark UpdateControllerButton probe",
             "Run Step 59U — UPDATE CONTROLLER ONLY", "STEP 59U UPDATECONTROLLERBUTTON PROBE: LOCKED",
-            "Fresh-process one-shot diagnostic. Repeats Gates A+B, then invokes only the inherited NButton.UpdateControllerButton() on the retained hidden embark button with the internal callsite trace armed. It never calls Enable/OnEnable/RegisterHotkeys/OpenCharacterSelect. It may update the controller-icon UI state, so terminate/relaunch after this probe.");
+            "Fresh-process one-shot diagnostic. Repeats Gates A+B, then invokes only the inherited NButton.UpdateControllerButton() on the retained hidden embark button without modifying the selected sts2 derivative. It never calls Enable/OnEnable/RegisterHotkeys/OpenCharacterSelect. It may update the controller-icon UI state, so terminate/relaunch after this probe.");
         _step59UpdateControllerProbeButton.TouchUpInside += async (_, _) => await RunStep59UpdateControllerProbeAsync();
+
+        (_step59ConfirmTailProbeButton, _step59ConfirmTailProbeResultLabel, _step59ConfirmTailProbeDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59T — isolated NConfirmButton post-base visual/tween tail",
+            "Run Step 59T — CONFIRM TAIL ONLY", "STEP 59T CONFIRM-BUTTON TAIL PROBE: LOCKED",
+            "Fresh-process one-shot diagnostic. Replays only the post-base portion of NConfirmButton.OnEnable with stage-by-stage durable checkpoints: outline/image Modulate changes, existing tween Kill, Node.CreateTween, TweenProperty, SetEase, SetTrans and FromCurrent. It never calls NButton.OnEnable/RegisterHotkeys/UpdateControllerButton/OpenCharacterSelect. Relaunch afterward.");
+        _step59ConfirmTailProbeButton.TouchUpInside += async (_, _) => await RunStep59ConfirmTailProbeAsync();
 
         (_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59E — isolated retained embark Enable probe",
             "Run Step 59E — ISOLATED EMBARK ENABLE", "STEP 59E ISOLATED EMBARK ENABLE: LOCKED",
-            "Fresh-process one-shot diagnostic. Calls the retained embark NClickableControl.Enable() directly outside OpenCharacterSelect while the new internal trace records exact NConfirmButton/NButton/hotkey/controller callsites. This intentionally mutates only the button/hotkey/tween lifecycle state and never performs submenu Push/OpenCharacterSelect, character selection, embark, or run start. Relaunch after this probe.");
+            "Fresh-process one-shot diagnostic. Calls the retained embark NClickableControl.Enable() directly outside OpenCharacterSelect outside OpenCharacterSelect; use 59H/59U/59T alongside it to isolate the failing subpath without runtime-wide IL instrumentation. This intentionally mutates only the button/hotkey/tween lifecycle state and never performs submenu Push/OpenCharacterSelect, character selection, embark, or run start. Relaunch after this probe.");
         _step59IsolatedEnableProbeButton.TouchUpInside += async (_, _) => await RunStep59IsolatedEnableProbeAsync();
 
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. This is the real-transition experiment from the same 0.0.202 IPA. Gate B reruns the full deep diagnostic deck and proves the synthetic trace bridge is inert. Gate C arms that callback only for the exact original OpenCharacterSelect invocation; every instrumented NConfirmButton/NButton/hotkey/controller entry/call/return breadcrumb is durably journaled. If the handler still throws, the callback is cleared before the post-failure field/peer snapshot is captured. Rendering stays frozen.");
+            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. This is the real-transition experiment from the same 0.0.203 IPA. Gate B reruns the full deep diagnostic deck. Gate C invokes the exact original OpenCharacterSelect once; if it throws, the post-failure field/peer snapshot is captured before UI return. The selected sts2 derivative is not runtime-instrumented. Rendering stays frozen.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,
@@ -100,24 +114,24 @@ public sealed partial class RootViewController
     private async Task RunStep58StartupLadderAsync()
     {
         const int step = 58;
-        if (!TryPrepareStartupLadderStep(step, _step57Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep57ClosurePassed,
-                "Step 58.0 requires Step 57.0 4/4 retained-PackedScene/PCK authority in this same process.", out var button, out var resultLabel, out var detailLabel)) return;
+        if (!TryPrepareStartupLadderStep(step, _step52Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep52ClosurePassed,
+                "Step 58.0 current ownership path requires only Step 52.0 4/4 in this same process; legacy Steps 53–57 are optional diagnostics.", out var button, out var resultLabel, out var detailLabel)) return;
         if (!TryInitializeStartupLadderTelemetry(step, "Character-select runtime ownership audit", "Step58-CharacterSelectOwnership-StaticMap", out var error)) { SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return; }
         BeginSteamOperation(allowCancel: false); _step58Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START — Step 58.0 actual game-owned character-select state + real OpenCharacterSelect frontier audit started; no mutation/rendering.");
-            if (!RecordStartupLadderGate(_step58Gates, _transformedRealStS2VeryEarlyInitialization.RunStep58ClosedStep57Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            WriteStartupLadderCheckpoint(step, "RUN_START — Step 58.0 current ownership acquisition + character-select audit started from Step-52 authority. Legacy Steps53-57 are skipped. Gate A may invoke exact game-owned OpenSingleplayerSubmenu once only if the retained submenu is absent/inactive; rendering remains frozen.");
+            if (!RecordStartupLadderGate(_step58Gates, _transformedRealStS2VeryEarlyInitialization.RunStep58CurrentOwnershipAcquisition(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step58Gates, _transformedRealStS2VeryEarlyInitialization.RunStep58RuntimeOwnershipBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step58Gates, _transformedRealStS2VeryEarlyInitialization.RunStep58OpenCharacterSelectFrontierAudit(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 58 ownership map write failed: " + mapError);
-            _transformedRealStS2VeryEarlyInitialization.MarkStep58StaticMapDurablyWritten(); WriteStartupLadderCheckpoint(step, "M58_C_STATIC_MAP_WRITE_RETURNED — runtime ownership + real-handler frontier evidence durably written; no mutation occurred.");
+            _transformedRealStS2VeryEarlyInitialization.MarkStep58StaticMapDurablyWritten(); WriteStartupLadderCheckpoint(step, "M58_C_STATIC_MAP_WRITE_RETURNED — current ownership + real-handler frontier evidence durably written; no OpenCharacterSelect mutation occurred.");
             if (!RecordStartupLadderGate(_step58Gates, _transformedRealStS2VeryEarlyInitialization.RunStep58FrozenOwnershipConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             CompleteStartupLadderStep(step, _step58Gates, resultLabel, detailLabel, "RUNTIME OWNERSHIP AUDIT CLOSED 4/4. Step 59 may let the real game handler finish the transition only if needed."); button.Enabled = false;
             WriteStartupLadderCheckpoint(step, "RUN_STEP58_4OF4 — actual game-owned character-select state accepted/audited; Step 59 real-handler transition unlocked.");
         }
         catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: false); }
-        finally { await FinishStartupLadderStepAsync(step, "Step58-TransformedRealStS2CharacterSelectOwnership.txt", "StS2 Launcher — Step 58.0 Character Select Runtime Ownership Audit", resultLabel, detailLabel, "Step 58 never invokes OpenCharacterSelect or restarts rendering."); }
+        finally { await FinishStartupLadderStepAsync(step, "Step58-TransformedRealStS2CharacterSelectOwnership.txt", "StS2 Launcher — Step 58.0 Character Select Runtime Ownership Audit", resultLabel, detailLabel, "Step 58 never invokes OpenCharacterSelect or restarts rendering. Gate A may invoke exact game-owned OpenSingleplayerSubmenu once when current ownership needs materialization/activation."); }
     }
 
     private bool TryPrepareStep59DiagnosticDeck(out UIButton button, out UILabel resultLabel, out UILabel detailLabel)

@@ -1,0 +1,12 @@
+StS2 Launcher — Step 54.0 frozen single-player submenu runtime binding map
+Selected compatibility SHA-256: 2e76bca2b7281b4cf5d8d42abc679f91365d53ba9f901598044e9606905bcb4c
+OpenSingleplayerSubmenu runtime token=0x06003E3A; exact Step-53 token match=True
+NMainMenu property: SubmenuStack; propertyType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack
+NMainMenuSubmenuStack field: _singleplayerSubmenu; fieldType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu
+Submenu existed before open: False
+Submenu inside tree before open: False
+Submenu Visible before open: False
+Submenu IsVisibleInTree before open: False
+SingleplayerButtonPressed invoked: NO
+OpenSingleplayerSubmenu invoked: NO
+Rendering restarted: NO

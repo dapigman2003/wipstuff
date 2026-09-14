@@ -65,13 +65,13 @@ public sealed partial class RootViewController
             var diagnostics = _transformedRealStS2VeryEarlyInitialization.RunStep59ControllerSingletonRehearsal(d => WriteStartupLadderCheckpoint(step, d));
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59R controller/singleton map write failed: " + mapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten();
-            WriteStartupLadderCheckpoint(step, "M59R_STATIC_MAP_WRITE_RETURNED — controller/hotkey rehearsal and runtime-trace breadcrumbs durably written; handlerArmed=False; mutationProbe=False.");
+            WriteStartupLadderCheckpoint(step, "M59R_STATIC_MAP_WRITE_RETURNED — controller/hotkey rehearsal durably written; handlerArmed=False; mutationProbe=False.");
             resultLabel.Text = "STEP 59R: CONTROLLER/SINGLETON REHEARSAL COMPLETE";
             resultLabel.TextColor = UIColor.SystemGreen;
             detailLabel.Text = "Getter/icon-lookup rehearsal completed without arming the real handler. Preserve the report. Because phone runs are cheap, use a fresh process for 59U, 59E, or the real Step 59 experiment.";
             if (_statusLabel is not null)
             {
-                _statusLabel.Text = "STEP 59R COMPLETE — controller/hotkey singleton evidence + internal trace captured. Fresh process recommended for the next Step-59 branch.";
+                _statusLabel.Text = "STEP 59R COMPLETE — controller/hotkey singleton evidence captured. Fresh process recommended for the next Step-59 branch.";
                 _statusLabel.TextColor = UIColor.SystemGreen;
             }
             WriteStartupLadderCheckpoint(step, $"RUN_STEP59R_COMPLETE — diagnosticsLength={diagnostics.Length}; realHandlerArmed=False; mutationProbe=False.");
@@ -82,8 +82,41 @@ public sealed partial class RootViewController
         }
         finally
         {
-            await FinishStartupLadderStepAsync(step, "Step59R-ControllerSingletonRehearsal.txt", "StS2 Launcher — Step 59R Controller/Hotkey Singleton Rehearsal", resultLabel, detailLabel, "Step 59R invokes only observational getters/icon lookups and the synthetic trace callback; no real handler or button Enable is armed.");
+            await FinishStartupLadderStepAsync(step, "Step59R-ControllerSingletonRehearsal.txt", "StS2 Launcher — Step 59R Controller/Hotkey Singleton Rehearsal", resultLabel, detailLabel, "Step 59R invokes only observational getters/icon lookups; no real handler or button Enable is armed.");
         }
+    }
+
+    private async Task RunStep59RegisterHotkeysProbeAsync()
+    {
+        const int step = 59;
+        if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted || _step59TransitionUiStarted || _step59MutationProbeUiStarted ||
+            _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
+        {
+            SetStartupLadderRefusal(step, _step59RegisterHotkeysProbeResultLabel!, _step59RegisterHotkeysProbeDetailLabel!, "FRESH PROCESS REQUIRED", "Step 59H is a one-shot hotkey-binding diagnostic. Relaunch and reproduce through Step 58 without running another Step-59 branch first.");
+            return;
+        }
+        if (!TryPrepareStep59Auxiliary(_step59RegisterHotkeysProbeButton, _step59RegisterHotkeysProbeResultLabel, _step59RegisterHotkeysProbeDetailLabel, "Step 59H", out var button, out var resultLabel, out var detailLabel)) return;
+        if (!TryInitializeStartupLadderTelemetry(step, "Step-59 isolated RegisterHotkeys probe", "Step59H-RegisterHotkeys-StaticMap", out var error))
+        {
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return;
+        }
+        BeginSteamOperation(allowCancel: false); _step59Gates.Reset();
+        try
+        {
+            WriteStartupLadderCheckpoint(step, "RUN_START_59H — isolated retained-embark RegisterHotkeys probe started. No UpdateControllerButton/Enable/OnEnable/Push/OpenCharacterSelect.");
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException("Step 59H preflight map write failed: " + preflightMapError);
+            _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten(); _step59MutationProbeUiStarted = true; button.Enabled = false;
+            var probe = _transformedRealStS2VeryEarlyInitialization.RunStep59RegisterHotkeysProbe(d => WriteStartupLadderCheckpoint(step, d));
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59H post-probe map refresh failed: " + mapError);
+            WriteStartupLadderCheckpoint(step, $"M59H_STATIC_MAP_REFRESH_RETURNED — passed={probe.Passed}; freshProcessRequired=True.");
+            resultLabel.Text = probe.Passed ? "STEP 59H: REGISTERHOTKEYS RETURNED" : "STEP 59H: REGISTERHOTKEYS THREW — EVIDENCE CAPTURED";
+            resultLabel.TextColor = probe.Passed ? UIColor.SystemGreen : UIColor.SystemOrange;
+            detailLabel.Text = probe.Passed ? "RegisterHotkeys returned. Preserve the report and relaunch before another Step-59 experiment." : "RegisterHotkeys reproduced a failure. Preserve the report; the hotkey-binding path is localized. Relaunch afterward.";
+        }
+        catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted); }
+        finally { await FinishStartupLadderStepAsync(step, "Step59H-IsolatedRegisterHotkeys.txt", "StS2 Launcher — Step 59H Isolated RegisterHotkeys Probe", resultLabel, detailLabel, "Step 59H may add hotkey bindings and requires a fresh process afterward. It never calls OpenCharacterSelect."); }
     }
 
     private async Task RunStep59UpdateControllerProbeAsync()
@@ -117,11 +150,11 @@ public sealed partial class RootViewController
             var probe = _transformedRealStS2VeryEarlyInitialization.RunStep59UpdateControllerButtonProbe(d => WriteStartupLadderCheckpoint(step, d));
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59U post-probe map refresh failed: " + mapError);
             WriteStartupLadderCheckpoint(step, $"M59U_STATIC_MAP_REFRESH_RETURNED — passed={probe.Passed}; freshProcessRequired=True.");
-            resultLabel.Text = probe.Passed ? "STEP 59U: UPDATECONTROLLERBUTTON RETURNED" : "STEP 59U: UPDATECONTROLLERBUTTON THREW — TRACE CAPTURED";
+            resultLabel.Text = probe.Passed ? "STEP 59U: UPDATECONTROLLERBUTTON RETURNED" : "STEP 59U: UPDATECONTROLLERBUTTON THREW — EVIDENCE CAPTURED";
             resultLabel.TextColor = probe.Passed ? UIColor.SystemGreen : UIColor.SystemOrange;
             detailLabel.Text = probe.Passed
                 ? "The isolated UpdateControllerButton path returned. Preserve the report and relaunch before any other Step-59 experiment."
-                : "The isolated controller-update path threw. This is useful localization evidence; preserve the trace/report and relaunch.";
+                : "The isolated controller-update path threw. This is useful localization evidence; preserve the report and relaunch.";
             WriteStartupLadderCheckpoint(step, $"RUN_STEP59U_COMPLETE — passed={probe.Passed}; diagnosticsLength={probe.Diagnostics.Length}; realHandlerArmed=False; freshProcessRequired=True.");
         }
         catch (Exception ex)
@@ -132,6 +165,39 @@ public sealed partial class RootViewController
         {
             await FinishStartupLadderStepAsync(step, "Step59U-IsolatedUpdateControllerButton.txt", "StS2 Launcher — Step 59U Isolated UpdateControllerButton Probe", resultLabel, detailLabel, "Step 59U is diagnostic only and requires a fresh process afterward. It never calls OpenCharacterSelect.");
         }
+    }
+
+    private async Task RunStep59ConfirmTailProbeAsync()
+    {
+        const int step = 59;
+        if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted || _step59TransitionUiStarted || _step59MutationProbeUiStarted ||
+            _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
+        {
+            SetStartupLadderRefusal(step, _step59ConfirmTailProbeResultLabel!, _step59ConfirmTailProbeDetailLabel!, "FRESH PROCESS REQUIRED", "Step 59T is a one-shot confirm-button visual/tween diagnostic. Relaunch and reproduce through Step 58 without running another Step-59 branch first.");
+            return;
+        }
+        if (!TryPrepareStep59Auxiliary(_step59ConfirmTailProbeButton, _step59ConfirmTailProbeResultLabel, _step59ConfirmTailProbeDetailLabel, "Step 59T", out var button, out var resultLabel, out var detailLabel)) return;
+        if (!TryInitializeStartupLadderTelemetry(step, "Step-59 isolated NConfirmButton post-base tail probe", "Step59T-ConfirmButtonTail-StaticMap", out var error))
+        {
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return;
+        }
+        BeginSteamOperation(allowCancel: false); _step59Gates.Reset();
+        try
+        {
+            WriteStartupLadderCheckpoint(step, "RUN_START_59T — isolated NConfirmButton post-base visual/tween tail started. No NButton.OnEnable/RegisterHotkeys/UpdateControllerButton/Push/OpenCharacterSelect.");
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException("Step 59T preflight map write failed: " + preflightMapError);
+            _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten(); _step59MutationProbeUiStarted = true; button.Enabled = false;
+            var probe = _transformedRealStS2VeryEarlyInitialization.RunStep59ConfirmButtonTailProbe(d => WriteStartupLadderCheckpoint(step, d));
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59T post-probe map refresh failed: " + mapError);
+            WriteStartupLadderCheckpoint(step, $"M59T_STATIC_MAP_REFRESH_RETURNED — passed={probe.Passed}; freshProcessRequired=True.");
+            resultLabel.Text = probe.Passed ? "STEP 59T: CONFIRM-BUTTON TAIL RETURNED" : "STEP 59T: CONFIRM-BUTTON TAIL THREW — STAGE CAPTURED";
+            resultLabel.TextColor = probe.Passed ? UIColor.SystemGreen : UIColor.SystemOrange;
+            detailLabel.Text = probe.Passed ? "Every post-base visual/tween tail stage returned. Preserve the report and relaunch." : "A post-base tail stage failed and its exact PRE/FAIL checkpoint is durable. Preserve the report and relaunch.";
+        }
+        catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted); }
+        finally { await FinishStartupLadderStepAsync(step, "Step59T-IsolatedConfirmButtonTail.txt", "StS2 Launcher — Step 59T Isolated Confirm-Button Tail Probe", resultLabel, detailLabel, "Step 59T changes only retained confirm-button visual/tween state and requires a fresh process afterward. It never calls OpenCharacterSelect."); }
     }
 
     private async Task RunStep59IsolatedEnableProbeAsync()
@@ -155,7 +221,7 @@ public sealed partial class RootViewController
         _step59Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START_59E — isolated retained embark Enable probe started outside OpenCharacterSelect. Internal Step-59 runtime trace will bracket the exact button/base/hotkey/controller calls.");
+            WriteStartupLadderCheckpoint(step, "RUN_START_59E — isolated retained embark Enable probe started outside OpenCharacterSelect. No runtime-wide IL instrumentation is used; compare this probe with 59H/59U/59T to isolate the failing subpath.");
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException("Step 59E preflight map write failed: " + preflightMapError);
@@ -165,11 +231,11 @@ public sealed partial class RootViewController
             var probe = _transformedRealStS2VeryEarlyInitialization.RunStep59IsolatedEmbarkEnableProbe(d => WriteStartupLadderCheckpoint(step, d));
             if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59E post-probe map refresh failed: " + mapError);
             WriteStartupLadderCheckpoint(step, $"M59E_STATIC_MAP_REFRESH_RETURNED — passed={probe.Passed}; freshProcessRequired=True; realHandlerArmed=False.");
-            resultLabel.Text = probe.Passed ? "STEP 59E: ISOLATED EMBARK ENABLE RETURNED" : "STEP 59E: ISOLATED EMBARK ENABLE THREW — TRACE CAPTURED";
+            resultLabel.Text = probe.Passed ? "STEP 59E: ISOLATED EMBARK ENABLE RETURNED" : "STEP 59E: ISOLATED EMBARK ENABLE THREW — EVIDENCE CAPTURED";
             resultLabel.TextColor = probe.Passed ? UIColor.SystemGreen : UIColor.SystemOrange;
             detailLabel.Text = probe.Passed
                 ? "The isolated Enable path returned outside OpenCharacterSelect. Preserve the trace/report and relaunch before another Step-59 experiment."
-                : "The isolated Enable path reproduced a failure outside OpenCharacterSelect. Preserve the internal trace/report; this sharply localizes the button path. Relaunch afterward.";
+                : "The isolated Enable path reproduced a failure outside OpenCharacterSelect. Preserve the report; this sharply localizes the button path. Relaunch afterward.";
             WriteStartupLadderCheckpoint(step, $"RUN_STEP59E_COMPLETE — passed={probe.Passed}; diagnosticsLength={probe.Diagnostics.Length}; realHandlerArmed=False; freshProcessRequired=True.");
         }
         catch (Exception ex)

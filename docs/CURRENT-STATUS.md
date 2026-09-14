@@ -1,3 +1,11 @@
+# 0.0.203 current architecture update
+
+**Active candidate: 0.0.203 (203).** The active ownership path is now **physically closed Step 52 -> current Step 58**, with legacy Steps 53–57 retained as optional regression/history diagnostics rather than mandatory choreography. 0.0.202 is rejected after physical Step 54 regressed inside `NSingleplayerSubmenu.RefreshButtons()` under runtime-wide Step-59 IL instrumentation. 0.0.203 restores `TransformedRealStS2VeryEarlyInitialization.cs` byte-for-byte from 0.0.201, contains no `STEP59TRACE_`/`ConfirmButtonCheckpointBridge`, and adds isolated 59R/59H/59U/59T/59E probes plus the real Step 59 transition in one IPA. Step 63 remains unopened.
+
+Recommended device path: fresh process -> closed path through Step 52 -> Step 58 directly -> one Step-59 branch per fresh process.
+
+---
+
 # Current status
 
 Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains uninvoked** on the engineering ladder.
@@ -6,25 +14,78 @@ Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains 
 
 Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-## Active candidate — Steps 58–62 compilation-efficient Step-59 callsite isolation / 0.0.202 (202)
+## Active candidate — Steps 58–62 NConfirmButton OnEnable preflight / visible-render trial / 0.0.201 (201)
 
-Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; each fresh process must rebuild through 52 and manually reprove 53–58 before any Step-59 branch.
+Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
-Physical **0.0.201** supplies the current frontier evidence. Step59D completed with no handler arm and no definite retained-button blocker: the retained `_embarkButton` was in-tree/ready with `_outline`, `_buttonImage`, `_viewport`, `_hotkeys`, `_controllerHotkeyIcon`, and `_moveTween` populated. A separate fresh-process real Step 59 reproduced the same `NConfirmButton.OnEnable()` NullReferenceException. Immediately afterward those fields were still populated, `_isEnabled` had changed to true, the character-select logical stack was bound to the exact retained main-menu stack, and a one-player `StartRunLobby` existed. This eliminates the obvious missing-Ready-product theory and proves the game-owned transition is partially progressing before failure.
+### What physical 0.0.194 changed
 
-**0.0.202 is therefore an isolation/efficiency release, not a speculative repair.** The selected private sts2 compatibility derivative receives a synthetic `StS2Launcher.Step59Diagnostics.ConfirmButtonCheckpointBridge` with a normally-null `Action<string>` callback. Stack-neutral `STEP59TRACE_*` markers bracket entry, selected calls/newobj operations, and returns across `NConfirmButton.OnEnable`, `NButton.OnEnable`, `RegisterHotkeys`, `UpdateControllerButton`, button hotkey getters, NHotkeyManager, NInputManager, NControllerManager, and the relevant NGame accessors. The callback is armed only around an explicit Step-59 experiment and disarmed before post-failure forensic capture. Original game calls remain in place.
+0.0.194 disproved the remaining simple Step-59 theory. Immediately before original `OpenCharacterSelect(NButton)`:
 
-The same compiled IPA exposes multiple cheap fresh-process experiments:
+- Step 58 had closed 4/4;
+- retained `NSingleplayerSubmenu._stack` was already the exact `NMainMenuSubmenuStack`;
+- the optional navigation-repair Push was skipped;
+- the retained real `_standardButton` was supplied;
+- cached `NCharacterSelectScreen` was present, hidden, in-tree, directly parented by the exact stack, and its own logical `_stack` was null;
+- original `OpenCharacterSelect` then threw `NullReferenceException`; rendering remained frozen.
 
-- **59D** — broad structural diagnostic deck, no handler.
-- **59R** — recommended first 0.0.202 run: controller/hotkey singleton and icon-lookup rehearsal, no `Enable`, no binding push, no `OpenCharacterSelect`.
-- **59U** — isolated inherited `NButton.UpdateControllerButton()` on the retained embark button; one-shot diagnostic mutation, then relaunch.
-- **59E** — isolated retained embark `Enable()` outside `OpenCharacterSelect`; one-shot lifecycle diagnostic, then relaunch.
-- **59** — original game-owned `OpenCharacterSelect` transition with the internal trace armed only around the exact handler invocation; one-shot, then never retry in-process.
+Static analysis now proves that character-select cache state is **normal game preload behavior**: `NMainMenuSubmenuStack._Ready()` pre-instantiates character select, hides it, and adds it as a child, while `NSubmenu._stack` remains null until `Push()`. It is no longer treated as an anomalous state.
 
-The known Step59D peer-matrix blind spot is also removed without changing the historical/default Step39 contract: Step-59 peer enumeration explicitly raises its local diagnostic ceiling to 4096 nodes while the general traversal default remains 256.
 
-No direct NConfirmButton/game-field repair, manual `_Ready()`, `OnEnable()` bypass, StS2 TSCN/PCK mutation, character choice/confirm/embark/run-start, or Step 63 behavior is authorized. Steps 60–62 remain reachable only after a clean real Step 59 transition.
+
+### What physical 0.0.198 changed
+
+Physical 0.0.198 makes the unique-name loss location conclusive. The exact `SceneState` still contains
+`unique_name_in_owner=True` for instanced roots such as character-select `AscensionPanel`/`ActDropdown`, game
+`RootSceneContainer`/`ReactionWheel`/`MultiplayerTimeoutOverlay`, and main-menu `MainMenuBg`. A fresh temporary **off-tree** `PackedScene.Instantiate()` already reports those runtime nodes as `UniqueNameInOwner=false`.
+
+Ordinary nodes in the same scenes (`InputManager`, `HotkeyManager`, `ReactionContainer`, `WorldEnvironment`,
+`Submenus`) preserve `true`. The live retained tree matches the temporary instance. The defect is therefore the
+application of parent-scene overrides to instanced-subscene roots during PackedScene instantiation, not parsing,
+resource caching, SceneTree admission, owner mutation, or a character-select-specific bug.
+
+The 0.0.199/0.0.200 hash-pinned private GodotSharp compatibility derivative remains unchanged. Its `PackedScene.Instantiate` epilogue calls a host compatibility callback before returning the new root; the callback reapplies only exact SceneState `unique_name_in_owner=true` values for instanced roots, verifies each write, and otherwise leaves the hierarchy untouched.
+
+### What physical 0.0.200 changed
+
+Physical 0.0.200 proves that compatibility correction is effective on-device. Character-select `AscensionPanel` and `ActDropdown`, game `RootSceneContainer` / `ReactionWheel` / `MultiplayerTimeoutOverlay`, and main-menu instanced roots now report `UniqueNameInOwner=true` in both fresh temporary and retained live instances; the previously null `_ascensionPanel`, `_actDropdown`, and `NGame.TimeoutOverlay` fields are populated before the real transition.
+
+The one-shot original `OpenCharacterSelect` then advances through `NSubmenuStack.Push` into `NCharacterSelectScreen.OnSubmenuOpened()` and fails at `NConfirmButton.OnEnable()` while enabling the retained `_embarkButton`. The post-failure snapshot proves the character-select logical stack was bound to the exact retained main-menu stack and a one-player `StartRunLobby` existed. Rendering remained frozen and the run ended normally, so that armed Step 59 must never be retried in-process.
+
+0.0.201 therefore makes **no new repair**. It adds a Gate-B-only `NConfirmButton` preflight: inspect the retained embark button's selected load context/tree/readiness, `_outline`, `_buttonImage`, `_viewport`, `_hotkeys`, related fields, exact selected `_Ready`/`OnEnable`/base `NButton` IL, live child graph, all serialized properties on the character-select embark instanced root, and exact character-select/confirm-button TSCN context. Any definite missing `OnEnable` prerequisite blocks before Gate C can arm the original handler.
+
+Because Codemagic compilation is the scarce resource while phone runs are cheap, the active 0.0.201 source also exposes **Step 59D — compilation-efficient deep diagnostic deck**. Step 59D executes only Step-59 Gates A+B and stops before Gate C. Its single durable map includes the full inherited embark-button field matrix, whole retained SceneTree `NConfirmButton` peer comparison, observational `GetViewport`/tree/owner accessors, null-field descendant-candidate mapping, exact Ready/OnEnable/base-button field/call order, and transitive execution-qualified frontiers for `_Ready`, `OnEnable`, `NButton.OnEnable`, `RegisterHotkeys`, `NClickableControl.Enable`, and `NCharacterSelectScreen.OnSubmenuOpened`. No Push/OpenCharacterSelect arm occurs.
+
+The normal Step-59 button remains in the **same compiled IPA** as a separate fresh-process experiment. If the original handler still fails, the candidate captures a post-failure full inherited field/peer/null-candidate deck and refreshes the Step-59 static map before returning to the UI. This lets one Codemagic compilation support multiple evidence-generating phone runs without weakening the no-direct-repair boundary.
+
+### What physical 0.0.197 changed
+
+Physical 0.0.197 safely stopped before the one-shot handler and proved the exact live `AscensionPanel` node exists,
+is the selected `NAscensionPanel` type, is inside-tree/ready, and is owned by the character-select root, but reports
+`UniqueNameInOwner=false`. The exact receipt-backed parent TSCN declares the instanced `AscensionPanel` root with
+`unique_name_in_owner=true`. A nested `AscensionIcon` unique node declared inside the subscene remains true.
+
+The same preflight found `_actDropdown=NULL` and `NGame.TimeoutOverlay=NULL`, strengthening the hypothesis that this
+is a systemic parent-scene/instanced-subscene unique-name override problem rather than one bad character-select field.
+
+0.0.198 compares TSCN → PackedScene SceneState → temporary off-tree instance → retained live node → direct-path/%Name
+lookup identity, with representative character-select, NGame and main-menu nodes. Gate C remains blocked on unhealthy
+state and no live field/flag is patched.
+
+### What physical 0.0.196 changed
+
+Physical 0.0.196 passed Step-59 Gate A but never entered the new Gate-B ready-binding diagnostics. The generic gate sequencer rejected the result because Core and UI used different Step-59 candidate-name strings. Rendering remained frozen and the real handler was never armed. 0.0.197 centralizes that gate name; the `%AscensionPanel` diagnostic itself is otherwise unchanged.
+
+### What physical 0.0.195 changed
+
+Physical 0.0.195 never armed the real handler. Gate A passed, then Gate B proved
+`NCharacterSelectScreen.IsNodeReady()==true` while `_ascensionPanel==null`; the run remained frozen and ended
+normally. Trusted `sts2.dll` IL places the `%AscensionPanel` lookup immediately after the successfully populated
+`_charButtonContainer`, so the active blocker is now the managed Ready binding itself.
+
+0.0.196 records the complete field state, selected `_Ready` IL window, live ascension-like descendant node/type/load
+context/owner/`UniqueNameInOwner` state, and exact TSCN declaration context. The static map is written before Gate C.
+If the binding is still unhealthy, Gate C intentionally fails before any one-shot mutation.
 
 ### 0.0.196 Step 59 purpose
 

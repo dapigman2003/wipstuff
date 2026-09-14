@@ -180,10 +180,10 @@ except Exception as ex:
     plist = {}
 
 project_text = project_path.read_text()
-require("<ApplicationVersion>202</ApplicationVersion>" in project_text, "build version is 202")
-require("<ApplicationDisplayVersion>0.0.202</ApplicationDisplayVersion>" in project_text, "display version is 0.0.202")
-require(plist.get("CFBundleVersion") == "202", "Info.plist build version is 202")
-require(plist.get("CFBundleShortVersionString") == "0.0.202", "Info.plist display version is 0.0.202")
+require("<ApplicationVersion>203</ApplicationVersion>" in project_text, "build version is 203")
+require("<ApplicationDisplayVersion>0.0.203</ApplicationDisplayVersion>" in project_text, "display version is 0.0.203")
+require(plist.get("CFBundleVersion") == "203", "Info.plist build version is 203")
+require(plist.get("CFBundleShortVersionString") == "0.0.203", "Info.plist display version is 0.0.203")
 require(plist.get("UIFileSharingEnabled") is True, "iOS Files sharing remains enabled")
 require(plist.get("LSSupportsOpeningDocumentsInPlace") is True, "open-in-place Documents access remains enabled")
 require("<RootNamespace>StS2Launcher.iOS</RootNamespace>" in project_text, "canonical iOS root namespace is explicit")
@@ -199,12 +199,12 @@ release_presentation_path = ROOT / "src/StS2Launcher.iOS/UI/CurrentReleasePresen
 require(release_presentation_path.is_file(), "current release presentation has one dedicated UI source")
 release_presentation = release_presentation_path.read_text() if release_presentation_path.is_file() else ""
 require("STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL" in release_presentation, "top launcher banner identifies the active Steps 58–62 ownership/render trial")
-require("STEPS 35–57 PHYSICALLY CLOSED" in release_presentation and "0.0.202 STEPS 58–62 ACTIVE" in release_presentation and "STEP 63 UNOPENED" in release_presentation, "top launcher presentation records physical closure through Step 57, active Steps 58–62, and Step 63 unopened")
-require("Active candidate: **0.0.202 (202)**" in read("README.md") and "Active candidate: **0.0.202 (202)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.202 (202) release identity")
-require("Active candidate — 0.0.202 compilation-efficient Step-59 callsite isolation" in read("docs/MASTER-PLAN.md") and "STEP59TRACE_*" in read("docs/MASTER-PLAN.md") and "59R" in read("docs/MASTER-PLAN.md") and "59U" in read("docs/MASTER-PLAN.md") and "59E" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.202 compile-once Step-59 isolation frontier")
-require(all(marker in release_presentation for marker in ["STEPS 35–57 PHYSICALLY CLOSED", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "Steam", "Step53", "Step 57", "Steps 58", "Step 62", "Step 63"]), "top launcher banner preserves historical authority and identifies the active closed-through-57 frontier")
+require("STEP 52 CURRENT-ARCHITECTURE BASELINE" in release_presentation and "0.0.203 STEPS 58–62 ACTIVE" in release_presentation and "LEGACY 53–57 OPTIONAL" in release_presentation and "STEP 63 UNOPENED" in release_presentation, "top launcher presentation records Step-52 current-architecture baseline, optional legacy 53–57, active Steps 58–62, and Step 63 unopened")
+require("Active candidate: **0.0.203 (203)**" in read("README.md") and "Active candidate: **0.0.203 (203)**" in read("docs/README.md"), "root and docs READMEs pin the exact 0.0.203 (203) release identity")
+require("Active candidate — 0.0.203 current-ownership acquisition + compilation-efficient Step-59 isolation" in read("docs/MASTER-PLAN.md") and "PackedScene.Instantiate(GenEditState)" in read("docs/MASTER-PLAN.md") and "legacy Steps 53–57" in read("docs/MASTER-PLAN.md"), "master plan points to the active 0.0.203 Step52-to-58 current-ownership frontier while retaining the proven PackedScene compatibility boundary")
+require(all(marker in release_presentation for marker in ["STEP 52 CURRENT-ARCHITECTURE BASELINE", "legacy Steps 53–57", "Step37ImplementationMarker", "Step38ImplementationMarker", "Step39ImplementationMarker", "Step40ImplementationMarker", "Step41ImplementationMarker", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "LaunchMainMenu", "Steam", "Step 57", "Steps 58", "Step 62", "Step 63"]), "top launcher banner preserves historical authority while identifying Step52->58 as the active architecture")
 require("NSBundle.MainBundle.ObjectForInfoDictionary(\"CFBundleShortVersionString\")" in release_presentation, "top launcher version is derived from the built Info.plist instead of a stale hard-coded version")
-require('ExpectedDisplayVersion = "0.0.202"' in release_presentation and 'ExpectedBuildVersion = "202"' in release_presentation, "startup-ladder source pins expected 0.0.202 bundle release identity")
+require('ExpectedDisplayVersion = "0.0.203"' in release_presentation and 'ExpectedBuildVersion = "203"' in release_presentation, "startup-ladder source pins expected 0.0.201 bundle release identity")
 require("GateSImplementationMarker" not in release_presentation and "GateTImplementationMarker" not in release_presentation, "retired Step-27 execution markers are absent from the active release presentation")
 root_ui_text = read("src/StS2Launcher.iOS/UI/RootViewController.cs")
 require("CurrentReleasePresentation.StepTitle" in root_ui_text and "CurrentReleasePresentation.DisplayVersion" in root_ui_text and "CurrentReleasePresentation.Summary" in root_ui_text and "CurrentReleasePresentation.InitialStatus" in root_ui_text, "RootViewController consumes the single current-release presentation source")
@@ -370,8 +370,8 @@ for key, value in {
     "STS2_IOS_PROJECT": "src/StS2Launcher.iOS/StS2Launcher.iOS.csproj",
     "STS2_APP_BUNDLE_NAME": "StS2Launcher.iOS.app",
     "STS2_IPA_REL": "artifacts/StS2-Launcher-Steps-58-62.ipa",
-    "STS2_DISPLAY_VERSION": "0.0.202",
-    "STS2_BUILD_VERSION": "202",
+    "STS2_DISPLAY_VERSION": "0.0.203",
+    "STS2_BUILD_VERSION": "203",
     "STS2_RUNTIME_POLICY_MARKER": "STEP35 RUNTIME POLICY:",
 }.items():
     require(f'{key}="{value}"' in release_config, f"release config pins {key}")
@@ -1708,10 +1708,10 @@ step32_physical_gatec_failure = read("docs/history/reports/STEP-32.0.4-PHYSICAL-
 require("REAL STS2 PREPAREMETHOD REWRITE FAIL — 2/4" in step32_physical_gatec_failure and "App version: 0.0.119 (119)" in step32_physical_gatec_failure and "Gate A — SourceAdmissionAndPrivateClone: PASS" in step32_physical_gatec_failure and "Gate B — DeterministicStackNeutralRewrite: PASS" in step32_physical_gatec_failure and "Gate C — TransformedImageVerification: FAIL" in step32_physical_gatec_failure and "Cecil write-time resolution requests: 9" in step32_physical_gatec_failure and "Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef" in step32_physical_gatec_failure and "Step-32 transformed PrewarmJit method identity/body drifted" in step32_physical_gatec_failure, "raw physical 0.0.119 report preserves the Step-32 2/4 Gate-B success and Gate-C transformed-method locator boundary")
 
 current_status = read("docs/CURRENT-STATUS.md")
-require(all(marker in current_status for marker in ["Active candidate — Steps 58–62 compilation-efficient Step-59 callsite isolation / 0.0.202 (202)", "capped at Step 52", "Step 57 4/4/frozen", "Physical **0.0.201**", "NConfirmButton.OnEnable()", "_outline", "_buttonImage", "_viewport", "_hotkeys", "STEP59TRACE_*", "59R", "59U", "59E", "Step 59.0 — forensic prerequisites + one-shot real OpenCharacterSelect transition", "Step 60.0 — actual active character-select surface audit", "Step 61.0 — short visible character-select render residency", "Step 62.0 — sustained visible character-select render residency", "Step 63", "skip Step 38", "Step 15 Gate D"]), "current status records stable Step-57 authority, physical 0.0.201 localization, and active 0.0.202 compile-once isolation design")
+require(all(marker in current_status for marker in ["Active candidate — Steps 58–62 NConfirmButton OnEnable preflight / visible-render trial / 0.0.201 (201)", "capped at Step 52", "Step 57 4/4/frozen", "What physical 0.0.198 changed", "What physical 0.0.200 changed", "SceneState", "PackedScene.Instantiate", "unique_name_in_owner", "NConfirmButton.OnEnable()", "_outline", "_buttonImage", "_viewport", "_hotkeys", "Step 59.0 — forensic prerequisites + one-shot real OpenCharacterSelect transition", "Step 60.0 — actual active character-select surface audit", "Step 61.0 — short visible character-select render residency", "Step 62.0 — sustained visible character-select render residency", "Step 63", "skip Step 38", "Step 15 Gate D"]), "current status records stable Step-57 baseline, physical 0.0.200 NConfirmButton localization, and active 0.0.201 fail-closed preflight design")
 testing_doc = read("docs/TESTING.md")
 release_checklist_doc = read("docs/RELEASE-CHECKLIST.md")
-require("0.0.202 (202)" in testing_doc and "0.0.202 (202)" in release_checklist_doc and "0.0.202 compilation-efficient Step-59 sequence" in testing_doc and "0.0.202 compilation-efficiency requirements" in release_checklist_doc and all(v in testing_doc for v in ["59R", "59U", "59E", "STEP59TRACE_*"]), "testing and release-checklist docs pin the 0.0.202 compilation-efficient Step-59 trace/probe contract")
+require("0.0.201" in testing_doc and "0.0.201" in release_checklist_doc and "0.0.201 NConfirmButton OnEnable-preflight expectations" in testing_doc and "0.0.201 NConfirmButton OnEnable-preflight requirements" in release_checklist_doc and "M59_B_CONFIRM_BUTTON_PREFLIGHT" in testing_doc, "testing and release-checklist docs pin the 0.0.201 NConfirmButton OnEnable-preflight PackedScene compatibility contract")
 require("0.0.140 (139)" not in testing_doc and "0.0.140 (138)" not in testing_doc and "0.0.140 (139)" not in release_checklist_doc and "0.0.140 (138)" not in release_checklist_doc, "release docs reject display/build-number drift like the prior 0.0.130 (129) documentation bug")
 
 master = read("docs/MASTER-PLAN.md")
@@ -2317,7 +2317,7 @@ require(not any(call in step41_core for call in [".GameStartup(", ".InitializePl
 require(not any(call in step41_ui for call in [".GameStartup(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred("]), "Step 41 UI never directly invokes startup/platform/main-menu/deferred methods")
 require(all(value in step41_ui for value in ["Step41-CrashCheckpoint-", "Step41-GameStartupFrontier-StaticMap-", "Step41-LastCheckpoint.txt", "Step41-TransformedRealStS2GameStartupFrontier.txt", "K_C_STATIC_MAP_WRITE_RETURNED"]), "Step 41 UI provides durable run-correlated checkpoint/static-map/final-report artifacts")
 require("AddTransformedRealStS2GameStartupFrontierControls(content);" in step41_root_ui and "ResetStep41State();" in step40_core, "RootViewController exposes Step 41 and rerunning Step 40 resets Step-41 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "STEPS 35–57 PHYSICALLY CLOSED", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "Step 57", "Steps 58", "Step 62", "Step 63"]), "active release presentation preserves Step-42 authority, physical closure through Step 57, and active Steps 58-62")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "physical 0.0.175 STEP 42 CLOSED POSITIVE 4/4", "STEP 52 CURRENT-ARCHITECTURE BASELINE", "legacy Steps 53–57", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "Step 57", "Steps 58", "Step 62", "Step 63"]), "active release presentation preserves Step-42/history authority while making Step 52 the current-architecture baseline for Steps 58-62")
 require(all(value in step41_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "GameStartupAsyncStateMachineMap", "FrozenNoInvocationConfinement"]), "Step 41 host regressions pin gate sequencing and stable ordinals")
 require("Earlier physical Step 39/40/41 authorities remain closed" in current_status and "GameStartup remains uninvoked" in current_status, "current status preserves physical Step-41 no-invocation authority")
 
@@ -2382,7 +2382,7 @@ require(not any(call in step42_core for call in [".GameStartup(", ".DoCloudSync(
 require(not any(call in step42_ui for call in [".GameStartup(", ".DoCloudSync(", ".InitializePlatform(", ".LaunchMainMenu(", ".ExecuteDeferred(", "StartRendering()", "StopRendering()"]), "Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering")
 require(all(value in step42_ui for value in ["Step42-CrashCheckpoint-", "Step42-InitPools-StaticMap-", "Step42-LastCheckpoint.txt", "Step42-TransformedRealStS2GameStartupInitPools.txt", "L_B_STATIC_MAP_WRITE_RETURNED", "L_C_UI_ARMED", "_step42InvocationUiStarted", "_step42InitPoolsButton.Enabled = false"]), "Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports")
 require("AddTransformedRealStS2GameStartupInitPoolsControls(content);" in root_ui_text and "ResetStep42State();" in step41_core, "RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state")
-require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.202\"", "ExpectedBuildVersion = \"202\"", "STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL"]), "active release presentation pins physical closure and Steps-58–62 / 0.0.202 identity")
+require(all(value in release_presentation for value in ["STEP 42 CLOSED POSITIVE 4/4", "Step42ImplementationMarker", "StartupLadderImplementationMarker", "ExpectedDisplayVersion = \"0.0.203\"", "ExpectedBuildVersion = \"203\"", "STEP 52 CURRENT-ARCHITECTURE BASELINE", "STEPS 58–62 — CHARACTER-SELECT REAL OWNERSHIP / VISIBLE RENDER TRIAL"]), "active release presentation pins Step-52 current architecture and Steps-58–62 / 0.0.203 identity")
 require(all(value in step42_tests for value in ["Assert.ThrowsExactly<InvalidOperationException>", "GateOrdinalsAreStable", "InitPoolsStaticClosureAudit", "ControlledInitPoolsInvocation", "FrozenPostInitPoolsConfinement"]), "Step 42 host regressions pin gate sequencing and stable ordinals")
 require(all(value in current_status for value in ["Physical 0.0.175 / Step 42 — CLOSED POSITIVE 4/4", "22-method zero-boundary closure", "renderer frozen", "zero resolver/host/private/initializer/rejected/native deltas"]), "current status pins the physically closed Step-42 InitPools authority")
 require((ROOT / "docs/history/steps/STEP-42.0-CONTROLLED-GAMESTARTUP-INITPOOLS.md").is_file(), "Step 42 design/provenance record is present")
@@ -2456,8 +2456,7 @@ continuation_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRe
 singleplayer_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2SingleplayerContinuation.cs")
 singleplayer_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2SingleplayerContinuation.cs")
 character_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2CharacterSelectContinuation.cs")
-character_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectContinuation.cs") + "\n" + read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectDiagnostics.cs")
-character_diag_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectDiagnostics.cs")
+character_ui = read("src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectContinuation.cs")
 startup_ui_all = startup_ui + "\n" + direct_ui + "\n" + continuation_ui + "\n" + singleplayer_ui + "\n" + character_ui
 require(all(text for text in [startup_core, direct_core, continuation_core, singleplayer_core, startup_gate, startup_result, startup_sequence, startup_summary, startup_tests, startup_ui, direct_ui, continuation_ui, singleplayer_ui]), "Steps 43-57 Core/test/UI surfaces exist")
 require(all(value in startup_gate for value in ["PrerequisiteAuthority = 1", "StaticAuditOrBinding = 2", "ControlledAction = 3", "PostActionConfinement = 4"]), "startup-ladder gate ordinals retain exact four-gate diagnosability")
@@ -2559,7 +2558,7 @@ require("const int maximumNodes = 4096" in direct_core and "EnumerateStartupLadd
 require("EnumerateStartupLadderMenuNodeGraph(menu, nodeType, \"Step 50.0 in-tree main-menu frame/input audit\")" in direct_core, "Step 50 uses the dedicated menu-only diagnostic traversal")
 require("EnumerateStartupLadderMenuNodeGraph(menu, nodeType, \"Step 52.0 sustained main-menu frame/input audit\")" in continuation_core, "Step 52 uses the dedicated menu-only diagnostic traversal")
 scene_tree_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2SceneTreeAdmission.cs")
-require("int maxNodes = 256" in scene_tree_core and "if (observations.Count >= maxNodes)" in scene_tree_core and "node-graph traversal exceeded {maxNodes} nodes" in scene_tree_core, "historical Step39 traversal default remains 256 while allowing explicit diagnostic overrides")
+require(all(v in scene_tree_core for v in ["int maxNodes = 256", "observations.Count >= maxNodes", "node-graph traversal exceeded {maxNodes} nodes"]) and "maxNodes: 4096" in character_core, "historical Step39 traversal defaults to 256 while Step59 diagnostics may explicitly widen to 4096")
 root_helper_start = direct_core.find("private StartupLadderRootSceneAuthority RequireRetainedStartupLadderRootSceneContainer")
 root_helper_end = direct_core.find("private void RequireStartupLadderRootSceneContainerPropertyIdentity", root_helper_start)
 root_helper_text = direct_core[root_helper_start:root_helper_end] if root_helper_start >= 0 and root_helper_end > root_helper_start else ""
@@ -2720,7 +2719,23 @@ require(all(v in read("docs/history/steps/STEP-59.7-NCONFIRMBUTTON-ONENABLE-PREF
 
 # Steps 58-62: adopt real runtime ownership, conditionally use the real handler, then visibly render.
 require(all(v in character_core for v in ["Physical 0.0.191 proved that _characterSelectSubmenu may already be in the SceneTree", "Step61CharacterSelectRenderTargetMilliseconds = 2_000", "Step61CharacterSelectRenderEvidenceCeilingMilliseconds = 10_000", "Step62CharacterSelectSustainedRenderTargetMilliseconds = 10_000", "Step62CharacterSelectSustainedRenderEvidenceCeilingMilliseconds = 30_000"]), "character-select continuation declares the physical ownership pivot and bounded visible-render constants")
-require(all(v in character_core for v in ["RunStep58ClosedStep57Authority", "RunStep58RuntimeOwnershipBinding", "ReadsFirstExplicitParameter", "RunStep58OpenCharacterSelectFrontierAudit", "RunStep58FrozenOwnershipConfinement"]), "Step 58 audits actual runtime ownership and the exact real OpenCharacterSelect frontier without mutation")
+require(all(v in character_core for v in ["RunStep58CurrentOwnershipAcquisition", "RequireStep52Prerequisite", "RunStep58RuntimeOwnershipBinding", "ReadsFirstExplicitParameter", "RunStep58OpenCharacterSelectFrontierAudit", "RunStep58FrozenOwnershipConfinement", "M58_A_PASS — current ownership acquisition complete from Step-52 baseline", "legacy Steps53-57 not required", "_step58CurrentOwnershipAcquisitionPassed"]), "Step 58 starts from Step-52 current-architecture authority, acquires/adopts real game-owned submenu state, then audits exact OpenCharacterSelect ownership without requiring legacy Steps 53-57")
+require("_step52Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep52ClosurePassed" in character_ui and "RunStep58CurrentOwnershipAcquisition" in character_ui and "legacy Steps 53–57 are optional diagnostics" in character_ui, "0.0.203 UI unlocks active Step 58 directly from same-process Step-52 authority and explicitly demotes legacy 53-57 to optional diagnostics")
+require("RunStep58ClosedStep57Authority" not in character_ui and "RunStep58ClosedStep57Authority" not in character_core, "0.0.203 active ownership path contains no obsolete Step-57 prerequisite gate")
+require(sha256(ROOT / "src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitialization.cs") == "d487af91db22a0c872811bcd778189707f65a4ed28a4411a117527cae7eb6775", "0.0.203 restores the exact physically proven 0.0.201 VeryEarlyInitialization source bytes")
+very_early_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitialization.cs")
+require(all(marker not in very_early_core for marker in ["STEP59TRACE_", "ConfirmButtonCheckpointBridge", "Step59RuntimeTraceBridge", "ArmStep59RuntimeTrace", "DisarmStep59RuntimeTrace"]), "0.0.203 removes the rejected 0.0.202 runtime-wide Step-59 trace bridge and shared-method markers")
+require(all(v in character_core for v in ["RunStep59ControllerSingletonRehearsal", "RunStep59RegisterHotkeysProbe", "RunStep59UpdateControllerButtonProbe", "RunStep59ConfirmButtonTailProbe", "RunStep59IsolatedEmbarkEnableProbe", "M59H_INVOKE_ARMED", "M59U_INVOKE_ARMED", "M59T_STAGE_PRE", "M59T_STAGE_POST", "M59T_STAGE_FAIL", "M59E_ENABLE_ARMED"]), "0.0.203 packs controller, hotkey, controller-update, confirm-tail and full-Enable Step-59 probes into one compilation")
+require(all(v in character_ui for v in ["Run Step 59R — CONTROLLER REHEARSAL", "Run Step 59H — REGISTER HOTKEYS ONLY", "Run Step 59U — UPDATE CONTROLLER ONLY", "Run Step 59T — CONFIRM TAIL ONLY", "Run Step 59E — ISOLATED EMBARK ENABLE"]), "0.0.203 exposes all reusable Step-59 isolation branches in the same IPA")
+register_start = character_core.find("public (bool Passed, string Diagnostics) RunStep59RegisterHotkeysProbe")
+register_end = character_core.find("public (bool Passed, string Diagnostics) RunStep59UpdateControllerButtonProbe", register_start)
+register_slice = character_core[register_start:register_end] if register_start >= 0 and register_end > register_start else ""
+require('RequireStep59InstanceRuntimeMethod(embark.GetType(), "RegisterHotkeys", 0, step)' in register_slice and register_slice.count("RequireStep59InstanceRuntimeMethod") == 1 and "method.Invoke(embark, null)" in register_slice and "RunStep59RealHandlerTransition" not in register_slice, "Step 59H resolves and invokes only exact RegisterHotkeys; controller update/full Enable/real handler are not invoked by the probe")
+tail_start = character_core.find("public (bool Passed, string Diagnostics) RunStep59ConfirmButtonTailProbe")
+tail_end = character_core.find("public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerTransition", tail_start)
+tail_slice = character_core[tail_start:tail_end] if tail_start >= 0 and tail_end > tail_start else ""
+require(all(v in tail_slice for v in ["outline.Modulate=Transparent", "buttonImage.Modulate=White", "existingTween.Kill", "Node.CreateTween", "Tween.TweenProperty", "PropertyTweener.SetEase", "PropertyTweener.SetTrans", "PropertyTweener.FromCurrent"]) and all(v not in tail_slice for v in ["OpenCharacterSelect", "RegisterHotkeys()", "UpdateControllerButton()"]), "Step 59T isolates every post-base NConfirmButton visual/tween operation with staged evidence and no base/real-handler call")
+require((ROOT / "docs/history/steps/STEP-59.9-CURRENT-OWNERSHIP-PIVOT-0.0.203.md").is_file() and all(v in read("docs/history/steps/STEP-59.9-CURRENT-OWNERSHIP-PIVOT-0.0.203.md") for v in ["0.0.202", "RefreshButtons", "byte-for-byte", "Step 52", "59R", "59H", "59U", "59T", "59E", "Step 63"]), "0.0.203 history note records the rejected trace regression, restored runtime, ownership pivot, multi-probe toolbox, and unopened Step 63")
 require(all(v in character_core for v in ["CharacterSelectRuntimeState.Absent", "InsideTree", "VisibleInTree", "ParentIsExactStack", "NButtonUnused=True", "OpenCharacterSelect invoked: NO"]), "Step 58 accepts actual absent/off-tree/in-tree cache states only under exact handler/type/stack authority")
 require(all(v in character_core for v in ["Step59HandlerInvocationRequired", "RunStep59RealHandlerBinding", "RunStep59RealHandlerTransition", "CaptureStep59ForensicSnapshot", "M59_B_FORENSIC_PREFLIGHT", "IsNodeReady", "_charButtonContainer", "_ascensionPanel", "_remotePlayerContainer", "_randomCharacterButton", "HotkeyManager", "RemoteCursorContainer", "ReactionContainer", "TimeoutOverlay", "RootSceneContainer", "Progress", "Epochs", "EncounterStats", "CurrentScene", "M59_C_HANDLER_INNER_EXCEPTION", "M59_C_FORENSIC_POSTFAIL", "ExceptionDispatchInfo.Capture(inner).Throw()", "_step58RuntimeOpenCharacterSelect!.Invoke(submenu, new object?[] { _step59StandardButton })"]), "Step 59 performs forensic prerequisite localization, preserves inner game exception evidence, and captures post-failure state around one real handler invocation")
 very_early_core = read("src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitialization.cs")
@@ -2739,17 +2754,27 @@ confirm_diag_slice = character_core[character_core.find("private string BuildSte
 require("SetValue(" not in confirm_diag_slice and "_Ready().Invoke" not in confirm_diag_slice and "OnEnable().Invoke" not in confirm_diag_slice, "0.0.201 confirm-button preflight is observational and performs no direct field/Ready/OnEnable repair")
 require(all(x in confirm_diag_slice for x in ['_embarkButton IsInsideTree()=false', '_embarkButton IsNodeReady()=false', 'foreach (var fieldName in new[] { "_outline", "_buttonImage", "_viewport", "_hotkeys" })', 'fieldValues[fieldName] is null', 'failures.Add($"_embarkButton {fieldName}=NULL")', 'AppendStep59ConfirmButtonBlocker(failures)']), "0.0.201 definite NConfirmButton prerequisites fail closed into the existing Step-59 handler blocker")
 require(character_core.find("M59_B_CONFIRM_BUTTON_PREFLIGHT") < character_core.find("M59_C_BLOCKED_READY_BINDING") < character_core.find("_step59TransitionStarted = true"), "0.0.201 writes confirm-button evidence and checks the shared blocker before the one-shot handler can arm")
-require("SetValue(" not in character_core[character_core.find("private string BuildStep59UniqueNameProvenanceDiagnostics"):character_core.find("private static string BuildStep59TscnContext")], "0.0.198 provenance diagnostics do not write game fields")
+unique_diag_start = character_core.find("private string BuildStep59UniqueNameProvenanceDiagnostics")
+unique_diag_end = character_core.find("private static string DescribeStep59SceneState", unique_diag_start)
+unique_diag_slice = character_core[unique_diag_start:unique_diag_end] if unique_diag_start >= 0 and unique_diag_end > unique_diag_start else ""
+require("SetValue(" not in unique_diag_slice, "0.0.198 provenance diagnostics do not write game fields")
 require("SetUniqueNameInOwner" not in character_core and ".UniqueNameInOwner =" not in character_core, "0.0.198 never repairs unique-name flags in launcher code")
 require("TryReleaseStep39OffTreeInstance(temporaryCharacter" in character_core and "TryReleaseStep39OffTreeInstance(temporaryGame" in character_core, "0.0.198 releases temporary off-tree provenance clones")
 require("AddChild" not in character_core[character_core.find("BuildStep59UniqueNameProvenanceDiagnostics"):character_core.find("BuildStep59TscnContext")], "0.0.198 temporary provenance clones are never admitted to the SceneTree")
 require(character_core.find("M59_C_BLOCKED_READY_BINDING") < character_core.find("_step59TransitionStarted = true"), "0.0.196 ready-binding blocker is checked before the one-shot transition flag can arm")
-require("SetValue(" not in character_core[character_core.find("BuildStep59ReadyBindingDiagnostics"):character_core.find("RunStep60ClosedStep59Authority")], "0.0.196 ready-binding diagnostics never patch _ascensionPanel or any game field")
+ready_diag_start = character_core.find("private string BuildStep59ReadyBindingDiagnostics")
+ready_diag_end = character_core.find("private string BuildStep59ConfirmButtonOnEnableDiagnostics", ready_diag_start)
+ready_diag_slice = character_core[ready_diag_start:ready_diag_end] if ready_diag_start >= 0 and ready_diag_end > ready_diag_start else ""
+require("SetValue(" not in ready_diag_slice, "0.0.196 ready-binding diagnostics never patch _ascensionPanel or any game field")
 require('method.Name == "_Ready"' in character_core and 'field.Name == "_charButtonContainer"' in character_core and 'value == "%AscensionPanel"' in character_core and 'field.Name == "_ascensionPanel"' in character_core, "0.0.196 selected Cecil audit pins _Ready ordering around the exact ascension lookup")
 require(character_core.find("if (_step58TransitionAlreadyComplete)") < character_core.find("_step59TransitionStarted = true"), "Step 59 checks the already-complete game-owned path before arming handler invocation")
 require(all(v in character_core for v in ["method.Parameters.Count == 1", "method.Parameters[0].ParameterType.FullName == SubmenuManagedTypeFullName", "AuditStartupLadderInvocationFrontier([push]", "RequireImmediateFrontierAdmissible(pushAudit", "retained NSingleplayerSubmenu is bound to a foreign logical stack"]), "Step 59 selects and audits exact void NSubmenuStack.Push(NSubmenu) and rejects foreign logical-stack authority")
-step59_core_slice = character_core[character_core.find("RunStep59RealHandlerBinding"):character_core.find("RunStep60ClosedStep59Authority")]
-require("SetValue(" not in step59_core_slice, "Step 59 never repairs submenu ownership by directly writing a runtime field")
+step59_binding_start = character_core.find("public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerBinding")
+step59_binding_end = character_core.find("public (bool Passed, string Diagnostics) RunStep59RegisterHotkeysProbe", step59_binding_start)
+step59_transition_start = character_core.find("public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerTransition")
+step59_transition_end = character_core.find("public TransformedRealStS2StartupLadderGateResult RunStep60ClosedStep59Authority", step59_transition_start)
+step59_core_slice = (character_core[step59_binding_start:step59_binding_end] if step59_binding_start >= 0 and step59_binding_end > step59_binding_start else "") + (character_core[step59_transition_start:step59_transition_end] if step59_transition_start >= 0 and step59_transition_end > step59_transition_start else "")
+require("SetValue(" not in step59_core_slice, "real Step 59 binding/transition never repairs submenu ownership by directly writing a runtime field; isolated 59T may set only Godot visual properties")
 require("throw tie.InnerException" not in step59_core_slice and "throw inner" not in step59_core_slice, "Step 59 does not reset the original inner exception stack at the reflection boundary")
 require(all(v in character_core for v in ["SingleplayerStandardButtonFieldNameForOwnership = \"_standardButton\"", "_step59StandardButton = standardButtonField.GetValue(submenu)", "openParameterType.IsInstanceOfType(_step59StandardButton)"]), "Step 59 binds and type-checks the retained real single-player standard button")
 require(all(v in character_ui for v in ["M59_B_STATIC_MAP_WRITE_RETURNED", "Step59ReadyBindingPreflightPassed", "_step59TransitionUiStarted = true", "RunStep59RealHandlerTransition"]), "Step 59 UI durably writes ready-binding forensics before Gate C and one-shot bookkeeping arms only after a clean preflight")
@@ -2763,21 +2788,9 @@ step59d_end = character_ui.find("private async Task RunStep59StartupLadderAsync"
 step59d_slice = character_ui[step59d_start:step59d_end] if step59d_start >= 0 and step59d_end > step59d_start else ""
 require(all(v in step59d_slice for v in ["RunStep59ClosedStep58Authority", "RunStep59RealHandlerBinding", "M59D_B_STATIC_MAP_WRITE_RETURNED", "RUN_STEP59D_COMPLETE", "handlerArmed=False"]), "0.0.201 Step 59D executes the complete observational Gate-A/B deck and durably reports completion")
 require("RunStep59RealHandlerTransition" not in step59d_slice and "_step59TransitionUiStarted = true" not in step59d_slice, "0.0.201 Step 59D cannot arm or invoke the real handler")
-require(all(v in character_ui for v in ["FRESH PROCESS REQUIRED", "M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED"]) and "_step59DiagnosticDeckUiStarted" in character_ui and "_step59ControllerRehearsalUiStarted" in character_ui and "_step59MutationProbeUiStarted" in character_ui, "0.0.202 separates observational/mutating/real-handler Step-59 branches by fresh process and persists post-failure map evidence")
+require(all(v in character_ui for v in ["FRESH PROCESS REQUIRED", "A Step-59 observational diagnostic already ran in this process", "M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED"]), "0.0.203 separates observational/mutating/real-handler phone experiments by fresh process and persists post-failure map evidence")
 require(all(v in character_core for v in ["BuildStep59PostFailureRuntimeDiagnosticDeck", "POST-FAILURE CONFIRM-BUTTON RUNTIME DECK", "M59_C_CONFIRM_BUTTON_POSTFAIL"]), "0.0.201 real-handler failure captures a post-failure embark runtime deck before preserved exception return")
-require(all(v in read("docs/TESTING.md") for v in ["Step 59D", "59R", "59U", "59E", "M59_TRACE_ARMED", "M59_TRACE_DISARMED", "M59_C_CONFIRM_BUTTON_POSTFAIL", "M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED"]), "0.0.202 testing procedure documents the compile-once multi-run Step-59 trace/probe sequence")
-require(all(v in very_early_core for v in ["Step59RuntimeTraceBridgeTypeFullName", "ConfirmButtonCheckpointBridge", "Step59RuntimeTraceMarkerPrefix", "AddStep59RuntimeTraceInstrumentation", "InsertStep59RuntimeTraceMethodMarkers", "RetargetStep59TraceIncomingControlFlow", "NConfirmButton.OnEnable", "NButton.UpdateControllerButton", "NHotkeyManager.get_Instance", "NInputManager.get_Instance", "NControllerManager.get_Instance"]), "0.0.202 injects a bounded Step-59-only callsite trace bridge into the selected private sts2 derivative")
-require(all(v in very_early_core for v in ["serializedStep59Bridge", "serializedStep59Callback", "serializedStep59Emit", "serializedStep59MarkerCount", "step59RuntimeTraceMethodCount"]), "0.0.202 reopens the derivative and verifies the serialized trace bridge/marker inventory before runtime use")
-require(all(v in step35_tests for v in ["Step59RuntimeTraceMarkersRoundTripAndRetargetIncomingBranchToPreCallMarker", "CALL#01 PRE", "CALL#01 POST", "RET#01"]), "0.0.202 host regression fixture round-trips Step-59 trace markers and branch retargeting")
-require(all(v in character_core for v in ["BuildStep59RuntimeTraceBridgeDiagnostics", "ArmStep59RuntimeTrace", "DisarmStep59RuntimeTrace", "M59_TRACE_ARMED", "M59_TRACE_DISARMED", "RunStep59ControllerSingletonRehearsal", "RunStep59UpdateControllerButtonProbe", "RunStep59IsolatedEmbarkEnableProbe"]), "0.0.202 Core exposes the reusable 59R/59U/59E experiment set and durable trace arm/disarm boundaries")
-real59_start = character_core.find("public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerTransition")
-real59_end = character_core.find("public TransformedRealStS2StartupLadderGateResult RunStep60ClosedStep59Authority", real59_start)
-real59_trace_slice = character_core[real59_start:real59_end] if real59_start >= 0 and real59_end > real59_start else ""
-require(real59_trace_slice.find("ArmStep59RuntimeTrace") >= 0 and real59_trace_slice.find("DisarmStep59RuntimeTrace") > real59_trace_slice.find("ArmStep59RuntimeTrace") and real59_trace_slice.find("BuildStep59PostFailureRuntimeDiagnosticDeck") > real59_trace_slice.find("DisarmStep59RuntimeTrace"), "0.0.202 real Step-59 trace is disarmed before post-failure forensic getters can contaminate the causal trace")
-require(all(v in character_diag_ui for v in ["RunStep59ControllerRehearsalAsync", "RunStep59UpdateControllerProbeAsync", "RunStep59IsolatedEnableProbeAsync", "FRESH PROCESS REQUIRED", "Step59R-ControllerSingletonRehearsal.txt", "Step59U-IsolatedUpdateControllerButton.txt", "Step59E-IsolatedEmbarkEnable.txt"]), "0.0.202 iOS UI packages three independent same-IPA Step-59 follow-up branches with fresh-process guards")
-require("EnumerateStep39NodeGraph(root, nodeType, maxNodes: 4096)" in character_core and "int maxNodes = 256" in scene_tree_core, "0.0.202 removes the Step-59 peer-matrix blind spot without widening the historical Step39 default traversal ceiling")
-require(all(v in read("docs/history/steps/STEP-59.8-COMPILATION-EFFICIENT-CALLSITE-TRACE-0.0.202.md") for v in ["Physical 0.0.201", "STEP59TRACE_*", "59R", "59U", "59E", "Formal physical authority remains Step 57"]), "0.0.202 history note records the compilation-efficiency rationale, physical 0.0.201 evidence, and unchanged authority boundary")
-require(all((ROOT / path).is_file() for path in ["docs/history/reports/STEP-59D-PHYSICAL-0.0.201-PASS-REPORT.txt", "docs/history/reports/STEP-59D-PHYSICAL-0.0.201-PASS-STATIC-MAP.txt", "docs/history/reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-REPORT.txt", "docs/history/reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-STATIC-MAP.txt"]), "physical 0.0.201 Step59D and real-handler evidence is retained in project history")
+require(all(v in read("docs/TESTING.md") for v in ["Step 59D", "RUN_START_DIAGNOSTIC_DECK", "M59D_B_STATIC_MAP_WRITE_RETURNED", "M59_C_CONFIRM_BUTTON_POSTFAIL", "M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED"]), "0.0.201 testing procedure prioritizes compilation-efficient Step59D and same-IPA fresh-process follow-up")
 require('public const string Step59GateName = "GLOBAL PACKEDSCENE UNIQUE-NAME COMPAT + REAL TRANSITION"' in character_core and '_step59Gates = new(59, TransformedRealStS2VeryEarlyInitialization.Step59GateName)' in character_ui, "0.0.199 retains one shared Step-59 gate-name authority between Core and iOS UI")
 require('_step59Gates = new(59, "FORENSIC REAL OPENCHARACTERSELECT FROZEN TRANSITION")' not in character_ui, "0.0.197 removes the stale Step-59 UI gate-name literal that caused the physical 0.0.196 harness failure")
 require(all(v in character_core for v in ["RunStep60ClosedStep59Authority", "RunStep60ActiveFrameInputAudit", "RunStep60SceneConnectionInventory", "RunStep60FrozenSurfaceConfinement"]), "Step 60 audits the actual active frame/input surface and exact TSCN connection evidence without rendering")
@@ -3061,20 +3074,18 @@ if singleplayer_manifest.is_file():
     require(not mismatches, "Steps 53-57 single-player continuation active files are hash-pinned", ", ".join(mismatches))
 
 
-# Dedicated 0.0.202 Steps 58-62 compilation-efficient Step-59 callsite-isolation candidate manifest.
+# Dedicated 0.0.201 Steps 58-62 NConfirmButton OnEnable-preflight / PackedScene compatibility candidate manifest.
 character_manifest = ROOT / "tools/validation/candidate-steps58-62-character-select-ownership.sha256"
 require(character_manifest.is_file(), "Steps 58-62 character-select ownership candidate hash manifest exists")
 if character_manifest.is_file():
     character_manifest_text = character_manifest.read_text()
     required_character_manifest_paths = [
         "src/StS2Launcher.Core/Runtime/TransformedRealStS2CharacterSelectContinuation.cs",
-        "src/StS2Launcher.Core/Runtime/TransformedRealStS2SceneTreeAdmission.cs",
         "src/StS2Launcher.Core/Runtime/TransformedRealStS2VeryEarlyInitialization.cs",
         "src/StS2Launcher.Core/Runtime/TransformedRealStS2SingleplayerContinuation.cs",
         "src/StS2Launcher.Core/Runtime/TransformedRealStS2StartupLadder.cs",
         "tests/StS2Launcher.Core.Tests/Runtime/TransformedRealStS2StartupLadderTests.cs",
         "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectContinuation.cs",
-        "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2CharacterSelectDiagnostics.cs",
         "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2SingleplayerContinuation.cs",
         "src/StS2Launcher.iOS/UI/RootViewController.TransformedRealStS2StartupLadder.cs",
         "src/StS2Launcher.iOS/UI/RootViewController.PhysicallyClosedPath.cs",
@@ -3096,14 +3107,6 @@ if character_manifest.is_file():
         "docs/history/steps/STEP-59.5-GLOBAL-PACKEDSCENE-UNIQUE-NAME-COMPAT-0.0.199.md",
         "docs/history/steps/STEP-59.6-HOST-REGRESSION-CONTRACT-0.0.200.md",
         "docs/history/steps/STEP-59.7-NCONFIRMBUTTON-ONENABLE-PREFLIGHT-0.0.201.md",
-        "docs/history/steps/STEP-59.8-COMPILATION-EFFICIENT-CALLSITE-TRACE-0.0.202.md",
-        "docs/history/reports/STEP-59D-PHYSICAL-0.0.201-PASS-REPORT.txt",
-        "docs/history/reports/STEP-59D-PHYSICAL-0.0.201-PASS-STATIC-MAP.txt",
-        "docs/history/reports/STEP-59D-PHYSICAL-0.0.201-PASS-CHECKPOINT.txt",
-        "docs/history/reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-REPORT.txt",
-        "docs/history/reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-STATIC-MAP.txt",
-        "docs/history/reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-CHECKPOINT.txt",
-        "docs/history/reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-LAST-CHECKPOINT.txt",
         "docs/history/reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-STATIC-MAP.txt",
         "docs/history/reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-REPORT.txt",
         "docs/history/reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-CHECKPOINT.txt",
@@ -3147,7 +3150,7 @@ if character_manifest.is_file():
         "docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-STATIC-MAP.txt",
         "docs/history/reports/STEP-57.0-PHYSICAL-0.0.189-PASS-LAST-CHECKPOINT.txt",
     ]
-    require(all(f"  {relative}" in character_manifest_text for relative in required_character_manifest_paths), "Steps 58-62 manifest pins 0.0.202 trace/probe design, retained physical 0.0.201 localization, prior PackedScene correction, and final Step-56/57 authority")
+    require(all(f"  {relative}" in character_manifest_text for relative in required_character_manifest_paths), "Steps 58-62 manifest pins ownership/render design, exact game-owned Push repair, physical 0.0.200 NConfirmButton localization, 0.0.201 preflight, and final Step-56/57 authority")
     mismatches=[]
     for line in character_manifest.read_text().splitlines():
         if not line.strip(): continue

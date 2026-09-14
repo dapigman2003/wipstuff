@@ -71,6 +71,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step61StaticMap = string.Empty;
     private string _step62StaticMap = string.Empty;
 
+    private bool _step58CurrentOwnershipAcquisitionPassed;
+    private bool _step58CurrentOwnershipAcquisitionInvokedOpen;
     private bool _step58OwnershipMapped;
     private bool _step58StaticMapDurablyWritten;
     private bool _step59TransitionBound;
@@ -106,9 +108,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step59UniqueNameProvenanceDiagnostics = string.Empty;
     private string _step59ConfirmButtonDiagnostics = string.Empty;
     private string _step59ConfirmButtonPostFailureDiagnostics = string.Empty;
-    private string _step59RuntimeTraceBridgeDiagnostics = string.Empty;
     private string _step59ControllerSingletonRehearsalDiagnostics = string.Empty;
+    private string _step59RegisterHotkeysProbeDiagnostics = string.Empty;
     private string _step59UpdateControllerProbeDiagnostics = string.Empty;
+    private string _step59ConfirmButtonTailProbeDiagnostics = string.Empty;
     private string _step59IsolatedEnableProbeDiagnostics = string.Empty;
     private bool _step59ReadyBindingPreflightPassed;
     private bool _step59DiagnosticMutationProbeStarted;
@@ -118,6 +121,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private object? _step59CharacterSelectScreen;
 
     public bool ExactStep58ClosurePassed => _exactStep58ClosurePassed;
+    public bool Step58CurrentOwnershipAcquisitionPassed => _step58CurrentOwnershipAcquisitionPassed;
+    public bool Step58CurrentOwnershipAcquisitionInvokedOpen => _step58CurrentOwnershipAcquisitionInvokedOpen;
     public bool ExactStep59ClosurePassed => _exactStep59ClosurePassed;
     public bool ExactStep60ClosurePassed => _exactStep60ClosurePassed;
     public bool ExactStep61ClosurePassed => _exactStep61ClosurePassed;
@@ -144,6 +149,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step60StaticMap = string.Empty;
         _step61StaticMap = string.Empty;
         _step62StaticMap = string.Empty;
+        _step58CurrentOwnershipAcquisitionPassed = false;
+        _step58CurrentOwnershipAcquisitionInvokedOpen = false;
         _step58OwnershipMapped = false;
         _step58StaticMapDurablyWritten = false;
         _step59TransitionBound = false;
@@ -177,9 +184,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59UniqueNameProvenanceDiagnostics = string.Empty;
         _step59ConfirmButtonDiagnostics = string.Empty;
         _step59ConfirmButtonPostFailureDiagnostics = string.Empty;
-        _step59RuntimeTraceBridgeDiagnostics = string.Empty;
         _step59ControllerSingletonRehearsalDiagnostics = string.Empty;
+        _step59RegisterHotkeysProbeDiagnostics = string.Empty;
         _step59UpdateControllerProbeDiagnostics = string.Empty;
+        _step59ConfirmButtonTailProbeDiagnostics = string.Empty;
         _step59IsolatedEnableProbeDiagnostics = string.Empty;
         _step59ReadyBindingPreflightPassed = false;
         _step59DiagnosticMutationProbeStarted = false;
@@ -227,23 +235,117 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
 
     // STEP 58 — adopt the runtime state the game actually owns; do not require null/off-tree cache state.
-    public TransformedRealStS2StartupLadderGateResult RunStep58ClosedStep57Authority(bool renderingStopped, Action<string>? checkpoint = null)
+    public TransformedRealStS2StartupLadderGateResult RunStep58CurrentOwnershipAcquisition(bool renderingStopped, Action<string>? checkpoint = null)
     {
-        const int step = 58; const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority; var stage = "initialization";
+        const int step = 58;
+        const TransformedRealStS2StartupLadderGate gate = TransformedRealStS2StartupLadderGate.PrerequisiteAuthority;
+        var stage = "initialization";
         try
         {
             ThrowIfDisposed();
-            var context = RequireStep58Prerequisite("Step 58 Gate A entry");
-            if (!renderingStopped) throw new InvalidOperationException("Step 58.0 is observational and requires rendering frozen.");
+            var context = RequireStep52Prerequisite("Step 58 current-ownership acquisition entry");
+            if (!_exactStep52ClosurePassed || !_step52PulsePassed || !_step52StaticMapDurablyWritten)
+                throw new InvalidOperationException("Step 58 current-ownership acquisition requires same-process Step-52 4/4 sustained main-menu render/refreeze authority.");
+            if (!renderingStopped)
+                throw new InvalidOperationException("Step 58 current-ownership acquisition requires rendering frozen.");
+
             var selected = RequireStartupLadderSelectedAuthority(step);
             _step58Baseline = CaptureStartupLadderBaseline(selected.Path, selected.Sha256, context);
-            RequireStartupLadderBaselineUnchanged(context, _step58Baseline, "Step 58 Gate A");
-            RequireVisibleSingleplayerSubmenu(step);
-            RequireRetainedCharacterSelectPackedSceneForOwnership(step);
-            Checkpoint(checkpoint, "M58_A_PASS — Step-57 4/4 retained PackedScene/PCK authority preserved; renderer stopped; runtime character-select ownership may be observed without mutation.");
-            return StartupLadderPass(step, Step58Name, gate, "Closed Step-57 authority retained; Step 58 may observe the actual game-owned character-select cache/tree state and re-audit the real handler without invoking it.");
+            RequireStartupLadderBaselineUnchanged(context, _step58Baseline, "Step 58 acquisition preflight");
+            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 58 acquisition guard recheck", requirePreAdmissionCounts: false);
+            var menu = RequireRetainedInTreeMainMenu(step);
+
+            using var resolver = new RejectingAssemblyResolver();
+            using var module = OpenStartupLadderModule(_step58Baseline.SelectedPath, resolver);
+            var allTypes = EnumerateTypes(module.Types).ToDictionary(type => type.FullName, StringComparer.Ordinal);
+            var allMethods = BuildStartupLadderMethodMap(allTypes);
+            var mainMenuType = RequireStartupLadderType(allTypes, MainMenuManagedRootTypeFullName, step);
+            var openMetadata = RequireUniqueStartupLadderNamedMethod(mainMenuType, MainMenuOpenSingleplayerSubmenuMethodName, step);
+            if (openMetadata.Parameters.Count != 0 || openMetadata.ReturnType.FullName != SingleplayerSubmenuManagedTypeFullName)
+                throw new InvalidDataException($"Step 58 acquisition requires zero-arg OpenSingleplayerSubmenu returning exact {SingleplayerSubmenuManagedTypeFullName}; observed params={openMetadata.Parameters.Count}; return={openMetadata.ReturnType.FullName}.");
+            var openAudit = AuditStartupLadderInvocationFrontier([openMetadata], allTypes, allMethods,
+                _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 58 acquisition requires retained Step-48 runtime guards."));
+            RequireImmediateFrontierAdmissible(openAudit, "Step 58 current-ownership OpenSingleplayerSubmenu acquisition");
+            if (resolver.Requests.Count != 0)
+                throw new InvalidDataException("Step 58 acquisition attempted external Cecil resolution: " + string.Join(" | ", resolver.Requests));
+
+            _step53OpenMethodToken = openMetadata.MetadataToken.ToUInt32();
+            var openRuntime = RequireRuntimeDeclaredZeroArgSingleplayerSubmenuMethod(menu.GetType(), step);
+            if (unchecked((uint)openRuntime.MetadataToken) != _step53OpenMethodToken)
+                throw new InvalidDataException($"Step 58 acquisition runtime OpenSingleplayerSubmenu token drifted: metadata=0x{_step53OpenMethodToken:X8}; runtime=0x{unchecked((uint)openRuntime.MetadataToken):X8}.");
+
+            var submenuStack = RequireRuntimeExactObjectProperty(menu, MainMenuSubmenuStackPropertyName, MainMenuSubmenuStackManagedTypeFullName, step);
+            var submenuField = RequireRuntimeExactInstanceField(submenuStack.GetType(), MainMenuSingleplayerFieldName, SingleplayerSubmenuManagedTypeFullName, step);
+            var submenu = submenuField.GetValue(submenuStack);
+            var preexisting = submenu is not null;
+            var preInside = submenu is not null && Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsInsideTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
+            var preVisible = submenu is not null && RequireRuntimeBoolProperty(submenu, "Visible", step);
+            var preVisibleInTree = submenu is not null && Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsVisibleInTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
+
+            _step54SubmenuStack = submenuStack;
+            _step54SingleplayerSubmenu = submenu;
+            _step54SubmenuExistedBefore = preexisting;
+            _step54SubmenuInsideTreeBefore = preInside;
+            _step54SubmenuVisibleBefore = preVisible;
+            _step54SubmenuVisibleInTreeBefore = preVisibleInTree;
+
+            if (submenu is null || !preInside || !preVisible || !preVisibleInTree)
+            {
+                Checkpoint(checkpoint, $"M58_A_ACQUIRE_OPEN_ARMED — current architecture needs the real game-owned NSingleplayerSubmenu materialized/activated; invoking exact OpenSingleplayerSubmenu token=0x{_step53OpenMethodToken:X8} once while rendering remains frozen; preexisting={preexisting}; inside={preInside}; visible={preVisible}; visibleInTree={preVisibleInTree}.");
+                object? returned;
+                try
+                {
+                    returned = openRuntime.Invoke(menu, null);
+                }
+                catch (TargetInvocationException tie) when (tie.InnerException is not null)
+                {
+                    Checkpoint(checkpoint, $"M58_A_ACQUIRE_OPEN_INNER_EXCEPTION — type={SanitizeCheckpoint(tie.InnerException.GetType().FullName ?? tie.InnerException.GetType().Name)}; targetSite={SanitizeCheckpoint(tie.InnerException.TargetSite?.ToString() ?? "<null>")}; stack={SanitizeCheckpoint(tie.InnerException.StackTrace ?? "<null>")}");
+                    ExceptionDispatchInfo.Capture(tie.InnerException).Throw();
+                    throw new InvalidOperationException("Unreachable after preserved Step-58 acquisition exception dispatch.");
+                }
+                if (returned is null || returned.GetType().FullName != SingleplayerSubmenuManagedTypeFullName)
+                    throw new InvalidDataException($"Step 58 acquisition OpenSingleplayerSubmenu returned invalid value: {returned?.GetType().FullName ?? "<null>"}.");
+                var fieldAfter = submenuField.GetValue(submenuStack) ?? throw new InvalidDataException("Step 58 acquisition left NMainMenuSubmenuStack._singleplayerSubmenu null.");
+                if (!ReferenceEquals(returned, fieldAfter))
+                    throw new InvalidDataException("Step 58 acquisition OpenSingleplayerSubmenu return identity did not match the retained stack field.");
+                submenu = fieldAfter;
+                _step54SingleplayerSubmenu = submenu;
+                _step58CurrentOwnershipAcquisitionInvokedOpen = true;
+            }
+            else
+            {
+                Checkpoint(checkpoint, "M58_A_ACQUIRE_OPEN_SKIPPED — retained NSingleplayerSubmenu is already visible/in-tree; current ownership path adopts it without duplicate OpenSingleplayerSubmenu invocation.");
+            }
+
+            if (submenu is null)
+                throw new InvalidDataException("Step 58 acquisition has no retained NSingleplayerSubmenu after adoption/materialization.");
+            var inside = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsInsideTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
+            var visible = RequireRuntimeBoolProperty(submenu, "Visible", step);
+            var visibleInTree = Convert.ToBoolean(RequireZeroArgBoolMethod(submenu.GetType(), "IsVisibleInTree").Invoke(submenu, null), System.Globalization.CultureInfo.InvariantCulture);
+            if (!inside || !visible || !visibleInTree)
+                throw new InvalidDataException($"Step 58 acquisition requires a visible/in-tree retained NSingleplayerSubmenu. inside={inside}; visible={visible}; visibleInTree={visibleInTree}.");
+
+            var packedScene = RequireRetainedCharacterSelectPackedSceneForOwnership(step);
+            _step57CharacterSelectResourcePath = RequireRuntimeStringProperty(packedScene, GodotResourcePathPropertyName, step).Replace('\\', '/');
+            if (!string.Equals(_step57CharacterSelectResourcePath, CharacterSelectSceneResourcePath, StringComparison.Ordinal))
+                throw new InvalidDataException($"Step 58 acquisition character-select resource path drifted: {_step57CharacterSelectResourcePath}.");
+            var pck = RequireEssentialResourcePackHandoff().PackAbsolutePath;
+            var entry = ExtractStartupLadderPckEntryUnpinned(pck, _step57CharacterSelectResourcePath, step);
+            if (entry.Bytes.Length == 0)
+                throw new InvalidDataException("Step 58 acquisition character-select PCK entry is empty.");
+
+            RequireStartupLadderBaselineUnchanged(context, _step58Baseline, "Step 58 acquisition post-adoption");
+            RequireStep48LifecycleRuntimeGuardsCurrent(context, "Step 58 acquisition post-adoption guard recheck", requirePreAdmissionCounts: false);
+            _step58CurrentOwnershipAcquisitionPassed = true;
+            Checkpoint(checkpoint, $"M58_A_PASS — current ownership acquisition complete from Step-52 baseline; legacy Steps53-57 not required; OpenSingleplayerSubmenuInvoked={_step58CurrentOwnershipAcquisitionInvokedOpen}; submenuVisibleInTree=True; characterSelectResource={SanitizeCheckpoint(_step57CharacterSelectResourcePath)}; pckBytes={entry.Bytes.Length}; rendererStopped=True.");
+            return StartupLadderPass(step, Step58Name, gate,
+                "Current ownership prerequisites were acquired directly from the physically closed Step-52 main-menu baseline. Legacy Steps 53-57 are diagnostic history, not mandatory choreography.");
         }
-        catch (Exception ex) { Checkpoint(checkpoint, $"M58_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step58Name, gate, stage, ex); }
+        catch (Exception ex)
+        {
+            Checkpoint(checkpoint, $"M58_A_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
+            return StartupLadderFail(step, Step58Name, gate, stage, ex);
+        }
     }
 
     public TransformedRealStS2StartupLadderGateResult RunStep58RuntimeOwnershipBinding(Action<string>? checkpoint = null)
@@ -416,7 +518,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 _step59ReadyBindingDiagnostics = BuildStep59ReadyBindingDiagnostics(forensicScreen, context, step, allTypes);
                 _step59ConfirmButtonDiagnostics = BuildStep59ConfirmButtonOnEnableDiagnostics(forensicScreen, context, step, allTypes);
                 _step59ConfirmButtonDiagnostics += "\n\n" + BuildStep59CompilationEfficientDiagnosticDeck(forensicScreen, context, step, allTypes, allMethods);
-                _step59RuntimeTraceBridgeDiagnostics = BuildStep59RuntimeTraceBridgeDiagnostics(context, step);
                 _step59UniqueNameProvenanceDiagnostics = BuildStep59UniqueNameProvenanceDiagnostics(forensicScreen, context, step);
             }
             catch (Exception diagnosticEx)
@@ -429,7 +530,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             Checkpoint(checkpoint, "M59_B_FORENSIC_PREFLIGHT — " + SanitizeCheckpoint(_step59PreflightSnapshot));
             Checkpoint(checkpoint, $"M59_B_READY_BINDING_DIAGNOSIS — handlerAuthorized={_step59ReadyBindingPreflightPassed}; blocker={SanitizeCheckpoint(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}; {SanitizeCheckpoint(_step59ReadyBindingDiagnostics)}");
             Checkpoint(checkpoint, "M59_B_CONFIRM_BUTTON_PREFLIGHT — " + SanitizeCheckpoint(_step59ConfirmButtonDiagnostics));
-            Checkpoint(checkpoint, "M59_B_RUNTIME_TRACE_BRIDGE — " + SanitizeCheckpoint(_step59RuntimeTraceBridgeDiagnostics));
             Checkpoint(checkpoint, "M59_B_UNIQUE_NAME_PROVENANCE — " + SanitizeCheckpoint(_step59UniqueNameProvenanceDiagnostics));
             _step59TransitionBound = true;
             _step59StaticMap = "StS2 Launcher — Step 59.0 character-select ready-binding forensics + game-owned transition\n" +
@@ -445,7 +545,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"Ready-binding blocker: {(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}\n" +
                 "[READY-BINDING DIAGNOSTICS]\n" + _step59ReadyBindingDiagnostics + "\n" +
                 "[CONFIRM-BUTTON ONENABLE PREFLIGHT]\n" + _step59ConfirmButtonDiagnostics + "\n" +
-                "[STEP-59 RUNTIME TRACE BRIDGE PREFLIGHT]\n" + _step59RuntimeTraceBridgeDiagnostics + "\n" +
                 "[UNIQUE-NAME PROVENANCE DIAGNOSTICS]\n" + _step59UniqueNameProvenanceDiagnostics + "\n" +
                 "Rendering active before transition: NO\n" +
                 BuildStartupLadderInvocationFrontierAppendix(pushAudit);
@@ -472,19 +571,48 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             throw new InvalidOperationException("Step 59R is observational and must run before any Step-59 mutation/handler probe in this process.");
 
         var embark = RequireStep59EmbarkButtonForProbe(context, step);
-        FieldInfo? traceField = null;
-        try
-        {
-            traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59R controller/singleton rehearsal");
-            _step59ControllerSingletonRehearsalDiagnostics = BuildStep59ControllerSingletonRehearsalDiagnostics(embark, context, step);
-        }
-        finally
-        {
-            DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59R controller/singleton rehearsal");
-        }
+        _step59ControllerSingletonRehearsalDiagnostics = BuildStep59ControllerSingletonRehearsalDiagnostics(embark, context, step);
         _step59StaticMap += "\n[STEP 59R CONTROLLER / HOTKEY SINGLETON REHEARSAL]\n" + _step59ControllerSingletonRehearsalDiagnostics + "\n";
         Checkpoint(checkpoint, "M59R_COMPLETE — " + SanitizeCheckpoint(_step59ControllerSingletonRehearsalDiagnostics));
         return _step59ControllerSingletonRehearsalDiagnostics;
+    }
+
+    public (bool Passed, string Diagnostics) RunStep59RegisterHotkeysProbe(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59H RegisterHotkeys probe entry");
+        if (!_step59TransitionBound)
+            throw new InvalidOperationException("Step 59H requires Step-59 Gate B binding before the isolated RegisterHotkeys probe.");
+        if (!_step59ReadyBindingPreflightPassed)
+            throw new InvalidOperationException("Step 59H requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted)
+            throw new InvalidOperationException("Step 59H is one-shot and requires a fresh process with no prior Step-59 mutation/handler probe.");
+        _step59DiagnosticMutationProbeStarted = true;
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59H PRE-PROBE EMBARK FIELDS");
+        var method = RequireStep59InstanceRuntimeMethod(embark.GetType(), "RegisterHotkeys", 0, step);
+        Exception? failure = null;
+        Checkpoint(checkpoint, $"M59H_INVOKE_ARMED — invoking exact inherited NButton.RegisterHotkeys token=0x{method.MetadataToken:X8} on retained embark button; no UpdateControllerButton/Enable/OnEnable/Push/OpenCharacterSelect.");
+        try
+        {
+            method.Invoke(embark, null);
+            Checkpoint(checkpoint, "M59H_INVOKE_RETURNED — exact RegisterHotkeys returned normally.");
+        }
+        catch (Exception ex)
+        {
+            failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+            Checkpoint(checkpoint, "M59H_INVOKE_EXCEPTION — " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
+        }
+        var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59H POST-PROBE EMBARK FIELDS");
+        _step59RegisterHotkeysProbeDiagnostics =
+            $"methodToken=0x{method.MetadataToken:X8}; passed={failure is null}; runtimeType={embark.GetType().FullName}\n" +
+            before + "\n" + after +
+            (failure is null ? "\nexception=<none>" : "\nexception=" + DescribeStep59ProbeException(failure));
+        _step59StaticMap += "\n[STEP 59H ISOLATED REGISTERHOTKEYS PROBE]\n" + _step59RegisterHotkeysProbeDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59H_COMPLETE — passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False.");
+        return (failure is null, _step59RegisterHotkeysProbeDiagnostics);
     }
 
     public (bool Passed, string Diagnostics) RunStep59UpdateControllerButtonProbe(Action<string>? checkpoint = null)
@@ -504,25 +632,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59U PRE-PROBE EMBARK FIELDS");
         var method = RequireStep59InstanceRuntimeMethod(embark.GetType(), "UpdateControllerButton", 0, step);
         Exception? failure = null;
-        FieldInfo? traceField = null;
+        Checkpoint(checkpoint, $"M59U_INVOKE_ARMED — invoking exact inherited NButton.UpdateControllerButton token=0x{method.MetadataToken:X8} on retained embark button; no Enable/OnEnable/RegisterHotkeys/Push/OpenCharacterSelect.");
         try
         {
-            traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59U UpdateControllerButton");
-            Checkpoint(checkpoint, $"M59U_INVOKE_ARMED — invoking exact inherited NButton.UpdateControllerButton token=0x{method.MetadataToken:X8} on retained embark button; no Enable/OnEnable/RegisterHotkeys/Push/OpenCharacterSelect.");
-            try
-            {
-                method.Invoke(embark, null);
-                Checkpoint(checkpoint, "M59U_INVOKE_RETURNED — exact UpdateControllerButton returned normally.");
-            }
-            catch (Exception ex)
-            {
-                failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
-                Checkpoint(checkpoint, "M59U_INVOKE_EXCEPTION — " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
-            }
+            method.Invoke(embark, null);
+            Checkpoint(checkpoint, "M59U_INVOKE_RETURNED — exact UpdateControllerButton returned normally.");
         }
-        finally
+        catch (Exception ex)
         {
-            DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59U UpdateControllerButton");
+            failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+            Checkpoint(checkpoint, "M59U_INVOKE_EXCEPTION — " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
         }
 
         var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59U POST-PROBE EMBARK FIELDS");
@@ -552,25 +671,16 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         var enable = RequireStep59InstanceRuntimeMethod(embark.GetType(), "Enable", 0, step);
         var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59E PRE-PROBE EMBARK FIELDS");
         Exception? failure = null;
-        FieldInfo? traceField = null;
+        Checkpoint(checkpoint, $"M59E_ENABLE_ARMED — invoking retained embark NClickableControl.Enable token=0x{enable.MetadataToken:X8} directly, outside OpenCharacterSelect, to isolate the button path. This probe may change only the retained embark button/hotkey/tween state and therefore requires a fresh process afterward.");
         try
         {
-            traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59E isolated embark Enable");
-            Checkpoint(checkpoint, $"M59E_ENABLE_ARMED — invoking retained embark NClickableControl.Enable token=0x{enable.MetadataToken:X8} directly, outside OpenCharacterSelect, to isolate the button path. This probe may change only the retained embark button/hotkey/tween state and therefore requires a fresh process afterward.");
-            try
-            {
-                enable.Invoke(embark, null);
-                Checkpoint(checkpoint, "M59E_ENABLE_RETURNED — isolated retained embark Enable returned normally.");
-            }
-            catch (Exception ex)
-            {
-                failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
-                Checkpoint(checkpoint, "M59E_ENABLE_EXCEPTION — " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
-            }
+            enable.Invoke(embark, null);
+            Checkpoint(checkpoint, "M59E_ENABLE_RETURNED — isolated retained embark Enable returned normally.");
         }
-        finally
+        catch (Exception ex)
         {
-            DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59E isolated embark Enable");
+            failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+            Checkpoint(checkpoint, "M59E_ENABLE_EXCEPTION — " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
         }
 
         var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59E POST-PROBE EMBARK FIELDS");
@@ -581,6 +691,118 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59StaticMap += "\n[STEP 59E ISOLATED RETAINED EMBARK ENABLE PROBE]\n" + _step59IsolatedEnableProbeDiagnostics + "\n";
         Checkpoint(checkpoint, $"M59E_COMPLETE — passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False.");
         return (failure is null, _step59IsolatedEnableProbeDiagnostics);
+    }
+
+    public (bool Passed, string Diagnostics) RunStep59ConfirmButtonTailProbe(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59T confirm-button tail probe entry");
+        if (!_step59TransitionBound)
+            throw new InvalidOperationException("Step 59T requires Step-59 Gate B binding before the isolated confirm-button tail probe.");
+        if (!_step59ReadyBindingPreflightPassed)
+            throw new InvalidOperationException("Step 59T requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted)
+            throw new InvalidOperationException("Step 59T is one-shot and requires a fresh process with no prior Step-59 mutation/handler probe.");
+        _step59DiagnosticMutationProbeStarted = true;
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59T PRE-PROBE EMBARK FIELDS");
+        var stages = new List<string>();
+        Exception? failure = null;
+
+        bool Stage(string name, Action action)
+        {
+            if (failure is not null) return false;
+            Checkpoint(checkpoint, "M59T_STAGE_PRE — " + name);
+            try
+            {
+                action();
+                stages.Add(name + "=PASS");
+                Checkpoint(checkpoint, "M59T_STAGE_POST — " + name + " returned normally.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+                stages.Add(name + "=FAIL:" + DescribeStep59ProbeException(ex));
+                Checkpoint(checkpoint, "M59T_STAGE_FAIL — " + name + "; " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
+                return false;
+            }
+        }
+
+        var outline = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_outline", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59T retained embark _outline is null.");
+        var image = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_buttonImage", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59T retained embark _buttonImage is null.");
+        var moveTween = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_moveTween", step).GetValue(embark);
+        var showPos = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_showPos", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59T retained embark _showPos could not be read.");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59T GodotSharp handoff absent.")).GodotSharpAssembly;
+        var colorsType = godotAssembly.GetType("Godot.Colors", throwOnError: true, ignoreCase: false) ?? throw new MissingMemberException("Godot.Colors");
+        var transparent = colorsType.GetProperty("Transparent", BindingFlags.Static | BindingFlags.Public)?.GetValue(null)
+            ?? throw new MissingMemberException("Godot.Colors.Transparent");
+        var white = colorsType.GetProperty("White", BindingFlags.Static | BindingFlags.Public)?.GetValue(null)
+            ?? throw new MissingMemberException("Godot.Colors.White");
+        var outlineModulate = outline.GetType().GetProperty("Modulate", BindingFlags.Instance | BindingFlags.Public)
+            ?? throw new MissingMemberException(outline.GetType().FullName, "Modulate");
+        var imageModulate = image.GetType().GetProperty("Modulate", BindingFlags.Instance | BindingFlags.Public)
+            ?? throw new MissingMemberException(image.GetType().FullName, "Modulate");
+
+        object? newTween = null;
+        object? propertyTweener = null;
+        Stage("outline.Modulate=Transparent", () => outlineModulate.SetValue(outline, transparent));
+        Stage("buttonImage.Modulate=White", () => imageModulate.SetValue(image, white));
+        if (moveTween is not null)
+            Stage("existingTween.Kill", () => RequireStep59InstanceRuntimeMethod(moveTween.GetType(), "Kill", 0, step).Invoke(moveTween, null));
+        else
+            stages.Add("existingTween.Kill=SKIP_NULL");
+        Stage("Node.CreateTween", () =>
+        {
+            newTween = RequireStep59InstanceRuntimeMethod(embark.GetType(), "CreateTween", 0, step).Invoke(embark, null)
+                ?? throw new NullReferenceException("Node.CreateTween returned null.");
+        });
+        Stage("Tween.TweenProperty", () =>
+        {
+            if (newTween is null) throw new InvalidOperationException("CreateTween did not produce a tween.");
+            var nodePathType = godotAssembly.GetType("Godot.NodePath", true, false) ?? throw new MissingMemberException("Godot.NodePath");
+            var variantType = godotAssembly.GetType("Godot.Variant", true, false) ?? throw new MissingMemberException("Godot.Variant");
+            var nodePathImplicit = nodePathType.GetMethods(BindingFlags.Static | BindingFlags.Public).Single(method => method.Name == "op_Implicit" && method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == typeof(string));
+            var variantImplicit = variantType.GetMethods(BindingFlags.Static | BindingFlags.Public).Single(method => method.Name == "op_Implicit" && method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == showPos.GetType());
+            var nodePath = nodePathImplicit.Invoke(null, new object?[] { "position" }) ?? throw new NullReferenceException("NodePath implicit conversion returned null.");
+            var variant = variantImplicit.Invoke(null, new[] { showPos }) ?? throw new NullReferenceException("Variant implicit conversion returned null.");
+            var tweenProperty = newTween.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).Single(method => method.Name == "TweenProperty" && method.GetParameters().Length == 4);
+            propertyTweener = tweenProperty.Invoke(newTween, new object?[] { embark, nodePath, variant, 0.35D })
+                ?? throw new NullReferenceException("Tween.TweenProperty returned null.");
+        });
+        Stage("PropertyTweener.SetEase", () =>
+        {
+            if (propertyTweener is null) throw new InvalidOperationException("TweenProperty did not produce a PropertyTweener.");
+            var method = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "SetEase", 1, step);
+            var enumValue = Enum.ToObject(method.GetParameters()[0].ParameterType, 1L);
+            if (method.Invoke(propertyTweener, new[] { enumValue }) is null) throw new NullReferenceException("PropertyTweener.SetEase returned null.");
+        });
+        Stage("PropertyTweener.SetTrans", () =>
+        {
+            if (propertyTweener is null) throw new InvalidOperationException("TweenProperty did not produce a PropertyTweener.");
+            var method = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "SetTrans", 1, step);
+            var enumValue = Enum.ToObject(method.GetParameters()[0].ParameterType, 10L);
+            if (method.Invoke(propertyTweener, new[] { enumValue }) is null) throw new NullReferenceException("PropertyTweener.SetTrans returned null.");
+        });
+        Stage("PropertyTweener.FromCurrent", () =>
+        {
+            if (propertyTweener is null) throw new InvalidOperationException("TweenProperty did not produce a PropertyTweener.");
+            if (RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "FromCurrent", 0, step).Invoke(propertyTweener, null) is null)
+                throw new NullReferenceException("PropertyTweener.FromCurrent returned null.");
+        });
+
+        var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59T POST-PROBE EMBARK FIELDS");
+        _step59ConfirmButtonTailProbeDiagnostics =
+            $"passed={failure is null}; runtimeType={embark.GetType().FullName}; stages={string.Join(" | ", stages)}\n" + before + "\n" + after +
+            (failure is null ? "\nexception=<none>" : "\nexception=" + DescribeStep59ProbeException(failure));
+        _step59StaticMap += "\n[STEP 59T ISOLATED NCONFIRMBUTTON POST-BASE TAIL PROBE]\n" + _step59ConfirmButtonTailProbeDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59T_COMPLETE — passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False; stages={SanitizeCheckpoint(string.Join(" | ", stages))}.");
+        return (failure is null, _step59ConfirmButtonTailProbeDiagnostics);
     }
 
     public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerTransition(Action<string>? checkpoint = null)
@@ -633,24 +855,15 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                     Checkpoint(checkpoint, "M59_C_NAVIGATION_REPAIR_SKIPPED — retained NSingleplayerSubmenu is already logically bound to the exact main-menu submenu stack.");
                 }
 
-                Checkpoint(checkpoint, $"M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with the real retained _standardButton ({SanitizeCheckpoint(_step59StandardButton?.GetType().FullName ?? "<null>")}); rendering remains frozen. Step-59 runtime callsite tracing will be armed only for the original handler call.");
+                Checkpoint(checkpoint, $"M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with the real retained _standardButton ({SanitizeCheckpoint(_step59StandardButton?.GetType().FullName ?? "<null>")}); rendering remains frozen.");
                 Exception? handlerFailure = null;
-                FieldInfo? traceField = null;
                 try
                 {
-                    traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59 real OpenCharacterSelect handler");
-                    try
-                    {
-                        _step58RuntimeOpenCharacterSelect!.Invoke(submenu, new object?[] { _step59StandardButton });
-                    }
-                    catch (Exception invokeEx)
-                    {
-                        handlerFailure = invokeEx is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : invokeEx;
-                    }
+                    _step58RuntimeOpenCharacterSelect!.Invoke(submenu, new object?[] { _step59StandardButton });
                 }
-                finally
+                catch (Exception invokeEx)
                 {
-                    DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59 real OpenCharacterSelect handler");
+                    handlerFailure = invokeEx is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : invokeEx;
                 }
 
                 if (handlerFailure is not null)
@@ -902,7 +1115,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
     private Step35ExecutionLoadContext RequireStep58Prerequisite(string boundary)
     {
-        var context = RequireStep57Prerequisite(boundary); if (!_exactStep57ClosurePassed || !_step57PreflightMapped || !_step57StaticMapDurablyWritten) throw new InvalidOperationException(boundary + " requires same-process Step-57 4/4 durable retained-PackedScene/PCK authority."); return context;
+        var context = RequireStep52Prerequisite(boundary);
+        if (!_exactStep52ClosurePassed || !_step52PulsePassed || !_step52StaticMapDurablyWritten)
+            throw new InvalidOperationException(boundary + " requires same-process Step-52 4/4 sustained main-menu render/refreeze authority.");
+        if (!_step58CurrentOwnershipAcquisitionPassed)
+            throw new InvalidOperationException(boundary + " requires the current-architecture Step-58 ownership acquisition. Legacy Steps 53-57 are not prerequisites.");
+        return context;
     }
     private Step35ExecutionLoadContext RequireStep59Prerequisite(string boundary)
     {
@@ -1078,63 +1296,6 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return $"character=[{current.State}; nodeReady={screenReady}; fields={string.Join(",", fieldStates)}]; ascension=[nodeReady={ascensionReady}; fields={string.Join(",", ascensionFieldStates)}]; nGame=[{string.Join(",", nGameStates)}]; save=Progress:{progress.GetType().FullName},Epochs:{epochs.GetType().FullName},EncounterStats:{encounterStats.GetType().FullName}; rootCurrentScene={currentSceneIdentity}; lobby={(lobby is null ? "NULL" : lobby.GetType().FullName)}; lobbyPlayers={playersCount}; requiredFailures={(prerequisiteFailures.Count == 0 ? "<none>" : string.Join(" | ", prerequisiteFailures))}";
     }
 
-
-    private string BuildStep59RuntimeTraceBridgeDiagnostics(Step35ExecutionLoadContext context, int step)
-    {
-        var admission = _admission ?? throw new InvalidOperationException("Step 59.0 runtime trace bridge requires the selected sts2 admission.");
-        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(admission.Assembly), context))
-            throw new InvalidDataException("Step 59.0 selected sts2 admission is not owned by the retained private load context.");
-        var bridgeType = admission.Assembly.GetType(Step59RuntimeTraceBridgeTypeFullName, throwOnError: true, ignoreCase: false)
-            ?? throw new MissingMemberException(Step59RuntimeTraceBridgeTypeFullName);
-        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(bridgeType.Assembly), context))
-            throw new InvalidDataException("Step 59.0 runtime trace bridge is not owned by the retained private load context.");
-        var callback = bridgeType.GetField(Step59RuntimeTraceBridgeCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
-            ?? throw new MissingFieldException(Step59RuntimeTraceBridgeTypeFullName, Step59RuntimeTraceBridgeCallbackFieldName);
-        if (callback.FieldType != typeof(Action<string>))
-            throw new InvalidDataException($"Step 59.0 runtime trace callback type drifted: {callback.FieldType.FullName}.");
-        if (callback.GetValue(null) is not null)
-            throw new InvalidDataException("Step 59.0 runtime trace callback was unexpectedly armed during Gate-B preflight.");
-        var emit = bridgeType.GetMethod("Emit", BindingFlags.Static | BindingFlags.Public, binder: null, types: new[] { typeof(string) }, modifiers: null)
-            ?? throw new MissingMethodException(Step59RuntimeTraceBridgeTypeFullName, "Emit(System.String)");
-        if (emit.ReturnType != typeof(void))
-            throw new InvalidDataException($"Step 59.0 runtime trace Emit return type drifted: {emit.ReturnType.FullName}.");
-        return $"bridge={bridgeType.FullName}; callbackType={callback.FieldType.FullName}; callbackArmed=False; emitToken=0x{emit.MetadataToken:X8}; selectedContext=True; markerPrefix={Step59RuntimeTraceMarkerPrefix}; instrumentation is inert until an explicit Step-59 probe/real-handler operation arms the synthetic callback.";
-    }
-
-    private FieldInfo ArmStep59RuntimeTrace(Action<string>? checkpoint, Step35ExecutionLoadContext context, int step, string operation)
-    {
-        if (checkpoint is null)
-            throw new InvalidOperationException($"Step {step}.0 {operation} requires a durable checkpoint callback before runtime trace arm.");
-        var admission = _admission ?? throw new InvalidOperationException($"Step {step}.0 {operation} requires the selected sts2 admission.");
-        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(admission.Assembly), context))
-            throw new InvalidDataException($"Step {step}.0 {operation} selected sts2 admission is outside the retained private load context.");
-        var bridgeType = admission.Assembly.GetType(Step59RuntimeTraceBridgeTypeFullName, throwOnError: true, ignoreCase: false)
-            ?? throw new MissingMemberException(Step59RuntimeTraceBridgeTypeFullName);
-        var callback = bridgeType.GetField(Step59RuntimeTraceBridgeCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
-            ?? throw new MissingFieldException(Step59RuntimeTraceBridgeTypeFullName, Step59RuntimeTraceBridgeCallbackFieldName);
-        if (callback.FieldType != typeof(Action<string>))
-            throw new InvalidDataException($"Step {step}.0 {operation} runtime trace callback type drifted: {callback.FieldType.FullName}.");
-        if (callback.GetValue(null) is not null)
-            throw new InvalidOperationException($"Step {step}.0 {operation} refuses to overwrite an already-armed Step-59 runtime trace callback.");
-        callback.SetValue(null, checkpoint);
-        Checkpoint(checkpoint, $"M59_TRACE_ARMED — operation={SanitizeCheckpoint(operation)}; bridge={Step59RuntimeTraceBridgeTypeFullName}; markerPrefix={Step59RuntimeTraceMarkerPrefix}; synthetic callback write only; no game field was changed.");
-        return callback;
-    }
-
-    private static void DisarmStep59RuntimeTrace(FieldInfo? callback, Action<string>? checkpoint, string operation)
-    {
-        if (callback is null)
-            return;
-        try
-        {
-            callback.SetValue(null, null);
-            Checkpoint(checkpoint, $"M59_TRACE_DISARMED — operation={SanitizeCheckpoint(operation)}; callback=NULL.");
-        }
-        catch (Exception ex)
-        {
-            Checkpoint(checkpoint, $"M59_TRACE_DISARM_FAIL — operation={SanitizeCheckpoint(operation)}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
-        }
-    }
 
     private object RequireStep59EmbarkButtonForProbe(Step35ExecutionLoadContext context, int step)
     {
