@@ -1,17 +1,5 @@
-StS2 Launcher — canonical static validation entry point
-UTC: 2026-09-14T09:20:41Z
-Checking active shell syntax...
-PASS: shell syntax — scripts/build-godot.sh
-PASS: shell syntax — scripts/build-ios.sh
-PASS: shell syntax — scripts/codemagic.sh
-PASS: shell syntax — scripts/lib/current-release.sh
-PASS: shell syntax — scripts/preflight-godot-link.sh
-PASS: shell syntax — scripts/test.sh
-PASS: shell syntax — scripts/validate.sh
-PASS: shell syntax — scripts/verify-ipa.sh
-PASS: Python validator compiles
 StS2 Launcher — Steps 43–52 guarded direct main-menu startup ladder validation
-Root: /mnt/data/work204/StS2Launcher-Steps58-62-0.0.204
+Root: /mnt/data/StS2Launcher-Steps58-62-0.0.205
 PASS: all 9 project/props/targets XML files parse
 PASS: global.json parses
 PASS: lexical delimiter scan passes for 304 C# files
@@ -21,10 +9,10 @@ PASS: legacy Step05 iOS project is absent from live src
 PASS: src contains exactly one live iOS application project
 PASS: iOS csproj parses as XML
 PASS: Info.plist parses
-PASS: build version is 204
-PASS: display version is 0.0.204
-PASS: Info.plist build version is 204
-PASS: Info.plist display version is 0.0.204
+PASS: build version is 205
+PASS: display version is 0.0.205
+PASS: Info.plist build version is 205
+PASS: Info.plist display version is 0.0.205
 PASS: iOS Files sharing remains enabled
 PASS: open-in-place Documents access remains enabled
 PASS: canonical iOS root namespace is explicit
@@ -34,11 +22,11 @@ PASS: live iOS source uses canonical namespace
 PASS: current release presentation has one dedicated UI source
 PASS: top launcher banner identifies the active Steps 58–62 ownership/render trial
 PASS: top launcher presentation records Step-52 current-architecture baseline, optional legacy 53–57, active Steps 58–62, and Step 63 unopened
-PASS: root and docs READMEs pin the exact 0.0.204 (204) release identity
-PASS: master plan points to the active 0.0.204 PropertyTweener compatibility frontier while retaining Step52-to-58 ownership and PackedScene compatibility
+PASS: root and docs READMEs pin the exact 0.0.205 (205) release identity
+PASS: master plan points to the active 0.0.205 compilation-efficient PropertyTweener observe/repair frontier
 PASS: top launcher banner preserves historical authority while identifying Step52->58 as the active architecture
 PASS: top launcher version is derived from the built Info.plist instead of a stale hard-coded version
-PASS: startup-ladder source pins expected 0.0.204 bundle release identity
+PASS: startup-ladder source pins expected 0.0.205 bundle release identity
 PASS: retired Step-27 execution markers are absent from the active release presentation
 PASS: RootViewController consumes the single current-release presentation source
 PASS: stale Step-26 top-banner identity is removed
@@ -1184,7 +1172,7 @@ PASS: Step 42 Core does not directly invoke GameStartup, cloud, platform, main-m
 PASS: Step 42 UI does not directly invoke GameStartup/cloud/platform/main-menu/deferred or restart/refreeze rendering
 PASS: Step 42 UI durably writes the verified map before arming a one-shot invocation and provides run-correlated reports
 PASS: RootViewController exposes Step 42 and rerunning Step 41 invalidates Step-42 state
-PASS: active release presentation pins Step-52 current architecture and Steps-58–62 / 0.0.204 identity
+PASS: active release presentation pins Step-52 current architecture and Steps-58–62 / 0.0.205 identity
 PASS: Step 42 host regressions pin gate sequencing and stable ordinals
 PASS: current status pins the physically closed Step-42 InitPools authority
 PASS: Step 42 design/provenance record is present
@@ -1319,16 +1307,16 @@ PASS: physical 0.0.200 map proves the PackedScene unique-name correction on reta
 PASS: 0.0.201 history note records the fail-closed NConfirmButton preflight and unchanged boundary
 PASS: character-select continuation declares the physical ownership pivot and bounded visible-render constants
 PASS: Step 58 starts from Step-52 current-architecture authority, acquires/adopts real game-owned submenu state, then audits exact OpenCharacterSelect ownership without requiring legacy Steps 53-57
-PASS: 0.0.204 UI unlocks active Step 58 directly from same-process Step-52 authority and explicitly demotes legacy 53-57 to optional diagnostics
-PASS: 0.0.204 active ownership path contains no obsolete Step-57 prerequisite gate
-PASS: 0.0.204 preserves the exact physically proven PackedScene compatibility implementation bytes
-PASS: 0.0.204 removes the rejected 0.0.202 runtime-wide Step-59 trace bridge and shared-method markers
-PASS: 0.0.204 contains the bounded TweenProperty PropertyTweener managed-wrapper compatibility and telemetry
-PASS: 0.0.204 exposes PropertyTweener compatibility state in Step-59 probes and diagnostic deck
-PASS: 0.0.204 host fixture serializes and reopens the dedicated TweenProperty helper compatibility while preserving shared fluent helpers
-PASS: 0.0.204 history note records physical localization, narrow compatibility, and compilation-efficient test sequence
-PASS: 0.0.204 retains controller, hotkey, controller-update, confirm-tail and full-Enable Step-59 probes in one compilation
-PASS: 0.0.204 exposes all reusable Step-59 isolation branches in the same IPA
+PASS: 0.0.205 UI unlocks active Step 58 directly from same-process Step-52 authority and explicitly demotes legacy 53-57 to optional diagnostics
+PASS: 0.0.205 active ownership path contains no obsolete Step-57 prerequisite gate
+PASS: 0.0.205 preserves the exact physically proven PackedScene compatibility implementation bytes
+PASS: 0.0.205 keeps the rejected 0.0.202 runtime-wide Step-59 trace bridge absent
+PASS: 0.0.205 contains switchable full-chain PropertyTweener observation and repair telemetry
+PASS: 0.0.205 exposes control/repair state across 59T/59X/59E/real Step59
+PASS: 0.0.205 host fixture serializes and reopens dedicated TweenProperty plus method-local fluent observe/repair hooks
+PASS: 0.0.204 compatibility history remains preserved
+PASS: 0.0.205 retains controller, hotkey, controller-update, control-tail, repair-tail and full-Enable branches in one compilation
+PASS: 0.0.205 exposes all reusable Step-59 isolation branches in the same IPA
 PASS: Step 59H resolves and invokes only exact RegisterHotkeys; controller update/full Enable/real handler are not invoked by the probe
 PASS: Step 59T isolates every post-base NConfirmButton visual/tween operation with staged evidence and no base/real-handler call
 PASS: 0.0.203 history note records the rejected trace regression, restored runtime, ownership pivot, multi-probe toolbox, and unopened Step 63
@@ -1342,7 +1330,7 @@ PASS: 0.0.199 re-applies only the serialized node metadata and verifies the corr
 PASS: 0.0.196 Step 59 localizes the exact %AscensionPanel Ready binding using selected IL, live node/load-context/owner evidence, and receipt-backed TSCN context before handler arm
 PASS: 0.0.198 compares retained SceneState, temporary off-tree instances, live unique flags, and direct/%Name lookups before handler arm
 PASS: 0.0.201 adds the retained embark NConfirmButton Ready/OnEnable IL/field/node/SceneState/TSCN preflight before handler arm
-PASS: 0.0.201 confirm-button preflight is observational and performs no direct field/Ready/OnEnable repair
+PASS: 0.0.201 confirm-button preflight remains free of direct game-field/Ready/OnEnable repair; 0.0.205 may toggle only its GodotSharp bridge field
 PASS: 0.0.201 definite NConfirmButton prerequisites fail closed into the existing Step-59 handler blocker
 PASS: 0.0.201 writes confirm-button evidence and checks the shared blocker before the one-shot handler can arm
 PASS: 0.0.198 provenance diagnostics do not write game fields
@@ -1354,12 +1342,12 @@ PASS: 0.0.196 ready-binding diagnostics never patch _ascensionPanel or any game 
 PASS: 0.0.196 selected Cecil audit pins _Ready ordering around the exact ascension lookup
 PASS: Step 59 checks the already-complete game-owned path before arming handler invocation
 PASS: Step 59 selects and audits exact void NSubmenuStack.Push(NSubmenu) and rejects foreign logical-stack authority
-PASS: real Step 59 binding/transition never repairs submenu ownership by directly writing a runtime field; isolated 59T may set only Godot visual properties
+PASS: real Step 59 binding/transition never repairs submenu/game ownership by directly writing game fields; 0.0.205 may toggle only its GodotSharp repair bridge field
 PASS: Step 59 does not reset the original inner exception stack at the reflection boundary
 PASS: Step 59 binds and type-checks the retained real single-player standard button
 PASS: Step 59 UI durably writes ready-binding forensics before Gate C and one-shot bookkeeping arms only after a clean preflight
 PASS: 0.0.201 compilation-efficient deck batches full fields, peers, null candidates, IL order and transitive Ready/Enable frontiers into one Gate-B map
-PASS: 0.0.201 compilation-efficient diagnostic deck performs no direct field write or reflective Ready/OnEnable replay
+PASS: 0.0.201 compilation-efficient diagnostic deck performs no direct game-field write or reflective Ready/OnEnable replay
 PASS: 0.0.201 Step 59D executes the complete observational Gate-A/B deck and durably reports completion
 PASS: 0.0.201 Step 59D cannot arm or invoke the real handler
 PASS: 0.0.203 separates observational/mutating/real-handler phone experiments by fresh process and persists post-failure map evidence

@@ -669,6 +669,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
 
         var embark = RequireStep59EmbarkButtonForProbe(context, step);
         var enable = RequireStep59InstanceRuntimeMethod(embark.GetType(), "Enable", 0, step);
+        SetStep59PropertyTweenerRepairEnabled(true, checkpoint, "M59E_PROPERTY_TWEENER_REPAIR_MODE");
         var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59E PRE-PROBE EMBARK FIELDS");
         var compatBefore = BuildStep59PropertyTweenerCompatibilityRuntimeState();
         Exception? failure = null;
@@ -697,20 +698,27 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
 
     public (bool Passed, string Diagnostics) RunStep59ConfirmButtonTailProbe(Action<string>? checkpoint = null)
+        => RunStep59ConfirmButtonTailProbeCore(repairEnabled: false, probeCode: "59T", checkpoint: checkpoint);
+
+    public (bool Passed, string Diagnostics) RunStep59ConfirmButtonTailRepairProbe(Action<string>? checkpoint = null)
+        => RunStep59ConfirmButtonTailProbeCore(repairEnabled: true, probeCode: "59X", checkpoint: checkpoint);
+
+    private (bool Passed, string Diagnostics) RunStep59ConfirmButtonTailProbeCore(bool repairEnabled, string probeCode, Action<string>? checkpoint)
     {
         const int step = 59;
         ThrowIfDisposed();
-        var context = RequireStep59Prerequisite("Step 59T confirm-button tail probe entry");
+        var context = RequireStep59Prerequisite($"Step {probeCode} confirm-button tail probe entry");
         if (!_step59TransitionBound)
-            throw new InvalidOperationException("Step 59T requires Step-59 Gate B binding before the isolated confirm-button tail probe.");
+            throw new InvalidOperationException( $"Step {probeCode} requires Step-59 Gate B binding before the isolated confirm-button tail probe.");
         if (!_step59ReadyBindingPreflightPassed)
-            throw new InvalidOperationException("Step 59T requires a clean Step-59 ready-binding preflight.");
+            throw new InvalidOperationException( $"Step {probeCode} requires a clean Step-59 ready-binding preflight.");
         if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted)
-            throw new InvalidOperationException("Step 59T is one-shot and requires a fresh process with no prior Step-59 mutation/handler probe.");
+            throw new InvalidOperationException( $"Step {probeCode} is one-shot and requires a fresh process with no prior Step-59 mutation/handler probe.");
         _step59DiagnosticMutationProbeStarted = true;
+        SetStep59PropertyTweenerRepairEnabled(repairEnabled, checkpoint, $"M{probeCode}_PROPERTY_TWEENER_REPAIR_MODE");
 
         var embark = RequireStep59EmbarkButtonForProbe(context, step);
-        var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59T PRE-PROBE EMBARK FIELDS");
+        var before = BuildStep59FullInheritedFieldMatrix(embark, $"STEP{probeCode} PRE-PROBE EMBARK FIELDS");
         var compatBefore = BuildStep59PropertyTweenerCompatibilityRuntimeState();
         var stages = new List<string>();
         Exception? failure = null;
@@ -718,31 +726,31 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         bool Stage(string name, Action action)
         {
             if (failure is not null) return false;
-            Checkpoint(checkpoint, "M59T_STAGE_PRE — " + name);
+            Checkpoint(checkpoint, $"M{probeCode}_STAGE_PRE — {name}");
             try
             {
                 action();
                 stages.Add(name + "=PASS");
-                Checkpoint(checkpoint, "M59T_STAGE_POST — " + name + " returned normally.");
+                Checkpoint(checkpoint, $"M{probeCode}_STAGE_POST — {name} returned normally.");
                 return true;
             }
             catch (Exception ex)
             {
                 failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
                 stages.Add(name + "=FAIL:" + DescribeStep59ProbeException(ex));
-                Checkpoint(checkpoint, "M59T_STAGE_FAIL — " + name + "; " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
+                Checkpoint(checkpoint, $"M{probeCode}_STAGE_FAIL — {name}; {SanitizeCheckpoint(DescribeStep59ProbeException(ex))}");
                 return false;
             }
         }
 
         var outline = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_outline", step).GetValue(embark)
-            ?? throw new InvalidDataException("Step 59T retained embark _outline is null.");
+            ?? throw new InvalidDataException($"Step {probeCode} retained embark _outline is null.");
         var image = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_buttonImage", step).GetValue(embark)
-            ?? throw new InvalidDataException("Step 59T retained embark _buttonImage is null.");
+            ?? throw new InvalidDataException($"Step {probeCode} retained embark _buttonImage is null.");
         var moveTween = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_moveTween", step).GetValue(embark);
         var showPos = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_showPos", step).GetValue(embark)
-            ?? throw new InvalidDataException("Step 59T retained embark _showPos could not be read.");
-        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59T GodotSharp handoff absent.")).GodotSharpAssembly;
+            ?? throw new InvalidDataException($"Step {probeCode} retained embark _showPos could not be read.");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException($"Step {probeCode} GodotSharp handoff absent.")).GodotSharpAssembly;
         var colorsType = godotAssembly.GetType("Godot.Colors", throwOnError: true, ignoreCase: false) ?? throw new MissingMemberException("Godot.Colors");
         var transparent = colorsType.GetProperty("Transparent", BindingFlags.Static | BindingFlags.Public)?.GetValue(null)
             ?? throw new MissingMemberException("Godot.Colors.Transparent");
@@ -800,14 +808,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 throw new NullReferenceException("PropertyTweener.FromCurrent returned null.");
         });
 
-        var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59T POST-PROBE EMBARK FIELDS");
+        var after = BuildStep59FullInheritedFieldMatrix(embark, $"STEP{probeCode} POST-PROBE EMBARK FIELDS");
         var compatAfter = BuildStep59PropertyTweenerCompatibilityRuntimeState();
-        Checkpoint(checkpoint, "M59T_PROPERTY_TWEENER_COMPAT — " + SanitizeCheckpoint(compatAfter));
+        Checkpoint(checkpoint, $"M{probeCode}_PROPERTY_TWEENER_COMPAT — {SanitizeCheckpoint(compatAfter)}");
         _step59ConfirmButtonTailProbeDiagnostics =
-            $"passed={failure is null}; runtimeType={embark.GetType().FullName}; stages={string.Join(" | ", stages)}\n" + compatBefore + "\n" + compatAfter + "\n" + before + "\n" + after +
+            $"probeCode={probeCode}; repairEnabled={repairEnabled}; passed={failure is null}; runtimeType={embark.GetType().FullName}; stages={string.Join(" | ", stages)}\n" + compatBefore + "\n" + compatAfter + "\n" + before + "\n" + after +
             (failure is null ? "\nexception=<none>" : "\nexception=" + DescribeStep59ProbeException(failure));
-        _step59StaticMap += "\n[STEP 59T ISOLATED NCONFIRMBUTTON POST-BASE TAIL PROBE]\n" + _step59ConfirmButtonTailProbeDiagnostics + "\n";
-        Checkpoint(checkpoint, $"M59T_COMPLETE — passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False; stages={SanitizeCheckpoint(string.Join(" | ", stages))}.");
+        _step59StaticMap += $"\n[STEP {probeCode} ISOLATED NCONFIRMBUTTON POST-BASE TAIL PROBE]\n" + _step59ConfirmButtonTailProbeDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M{probeCode}_COMPLETE — repairEnabled={repairEnabled}; passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False; stages={SanitizeCheckpoint(string.Join(" | ", stages))}.");
         return (failure is null, _step59ConfirmButtonTailProbeDiagnostics);
     }
 
@@ -825,6 +833,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 Checkpoint(checkpoint, $"M59_C_BLOCKED_READY_BINDING — no mutation/handler arm; blocker={SanitizeCheckpoint(_step59ReadyBindingBlocker)}; renderingStopped=True.");
                 throw new InvalidDataException("Step 59.0 handler intentionally blocked before one-shot arm because ready-binding forensics found: " + _step59ReadyBindingBlocker);
             }
+            SetStep59PropertyTweenerRepairEnabled(true, checkpoint, "M59_C_PROPERTY_TWEENER_REPAIR_MODE");
             if (!_step58TransitionAlreadyComplete)
             {
                 if (_step59TransitionStarted) throw new InvalidOperationException("Step 59.0 game-owned stack repair + character-select transition is one-shot in-process.");
@@ -1735,22 +1744,45 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return text.ToString().TrimEnd();
     }
 
+    private void SetStep59PropertyTweenerRepairEnabled(bool enabled, Action<string>? checkpoint, string checkpointMarker)
+    {
+        var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 59 PropertyTweener repair mode requires the retained GodotSharp callback handoff.");
+        var bridge = handoff.GodotSharpAssembly.GetType(GodotSharpDiagnosticBridgeTypeFullName, throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException(GodotSharpDiagnosticBridgeTypeFullName);
+        var field = bridge.GetField(GodotSharpPropertyTweenerRepairEnabledFieldName, BindingFlags.Public | BindingFlags.Static)
+            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpPropertyTweenerRepairEnabledFieldName);
+        field.SetValue(null, enabled);
+        Checkpoint(checkpoint, $"{checkpointMarker} — repairEnabled={enabled}; " + SanitizeCheckpoint(BuildStep59PropertyTweenerCompatibilityRuntimeState()));
+    }
+
     private string BuildStep59PropertyTweenerCompatibilityRuntimeState()
     {
         var handoff = _callbackHandoff ?? throw new InvalidOperationException("Step 59 PropertyTweener compatibility state requires the retained GodotSharp callback handoff.");
         var bridge = handoff.GodotSharpAssembly.GetType(GodotSharpDiagnosticBridgeTypeFullName, throwOnError: true, ignoreCase: false)
             ?? throw new MissingMemberException(GodotSharpDiagnosticBridgeTypeFullName);
-        var countField = bridge.GetField(GodotSharpPropertyTweenerFallbackCountFieldName, BindingFlags.Public | BindingFlags.Static)
-            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpPropertyTweenerFallbackCountFieldName);
-        var ptrField = bridge.GetField(GodotSharpPropertyTweenerLastNativePtrFieldName, BindingFlags.Public | BindingFlags.Static)
-            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, GodotSharpPropertyTweenerLastNativePtrFieldName);
-        var count = countField.GetValue(null) is int value ? value : throw new InvalidDataException("Step 59 PropertyTweener fallback count field is not Int32.");
-        var nativePtr = ptrField.GetValue(null) is IntPtr ptr ? ptr : throw new InvalidDataException("Step 59 PropertyTweener last-native-pointer field is not IntPtr.");
+        object? Read(string name) => (bridge.GetField(name, BindingFlags.Public | BindingFlags.Static)
+            ?? throw new MissingFieldException(GodotSharpDiagnosticBridgeTypeFullName, name)).GetValue(null);
+        var repairEnabled = Read(GodotSharpPropertyTweenerRepairEnabledFieldName) is bool enabled && enabled;
+        var observations = Read(GodotSharpPropertyTweenerObservationCountFieldName) is int obs ? obs : -1;
+        var nativeNulls = Read(GodotSharpPropertyTweenerNativeNullCountFieldName) is int nn ? nn : -1;
+        var managedNulls = Read(GodotSharpPropertyTweenerManagedNullCountFieldName) is int mn ? mn : -1;
+        var wrongTypes = Read(GodotSharpPropertyTweenerWrongTypeCountFieldName) is int wt ? wt : -1;
+        var repairs = Read(GodotSharpPropertyTweenerFallbackCountFieldName) is int rp ? rp : -1;
+        var nativePtr = Read(GodotSharpPropertyTweenerLastNativePtrFieldName) is IntPtr ptr ? ptr : IntPtr.Zero;
+        var lastManaged = Read(GodotSharpPropertyTweenerLastManagedObjectFieldName);
+        var fluentObservations = Read(GodotSharpPropertyTweenerFluentObservationCountFieldName) is int fo ? fo : -1;
+        var fluentRepairs = Read(GodotSharpPropertyTweenerFluentFallbackCountFieldName) is int fr ? fr : -1;
+        var lastFluentManaged = Read(GodotSharpPropertyTweenerLastFluentManagedObjectFieldName);
+        var lastFluentStage = Read(GodotSharpPropertyTweenerLastFluentStageFieldName) as string ?? "<none>";
         var propertyTweenerType = handoff.GodotSharpAssembly.GetType("Godot.PropertyTweener", throwOnError: true, ignoreCase: false)
             ?? throw new MissingMemberException("Godot.PropertyTweener");
         var nativeCtors = propertyTweenerType.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
             .Count(ctor => ctor.GetParameters().Length == 1 && ctor.GetParameters()[0].ParameterType == typeof(IntPtr));
-        return $"[PROPERTYTWEENER MANAGED-WRAPPER COMPATIBILITY] fallbackCount={count}; lastNativePtr=0x{nativePtr.ToInt64():X}; propertyTweenerIntPtrConstructors={nativeCtors}; bridgeAssembly={handoff.GodotSharpAssembly.GetName().FullName}; loadContext={AssemblyLoadContext.GetLoadContext(handoff.GodotSharpAssembly)?.Name ?? "<null>"}";
+        var lastManagedType = lastManaged?.GetType().FullName ?? "<null>";
+        var lastManagedIsPropertyTweener = lastManaged is not null && propertyTweenerType.IsInstanceOfType(lastManaged);
+        var lastFluentManagedType = lastFluentManaged?.GetType().FullName ?? "<null>";
+        var lastFluentManagedIsPropertyTweener = lastFluentManaged is not null && propertyTweenerType.IsInstanceOfType(lastFluentManaged);
+        return $"[PROPERTYTWEENER MANAGED-WRAPPER OBSERVE/REPAIR] repairEnabled={repairEnabled}; observations={observations}; nativeNulls={nativeNulls}; managedNulls={managedNulls}; wrongTypes={wrongTypes}; repairs={repairs}; lastNativePtr=0x{nativePtr.ToInt64():X}; lastManagedType={lastManagedType}; lastManagedIsPropertyTweener={lastManagedIsPropertyTweener}; fluentObservations={fluentObservations}; fluentRepairs={fluentRepairs}; lastFluentStage={lastFluentStage}; lastFluentManagedType={lastFluentManagedType}; lastFluentManagedIsPropertyTweener={lastFluentManagedIsPropertyTweener}; propertyTweenerIntPtrConstructors={nativeCtors}; bridgeAssembly={handoff.GodotSharpAssembly.GetName().FullName}; loadContext={AssemblyLoadContext.GetLoadContext(handoff.GodotSharpAssembly)?.Name ?? "<null>"}";
     }
 
     private static MethodDefinition RequireUniqueZeroArgBodyMethodForStep59(TypeDefinition type, string name, int step)

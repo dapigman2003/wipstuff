@@ -1,8 +1,11 @@
 # StS2Launcher — Steps 58–62
 
-Active candidate: **0.0.204 (204)**. Physical history remains closed through **Step 57**, while the active architecture uses **Step 52 as the prerequisite baseline for Step 58**. Legacy Steps 53–57 remain optional regression/history diagnostics rather than mandatory gameplay choreography.
+Active candidate: **0.0.205 (205)**. Physical history remains closed through **Step 57**, while the active architecture uses **Step 52 as the prerequisite baseline for Step 58**. Legacy Steps 53–57 remain optional regression/history diagnostics rather than mandatory gameplay choreography.
 
 Use **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** from a fresh process. It ends frozen. Then run **Step 58 directly**. Step 58 adopts the current game-owned single-player submenu if it already exists, or invokes exact game-owned `NMainMenu.OpenSingleplayerSubmenu()` once only when the retained submenu must be materialized/activated. It validates the retained character-select ownership state without invoking `OpenCharacterSelect`.
+
+
+Physical **0.0.204** repeated the 59T failure and proved the first null-only PropertyTweener fallback never activated (`fallbackCount=0`) while `TweenProperty()` still returned null. **0.0.205** therefore makes the same compiled IPA a control/repair toolbox: 59T runs with repair disabled and records native pointer + managed wrapper null/wrong-type identity; 59X enables repair for nonzero-pointer unusable wrappers and method-local fluent return repair. 59E and real Step 59 explicitly enable the same repair, and 60–62 remain available if the transition succeeds.
 
 Physical **0.0.203** localized the current Step-59 failure sharply: **59U** proved `NButton.UpdateControllerButton()` returns normally; **59T** proved outline/image modulation, existing tween kill, and `Node.CreateTween()` all succeed, then `Tween.TweenProperty(...)` returns `null`; **59E** reproduced the same `NConfirmButton.OnEnable()` NRE by invoking the retained embark `Enable()` outside `OpenCharacterSelect`. The original game IL immediately chains `SetEase()` after `TweenProperty()`, so the null return explains the observed NRE.
 

@@ -1058,10 +1058,10 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 module.Types.Add(marshaling);
                 AddMethod(marshaling, "ConvertStringToNative", module.TypeSystem.Object, module.TypeSystem.String);
 
-                // 0.0.204 host-regression contract: physical 59T proved Tween.TweenProperty
-                // returns null after a successful CreateTween/native call. Model the generated
-                // GodotSharp return path so the PropertyTweener nonzero-native-pointer fallback
-                // is serialized and re-opened in CI before a physical build is trusted.
+                // 0.0.205 host-regression contract: physical 0.0.204 proved the null-only fallback never fired.
+                // Model the generated object-return + isinst shape so control/repair observation of
+                // native-null, managed-null, wrong-type, and method-local fluent fallbacks is serialized
+                // and re-opened in CI before a physical build is trusted.
                 var propertyTweener = new TypeDefinition("Godot", "PropertyTweener",
                     Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
                     godotObject);
@@ -1183,16 +1183,31 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             var packedSceneCompatibilityField = serializedBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPackedSceneCompatibilityCallbackFieldName);
             Assert.IsNotNull(packedSceneCompatibilityField);
             Assert.AreEqual("System.Action`2<System.Object,System.Object>", packedSceneCompatibilityField.FieldType.FullName);
-            var propertyTweenerFallbackCountField = serializedBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackCountFieldName);
-            var propertyTweenerLastPtrField = serializedBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerLastNativePtrFieldName);
+            string[] expectedBridgeFields =
+            [
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerRepairEnabledFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerObservationCountFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerNativeNullCountFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerManagedNullCountFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerWrongTypeCountFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackCountFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerLastNativePtrFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerLastManagedObjectFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentObservationCountFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackCountFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerLastFluentManagedObjectFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerLastFluentStageFieldName,
+            ];
+            foreach (var fieldName in expectedBridgeFields)
+                Assert.IsNotNull(serializedBridge.Fields.SingleOrDefault(field => field.Name == fieldName), fieldName);
             var propertyTweenerFallbackMethod = serializedBridge.Methods.SingleOrDefault(method => method.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackMethodName);
-            Assert.IsNotNull(propertyTweenerFallbackCountField);
-            Assert.IsNotNull(propertyTweenerLastPtrField);
+            var propertyTweenerFluentFallbackMethod = serializedBridge.Methods.SingleOrDefault(method => method.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackMethodName);
             Assert.IsNotNull(propertyTweenerFallbackMethod);
-            Assert.AreEqual("System.Int32", propertyTweenerFallbackCountField.FieldType.FullName);
-            Assert.AreEqual("System.IntPtr", propertyTweenerLastPtrField.FieldType.FullName);
-            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER:godot_icall_4_1441");
-            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetEase=UNCHANGED_SHARED_HELPER:");
+            Assert.IsNotNull(propertyTweenerFluentFallbackMethod);
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER_OBSERVE_REPAIR:godot_icall_4_1441");
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetEase=PATCHED_METHOD_LOCAL_OBSERVE_REPAIR");
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetTrans=PATCHED_METHOD_LOCAL_OBSERVE_REPAIR");
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.FromCurrent=PATCHED_METHOD_LOCAL_OBSERVE_REPAIR");
             Assert.IsTrue(propertyTweenerFallbackMethod.Body.Instructions.Any(instruction =>
                 instruction.OpCode.Code == Code.Newobj && instruction.Operand is MethodReference ctorRef &&
                 ctorRef.DeclaringType.FullName == "Godot.PropertyTweener" && ctorRef.Parameters.Count == 1 &&
@@ -1209,6 +1224,15 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
                 call.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName &&
                 call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackMethodName));
+            var serializedPropertyTweener = reopened.MainModule.Types.Single(type => type.FullName == "Godot.PropertyTweener");
+            foreach (var fluentName in new[] { "SetEase", "SetTrans", "FromCurrent" })
+            {
+                var fluentMethod = serializedPropertyTweener.Methods.Single(method => method.Name == fluentName && method.HasBody);
+                Assert.AreEqual(1, fluentMethod.Body.Instructions.Count(instruction =>
+                    instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
+                    call.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName &&
+                    call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackMethodName), fluentName);
+            }
 
             var serializedPackedScene = reopened.MainModule.Types.Single(type => type.FullName == "Godot.PackedScene");
             var serializedInstantiate = serializedPackedScene.Methods.Single(method =>

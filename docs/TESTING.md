@@ -1,6 +1,11 @@
-# 0.0.204 PropertyTweener compatibility / compilation-efficient testing
+# 0.0.205 PropertyTweener observe/repair / compilation-efficient testing
 
-- Bundle identity must be **0.0.204 (204)**.
+- Bundle identity must be **0.0.205 (205)**.
+
+## 0.0.205 recommended high-information sequence
+
+Use fresh processes for mutating Step-59 branches: **59T CONTROL** (repair disabled, capture native pointer + managed type) -> **59X REPAIR** -> if pass, **59E** -> if pass, **real Step 59** -> then **60 -> 61 -> 62** in the successful process. 59D/R/H/U remain alternative branches in the same IPA. Never retry a mutating Step-59 branch in-process.
+
 - The active VeryEarlyInitialization may change only for the bounded GodotSharp PropertyTweener compatibility; the proven PackedScene compatibility slice is separately hash-pinned unchanged.
 - No `Step59RuntimeTrace`, `ConfirmButtonCheckpointBridge`, or `STEP59TRACE_` runtime instrumentation may exist in active source.
 - The proven PackedScene instanced-root unique-name compatibility implementation must remain byte-identical to 0.0.203.

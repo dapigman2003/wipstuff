@@ -81,3 +81,8 @@ Physical 0.0.203 established the expected control pattern: 59U returns; 59T fail
 For 59T, preserve the Step59 crash checkpoint, `Step59T-IsolatedConfirmButtonTail.txt`, and its static map. The key sequence is `M59T_STAGE_PRE/POST` plus `M59T_PROPERTY_TWEENER_COMPAT`. A successful compatibility run should show `Tween.TweenProperty` returning normally and then naturally reach `PropertyTweener.SetEase`, `SetTrans`, and `FromCurrent`. If fallbackCount increments, lastNativePtr must be nonzero. A true native null must never trigger fallback.
 
 If 59T passes, use a fresh process for 59E and preserve `M59E_PROPERTY_TWEENER_COMPAT`. If 59E passes, use a fresh process for real Step 59. If real Step 59 succeeds, continue through 60/61/62 without a new compilation.
+
+
+## 0.0.205 PropertyTweener observe/repair evidence contract
+
+59T CONTROL and 59X REPAIR record `[PROPERTYTWEENER MANAGED-WRAPPER OBSERVE/REPAIR]`: `repairEnabled`, observation/native-null/managed-null/wrong-type/repair counts, `lastNativePtr`, `lastManagedType`, fluent observation/repair counts, last fluent stage, and last fluent managed type. 59T must show repair disabled; 59X must show repair enabled. 59E and real Step 59 explicitly enable the same repair. A native-pointer repair is valid only for a nonzero pointer.

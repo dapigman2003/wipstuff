@@ -1,6 +1,11 @@
-# 0.0.204 PropertyTweener compatibility release checklist
+# 0.0.205 PropertyTweener observe/repair release checklist
 
-- Bundle identity must be **0.0.204 (204)**.
+- Bundle identity must be **0.0.205 (205)**.
+- 59T CONTROL must explicitly keep repair disabled while recording native pointer, managed-null/wrong-type counts, and last managed runtime type.
+- 59X REPAIR must explicitly enable repair; a constructed `PropertyTweener(IntPtr)` requires a nonzero native pointer.
+- `SetEase`, `SetTrans`, and `FromCurrent` use only method-local switchable return-self compatibility; their shared NativeCalls helpers remain untouched.
+- 59E and real Step 59 explicitly enable the same repair in their fresh processes.
+- Same IPA retains 59D/R/H/U/T/X/E, real Step 59, and 60–62.
 - The active VeryEarlyInitialization may change only for the bounded GodotSharp PropertyTweener compatibility; the proven PackedScene compatibility slice is separately hash-pinned unchanged.
 - No `Step59RuntimeTrace`, `ConfirmButtonCheckpointBridge`, or `STEP59TRACE_` runtime instrumentation may exist in active source.
 - The proven PackedScene instanced-root unique-name compatibility implementation must remain byte-identical to 0.0.203.

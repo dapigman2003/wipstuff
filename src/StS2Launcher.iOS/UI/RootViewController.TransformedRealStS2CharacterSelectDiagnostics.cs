@@ -167,37 +167,46 @@ public sealed partial class RootViewController
         }
     }
 
-    private async Task RunStep59ConfirmTailProbeAsync()
+    private Task RunStep59ConfirmTailProbeAsync() => RunStep59ConfirmTailProbeAsync(repairEnabled: false);
+    private Task RunStep59ConfirmTailRepairProbeAsync() => RunStep59ConfirmTailProbeAsync(repairEnabled: true);
+
+    private async Task RunStep59ConfirmTailProbeAsync(bool repairEnabled)
     {
         const int step = 59;
+        var code = repairEnabled ? "59X" : "59T";
+        var requestedButton = repairEnabled ? _step59ConfirmTailRepairProbeButton : _step59ConfirmTailProbeButton;
+        var requestedResult = repairEnabled ? _step59ConfirmTailRepairProbeResultLabel : _step59ConfirmTailProbeResultLabel;
+        var requestedDetail = repairEnabled ? _step59ConfirmTailRepairProbeDetailLabel : _step59ConfirmTailProbeDetailLabel;
         if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted || _step59TransitionUiStarted || _step59MutationProbeUiStarted ||
             _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
         {
-            SetStartupLadderRefusal(step, _step59ConfirmTailProbeResultLabel!, _step59ConfirmTailProbeDetailLabel!, "FRESH PROCESS REQUIRED", "Step 59T is a one-shot confirm-button visual/tween diagnostic. Relaunch and reproduce through Step 58 without running another Step-59 branch first.");
+            SetStartupLadderRefusal(step, requestedResult!, requestedDetail!, "FRESH PROCESS REQUIRED", $"Step {code} is a one-shot confirm-button tail experiment. Relaunch through Step 58 without another Step-59 branch first.");
             return;
         }
-        if (!TryPrepareStep59Auxiliary(_step59ConfirmTailProbeButton, _step59ConfirmTailProbeResultLabel, _step59ConfirmTailProbeDetailLabel, "Step 59T", out var button, out var resultLabel, out var detailLabel)) return;
-        if (!TryInitializeStartupLadderTelemetry(step, "Step-59 isolated NConfirmButton post-base tail probe", "Step59T-ConfirmButtonTail-StaticMap", out var error))
+        if (!TryPrepareStep59Auxiliary(requestedButton, requestedResult, requestedDetail, $"Step {code}", out var button, out var resultLabel, out var detailLabel)) return;
+        if (!TryInitializeStartupLadderTelemetry(step, repairEnabled ? "Step-59X PropertyTweener repair tail probe" : "Step-59T PropertyTweener control tail probe", repairEnabled ? "Step59X-PropertyTweenerRepair-StaticMap" : "Step59T-PropertyTweenerControl-StaticMap", out var error))
         {
             SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return;
         }
         BeginSteamOperation(allowCancel: false); _step59Gates.Reset();
         try
         {
-            WriteStartupLadderCheckpoint(step, "RUN_START_59T — isolated NConfirmButton post-base visual/tween tail started. No NButton.OnEnable/RegisterHotkeys/UpdateControllerButton/Push/OpenCharacterSelect.");
+            WriteStartupLadderCheckpoint(step, $"RUN_START_{code} — isolated NConfirmButton post-base tail; repairEnabled={repairEnabled}. No NButton.OnEnable/RegisterHotkeys/UpdateControllerButton/Push/OpenCharacterSelect.");
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException("Step 59T preflight map write failed: " + preflightMapError);
+            if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException($"Step {code} preflight map write failed: " + preflightMapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten(); _step59MutationProbeUiStarted = true; button.Enabled = false;
-            var probe = _transformedRealStS2VeryEarlyInitialization.RunStep59ConfirmButtonTailProbe(d => WriteStartupLadderCheckpoint(step, d));
-            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59T post-probe map refresh failed: " + mapError);
-            WriteStartupLadderCheckpoint(step, $"M59T_STATIC_MAP_REFRESH_RETURNED — passed={probe.Passed}; freshProcessRequired=True.");
-            resultLabel.Text = probe.Passed ? "STEP 59T: CONFIRM-BUTTON TAIL RETURNED" : "STEP 59T: CONFIRM-BUTTON TAIL THREW — STAGE CAPTURED";
+            var probe = repairEnabled
+                ? _transformedRealStS2VeryEarlyInitialization.RunStep59ConfirmButtonTailRepairProbe(d => WriteStartupLadderCheckpoint(step, d))
+                : _transformedRealStS2VeryEarlyInitialization.RunStep59ConfirmButtonTailProbe(d => WriteStartupLadderCheckpoint(step, d));
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException($"Step {code} post-probe map refresh failed: " + mapError);
+            WriteStartupLadderCheckpoint(step, $"M{code}_STATIC_MAP_REFRESH_RETURNED — repairEnabled={repairEnabled}; passed={probe.Passed}; freshProcessRequired=True.");
+            resultLabel.Text = probe.Passed ? $"STEP {code}: FULL TAIL RETURNED" : $"STEP {code}: TAIL THREW — STAGE CAPTURED";
             resultLabel.TextColor = probe.Passed ? UIColor.SystemGreen : UIColor.SystemOrange;
-            detailLabel.Text = probe.Passed ? "Every post-base visual/tween tail stage returned. Preserve the report and relaunch." : "A post-base tail stage failed and its exact PRE/FAIL checkpoint is durable. Preserve the report and relaunch.";
+            detailLabel.Text = probe.Passed ? "Every tail stage returned. Preserve the report and relaunch for the next branch." : "A tail stage failed; bridge telemetry distinguishes native-null, managed-null, wrong-type, and repair activity. Preserve the report and relaunch.";
         }
         catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted); }
-        finally { await FinishStartupLadderStepAsync(step, "Step59T-IsolatedConfirmButtonTail.txt", "StS2 Launcher — Step 59T Isolated Confirm-Button Tail Probe", resultLabel, detailLabel, "Step 59T changes only retained confirm-button visual/tween state and requires a fresh process afterward. It never calls OpenCharacterSelect."); }
+        finally { await FinishStartupLadderStepAsync(step, repairEnabled ? "Step59X-PropertyTweenerRepairTail.txt" : "Step59T-PropertyTweenerControlTail.txt", repairEnabled ? "StS2 Launcher — Step 59X PropertyTweener Repair Tail" : "StS2 Launcher — Step 59T PropertyTweener Control Tail", resultLabel, detailLabel, $"Step {code} mutates only retained confirm-button visual/tween state and requires a fresh process afterward."); }
     }
 
     private async Task RunStep59IsolatedEnableProbeAsync()

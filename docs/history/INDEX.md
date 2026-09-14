@@ -596,3 +596,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59T-PHYSICAL-0.0.203-*` — stage evidence proving `TweenProperty()` returns null after `CreateTween()` succeeds.
 - `reports/STEP-59E-PHYSICAL-0.0.203-*` — direct `Enable()` reproduction of the `NConfirmButton.OnEnable()` NRE outside `OpenCharacterSelect`.
 - `reports/STEP-35-PHYSICAL-0.0.203-PROPERTYTWEENER-TRACE-EXCERPT.txt` — bounded GodotSharp native/managed wrapper trace around the 59E failure; the full 156 MB journal is intentionally not retained in source history.
+
+## Step 59 PropertyTweener full-chain observation / 0.0.205
+- `steps/STEP-59.11-PROPERTYTWEENER-OBSERVE-REPAIR-0.0.205.md` — physical 0.0.204 null-only-fallback rejection plus switchable 59T control / 59X repair and method-local fluent-return compatibility.
+- `reports/STEP-59T-PHYSICAL-0.0.204-*` — physical evidence that TweenProperty still returned null while the 0.0.204 fallback count stayed zero.
