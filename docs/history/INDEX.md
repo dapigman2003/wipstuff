@@ -600,3 +600,9 @@ The current architecture and plan always live one level up in `docs/`.
 ## Step 59 PropertyTweener full-chain observation / 0.0.205
 - `steps/STEP-59.11-PROPERTYTWEENER-OBSERVE-REPAIR-0.0.205.md` — physical 0.0.204 null-only-fallback rejection plus switchable 59T control / 59X repair and method-local fluent-return compatibility.
 - `reports/STEP-59T-PHYSICAL-0.0.204-*` — physical evidence that TweenProperty still returned null while the 0.0.204 fallback count stayed zero.
+
+## Step 59 PropertyTweener typed-return / 0.0.206
+- `steps/STEP-59.12-PROPERTYTWEENER-RETURN-EPILOGUE-0.0.206.md` — physical 0.0.205 Step-35 preflight rejection plus shape-independent typed-return repair and 59T/59W/59X three-mode experiment deck.
+- `reports/STEP-35-PHYSICAL-0.0.205-PREFLIGHT-FAIL-REPORT.txt` — Step-35 normal report proving the speculative SetEase cast-shape assumption failed before game progress.
+- `reports/STEP-35-PHYSICAL-0.0.205-PREFLIGHT-FAIL-CHECKPOINT.txt` — same-run checkpoint showing Gate A fail and normal teardown.
+- `reports/PHYSICALLY-CLOSED-PATH-0.0.205-STOPPED.txt` — convenience path stopped because Step 35 did not close; no later stage invoked.

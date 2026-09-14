@@ -44,6 +44,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     internal const string GodotSharpPropertyTweenerFallbackCountFieldName = "PropertyTweenerFallbackCount";
     internal const string GodotSharpPropertyTweenerLastNativePtrFieldName = "PropertyTweenerLastNativePtr";
     internal const string GodotSharpPropertyTweenerRepairEnabledFieldName = "PropertyTweenerRepairEnabled";
+    internal const string GodotSharpPropertyTweenerFluentRepairEnabledFieldName = "PropertyTweenerFluentRepairEnabled";
     internal const string GodotSharpPropertyTweenerObservationCountFieldName = "PropertyTweenerObservationCount";
     internal const string GodotSharpPropertyTweenerNativeNullCountFieldName = "PropertyTweenerNativeNullCount";
     internal const string GodotSharpPropertyTweenerManagedNullCountFieldName = "PropertyTweenerManagedNullCount";
@@ -2953,6 +2954,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             return field;
         }
         _ = RequireBridgeField(GodotSharpPropertyTweenerRepairEnabledFieldName, "System.Boolean");
+        _ = RequireBridgeField(GodotSharpPropertyTweenerFluentRepairEnabledFieldName, "System.Boolean");
         _ = RequireBridgeField(GodotSharpPropertyTweenerObservationCountFieldName, "System.Int32");
         _ = RequireBridgeField(GodotSharpPropertyTweenerNativeNullCountFieldName, "System.Int32");
         _ = RequireBridgeField(GodotSharpPropertyTweenerManagedNullCountFieldName, "System.Int32");
@@ -2971,8 +2973,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         if (propertyTweenerFallback.ReturnType.FullName != "Godot.GodotObject" || propertyTweenerFallback.Parameters.Count != 2 ||
             propertyTweenerFallback.Parameters[1].ParameterType.FullName != "System.IntPtr" ||
             !propertyTweenerFallback.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Newobj && instruction.Operand is MethodReference ctor && ctor.DeclaringType.FullName == "Godot.PropertyTweener" && ctor.Parameters.Count == 1 && ctor.Parameters[0].ParameterType.FullName == "System.IntPtr") ||
-            propertyTweenerFluentFallback.ReturnType.FullName != "Godot.GodotObject" || propertyTweenerFluentFallback.Parameters.Count != 3 ||
-            propertyTweenerFluentFallback.Parameters[1].ParameterType.FullName != "Godot.PropertyTweener" || propertyTweenerFluentFallback.Parameters[2].ParameterType.FullName != "System.String")
+            propertyTweenerFluentFallback.ReturnType.FullName != "Godot.PropertyTweener" || propertyTweenerFluentFallback.Parameters.Count != 3 ||
+            propertyTweenerFluentFallback.Parameters[0].ParameterType.FullName != "Godot.PropertyTweener" || propertyTweenerFluentFallback.Parameters[1].ParameterType.FullName != "Godot.PropertyTweener" || propertyTweenerFluentFallback.Parameters[2].ParameterType.FullName != "System.String")
             throw new InvalidDataException("Step-59.7 serialized PropertyTweener observe/repair bridge drifted.");
 
         var verifyTween = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == "Godot.Tween")
@@ -2991,7 +2993,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         {
             var method = verifyPropertyTweener.Methods.Single(candidate => candidate.Name == name && candidate.HasBody && candidate.ReturnType.FullName == "Godot.PropertyTweener");
             var repairCalls = method.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference called && called.DeclaringType.FullName == GodotSharpDiagnosticBridgeTypeFullName && called.Name == GodotSharpPropertyTweenerFluentFallbackMethodName);
-            if (repairCalls != 1) throw new InvalidDataException($"Step-59.7 PropertyTweener.{name} method-local observe/repair hook drifted: bridgeCalls={repairCalls}.");
+            var serializedReturns = method.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Ret);
+            if (repairCalls == 0 || repairCalls != serializedReturns)
+                throw new InvalidDataException($"Step-59.7 PropertyTweener.{name} typed-return observe/repair hook drifted: bridgeCalls={repairCalls}; returns={serializedReturns}.");
+            if (!propertyTweenerCompatibilityReport.Contains($"Godot.PropertyTweener.{name}=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns=", StringComparison.Ordinal))
+                throw new InvalidDataException($"Step-59.7 PropertyTweener.{name} compatibility report did not record typed-return epilogue repair: {propertyTweenerCompatibilityReport}.");
         }
 
         var bridgeEmit = bridgeType.Methods.SingleOrDefault(method => method.Name == "Emit" && method.HasBody)
@@ -3067,6 +3073,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             GodotSharpPropertyTweenerFallbackCountFieldName,
             GodotSharpPropertyTweenerLastNativePtrFieldName,
             GodotSharpPropertyTweenerRepairEnabledFieldName,
+            GodotSharpPropertyTweenerFluentRepairEnabledFieldName,
             GodotSharpPropertyTweenerObservationCountFieldName,
             GodotSharpPropertyTweenerNativeNullCountFieldName,
             GodotSharpPropertyTweenerManagedNullCountFieldName,
@@ -3088,6 +3095,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             return field;
         }
         var repairEnabledField = AddField(GodotSharpPropertyTweenerRepairEnabledFieldName, module.TypeSystem.Boolean);
+        var fluentRepairEnabledField = AddField(GodotSharpPropertyTweenerFluentRepairEnabledFieldName, module.TypeSystem.Boolean);
         var observationCountField = AddField(GodotSharpPropertyTweenerObservationCountFieldName, module.TypeSystem.Int32);
         var nativeNullCountField = AddField(GodotSharpPropertyTweenerNativeNullCountFieldName, module.TypeSystem.Int32);
         var managedNullCountField = AddField(GodotSharpPropertyTweenerManagedNullCountFieldName, module.TypeSystem.Int32);
@@ -3165,8 +3173,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         var ensureFluent = new MethodDefinition(
             GodotSharpPropertyTweenerFluentFallbackMethodName,
             Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
-            godotObject);
-        ensureFluent.Parameters.Add(new ParameterDefinition("managed", Mono.Cecil.ParameterAttributes.None, godotObject));
+            propertyTweener);
+        ensureFluent.Parameters.Add(new ParameterDefinition("managed", Mono.Cecil.ParameterAttributes.None, propertyTweener));
         ensureFluent.Parameters.Add(new ParameterDefinition("self", Mono.Cecil.ParameterAttributes.None, propertyTweener));
         ensureFluent.Parameters.Add(new ParameterDefinition("stage", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
         bridge.Methods.Add(ensureFluent);
@@ -3180,18 +3188,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         fluentIl.Append(Instruction.Create(OpCodes.Ldarg_2));
         fluentIl.Append(Instruction.Create(OpCodes.Stsfld, lastFluentStageField));
         fluentIl.Append(Instruction.Create(OpCodes.Ldarg_0));
-        fluentIl.Append(Instruction.Create(OpCodes.Isinst, propertyTweener));
         fluentIl.Append(Instruction.Create(OpCodes.Brfalse, fluentCandidateRepair));
         fluentIl.Append(Instruction.Create(OpCodes.Ldarg_0));
         fluentIl.Append(Instruction.Create(OpCodes.Ret));
         fluentIl.Append(fluentCandidateRepair);
-        fluentIl.Append(Instruction.Create(OpCodes.Ldsfld, repairEnabledField));
+        fluentIl.Append(Instruction.Create(OpCodes.Ldsfld, fluentRepairEnabledField));
         fluentIl.Append(Instruction.Create(OpCodes.Brtrue, fluentRepair));
-        fluentIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+        fluentIl.Append(Instruction.Create(OpCodes.Ldnull));
         fluentIl.Append(Instruction.Create(OpCodes.Ret));
         fluentIl.Append(fluentRepair);
         AppendIncrement(fluentIl, fluentFallbackCountField);
-        fluentIl.Append(Instruction.Create(OpCodes.Ldstr, "GODOT_PROPERTY_TWEENER_FLUENT_REPAIR — fluent PropertyTweener method returned no usable PropertyTweener wrapper; returning the already-valid receiver after the native call."));
+        fluentIl.Append(Instruction.Create(OpCodes.Ldstr, "GODOT_PROPERTY_TWEENER_FLUENT_REPAIR — typed fluent PropertyTweener return was null; returning the already-valid receiver after the original method body completed."));
         fluentIl.Append(Instruction.Create(OpCodes.Call, emitReference));
         fluentIl.Append(Instruction.Create(OpCodes.Ldarg_1));
         fluentIl.Append(Instruction.Create(OpCodes.Ret));
@@ -3250,23 +3257,35 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             if (methods.Length != 1)
                 throw new InvalidDataException($"Step-59.7 expected exactly one PropertyTweener.{name} returning PropertyTweener; found {methods.Length}.");
             var method = methods[0];
-            var nativeCallInstructions = method.Body.Instructions.Where(instruction =>
-                (instruction.OpCode.Code is Code.Call or Code.Callvirt) &&
-                instruction.Operand is MethodReference called && called.DeclaringType.FullName == "Godot.NativeCalls" && called.ReturnType.FullName == "Godot.GodotObject").ToArray();
-            if (nativeCallInstructions.Length != 1)
-                throw new InvalidDataException($"Step-59.7 expected exactly one object-return NativeCalls helper in PropertyTweener.{name}; found {nativeCallInstructions.Length}.");
-            var nativeCallInstruction = nativeCallInstructions[0];
-            var followingIsinst = method.Body.Instructions.SkipWhile(i => !ReferenceEquals(i, nativeCallInstruction)).Skip(1)
-                .FirstOrDefault(i => i.OpCode.Code == Code.Isinst && i.Operand is TypeReference tr && tr.FullName == "Godot.PropertyTweener")
-                ?? throw new InvalidDataException($"Step-59.7 could not find PropertyTweener cast after native return in {method.FullName}.");
-            if (IsInstructionBranchTarget(method, followingIsinst))
-                throw new InvalidDataException($"Step-59.7 refuses to insert fluent observe/repair before branch-target isinst in {method.FullName}.");
+            var originalReturns = method.Body.Instructions.Where(instruction => instruction.OpCode.Code == Code.Ret).ToArray();
+            if (originalReturns.Length == 0 || originalReturns.Length > 8)
+                throw new InvalidDataException($"Step-59.7 PropertyTweener.{name} return-site count was implausible: {originalReturns.Length}.");
+
+            // 0.0.206 deliberately does not assume anything about the generated native-call/cast shape.
+            // Every existing return instruction object becomes the first epilogue instruction, so any
+            // pre-existing branch-to-ret still flows through the typed return observer/repair.
+            method.Body.InitLocals = true;
             method.Body.MaxStackSize = Math.Max(method.Body.MaxStackSize, 3);
+            var typedResult = new VariableDefinition(propertyTweener);
+            method.Body.Variables.Add(typedResult);
             var il = method.Body.GetILProcessor();
-            il.InsertBefore(followingIsinst, Instruction.Create(OpCodes.Ldarg_0));
-            il.InsertBefore(followingIsinst, Instruction.Create(OpCodes.Ldstr, name));
-            il.InsertBefore(followingIsinst, Instruction.Create(OpCodes.Call, ensureFluentReference));
-            fluentReport.Add($"Godot.PropertyTweener.{name}=PATCHED_METHOD_LOCAL_OBSERVE_REPAIR");
+            foreach (var originalReturn in originalReturns)
+            {
+                originalReturn.OpCode = OpCodes.Stloc;
+                originalReturn.Operand = typedResult;
+                var cursor = originalReturn;
+                void AppendAfter(Instruction instruction)
+                {
+                    il.InsertAfter(cursor, instruction);
+                    cursor = instruction;
+                }
+                AppendAfter(Instruction.Create(OpCodes.Ldloc, typedResult));
+                AppendAfter(Instruction.Create(OpCodes.Ldarg_0));
+                AppendAfter(Instruction.Create(OpCodes.Ldstr, name));
+                AppendAfter(Instruction.Create(OpCodes.Call, ensureFluentReference));
+                AppendAfter(Instruction.Create(OpCodes.Ret));
+            }
+            fluentReport.Add($"Godot.PropertyTweener.{name}=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns={originalReturns.Length}");
         }
 
         return $"Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER_OBSERVE_REPAIR:{nativeHelper.Name}; helperCallsites=1; " + string.Join(" | ", fluentReport);

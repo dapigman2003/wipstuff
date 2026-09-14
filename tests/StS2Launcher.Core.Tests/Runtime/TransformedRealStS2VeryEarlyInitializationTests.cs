@@ -1058,10 +1058,11 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 module.Types.Add(marshaling);
                 AddMethod(marshaling, "ConvertStringToNative", module.TypeSystem.Object, module.TypeSystem.String);
 
-                // 0.0.205 host-regression contract: physical 0.0.204 proved the null-only fallback never fired.
-                // Model the generated object-return + isinst shape so control/repair observation of
-                // native-null, managed-null, wrong-type, and method-local fluent fallbacks is serialized
-                // and re-opened in CI before a physical build is trusted.
+                // 0.0.206 host-regression contract: physical 0.0.205 proved that assuming a specific
+                // PropertyTweener fluent native-return/cast IL shape can fail Step-35 preflight before
+                // any game progress. Deliberately give the three fluent methods different typed-return
+                // shapes so the production transform must operate only at their PropertyTweener return
+                // boundaries, independent of native helper / isinst / castclass details.
                 var propertyTweener = new TypeDefinition("Godot", "PropertyTweener",
                     Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
                     godotObject);
@@ -1074,26 +1075,42 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 propertyTweenerCtor.Body.GetILProcessor().Append(propertyTweenerCtor.Body.GetILProcessor().Create(OpCodes.Ret));
                 propertyTweener.Methods.Add(propertyTweenerCtor);
 
-                static MethodDefinition AddInstanceNativeReturn(
+                static MethodDefinition AddFluentTypedReturn(
                     TypeDefinition type,
                     string name,
                     TypeReference returnType,
-                    MethodReference nativeHelper,
+                    int shape,
                     TypeReference? parameter = null)
                 {
                     var method = new MethodDefinition(name, Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig, returnType);
                     if (parameter is not null) method.Parameters.Add(new ParameterDefinition(parameter));
                     var il = method.Body.GetILProcessor();
-                    if (parameter is not null) il.Append(il.Create(OpCodes.Ldarg_1));
-                    il.Append(il.Create(OpCodes.Call, nativeHelper));
-                    il.Append(il.Create(OpCodes.Isinst, returnType));
-                    il.Append(il.Create(OpCodes.Ret));
+                    if (shape == 0)
+                    {
+                        il.Append(il.Create(OpCodes.Ldnull));
+                        il.Append(il.Create(OpCodes.Ret));
+                    }
+                    else if (shape == 1)
+                    {
+                        method.Body.InitLocals = true;
+                        var local = new VariableDefinition(returnType);
+                        method.Body.Variables.Add(local);
+                        il.Append(il.Create(OpCodes.Ldnull));
+                        il.Append(il.Create(OpCodes.Stloc, local));
+                        il.Append(il.Create(OpCodes.Ldloc, local));
+                        il.Append(il.Create(OpCodes.Ret));
+                    }
+                    else
+                    {
+                        il.Append(il.Create(OpCodes.Ldarg_0));
+                        il.Append(il.Create(OpCodes.Ret));
+                    }
                     type.Methods.Add(method);
                     return method;
                 }
-                AddInstanceNativeReturn(propertyTweener, "SetEase", propertyTweener, propertyTweenerSharedOne, module.TypeSystem.Int64);
-                AddInstanceNativeReturn(propertyTweener, "SetTrans", propertyTweener, propertyTweenerSharedOne, module.TypeSystem.Int64);
-                AddInstanceNativeReturn(propertyTweener, "FromCurrent", propertyTweener, propertyTweenerSharedZero);
+                AddFluentTypedReturn(propertyTweener, "SetEase", propertyTweener, shape: 0, module.TypeSystem.Int64);
+                AddFluentTypedReturn(propertyTweener, "SetTrans", propertyTweener, shape: 1, module.TypeSystem.Int64);
+                AddFluentTypedReturn(propertyTweener, "FromCurrent", propertyTweener, shape: 2);
 
                 var tween = new TypeDefinition("Godot", "Tween",
                     Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.Class,
@@ -1186,6 +1203,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             string[] expectedBridgeFields =
             [
                 TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerRepairEnabledFieldName,
+                TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentRepairEnabledFieldName,
                 TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerObservationCountFieldName,
                 TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerNativeNullCountFieldName,
                 TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerManagedNullCountFieldName,
@@ -1205,9 +1223,9 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             Assert.IsNotNull(propertyTweenerFallbackMethod);
             Assert.IsNotNull(propertyTweenerFluentFallbackMethod);
             StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER_OBSERVE_REPAIR:godot_icall_4_1441");
-            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetEase=PATCHED_METHOD_LOCAL_OBSERVE_REPAIR");
-            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetTrans=PATCHED_METHOD_LOCAL_OBSERVE_REPAIR");
-            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.FromCurrent=PATCHED_METHOD_LOCAL_OBSERVE_REPAIR");
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetEase=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns=");
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetTrans=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns=");
+            StringAssert.Contains(result.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.FromCurrent=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns=");
             Assert.IsTrue(propertyTweenerFallbackMethod.Body.Instructions.Any(instruction =>
                 instruction.OpCode.Code == Code.Newobj && instruction.Operand is MethodReference ctorRef &&
                 ctorRef.DeclaringType.FullName == "Godot.PropertyTweener" && ctorRef.Parameters.Count == 1 &&
@@ -1228,10 +1246,13 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
             foreach (var fluentName in new[] { "SetEase", "SetTrans", "FromCurrent" })
             {
                 var fluentMethod = serializedPropertyTweener.Methods.Single(method => method.Name == fluentName && method.HasBody);
-                Assert.AreEqual(1, fluentMethod.Body.Instructions.Count(instruction =>
+                var fluentRepairCalls = fluentMethod.Body.Instructions.Count(instruction =>
                     instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
                     call.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName &&
-                    call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackMethodName), fluentName);
+                    call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackMethodName);
+                var fluentReturns = fluentMethod.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Ret);
+                Assert.Greater(fluentRepairCalls, 0, fluentName);
+                Assert.AreEqual(fluentReturns, fluentRepairCalls, fluentName);
             }
 
             var serializedPackedScene = reopened.MainModule.Types.Single(type => type.FullName == "Godot.PackedScene");

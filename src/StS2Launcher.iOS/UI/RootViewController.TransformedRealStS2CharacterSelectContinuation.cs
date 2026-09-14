@@ -14,7 +14,7 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT SUSTAINED RENDER RESIDENCY");
 
     private UIButton? _step58Button; private UIButton? _step59Button; private UIButton? _step60Button; private UIButton? _step61Button; private UIButton? _step62Button;
-    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59RegisterHotkeysProbeButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59ConfirmTailProbeButton; private UIButton? _step59ConfirmTailRepairProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
+    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59RegisterHotkeysProbeButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59ConfirmTailProbeButton; private UIButton? _step59ConfirmTailWrapperRepairProbeButton; private UIButton? _step59ConfirmTailRepairProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
     private UILabel? _step58ResultLabel; private UILabel? _step59ResultLabel; private UILabel? _step60ResultLabel; private UILabel? _step61ResultLabel; private UILabel? _step62ResultLabel;
     private UILabel? _step58DetailLabel; private UILabel? _step59DetailLabel; private UILabel? _step60DetailLabel; private UILabel? _step61DetailLabel; private UILabel? _step62DetailLabel;
     private UILabel? _step59DiagnosticDeckResultLabel; private UILabel? _step59DiagnosticDeckDetailLabel;
@@ -22,6 +22,7 @@ public sealed partial class RootViewController
     private UILabel? _step59RegisterHotkeysProbeResultLabel; private UILabel? _step59RegisterHotkeysProbeDetailLabel;
     private UILabel? _step59UpdateControllerProbeResultLabel; private UILabel? _step59UpdateControllerProbeDetailLabel;
     private UILabel? _step59ConfirmTailProbeResultLabel; private UILabel? _step59ConfirmTailProbeDetailLabel;
+    private UILabel? _step59ConfirmTailWrapperRepairProbeResultLabel; private UILabel? _step59ConfirmTailWrapperRepairProbeDetailLabel;
     private UILabel? _step59ConfirmTailRepairProbeResultLabel; private UILabel? _step59ConfirmTailRepairProbeDetailLabel;
     private UILabel? _step59IsolatedEnableProbeResultLabel; private UILabel? _step59IsolatedEnableProbeDetailLabel;
     private bool _step59TransitionUiStarted; private bool _step59DiagnosticDeckUiStarted; private bool _step59ControllerRehearsalUiStarted; private bool _step59MutationProbeUiStarted; private bool _step61PulseUiStarted; private bool _step62PulseUiStarted;
@@ -31,7 +32,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "0.0.205 keeps Step52→58 and the proven PackedScene correction, but turns the PropertyTweener work into a switchable experiment deck. Run 59T CONTROL first: repair is disabled and the bridge records native pointer, managed-null/wrong-type identity, and fluent-return identity. Then relaunch and run 59X REPAIR: the same compiled GodotSharp derivative enables repair, constructs PropertyTweener(IntPtr) only for nonzero native pointers with unusable wrappers, and method-locally returns the valid receiver for broken SetEase/SetTrans/FromCurrent fluent returns. If 59X passes, fresh-process 59E and real Step59 automatically enable the same repair; 60–62 can follow without recompiling.",
+            "0.0.206 keeps Step52→58 and the proven PackedScene correction, but makes the PropertyTweener work a three-mode experiment deck verified against the real GodotSharp binary shape. Run 59T CONTROL first with both repairs disabled. Then 59W enables only the TweenProperty native-wrapper repair while leaving fluent returns natural. Then 59X enables both wrapper repair and typed-return fluent repair. The fluent transform no longer assumes any internal native-call/cast IL shape; it observes/repairs only typed PropertyTweener return boundaries. If 59X passes, fresh-process 59E and real Step59 use full repair automatically; 60–62 can follow without recompiling.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -70,22 +71,28 @@ public sealed partial class RootViewController
             "Fresh-process control. Runs the real post-base tail with PropertyTweener repair explicitly disabled and records every TweenProperty native pointer plus managed wrapper type/null/wrong-type outcome. It also observes SetEase/SetTrans/FromCurrent if reached. Relaunch afterward.");
         _step59ConfirmTailProbeButton.TouchUpInside += async (_, _) => await RunStep59ConfirmTailProbeAsync();
 
+        (_step59ConfirmTailWrapperRepairProbeButton, _step59ConfirmTailWrapperRepairProbeResultLabel, _step59ConfirmTailWrapperRepairProbeDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59W — WRAPPER-ONLY REPAIR: isolated confirm-button tween tail",
+            "Run Step 59W — WRAPPER REPAIR ONLY", "STEP 59W WRAPPER REPAIR: LOCKED",
+            "Fresh-process middle experiment using the same compiled IPA. Enables only native-pointer-aware TweenProperty wrapper repair; fluent SetEase/SetTrans/FromCurrent return repair stays disabled. If TweenProperty starts working but a fluent call returns null, this run proves the wrapper fix and localizes the next boundary without conflating repairs.");
+        _step59ConfirmTailWrapperRepairProbeButton.TouchUpInside += async (_, _) => await RunStep59ConfirmTailWrapperRepairProbeAsync();
+
         (_step59ConfirmTailRepairProbeButton, _step59ConfirmTailRepairProbeResultLabel, _step59ConfirmTailRepairProbeDetailLabel) = AddStartupLadderStepControls(content,
-            "Step 59X — REPAIR: isolated confirm-button tween tail",
-            "Run Step 59X — REPAIR / FULL TAIL", "STEP 59X REPAIR: LOCKED",
-            "Fresh-process repair experiment using the same compiled IPA. Enables native-pointer-aware TweenProperty wrapper repair and method-local fluent return-self repair for SetEase/SetTrans/FromCurrent. Stage checkpoints and bridge counters prove exactly which repair fired. If this passes, relaunch for 59E, then real Step59.");
+            "Step 59X — FULL REPAIR: isolated confirm-button tween tail",
+            "Run Step 59X — FULL REPAIR / FULL TAIL", "STEP 59X FULL REPAIR: LOCKED",
+            "Fresh-process full repair experiment using the same compiled IPA. Enables native-pointer-aware TweenProperty wrapper repair plus typed-return fluent return-self repair for SetEase/SetTrans/FromCurrent. The fluent repair is independent of their internal generated IL shape. Stage checkpoints and bridge counters prove which repair fired. If this passes, relaunch for 59E, then real Step59.");
         _step59ConfirmTailRepairProbeButton.TouchUpInside += async (_, _) => await RunStep59ConfirmTailRepairProbeAsync();
 
         (_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59E — isolated retained embark Enable probe",
             "Run Step 59E — ISOLATED EMBARK ENABLE", "STEP 59E ISOLATED EMBARK ENABLE: LOCKED",
-            "Fresh-process repair validation. Enables the 0.0.205 PropertyTweener repair, then calls retained embark NClickableControl.Enable() directly outside OpenCharacterSelect. If 59X passes but 59E fails, the remaining failure is outside the isolated tween tail. Relaunch afterward.");
+            "Fresh-process repair validation. Enables the 0.0.206 full PropertyTweener repair, then calls retained embark NClickableControl.Enable() directly outside OpenCharacterSelect. If 59X passes but 59E fails, the remaining failure is outside the isolated tween tail. Relaunch afterward.");
         _step59IsolatedEnableProbeButton.TouchUpInside += async (_, _) => await RunStep59IsolatedEnableProbeAsync();
 
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. Gate C enables the same 0.0.205 PropertyTweener repair validated by 59X/59E, then invokes exact original OpenCharacterSelect once. If it succeeds, continue directly to 60–62 in this IPA; if it throws, post-failure wrapper/button evidence is captured.");
+            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. Gate C enables the same 0.0.206 full PropertyTweener repair validated by 59X/59E, then invokes exact original OpenCharacterSelect once. If it succeeds, continue directly to 60–62 in this IPA; if it throws, post-failure wrapper/button evidence is captured.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,

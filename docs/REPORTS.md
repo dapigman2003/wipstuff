@@ -86,3 +86,8 @@ If 59T passes, use a fresh process for 59E and preserve `M59E_PROPERTY_TWEENER_C
 ## 0.0.205 PropertyTweener observe/repair evidence contract
 
 59T CONTROL and 59X REPAIR record `[PROPERTYTWEENER MANAGED-WRAPPER OBSERVE/REPAIR]`: `repairEnabled`, observation/native-null/managed-null/wrong-type/repair counts, `lastNativePtr`, `lastManagedType`, fluent observation/repair counts, last fluent stage, and last fluent managed type. 59T must show repair disabled; 59X must show repair enabled. 59E and real Step 59 explicitly enable the same repair. A native-pointer repair is valid only for a nonzero pointer.
+
+
+## 0.0.206 PropertyTweener three-mode evidence contract
+
+59T/59W/59X record `[PROPERTYTWEENER MANAGED-WRAPPER OBSERVE/REPAIR]` with independent `wrapperRepairEnabled` and `fluentRepairEnabled` flags. 59T must report both false; 59W must report wrapper true/fluent false; 59X must report both true. `TweenProperty` records native pointer, managed-null/wrong-type counts, last managed runtime type, and repair count. Fluent methods are observed only at typed return boundaries and record fluent observation/repair count plus last stage. 59E and real Step 59 enable both repairs.

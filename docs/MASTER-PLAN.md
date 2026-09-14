@@ -1,8 +1,8 @@
-# 0.0.205 active frontier
+# 0.0.206 active frontier
 
-**Active candidate — 0.0.205 current ownership + switchable PropertyTweener observe/repair.** Physical history through Step 57 remains retained, Step 58 starts directly from Step 52, and legacy Steps 53–57 remain optional. Physical 0.0.204 proved the null-only fallback never fired while `TweenProperty()` still returned null. 0.0.205 preserves the proven `PackedScene.Instantiate(GenEditState)` unique-name compatibility and maximizes information/optionality per compilation: 59T CONTROL records native pointer + managed wrapper identity with repair disabled; 59X REPAIR enables nonzero-pointer null/wrong-type `PropertyTweener(IntPtr)` recovery plus method-local `SetEase`/`SetTrans`/`FromCurrent` return-self repair. 59E and real Step 59 enable the same repair, while 59D/R/H/U remain controls and Steps 60–62 stay available after a clean transition. Step 63 remains unopened.
+**Active candidate — 0.0.206 current ownership + three-mode PropertyTweener observe/repair.** Physical history through Step 57 remains retained, Step 58 starts directly from Step 52, and legacy Steps 53–57 remain optional. Physical 0.0.205 rejected before Step 59 because the candidate assumed an internal `SetEase` post-native `isinst` shape that the real GodotSharp binary does not have. 0.0.206 preserves the proven `PackedScene.Instantiate(GenEditState)` unique-name compatibility and maximizes information/optionality per compilation: **59T CONTROL** disables both repairs; **59W WRAPPER-ONLY** enables only nonzero-pointer null/wrong-type `PropertyTweener(IntPtr)` recovery; **59X FULL REPAIR** additionally enables shape-independent typed-return repair for `SetEase`/`SetTrans`/`FromCurrent`. 59E and real Step 59 use full repair, while 59D/R/H/U remain controls and Steps 60–62 stay available after a clean transition. Step 63 remains unopened.
 
-Compilation efficiency is a first-class rule: use multiple fresh-process phone experiments per build and avoid shared-method IL instrumentation when isolated probes can answer the same question.
+Compilation efficiency is a first-class rule: use multiple fresh-process phone experiments per build and make candidate transforms fail only on real authority/safety violations, not speculative internal IL shapes.
 
 ---
 
