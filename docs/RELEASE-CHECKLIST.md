@@ -1,6 +1,6 @@
 # Release checklist — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Release identity: display/build `0.0.200 (200)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.201 (201)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190–0.0.192 Step-58 localization evidence and physical 0.0.193 Step-59 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -46,7 +46,7 @@ Require exact 0.0.197 source/plist/release/shell identity; current active manife
 - Existing unhealthy prerequisites still block Gate C before one-shot Push/OpenCharacterSelect arm.
 
 
-## 0.0.200 central PackedScene compatibility requirements
+## 0.0.201 NConfirmButton OnEnable-preflight requirements
 
 - The synthetic GodotSharp host fixture must define the instance `Godot.PackedScene.Instantiate` surface and verify one compatibility field load/invoke/return epilogue.
 - MODEL-BOOTSTRAP live status/checkpoint text must identify the verified GodotSharp compatibility derivative as the selected bridge authority, while exact prepared GodotSharp remains immutable source authority.
@@ -62,3 +62,11 @@ Require exact 0.0.197 source/plist/release/shell identity; current active manife
   on the reflection-time `Godot.NodePath` lookup that produced diagnostic TypeLoad noise in 0.0.198.
 - No StS2 private UI/game field is written and no `_Ready()` method is manually invoked.
 - Physical 0.0.198 report/checkpoint/static-map/last-checkpoint evidence is retained in history.
+- Physical 0.0.200 Step-59 report/checkpoint/static-map/last-checkpoint evidence is retained in history.
+- Step 59 Gate B emits `M59_B_CONFIRM_BUTTON_PREFLIGHT` before handler arm and statically verifies selected `NConfirmButton._Ready`, `NConfirmButton.OnEnable`, `NButton.OnEnable`, and `NButton.RegisterHotkeys`.
+- A dedicated **Step 59D** control runs only Step-59 Gates A+B, writes `Step59-DeepDiagnosticDeck-StaticMap-*`, emits `M59D_B_STATIC_MAP_WRITE_RETURNED`, and never calls `RunStep59RealHandlerTransition`.
+- The Step59D map includes a full inherited embark field matrix, whole-SceneTree `NConfirmButton` peer matrix, observational accessor snapshot, null-field live-node candidate matrix, exact IL field/call order, and transitive execution frontiers for the immediate Ready/Enable chain.
+- The normal Step-59 real-handler control refuses same-process continuation after Step59D; a fresh process is required so the two experiments can reuse one compiled IPA without sharing mutated/diagnostic state.
+- Any real-handler failure captures `M59_C_CONFIRM_BUTTON_POSTFAIL` and refreshes the durable static map before UI return with `[POST-FAILURE CONFIRM-BUTTON RUNTIME DECK]`.
+- Live `_embarkButton` `_outline`, `_buttonImage`, `_viewport`, and `_hotkeys` are non-null prerequisites; any definite failure blocks Gate C without direct repair.
+- No direct NConfirmButton field write, manual `_Ready()`, or `OnEnable` bypass is introduced.

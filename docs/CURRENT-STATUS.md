@@ -6,7 +6,7 @@ Earlier physical Step 39/40/41 authorities remain closed; **GameStartup remains 
 
 Step 42 retained the exact **22-method zero-boundary closure** for `NGame.InitPools`, returned normally with the **renderer frozen**, and closed with **zero resolver/host/private/initializer/rejected/native deltas**. That physical authority remains protected by 0.0.195.
 
-## Active candidate — Steps 58–62 global PackedScene unique-name compatibility / visible-render trial / 0.0.200 (200)
+## Active candidate — Steps 58–62 NConfirmButton OnEnable preflight / visible-render trial / 0.0.201 (201)
 
 Physical runtime authority remains closed through **Step 57 4/4/frozen**. The one-button **Physically Closed Path** remains intentionally capped at Step 52; a fresh process must rebuild through 52 and then manually reprove 53–58 before Step 59.
 
@@ -36,11 +36,19 @@ Ordinary nodes in the same scenes (`InputManager`, `HotkeyManager`, `ReactionCon
 application of parent-scene overrides to instanced-subscene roots during PackedScene instantiation, not parsing,
 resource caching, SceneTree admission, owner mutation, or a character-select-specific bug.
 
-0.0.200 retains the 0.0.199 hash-pinned private GodotSharp compatibility derivative for the active model-bootstrap path. The 0.0.200 delta is host-regression/evidence-contract only: the synthetic GodotSharp fixture now contains the PackedScene.Instantiate surface the emitter requires, and live model-bootstrap wording now names the derivative actually selected.
-Its `PackedScene.Instantiate` epilogue calls a host compatibility callback before returning the new root. The callback
-reapplies only exact SceneState `unique_name_in_owner=true` values for instanced roots, verifies each write, and
-otherwise leaves the new hierarchy untouched. The Step-59 forensic snapshot then proves whether normal StS2 Ready
-bindings recover.
+The 0.0.199/0.0.200 hash-pinned private GodotSharp compatibility derivative remains unchanged. Its `PackedScene.Instantiate` epilogue calls a host compatibility callback before returning the new root; the callback reapplies only exact SceneState `unique_name_in_owner=true` values for instanced roots, verifies each write, and otherwise leaves the hierarchy untouched.
+
+### What physical 0.0.200 changed
+
+Physical 0.0.200 proves that compatibility correction is effective on-device. Character-select `AscensionPanel` and `ActDropdown`, game `RootSceneContainer` / `ReactionWheel` / `MultiplayerTimeoutOverlay`, and main-menu instanced roots now report `UniqueNameInOwner=true` in both fresh temporary and retained live instances; the previously null `_ascensionPanel`, `_actDropdown`, and `NGame.TimeoutOverlay` fields are populated before the real transition.
+
+The one-shot original `OpenCharacterSelect` then advances through `NSubmenuStack.Push` into `NCharacterSelectScreen.OnSubmenuOpened()` and fails at `NConfirmButton.OnEnable()` while enabling the retained `_embarkButton`. The post-failure snapshot proves the character-select logical stack was bound to the exact retained main-menu stack and a one-player `StartRunLobby` existed. Rendering remained frozen and the run ended normally, so that armed Step 59 must never be retried in-process.
+
+0.0.201 therefore makes **no new repair**. It adds a Gate-B-only `NConfirmButton` preflight: inspect the retained embark button's selected load context/tree/readiness, `_outline`, `_buttonImage`, `_viewport`, `_hotkeys`, related fields, exact selected `_Ready`/`OnEnable`/base `NButton` IL, live child graph, all serialized properties on the character-select embark instanced root, and exact character-select/confirm-button TSCN context. Any definite missing `OnEnable` prerequisite blocks before Gate C can arm the original handler.
+
+Because Codemagic compilation is the scarce resource while phone runs are cheap, the active 0.0.201 source also exposes **Step 59D — compilation-efficient deep diagnostic deck**. Step 59D executes only Step-59 Gates A+B and stops before Gate C. Its single durable map includes the full inherited embark-button field matrix, whole retained SceneTree `NConfirmButton` peer comparison, observational `GetViewport`/tree/owner accessors, null-field descendant-candidate mapping, exact Ready/OnEnable/base-button field/call order, and transitive execution-qualified frontiers for `_Ready`, `OnEnable`, `NButton.OnEnable`, `RegisterHotkeys`, `NClickableControl.Enable`, and `NCharacterSelectScreen.OnSubmenuOpened`. No Push/OpenCharacterSelect arm occurs.
+
+The normal Step-59 button remains in the **same compiled IPA** as a separate fresh-process experiment. If the original handler still fails, the candidate captures a post-failure full inherited field/peer/null-candidate deck and refreshes the Step-59 static map before returning to the UI. This lets one Codemagic compilation support multiple evidence-generating phone runs without weakening the no-direct-repair boundary.
 
 ### What physical 0.0.197 changed
 
@@ -234,7 +242,7 @@ Reports: `Step58-CrashCheckpoint-<RunId>.txt`, `Step58-CharacterSelectOwnership-
 
 ## Step 59.0 — forensic prerequisites + one-shot real OpenCharacterSelect transition
 
-Requires Step 58 4/4/frozen. Before any handler mutation, Gate B captures a durable prerequisite snapshot proving character-select/ascension `IsNodeReady`, critical character-select `_Ready` fields, NGame hotkey/input/remote-cursor/reaction/timeout/root-scene services, and production SaveManager `Progress/Epochs/EncounterStats`; it also records `RootSceneContainer.CurrentScene` identity and current character `_lobby` state. The retained single-player logical stack is still checked strictly: a foreign stack fails; exact retained needs no repair; null alone permits the previously audited game-owned `NSubmenuStack.Push(NSubmenu)` repair. Then original `OpenCharacterSelect(NButton)` is invoked once with the retained real `_standardButton`. If it throws, Step 59 checkpoints the inner game exception `TargetSite`, `Source`, and original stack trace and captures post-failure lobby/player/screen state before returning failure with the inner stack preserved through `ExceptionDispatchInfo`. No direct field repair, initializer-substage reproduction, `ExecuteDeferred`, or full `GameStartup` call is authorized. Never retry after handler transition arm.
+Requires Step 58 4/4/frozen. Before any handler mutation, Gate B captures a durable prerequisite snapshot proving character-select/ascension `IsNodeReady`, critical character-select `_Ready` fields, NGame hotkey/input/remote-cursor/reaction/timeout/root-scene services, and production SaveManager `Progress/Epochs/EncounterStats`; it also records `RootSceneContainer.CurrentScene` identity and current character `_lobby` state. Physical 0.0.200 moves the active frontier into the retained embark `NConfirmButton.OnEnable()` path, so 0.0.201 also requires a dedicated preflight of `_outline`, `_buttonImage`, `_viewport`, `_hotkeys`, selected `_Ready`/`OnEnable`/`RegisterHotkeys` IL, live child graph, SceneState properties, and exact TSCN context. Definite missing prerequisites fail closed before Gate C. The retained single-player logical stack is still checked strictly: a foreign stack fails; exact retained needs no repair; null alone permits the previously audited game-owned `NSubmenuStack.Push(NSubmenu)` repair. Then original `OpenCharacterSelect(NButton)` is invoked once with the retained real `_standardButton`. If it throws, Step 59 checkpoints the inner game exception `TargetSite`, `Source`, and original stack trace and captures post-failure lobby/player/screen state before returning failure with the inner stack preserved through `ExceptionDispatchInfo`. No direct field repair, initializer-substage reproduction, `ExecuteDeferred`, or full `GameStartup` call is authorized. Never retry after handler transition arm.
 
 Reports: `Step59-CrashCheckpoint-<RunId>.txt`, `Step59-RealOpenCharacterSelect-StaticMap-<RunId>.txt`, `Step59-LastCheckpoint.txt`, `Step59-TransformedRealStS2OpenCharacterSelectFrozen.txt`.
 
@@ -256,10 +264,12 @@ Requires Step 61 4/4/refrozen. Rechecks the same active-screen authority, then s
 
 Reports: `Step62-CrashCheckpoint-<RunId>.txt`, `Step62-CharacterSelectSustainedRender-StaticMap-<RunId>.txt`, `Step62-LastCheckpoint.txt`, `Step62-TransformedRealStS2CharacterSelectSustainedRender.txt`.
 
-## Physical sequence for 0.0.195
+## Physical sequence for 0.0.201
 
-Fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. Require Step 52 4/4/frozen. Then manually run **53 → 54 → 55 → 56 → 57**. Continue **58 → 59** first, stopping immediately at the first failure. Only if Step 59 closes 4/4 continue **60 → 61 → 62**.
+For the first 0.0.201 phone experiment: fresh process → press **Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52** once. Require Step 52 4/4/frozen. Then manually run **53 → 54 → 55 → 56 → 57 → 58**, then run **Step 59D — DEEP DIAGNOSTICS ONLY**. Preserve the Step59D report/static map and stop; no handler was armed.
 
-Step 59 is one-shot once it arms the real handler transition; preserve the forensic checkpoint journal and final report on any failure. Steps 61 and 62 are one-shot after render arm. If all five new rungs close 4/4, stop after Step 62 and preserve its evidence. **Step 63 has no behavior in 0.0.195.**
+If the Step59D evidence warrants the real transition, use another fresh process with the same IPA, rebuild through **53 → 58**, and run the normal **Step 59.0** button. Only if Step 59 closes 4/4 continue **60 → 61 → 62**. This split is intentional: multiple cheap phone runs reuse one expensive compilation.
 
-Still globally forbidden in 0.0.195: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 63+. Render rungs are Step 50, Step 52, Step 55, Step 61, and Step 62; each bounded rung synchronously refreezes before success evaluation.
+Step 59 is one-shot once it arms the real handler transition; preserve the forensic checkpoint journal and final report on any failure. Steps 61 and 62 are one-shot after render arm. If all five new rungs close 4/4, stop after Step 62 and preserve its evidence. **Step 63 has no behavior in 0.0.201.**
+
+Still globally forbidden in 0.0.201: whole `GameStartup`, original `LaunchMainMenu`, `DoCloudSync`, migration/archive mutation, `InitializePlatform`, external Steamworks/native Steam APIs, `LoadDeferredStartupAssetsAsync`, `ExecuteDeferred`, character choice/confirm/embark/run-start actions, native FMOD/Spine game extensions, explicit teardown/state reset beyond already proven paths, trusted-install mutation, and Step 63+. Render rungs are Step 50, Step 52, Step 55, Step 61, and Step 62; each bounded rung synchronously refreezes before success evaluation.

@@ -20,9 +20,11 @@ namespace StS2Launcher.Core;
 /// GetNode<NAscensionPanel>("%AscensionPanel") into _ascensionPanel. Physical 0.0.197 then proved the exact
 /// AscensionPanel node exists with the selected NAscensionPanel runtime type, correct character-select owner, and
 /// IsNodeReady()==true, while its live UniqueNameInOwner flag is false even though the exact parent TSCN override says
-/// unique_name_in_owner=true. Step 59 now localizes that discrepancy across exact TSCN text, retained PackedScene
-/// SceneState, temporary off-tree instantiation, live node flags/owners, and direct-path versus %Name lookup behavior.
-/// Steps 60-62 remain available only after a
+/// unique_name_in_owner=true. Physical 0.0.200 then proves the global PackedScene compatibility layer restores those
+/// instanced-root unique-name values and the previously missing Ready-bound fields. The original transition advances
+/// into NCharacterSelectScreen.OnSubmenuOpened() and fails in NConfirmButton.OnEnable() while enabling the retained
+/// embark button. Step 59 therefore adds a fail-closed pre-handler NConfirmButton Ready/OnEnable field/IL/scene/TSCN
+/// preflight without repairing game state. Steps 60-62 remain available only after a
 /// clean original-handler transition and then audit/render the actual active screen
 /// and run bounded visible render residencies. Character choice, confirm/embark, run start and Step 63 remain unopened.
 /// </summary>
@@ -49,6 +51,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private const string SubmenuStackFieldName = "_stack";
     private const string AscensionPanelManagedTypeFullNameForForensics = "MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel";
     private const string AscensionPanelResourcePathForForensics = "res://scenes/screens/ascension_panel.tscn";
+    private const string ConfirmButtonManagedTypeFullNameForForensics = "MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton";
+    private const string NButtonManagedTypeFullNameForForensics = "MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton";
+    private const string ClickableControlManagedTypeFullNameForForensics = "MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl";
+    private const string ConfirmButtonResourcePathForForensics = "res://scenes/ui/confirm_button.tscn";
 
     private StartupLadderBaseline? _step58Baseline;
     private StartupLadderBaseline? _step59Baseline;
@@ -98,6 +104,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step59ReadyBindingDiagnostics = string.Empty;
     private string _step59ReadyBindingBlocker = string.Empty;
     private string _step59UniqueNameProvenanceDiagnostics = string.Empty;
+    private string _step59ConfirmButtonDiagnostics = string.Empty;
+    private string _step59ConfirmButtonPostFailureDiagnostics = string.Empty;
     private bool _step59ReadyBindingPreflightPassed;
     private object? _step58ObservedCharacterSelect;
     private CharacterSelectRuntimeState? _step58ObservedState;
@@ -161,6 +169,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59ReadyBindingDiagnostics = string.Empty;
         _step59ReadyBindingBlocker = string.Empty;
         _step59UniqueNameProvenanceDiagnostics = string.Empty;
+        _step59ConfirmButtonDiagnostics = string.Empty;
+        _step59ConfirmButtonPostFailureDiagnostics = string.Empty;
         _step59ReadyBindingPreflightPassed = false;
         _step58ObservedCharacterSelect = null;
         _step58ObservedState = null;
@@ -393,6 +403,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             try
             {
                 _step59ReadyBindingDiagnostics = BuildStep59ReadyBindingDiagnostics(forensicScreen, context, step, allTypes);
+                _step59ConfirmButtonDiagnostics = BuildStep59ConfirmButtonOnEnableDiagnostics(forensicScreen, context, step, allTypes);
+                _step59ConfirmButtonDiagnostics += "\n\n" + BuildStep59CompilationEfficientDiagnosticDeck(forensicScreen, context, step, allTypes, allMethods);
                 _step59UniqueNameProvenanceDiagnostics = BuildStep59UniqueNameProvenanceDiagnostics(forensicScreen, context, step);
             }
             catch (Exception diagnosticEx)
@@ -404,6 +416,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             _step59ReadyBindingPreflightPassed = string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker);
             Checkpoint(checkpoint, "M59_B_FORENSIC_PREFLIGHT — " + SanitizeCheckpoint(_step59PreflightSnapshot));
             Checkpoint(checkpoint, $"M59_B_READY_BINDING_DIAGNOSIS — handlerAuthorized={_step59ReadyBindingPreflightPassed}; blocker={SanitizeCheckpoint(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}; {SanitizeCheckpoint(_step59ReadyBindingDiagnostics)}");
+            Checkpoint(checkpoint, "M59_B_CONFIRM_BUTTON_PREFLIGHT — " + SanitizeCheckpoint(_step59ConfirmButtonDiagnostics));
             Checkpoint(checkpoint, "M59_B_UNIQUE_NAME_PROVENANCE — " + SanitizeCheckpoint(_step59UniqueNameProvenanceDiagnostics));
             _step59TransitionBound = true;
             _step59StaticMap = "StS2 Launcher — Step 59.0 character-select ready-binding forensics + game-owned transition\n" +
@@ -418,6 +431,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"Ready-binding handler authorization: {_step59ReadyBindingPreflightPassed}\n" +
                 $"Ready-binding blocker: {(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}\n" +
                 "[READY-BINDING DIAGNOSTICS]\n" + _step59ReadyBindingDiagnostics + "\n" +
+                "[CONFIRM-BUTTON ONENABLE PREFLIGHT]\n" + _step59ConfirmButtonDiagnostics + "\n" +
                 "[UNIQUE-NAME PROVENANCE DIAGNOSTICS]\n" + _step59UniqueNameProvenanceDiagnostics + "\n" +
                 "Rendering active before transition: NO\n" +
                 BuildStartupLadderInvocationFrontierAppendix(pushAudit);
@@ -489,8 +503,13 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                     try
                     {
                         _step59FailureSnapshot = CaptureStep59ForensicSnapshot(context, step, requireReadyPrerequisites: false);
-                        _step59StaticMap += $"Handler inner exception: {inner.GetType().FullName}: {inner.Message}\nTargetSite: {inner.TargetSite}\nOriginal stack: {inner.StackTrace}\nPost-failure forensic snapshot: {_step59FailureSnapshot}\n";
+                        var postFailureState = CaptureCurrentCharacterSelectState(step, context);
+                        _step59ConfirmButtonPostFailureDiagnostics = postFailureState.Screen is null
+                            ? "post-failure character-select screen is absent"
+                            : BuildStep59PostFailureRuntimeDiagnosticDeck(postFailureState.Screen, context, step);
+                        _step59StaticMap += $"Handler inner exception: {inner.GetType().FullName}: {inner.Message}\nTargetSite: {inner.TargetSite}\nOriginal stack: {inner.StackTrace}\nPost-failure forensic snapshot: {_step59FailureSnapshot}\n[POST-FAILURE CONFIRM-BUTTON RUNTIME DECK]\n{_step59ConfirmButtonPostFailureDiagnostics}\n";
                         Checkpoint(checkpoint, "M59_C_FORENSIC_POSTFAIL — " + SanitizeCheckpoint(_step59FailureSnapshot));
+                        Checkpoint(checkpoint, "M59_C_CONFIRM_BUTTON_POSTFAIL — " + SanitizeCheckpoint(_step59ConfirmButtonPostFailureDiagnostics));
                     }
                     catch (Exception snapshotEx)
                     {
@@ -999,6 +1018,410 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     }
 
 
+    private string BuildStep59ConfirmButtonOnEnableDiagnostics(
+        object screen,
+        Step35ExecutionLoadContext context,
+        int step,
+        IReadOnlyDictionary<string, TypeDefinition> allTypes)
+    {
+        var text = new System.Text.StringBuilder();
+        var failures = new List<string>();
+        var embarkField = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), "_embarkButton", step);
+        var embark = embarkField.GetValue(screen);
+        if (embark is null)
+        {
+            failures.Add("character-select _embarkButton=NULL");
+            text.AppendLine("Retained _embarkButton: NULL");
+            AppendStep59ConfirmButtonBlocker(failures);
+            return text.ToString().TrimEnd();
+        }
+
+        var embarkTypeName = embark.GetType().FullName ?? "<unknown>";
+        var loadContext = AssemblyLoadContext.GetLoadContext(embark.GetType().Assembly);
+        var insideTree = InvokeRuntimeBoolForForensics(embark, "IsInsideTree", step);
+        var nodeReady = InvokeRuntimeBoolForForensics(embark, "IsNodeReady", step);
+        text.AppendLine($"Retained _embarkButton: type={embarkTypeName}; selectedContext={ReferenceEquals(loadContext, context)}; insideTree={insideTree}; nodeReady={nodeReady}.");
+        if (!string.Equals(embarkTypeName, ConfirmButtonManagedTypeFullNameForForensics, StringComparison.Ordinal))
+            failures.Add($"_embarkButton runtime type={embarkTypeName}, expected {ConfirmButtonManagedTypeFullNameForForensics}");
+        if (!ReferenceEquals(loadContext, context))
+            failures.Add("_embarkButton is not owned by the selected private load context");
+        if (!insideTree)
+            failures.Add("_embarkButton IsInsideTree()=false");
+        if (!nodeReady)
+            failures.Add("_embarkButton IsNodeReady()=false");
+
+        var runtimeFields = new[]
+        {
+            "_outline", "_buttonImage", "_viewport", "_hotkeys", "_moveTween", "_showPos",
+            "_isEnabled", "_controllerHotkeyIcon"
+        };
+        var fieldValues = new Dictionary<string, object?>(StringComparer.Ordinal);
+        text.AppendLine("[LIVE EMBARK NCONFIRMBUTTON FIELDS]");
+        foreach (var fieldName in runtimeFields)
+        {
+            var field = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), fieldName, step);
+            var value = field.GetValue(embark);
+            fieldValues[fieldName] = value;
+            text.AppendLine($"  {fieldName}={DescribeStep59RuntimeValue(value)}");
+        }
+        foreach (var fieldName in new[] { "_outline", "_buttonImage", "_viewport", "_hotkeys" })
+        {
+            if (fieldValues[fieldName] is null)
+                failures.Add($"_embarkButton {fieldName}=NULL");
+        }
+
+        var confirmType = RequireStartupLadderType(allTypes, ConfirmButtonManagedTypeFullNameForForensics, step);
+        var ready = confirmType.Methods.SingleOrDefault(method => method.Name == "_Ready" && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody)
+            ?? throw new MissingMethodException(ConfirmButtonManagedTypeFullNameForForensics, "_Ready()");
+        var onEnable = confirmType.Methods.SingleOrDefault(method => method.Name == "OnEnable" && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody)
+            ?? throw new MissingMethodException(ConfirmButtonManagedTypeFullNameForForensics, "OnEnable()");
+        var nButtonType = RequireStartupLadderType(allTypes, NButtonManagedTypeFullNameForForensics, step);
+        var baseOnEnable = nButtonType.Methods.SingleOrDefault(method => method.Name == "OnEnable" && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody)
+            ?? throw new MissingMethodException(NButtonManagedTypeFullNameForForensics, "OnEnable()");
+        var registerHotkeys = nButtonType.Methods.SingleOrDefault(method => method.Name == "RegisterHotkeys" && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody)
+            ?? throw new MissingMethodException(NButtonManagedTypeFullNameForForensics, "RegisterHotkeys()");
+
+        RequireStep59FieldStore(ready, "_outline", step);
+        RequireStep59FieldStore(ready, "_buttonImage", step);
+        RequireStep59FieldStore(ready, "_viewport", step);
+        RequireStep59FieldLoad(onEnable, "_outline", step);
+        RequireStep59FieldLoad(onEnable, "_buttonImage", step);
+        RequireStep59FieldLoad(onEnable, "_moveTween", step);
+        if (!onEnable.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference method && method.Name == "CreateTween"))
+            throw new InvalidDataException($"Step {step}.0 selected NConfirmButton.OnEnable no longer calls CreateTween().");
+
+        text.AppendLine($"Selected NConfirmButton._Ready token=0x{ready.MetadataToken.ToUInt32():X8}; IL={ready.Body.Instructions.Count}.");
+        text.AppendLine("[SELECTED NCONFIRMBUTTON _READY IL]");
+        foreach (var instruction in ready.Body.Instructions)
+            text.AppendLine("  " + FormatStep41Instruction(instruction));
+        text.AppendLine($"Selected NConfirmButton.OnEnable token=0x{onEnable.MetadataToken.ToUInt32():X8}; IL={onEnable.Body.Instructions.Count}.");
+        text.AppendLine("[SELECTED NCONFIRMBUTTON ONENABLE IL]");
+        foreach (var instruction in onEnable.Body.Instructions)
+            text.AppendLine("  " + FormatStep41Instruction(instruction));
+        text.AppendLine($"Selected NButton.OnEnable token=0x{baseOnEnable.MetadataToken.ToUInt32():X8}; IL={baseOnEnable.Body.Instructions.Count}; RegisterHotkeys token=0x{registerHotkeys.MetadataToken.ToUInt32():X8}; IL={registerHotkeys.Body.Instructions.Count}.");
+        text.AppendLine("[SELECTED NBUTTON ONENABLE + REGISTERHOTKEYS IL]");
+        foreach (var instruction in baseOnEnable.Body.Instructions)
+            text.AppendLine("  " + FormatStep41Instruction(instruction));
+        foreach (var instruction in registerHotkeys.Body.Instructions)
+            text.AppendLine("  " + FormatStep41Instruction(instruction));
+
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59.0 GodotSharp handoff absent.")).GodotSharpAssembly;
+        var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("Godot.Node");
+        var descendants = EnumerateStep39NodeGraph(embark, nodeType);
+        text.AppendLine($"[LIVE EMBARK NCONFIRMBUTTON NODE GRAPH] nodes={descendants.Count}");
+        foreach (var item in descendants.Take(64))
+            text.AppendLine($"  {item.Path} | name={GetStep39NodeName(item.Node, 0)} | type={item.Node.GetType().FullName}");
+
+        var submenuStack = _step54SubmenuStack ?? throw new InvalidOperationException("Step 59.0 confirm-button diagnostics require retained NMainMenuSubmenuStack.");
+        var characterPackedField = RequireRuntimeExactInstanceField(submenuStack.GetType(), MainMenuCharacterSelectSceneFieldName, PackedSceneManagedTypeFullName, step);
+        var characterPacked = characterPackedField.GetValue(submenuStack)
+            ?? throw new InvalidDataException("Step 59.0 retained character-select PackedScene is null during confirm-button diagnostics.");
+        var embarkNodeName = GetStep39NodeName(embark, 0);
+        text.AppendLine("[CHARACTER-SELECT SCENESTATE EMBARK ROOT — ALL SERIALIZED PROPERTIES]");
+        text.AppendLine(DescribeStep59SceneState(characterPacked, [embarkNodeName], step, includeAllProperties: true));
+
+        var pck = RequireEssentialResourcePackHandoff().PackAbsolutePath;
+        RequireExactPckDirectoryResource(pck, CharacterSelectSceneResourcePath, step);
+        RequireExactPckDirectoryResource(pck, ConfirmButtonResourcePathForForensics, step);
+        var characterEntry = ExtractStartupLadderPckEntryUnpinned(pck, CharacterSelectSceneResourcePath, step);
+        var confirmEntry = ExtractStartupLadderPckEntryUnpinned(pck, ConfirmButtonResourcePathForForensics, step);
+        var characterText = new System.Text.UTF8Encoding(false, true).GetString(characterEntry.Bytes);
+        var confirmText = new System.Text.UTF8Encoding(false, true).GetString(confirmEntry.Bytes);
+        text.AppendLine($"Confirm-button TSCN bytes={confirmEntry.Bytes.Length}; sha256={Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(confirmEntry.Bytes)).ToLowerInvariant()}.");
+        text.AppendLine("[CHARACTER-SELECT TSCN EMBARK CONTEXT]");
+        text.AppendLine(BuildStep59TscnContext(characterText, embarkNodeName, 8, maxMatches: 8));
+        text.AppendLine("[CONFIRM-BUTTON TSCN OUTLINE CONTEXT]");
+        text.AppendLine(BuildStep59TscnContext(confirmText, "Outline", 5, maxMatches: 8));
+        text.AppendLine("[CONFIRM-BUTTON TSCN IMAGE CONTEXT]");
+        text.AppendLine(BuildStep59TscnContext(confirmText, "Image", 5, maxMatches: 8));
+
+        if (failures.Count == 0)
+            text.AppendLine("Definite OnEnable preflight blockers: <none>");
+        else
+            text.AppendLine("Definite OnEnable preflight blockers: " + string.Join(" | ", failures));
+        AppendStep59ConfirmButtonBlocker(failures);
+        return text.ToString().TrimEnd();
+    }
+
+    private string BuildStep59CompilationEfficientDiagnosticDeck(
+        object screen,
+        Step35ExecutionLoadContext context,
+        int step,
+        IReadOnlyDictionary<string, TypeDefinition> allTypes,
+        IReadOnlyDictionary<string, MethodDefinition> allMethods)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("[COMPILATION-EFFICIENT STEP-59 DIAGNOSTIC DECK]");
+        text.AppendLine("Purpose: maximize evidence per compiled IPA. This deck is observational only: no field writes, _Ready replay, OnEnable invocation, handler arm, rendering restart, or game-state repair.");
+
+        var embarkField = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), "_embarkButton", step);
+        var embark = embarkField.GetValue(screen);
+        if (embark is null)
+        {
+            text.AppendLine("Retained embark button is NULL; deeper confirm-button runtime sections are unavailable.");
+            return text.ToString().TrimEnd();
+        }
+
+        text.AppendLine(BuildStep59FullInheritedFieldMatrix(embark, "RETAINED EMBARK FULL INHERITED FIELD MATRIX"));
+        text.AppendLine(BuildStep59RuntimeAccessorSnapshot(embark, step));
+        text.AppendLine(BuildStep59ConfirmButtonPeerMatrix(embark, context, step));
+        text.AppendLine(BuildStep59NullFieldCandidateMatrix(embark, step));
+
+        try
+        {
+            var confirmType = RequireStartupLadderType(allTypes, ConfirmButtonManagedTypeFullNameForForensics, step);
+            var ready = RequireUniqueZeroArgBodyMethodForStep59(confirmType, "_Ready", step);
+            var onEnable = RequireUniqueZeroArgBodyMethodForStep59(confirmType, "OnEnable", step);
+            var nButtonType = RequireStartupLadderType(allTypes, NButtonManagedTypeFullNameForForensics, step);
+            var baseOnEnable = RequireUniqueZeroArgBodyMethodForStep59(nButtonType, "OnEnable", step);
+            var registerHotkeys = RequireUniqueZeroArgBodyMethodForStep59(nButtonType, "RegisterHotkeys", step);
+            var clickableType = RequireStartupLadderType(allTypes, ClickableControlManagedTypeFullNameForForensics, step);
+            var enable = clickableType.Methods.SingleOrDefault(method => method.Name == "Enable" && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody);
+            var characterType = RequireStartupLadderType(allTypes, CharacterSelectScreenManagedTypeFullName, step);
+            var opened = characterType.Methods.SingleOrDefault(method => method.Name == "OnSubmenuOpened" && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody);
+
+            text.AppendLine(BuildStep59FieldAccessAndCallOrder(ready, "NCONFIRMBUTTON _READY FIELD/CALL ORDER"));
+            text.AppendLine(BuildStep59FieldAccessAndCallOrder(onEnable, "NCONFIRMBUTTON ONENABLE FIELD/CALL ORDER"));
+            text.AppendLine(BuildStep59FieldAccessAndCallOrder(baseOnEnable, "NBUTTON ONENABLE FIELD/CALL ORDER"));
+            text.AppendLine(BuildStep59FieldAccessAndCallOrder(registerHotkeys, "NBUTTON REGISTERHOTKEYS FIELD/CALL ORDER"));
+            if (enable is not null)
+                text.AppendLine(BuildStep59FieldAccessAndCallOrder(enable, "NCLICKABLECONTROL ENABLE FIELD/CALL ORDER"));
+            if (opened is not null)
+                text.AppendLine(BuildStep59FieldAccessAndCallOrder(opened, "NCHARACTERSELECTSCREEN ONSUBMENUOPENED FIELD/CALL ORDER"));
+
+            var guards = _step48LifecycleGuardAuthority ?? throw new InvalidOperationException("Step 59.0 diagnostic deck requires retained Step-48 runtime guards.");
+            foreach (var root in new[] { ready, onEnable, baseOnEnable, registerHotkeys, enable, opened }.Where(method => method is not null).Cast<MethodDefinition>())
+            {
+                try
+                {
+                    var audit = AuditStartupLadderInvocationFrontier([root], allTypes, allMethods, guards);
+                    text.AppendLine($"[TRANSITIVE EXECUTION FRONTIER — {root.DeclaringType.FullName}.{root.Name}]");
+                    text.AppendLine(BuildStartupLadderInvocationFrontierAppendix(audit));
+                }
+                catch (Exception ex)
+                {
+                    text.AppendLine($"[TRANSITIVE EXECUTION FRONTIER — {root.DeclaringType.FullName}.{root.Name}] audit-failed={ex.GetType().FullName}: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            text.AppendLine($"Static IL/frontier deck failed non-fatally: {ex.GetType().FullName}: {ex.Message}");
+        }
+
+        text.AppendLine("Deck boundary: observational only; direct field repair, _Ready replay, direct OnEnable invocation, character selection, confirm/embark, run start, and Step 63+ remain unopened.");
+        return text.ToString().TrimEnd();
+    }
+
+    private string BuildStep59PostFailureRuntimeDiagnosticDeck(object screen, Step35ExecutionLoadContext context, int step)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("Purpose: capture runtime deltas immediately after an original-handler failure, before managed control returns to the UI.");
+        var embarkField = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), "_embarkButton", step);
+        var embark = embarkField.GetValue(screen);
+        if (embark is null)
+            return "Retained _embarkButton became NULL after handler failure.";
+        text.AppendLine(BuildStep59FullInheritedFieldMatrix(embark, "POSTFAIL EMBARK FULL INHERITED FIELD MATRIX"));
+        text.AppendLine(BuildStep59RuntimeAccessorSnapshot(embark, step));
+        text.AppendLine(BuildStep59ConfirmButtonPeerMatrix(embark, context, step));
+        text.AppendLine(BuildStep59NullFieldCandidateMatrix(embark, step));
+        return text.ToString().TrimEnd();
+    }
+
+    private static MethodDefinition RequireUniqueZeroArgBodyMethodForStep59(TypeDefinition type, string name, int step)
+        => type.Methods.SingleOrDefault(method => method.Name == name && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == 0 && method.HasBody)
+            ?? throw new MissingMethodException(type.FullName, $"Step {step}.0 {name}()");
+
+    private static string BuildStep59FullInheritedFieldMatrix(object instance, string heading)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("[" + heading + "]");
+        for (var type = instance.GetType(); type is not null; type = type.BaseType)
+        {
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
+                .Where(field => !field.IsStatic)
+                .OrderBy(field => field.Name, StringComparer.Ordinal)
+                .ToArray();
+            if (fields.Length == 0)
+                continue;
+            text.AppendLine($"  declaringType={type.FullName}");
+            foreach (var field in fields)
+            {
+                try
+                {
+                    text.AppendLine($"    {field.FieldType.FullName} {field.Name}={DescribeStep59RuntimeValue(field.GetValue(instance))}");
+                }
+                catch (Exception ex)
+                {
+                    text.AppendLine($"    {field.FieldType.FullName} {field.Name}=<read-failed:{ex.GetType().Name}:{ex.Message}>");
+                }
+            }
+        }
+        return text.ToString().TrimEnd();
+    }
+
+    private static string BuildStep59RuntimeAccessorSnapshot(object instance, int step)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("[RETAINED EMBARK OBSERVATIONAL ACCESSORS]");
+        foreach (var methodName in new[] { "IsInsideTree", "IsNodeReady", "IsVisibleInTree", "GetViewport", "GetTree", "GetParent", "GetOwner" })
+        {
+            try
+            {
+                var method = EnumerateRuntimeMethodsForOwnership(instance.GetType())
+                    .FirstOrDefault(method => method.Name == methodName && !method.IsGenericMethod && method.GetParameters().Length == 0);
+                if (method is null)
+                {
+                    text.AppendLine($"  {methodName}()=<method-absent>");
+                    continue;
+                }
+                var value = method.Invoke(instance, null);
+                text.AppendLine($"  {methodName}()={DescribeStep59RuntimeValue(value)}");
+            }
+            catch (TargetInvocationException tie) when (tie.InnerException is not null)
+            {
+                text.AppendLine($"  {methodName}()=<inner-exception:{tie.InnerException.GetType().FullName}:{tie.InnerException.Message}>");
+            }
+            catch (Exception ex)
+            {
+                text.AppendLine($"  {methodName}()=<exception:{ex.GetType().FullName}:{ex.Message}>");
+            }
+        }
+        return text.ToString().TrimEnd();
+    }
+
+    private string BuildStep59ConfirmButtonPeerMatrix(object embark, Step35ExecutionLoadContext context, int step)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("[LIVE NCONFIRMBUTTON PEER MATRIX — WHOLE RETAINED SCENETREE]");
+        try
+        {
+            var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59.0 GodotSharp handoff absent.")).GodotSharpAssembly;
+            var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false) ?? throw new MissingMemberException("Godot.Node");
+            var root = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 59.0 retained SceneTree root is absent.");
+            var nodes = EnumerateStep39NodeGraph(root, nodeType);
+            var confirmType = embark.GetType();
+            var peers = nodes.Where(item => confirmType.IsInstanceOfType(item.Node)).Take(128).ToArray();
+            text.AppendLine($"  peers={peers.Length}; exactRuntimeType={confirmType.FullName}; selectedContext={ReferenceEquals(AssemblyLoadContext.GetLoadContext(confirmType.Assembly), context)}");
+            foreach (var peer in peers)
+            {
+                text.Append($"  path={peer.Path}; type={peer.Node.GetType().FullName}");
+                foreach (var fieldName in new[] { "_outline", "_buttonImage", "_viewport", "_hotkeys", "_moveTween", "_isEnabled", "_controllerHotkeyIcon" })
+                {
+                    try
+                    {
+                        var field = RequireRuntimeInstanceFieldForOwnership(peer.Node.GetType(), fieldName, step);
+                        text.Append($"; {fieldName}={DescribeStep59RuntimeValue(field.GetValue(peer.Node))}");
+                    }
+                    catch (Exception ex)
+                    {
+                        text.Append($"; {fieldName}=<unavailable:{ex.GetType().Name}>");
+                    }
+                }
+                try { text.Append($"; insideTree={InvokeRuntimeBoolForForensics(peer.Node, "IsInsideTree", step)}"); } catch { text.Append("; insideTree=<error>"); }
+                try { text.Append($"; nodeReady={InvokeRuntimeBoolForForensics(peer.Node, "IsNodeReady", step)}"); } catch { text.Append("; nodeReady=<error>"); }
+                text.AppendLine();
+            }
+            if (peers.Length == 0)
+                text.AppendLine("  <no live NConfirmButton peers found>");
+        }
+        catch (Exception ex)
+        {
+            text.AppendLine($"  peer-matrix-failed={ex.GetType().FullName}: {ex.Message}");
+        }
+        return text.ToString().TrimEnd();
+    }
+
+    private string BuildStep59NullFieldCandidateMatrix(object embark, int step)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("[NULL-FIELD LIVE NODE CANDIDATE MATRIX]");
+        try
+        {
+            var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59.0 GodotSharp handoff absent.")).GodotSharpAssembly;
+            var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false) ?? throw new MissingMemberException("Godot.Node");
+            var nodes = EnumerateStep39NodeGraph(embark, nodeType);
+            foreach (var fieldName in new[] { "_outline", "_buttonImage", "_viewport", "_hotkeys", "_controllerHotkeyIcon" })
+            {
+                try
+                {
+                    var field = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), fieldName, step);
+                    var current = field.GetValue(embark);
+                    if (current is not null)
+                    {
+                        text.AppendLine($"  {fieldName}: already-bound={DescribeStep59RuntimeValue(current)}");
+                        continue;
+                    }
+                    var candidates = nodes.Where(item => field.FieldType.IsInstanceOfType(item.Node)).Take(32).ToArray();
+                    text.AppendLine($"  {fieldName}: NULL; fieldType={field.FieldType.FullName}; descendantCandidates={candidates.Length}");
+                    foreach (var candidate in candidates)
+                        text.AppendLine($"    {candidate.Path} | name={GetStep39NodeName(candidate.Node, 0)} | type={candidate.Node.GetType().FullName}");
+                }
+                catch (Exception ex)
+                {
+                    text.AppendLine($"  {fieldName}: candidate-scan-failed={ex.GetType().FullName}: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            text.AppendLine($"  matrix-failed={ex.GetType().FullName}: {ex.Message}");
+        }
+        return text.ToString().TrimEnd();
+    }
+
+    private static string BuildStep59FieldAccessAndCallOrder(MethodDefinition method, string heading)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("[" + heading + "]");
+        foreach (var instruction in method.Body.Instructions)
+        {
+            var include = instruction.OpCode.Code is Code.Ldfld or Code.Ldflda or Code.Stfld or Code.Call or Code.Callvirt or Code.Newobj or Code.Ldstr or Code.Brtrue or Code.Brtrue_S or Code.Brfalse or Code.Brfalse_S;
+            if (!include)
+                continue;
+            text.AppendLine($"  IL_{instruction.Offset:X4}: {FormatStep41Instruction(instruction)}");
+        }
+        return text.ToString().TrimEnd();
+    }
+
+    private void AppendStep59ConfirmButtonBlocker(IReadOnlyCollection<string> failures)
+    {
+        if (failures.Count == 0)
+            return;
+        var detail = "confirm-button preflight: " + string.Join(" | ", failures);
+        _step59ReadyBindingBlocker = string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker)
+            ? detail
+            : _step59ReadyBindingBlocker + " | " + detail;
+    }
+
+    private static string DescribeStep59RuntimeValue(object? value)
+    {
+        if (value is null)
+            return "NULL";
+        if (value is Array array)
+            return $"{value.GetType().FullName}[Length={array.Length}]";
+        if (value is bool boolean)
+            return $"System.Boolean:{boolean}";
+        var type = value.GetType();
+        if (type.IsValueType || value is string)
+            return $"{type.FullName}:{value}";
+        return type.FullName ?? type.Name;
+    }
+
+    private static void RequireStep59FieldStore(MethodDefinition method, string fieldName, int step)
+    {
+        if (!method.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Stfld && instruction.Operand is FieldReference field && field.Name == fieldName))
+            throw new InvalidDataException($"Step {step}.0 selected {method.DeclaringType.FullName}.{method.Name} no longer stores {fieldName}.");
+    }
+
+    private static void RequireStep59FieldLoad(MethodDefinition method, string fieldName, int step)
+    {
+        if (!method.Body.Instructions.Any(instruction => instruction.OpCode.Code == Code.Ldfld && instruction.Operand is FieldReference field && field.Name == fieldName))
+            throw new InvalidDataException($"Step {step}.0 selected {method.DeclaringType.FullName}.{method.Name} no longer loads {fieldName}.");
+    }
+
+
     private string BuildStep59UniqueNameProvenanceDiagnostics(
         object liveCharacterScreen,
         Step35ExecutionLoadContext context,
@@ -1117,7 +1540,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return text.ToString().TrimEnd();
     }
 
-    private static string DescribeStep59SceneState(object packedScene, IReadOnlyCollection<string> targetNames, int step)
+    private static string DescribeStep59SceneState(object packedScene, IReadOnlyCollection<string> targetNames, int step, bool includeAllProperties = false)
     {
         var getState = packedScene.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .SingleOrDefault(method => method.Name == "GetState" && !method.IsGenericMethod && method.GetParameters().Length == 0)
@@ -1169,11 +1592,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             for (var p = 0; p < propertyCount; p++)
             {
                 var propName = InvokeStep59DiagnosticMethod(getPropertyName, state, [i, p], step, "SceneState.GetNodePropertyName")?.ToString() ?? "<null>";
-                if (!string.Equals(propName, "unique_name_in_owner", StringComparison.Ordinal) &&
+                if (!includeAllProperties &&
+                    !string.Equals(propName, "unique_name_in_owner", StringComparison.Ordinal) &&
                     !string.Equals(propName, "script", StringComparison.Ordinal))
                     continue;
                 var propValue = InvokeStep59DiagnosticMethod(getPropertyValue, state, [i, p], step, "SceneState.GetNodePropertyValue");
-                properties.Add(propName + "=" + FormatStep59DiagnosticValue(propValue));
+                properties.Add(propName + "=" + (includeAllProperties ? FormatStep59DiagnosticValueVerbose(propValue) : FormatStep59DiagnosticValue(propValue)));
             }
             lines.Add($"name={name}; path={pathValue?.ToString() ?? "<null>"}; ownerPath={ownerPath}; type={nodeType}; instance={(instance is null ? "NO" : "YES:" + (instance.GetType().FullName ?? "<unknown>"))}; properties=[{string.Join(",", properties)}]");
         }
@@ -1331,6 +1755,20 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             return method?.Invoke(instance, null)?.ToString() ?? "<unreadable>";
         }
         catch (Exception ex) { return "<error:" + ex.GetType().Name + ">"; }
+    }
+
+    private static string FormatStep59DiagnosticValueVerbose(object? value)
+    {
+        if (value is null)
+            return "<null>";
+        try
+        {
+            return $"{value.GetType().FullName}:{value}";
+        }
+        catch (Exception ex)
+        {
+            return $"{value.GetType().FullName}:<format-error:{ex.GetType().Name}>";
+        }
     }
 
     private static string FormatStep59DiagnosticValue(object? value)

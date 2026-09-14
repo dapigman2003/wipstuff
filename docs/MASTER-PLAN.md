@@ -1,24 +1,12 @@
-## Current frontier — Steps 58–62 / 0.0.200
+## Current frontier — Steps 58–62 / 0.0.201
 
-**Active candidate — 0.0.200 host-regression-corrected PackedScene instanced-root unique-name compatibility.** Physical authority remains
-formally closed through Step 57 4/4/frozen. Physical 0.0.198 proves exact TSCN and retained `PackedScene.GetState()`
-data preserve `unique_name_in_owner=true`, while a fresh off-tree `PackedScene.Instantiate(GenEditState)` loses that
-property specifically on roots of instanced subscenes. Ordinary nodes in the same scenes preserve the property, and
-retained live nodes match the temporary instances. The defect therefore occurs during scene instantiation/property
-application, before SceneTree admission and before StS2 managed `_Ready()` callbacks.
+**Active candidate — 0.0.201 NConfirmButton OnEnable-preflight PackedScene instanced-root unique-name compatibility.** Physical authority remains formally closed through Step 57 4/4/frozen. Physical 0.0.200 proves the 0.0.199/0.0.200 correction in the **private Godot managed compatibility boundary**: `PackedScene.Instantiate(GenEditState)` now preserves the parent-scene `unique_name_in_owner=true` overrides on instanced-subscene roots, and the formerly missing character-select/NGame Ready-bound fields are populated.
 
-0.0.200 retains the 0.0.199 runtime correction in the **private Godot managed compatibility boundary** and corrects the host fixture/evidence contract without widening runtime behavior. A separately verified
-GodotSharp derivative wraps `PackedScene.Instantiate(GenEditState)` and reconciles only SceneState entries that are
-both instanced-subscene roots and explicitly `unique_name_in_owner=true`, before the new scene root is returned.
-No StS2 field, scene owner, `_Ready()` callback, TSCN/PCK byte, or trusted runtime file is patched.
+The next failure is later and narrower. Original `OpenCharacterSelect` reaches `NSubmenuStack.Push` → `NCharacterSelectScreen.OnSubmenuOpened()` → `_embarkButton.Enable()` and throws from `NConfirmButton.OnEnable()`. 0.0.201 retains `PackedScene.Instantiate(GenEditState)` compatibility behavior unchanged and adds only a fail-closed pre-handler forensic boundary around that retained `NConfirmButton`: live `_Ready` products (`_outline`, `_buttonImage`, `_viewport`, `_hotkeys`), exact selected IL, child graph, SceneState properties, and exact TSCN context. A definite missing prerequisite blocks before the one-shot handler is armed.
 
-Step 59 retains the full ready/provenance audit as post-correction proof. If the prior metadata loss is fixed, normal
-NGame/main-menu/character-select lifecycle should populate the fields that were previously null and the original
-game-owned character-select transition can proceed. If a different earlier lifecycle boundary appears, the ladder
-still stops on that first failure.
+Compilation efficiency is now a first-class constraint. One 0.0.201 IPA must support multiple cheap device experiments: **Step 59D** performs the expanded observational deck and stops before Gate C; the separate normal Step 59 run is used only from a fresh process if the Step59D evidence warrants it. The deck includes full inherited fields, whole-SceneTree confirm-button peers, observational accessors, null-field candidate nodes, Ready/Enable field-call ordering, and transitive frontiers. A failed real handler automatically adds a post-failure runtime deck to the durable map before UI return.
 
-This is the desired long-term direction: fix a proven host/runtime semantic mismatch once beneath the game, then let
-the original StS2/Godot lifecycle own scene state and navigation.
+No direct NConfirmButton field write, manual `_Ready()`, scene-owner mutation, StS2 TSCN/PCK mutation, or speculative `OnEnable` bypass is authorized. Steps 60–62 remain available only after a clean original transition. Step 63 remains unopened.
 
 ## Strategic architecture revision — startup convergence
 

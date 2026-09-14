@@ -1,23 +1,17 @@
-# Documentation index — active Steps 58–62 / 0.0.195
+# Documentation index — active Steps 58–62 / 0.0.201
 
-Active candidate: **0.0.200 (200)**. Physical authority is closed through Step 57. Physical **0.0.194** proved the retained single-player submenu was already logically bound and the real standard button was supplied before original `OpenCharacterSelect`, yet the original handler still threw `NullReferenceException`.
+Active candidate: **0.0.201 (201)**. Physical authority remains formally closed through Step 57, while physical **0.0.200** is the latest Step-59 diagnostic result. It confirms the global PackedScene unique-name compatibility correction: the audited instanced-subscene roots now retain `unique_name_in_owner=true` in temporary and live scenes. The original `OpenCharacterSelect` transition then reaches `NCharacterSelectScreen.OnSubmenuOpened()` and fails at `NConfirmButton.OnEnable()` while enabling the retained `_embarkButton`.
 
-Static analysis now proves the cached `NCharacterSelectScreen` being hidden, in-tree, parented by the main-menu stack, and logically unbound is the game's normal preload state. 0.0.195 therefore adds no guessed character-select repair. Step 59 first checkpoints scene readiness, critical character/ascension fields, NGame service nodes, SaveManager progress internals, and RootSceneContainer ownership. On handler failure it records the original inner game TargetSite/stack and post-failure lobby/player/screen state. Steps 60–62 remain unavailable unless the real handler succeeds. Step 63 remains unopened.
+0.0.201 keeps the PackedScene compatibility path unchanged and turns the new frontier into a compilation-efficient multi-run diagnostic platform. **Step 59D** is the recommended first phone experiment: it executes only Gates A+B and never arms the handler. Gate B records the live embark button's `_Ready` products (`_outline`, `_buttonImage`, `_viewport`, `_hotkeys`), complete inherited field matrix, whole-SceneTree `NConfirmButton` peer comparison, observational accessors, null-field live-node candidates, selected `_Ready`/`OnEnable`/base-button IL plus field/call order and transitive frontiers, live child graph, serialized SceneState properties, and exact TSCN context. The same IPA retains a separate fresh-process real Step-59 transition, and any failure automatically appends a post-failure runtime deck to the durable static map. A definite missing prerequisite prevents Gate C from arming the one-shot handler. Steps 60–62 remain unavailable unless Step 59 closes cleanly. Step 63 remains unopened.
 
 Primary authority:
 
 - `CURRENT-STATUS.md` — current physical frontier and exact device sequence.
 - `MASTER-PLAN.md` — product objective, authority model, and roadmap.
-- `TESTING.md` — static/Codemagic/device procedure for 0.0.195.
+- `TESTING.md` — static/Codemagic/device procedure for 0.0.201.
 - `RELEASE-CHECKLIST.md` — release-quality and packaging requirements.
 - `REPORTS.md` — evidence surface contracts.
 - `REGRESSION-CONTRACTS.md` — protected historical contracts.
 - `history/INDEX.md` — evidence/design provenance.
 
-Physical 0.0.190–0.0.192 established that the real character-select cache may already exist, be in-tree, and still be logically unbound. Physical 0.0.193 then reached real `OpenCharacterSelect` and failed immediately after arm; the selected handler IL does not read the explicit button argument and begins by dereferencing `NSingleplayerSubmenu._stack`. 0.0.195 restores that skipped game-owned navigation state narrowly, then continues to active-screen audit and the 2-second/10-second visible render trials.
-
-
-0.0.196 specifically localizes the `%AscensionPanel` ready-binding failure before any Step-59 handler arm.
-
-
-0.0.200 retains the 0.0.199 global scene-compatibility correction, with a corrected host regression fixture and live evidence wording: a private GodotSharp `PackedScene.Instantiate` hook restores only serialized instanced-root `unique_name_in_owner=true` overrides before game lifecycle callbacks run.
+Physical 0.0.193–0.0.198 progressively localized the Step-59 transition and instanced-root unique-name loss. 0.0.199 introduced the narrow GodotSharp `PackedScene.Instantiate` compatibility boundary; 0.0.200 physically proves that correction reaches the retained game scenes, then localizes the next failure to the embark `NConfirmButton.OnEnable()` path. 0.0.201 is diagnostic/preflight-first at that new frontier, with Step 59D and the separate real-handler experiment intentionally split so multiple cheap phone runs can reuse one expensive compilation.

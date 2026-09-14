@@ -14,16 +14,18 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT SUSTAINED RENDER RESIDENCY");
 
     private UIButton? _step58Button; private UIButton? _step59Button; private UIButton? _step60Button; private UIButton? _step61Button; private UIButton? _step62Button;
+    private UIButton? _step59DiagnosticDeckButton;
     private UILabel? _step58ResultLabel; private UILabel? _step59ResultLabel; private UILabel? _step60ResultLabel; private UILabel? _step61ResultLabel; private UILabel? _step62ResultLabel;
     private UILabel? _step58DetailLabel; private UILabel? _step59DetailLabel; private UILabel? _step60DetailLabel; private UILabel? _step61DetailLabel; private UILabel? _step62DetailLabel;
-    private bool _step59TransitionUiStarted; private bool _step61PulseUiStarted; private bool _step62PulseUiStarted;
+    private UILabel? _step59DiagnosticDeckResultLabel; private UILabel? _step59DiagnosticDeckDetailLabel;
+    private bool _step59TransitionUiStarted; private bool _step59DiagnosticDeckUiStarted; private bool _step61PulseUiStarted; private bool _step62PulseUiStarted;
 
     private void AddCharacterSelectContinuationControls(UIStackView content)
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Requires the physically proven Step 57 extension in the same fresh process. Physical 0.0.195 localized the current blocker before handler arm: NCharacterSelectScreen IsNodeReady=true and _charButtonContainer is populated, but _ascensionPanel is null. Trusted game IL proves _Ready resolves %AscensionPanel immediately after the character-button container. Step 59 now compares that selected _Ready IL with the live descendant/type/load-context/unique-name graph and exact receipt-backed character-select + ascension-panel TSCN declarations. If the ready binding is unhealthy, Gate C stops before any Push/OpenCharacterSelect arm. Steps 60–62 remain locked unless the real handler succeeds. Step 63/continuous interactive ownership remains unopened.",
+            "Requires the physically proven Step 57 extension in the same fresh process. Physical 0.0.200 proved the PackedScene unique-name compatibility correction reaches the original character-select transition, which now fails inside retained embark NConfirmButton.OnEnable(). This 0.0.201 build is intentionally compilation-efficient: Step 59D gathers a deep no-mutation embark/button peer/field/IL/frontier/scene diagnostic deck and stops before the handler, while the normal Step 59 button remains available as a separate fresh-process real-transition experiment from the same compiled IPA. Any real-handler failure also captures a post-failure button matrix before returning. Steps 60–62 remain locked unless the real handler succeeds. Step 63/continuous interactive ownership remains unopened.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -32,10 +34,16 @@ public sealed partial class RootViewController
             "Requires Step 57.0 4/4. Rebinds exact OpenCharacterSelect(NButton), proves its button parameter is unused, records the actual _characterSelectSubmenu state whether absent/off-tree/in-tree/visible, and re-audits the whole real handler frontier without invoking it. No artificial null/off-tree prerequisite remains.");
         _step58Button.TouchUpInside += async (_, _) => await RunStep58StartupLadderAsync();
 
+        (_step59DiagnosticDeckButton, _step59DiagnosticDeckResultLabel, _step59DiagnosticDeckDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59D — compilation-efficient deep diagnostic deck (NO HANDLER)",
+            "Run Step 59D — DEEP DIAGNOSTICS ONLY", "STEP 59D DEEP DIAGNOSTIC DECK: LOCKED",
+            "Recommended first 0.0.201 phone run after Step 58. Executes only Step-59 Gates A+B, writes the full ready/unique-name/embark field matrix plus whole-SceneTree NConfirmButton peer comparison, observational accessors, null-field live-node candidates, exact IL field/call order, and transitive execution frontiers. It intentionally stops before NSubmenuStack.Push/OpenCharacterSelect; no one-shot handler arm, field write, _Ready replay, OnEnable call, render restart, character input, or embark action.");
+        _step59DiagnosticDeckButton.TouchUpInside += async (_, _) => await RunStep59DiagnosticDeckAsync();
+
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4. Physical 0.0.198 proved parent-scene unique-name overrides are lost during PackedScene instantiation only for roots of instanced subscenes. 0.0.199 applies the global private-GodotSharp Instantiate compatibility hook before any game Ready callback, then Gate B reruns the ready-field + SceneState/off-tree/live provenance audit as proof. Unhealthy state still blocks before any Push/OpenCharacterSelect arm. Rendering stays frozen.");
+            "Requires Step 58.0 4/4. This is the separate real-transition experiment from the same 0.0.201 IPA. Prefer Step 59D first and preserve its report. Gate B reruns the full deep diagnostic deck; unhealthy state blocks before any Push/OpenCharacterSelect arm. If the original handler is armed and still throws, 0.0.201 automatically captures a post-failure embark full-field/peer/null-candidate matrix and refreshes the durable static map before the UI returns. Rendering stays frozen.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,
@@ -91,9 +99,89 @@ public sealed partial class RootViewController
         finally { await FinishStartupLadderStepAsync(step, "Step58-TransformedRealStS2CharacterSelectOwnership.txt", "StS2 Launcher — Step 58.0 Character Select Runtime Ownership Audit", resultLabel, detailLabel, "Step 58 never invokes OpenCharacterSelect or restarts rendering."); }
     }
 
+    private bool TryPrepareStep59DiagnosticDeck(out UIButton button, out UILabel resultLabel, out UILabel detailLabel)
+    {
+        button = _step59DiagnosticDeckButton!;
+        resultLabel = _step59DiagnosticDeckResultLabel!;
+        detailLabel = _step59DiagnosticDeckDetailLabel!;
+        if (_statusLabel is null)
+            return false;
+        if (!CurrentReleasePresentation.BundleIdentityMatchesExpected)
+        {
+            SetStartupLadderRefusal(59, resultLabel, detailLabel, "RELEASE IDENTITY FAIL", "Built bundle identity does not match the source-pinned candidate.");
+            return false;
+        }
+        if (!_step58Gates.Snapshot().Passed || !_transformedRealStS2VeryEarlyInitialization.ExactStep58ClosurePassed)
+        {
+            SetStartupLadderRefusal(59, resultLabel, detailLabel, "PREREQUISITE NOT MET", "Step 59D requires Step 58.0 4/4 runtime-ownership authority in this same fresh process.");
+            return false;
+        }
+        if (GodotStep15NativeBridge.IsRenderingActive)
+        {
+            SetStartupLadderRefusal(59, resultLabel, detailLabel, "RENDERER MUST BE FROZEN", "Step 59D is observational and requires rendering stopped at entry.");
+            return false;
+        }
+        return true;
+    }
+
+    private async Task RunStep59DiagnosticDeckAsync()
+    {
+        const int step = 59;
+        if (_step59TransitionUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted)
+        {
+            SetStartupLadderRefusal(step, _step59DiagnosticDeckResultLabel!, _step59DiagnosticDeckDetailLabel!, "HANDLER ALREADY ARMED", "Step 59D must not run after the real Step-59 handler has armed in this process. Preserve reports and relaunch.");
+            return;
+        }
+        if (_step59DiagnosticDeckUiStarted)
+        {
+            SetStartupLadderRefusal(step, _step59DiagnosticDeckResultLabel!, _step59DiagnosticDeckDetailLabel!, "DIAGNOSTIC ALREADY RUN", "The deep diagnostic deck already ran in this process. Preserve its report; use a fresh process for the separate real-transition experiment.");
+            return;
+        }
+        if (!TryPrepareStep59DiagnosticDeck(out var button, out var resultLabel, out var detailLabel))
+            return;
+        if (!TryInitializeStartupLadderTelemetry(step, "Compilation-efficient Step-59 deep diagnostic deck", "Step59-DeepDiagnosticDeck-StaticMap", out var error))
+        {
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error);
+            return;
+        }
+        BeginSteamOperation(allowCancel: false);
+        _step59Gates.Reset();
+        _step59DiagnosticDeckUiStarted = true;
+        button.Enabled = false;
+        try
+        {
+            WriteStartupLadderCheckpoint(step, "RUN_START_DIAGNOSTIC_DECK — Step 59D compilation-efficient observational deck started. Gates A+B only; no Push/OpenCharacterSelect arm is permitted in this operation.");
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59D deep diagnostic map write failed: " + mapError);
+            _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten();
+            WriteStartupLadderCheckpoint(step, "M59D_B_STATIC_MAP_WRITE_RETURNED — complete compilation-efficient diagnostic deck durably written; handler arm=NO; mutation=NO; renderingStopped=True.");
+            resultLabel.Text = "STEP 59D: DIAGNOSTIC DECK COMPLETE / NO HANDLER ARMED";
+            resultLabel.TextColor = UIColor.SystemGreen;
+            detailLabel.Text = _transformedRealStS2VeryEarlyInitialization.Step59ReadyBindingPreflightPassed
+                ? "Deep preflight found no definite blocker. Preserve this report; the same compiled IPA can next run the separate real Step 59 transition in a fresh process if desired."
+                : "Deep preflight found a definite blocker and stopped without arming the handler. Preserve the static map/report; no real Step-59 transition is needed until the evidence is reviewed.";
+            if (_statusLabel is not null)
+            {
+                _statusLabel.Text = "STEP 59D COMPLETE — deep diagnostic evidence captured with no handler arm. Preserve reports; use a fresh process for any separate Step-59 transition run.";
+                _statusLabel.TextColor = UIColor.SystemGreen;
+            }
+            WriteStartupLadderCheckpoint(step, $"RUN_STEP59D_COMPLETE — handlerAuthorized={_transformedRealStS2VeryEarlyInitialization.Step59ReadyBindingPreflightPassed}; handlerArmed=False; directRepair=False; renderingStopped=True.");
+        }
+        catch (Exception ex)
+        {
+            HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: false);
+        }
+        finally
+        {
+            await FinishStartupLadderStepAsync(step, "Step59D-CompilationEfficientDeepDiagnosticDeck.txt", "StS2 Launcher — Step 59D Compilation-Efficient Deep Diagnostic Deck", resultLabel, detailLabel, "Step 59D never arms Push/OpenCharacterSelect, writes fields, replays _Ready/OnEnable, restarts rendering, or opens Step 63.");
+        }
+    }
+
     private async Task RunStep59StartupLadderAsync()
     {
         const int step = 59;
+        if (_step59DiagnosticDeckUiStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "FRESH PROCESS REQUIRED", "Step 59D already ran in this process. Preserve its observational evidence and relaunch before the separate real-handler Step 59 experiment."); return; }
         if (_step59TransitionUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "ONE-SHOT ALREADY ARMED", "Step 59 real handler was already armed in this process. Preserve reports and relaunch; never retry it in-process."); return; }
         if (!TryPrepareStartupLadderStep(step, _step58Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep58ClosurePassed,
                 "Step 59.0 requires Step 58.0 4/4 runtime-ownership authority in this same process.", out var button, out var resultLabel, out var detailLabel)) return;
@@ -107,9 +195,13 @@ public sealed partial class RootViewController
             if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException("Step 59 forensic preflight map write failed: " + preflightMapError);
             _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten(); WriteStartupLadderCheckpoint(step, "M59_B_STATIC_MAP_WRITE_RETURNED — ready-binding/scene/TSCN forensic evidence durably written before Gate C; no Push/OpenCharacterSelect mutation has armed.");
             if (_transformedRealStS2VeryEarlyInitialization.Step59HandlerInvocationRequired && _transformedRealStS2VeryEarlyInitialization.Step59ReadyBindingPreflightPassed) { _step59TransitionUiStarted = true; button.Enabled = false; }
-            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerTransition(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
-            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59 transition map refresh failed: " + mapError);
-            WriteStartupLadderCheckpoint(step, "M59_C_STATIC_MAP_REFRESH_RETURNED — successful game-owned transition evidence appended to the already-durable forensic map; rendering remains stopped.");
+            var transitionResult = _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerTransition(d => WriteStartupLadderCheckpoint(step, d));
+            var transitionPassed = RecordStartupLadderGate(_step59Gates, transitionResult, resultLabel, detailLabel);
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59 transition/post-failure map refresh failed: " + mapError);
+            WriteStartupLadderCheckpoint(step, transitionPassed
+                ? "M59_C_STATIC_MAP_REFRESH_RETURNED — successful game-owned transition evidence appended to the already-durable forensic map; rendering remains stopped."
+                : "M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED — failed original-handler evidence plus post-failure confirm-button runtime deck durably refreshed before UI return; rendering remains stopped.");
+            if (!transitionPassed) return;
             if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59FrozenPostTransitionConfinement(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
             CompleteStartupLadderStep(step, _step59Gates, resultLabel, detailLabel, "GAME-OWNED SUBMENU + CHARACTER-SELECT TRANSITION CLOSED 4/4. The real screen is visible/in-tree and logically bound; Step 60 active-surface audit is unlocked."); button.Enabled = false;
             WriteStartupLadderCheckpoint(step, "RUN_STEP59_4OF4 — game-owned submenu-stack binding and character-select transition/adoption closed; Step 60 actual active-screen audit unlocked.");

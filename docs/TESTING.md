@@ -1,6 +1,6 @@
 # Testing — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
 
-Active candidate: `0.0.200 (200)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.201 (201)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -56,9 +56,17 @@ No `SetUniqueNameInOwner`, live owner mutation, direct `_ascensionPanel` write, 
 closes 4/4.
 
 
-## 0.0.200 PackedScene compatibility expectations
+## 0.0.201 NConfirmButton OnEnable-preflight expectations
 
-0.0.200 keeps the 0.0.199 runtime hook unchanged, but the host synthetic GodotSharp fixture must expose `Godot.PackedScene.Instantiate(GenEditState)` and assert the serialized compatibility epilogue before Codemagic may proceed.
+0.0.201 keeps the physically proven 0.0.199/0.0.200 PackedScene runtime hook unchanged. In addition to the retained host fixture contract, Step 59 Gate B must complete the new retained-embark `NConfirmButton.OnEnable()` preflight before Gate C can arm.
+
+Physical 0.0.200 is the expected baseline: unique-name provenance should already be healthy, while the original transition failed in `NConfirmButton.OnEnable()`. On 0.0.201 require `M59_B_CONFIRM_BUTTON_PREFLIGHT` and preserve its static map. If `_outline`, `_buttonImage`, `_viewport`, `_hotkeys`, selected-context ownership, tree admission, or node-ready state is definitively absent, Gate C must not invoke `OpenCharacterSelect`. Do not manually call `_Ready()` or repair those fields. If the preflight is clean and the handler is armed, Step 59 remains one-shot for that process.
+
+### Compilation-efficient phone-run sequence
+
+Use **Step 59D first** after closing Step 58 in a fresh process. Require `RUN_START_DIAGNOSTIC_DECK`, `M59_B_CONFIRM_BUTTON_PREFLIGHT`, the `[COMPILATION-EFFICIENT STEP-59 DIAGNOSTIC DECK]` section, `[LIVE NCONFIRMBUTTON PEER MATRIX — WHOLE RETAINED SCENETREE]`, `[NULL-FIELD LIVE NODE CANDIDATE MATRIX]`, field/call-order sections, and one or more `[TRANSITIVE EXECUTION FRONTIER — ...]` sections. Require `M59D_B_STATIC_MAP_WRITE_RETURNED` and `RUN_STEP59D_COMPLETE`; there must be **no** `M59_C_HANDLER_ARMED`.
+
+Only after reviewing Step59D should the normal Step 59 button be used, and then only in a **new process using the same compiled IPA**. If that handler fails, require `M59_C_CONFIRM_BUTTON_POSTFAIL` and `M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED`; the refreshed map must contain `[POST-FAILURE CONFIRM-BUTTON RUNTIME DECK]`. This post-failure deck is evidence only and does not authorize in-process retry.
 
 The active model-bootstrap path now selects the verified GodotSharp compatibility derivative rather than exact
 prepared GodotSharp bytes. During GodotSharp load, the checkpoint must include

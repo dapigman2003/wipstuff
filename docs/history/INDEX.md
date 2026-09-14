@@ -577,3 +577,11 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-CHECKPOINT.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-STATIC-MAP.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-LAST-CHECKPOINT.txt`
+
+## Step 59 physical NConfirmButton OnEnable localization / 0.0.201 preflight
+
+- `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-REPORT.txt` — physical 0.0.200 Step-59 result: PackedScene unique-name compatibility is healthy, then original `OpenCharacterSelect` fails at `NConfirmButton.OnEnable()` through the retained embark button.
+- `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-CHECKPOINT.txt` — run-correlated one-shot transition journal including preflight, handler arm, inner game stack, post-failure exact logical-stack binding and one-player `StartRunLobby` state.
+- `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-STATIC-MAP.txt` — durable SceneState/off-tree/live unique-name proof plus selected Step-59 IL/frontier evidence.
+- `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-LAST-CHECKPOINT.txt` — normal run end with rendering frozen and explicit no-retry-after-arm warning.
+- `steps/STEP-59.7-NCONFIRMBUTTON-ONENABLE-PREFLIGHT-0.0.201.md` — keeps PackedScene compatibility unchanged and adds a fail-closed retained-embark Ready/OnEnable field/IL/node/SceneState/TSCN preflight before any new handler arm.
