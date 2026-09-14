@@ -578,6 +578,12 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-STATIC-MAP.txt`
 - `reports/STEP-59.0-PHYSICAL-0.0.198-FAIL-LAST-CHECKPOINT.txt`
 
+## Step 59.8 compilation-efficient callsite isolation / 0.0.202
+
+- `steps/STEP-59.8-COMPILATION-EFFICIENT-CALLSITE-TRACE-0.0.202.md` — records physical 0.0.201 retained-button/post-failure evidence and the compile-once 59D/59R/59U/59E/real-handler trace platform. Formal authority remains Step 57.
+- `reports/STEP-59D-PHYSICAL-0.0.201-PASS-REPORT.txt` / `...STATIC-MAP.txt` / `...CHECKPOINT.txt` — physical Step59D completed with no handler armed and no definite retained-button blocker.
+- `reports/STEP-59.0-PHYSICAL-0.0.201-FAIL-REPORT.txt` / `...STATIC-MAP.txt` / `...CHECKPOINT.txt` / `...LAST-CHECKPOINT.txt` — separate fresh-process real Step 59 reproduces the `NConfirmButton.OnEnable()` NRE, preserves clean retained-button fields, exact stack binding and one-player lobby state.
+
 ## Step 59 physical NConfirmButton OnEnable localization / 0.0.201 preflight
 
 - `reports/STEP-59.0-PHYSICAL-0.0.200-FAIL-REPORT.txt` — physical 0.0.200 Step-59 result: PackedScene unique-name compatibility is healthy, then original `OpenCharacterSelect` fails at `NConfirmButton.OnEnable()` through the retained embark button.

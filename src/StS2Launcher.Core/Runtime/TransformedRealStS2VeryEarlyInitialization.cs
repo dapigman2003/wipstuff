@@ -41,6 +41,9 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
     internal const string GodotSharpDiagnosticBridgeTypeFullName = "StS2Launcher.Step35Diagnostics.GodotSharpCheckpointBridge";
     internal const string GodotSharpDiagnosticBridgeCallbackFieldName = "Callback";
     internal const string GodotSharpPackedSceneCompatibilityCallbackFieldName = "PackedSceneInstantiateCompatibilityCallback";
+    internal const string Step59RuntimeTraceBridgeTypeFullName = "StS2Launcher.Step59Diagnostics.ConfirmButtonCheckpointBridge";
+    internal const string Step59RuntimeTraceBridgeCallbackFieldName = "Callback";
+    internal const string Step59RuntimeTraceMarkerPrefix = "STEP59TRACE_";
     internal const string NullPlatformTypeFullName = "MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy";
     internal const string NullPlatformConstructorFullName = "System.Void MegaCrit.Sts2.Core.Platform.Null.NullPlatformUtilStrategy::.ctor()";
     internal const string CommandLineHelperTypeFullName = "MegaCrit.Sts2.Core.Helpers.CommandLineHelper";
@@ -1573,6 +1576,10 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
         int step39SentryServiceStubCount;
         int step39SentryNestedStubCount;
         int step39ExternalSentryDelegateStubCount;
+        int step59RuntimeTraceMethodCount;
+        int step59RuntimeTraceMarkerCount;
+        string step59RuntimeTracePlan;
+        var step59RuntimeTraceMarkers = new List<(string MethodFullName, string Marker)>();
 
         using var resolver = new DiagnosticConstantMetadataWriteResolver();
         using (var module = ModuleDefinition.ReadModule(exactTransformedPath, new ReaderParameters
@@ -2138,6 +2145,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             }
             step39ExternalSentryDelegateStubCount = externalSentryDelegateHelpers.Length;
 
+            var step59Trace = AddStep59RuntimeTraceInstrumentation(module, allTypes, step59RuntimeTraceMarkers);
+            step59RuntimeTraceMethodCount = step59Trace.MethodCount;
+            step59RuntimeTraceMarkerCount = step59Trace.MarkerCount;
+            step59RuntimeTracePlan = step59Trace.Plan;
+
             module.Write(compatibilityPath, new WriterParameters { WriteSymbols = false });
             writeResolutionRequestCount = resolver.Requests.Count;
             writeResolutionIdentities = string.Join(" | ", resolver.Requests);
@@ -2325,6 +2337,41 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             if (serializedExternalSentryDelegateHelpers.Length != 0)
                 throw new InvalidDataException("Step-39.1 serialized compiler-generated Sentry delegate helpers still contain external Sentry method references: " + string.Join(" | ", serializedExternalSentryDelegateHelpers.Select(method => method.FullName)));
 
+            var serializedStep59Bridge = EnumerateTypes(verifyModule.Types).SingleOrDefault(type => type.FullName == Step59RuntimeTraceBridgeTypeFullName)
+                ?? throw new MissingMemberException(Step59RuntimeTraceBridgeTypeFullName);
+            var serializedStep59Callback = serializedStep59Bridge.Fields.SingleOrDefault(field => field.Name == Step59RuntimeTraceBridgeCallbackFieldName)
+                ?? throw new MissingFieldException(Step59RuntimeTraceBridgeTypeFullName, Step59RuntimeTraceBridgeCallbackFieldName);
+            if (!serializedStep59Callback.IsStatic || serializedStep59Callback.FieldType.FullName != "System.Action`1<System.String>")
+                throw new InvalidDataException($"Step-59 serialized runtime trace callback signature drifted: {serializedStep59Callback.FieldType.FullName}.");
+            var serializedStep59Emit = serializedStep59Bridge.Methods.SingleOrDefault(method => method.Name == "Emit" && method.IsStatic && method.HasBody)
+                ?? throw new MissingMethodException(Step59RuntimeTraceBridgeTypeFullName, "Emit");
+            if (serializedStep59Emit.ReturnType.FullName != "System.Void" || serializedStep59Emit.Parameters.Count != 1 || serializedStep59Emit.Parameters[0].ParameterType.FullName != "System.String")
+                throw new InvalidDataException("Step-59 serialized runtime trace Emit signature drifted.");
+
+            var serializedStep59MarkerCount = EnumerateTypes(verifyModule.Types)
+                .SelectMany(type => type.Methods)
+                .Where(method => method.HasBody)
+                .SelectMany(method => method.Body.Instructions)
+                .Count(instruction => instruction.OpCode.Code == Code.Ldstr && instruction.Operand is string marker && marker.StartsWith(Step59RuntimeTraceMarkerPrefix, StringComparison.Ordinal));
+            if (serializedStep59MarkerCount != step59RuntimeTraceMarkerCount)
+                throw new InvalidDataException($"Step-59 serialized runtime trace marker count drifted: expected {step59RuntimeTraceMarkerCount}; observed {serializedStep59MarkerCount}.");
+            if (step59RuntimeTraceMarkers.Select(item => item.MethodFullName).Distinct(StringComparer.Ordinal).Count() != step59RuntimeTraceMethodCount)
+                throw new InvalidDataException("Step-59 runtime trace method inventory count drifted before serialized verification.");
+            foreach (var item in step59RuntimeTraceMarkers)
+            {
+                var method = EnumerateTypes(verifyModule.Types).SelectMany(type => type.Methods).SingleOrDefault(candidate => candidate.FullName == item.MethodFullName)
+                    ?? throw new MissingMethodException("Step-59 serialized runtime trace target missing: " + item.MethodFullName);
+                var markerInstructions = method.Body.Instructions.Where(instruction => instruction.OpCode.Code == Code.Ldstr && Equals(instruction.Operand, item.Marker)).ToArray();
+                if (markerInstructions.Length != 1 ||
+                    markerInstructions[0].Next?.OpCode.Code != Code.Call ||
+                    markerInstructions[0].Next?.Operand is not MethodReference markerEmit ||
+                    markerEmit.DeclaringType.FullName != Step59RuntimeTraceBridgeTypeFullName ||
+                    markerEmit.Name != "Emit")
+                {
+                    throw new InvalidDataException($"Step-59 serialized runtime trace marker drifted in {item.MethodFullName}: {item.Marker}.");
+                }
+            }
+
             if (verifyResolver.Requests.Count != 0)
                 throw new InvalidDataException("Step-36.0.5/Step-38.2 compatibility clone reopen unexpectedly resolved a dependency through Cecil.");
         }
@@ -2358,7 +2405,11 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             $"SentryService nested/compiler-helper methods replaced by inert default-return bodies: {step39SentryNestedStubCount:N0}\n" +
             $"External-Sentry compiler-generated delegate helpers outside SentryService inerted: {step39ExternalSentryDelegateStubCount:N0}\n" +
             "Sentry policy: disabled at the game-owned wrapper boundary; Gate B still rejects surviving external Sentry references outside the sealed inert surface\n" +
-            "Steam policy: cloud capability only forced FALSE; Steam initialization/native API remain forbidden and deferred";
+            "Steam policy: cloud capability only forced FALSE; Steam initialization/native API remain forbidden and deferred\n" +
+            "STEP 59.8 COMPILATION-EFFICIENT NCONFIRMBUTTON RUNTIME TRACE\n" +
+            $"Instrumented methods: {step59RuntimeTraceMethodCount:N0}\n" +
+            $"Stack-neutral durable markers: {step59RuntimeTraceMarkerCount:N0}\n" +
+            step59RuntimeTracePlan;
 
         return new DiagnosticCloneSnapshot(
             compatibilityPath,
@@ -2377,6 +2428,197 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization : IDispos
             approvedConstantScopeCount,
             approvedConstantRequirementCount,
             writeResolutionIdentities);
+    }
+
+
+    private static (int MethodCount, int MarkerCount, string Plan) AddStep59RuntimeTraceInstrumentation(
+        ModuleDefinition module,
+        IReadOnlyDictionary<string, TypeDefinition> allTypes,
+        ICollection<(string MethodFullName, string Marker)> markerInventory)
+    {
+        if (EnumerateTypes(module.Types).Any(type => type.FullName == Step59RuntimeTraceBridgeTypeFullName))
+            throw new InvalidDataException("Step-59 runtime trace bridge already exists in the selected sts2 compatibility image.");
+
+        var bridge = new TypeDefinition(
+            "StS2Launcher.Step59Diagnostics",
+            "ConfirmButtonCheckpointBridge",
+            Mono.Cecil.TypeAttributes.Class | Mono.Cecil.TypeAttributes.Abstract | Mono.Cecil.TypeAttributes.Sealed |
+            Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.BeforeFieldInit,
+            module.TypeSystem.Object);
+        module.Types.Add(bridge);
+
+        var systemRuntime = module.AssemblyReferences
+            .Where(reference => reference.Name == "System.Runtime")
+            .OrderByDescending(reference => reference.Version)
+            .FirstOrDefault()
+            ?? throw new InvalidDataException("Step-59 runtime trace bridge requires the existing System.Runtime metadata scope.");
+        var (actionStringType, invoke) = CreateDiagnosticActionStringInvokeReference(module, systemRuntime);
+        var callbackField = new FieldDefinition(
+            Step59RuntimeTraceBridgeCallbackFieldName,
+            Mono.Cecil.FieldAttributes.Public | Mono.Cecil.FieldAttributes.Static,
+            actionStringType);
+        bridge.Fields.Add(callbackField);
+
+        var emit = new MethodDefinition(
+            "Emit",
+            Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig,
+            module.TypeSystem.Void);
+        emit.Parameters.Add(new ParameterDefinition("marker", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
+        bridge.Methods.Add(emit);
+        var emitIl = emit.Body.GetILProcessor();
+        var haveCallback = Instruction.Create(OpCodes.Nop);
+        emitIl.Append(Instruction.Create(OpCodes.Ldsfld, callbackField));
+        emitIl.Append(Instruction.Create(OpCodes.Dup));
+        emitIl.Append(Instruction.Create(OpCodes.Brtrue_S, haveCallback));
+        emitIl.Append(Instruction.Create(OpCodes.Pop));
+        emitIl.Append(Instruction.Create(OpCodes.Ret));
+        emitIl.Append(haveCallback);
+        emitIl.Append(Instruction.Create(OpCodes.Ldarg_0));
+        emitIl.Append(Instruction.Create(OpCodes.Callvirt, invoke));
+        emitIl.Append(Instruction.Create(OpCodes.Ret));
+        var emitReference = module.ImportReference(emit);
+
+        var targets = new (string TypeName, string MethodName, int ParameterCount, string DisplayName)[]
+        {
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton", "OnEnable", 0, "NConfirmButton.OnEnable"),
+            ("MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton", "OnEnable", 0, "NButton.OnEnable"),
+            ("MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton", "RegisterHotkeys", 0, "NButton.RegisterHotkeys"),
+            ("MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton", "UpdateControllerButton", 0, "NButton.UpdateControllerButton"),
+            ("MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton", "get_HasControllerHotkey", 0, "NButton.get_HasControllerHotkey"),
+            ("MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton", "get_ControllerIconHotkey", 0, "NButton.get_ControllerIconHotkey"),
+            ("MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton", "get_Hotkeys", 0, "NButton.get_Hotkeys"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager", "get_Instance", 0, "NHotkeyManager.get_Instance"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager", "PushHotkeyPressedBinding", 2, "NHotkeyManager.PushHotkeyPressedBinding"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager", "PushHotkeyReleasedBinding", 2, "NHotkeyManager.PushHotkeyReleasedBinding"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager", "get_Instance", 0, "NInputManager.get_Instance"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager", "get_ControllerManager", 0, "NInputManager.get_ControllerManager"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager", "GetHotkeyIcon", 1, "NInputManager.GetHotkeyIcon"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager", "get_Instance", 0, "NControllerManager.get_Instance"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager", "get_IsUsingController", 0, "NControllerManager.get_IsUsingController"),
+            ("MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager", "GetHotkeyIcon", 1, "NControllerManager.GetHotkeyIcon"),
+            ("MegaCrit.Sts2.Core.Nodes.NGame", "get_Instance", 0, "NGame.get_Instance"),
+            ("MegaCrit.Sts2.Core.Nodes.NGame", "get_InputManager", 0, "NGame.get_InputManager"),
+            ("MegaCrit.Sts2.Core.Nodes.NGame", "get_HotkeyManager", 0, "NGame.get_HotkeyManager"),
+        };
+
+        var plan = new System.Text.StringBuilder();
+        plan.AppendLine("STEP 59.8 RUNTIME CALLSITE TRACE PLAN");
+        plan.AppendLine("Trace callback is null during normal startup and is armed only around explicit Step-59 diagnostic/probe operations. Markers are stack-neutral and preserve original call arguments/return values.");
+        var methodCount = 0;
+        var markerCount = 0;
+        foreach (var target in targets)
+        {
+            var type = allTypes.GetValueOrDefault(target.TypeName)
+                ?? throw new MissingMemberException(target.TypeName);
+
+            // Singleton Instance getters are static; all other selected targets are instance methods.
+            MethodDefinition[] candidates;
+            if (target.MethodName == "get_Instance")
+                candidates = type.Methods.Where(method => method.Name == target.MethodName && method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == target.ParameterCount && method.HasBody).ToArray();
+            else
+                candidates = type.Methods.Where(method => method.Name == target.MethodName && !method.IsStatic && !method.HasGenericParameters && method.Parameters.Count == target.ParameterCount && method.HasBody).ToArray();
+
+            if (candidates.Length != 1)
+                throw new InvalidDataException($"Step-59 runtime trace expected exactly one {target.TypeName}.{target.MethodName}/{target.ParameterCount}; observed {candidates.Length}.");
+            var method = candidates[0];
+            var added = InsertStep59RuntimeTraceMethodMarkers(method, emitReference, target.DisplayName, markerInventory);
+            markerCount = checked(markerCount + added);
+            methodCount++;
+            plan.AppendLine($"  {target.DisplayName}: token=0x{method.MetadataToken.ToUInt32():X8}; originalCalls={method.Body.Instructions.Count(instruction => instruction.OpCode.Code is (Code.Call or Code.Callvirt or Code.Newobj) && instruction.Operand is MethodReference callee && callee.DeclaringType.FullName != Step59RuntimeTraceBridgeTypeFullName)}; markers={added}");
+        }
+
+        if (methodCount != targets.Length || markerCount < methodCount * 2)
+            throw new InvalidDataException($"Step-59 runtime trace instrumentation was implausibly small: methods={methodCount}; markers={markerCount}.");
+        plan.AppendLine($"Methods instrumented: {methodCount}");
+        plan.AppendLine($"Durable trace markers: {markerCount}");
+        plan.AppendLine("No original game branch/call is removed or bypassed by this trace layer.");
+        return (methodCount, markerCount, plan.ToString().TrimEnd());
+    }
+
+    internal static int InsertStep59RuntimeTraceMethodMarkers(
+        MethodDefinition method,
+        MethodReference emitReference,
+        string displayName,
+        ICollection<(string MethodFullName, string Marker)> markerInventory)
+    {
+        if (!method.HasBody || method.Body.Instructions.Count == 0)
+            throw new InvalidDataException($"Step-59 runtime trace target has no IL: {method.FullName}.");
+
+        var originalInstructions = method.Body.Instructions.ToArray();
+        var il = method.Body.GetILProcessor();
+        var markerCount = 0;
+
+        void InsertBeforeWithRetarget(Instruction target, string marker)
+        {
+            var markerInstruction = Instruction.Create(OpCodes.Ldstr, marker);
+            il.InsertBefore(target, markerInstruction);
+            il.InsertBefore(target, Instruction.Create(OpCodes.Call, emitReference));
+            RetargetStep59TraceIncomingControlFlow(method, target, markerInstruction);
+            markerInventory.Add((method.FullName, marker));
+            markerCount++;
+        }
+
+        var entryMarker = $"{Step59RuntimeTraceMarkerPrefix}ENTRY — {displayName}";
+        InsertBeforeWithRetarget(originalInstructions[0], entryMarker);
+
+        var callsiteOrdinal = 0;
+        foreach (var instruction in originalInstructions)
+        {
+            if (instruction.OpCode.Code is not (Code.Call or Code.Callvirt or Code.Newobj) ||
+                instruction.Operand is not MethodReference callee ||
+                (callee.DeclaringType.FullName == Step59RuntimeTraceBridgeTypeFullName && callee.Name == "Emit"))
+            {
+                continue;
+            }
+
+            callsiteOrdinal++;
+            var beforeMarker = $"{Step59RuntimeTraceMarkerPrefix}{displayName} CALL#{callsiteOrdinal:D2} PRE — {instruction.OpCode.Name} {callee.FullName}";
+            var afterMarker = $"{Step59RuntimeTraceMarkerPrefix}{displayName} CALL#{callsiteOrdinal:D2} POST — {instruction.OpCode.Name} {callee.FullName}";
+            InsertBeforeWithRetarget(instruction, beforeMarker);
+            var afterText = Instruction.Create(OpCodes.Ldstr, afterMarker);
+            il.InsertAfter(instruction, afterText);
+            il.InsertAfter(afterText, Instruction.Create(OpCodes.Call, emitReference));
+            markerInventory.Add((method.FullName, afterMarker));
+            markerCount++;
+        }
+
+        var returnOrdinal = 0;
+        foreach (var instruction in originalInstructions.Where(instruction => instruction.OpCode.Code == Code.Ret))
+        {
+            returnOrdinal++;
+            InsertBeforeWithRetarget(instruction, $"{Step59RuntimeTraceMarkerPrefix}{displayName} RET#{returnOrdinal:D2}");
+        }
+
+        // Markers can execute with original arguments/return values already resident on the stack.
+        // Reserve exactly one additional evaluation-stack slot for the temporary marker string.
+        ReserveLiveStackDiagnosticMarkerSlot(method);
+        return markerCount;
+    }
+
+    private static void RetargetStep59TraceIncomingControlFlow(MethodDefinition method, Instruction originalTarget, Instruction markerTarget)
+    {
+        foreach (var instruction in method.Body.Instructions)
+        {
+            if (ReferenceEquals(instruction, markerTarget))
+                continue;
+            if (instruction.Operand is Instruction single && ReferenceEquals(single, originalTarget))
+            {
+                instruction.Operand = markerTarget;
+            }
+            else if (instruction.Operand is Instruction[] many && many.Any(target => ReferenceEquals(target, originalTarget)))
+            {
+                instruction.Operand = many.Select(target => ReferenceEquals(target, originalTarget) ? markerTarget : target).ToArray();
+            }
+        }
+
+        // Start boundaries should include the marker. End boundaries are exclusive and intentionally
+        // remain pointed at the original instruction so the injected marker does not silently widen them.
+        foreach (var handler in method.Body.ExceptionHandlers)
+        {
+            if (ReferenceEquals(handler.TryStart, originalTarget)) handler.TryStart = markerTarget;
+            if (ReferenceEquals(handler.HandlerStart, originalTarget)) handler.HandlerStart = markerTarget;
+            if (ReferenceEquals(handler.FilterStart, originalTarget)) handler.FilterStart = markerTarget;
+        }
     }
 
     private static DiagnosticCloneSnapshot CreateInstrumentedDiagnosticClone(string exactTransformedPath, string diagnosticPath, Step35DiagnosticMode diagnosticMode)

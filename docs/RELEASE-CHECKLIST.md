@@ -1,6 +1,6 @@
-# Release checklist — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
+# Release checklist — Steps 58–62 compilation-efficient Step-59 isolation / 0.0.202
 
-Release identity: display/build `0.0.201 (201)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Release identity: display/build `0.0.202 (202)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Require physical authority through **Step 57 4/4/frozen** to be preserved, including final Step-56/57 pass artifacts plus the physical 0.0.190–0.0.192 Step-58 localization evidence and physical 0.0.193 Step-59 localization evidence. The Physically Closed Path remains fresh-process-only and capped at Step 52.
 
@@ -14,7 +14,7 @@ Require the new block to preserve exact sequencing and authority:
 
 Step 59 is one-shot once its navigation repair and/or handler transition arms. Steps 61/62 are always one-shot after render arm. Character choice/confirm/embark/run-start, whole `GameStartup`/original `LaunchMainMenu`, cloud/migration/platform/Steam/deferred startup, native game extensions, trusted-install mutation, and Step 63+ remain unopened.
 
-Require exact 0.0.197 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
+Require exact 0.0.202 source/plist/release/shell identity; current active manifests regenerated; protected historical evidence unchanged; no proprietary StS2/native payload in source archive; `history.zip` rebuilt from `docs/history`; final ZIP integrity clean; canonical validator green in the release tree and fresh extraction.
 
 
 ## 0.0.196 forensic-ready requirements
@@ -70,3 +70,13 @@ Require exact 0.0.197 source/plist/release/shell identity; current active manife
 - Any real-handler failure captures `M59_C_CONFIRM_BUTTON_POSTFAIL` and refreshes the durable static map before UI return with `[POST-FAILURE CONFIRM-BUTTON RUNTIME DECK]`.
 - Live `_embarkButton` `_outline`, `_buttonImage`, `_viewport`, and `_hotkeys` are non-null prerequisites; any definite failure blocks Gate C without direct repair.
 - No direct NConfirmButton field write, manual `_Ready()`, or `OnEnable` bypass is introduced.
+
+## 0.0.202 compilation-efficiency requirements
+
+- Preserve physical 0.0.201 Step59D and real-handler evidence as diagnostic provenance; formal authority remains Step 57.
+- The private sts2 derivative contains one synthetic Step-59 trace bridge with a normally-null `Action<string>` callback and stack-neutral `STEP59TRACE_*` entry/call/return markers.
+- Trace instrumentation does not delete, replace, bypass, or reorder original game calls; host tests round-trip marker placement and branch retargeting.
+- Step 59R, 59U, 59E, Step59D, and real Step 59 are all present in the same IPA. 59R/59D are no-handler diagnostics; 59U/59E/real Step59 require fresh-process separation.
+- Real Step 59 disarms the trace callback before any post-failure forensic snapshot.
+- Step-59 whole-tree confirm-button peer enumeration may use a 4096-node diagnostic ceiling; historical/default Step39 traversal remains 256.
+- Trusted StS2/Godot payloads remain immutable and Step 63 remains unopened.

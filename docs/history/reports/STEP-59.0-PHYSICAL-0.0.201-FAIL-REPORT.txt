@@ -1,0 +1,51 @@
+StS2 Launcher — Step 59.0 Forensic Real OpenCharacterSelect Frozen Transition
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-14T01:48:36.1165350+00:00
+
+RESULT
+STEP 59.0 GLOBAL PACKEDSCENE UNIQUE-NAME COMPAT + REAL TRANSITION FAIL — 2/4
+
+METADATA
+App version: 0.0.201 (201)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Stage: initialization
+Exception depth 0: System.NullReferenceException
+  Message: Arg_NullReferenceException
+  HResult: 0x80004003
+  Source: sts2
+  TargetSite: MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::Void OnEnable()
+  StackTrace:
+       at MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton.OnEnable()
+       at MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl.Enable()
+       at MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen.OnSubmenuOpened()
+       at MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack.Push(NSubmenu screen)
+       at MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu.OpenCharacterSelect(NButton _)
+       at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+       at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+    --- End of stack trace from previous location ---
+       at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerTransition(Action`1 checkpoint)
+Base exception: System.NullReferenceException: Arg_NullReferenceException
+Base HResult: 0x80004003
+Base Source: sts2
+Base TargetSite: MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::Void OnEnable()
+Base StackTrace:
+     at MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton.OnEnable()
+     at MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl.Enable()
+     at MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen.OnSubmenuOpened()
+     at MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack.Push(NSubmenu screen)
+     at MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu.OpenCharacterSelect(NButton _)
+     at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+     at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+  --- End of stack trace from previous location ---
+     at StS2Launcher.Core.TransformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerTransition(Action`1 checkpoint)
+
+END OF REPORT

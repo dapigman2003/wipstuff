@@ -1,0 +1,6 @@
+StS2 Launcher — Step 59 last durable checkpoint
+Output-only diagnostic; overwrite-on-each-checkpoint convenience file.
+Run ID: 20260914T0148306295730Z-pid7955-a1e7dc28b63c4103831f74fa2e70691b
+Journal: Step59-CrashCheckpoint-20260914T0148306295730Z-pid7955-a1e7dc28b63c4103831f74fa2e70691b.txt
+Static map: Step59-RealOpenCharacterSelect-StaticMap-20260914T0148306295730Z-pid7955-a1e7dc28b63c4103831f74fa2e70691b.txt
+2026-09-14T01:48:36.1570970+00:00 | run=20260914T0148306295730Z-pid7955-a1e7dc28b63c4103831f74fa2e70691b | pid=7955 | managedThread=18 | RUN_END — Step-59 UI operation ended normally; Step 59 leaves rendering frozen. If the real handler was armed, never retry Step 59 in-process.

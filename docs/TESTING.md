@@ -1,6 +1,6 @@
-# Testing — Steps 58–62 unique-name provenance forensics / visible-render trial / 0.0.198
+# Testing — Steps 58–62 compilation-efficient Step-59 callsite isolation / 0.0.202
 
-Active candidate: `0.0.201 (201)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
+Active candidate: `0.0.202 (202)`, IPA `StS2-Launcher-Steps-58-62.ipa`, workflow `ios-canonical`.
 
 Static/container validation proves source wiring, hashes, fail-stop sequencing, one-shot guards, evidence surfaces, release identity, provenance and payload/security policy. Codemagic is compile/AOT/link/package authority. Physical iPhone reports are runtime authority.
 
@@ -67,6 +67,14 @@ Physical 0.0.200 is the expected baseline: unique-name provenance should already
 Use **Step 59D first** after closing Step 58 in a fresh process. Require `RUN_START_DIAGNOSTIC_DECK`, `M59_B_CONFIRM_BUTTON_PREFLIGHT`, the `[COMPILATION-EFFICIENT STEP-59 DIAGNOSTIC DECK]` section, `[LIVE NCONFIRMBUTTON PEER MATRIX — WHOLE RETAINED SCENETREE]`, `[NULL-FIELD LIVE NODE CANDIDATE MATRIX]`, field/call-order sections, and one or more `[TRANSITIVE EXECUTION FRONTIER — ...]` sections. Require `M59D_B_STATIC_MAP_WRITE_RETURNED` and `RUN_STEP59D_COMPLETE`; there must be **no** `M59_C_HANDLER_ARMED`.
 
 Only after reviewing Step59D should the normal Step 59 button be used, and then only in a **new process using the same compiled IPA**. If that handler fails, require `M59_C_CONFIRM_BUTTON_POSTFAIL` and `M59_C_POSTFAIL_STATIC_MAP_REFRESH_RETURNED`; the refreshed map must contain `[POST-FAILURE CONFIRM-BUTTON RUNTIME DECK]`. This post-failure deck is evidence only and does not authorize in-process retry.
+
+## 0.0.202 compilation-efficient Step-59 sequence
+
+After Step 58 closes in a fresh process, prefer **59R first**. It runs Gates A+B and observational controller/hotkey singleton + icon lookup rehearsals while the internal callback records `STEP59TRACE_*` breadcrumbs; it must not call `Enable`, bind hotkeys, push a submenu, or invoke `OpenCharacterSelect`. Preserve the report and static map.
+
+Use the same IPA for follow-ups in separate fresh processes: **59U** isolates only inherited `NButton.UpdateControllerButton()` on the retained embark button; **59E** isolates the retained embark `Enable()` path; normal **Step 59** invokes the original game-owned transition once. 59U, 59E, and real Step 59 are mutating/one-shot diagnostics and must never be combined in one process. Step 59D remains available as the broad no-handler structural deck.
+
+For every traced branch require `M59_TRACE_ARMED`, one or more `STEP59TRACE_*` checkpoints, and `M59_TRACE_DISARMED`. The last PRE marker without a matching POST marker is the primary callsite localization signal. The real Step-59 failure path must disarm tracing before capturing the post-failure runtime deck so forensic getter traffic cannot contaminate the failure trace.
 
 The active model-bootstrap path now selects the verified GodotSharp compatibility derivative rather than exact
 prepared GodotSharp bytes. During GodotSharp load, the checkpoint must include

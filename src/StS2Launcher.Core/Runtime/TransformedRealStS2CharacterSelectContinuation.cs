@@ -106,7 +106,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step59UniqueNameProvenanceDiagnostics = string.Empty;
     private string _step59ConfirmButtonDiagnostics = string.Empty;
     private string _step59ConfirmButtonPostFailureDiagnostics = string.Empty;
+    private string _step59RuntimeTraceBridgeDiagnostics = string.Empty;
+    private string _step59ControllerSingletonRehearsalDiagnostics = string.Empty;
+    private string _step59UpdateControllerProbeDiagnostics = string.Empty;
+    private string _step59IsolatedEnableProbeDiagnostics = string.Empty;
     private bool _step59ReadyBindingPreflightPassed;
+    private bool _step59DiagnosticMutationProbeStarted;
     private object? _step58ObservedCharacterSelect;
     private CharacterSelectRuntimeState? _step58ObservedState;
     private bool _step58TransitionAlreadyComplete;
@@ -120,6 +125,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     public bool Step59TransitionStarted => _step59TransitionStarted;
     public bool Step59HandlerInvocationRequired => !_step58TransitionAlreadyComplete;
     public bool Step59ReadyBindingPreflightPassed => _step59ReadyBindingPreflightPassed;
+    public bool Step59DiagnosticMutationProbeStarted => _step59DiagnosticMutationProbeStarted;
     public bool Step61PulseStarted => _step61PulseStarted;
     public bool Step62PulseStarted => _step62PulseStarted;
 
@@ -171,7 +177,12 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59UniqueNameProvenanceDiagnostics = string.Empty;
         _step59ConfirmButtonDiagnostics = string.Empty;
         _step59ConfirmButtonPostFailureDiagnostics = string.Empty;
+        _step59RuntimeTraceBridgeDiagnostics = string.Empty;
+        _step59ControllerSingletonRehearsalDiagnostics = string.Empty;
+        _step59UpdateControllerProbeDiagnostics = string.Empty;
+        _step59IsolatedEnableProbeDiagnostics = string.Empty;
         _step59ReadyBindingPreflightPassed = false;
+        _step59DiagnosticMutationProbeStarted = false;
         _step58ObservedCharacterSelect = null;
         _step58ObservedState = null;
         _step58TransitionAlreadyComplete = false;
@@ -405,6 +416,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 _step59ReadyBindingDiagnostics = BuildStep59ReadyBindingDiagnostics(forensicScreen, context, step, allTypes);
                 _step59ConfirmButtonDiagnostics = BuildStep59ConfirmButtonOnEnableDiagnostics(forensicScreen, context, step, allTypes);
                 _step59ConfirmButtonDiagnostics += "\n\n" + BuildStep59CompilationEfficientDiagnosticDeck(forensicScreen, context, step, allTypes, allMethods);
+                _step59RuntimeTraceBridgeDiagnostics = BuildStep59RuntimeTraceBridgeDiagnostics(context, step);
                 _step59UniqueNameProvenanceDiagnostics = BuildStep59UniqueNameProvenanceDiagnostics(forensicScreen, context, step);
             }
             catch (Exception diagnosticEx)
@@ -417,6 +429,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             Checkpoint(checkpoint, "M59_B_FORENSIC_PREFLIGHT — " + SanitizeCheckpoint(_step59PreflightSnapshot));
             Checkpoint(checkpoint, $"M59_B_READY_BINDING_DIAGNOSIS — handlerAuthorized={_step59ReadyBindingPreflightPassed}; blocker={SanitizeCheckpoint(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}; {SanitizeCheckpoint(_step59ReadyBindingDiagnostics)}");
             Checkpoint(checkpoint, "M59_B_CONFIRM_BUTTON_PREFLIGHT — " + SanitizeCheckpoint(_step59ConfirmButtonDiagnostics));
+            Checkpoint(checkpoint, "M59_B_RUNTIME_TRACE_BRIDGE — " + SanitizeCheckpoint(_step59RuntimeTraceBridgeDiagnostics));
             Checkpoint(checkpoint, "M59_B_UNIQUE_NAME_PROVENANCE — " + SanitizeCheckpoint(_step59UniqueNameProvenanceDiagnostics));
             _step59TransitionBound = true;
             _step59StaticMap = "StS2 Launcher — Step 59.0 character-select ready-binding forensics + game-owned transition\n" +
@@ -432,6 +445,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 $"Ready-binding blocker: {(string.IsNullOrWhiteSpace(_step59ReadyBindingBlocker) ? "<none>" : _step59ReadyBindingBlocker)}\n" +
                 "[READY-BINDING DIAGNOSTICS]\n" + _step59ReadyBindingDiagnostics + "\n" +
                 "[CONFIRM-BUTTON ONENABLE PREFLIGHT]\n" + _step59ConfirmButtonDiagnostics + "\n" +
+                "[STEP-59 RUNTIME TRACE BRIDGE PREFLIGHT]\n" + _step59RuntimeTraceBridgeDiagnostics + "\n" +
                 "[UNIQUE-NAME PROVENANCE DIAGNOSTICS]\n" + _step59UniqueNameProvenanceDiagnostics + "\n" +
                 "Rendering active before transition: NO\n" +
                 BuildStartupLadderInvocationFrontierAppendix(pushAudit);
@@ -442,6 +456,131 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                 : "Ready-binding forensics localized a pre-handler scene lifecycle blocker. Evidence is complete and must be durably written; Gate C will stop before arming Push/OpenCharacterSelect.");
         }
         catch (Exception ex) { Checkpoint(checkpoint, $"M59_B_FAIL — stage={stage}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}"); return StartupLadderFail(step, Step59Name, gate, stage, ex); }
+    }
+
+
+    public string RunStep59ControllerSingletonRehearsal(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59R controller/singleton rehearsal entry");
+        if (!_step59TransitionBound)
+            throw new InvalidOperationException("Step 59R requires Step-59 Gate B binding before rehearsal.");
+        if (!_step59ReadyBindingPreflightPassed)
+            throw new InvalidOperationException("Step 59R requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted)
+            throw new InvalidOperationException("Step 59R is observational and must run before any Step-59 mutation/handler probe in this process.");
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        FieldInfo? traceField = null;
+        try
+        {
+            traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59R controller/singleton rehearsal");
+            _step59ControllerSingletonRehearsalDiagnostics = BuildStep59ControllerSingletonRehearsalDiagnostics(embark, context, step);
+        }
+        finally
+        {
+            DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59R controller/singleton rehearsal");
+        }
+        _step59StaticMap += "\n[STEP 59R CONTROLLER / HOTKEY SINGLETON REHEARSAL]\n" + _step59ControllerSingletonRehearsalDiagnostics + "\n";
+        Checkpoint(checkpoint, "M59R_COMPLETE — " + SanitizeCheckpoint(_step59ControllerSingletonRehearsalDiagnostics));
+        return _step59ControllerSingletonRehearsalDiagnostics;
+    }
+
+    public (bool Passed, string Diagnostics) RunStep59UpdateControllerButtonProbe(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59U UpdateControllerButton probe entry");
+        if (!_step59TransitionBound)
+            throw new InvalidOperationException("Step 59U requires Step-59 Gate B binding before the isolated controller-update probe.");
+        if (!_step59ReadyBindingPreflightPassed)
+            throw new InvalidOperationException("Step 59U requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted)
+            throw new InvalidOperationException("Step 59U is one-shot and requires a fresh process with no prior Step-59 mutation/handler probe.");
+        _step59DiagnosticMutationProbeStarted = true;
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59U PRE-PROBE EMBARK FIELDS");
+        var method = RequireStep59InstanceRuntimeMethod(embark.GetType(), "UpdateControllerButton", 0, step);
+        Exception? failure = null;
+        FieldInfo? traceField = null;
+        try
+        {
+            traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59U UpdateControllerButton");
+            Checkpoint(checkpoint, $"M59U_INVOKE_ARMED — invoking exact inherited NButton.UpdateControllerButton token=0x{method.MetadataToken:X8} on retained embark button; no Enable/OnEnable/RegisterHotkeys/Push/OpenCharacterSelect.");
+            try
+            {
+                method.Invoke(embark, null);
+                Checkpoint(checkpoint, "M59U_INVOKE_RETURNED — exact UpdateControllerButton returned normally.");
+            }
+            catch (Exception ex)
+            {
+                failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+                Checkpoint(checkpoint, "M59U_INVOKE_EXCEPTION — " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
+            }
+        }
+        finally
+        {
+            DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59U UpdateControllerButton");
+        }
+
+        var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59U POST-PROBE EMBARK FIELDS");
+        _step59UpdateControllerProbeDiagnostics =
+            $"methodToken=0x{method.MetadataToken:X8}; passed={failure is null}; runtimeType={embark.GetType().FullName}\n" +
+            before + "\n" + after +
+            (failure is null ? "\nexception=<none>" : "\nexception=" + DescribeStep59ProbeException(failure));
+        _step59StaticMap += "\n[STEP 59U ISOLATED UPDATECONTROLLERBUTTON PROBE]\n" + _step59UpdateControllerProbeDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59U_COMPLETE — passed={failure is null}; freshProcessRequired=True.");
+        return (failure is null, _step59UpdateControllerProbeDiagnostics);
+    }
+
+    public (bool Passed, string Diagnostics) RunStep59IsolatedEmbarkEnableProbe(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59E isolated embark Enable probe entry");
+        if (!_step59TransitionBound)
+            throw new InvalidOperationException("Step 59E requires Step-59 Gate B binding before the isolated Enable probe.");
+        if (!_step59ReadyBindingPreflightPassed)
+            throw new InvalidOperationException("Step 59E requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted)
+            throw new InvalidOperationException("Step 59E is one-shot and requires a fresh process with no prior Step-59 mutation/handler probe.");
+        _step59DiagnosticMutationProbeStarted = true;
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var enable = RequireStep59InstanceRuntimeMethod(embark.GetType(), "Enable", 0, step);
+        var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59E PRE-PROBE EMBARK FIELDS");
+        Exception? failure = null;
+        FieldInfo? traceField = null;
+        try
+        {
+            traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59E isolated embark Enable");
+            Checkpoint(checkpoint, $"M59E_ENABLE_ARMED — invoking retained embark NClickableControl.Enable token=0x{enable.MetadataToken:X8} directly, outside OpenCharacterSelect, to isolate the button path. This probe may change only the retained embark button/hotkey/tween state and therefore requires a fresh process afterward.");
+            try
+            {
+                enable.Invoke(embark, null);
+                Checkpoint(checkpoint, "M59E_ENABLE_RETURNED — isolated retained embark Enable returned normally.");
+            }
+            catch (Exception ex)
+            {
+                failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+                Checkpoint(checkpoint, "M59E_ENABLE_EXCEPTION — " + SanitizeCheckpoint(DescribeStep59ProbeException(ex)));
+            }
+        }
+        finally
+        {
+            DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59E isolated embark Enable");
+        }
+
+        var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59E POST-PROBE EMBARK FIELDS");
+        _step59IsolatedEnableProbeDiagnostics =
+            $"enableToken=0x{enable.MetadataToken:X8}; passed={failure is null}; runtimeType={embark.GetType().FullName}\n" +
+            before + "\n" + after +
+            (failure is null ? "\nexception=<none>" : "\nexception=" + DescribeStep59ProbeException(failure));
+        _step59StaticMap += "\n[STEP 59E ISOLATED RETAINED EMBARK ENABLE PROBE]\n" + _step59IsolatedEnableProbeDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59E_COMPLETE — passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False.");
+        return (failure is null, _step59IsolatedEnableProbeDiagnostics);
     }
 
     public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerTransition(Action<string>? checkpoint = null)
@@ -494,11 +633,29 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
                     Checkpoint(checkpoint, "M59_C_NAVIGATION_REPAIR_SKIPPED — retained NSingleplayerSubmenu is already logically bound to the exact main-menu submenu stack.");
                 }
 
-                Checkpoint(checkpoint, $"M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with the real retained _standardButton ({SanitizeCheckpoint(_step59StandardButton?.GetType().FullName ?? "<null>")}); rendering remains frozen.");
-                try { _step58RuntimeOpenCharacterSelect!.Invoke(submenu, new object?[] { _step59StandardButton }); }
-                catch (TargetInvocationException tie) when (tie.InnerException is not null)
+                Checkpoint(checkpoint, $"M59_C_HANDLER_ARMED — invoking original OpenCharacterSelect(NButton) exactly once with the real retained _standardButton ({SanitizeCheckpoint(_step59StandardButton?.GetType().FullName ?? "<null>")}); rendering remains frozen. Step-59 runtime callsite tracing will be armed only for the original handler call.");
+                Exception? handlerFailure = null;
+                FieldInfo? traceField = null;
+                try
                 {
-                    var inner = tie.InnerException;
+                    traceField = ArmStep59RuntimeTrace(checkpoint, context, step, "Step59 real OpenCharacterSelect handler");
+                    try
+                    {
+                        _step58RuntimeOpenCharacterSelect!.Invoke(submenu, new object?[] { _step59StandardButton });
+                    }
+                    catch (Exception invokeEx)
+                    {
+                        handlerFailure = invokeEx is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : invokeEx;
+                    }
+                }
+                finally
+                {
+                    DisarmStep59RuntimeTrace(traceField, checkpoint, "Step59 real OpenCharacterSelect handler");
+                }
+
+                if (handlerFailure is not null)
+                {
+                    var inner = handlerFailure;
                     Checkpoint(checkpoint, $"M59_C_HANDLER_INNER_EXCEPTION — type={SanitizeCheckpoint(inner.GetType().FullName ?? inner.GetType().Name)}; targetSite={SanitizeCheckpoint(inner.TargetSite?.ToString() ?? "<null>")}; source={SanitizeCheckpoint(inner.Source ?? "<null>")}; stack={SanitizeCheckpoint(inner.StackTrace ?? "<null>")}");
                     try
                     {
@@ -921,6 +1078,186 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         return $"character=[{current.State}; nodeReady={screenReady}; fields={string.Join(",", fieldStates)}]; ascension=[nodeReady={ascensionReady}; fields={string.Join(",", ascensionFieldStates)}]; nGame=[{string.Join(",", nGameStates)}]; save=Progress:{progress.GetType().FullName},Epochs:{epochs.GetType().FullName},EncounterStats:{encounterStats.GetType().FullName}; rootCurrentScene={currentSceneIdentity}; lobby={(lobby is null ? "NULL" : lobby.GetType().FullName)}; lobbyPlayers={playersCount}; requiredFailures={(prerequisiteFailures.Count == 0 ? "<none>" : string.Join(" | ", prerequisiteFailures))}";
     }
 
+
+    private string BuildStep59RuntimeTraceBridgeDiagnostics(Step35ExecutionLoadContext context, int step)
+    {
+        var admission = _admission ?? throw new InvalidOperationException("Step 59.0 runtime trace bridge requires the selected sts2 admission.");
+        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(admission.Assembly), context))
+            throw new InvalidDataException("Step 59.0 selected sts2 admission is not owned by the retained private load context.");
+        var bridgeType = admission.Assembly.GetType(Step59RuntimeTraceBridgeTypeFullName, throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException(Step59RuntimeTraceBridgeTypeFullName);
+        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(bridgeType.Assembly), context))
+            throw new InvalidDataException("Step 59.0 runtime trace bridge is not owned by the retained private load context.");
+        var callback = bridgeType.GetField(Step59RuntimeTraceBridgeCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
+            ?? throw new MissingFieldException(Step59RuntimeTraceBridgeTypeFullName, Step59RuntimeTraceBridgeCallbackFieldName);
+        if (callback.FieldType != typeof(Action<string>))
+            throw new InvalidDataException($"Step 59.0 runtime trace callback type drifted: {callback.FieldType.FullName}.");
+        if (callback.GetValue(null) is not null)
+            throw new InvalidDataException("Step 59.0 runtime trace callback was unexpectedly armed during Gate-B preflight.");
+        var emit = bridgeType.GetMethod("Emit", BindingFlags.Static | BindingFlags.Public, binder: null, types: new[] { typeof(string) }, modifiers: null)
+            ?? throw new MissingMethodException(Step59RuntimeTraceBridgeTypeFullName, "Emit(System.String)");
+        if (emit.ReturnType != typeof(void))
+            throw new InvalidDataException($"Step 59.0 runtime trace Emit return type drifted: {emit.ReturnType.FullName}.");
+        return $"bridge={bridgeType.FullName}; callbackType={callback.FieldType.FullName}; callbackArmed=False; emitToken=0x{emit.MetadataToken:X8}; selectedContext=True; markerPrefix={Step59RuntimeTraceMarkerPrefix}; instrumentation is inert until an explicit Step-59 probe/real-handler operation arms the synthetic callback.";
+    }
+
+    private FieldInfo ArmStep59RuntimeTrace(Action<string>? checkpoint, Step35ExecutionLoadContext context, int step, string operation)
+    {
+        if (checkpoint is null)
+            throw new InvalidOperationException($"Step {step}.0 {operation} requires a durable checkpoint callback before runtime trace arm.");
+        var admission = _admission ?? throw new InvalidOperationException($"Step {step}.0 {operation} requires the selected sts2 admission.");
+        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(admission.Assembly), context))
+            throw new InvalidDataException($"Step {step}.0 {operation} selected sts2 admission is outside the retained private load context.");
+        var bridgeType = admission.Assembly.GetType(Step59RuntimeTraceBridgeTypeFullName, throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException(Step59RuntimeTraceBridgeTypeFullName);
+        var callback = bridgeType.GetField(Step59RuntimeTraceBridgeCallbackFieldName, BindingFlags.Static | BindingFlags.Public)
+            ?? throw new MissingFieldException(Step59RuntimeTraceBridgeTypeFullName, Step59RuntimeTraceBridgeCallbackFieldName);
+        if (callback.FieldType != typeof(Action<string>))
+            throw new InvalidDataException($"Step {step}.0 {operation} runtime trace callback type drifted: {callback.FieldType.FullName}.");
+        if (callback.GetValue(null) is not null)
+            throw new InvalidOperationException($"Step {step}.0 {operation} refuses to overwrite an already-armed Step-59 runtime trace callback.");
+        callback.SetValue(null, checkpoint);
+        Checkpoint(checkpoint, $"M59_TRACE_ARMED — operation={SanitizeCheckpoint(operation)}; bridge={Step59RuntimeTraceBridgeTypeFullName}; markerPrefix={Step59RuntimeTraceMarkerPrefix}; synthetic callback write only; no game field was changed.");
+        return callback;
+    }
+
+    private static void DisarmStep59RuntimeTrace(FieldInfo? callback, Action<string>? checkpoint, string operation)
+    {
+        if (callback is null)
+            return;
+        try
+        {
+            callback.SetValue(null, null);
+            Checkpoint(checkpoint, $"M59_TRACE_DISARMED — operation={SanitizeCheckpoint(operation)}; callback=NULL.");
+        }
+        catch (Exception ex)
+        {
+            Checkpoint(checkpoint, $"M59_TRACE_DISARM_FAIL — operation={SanitizeCheckpoint(operation)}; {ex.GetType().FullName}: {SanitizeCheckpoint(ex.Message)}");
+        }
+    }
+
+    private object RequireStep59EmbarkButtonForProbe(Step35ExecutionLoadContext context, int step)
+    {
+        var current = CaptureCurrentCharacterSelectState(step, context);
+        var screen = current.Screen ?? throw new InvalidOperationException($"Step {step}.0 probe requires the retained preloaded NCharacterSelectScreen.");
+        var embarkField = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), "_embarkButton", step);
+        var embark = embarkField.GetValue(screen) ?? throw new InvalidDataException($"Step {step}.0 retained NCharacterSelectScreen._embarkButton is null.");
+        if (embark.GetType().FullName != ConfirmButtonManagedTypeFullNameForForensics)
+            throw new InvalidDataException($"Step {step}.0 retained embark runtime type drifted: {embark.GetType().FullName}.");
+        if (!ReferenceEquals(AssemblyLoadContext.GetLoadContext(embark.GetType().Assembly), context))
+            throw new InvalidDataException($"Step {step}.0 retained embark button is outside the selected private load context.");
+        return embark;
+    }
+
+    private static MethodInfo RequireStep59StaticRuntimeMethod(Type type, string name, int parameterCount, int step)
+    {
+        var candidates = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(method => method.Name == name && !method.IsGenericMethod && method.GetParameters().Length == parameterCount)
+            .ToArray();
+        return candidates.SingleOrDefault() ?? throw new MissingMethodException(type.FullName, $"Step {step}.0 static {name}/{parameterCount}");
+    }
+
+    private static MethodInfo RequireStep59InstanceRuntimeMethod(Type type, string name, int parameterCount, int step)
+    {
+        var candidates = EnumerateRuntimeMethodsForOwnership(type)
+            .Where(method => method.Name == name && !method.IsStatic && !method.IsGenericMethod && method.GetParameters().Length == parameterCount)
+            .ToArray();
+        return candidates.SingleOrDefault() ?? throw new MissingMethodException(type.FullName, $"Step {step}.0 instance {name}/{parameterCount}");
+    }
+
+    private static string DescribeStep59ProbeException(Exception exception)
+    {
+        var actual = exception is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : exception;
+        return $"{actual.GetType().FullName}: {actual.Message}; targetSite={actual.TargetSite}; source={actual.Source}; stack={actual.StackTrace}";
+    }
+
+    private string BuildStep59ControllerSingletonRehearsalDiagnostics(object embark, Step35ExecutionLoadContext context, int step)
+    {
+        var text = new System.Text.StringBuilder();
+        text.AppendLine("[STEP 59R CONTROLLER / HOTKEY SINGLETON REHEARSAL]");
+        text.AppendLine("Observational intent: invoke only getters/icon lookups and compare singleton identities. No Enable/OnEnable/RegisterHotkeys/PushHotkey binding, field write, stack Push, OpenCharacterSelect, or render restart.");
+
+        var admission = _admission ?? throw new InvalidOperationException("Step 59R requires selected sts2 admission.");
+        object? InvokeAndRecord(Type type, object? instance, string methodName, int parameterCount, params object?[] args)
+        {
+            try
+            {
+                var method = instance is null
+                    ? RequireStep59StaticRuntimeMethod(type, methodName, parameterCount, step)
+                    : RequireStep59InstanceRuntimeMethod(type, methodName, parameterCount, step);
+                var value = method.Invoke(instance, args);
+                text.AppendLine($"  PASS {type.FullName}.{methodName}/{parameterCount} => {DescribeStep59RuntimeValue(value)}; token=0x{method.MetadataToken:X8}");
+                return value;
+            }
+            catch (Exception ex)
+            {
+                text.AppendLine($"  FAIL {type.FullName}.{methodName}/{parameterCount} => {DescribeStep59ProbeException(ex)}");
+                return null;
+            }
+        }
+
+        var hasControllerHotkey = InvokeAndRecord(embark.GetType(), embark, "get_HasControllerHotkey", 0);
+        var controllerIconHotkey = InvokeAndRecord(embark.GetType(), embark, "get_ControllerIconHotkey", 0);
+        var hotkeys = InvokeAndRecord(embark.GetType(), embark, "get_Hotkeys", 0);
+        text.AppendLine($"  embarkSummary: hasControllerHotkey={DescribeStep59RuntimeValue(hasControllerHotkey)}; controllerIconHotkey={DescribeStep59RuntimeValue(controllerIconHotkey)}; hotkeys={DescribeStep59RuntimeValue(hotkeys)}");
+
+        var nGame = _step39NGameInstance ?? throw new InvalidOperationException("Step 59R retained NGame instance is absent.");
+        var nGameHotkey = InvokeAndRecord(nGame.GetType(), nGame, "get_HotkeyManager", 0);
+        var nGameInput = InvokeAndRecord(nGame.GetType(), nGame, "get_InputManager", 0);
+
+        var hotkeyType = admission.Assembly.GetType("MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("NHotkeyManager");
+        var inputType = admission.Assembly.GetType("MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("NInputManager");
+        var controllerType = admission.Assembly.GetType("MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager", throwOnError: true, ignoreCase: false)
+            ?? throw new MissingMemberException("NControllerManager");
+
+        var hotkeySingleton = InvokeAndRecord(hotkeyType, null, "get_Instance", 0);
+        var inputSingleton = InvokeAndRecord(inputType, null, "get_Instance", 0);
+        var controllerFromInput = inputSingleton is null ? null : InvokeAndRecord(inputType, inputSingleton, "get_ControllerManager", 0);
+        var controllerSingleton = InvokeAndRecord(controllerType, null, "get_Instance", 0);
+        var controllerUsing = controllerSingleton is null ? null : InvokeAndRecord(controllerType, controllerSingleton, "get_IsUsingController", 0);
+
+        text.AppendLine($"  identity: NGame.HotkeyManager===NHotkeyManager.Instance => {ReferenceEquals(nGameHotkey, hotkeySingleton)}");
+        text.AppendLine($"  identity: NGame.InputManager===NInputManager.Instance => {ReferenceEquals(nGameInput, inputSingleton)}");
+        text.AppendLine($"  identity: NInputManager.ControllerManager===NControllerManager.Instance => {ReferenceEquals(controllerFromInput, controllerSingleton)}");
+        text.AppendLine($"  controllerUsing={DescribeStep59RuntimeValue(controllerUsing)}");
+
+        var iconKey = controllerIconHotkey as string;
+        if (!string.IsNullOrWhiteSpace(iconKey))
+        {
+            if (inputSingleton is not null)
+                InvokeAndRecord(inputType, inputSingleton, "GetHotkeyIcon", 1, iconKey);
+            if (controllerSingleton is not null)
+                InvokeAndRecord(controllerType, controllerSingleton, "GetHotkeyIcon", 1, iconKey);
+        }
+        else
+        {
+            text.AppendLine("  icon lookups skipped because ControllerIconHotkey was null/empty.");
+        }
+
+        foreach (var (name, value) in new[]
+                 {
+                     ("NGame.HotkeyManager", nGameHotkey),
+                     ("NHotkeyManager.Instance", hotkeySingleton),
+                     ("NGame.InputManager", nGameInput),
+                     ("NInputManager.Instance", inputSingleton),
+                     ("NInputManager.ControllerManager", controllerFromInput),
+                     ("NControllerManager.Instance", controllerSingleton),
+                 })
+        {
+            if (value is null)
+            {
+                text.AppendLine($"[{name} FIELD MATRIX] NULL");
+                continue;
+            }
+            text.AppendLine($"[{name} FIELD MATRIX]");
+            text.AppendLine(BuildStep59FullInheritedFieldMatrix(value, name + " FIELDS"));
+            text.AppendLine($"  loadContext={AssemblyLoadContext.GetLoadContext(value.GetType().Assembly)?.Name ?? "<null>"}; selectedContext={ReferenceEquals(AssemblyLoadContext.GetLoadContext(value.GetType().Assembly), context)}");
+        }
+        return text.ToString().TrimEnd();
+    }
+
     private string BuildStep59ReadyBindingDiagnostics(
         object screen,
         Step35ExecutionLoadContext context,
@@ -1300,7 +1637,7 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
             var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59.0 GodotSharp handoff absent.")).GodotSharpAssembly;
             var nodeType = godotAssembly.GetType("Godot.Node", throwOnError: true, ignoreCase: false) ?? throw new MissingMemberException("Godot.Node");
             var root = _step39SceneTreeRoot ?? throw new InvalidOperationException("Step 59.0 retained SceneTree root is absent.");
-            var nodes = EnumerateStep39NodeGraph(root, nodeType);
+            var nodes = EnumerateStep39NodeGraph(root, nodeType, maxNodes: 4096);
             var confirmType = embark.GetType();
             var peers = nodes.Where(item => confirmType.IsInstanceOfType(item.Node)).Take(128).ToArray();
             text.AppendLine($"  peers={peers.Length}; exactRuntimeType={confirmType.FullName}; selectedContext={ReferenceEquals(AssemblyLoadContext.GetLoadContext(confirmType.Assembly), context)}");

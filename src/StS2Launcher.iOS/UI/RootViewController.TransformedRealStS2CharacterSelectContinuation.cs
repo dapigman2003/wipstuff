@@ -14,18 +14,21 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT SUSTAINED RENDER RESIDENCY");
 
     private UIButton? _step58Button; private UIButton? _step59Button; private UIButton? _step60Button; private UIButton? _step61Button; private UIButton? _step62Button;
-    private UIButton? _step59DiagnosticDeckButton;
+    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
     private UILabel? _step58ResultLabel; private UILabel? _step59ResultLabel; private UILabel? _step60ResultLabel; private UILabel? _step61ResultLabel; private UILabel? _step62ResultLabel;
     private UILabel? _step58DetailLabel; private UILabel? _step59DetailLabel; private UILabel? _step60DetailLabel; private UILabel? _step61DetailLabel; private UILabel? _step62DetailLabel;
     private UILabel? _step59DiagnosticDeckResultLabel; private UILabel? _step59DiagnosticDeckDetailLabel;
-    private bool _step59TransitionUiStarted; private bool _step59DiagnosticDeckUiStarted; private bool _step61PulseUiStarted; private bool _step62PulseUiStarted;
+    private UILabel? _step59ControllerRehearsalResultLabel; private UILabel? _step59ControllerRehearsalDetailLabel;
+    private UILabel? _step59UpdateControllerProbeResultLabel; private UILabel? _step59UpdateControllerProbeDetailLabel;
+    private UILabel? _step59IsolatedEnableProbeResultLabel; private UILabel? _step59IsolatedEnableProbeDetailLabel;
+    private bool _step59TransitionUiStarted; private bool _step59DiagnosticDeckUiStarted; private bool _step59ControllerRehearsalUiStarted; private bool _step59MutationProbeUiStarted; private bool _step61PulseUiStarted; private bool _step62PulseUiStarted;
 
     private void AddCharacterSelectContinuationControls(UIStackView content)
     {
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "Requires the physically proven Step 57 extension in the same fresh process. Physical 0.0.200 proved the PackedScene unique-name compatibility correction reaches the original character-select transition, which now fails inside retained embark NConfirmButton.OnEnable(). This 0.0.201 build is intentionally compilation-efficient: Step 59D gathers a deep no-mutation embark/button peer/field/IL/frontier/scene diagnostic deck and stops before the handler, while the normal Step 59 button remains available as a separate fresh-process real-transition experiment from the same compiled IPA. Any real-handler failure also captures a post-failure button matrix before returning. Steps 60–62 remain locked unless the real handler succeeds. Step 63/continuous interactive ownership remains unopened.",
+            "Requires the physically proven Step 57 extension in the same fresh process. Physical 0.0.201 proves the retained embark NConfirmButton is ready/in-tree with its obvious fields populated immediately before and after the reproducible OnEnable NullReferenceException. This 0.0.202 build is compilation-efficient: the private sts2 compatibility derivative now contains an inert Step-59-only callsite trace bridge that is armed only around explicit probes/real handler execution, plus multiple separately runnable phone experiments (59D deep map, 59R controller/singleton rehearsal, 59U isolated UpdateControllerButton, 59E isolated embark Enable, and the normal real Step 59 transition). Use a fresh process for each mutating/real-handler experiment. Steps 60–62 remain locked unless the real handler succeeds. Step 63/continuous interactive ownership remains unopened.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -37,13 +40,31 @@ public sealed partial class RootViewController
         (_step59DiagnosticDeckButton, _step59DiagnosticDeckResultLabel, _step59DiagnosticDeckDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59D — compilation-efficient deep diagnostic deck (NO HANDLER)",
             "Run Step 59D — DEEP DIAGNOSTICS ONLY", "STEP 59D DEEP DIAGNOSTIC DECK: LOCKED",
-            "Recommended first 0.0.201 phone run after Step 58. Executes only Step-59 Gates A+B, writes the full ready/unique-name/embark field matrix plus whole-SceneTree NConfirmButton peer comparison, observational accessors, null-field live-node candidates, exact IL field/call order, and transitive execution frontiers. It intentionally stops before NSubmenuStack.Push/OpenCharacterSelect; no one-shot handler arm, field write, _Ready replay, OnEnable call, render restart, character input, or embark action.");
+            "Regression/forensic deck. Executes only Step-59 Gates A+B, writes the full ready/unique-name/embark field matrix plus expanded whole-SceneTree NConfirmButton peer comparison, observational accessors, null-field live-node candidates, exact IL field/call order, runtime trace-bridge preflight, and transitive execution frontiers. It intentionally stops before NSubmenuStack.Push/OpenCharacterSelect; no one-shot handler arm, field write, _Ready replay, OnEnable call, render restart, character input, or embark action.");
         _step59DiagnosticDeckButton.TouchUpInside += async (_, _) => await RunStep59DiagnosticDeckAsync();
+
+        (_step59ControllerRehearsalButton, _step59ControllerRehearsalResultLabel, _step59ControllerRehearsalDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59R — controller/hotkey singleton + icon lookup rehearsal (NO HANDLER)",
+            "Run Step 59R — CONTROLLER REHEARSAL", "STEP 59R CONTROLLER REHEARSAL: LOCKED",
+            "Recommended first 0.0.202 diagnostic run after Step 58. Repeats Gates A+B, then arms the synthetic Step-59 trace callback only around observational getters/icon lookups. It compares NGame HotkeyManager/InputManager with static singleton getters, resolves ControllerManager/IsUsingController, rehearses controller-icon lookup when a key exists, dumps manager fields/load-context identity, and performs no Enable/OnEnable/RegisterHotkeys/PushHotkey binding/OpenCharacterSelect.");
+        _step59ControllerRehearsalButton.TouchUpInside += async (_, _) => await RunStep59ControllerRehearsalAsync();
+
+        (_step59UpdateControllerProbeButton, _step59UpdateControllerProbeResultLabel, _step59UpdateControllerProbeDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59U — isolated retained embark UpdateControllerButton probe",
+            "Run Step 59U — UPDATE CONTROLLER ONLY", "STEP 59U UPDATECONTROLLERBUTTON PROBE: LOCKED",
+            "Fresh-process one-shot diagnostic. Repeats Gates A+B, then invokes only the inherited NButton.UpdateControllerButton() on the retained hidden embark button with the internal callsite trace armed. It never calls Enable/OnEnable/RegisterHotkeys/OpenCharacterSelect. It may update the controller-icon UI state, so terminate/relaunch after this probe.");
+        _step59UpdateControllerProbeButton.TouchUpInside += async (_, _) => await RunStep59UpdateControllerProbeAsync();
+
+        (_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59E — isolated retained embark Enable probe",
+            "Run Step 59E — ISOLATED EMBARK ENABLE", "STEP 59E ISOLATED EMBARK ENABLE: LOCKED",
+            "Fresh-process one-shot diagnostic. Calls the retained embark NClickableControl.Enable() directly outside OpenCharacterSelect while the new internal trace records exact NConfirmButton/NButton/hotkey/controller callsites. This intentionally mutates only the button/hotkey/tween lifecycle state and never performs submenu Push/OpenCharacterSelect, character selection, embark, or run start. Relaunch after this probe.");
+        _step59IsolatedEnableProbeButton.TouchUpInside += async (_, _) => await RunStep59IsolatedEnableProbeAsync();
 
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4. This is the separate real-transition experiment from the same 0.0.201 IPA. Prefer Step 59D first and preserve its report. Gate B reruns the full deep diagnostic deck; unhealthy state blocks before any Push/OpenCharacterSelect arm. If the original handler is armed and still throws, 0.0.201 automatically captures a post-failure embark full-field/peer/null-candidate matrix and refreshes the durable static map before the UI returns. Rendering stays frozen.");
+            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. This is the real-transition experiment from the same 0.0.202 IPA. Gate B reruns the full deep diagnostic deck and proves the synthetic trace bridge is inert. Gate C arms that callback only for the exact original OpenCharacterSelect invocation; every instrumented NConfirmButton/NButton/hotkey/controller entry/call/return breadcrumb is durably journaled. If the handler still throws, the callback is cleared before the post-failure field/peer snapshot is captured. Rendering stays frozen.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,
@@ -127,9 +148,9 @@ public sealed partial class RootViewController
     private async Task RunStep59DiagnosticDeckAsync()
     {
         const int step = 59;
-        if (_step59TransitionUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted)
+        if (_step59TransitionUiStarted || _step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
         {
-            SetStartupLadderRefusal(step, _step59DiagnosticDeckResultLabel!, _step59DiagnosticDeckDetailLabel!, "HANDLER ALREADY ARMED", "Step 59D must not run after the real Step-59 handler has armed in this process. Preserve reports and relaunch.");
+            SetStartupLadderRefusal(step, _step59DiagnosticDeckResultLabel!, _step59DiagnosticDeckDetailLabel!, "FRESH PROCESS REQUIRED", "Step 59D must not run after a Step-59 mutation/real-handler probe in this process. Preserve reports and relaunch.");
             return;
         }
         if (_step59DiagnosticDeckUiStarted)
@@ -178,10 +199,12 @@ public sealed partial class RootViewController
         }
     }
 
+
     private async Task RunStep59StartupLadderAsync()
     {
         const int step = 59;
-        if (_step59DiagnosticDeckUiStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "FRESH PROCESS REQUIRED", "Step 59D already ran in this process. Preserve its observational evidence and relaunch before the separate real-handler Step 59 experiment."); return; }
+        if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "FRESH PROCESS REQUIRED", "A Step-59 observational diagnostic already ran in this process. Preserve its evidence and relaunch before the separate real-handler Step 59 experiment."); return; }
+        if (_step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "FRESH PROCESS REQUIRED", "A Step-59 mutating micro-probe already ran in this process. Relaunch before the original real-handler transition."); return; }
         if (_step59TransitionUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "ONE-SHOT ALREADY ARMED", "Step 59 real handler was already armed in this process. Preserve reports and relaunch; never retry it in-process."); return; }
         if (!TryPrepareStartupLadderStep(step, _step58Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep58ClosurePassed,
                 "Step 59.0 requires Step 58.0 4/4 runtime-ownership authority in this same process.", out var button, out var resultLabel, out var detailLabel)) return;

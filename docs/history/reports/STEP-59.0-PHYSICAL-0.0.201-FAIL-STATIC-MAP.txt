@@ -1,0 +1,1192 @@
+StS2 Launcher — Step 59.0 character-select ready-binding forensics + game-owned transition
+NSubmenuStack.Push token: 0x06003FBE; parameter=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu
+Single-player logical stack before repair: MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack
+Navigation repair required: False
+OpenCharacterSelect token: 0x06003F71
+OpenCharacterSelect invocation required: True
+Real standard button type: MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuButton
+Before character-select transition: present=True; insideTree=True; visible=False; visibleInTree=False; logicalStackNull=True; logicalStackExactRetained=False; logicalStackType=<null>; parentExactStack=True; parentType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack
+Forensic preflight: character=[present=True; insideTree=True; visible=False; visibleInTree=False; logicalStackNull=True; logicalStackExactRetained=False; logicalStackType=<null>; parentExactStack=True; parentType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack; nodeReady=True; fields=_charButtonContainer=Godot.HBoxContainer,_ascensionPanel=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel,_actDropdown=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown,_actDropdownLabel=MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel,_remotePlayerContainer=MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer,_readyAndWaitingContainer=Godot.Control,_backButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NBackButton,_unreadyButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NBackButton,_embarkButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton,_randomCharacterButton=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton]; ascension=[nodeReady=True; fields=_leftArrow=MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton,_rightArrow=MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton,_ascensionLevel=MegaCrit.Sts2.addons.mega_text.MegaLabel,_info=MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel,_leftTriggerIcon=Godot.TextureRect,_rightTriggerIcon=Godot.TextureRect,_iconHsv=Godot.ShaderMaterial]; nGame=[HotkeyManager=MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager,InputManager=MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager,RemoteCursorContainer=MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer,ReactionContainer=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer,TimeoutOverlay=MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay,RootSceneContainer=MegaCrit.Sts2.Core.Nodes.NSceneContainer]; save=Progress:MegaCrit.Sts2.Core.Saves.ProgressState,Epochs:System.Collections.Generic.List`1[[MegaCrit.Sts2.Core.Saves.SerializableEpoch, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null]],EncounterStats:System.Collections.Generic.Dictionary`2[[MegaCrit.Sts2.Core.Models.ModelId, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null],[MegaCrit.Sts2.Core.Saves.EncounterStats, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null]]; rootCurrentScene=NULL; lobby=NULL; lobbyPlayers=n/a; requiredFailures=<none>
+Ready-binding handler authorization: True
+Ready-binding blocker: <none>
+[READY-BINDING DIAGNOSTICS]
+Selected _Ready token=0x0600443B; IL=192; charButtonStoreIndex=67; ascensionStringIndex=70; ascensionStoreIndex=73.
+[SELECTED _READY ASCENSION LOOKUP WINDOW]
+  IL_00E9: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_00EE: call !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+  IL_00F3: stfld Godot.Control MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_charButtonContainer
+  IL_00F8: ldarg.0
+  IL_00F9: ldarg.0
+  IL_00FA: ldstr "%AscensionPanel"
+  IL_00FF: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_0104: call !!0 Godot.Node::GetNode<MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel>(Godot.NodePath)
+  IL_0109: stfld MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_ascensionPanel
+  IL_010E: ldarg.0
+  IL_010F: ldarg.0
+  IL_0110: ldstr "%ActDropdown"
+Live character-select descendant nodes=179; ascension-like candidates=5.
+[LIVE ASCENSION-LIKE NODES]
+  path=/Game/AscensionPanel; name=AscensionPanel; type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=character-select-root
+  path=/Game/AscensionPanel/HBoxContainer/AscensionIconContainer; name=AscensionIconContainer; type=Godot.Control; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  path=/Game/AscensionPanel/HBoxContainer/AscensionDescription; name=AscensionDescription; type=Godot.Control; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  path=/Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon; name=AscensionIcon; type=Godot.TextureRect; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  path=/Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon/AscensionLevel; name=AscensionLevel; type=MegaCrit.Sts2.addons.mega_text.MegaLabel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=False; owner=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+[LIVE CHARACTER-SELECT NODE TYPES AROUND ASCENSION]
+  /Game/AscensionPanel | MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel
+  /Game/AscensionPanel/Background | Godot.NinePatchRect
+  /Game/AscensionPanel/HBoxContainer | Godot.HBoxContainer
+  /Game/AscensionPanel/HBoxContainer/LeftTriggerIcon | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/LeftArrowContainer | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/AscensionIconContainer | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/AscensionDescription | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/RightArrowContainer | Godot.Control
+  /Game/AscensionPanel/HBoxContainer/RightTriggerIcon | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/LeftArrowContainer/LeftArrow | MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton
+  /Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/AscensionDescription/Description | MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel
+  /Game/AscensionPanel/HBoxContainer/RightArrowContainer/RightArrow | MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton
+  /Game/AscensionPanel/HBoxContainer/LeftArrowContainer/LeftArrow/TextureRect | Godot.TextureRect
+  /Game/AscensionPanel/HBoxContainer/AscensionIconContainer/AscensionIcon/AscensionLevel | MegaCrit.Sts2.addons.mega_text.MegaLabel
+  /Game/AscensionPanel/HBoxContainer/RightArrowContainer/RightArrow/TextureRect | Godot.TextureRect
+Character-select TSCN bytes=16015; sha256=3d2305fdddae6f432e52ac4b8ea5035c5cecfd26fbc30c319f09b1cd4a05eb1e.
+Ascension-panel TSCN bytes=8192; sha256=71c3b9dba2fe053be1c70159ebee3e1757c035dd7e5ef8a4dbd91b7eb1d02c26.
+[CHARACTER-SELECT TSCN ASCENSION CONTEXT]
+  L311: script = ExtResource("4_36sm0")
+  L312: MinFontSize = 12
+  L313: MaxFontSize = 24
+  L314: 
+  L315: [node name="AscensionPanel" parent="." instance=ExtResource("12_gxq8b")]
+  L316: unique_name_in_owner = true
+  L317: layout_mode = 1
+  L318: offset_left = -317.0
+  L319: offset_top = -342.0
+[ASCENSION-PANEL TSCN ROOT CONTEXT]
+  L35: shader_parameter/v = 1.0
+  L36: 
+  L37: [node name="AscensionPanel" type="Control"]
+  L38: layout_mode = 3
+  L39: anchors_preset = 7
+  L51: script = ExtResource("1_0jdvo")
+  L52: 
+  L53: [node name="Background" type="NinePatchRect" parent="."]
+  L54: modulate = Color(0, 0, 0, 0.470588)
+  L55: layout_mode = 0
+  L64: patch_margin_bottom = 12
+  L65: 
+  L66: [node name="HBoxContainer" type="HBoxContainer" parent="."]
+  L67: layout_mode = 1
+  L68: anchors_preset = 15
+  L75: alignment = 1
+  L76: 
+  L77: [node name="LeftTriggerIcon" type="TextureRect" parent="HBoxContainer"]
+  L78: unique_name_in_owner = true
+  L79: custom_minimum_size = Vector2(64, 64)
+  L85: stretch_mode = 4
+  L86: 
+  L87: [node name="LeftArrowContainer" type="Control" parent="HBoxContainer"]
+  L88: custom_minimum_size = Vector2(80, 64)
+  L89: layout_mode = 2
+  L90: mouse_filter = 2
+  L91: 
+  L92: [node name="LeftArrow" type="Control" parent="HBoxContainer/LeftArrowContainer"]
+  L93: layout_mode = 1
+  L94: anchors_preset = 15
+  L99: script = ExtResource("2_nikwq")
+  L100: 
+  L101: [node name="TextureRect" type="TextureRect" parent="HBoxContainer/LeftArrowContainer/LeftArrow"]
+  L102: material = SubResource("ShaderMaterial_qf22s")
+  L103: custom_minimum_size = Vector2(64, 64)
+  L120: stretch_mode = 5
+  L121: 
+  L122: [node name="AscensionIconContainer" type="Control" parent="HBoxContainer"]
+  L123: custom_minimum_size = Vector2(64, 64)
+  L124: layout_mode = 2
+[CONFIRM-BUTTON ONENABLE PREFLIGHT]
+Retained _embarkButton: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton; selectedContext=True; insideTree=True; nodeReady=True.
+[LIVE EMBARK NCONFIRMBUTTON FIELDS]
+  _outline=Godot.TextureRect
+  _buttonImage=Godot.TextureRect
+  _viewport=Godot.Window
+  _hotkeys=System.String[][Length=1]
+  _moveTween=Godot.Tween
+  _showPos=Godot.Vector2:(560, 546)
+  _isEnabled=System.Boolean:False
+  _controllerHotkeyIcon=Godot.TextureRect
+Selected NConfirmButton._Ready token=0x060054BD; IL=49.
+[SELECTED NCONFIRMBUTTON _READY IL]
+  IL_0000: ldarg.0
+  IL_0001: callvirt System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals()
+  IL_0006: ldarg.0
+  IL_0007: ldc.i4.0
+  IL_0008: stfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_000D: ldarg.0
+  IL_000E: ldarg.0
+  IL_000F: ldstr "Outline"
+  IL_0014: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_0019: call !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+  IL_001E: stfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_outline
+  IL_0023: ldarg.0
+  IL_0024: ldarg.0
+  IL_0025: ldstr "Image"
+  IL_002A: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_002F: call !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+  IL_0034: stfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_buttonImage
+  IL_0039: ldarg.0
+  IL_003A: ldarg.0
+  IL_003B: call Godot.Viewport Godot.Node::GetViewport()
+  IL_0040: stfld Godot.Viewport MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_viewport
+  IL_0045: ldarg.0
+  IL_0046: ldarg.0
+  IL_0047: call System.Single Godot.Control::get_OffsetRight()
+  IL_004C: ldc.r4 120
+  IL_0051: add
+  IL_0052: ldarg.0
+  IL_0053: call System.Single Godot.Control::get_OffsetBottom()
+  IL_0058: neg
+  IL_0059: ldc.r4 110
+  IL_005E: add
+  IL_005F: newobj System.Void Godot.Vector2::.ctor(System.Single,System.Single)
+  IL_0064: stfld Godot.Vector2 MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_posOffset
+  IL_0069: ldarg.0
+  IL_006A: call Godot.SceneTree Godot.Node::GetTree()
+  IL_006F: callvirt Godot.Window Godot.SceneTree::get_Root()
+  IL_0074: ldsfld Godot.StringName Godot.Viewport/SignalName::SizeChanged
+  IL_0079: ldarg.0
+  IL_007A: ldftn System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnWindowChange()
+  IL_0080: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  IL_0085: call Godot.Callable Godot.Callable::From(System.Action)
+  IL_008A: ldc.i4.0
+  IL_008B: callvirt Godot.Error Godot.GodotObject::Connect(Godot.StringName,Godot.Callable,System.UInt32)
+  IL_0090: pop
+  IL_0091: ldarg.0
+  IL_0092: call System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnWindowChange()
+  IL_0097: ldarg.0
+  IL_0098: callvirt System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnDisable()
+  IL_009D: ret
+Selected NConfirmButton.OnEnable token=0x060054C0; IL=43.
+[SELECTED NCONFIRMBUTTON ONENABLE IL]
+  IL_0000: ldarg.0
+  IL_0001: call System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable()
+  IL_0006: ldarg.0
+  IL_0007: ldc.i4.1
+  IL_0008: stfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_000D: ldarg.0
+  IL_000E: ldfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_outline
+  IL_0013: call Godot.Color Godot.Colors::get_Transparent()
+  IL_0018: callvirt System.Void Godot.CanvasItem::set_Modulate(Godot.Color)
+  IL_001D: ldarg.0
+  IL_001E: ldfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_buttonImage
+  IL_0023: call Godot.Color Godot.Colors::get_White()
+  IL_0028: callvirt System.Void Godot.CanvasItem::set_Modulate(Godot.Color)
+  IL_002D: ldarg.0
+  IL_002E: ldfld Godot.Tween MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_moveTween
+  IL_0033: dup
+  IL_0034: brtrue.s IL_0039
+  IL_0036: pop
+  IL_0037: br.s IL_003E
+  IL_0039: call System.Void Godot.Tween::Kill()
+  IL_003E: ldarg.0
+  IL_003F: ldarg.0
+  IL_0040: call Godot.Tween Godot.Node::CreateTween()
+  IL_0045: stfld Godot.Tween MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_moveTween
+  IL_004A: ldarg.0
+  IL_004B: ldfld Godot.Tween MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_moveTween
+  IL_0050: ldarg.0
+  IL_0051: ldstr "position"
+  IL_0056: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_005B: ldarg.0
+  IL_005C: ldfld Godot.Vector2 MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_showPos
+  IL_0061: call Godot.Variant Godot.Variant::op_Implicit(Godot.Vector2)
+  IL_0066: ldc.r8 0.3499999940395355
+  IL_006F: callvirt Godot.PropertyTweener Godot.Tween::TweenProperty(Godot.GodotObject,Godot.NodePath,Godot.Variant,System.Double)
+  IL_0074: ldc.i4.1
+  IL_0075: conv.i8
+  IL_0076: callvirt Godot.PropertyTweener Godot.PropertyTweener::SetEase(Godot.Tween/EaseType)
+  IL_007B: ldc.i4.s 10
+  IL_007D: conv.i8
+  IL_007E: callvirt Godot.PropertyTweener Godot.PropertyTweener::SetTrans(Godot.Tween/TransitionType)
+  IL_0083: callvirt Godot.PropertyTweener Godot.PropertyTweener::FromCurrent()
+  IL_0088: pop
+  IL_0089: ret
+Selected NButton.OnEnable token=0x06004F3D; IL=5; RegisterHotkeys token=0x06004F40; IL=38.
+[SELECTED NBUTTON ONENABLE + REGISTERHOTKEYS IL]
+  IL_0000: ldarg.0
+  IL_0001: call System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys()
+  IL_0006: ldarg.0
+  IL_0007: call System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::UpdateControllerButton()
+  IL_000C: ret
+  IL_0000: ldarg.0
+  IL_0001: call System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_HasControllerHotkey()
+  IL_0006: brfalse.s IL_0057
+  IL_0008: ldarg.0
+  IL_0009: ldfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_000E: brfalse.s IL_0057
+  IL_0010: ldarg.0
+  IL_0011: callvirt System.String[] MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_Hotkeys()
+  IL_0016: stloc.0
+  IL_0017: ldc.i4.0
+  IL_0018: stloc.1
+  IL_0019: br.s IL_0051
+  IL_001B: ldloc.0
+  IL_001C: ldloc.1
+  IL_001D: ldelem.ref
+  IL_001E: stloc.2
+  IL_001F: call MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::get_Instance()
+  IL_0024: ldloc.2
+  IL_0025: ldarg.0
+  IL_0026: ldftn System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnPressHandler()
+  IL_002C: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  IL_0031: callvirt System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyPressedBinding(System.String,System.Action)
+  IL_0036: call MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::get_Instance()
+  IL_003B: ldloc.2
+  IL_003C: ldarg.0
+  IL_003D: ldftn System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnReleaseHandler()
+  IL_0043: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  IL_0048: callvirt System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyReleasedBinding(System.String,System.Action)
+  IL_004D: ldloc.1
+  IL_004E: ldc.i4.1
+  IL_004F: add
+  IL_0050: stloc.1
+  IL_0051: ldloc.1
+  IL_0052: ldloc.0
+  IL_0053: ldlen
+  IL_0054: conv.i4
+  IL_0055: blt.s IL_001B
+  IL_0057: ret
+[LIVE EMBARK NCONFIRMBUTTON NODE GRAPH] nodes=6
+  /Game | name=ConfirmButton | type=MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton
+  /Game/Shadow | name=Shadow | type=Godot.TextureRect
+  /Game/Outline | name=Outline | type=Godot.TextureRect
+  /Game/Image | name=Image | type=Godot.TextureRect
+  /Game/Image/Icon | name=Icon | type=Godot.TextureRect
+  /Game/Image/ControllerIcon | name=ControllerIcon | type=Godot.TextureRect
+[CHARACTER-SELECT SCENESTATE EMBARK ROOT — ALL SERIALIZED PROPERTIES]
+sceneStateType=Godot.SceneState; nodeCount=38
+name=ConfirmButton; path=./ConfirmButton; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[layout_mode=Godot.Variant:1]
+Confirm-button TSCN bytes=3458; sha256=b402c045162aa018a7bb901245bd0d0aa5658ffa426548520ebd600989e773ab.
+[CHARACTER-SELECT TSCN EMBARK CONTEXT]
+  L398: scroll_active = false
+  L399: horizontal_alignment = 1
+  L400: vertical_alignment = 1
+  L401: script = ExtResource("4_36sm0")
+  L402: MinFontSize = 32
+  L403: MaxFontSize = 32
+  L404: metadata/_custom_type_script = "uid://c2oywrx8xbqfx"
+  L405: 
+  L406: [node name="ConfirmButton" parent="." instance=ExtResource("7_41hqo")]
+  L407: layout_mode = 1
+  L408: 
+  L409: [node name="ControllerIcon" parent="ConfirmButton/Image" index="1"]
+  L410: material = SubResource("ShaderMaterial_dxegn")
+  L411: 
+  L412: [node name="RemotePlayerContainer" parent="." instance=ExtResource("20_3temk")]
+  L413: layout_mode = 1
+  L414: offset_bottom = 399.0
+  L415: 
+  L416: [node name="ActLabel" type="RichTextLabel" parent="."]
+  L417: clip_contents = false
+  L460: layout_mode = 1
+  L461: 
+  L462: [node name="Icon" parent="UnreadyButton/Image" index="0"]
+  L463: texture = ExtResource("19_g6e16")
+  L464: 
+  L465: [node name="ControllerIcon" parent="UnreadyButton" index="3"]
+  L466: material = SubResource("ShaderMaterial_3temk")
+  L467: 
+  L468: [editable path="ConfirmButton"]
+  L469: [editable path="UnreadyButton"]
+  L470: 
+[CONFIRM-BUTTON TSCN OUTLINE CONTEXT]
+  L1: [gd_scene load_steps=9 format=3 uid="uid://bl460ab2i4mkx"]
+  L2: 
+  L3: [ext_resource type="Script" uid="uid://bhwbc36rjhdsl" path="res://src/Core/Nodes/CommonUi/NConfirmButton.cs" id="1_oepry"]
+  L4: [ext_resource type="Texture2D" uid="uid://cp3mg3t" path="res://images/atlases/compressed.sprites/confirm_button_tick.tres" id="2_gyo8o"]
+  L5: [ext_resource type="Texture2D" uid="uid://yefjak" path="res://images/atlases/ui_atlas.sprites/confirm_button.tres" id="2_mgyux"]
+  L6: [ext_resource type="Texture2D" uid="uid://b1ommqi" path="res://images/atlases/compressed.sprites/confirm_button_outline.tres" id="3_p1qi5"]
+  L7: [ext_resource type="Shader" uid="uid://c66gb6g7tup3n" path="res://shaders/hsv.gdshader" id="5_rgtjk"]
+  L8: [ext_resource type="Texture2D" uid="uid://b5x513mavmk5v" path="res://images/ui/placeholder_controller_icon.png" id="7_hktrx"]
+  L9: [ext_resource type="Material" uid="uid://c4ycqv0gdxvmr" path="res://themes/canvas_item_material_additive_shared.tres" id="shared_additive_mat"]
+  L10: 
+  L11: [sub_resource type="ShaderMaterial" id="ShaderMaterial_ni7e0"]
+  L48: mouse_filter = 2
+  L49: texture = ExtResource("2_mgyux")
+  L50: expand_mode = 2
+  L51: stretch_mode = 5
+  L52: 
+  L53: [node name="Outline" type="TextureRect" parent="."]
+  L54: modulate = Color(0.941176, 0.705882, 0, 0.752941)
+  L55: material = ExtResource("shared_additive_mat")
+  L56: layout_mode = 1
+  L57: anchors_preset = 15
+  L58: anchor_right = 1.0
+[CONFIRM-BUTTON TSCN IMAGE CONTEXT]
+  L1: [gd_scene load_steps=9 format=3 uid="uid://bl460ab2i4mkx"]
+  L2: 
+  L3: [ext_resource type="Script" uid="uid://bhwbc36rjhdsl" path="res://src/Core/Nodes/CommonUi/NConfirmButton.cs" id="1_oepry"]
+  L4: [ext_resource type="Texture2D" uid="uid://cp3mg3t" path="res://images/atlases/compressed.sprites/confirm_button_tick.tres" id="2_gyo8o"]
+  L5: [ext_resource type="Texture2D" uid="uid://yefjak" path="res://images/atlases/ui_atlas.sprites/confirm_button.tres" id="2_mgyux"]
+  L6: [ext_resource type="Texture2D" uid="uid://b1ommqi" path="res://images/atlases/compressed.sprites/confirm_button_outline.tres" id="3_p1qi5"]
+  L7: [ext_resource type="Shader" uid="uid://c66gb6g7tup3n" path="res://shaders/hsv.gdshader" id="5_rgtjk"]
+  L8: [ext_resource type="Texture2D" uid="uid://b5x513mavmk5v" path="res://images/ui/placeholder_controller_icon.png" id="7_hktrx"]
+  L9: [ext_resource type="Material" uid="uid://c4ycqv0gdxvmr" path="res://themes/canvas_item_material_additive_shared.tres" id="shared_additive_mat"]
+  L10: 
+  L11: [sub_resource type="ShaderMaterial" id="ShaderMaterial_ni7e0"]
+  L12: resource_local_to_scene = true
+  L13: shader = ExtResource("5_rgtjk")
+  L66: mouse_filter = 2
+  L67: texture = ExtResource("3_p1qi5")
+  L68: expand_mode = 2
+  L69: stretch_mode = 5
+  L70: 
+  L71: [node name="Image" type="TextureRect" parent="."]
+  L72: layout_mode = 1
+  L73: anchors_preset = 15
+  L74: anchor_right = 1.0
+  L75: anchor_bottom = 1.0
+  L76: offset_left = -53.0
+  L82: mouse_filter = 2
+  L83: texture = ExtResource("2_mgyux")
+  L84: expand_mode = 1
+  L85: stretch_mode = 5
+  L86: 
+  L87: [node name="Icon" type="TextureRect" parent="Image"]
+  L88: modulate = Color(1, 0.964706, 0.886275, 1)
+  L89: layout_mode = 0
+  L90: offset_left = 88.0
+  L91: offset_top = 28.0
+  L92: offset_right = 168.0
+  L94: mouse_filter = 2
+  L95: texture = ExtResource("2_gyo8o")
+  L96: expand_mode = 2
+  L97: stretch_mode = 5
+  L98: 
+  L99: [node name="ControllerIcon" type="TextureRect" parent="Image"]
+  L100: unique_name_in_owner = true
+  L101: material = SubResource("ShaderMaterial_ni7e0")
+  L102: layout_mode = 1
+  L103: anchors_preset = 8
+  L104: anchor_left = 0.5
+Definite OnEnable preflight blockers: <none>
+
+[COMPILATION-EFFICIENT STEP-59 DIAGNOSTIC DECK]
+Purpose: maximize evidence per compiled IPA. This deck is observational only: no field writes, _Ready replay, OnEnable invocation, handler arm, rendering restart, or game-state repair.
+[RETAINED EMBARK FULL INHERITED FIELD MATRIX]
+  declaringType=MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton
+    Godot.Control _buttonImage=Godot.TextureRect
+    Godot.Color _defaultOutlineColor=Godot.Color:(1, 0.9647059, 0.8862745, 1)
+    Godot.Color _downColor=Godot.Color:(0.74509805, 0.74509805, 0.74509805, 1)
+    Godot.Vector2 _hidePos=Godot.Vector2:(740, 546)
+    System.String[] _hotkeys=System.String[][Length=1]
+    Godot.Color _hoveredOutlineColor=Godot.Color:(0.9372549, 0.78431374, 0.31764707, 1)
+    Godot.Tween _moveTween=Godot.Tween
+    Godot.Control _outline=Godot.TextureRect
+    Godot.Color _outlineColor=Godot.Color:(0.9411765, 0.7058824, 0, 1)
+    Godot.Color _outlineTransparentColor=Godot.Color:(0, 1, 1, 0)
+    Godot.Vector2 _posOffset=Godot.Vector2:(160, 354)
+    System.Threading.CancellationTokenSource _pressDownCancelToken=NULL
+    Godot.Vector2 _showPos=Godot.Vector2:(560, 546)
+    System.Threading.CancellationTokenSource _unhoverAnimCancelToken=NULL
+    Godot.Viewport _viewport=Godot.Window
+  declaringType=MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton
+    Godot.TextureRect _controllerHotkeyIcon=Godot.TextureRect
+  declaringType=MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl
+    System.Boolean <IsFocused>k__BackingField=System.Boolean:False
+    Godot.Vector2 _beginDragPosition=Godot.Vector2:(0, 0)
+    System.Single _ignoreDragThreshold=System.Single:-1
+    System.Boolean _isControllerFocused=System.Boolean:False
+    System.Boolean _isControllerNavigable=System.Boolean:False
+    System.Boolean _isEnabled=System.Boolean:False
+    System.Boolean _isHovered=System.Boolean:False
+    System.Boolean _isPressed=System.Boolean:False
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+FocusedEventHandler backing_Focused=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+MousePressedEventHandler backing_MousePressed=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+MouseReleasedEventHandler backing_MouseReleased=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+ReleasedEventHandler backing_Released=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+UnfocusedEventHandler backing_Unfocused=NULL
+  declaringType=Godot.GodotObject
+    System.IntPtr NativePtr=System.IntPtr:5657285632
+    System.Boolean _disposed=System.Boolean:False
+    System.Boolean _memoryOwn=System.Boolean:False
+    System.WeakReference`1[[Godot.GodotObject, GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null]] _weakReferenceToSelf=System.WeakReference`1[[Godot.GodotObject, GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null]]
+[RETAINED EMBARK OBSERVATIONAL ACCESSORS]
+  IsInsideTree()=System.Boolean:True
+  IsNodeReady()=System.Boolean:True
+  IsVisibleInTree()=System.Boolean:False
+  GetViewport()=Godot.Window
+  GetTree()=Godot.SceneTree
+  GetParent()=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen
+  GetOwner()=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen
+[LIVE NCONFIRMBUTTON PEER MATRIX — WHOLE RETAINED SCENETREE]
+  peer-matrix-failed=System.IO.InvalidDataException: Step 39.0 node-graph traversal exceeded 256 nodes.
+[NULL-FIELD LIVE NODE CANDIDATE MATRIX]
+  _outline: already-bound=Godot.TextureRect
+  _buttonImage: already-bound=Godot.TextureRect
+  _viewport: already-bound=Godot.Window
+  _hotkeys: already-bound=System.String[][Length=1]
+  _controllerHotkeyIcon: already-bound=Godot.TextureRect
+[NCONFIRMBUTTON _READY FIELD/CALL ORDER]
+  IL_0001: IL_0001: callvirt System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals()
+  IL_0008: IL_0008: stfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_000F: IL_000F: ldstr "Outline"
+  IL_0014: IL_0014: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_0019: IL_0019: call !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+  IL_001E: IL_001E: stfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_outline
+  IL_0025: IL_0025: ldstr "Image"
+  IL_002A: IL_002A: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_002F: IL_002F: call !!0 Godot.Node::GetNode<Godot.Control>(Godot.NodePath)
+  IL_0034: IL_0034: stfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_buttonImage
+  IL_003B: IL_003B: call Godot.Viewport Godot.Node::GetViewport()
+  IL_0040: IL_0040: stfld Godot.Viewport MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_viewport
+  IL_0047: IL_0047: call System.Single Godot.Control::get_OffsetRight()
+  IL_0053: IL_0053: call System.Single Godot.Control::get_OffsetBottom()
+  IL_005F: IL_005F: newobj System.Void Godot.Vector2::.ctor(System.Single,System.Single)
+  IL_0064: IL_0064: stfld Godot.Vector2 MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_posOffset
+  IL_006A: IL_006A: call Godot.SceneTree Godot.Node::GetTree()
+  IL_006F: IL_006F: callvirt Godot.Window Godot.SceneTree::get_Root()
+  IL_0080: IL_0080: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  IL_0085: IL_0085: call Godot.Callable Godot.Callable::From(System.Action)
+  IL_008B: IL_008B: callvirt Godot.Error Godot.GodotObject::Connect(Godot.StringName,Godot.Callable,System.UInt32)
+  IL_0092: IL_0092: call System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnWindowChange()
+  IL_0098: IL_0098: callvirt System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnDisable()
+[NCONFIRMBUTTON ONENABLE FIELD/CALL ORDER]
+  IL_0001: IL_0001: call System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable()
+  IL_0008: IL_0008: stfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_000E: IL_000E: ldfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_outline
+  IL_0013: IL_0013: call Godot.Color Godot.Colors::get_Transparent()
+  IL_0018: IL_0018: callvirt System.Void Godot.CanvasItem::set_Modulate(Godot.Color)
+  IL_001E: IL_001E: ldfld Godot.Control MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_buttonImage
+  IL_0023: IL_0023: call Godot.Color Godot.Colors::get_White()
+  IL_0028: IL_0028: callvirt System.Void Godot.CanvasItem::set_Modulate(Godot.Color)
+  IL_002E: IL_002E: ldfld Godot.Tween MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_moveTween
+  IL_0034: IL_0034: brtrue.s IL_0039
+  IL_0039: IL_0039: call System.Void Godot.Tween::Kill()
+  IL_0040: IL_0040: call Godot.Tween Godot.Node::CreateTween()
+  IL_0045: IL_0045: stfld Godot.Tween MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_moveTween
+  IL_004B: IL_004B: ldfld Godot.Tween MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_moveTween
+  IL_0051: IL_0051: ldstr "position"
+  IL_0056: IL_0056: call Godot.NodePath Godot.NodePath::op_Implicit(System.String)
+  IL_005C: IL_005C: ldfld Godot.Vector2 MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_showPos
+  IL_0061: IL_0061: call Godot.Variant Godot.Variant::op_Implicit(Godot.Vector2)
+  IL_006F: IL_006F: callvirt Godot.PropertyTweener Godot.Tween::TweenProperty(Godot.GodotObject,Godot.NodePath,Godot.Variant,System.Double)
+  IL_0076: IL_0076: callvirt Godot.PropertyTweener Godot.PropertyTweener::SetEase(Godot.Tween/EaseType)
+  IL_007E: IL_007E: callvirt Godot.PropertyTweener Godot.PropertyTweener::SetTrans(Godot.Tween/TransitionType)
+  IL_0083: IL_0083: callvirt Godot.PropertyTweener Godot.PropertyTweener::FromCurrent()
+[NBUTTON ONENABLE FIELD/CALL ORDER]
+  IL_0001: IL_0001: call System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys()
+  IL_0007: IL_0007: call System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::UpdateControllerButton()
+[NBUTTON REGISTERHOTKEYS FIELD/CALL ORDER]
+  IL_0001: IL_0001: call System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_HasControllerHotkey()
+  IL_0006: IL_0006: brfalse.s IL_0057
+  IL_0009: IL_0009: ldfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_000E: IL_000E: brfalse.s IL_0057
+  IL_0011: IL_0011: callvirt System.String[] MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_Hotkeys()
+  IL_001F: IL_001F: call MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::get_Instance()
+  IL_002C: IL_002C: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  IL_0031: IL_0031: callvirt System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyPressedBinding(System.String,System.Action)
+  IL_0036: IL_0036: call MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::get_Instance()
+  IL_0043: IL_0043: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  IL_0048: IL_0048: callvirt System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyReleasedBinding(System.String,System.Action)
+[NCLICKABLECONTROL ENABLE FIELD/CALL ORDER]
+  IL_0001: IL_0001: ldfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_0006: IL_0006: brfalse.s IL_0009
+  IL_000B: IL_000B: stfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isEnabled
+  IL_0012: IL_0012: ldfld System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::_isControllerNavigable
+  IL_0017: IL_0017: brtrue.s IL_001D
+  IL_001F: IL_001F: call System.Void Godot.Control::set_FocusMode(Godot.Control/FocusModeEnum)
+  IL_0025: IL_0025: callvirt System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnEnable()
+  IL_002B: IL_002B: call System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::RefreshFocus()
+  IL_0037: IL_0037: newobj System.Void System.Action::.ctor(System.Object,System.IntPtr)
+  IL_003C: IL_003C: call Godot.Callable Godot.Callable::From(System.Action)
+  IL_0044: IL_0044: call !!0[] System.Array::Empty<Godot.Variant>()
+  IL_0049: IL_0049: call System.Void Godot.Callable::CallDeferred(Godot.Variant[])
+[NCHARACTERSELECTSCREEN ONSUBMENUOPENED FIELD/CALL ORDER]
+  IL_0001: IL_0001: call System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu::OnSubmenuOpened()
+  IL_0007: IL_0007: ldfld Godot.Control MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_charButtonContainer
+  IL_000D: IL_000D: callvirt Godot.Collections.Array`1<Godot.Node> Godot.Node::GetChildren(System.Boolean)
+  IL_0012: IL_0012: call System.Collections.Generic.IEnumerable`1<!!0> System.Linq.Enumerable::OfType<MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton>(System.Collections.IEnumerable)
+  IL_0017: IL_0017: callvirt System.Collections.Generic.IEnumerator`1<!0> System.Collections.Generic.IEnumerable`1<MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton>::GetEnumerator()
+  IL_0020: IL_0020: callvirt !0 System.Collections.Generic.IEnumerator`1<MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton>::get_Current()
+  IL_0027: IL_0027: callvirt System.Boolean MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::get_IsLocked()
+  IL_002C: IL_002C: brtrue.s IL_0036
+  IL_002F: IL_002F: callvirt System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::Enable()
+  IL_0037: IL_0037: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible()
+  IL_003D: IL_003D: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Reset()
+  IL_0043: IL_0043: callvirt System.Boolean System.Collections.IEnumerator::MoveNext()
+  IL_0048: IL_0048: brtrue.s IL_001F
+  IL_004D: IL_004D: brfalse.s IL_0055
+  IL_0050: IL_0050: callvirt System.Void System.IDisposable::Dispose()
+  IL_0057: IL_0057: ldfld MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_embarkButton
+  IL_005C: IL_005C: callvirt System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::Enable()
+  IL_0061: IL_0061: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+  IL_0066: IL_0066: callvirt MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.SaveManager::get_Progress()
+  IL_006B: IL_006B: callvirt MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.ProgressState::get_PendingCharacterUnlock()
+  IL_0075: IL_0075: call System.Boolean MegaCrit.Sts2.Core.Models.ModelId::op_Equality(MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Models.ModelId)
+  IL_007A: IL_007A: brfalse.s IL_0090
+  IL_007D: IL_007D: ldfld Godot.Control MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_charButtonContainer
+  IL_0084: IL_0084: callvirt !!0 Godot.Node::GetChild<MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton>(System.Int32,System.Boolean)
+  IL_0089: IL_0089: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Select()
+  IL_0091: IL_0091: call MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+  IL_0096: IL_0096: callvirt MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.SaveManager::get_Progress()
+  IL_009B: IL_009B: callvirt MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.ProgressState::get_PendingCharacterUnlock()
+  IL_00A0: IL_00A0: call System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId)
+  IL_00A5: IL_00A5: call System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::RunSafely(System.Threading.Tasks.Task)
+  IL_00AC: IL_00AC: ldfld MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_remotePlayerContainer
+  IL_00B2: IL_00B2: ldfld MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_lobby
+  IL_00B7: IL_00B7: callvirt MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_NetService()
+  IL_00BC: IL_00BC: callvirt MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService::get_Type()
+  IL_00C7: IL_00C7: callvirt System.Void Godot.CanvasItem::set_Visible(System.Boolean)
+  IL_00CD: IL_00CD: ldfld MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_remotePlayerContainer
+  IL_00D3: IL_00D3: ldfld MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_lobby
+  IL_00D9: IL_00D9: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby,System.Boolean)
+  IL_00DF: IL_00DF: ldfld MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_lobby
+  IL_00E4: IL_00E4: callvirt MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_NetService()
+  IL_00E9: IL_00E9: callvirt MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService::get_Type()
+  IL_00F2: IL_00F2: ldfld MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_ascensionPanel
+  IL_00F8: IL_00F8: ldfld MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_lobby
+  IL_00FD: IL_00FD: callvirt System.Int32 MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_Ascension()
+  IL_0102: IL_0102: callvirt System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::SetAscensionLevel(System.Int32)
+  IL_0108: IL_0108: ldfld MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_actDropdown
+  IL_010E: IL_010E: call System.Boolean MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::get_ShouldShowActDropdown()
+  IL_0113: IL_0113: callvirt System.Void Godot.CanvasItem::set_Visible(System.Boolean)
+  IL_0119: IL_0119: ldfld MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_actDropdownLabel
+  IL_011F: IL_011F: ldfld MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_actDropdown
+  IL_0124: IL_0124: callvirt System.Boolean Godot.CanvasItem::get_Visible()
+  IL_0129: IL_0129: callvirt System.Void Godot.CanvasItem::set_Visible(System.Boolean)
+  IL_012F: IL_012F: ldfld Godot.Control MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_readyAndWaitingContainer
+  IL_0135: IL_0135: callvirt System.Void Godot.CanvasItem::set_Visible(System.Boolean)
+  IL_013B: IL_013B: ldfld MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::_lobby
+  IL_0140: IL_0140: callvirt System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer> MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_Players()
+  IL_0145: IL_0145: callvirt System.Collections.Generic.List`1/Enumerator<!0> System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer>::GetEnumerator()
+  IL_014F: IL_014F: call !0 System.Collections.Generic.List`1/Enumerator<MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer>::get_Current()
+  IL_0157: IL_0157: call System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::RefreshButtonSelectionForPlayer(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer)
+  IL_015E: IL_015E: call System.Boolean System.Collections.Generic.List`1/Enumerator<MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer>::MoveNext()
+  IL_0163: IL_0163: brtrue.s IL_014D
+  IL_016F: IL_016F: callvirt System.Void System.IDisposable::Dispose()
+[TRANSITIVE EXECUTION FRONTIER — MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton._Ready]
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 12
+Compiler state-machine MoveNext expansions reached from immediate edges: 0
+Immediate classified boundary references: 0
+Deferred/non-executing method-reference frontiers: 8
+Runtime-guarded immediate frontiers: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06001B98; MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance()
+  - token=0x06004F51; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::get_AllowFocusWhileDisabled()
+  - token=0x06004F52; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::get_IsFocused()
+  - token=0x06004F53; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::set_IsFocused(System.Boolean)
+  - token=0x06004F55; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals()
+  - token=0x06004F57; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnFocusHandler()
+  - token=0x06004F5F; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::RefreshFocus()
+  - token=0x06004F60; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnFocus()
+  - token=0x06004F61; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnUnfocus()
+  - token=0x06004F6D; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnDisable()
+  - token=0x060054BD; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready()
+  - token=0x060054BF; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnWindowChange()
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - none
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnWindowChange(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnWindowChange()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::HandleMousePress(Godot.InputEvent); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::HandleMousePress(Godot.InputEvent)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::HandleMouseRelease(Godot.InputEvent); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::HandleMouseRelease(Godot.InputEvent)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnFocusHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnFocusHandler()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnHoverHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnHoverHandler()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnUnFocusHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnUnFocusHandler()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnUnhoverHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnUnhoverHandler()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnVisibilityChanged(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::_Ready() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::ConnectSignals() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnVisibilityChanged()
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - none
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - none
+
+[TRANSITIVE EXECUTION FRONTIER — MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton.OnEnable]
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 20
+Compiler state-machine MoveNext expansions reached from immediate edges: 0
+Immediate classified boundary references: 0
+Deferred/non-executing method-reference frontiers: 2
+Runtime-guarded immediate frontiers: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06001B98; MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance()
+  - token=0x06001BA9; MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager MegaCrit.Sts2.Core.Nodes.NGame::get_InputManager()
+  - token=0x06001BAB; MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.NGame::get_HotkeyManager()
+  - token=0x06004F33; System.String[] MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_Hotkeys()
+  - token=0x06004F34; System.String MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_ControllerIconHotkey()
+  - token=0x06004F35; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_HasControllerHotkey()
+  - token=0x06004F3D; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable()
+  - token=0x06004F3F; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::UpdateControllerButton()
+  - token=0x06004F40; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys()
+  - token=0x060054C0; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnEnable()
+  - token=0x060054DB; MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager::get_Instance()
+  - token=0x060054DD; System.Boolean MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager::get_IsUsingController()
+  - token=0x060054E8; Godot.Texture2D MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager::GetHotkeyIcon(System.String)
+  - token=0x06005610; MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::get_Instance()
+  - token=0x06005611; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyPressedBinding(System.String,System.Action)
+  - token=0x06005613; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyReleasedBinding(System.String,System.Action)
+  - token=0x06005625; MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::get_Instance()
+  - token=0x06005627; MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::get_ControllerManager()
+  - token=0x06005631; Godot.Texture2D MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::GetHotkeyIcon(System.String)
+  - token=0x0600B9DA; Godot.Texture2D MegaCrit.Sts2.Core.ControllerInput.IControllerInputStrategy::GetHotkeyIcon(System.String)
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - none
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnPressHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnEnable() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnPressHandler()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnReleaseHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton::OnEnable() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnReleaseHandler()
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - none
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - none
+
+[TRANSITIVE EXECUTION FRONTIER — MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton.OnEnable]
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 19
+Compiler state-machine MoveNext expansions reached from immediate edges: 0
+Immediate classified boundary references: 0
+Deferred/non-executing method-reference frontiers: 2
+Runtime-guarded immediate frontiers: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06001B98; MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance()
+  - token=0x06001BA9; MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager MegaCrit.Sts2.Core.Nodes.NGame::get_InputManager()
+  - token=0x06001BAB; MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.NGame::get_HotkeyManager()
+  - token=0x06004F33; System.String[] MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_Hotkeys()
+  - token=0x06004F34; System.String MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_ControllerIconHotkey()
+  - token=0x06004F35; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_HasControllerHotkey()
+  - token=0x06004F3D; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable()
+  - token=0x06004F3F; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::UpdateControllerButton()
+  - token=0x06004F40; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys()
+  - token=0x060054DB; MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager::get_Instance()
+  - token=0x060054DD; System.Boolean MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager::get_IsUsingController()
+  - token=0x060054E8; Godot.Texture2D MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager::GetHotkeyIcon(System.String)
+  - token=0x06005610; MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::get_Instance()
+  - token=0x06005611; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyPressedBinding(System.String,System.Action)
+  - token=0x06005613; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyReleasedBinding(System.String,System.Action)
+  - token=0x06005625; MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::get_Instance()
+  - token=0x06005627; MegaCrit.Sts2.Core.Nodes.CommonUi.NControllerManager MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::get_ControllerManager()
+  - token=0x06005631; Godot.Texture2D MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager::GetHotkeyIcon(System.String)
+  - token=0x0600B9DA; Godot.Texture2D MegaCrit.Sts2.Core.ControllerInput.IControllerInputStrategy::GetHotkeyIcon(System.String)
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - none
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnPressHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnPressHandler()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnReleaseHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::OnEnable() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnReleaseHandler()
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - none
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - none
+
+[TRANSITIVE EXECUTION FRONTIER — MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton.RegisterHotkeys]
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 8
+Compiler state-machine MoveNext expansions reached from immediate edges: 0
+Immediate classified boundary references: 0
+Deferred/non-executing method-reference frontiers: 2
+Runtime-guarded immediate frontiers: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06001B98; MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance()
+  - token=0x06001BAB; MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.NGame::get_HotkeyManager()
+  - token=0x06004F33; System.String[] MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_Hotkeys()
+  - token=0x06004F35; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::get_HasControllerHotkey()
+  - token=0x06004F40; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys()
+  - token=0x06005610; MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::get_Instance()
+  - token=0x06005611; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyPressedBinding(System.String,System.Action)
+  - token=0x06005613; System.Void MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager::PushHotkeyReleasedBinding(System.String,System.Action)
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - none
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnPressHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnPressHandler()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnReleaseHandler(); path=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton::RegisterHotkeys() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnReleaseHandler()
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - none
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - none
+
+[TRANSITIVE EXECUTION FRONTIER — MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl.Enable]
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 8
+Compiler state-machine MoveNext expansions reached from immediate edges: 0
+Immediate classified boundary references: 0
+Deferred/non-executing method-reference frontiers: 1
+Runtime-guarded immediate frontiers: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06004F51; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::get_AllowFocusWhileDisabled()
+  - token=0x06004F52; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::get_IsFocused()
+  - token=0x06004F53; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::set_IsFocused(System.Boolean)
+  - token=0x06004F5F; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::RefreshFocus()
+  - token=0x06004F60; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnFocus()
+  - token=0x06004F61; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnUnfocus()
+  - token=0x06004F6A; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::Enable()
+  - token=0x06004F6C; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnEnable()
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - none
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::<Enable>b__42_0(); path=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::Enable() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::<Enable>b__42_0()
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - none
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - none
+
+[TRANSITIVE EXECUTION FRONTIER — MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen.OnSubmenuOpened]
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 199
+Compiler state-machine MoveNext expansions reached from immediate edges: 5
+Immediate classified boundary references: 5
+Deferred/non-executing method-reference frontiers: 18
+Runtime-guarded immediate frontiers: 4
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06000304; System.Collections.Generic.IEnumerable`1<MegaCrit.Sts2.Core.Models.CharacterModel> MegaCrit.Sts2.Core.Unlocks.UnlockState::get_Characters()
+  - token=0x0600030D; System.Void MegaCrit.Sts2.Core.Unlocks.UnlockState::.ctor(MegaCrit.Sts2.Core.Saves.ProgressState)
+  - token=0x0600030F; System.Boolean MegaCrit.Sts2.Core.Unlocks.UnlockState::IsEpochRevealed()
+  - token=0x0600034C; System.String MegaCrit.Sts2.Core.Timeline.EpochModel::GetId()
+  - token=0x06000573; System.Boolean MegaCrit.Sts2.Core.TestSupport.TestMode::get_IsOn()
+  - token=0x06000E0D; MegaCrit.Sts2.Core.Settings.FastModeType MegaCrit.Sts2.Core.Saves.PrefsSave::get_FastMode()
+  - token=0x06000E2C; System.Collections.Generic.IReadOnlyDictionary`2<MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Saves.EncounterStats> MegaCrit.Sts2.Core.Saves.ProgressState::get_EncounterStats()
+  - token=0x06000E34; System.Collections.Generic.IReadOnlyList`1<MegaCrit.Sts2.Core.Saves.SerializableEpoch> MegaCrit.Sts2.Core.Saves.ProgressState::get_Epochs()
+  - token=0x06000E4D; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Saves.ProgressState::get_PendingCharacterUnlock()
+  - token=0x06000E4E; System.Void MegaCrit.Sts2.Core.Saves.ProgressState::set_PendingCharacterUnlock(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06000E4F; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_Wins()
+  - token=0x06000E50; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_Losses()
+  - token=0x06000E53; System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_NumberOfRuns()
+  - token=0x06000EB8; MegaCrit.Sts2.Core.Saves.PrefsSave MegaCrit.Sts2.Core.Saves.SaveManager::get_PrefsSave()
+  - token=0x06000EB9; MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.SaveManager::get_Progress()
+  - token=0x06000EF5; MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.SaveManager::GenerateUnlockStateFromProgress()
+  - token=0x0600122F; MegaCrit.Sts2.Core.Saves.PrefsSave MegaCrit.Sts2.Core.Saves.Managers.PrefsSaveManager::get_Prefs()
+  - token=0x0600123C; MegaCrit.Sts2.Core.Saves.ProgressState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::get_Progress()
+  - token=0x06001243; MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::GenerateUnlockState()
+  - token=0x060019FA; System.UInt64 MegaCrit.Sts2.Core.Random.MegaRandom::NextULongInner()
+  - token=0x060019FD; System.Double MegaCrit.Sts2.Core.Random.MegaRandom::NextDouble()
+  - token=0x06001A0F; MegaCrit.Sts2.Core.Random.Rng MegaCrit.Sts2.Core.Random.Rng::get_Chaotic()
+  - token=0x06001A10; System.Int32 MegaCrit.Sts2.Core.Random.Rng::get_Counter()
+  - token=0x06001A11; System.Void MegaCrit.Sts2.Core.Random.Rng::set_Counter(System.Int32)
+  - token=0x06001A1C; System.Single MegaCrit.Sts2.Core.Random.Rng::NextFloat(System.Single)
+  - token=0x06001A1D; System.Single MegaCrit.Sts2.Core.Random.Rng::NextFloat(System.Single,System.Single)
+  - token=0x06001A33; System.Boolean MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::get_SupportsInviteDialog()
+  - token=0x06001A46; MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - token=0x06001A4B; System.Boolean MegaCrit.Sts2.Core.Platform.PlatformUtil::SupportsInviteDialog(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - token=0x06001B98; MegaCrit.Sts2.Core.Nodes.NGame MegaCrit.Sts2.Core.Nodes.NGame::get_Instance()
+  - token=0x06001BB5; MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager MegaCrit.Sts2.Core.Nodes.NGame::get_DebugAudio()
+  - token=0x06001BD4; System.Boolean MegaCrit.Sts2.Core.Nodes.NGame::IsMainThread()
+  - token=0x06003F8E; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu::OnSubmenuOpened()
+  - token=0x060043C0; MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.ICharacterSelectButtonDelegate::get_Lobby()
+  - token=0x060043C1; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.ICharacterSelectButtonDelegate::SelectCharacter(MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton,MegaCrit.Sts2.Core.Models.CharacterModel)
+  - token=0x060043D9; System.Int32 MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::get_Ascension()
+  - token=0x060043DA; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::set_Ascension(System.Int32)
+  - token=0x060043E0; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::SetAscensionLevel(System.Int32)
+  - token=0x060043E3; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::RefreshArrowVisibility()
+  - token=0x060043E5; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::RefreshAscensionText()
+  - token=0x06004408; System.Collections.Generic.IReadOnlyCollection`1<System.UInt64> MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::get_RemoteSelectedPlayers()
+  - token=0x06004409; MegaCrit.Sts2.Core.Models.CharacterModel MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::get_Character()
+  - token=0x0600440A; System.Boolean MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::get_IsLocked()
+  - token=0x06004412; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::LockForAnimation()
+  - token=0x06004413; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::AnimateUnlock()
+  - token=0x06004414; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Reset()
+  - token=0x06004415; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::OnRemotePlayerSelected(System.UInt64)
+  - token=0x06004416; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::OnRemotePlayerDeselected(System.UInt64)
+  - token=0x06004417; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Select()
+  - token=0x06004418; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Deselect()
+  - token=0x06004419; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::RefreshState()
+  - token=0x0600441A; System.Single MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::GetSaturationForCurrentState()
+  - token=0x0600441B; System.Single MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::GetValueForCurrentState()
+  - token=0x0600441C; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::AnimateSaturationToCurrentState(Godot.Tween)
+  - token=0x0600441D; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::RefreshOutline()
+  - token=0x0600441E; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::RefreshPlayerIcons()
+  - token=0x06004420; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible()
+  - token=0x06004435; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton/<AnimateUnlock>d__55::MoveNext()
+  - token=0x06004444; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened()
+  - token=0x06004445; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06004446; System.Boolean MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::get_ShouldShowActDropdown()
+  - token=0x06004455; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::RefreshButtonSelectionForPlayer(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer)
+  - token=0x06004475; System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext()
+  - token=0x06004D2A; System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby)
+  - token=0x06004D2E; System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::UpdateVisibility()
+  - token=0x06004E75; MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayer MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayer::Create(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer,MegaCrit.Sts2.Core.Platform.PlatformType,System.Boolean)
+  - token=0x06004E92; System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby,System.Boolean)
+  - token=0x06004E93; System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::OnPlayerConnected(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer)
+  - token=0x06004E96; System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::RefreshSoloLabelVisibility()
+  - token=0x06004F51; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::get_AllowFocusWhileDisabled()
+  - token=0x06004F52; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::get_IsFocused()
+  - token=0x06004F53; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::set_IsFocused(System.Boolean)
+  - token=0x06004F5F; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::RefreshFocus()
+  - token=0x06004F60; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnFocus()
+  - token=0x06004F61; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnUnfocus()
+  - token=0x06004F6A; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::Enable()
+  - token=0x06004F6B; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::Disable()
+  - token=0x06004F6C; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnEnable()
+  - token=0x06004F6D; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::OnDisable()
+  - token=0x06004FDF; System.Threading.Tasks.Task`1<System.Single> MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil::AwaitProcessFrame(Godot.Node,System.Threading.CancellationToken)
+  - token=0x06004FE1; Godot.SceneTree MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil::GetTreeOrNull(Godot.Node)
+  - token=0x06004FE3; System.Boolean MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil::IsValid(Godot.Node)
+  - token=0x06004FF1; System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil/<AwaitProcessFrame>d__0::MoveNext()
+  - token=0x0600639D; MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService::get_Type()
+  - token=0x0600639E; MegaCrit.Sts2.Core.Platform.PlatformType MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService::get_Platform()
+  - token=0x060063E1; System.Boolean MegaCrit.Sts2.Core.Multiplayer.Game.NetGameTypeExtensions::IsMultiplayer(MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType)
+  - token=0x06006539; MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_NetService()
+  - token=0x0600653C; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_MaxPlayers()
+  - token=0x0600653E; System.Int32 MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_Ascension()
+  - token=0x0600654D; System.Collections.Generic.List`1<MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer> MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_Players()
+  - token=0x0600654E; MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_LocalPlayer()
+  - token=0x0600654F; System.Void MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::add_PlayerConnected(System.Action`1<MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer>)
+  - token=0x06006551; System.Void MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::add_PlayerDisconnected(System.Action`1<MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer>)
+  - token=0x0600665D; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Models.AbstractModel::get_Id()
+  - token=0x06006722; System.Boolean MegaCrit.Sts2.Core.Models.AbstractModel::ShouldStopCombatFromEnding()
+  - token=0x06006920; System.String MegaCrit.Sts2.Core.Models.CharacterModel::get_CharacterSelectIconPath()
+  - token=0x06006921; Godot.CompressedTexture2D MegaCrit.Sts2.Core.Models.CharacterModel::get_CharacterSelectIcon()
+  - token=0x06006922; System.String MegaCrit.Sts2.Core.Models.CharacterModel::get_CharacterSelectLockedIconPath()
+  - token=0x06006923; Godot.CompressedTexture2D MegaCrit.Sts2.Core.Models.CharacterModel::get_CharacterSelectLockedIcon()
+  - token=0x06006A04; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Models.ModelDb::GetId()
+  - token=0x06006A05; MegaCrit.Sts2.Core.Models.ModelId MegaCrit.Sts2.Core.Models.ModelDb::GetId(System.Type)
+  - token=0x06006A06; System.Type MegaCrit.Sts2.Core.Models.ModelDb::GetCategoryType(System.Type)
+  - token=0x06006A07; System.String MegaCrit.Sts2.Core.Models.ModelDb::GetCategory(System.Type)
+  - token=0x06006A08; System.String MegaCrit.Sts2.Core.Models.ModelDb::GetEntry(System.Type)
+  - token=0x06006A0C; T MegaCrit.Sts2.Core.Models.ModelDb::Get()
+  - token=0x06006A18; T MegaCrit.Sts2.Core.Models.ModelDb::Character()
+  - token=0x06006A19; System.Collections.Generic.IEnumerable`1<MegaCrit.Sts2.Core.Models.CharacterModel> MegaCrit.Sts2.Core.Models.ModelDb::get_AllCharacters()
+  - token=0x06006A5C; System.Type MegaCrit.Sts2.Core.Models.ModelId::get_EqualityContract()
+  - token=0x06006A5E; System.String MegaCrit.Sts2.Core.Models.ModelId::get_Entry()
+  - token=0x06006A5F; System.Void MegaCrit.Sts2.Core.Models.ModelId::.ctor(System.String,System.String)
+  - token=0x06006A64; System.String MegaCrit.Sts2.Core.Models.ModelId::SlugifyCategory(System.String)
+  - token=0x06006A67; System.Boolean MegaCrit.Sts2.Core.Models.ModelId::op_Equality(MegaCrit.Sts2.Core.Models.ModelId,MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x06006A6A; System.Boolean MegaCrit.Sts2.Core.Models.ModelId::Equals(MegaCrit.Sts2.Core.Models.ModelId)
+  - token=0x0600ABFE; System.Void MegaCrit.Sts2.Core.Logging.ILogPrinter::Print(MegaCrit.Sts2.Core.Logging.LogLevel,System.String,System.Int32)
+  - token=0x0600AC07; System.Void MegaCrit.Sts2.Core.Logging.Log::Warn(System.String,System.Int32)
+  - token=0x0600AC08; System.Void MegaCrit.Sts2.Core.Logging.Log::Error(System.String,System.Int32)
+  - token=0x0600AC0B; MegaCrit.Sts2.Core.Logging.LogLevel MegaCrit.Sts2.Core.Logging.Logger::get_GlobalLogLevel()
+  - token=0x0600AC0E; System.String MegaCrit.Sts2.Core.Logging.Logger::get_Context()
+  - token=0x0600AC14; System.Boolean MegaCrit.Sts2.Core.Logging.Logger::WillLog(MegaCrit.Sts2.Core.Logging.LogLevel)
+  - token=0x0600AC15; System.Void MegaCrit.Sts2.Core.Logging.Logger::LogMessage(MegaCrit.Sts2.Core.Logging.LogLevel,System.String,System.Int32)
+  - token=0x0600AC16; System.Void MegaCrit.Sts2.Core.Logging.Logger::LogMessage(MegaCrit.Sts2.Core.Logging.LogLevel,MegaCrit.Sts2.Core.Logging.LogType,System.String,System.Int32)
+  - token=0x0600AC1B; System.Void MegaCrit.Sts2.Core.Logging.Logger::Warn(System.String,System.Int32)
+  - token=0x0600AC1C; System.Void MegaCrit.Sts2.Core.Logging.Logger::Error(System.String,System.Int32)
+  - token=0x0600AC2A; System.Void MegaCrit.Sts2.Core.Localization.LocException::.ctor(System.String)
+  - token=0x0600AC44; MegaCrit.Sts2.Core.Localization.LocManager MegaCrit.Sts2.Core.Localization.LocManager::get_Instance()
+  - token=0x0600AC4E; System.Globalization.CultureInfo MegaCrit.Sts2.Core.Localization.LocManager::get_CultureInfo()
+  - token=0x0600AC59; System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>)
+  - token=0x0600AC5B; System.String MegaCrit.Sts2.Core.Localization.LocManager::ToString(System.Collections.Generic.Dictionary`2<System.String,System.Object>)
+  - token=0x0600AC61; MegaCrit.Sts2.Core.Localization.LocTable MegaCrit.Sts2.Core.Localization.LocManager::GetTable(System.String)
+  - token=0x0600AC79; System.Void MegaCrit.Sts2.Core.Localization.LocManager/<>c__DisplayClass48_0::.ctor()
+  - token=0x0600AC7B; System.Void MegaCrit.Sts2.Core.Localization.LocString::.ctor(System.String,System.String)
+  - token=0x0600AC7C; System.String MegaCrit.Sts2.Core.Localization.LocString::get_LocTable()
+  - token=0x0600AC7D; System.String MegaCrit.Sts2.Core.Localization.LocString::get_LocEntryKey()
+  - token=0x0600AC82; System.String MegaCrit.Sts2.Core.Localization.LocString::GetFormattedText()
+  - token=0x0600AC83; System.String MegaCrit.Sts2.Core.Localization.LocString::GetRawText()
+  - token=0x0600ACC9; System.String MegaCrit.Sts2.Core.Localization.LocTable::GetRawText(System.String)
+  - token=0x0600ACCB; System.Boolean MegaCrit.Sts2.Core.Localization.LocTable::IsLocalKey(System.String)
+  - token=0x0600AED8; System.Boolean MegaCrit.Sts2.Core.Hooks.Hook::ShouldStopCombatFromEnding(MegaCrit.Sts2.Core.Combat.ICombatState)
+  - token=0x0600AF8B; MegaCrit.Sts2.Core.Localization.LocString MegaCrit.Sts2.Core.Helpers.AscensionHelper::GetTitle(System.Int32)
+  - token=0x0600AF8C; MegaCrit.Sts2.Core.Localization.LocString MegaCrit.Sts2.Core.Helpers.AscensionHelper::GetDescription(System.Int32)
+  - token=0x0600AF8D; System.String MegaCrit.Sts2.Core.Helpers.AscensionHelper::GetKey(System.Int32)
+  - token=0x0600AF99; System.Single MegaCrit.Sts2.Core.Helpers.Ease::QuadOut(System.Single)
+  - token=0x0600AFBA; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::AddChildSafely(Godot.Node,Godot.Node)
+  - token=0x0600AFBC; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::MoveChildSafely(Godot.Node,Godot.Node,System.Int32)
+  - token=0x0600AFBE; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::RemoveChildSafely(Godot.Node,Godot.Node)
+  - token=0x0600AFBF; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::QueueFreeSafely(Godot.Node)
+  - token=0x0600AFC0; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::QueueFreeSafelyNoPool(Godot.Node)
+  - token=0x0600AFC2; System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions/<>c__DisplayClass5_0::.ctor()
+  - token=0x0600AFD5; System.String MegaCrit.Sts2.Core.Helpers.ImageHelper::GetImagePath(System.String)
+  - token=0x0600AFDF; System.Func`1<System.Boolean> MegaCrit.Sts2.Core.Helpers.NonInteractiveMode::get_AutoSlayerCheck()
+  - token=0x0600AFE1; System.Boolean MegaCrit.Sts2.Core.Helpers.NonInteractiveMode::get_IsActive()
+  - token=0x0600B008; System.Text.RegularExpressions.Regex MegaCrit.Sts2.Core.Helpers.StringHelper::CamelCaseRegex()
+  - token=0x0600B00A; System.Text.RegularExpressions.Regex MegaCrit.Sts2.Core.Helpers.StringHelper::WhitespaceRegex()
+  - token=0x0600B00B; System.Text.RegularExpressions.Regex MegaCrit.Sts2.Core.Helpers.StringHelper::SpecialCharRegex()
+  - token=0x0600B00D; System.String MegaCrit.Sts2.Core.Helpers.StringHelper::Slugify(System.String)
+  - token=0x0600B01B; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::RunSafely(System.Threading.Tasks.Task)
+  - token=0x0600B01C; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::LogTaskExceptions(System.Threading.Tasks.Task)
+  - token=0x0600B01E; System.Void MegaCrit.Sts2.Core.Helpers.TaskHelper/<LogTaskExceptions>d__1::MoveNext()
+  - token=0x0600B974; System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception)
+  - token=0x0600B975; System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception,System.Action`1<Sentry.Scope>)
+  - token=0x0600BB11; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Boolean)
+  - token=0x0600BB12; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Threading.CancellationToken,System.Boolean)
+  - token=0x0600BB13; System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::WaitInternal(Godot.SceneTreeTimer,System.Threading.CancellationToken)
+  - token=0x0600BB15; System.Void MegaCrit.Sts2.Core.Commands.Cmd/<>c__DisplayClass2_0::.ctor()
+  - token=0x0600BB1A; System.Void MegaCrit.Sts2.Core.Commands.Cmd/<Wait>d__1::MoveNext()
+  - token=0x0600BC73; MegaCrit.Sts2.Core.Combat.CombatManager MegaCrit.Sts2.Core.Combat.CombatManager::get_Instance()
+  - token=0x0600BC9A; System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager::get_IsInProgress()
+  - token=0x0600BCA2; System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager::get_IsEnding()
+  - token=0x0600BCD1; System.Type MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState::get_EqualityContract()
+  - token=0x0600BCD8; System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState::op_Inequality(MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState,MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState)
+  - token=0x0600BCD9; System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState::op_Equality(MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState,MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState)
+  - token=0x0600BCDC; System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState::Equals(MegaCrit.Sts2.Core.Combat.CombatManager/PendingLossState)
+  - token=0x0600BD21; System.Collections.Generic.IReadOnlyList`1<MegaCrit.Sts2.Core.Entities.Creatures.Creature> MegaCrit.Sts2.Core.Combat.CombatState::get_Enemies()
+  - token=0x0600BDAD; System.Collections.Generic.IEnumerable`1<MegaCrit.Sts2.Core.Models.AbstractModel> MegaCrit.Sts2.Core.Combat.ICombatState::IterateHookListeners()
+  - token=0x0600C077; MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::get_Instance()
+  - token=0x0600C079; System.Int32 MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::Play(System.String,System.Single,MegaCrit.Sts2.Core.Audio.Debug.PitchVariance)
+  - token=0x0600C081; System.Single MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::GetRandomPitchScale(MegaCrit.Sts2.Core.Audio.Debug.PitchVariance)
+  - token=0x0600C093; System.Void MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager/<>c__DisplayClass9_0::.ctor()
+  - token=0x0600C097; System.String MegaCrit.Sts2.Core.Audio.Debug.TmpSfx::GetPath(System.String)
+  - token=0x0600C09A; Godot.Resource MegaCrit.Sts2.Core.Assets.AssetCache::GetAsset(System.String)
+  - token=0x0600C09B; TS MegaCrit.Sts2.Core.Assets.AssetCache::GetAsset(System.String)
+  - token=0x0600C09C; Godot.Resource MegaCrit.Sts2.Core.Assets.AssetCache::LoadAsset(System.String)
+  - token=0x0600C0A4; Godot.PackedScene MegaCrit.Sts2.Core.Assets.AssetCache::GetScene(System.String)
+  - token=0x0600C0A5; Godot.Texture2D MegaCrit.Sts2.Core.Assets.AssetCache::GetTexture2D(System.String)
+  - token=0x0600C0AB; System.Void MegaCrit.Sts2.Core.Assets.AssetLoadException::.ctor(System.String)
+  - token=0x0600C10D; MegaCrit.Sts2.Core.Assets.AssetCache MegaCrit.Sts2.Core.Assets.PreloadManager::get_Cache()
+  - token=0x0600C193; System.Boolean MegaCrit.Sts2.addons.mega_text.MegaLabel::get_AutoSizeEnabled()
+  - token=0x0600C195; System.Int32 MegaCrit.Sts2.addons.mega_text.MegaLabel::get_MinFontSize()
+  - token=0x0600C197; System.Int32 MegaCrit.Sts2.addons.mega_text.MegaLabel::get_MaxFontSize()
+  - token=0x0600C19C; System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::SetTextAutoSize(System.String)
+  - token=0x0600C19D; System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::SetFontSize(System.Int32)
+  - token=0x0600C19E; System.Void MegaCrit.Sts2.addons.mega_text.MegaLabel::AdjustFontSize()
+  - token=0x0600C1B3; Godot.Vector2 MegaCrit.Sts2.addons.mega_text.MegaLabelHelper::EstimateTextSize(Godot.TextParagraph,System.String,Godot.Font,System.Int32,System.Single,System.Single,System.Boolean)
+  - token=0x0600C1B4; System.Boolean MegaCrit.Sts2.addons.mega_text.MegaLabelHelper::IsTooBig(Godot.TextParagraph,System.String,Godot.Font,System.Int32,System.Single,System.Boolean,Godot.Vector2)
+  - token=0x0600C1B7; System.Boolean MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::get_AutoSizeEnabled()
+  - token=0x0600C1C4; System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::InstallEffectsIfNeeded()
+  - token=0x0600C1C6; System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::SetTextAutoSize(System.String)
+  - token=0x0600C1C8; System.Void MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel::set_Text(System.String)
+  - token=0x0600C1E6; System.Void <>z__ReadOnlyArray`1::.ctor(T[])
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - category=PLATFORM
+      reference: MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby,System.Boolean) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::UpdateVisibility() -> System.Boolean MegaCrit.Sts2.Core.Platform.PlatformUtil::SupportsInviteDialog(MegaCrit.Sts2.Core.Platform.PlatformType) -> MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy MegaCrit.Sts2.Core.Platform.PlatformUtil::GetPlatformUtil(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::get_SupportsInviteDialog()
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby,System.Boolean) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::UpdateVisibility() -> System.Boolean MegaCrit.Sts2.Core.Platform.PlatformUtil::SupportsInviteDialog(MegaCrit.Sts2.Core.Platform.PlatformType) -> System.Boolean MegaCrit.Sts2.Core.Platform.IPlatformUtilStrategy::get_SupportsInviteDialog()
+  - category=PLATFORM
+      reference: System.Boolean MegaCrit.Sts2.Core.Platform.PlatformUtil::SupportsInviteDialog(MegaCrit.Sts2.Core.Platform.PlatformType)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby,System.Boolean) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::UpdateVisibility() -> System.Boolean MegaCrit.Sts2.Core.Platform.PlatformUtil::SupportsInviteDialog(MegaCrit.Sts2.Core.Platform.PlatformType)
+  - category=SENTRY_INERT_WRAPPER
+      reference: System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::RunSafely(System.Threading.Tasks.Task) -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::LogTaskExceptions(System.Threading.Tasks.Task) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Helpers.TaskHelper/<LogTaskExceptions>d__1::MoveNext() -> System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception)
+  - category=SENTRY_INERT_WRAPPER
+      reference: System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception,System.Action`1<Sentry.Scope>)
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::SetAscensionLevel(System.Int32) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::RefreshAscensionText() -> System.String MegaCrit.Sts2.Core.Localization.LocString::GetFormattedText() -> System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>) -> System.Void MegaCrit.Sts2.Core.Debug.SentryService::CaptureException(System.Exception,System.Action`1<Sentry.Scope>)
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager/<>c::<get_IsEnding>b__95_0(MegaCrit.Sts2.Core.Entities.Creatures.Creature); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Boolean) -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Threading.CancellationToken,System.Boolean) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Commands.Cmd/<Wait>d__1::MoveNext() -> System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager::get_IsEnding() --Ldftn--> System.Boolean MegaCrit.Sts2.Core.Combat.CombatManager/<>c::<get_IsEnding>b__95_0(MegaCrit.Sts2.Core.Entities.Creatures.Creature)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Boolean MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::<get_LocalPlayer>b__51_0(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::RefreshButtonSelectionForPlayer(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer) -> MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::get_LocalPlayer() --Ldftn--> System.Boolean MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby::<get_LocalPlayer>b__51_0(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Boolean MegaCrit.Sts2.Core.Unlocks.UnlockState/<>c::<.ctor>b__23_0(MegaCrit.Sts2.Core.Saves.SerializableEpoch); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.SaveManager::GenerateUnlockStateFromProgress() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::GenerateUnlockState() -> System.Void MegaCrit.Sts2.Core.Unlocks.UnlockState::.ctor(MegaCrit.Sts2.Core.Saves.ProgressState) --Ldftn--> System.Boolean MegaCrit.Sts2.Core.Unlocks.UnlockState/<>c::<.ctor>b__23_0(MegaCrit.Sts2.Core.Saves.SerializableEpoch)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Boolean MegaCrit.Sts2.Core.Unlocks.UnlockState/<>c::<.ctor>b__23_2(MegaCrit.Sts2.Core.Models.ModelId); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.SaveManager::GenerateUnlockStateFromProgress() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::GenerateUnlockState() -> System.Void MegaCrit.Sts2.Core.Unlocks.UnlockState::.ctor(MegaCrit.Sts2.Core.Saves.ProgressState) --Ldftn--> System.Boolean MegaCrit.Sts2.Core.Unlocks.UnlockState/<>c::<.ctor>b__23_2(MegaCrit.Sts2.Core.Models.ModelId)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState/<>c::<get_Losses>b__103_0(MegaCrit.Sts2.Core.Saves.CharacterStats); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.SaveManager::GenerateUnlockStateFromProgress() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::GenerateUnlockState() -> System.Void MegaCrit.Sts2.Core.Unlocks.UnlockState::.ctor(MegaCrit.Sts2.Core.Saves.ProgressState) -> System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_NumberOfRuns() -> System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_Losses() --Ldftn--> System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState/<>c::<get_Losses>b__103_0(MegaCrit.Sts2.Core.Saves.CharacterStats)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState/<>c::<get_Wins>b__101_0(MegaCrit.Sts2.Core.Saves.CharacterStats); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.SaveManager::GenerateUnlockStateFromProgress() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::GenerateUnlockState() -> System.Void MegaCrit.Sts2.Core.Unlocks.UnlockState::.ctor(MegaCrit.Sts2.Core.Saves.ProgressState) -> System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_NumberOfRuns() -> System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState::get_Wins() --Ldftn--> System.Int32 MegaCrit.Sts2.Core.Saves.ProgressState/<>c::<get_Wins>b__101_0(MegaCrit.Sts2.Core.Saves.CharacterStats)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.String MegaCrit.Sts2.Core.Localization.LocManager/<>c::<ToString>b__50_0(System.Collections.Generic.KeyValuePair`2<System.String,System.Object>); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::SetAscensionLevel(System.Int32) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::RefreshAscensionText() -> System.String MegaCrit.Sts2.Core.Localization.LocString::GetFormattedText() -> System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>) -> System.String MegaCrit.Sts2.Core.Localization.LocManager::ToString(System.Collections.Generic.Dictionary`2<System.String,System.Object>) --Ldftn--> System.String MegaCrit.Sts2.Core.Localization.LocManager/<>c::<ToString>b__50_0(System.Collections.Generic.KeyValuePair`2<System.String,System.Object>)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.String MegaCrit.Sts2.Core.Unlocks.UnlockState/<>c::<.ctor>b__23_1(MegaCrit.Sts2.Core.Saves.SerializableEpoch); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.SaveManager::GenerateUnlockStateFromProgress() -> MegaCrit.Sts2.Core.Unlocks.UnlockState MegaCrit.Sts2.Core.Saves.Managers.ProgressSaveManager::GenerateUnlockState() -> System.Void MegaCrit.Sts2.Core.Unlocks.UnlockState::.ctor(MegaCrit.Sts2.Core.Saves.ProgressState) --Ldftn--> System.String MegaCrit.Sts2.Core.Unlocks.UnlockState/<>c::<.ctor>b__23_1(MegaCrit.Sts2.Core.Saves.SerializableEpoch)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager/<>c__DisplayClass9_0::<Play>b__0(); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::AnimateUnlock() -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton/<AnimateUnlock>d__55::MoveNext() -> System.Int32 MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager::Play(System.String,System.Single,MegaCrit.Sts2.Core.Audio.Debug.PitchVariance) --Ldftn--> System.Void MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager/<>c__DisplayClass9_0::<Play>b__0()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Commands.Cmd/<>c__DisplayClass2_0::<WaitInternal>b__1(); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Boolean) -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Threading.CancellationToken,System.Boolean) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Commands.Cmd/<Wait>d__1::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::WaitInternal(Godot.SceneTreeTimer,System.Threading.CancellationToken) --Ldftn--> System.Void MegaCrit.Sts2.Core.Commands.Cmd/<>c__DisplayClass2_0::<WaitInternal>b__1()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Commands.Cmd/<>c__DisplayClass2_0::<WaitInternal>g__Receive|0(); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Boolean) -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Threading.CancellationToken,System.Boolean) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Commands.Cmd/<Wait>d__1::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::WaitInternal(Godot.SceneTreeTimer,System.Threading.CancellationToken) --Ldftn--> System.Void MegaCrit.Sts2.Core.Commands.Cmd/<>c__DisplayClass2_0::<WaitInternal>g__Receive|0()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions/<>c__DisplayClass5_0::<QueueFreeSafely>b__0(); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Reset() -> System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions::QueueFreeSafely(Godot.Node) --Ldftn--> System.Void MegaCrit.Sts2.Core.Helpers.GodotTreeExtensions/<>c__DisplayClass5_0::<QueueFreeSafely>b__0()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Localization.LocManager/<>c__DisplayClass48_0::<SmartFormat>b__0(Sentry.Scope); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::SetAscensionLevel(System.Int32) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel::RefreshAscensionText() -> System.String MegaCrit.Sts2.Core.Localization.LocString::GetFormattedText() -> System.String MegaCrit.Sts2.Core.Localization.LocManager::SmartFormat(MegaCrit.Sts2.Core.Localization.LocString,System.Collections.Generic.Dictionary`2<System.String,System.Object>) --Ldftn--> System.Void MegaCrit.Sts2.Core.Localization.LocManager/<>c__DisplayClass48_0::<SmartFormat>b__0(Sentry.Scope)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::<Enable>b__42_0(); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::Enable() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl::<Enable>b__42_0()
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::OnPlayerConnected(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby,System.Boolean) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby) --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::OnPlayerConnected(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::OnPlayerDisconnected(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby,System.Boolean) -> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::Initialize(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby) --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Multiplayer.NInvitePlayersButton::OnPlayerDisconnected(MegaCrit.Sts2.Core.Entities.Multiplayer.LobbyPlayer)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UpdateShaderS(System.Single); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Select() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::RefreshState() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::AnimateSaturationToCurrentState(Godot.Tween) --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UpdateShaderS(System.Single)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UpdateShaderV(System.Single); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::Select() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::RefreshState() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::AnimateSaturationToCurrentState(Godot.Tween) --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UpdateShaderV(System.Single)
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - reference=MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+      reason: SaveManager _mockInstance is null, production _instance is non-null, and exact get_Instance() rehearsal returned that same instance with zero context/native drift
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Boolean) -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Threading.CancellationToken,System.Boolean) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Commands.Cmd/<Wait>d__1::MoveNext() -> [RUNTIME-GUARDED] MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+  - reference=MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+      reason: SaveManager _mockInstance is null, production _instance is non-null, and exact get_Instance() rehearsal returned that same instance with zero context/native drift
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId) -> [AsyncStateMachineAttribute] System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext() -> [RUNTIME-GUARDED] MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+  - reference=MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+      reason: SaveManager _mockInstance is null, production _instance is non-null, and exact get_Instance() rehearsal returned that same instance with zero context/native drift
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::UnlockIfPossible() -> [RUNTIME-GUARDED] MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+  - reference=MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+      reason: SaveManager _mockInstance is null, production _instance is non-null, and exact get_Instance() rehearsal returned that same instance with zero context/native drift
+      path: System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::OnSubmenuOpened() -> [RUNTIME-GUARDED] MegaCrit.Sts2.Core.Saves.SaveManager MegaCrit.Sts2.Core.Saves.SaveManager::get_Instance()
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - AsyncStateMachineAttribute: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Commands.Cmd::Wait(System.Single,System.Threading.CancellationToken,System.Boolean) -> System.Void MegaCrit.Sts2.Core.Commands.Cmd/<Wait>d__1::MoveNext()
+  - AsyncStateMachineAttribute: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Helpers.TaskHelper::LogTaskExceptions(System.Threading.Tasks.Task) -> System.Void MegaCrit.Sts2.Core.Helpers.TaskHelper/<LogTaskExceptions>d__1::MoveNext()
+  - AsyncStateMachineAttribute: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton::AnimateUnlock() -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton/<AnimateUnlock>d__55::MoveNext()
+  - AsyncStateMachineAttribute: System.Threading.Tasks.Task MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen::PlayUnlockCharacterAnimation(MegaCrit.Sts2.Core.Models.ModelId) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen/<PlayUnlockCharacterAnimation>d__47::MoveNext()
+  - AsyncStateMachineAttribute: System.Threading.Tasks.Task`1<System.Single> MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil::AwaitProcessFrame(Godot.Node,System.Threading.CancellationToken) -> System.Void MegaCrit.Sts2.Core.Nodes.GodotExtensions.NodeUtil/<AwaitProcessFrame>d__0::MoveNext()
+
+Deck boundary: observational only; direct field repair, _Ready replay, direct OnEnable invocation, character selection, confirm/embark, run start, and Step 63+ remain unopened.
+[UNIQUE-NAME PROVENANCE DIAGNOSTICS]
+Purpose: distinguish serialized SceneState loss, PackedScene instantiation loss, live-tree/owner loss, and managed %Name lookup failure without mutating retained game state.
+[CHARACTER-SELECT PACKEDSCENE SCENESTATE]
+sceneStateType=Godot.SceneState; nodeCount=38
+name=AscensionPanel; path=./AscensionPanel; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ActDropdown; path=./ActDropdown; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+[CHARACTER-SELECT TEMPORARY OFF-TREE INSTANCE]
+AscensionPanel: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ActDropdown: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[CHARACTER-SELECT RETAINED LIVE INSTANCE]
+AscensionPanel: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ActDropdown: type=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[GAME PACKEDSCENE SCENESTATE]
+sceneStateType=Godot.SceneState; nodeCount=40
+name=InputManager; path=./InputManager; ownerPath=.; type=Node; instance=NO; properties=[unique_name_in_owner=True,script=True]
+name=HotkeyManager; path=./HotkeyManager; ownerPath=.; type=Node; instance=NO; properties=[unique_name_in_owner=True,script=True]
+name=RootSceneContainer; path=./RootSceneContainer; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ReactionWheel; path=./ReactionWheel; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ReactionContainer; path=./ReactionContainer; ownerPath=.; type=Control; instance=NO; properties=[unique_name_in_owner=True,script=True]
+name=MultiplayerTimeoutOverlay; path=./MultiplayerTimeoutOverlay; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=WorldEnvironment; path=./WorldEnvironment; ownerPath=.; type=WorldEnvironment; instance=NO; properties=[unique_name_in_owner=True]
+[GAME TEMPORARY OFF-TREE INSTANCE]
+InputManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+HotkeyManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+RootSceneContainer: type=MegaCrit.Sts2.Core.Nodes.NSceneContainer; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionWheel: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionContainer: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+MultiplayerTimeoutOverlay: type=MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+WorldEnvironment: type=Godot.WorldEnvironment; selectedContext=True; insideTree=False; nodeReady=False; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[GAME RETAINED LIVE INSTANCE]
+InputManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+HotkeyManager: type=MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+RootSceneContainer: type=MegaCrit.Sts2.Core.Nodes.NSceneContainer; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionWheel: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ReactionContainer: type=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+MultiplayerTimeoutOverlay: type=MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+WorldEnvironment: direct/find=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+[MAIN-MENU PACKEDSCENE SCENESTATE]
+sceneStateType=Godot.SceneState; nodeCount=41
+name=MainMenuBg; path=./MainMenuBg; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=ContinueRunInfo; path=./MainMenuTextButtons/ContinueButton/ContinueRunInfo; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=PatchNotesScreen; path=./PatchNotesScreen; ownerPath=.; type=; instance=YES:Godot.PackedScene; properties=[unique_name_in_owner=True]
+name=Submenus; path=./Submenus; ownerPath=.; type=Control; instance=NO; properties=[unique_name_in_owner=True,script=True]
+[MAIN-MENU RETAINED LIVE INSTANCE]
+Submenus: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+MainMenuBg: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuBg; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+ContinueRunInfo: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NContinueRunInfo; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+PatchNotesScreen: type=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NPatchNotesScreen; selectedContext=True; insideTree=True; nodeReady=True; uniqueNameInOwner=True; owner=ROOT; directPathLookup=NULL; percentLookup=NULL; percentError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null; directError=TypeLoadException:ClassLoad_General, Godot.NodePath, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Rendering active before transition: NO
+
+[EXECUTION-OPCODE-QUALIFIED LAUNCHMAINMENU FRONTIER]
+Immediate closure methods: 9
+Compiler state-machine MoveNext expansions reached from immediate edges: 0
+Immediate classified boundary references: 0
+Deferred/non-executing method-reference frontiers: 2
+Runtime-guarded immediate frontiers: 0
+Unresolved same-sts2 references: 0
+External Cecil resolution requests: 0
+Policy: call/callvirt/newobj/jmp traverse; ldftn/ldvirtftn/ldtoken are recorded but never traversed. This map never authorizes or invokes original LaunchMainMenu.
+
+[IMMEDIATE CLOSURE METHODS]
+  - token=0x06003783; System.Void MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::Update()
+  - token=0x06003784; MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::get_Instance()
+  - token=0x06003788; System.Void MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext.ActiveScreenContext::.ctor()
+  - token=0x06003E1E; Godot.Control MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::get_BlurBackstop()
+  - token=0x06003E2A; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::EnableBackstop()
+  - token=0x06003E6A; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuBg::HideLogo()
+  - token=0x06003F88; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu::SetStack(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack)
+  - token=0x06003F8E; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu::OnSubmenuOpened()
+  - token=0x06003FBE; System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack::Push(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu)
+
+[IMMEDIATE CLASSIFIED BOUNDARIES — EVIDENCE ONLY, NOT AUTHORIZATION]
+  - none
+
+[DEFERRED / NON-EXECUTING METHOD FRONTIERS]
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderLod(System.Single); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack::Push(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::EnableBackstop() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderLod(System.Single)
+  - opcode=Ldftn; category=UNCLASSIFIED; reference=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderMix(System.Single); path=System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack::Push(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenu) -> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::EnableBackstop() --Ldftn--> System.Void MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu::UpdateShaderMix(System.Single)
+
+[RUNTIME-GUARDED IMMEDIATE FRONTIERS]
+  - none
+
+[COMPILER STATE-MACHINE EXPANSIONS]
+  - none
+Handler inner exception: System.NullReferenceException: Arg_NullReferenceException
+TargetSite: Void OnEnable()
+Original stack:    at MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton.OnEnable()
+   at MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl.Enable()
+   at MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen.OnSubmenuOpened()
+   at MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSubmenuStack.Push(NSubmenu screen)
+   at MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NSingleplayerSubmenu.OpenCharacterSelect(NButton _)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+Post-failure forensic snapshot: character=[present=True; insideTree=True; visible=False; visibleInTree=False; logicalStackNull=False; logicalStackExactRetained=True; logicalStackType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack; parentExactStack=True; parentType=MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenuSubmenuStack; nodeReady=True; fields=_charButtonContainer=Godot.HBoxContainer,_ascensionPanel=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NAscensionPanel,_actDropdown=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NActDropdown,_actDropdownLabel=MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel,_remotePlayerContainer=MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteLobbyPlayerContainer,_readyAndWaitingContainer=Godot.Control,_backButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NBackButton,_unreadyButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NBackButton,_embarkButton=MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton,_randomCharacterButton=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectButton]; ascension=[nodeReady=True; fields=_leftArrow=MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton,_rightArrow=MegaCrit.Sts2.Core.Nodes.CommonUi.NGoldArrowButton,_ascensionLevel=MegaCrit.Sts2.addons.mega_text.MegaLabel,_info=MegaCrit.Sts2.addons.mega_text.MegaRichTextLabel,_leftTriggerIcon=Godot.TextureRect,_rightTriggerIcon=Godot.TextureRect,_iconHsv=Godot.ShaderMaterial]; nGame=[HotkeyManager=MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager,InputManager=MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager,RemoteCursorContainer=MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer,ReactionContainer=MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer,TimeoutOverlay=MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay,RootSceneContainer=MegaCrit.Sts2.Core.Nodes.NSceneContainer]; save=Progress:MegaCrit.Sts2.Core.Saves.ProgressState,Epochs:System.Collections.Generic.List`1[[MegaCrit.Sts2.Core.Saves.SerializableEpoch, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null]],EncounterStats:System.Collections.Generic.Dictionary`2[[MegaCrit.Sts2.Core.Models.ModelId, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null],[MegaCrit.Sts2.Core.Saves.EncounterStats, sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null]]; rootCurrentScene=NULL; lobby=MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby; lobbyPlayers=1; requiredFailures=<none>
+[POST-FAILURE CONFIRM-BUTTON RUNTIME DECK]
+Purpose: capture runtime deltas immediately after an original-handler failure, before managed control returns to the UI.
+[POSTFAIL EMBARK FULL INHERITED FIELD MATRIX]
+  declaringType=MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton
+    Godot.Control _buttonImage=Godot.TextureRect
+    Godot.Color _defaultOutlineColor=Godot.Color:(1, 0.9647059, 0.8862745, 1)
+    Godot.Color _downColor=Godot.Color:(0.74509805, 0.74509805, 0.74509805, 1)
+    Godot.Vector2 _hidePos=Godot.Vector2:(740, 546)
+    System.String[] _hotkeys=System.String[][Length=1]
+    Godot.Color _hoveredOutlineColor=Godot.Color:(0.9372549, 0.78431374, 0.31764707, 1)
+    Godot.Tween _moveTween=Godot.Tween
+    Godot.Control _outline=Godot.TextureRect
+    Godot.Color _outlineColor=Godot.Color:(0.9411765, 0.7058824, 0, 1)
+    Godot.Color _outlineTransparentColor=Godot.Color:(0, 1, 1, 0)
+    Godot.Vector2 _posOffset=Godot.Vector2:(160, 354)
+    System.Threading.CancellationTokenSource _pressDownCancelToken=NULL
+    Godot.Vector2 _showPos=Godot.Vector2:(560, 546)
+    System.Threading.CancellationTokenSource _unhoverAnimCancelToken=NULL
+    Godot.Viewport _viewport=Godot.Window
+  declaringType=MegaCrit.Sts2.Core.Nodes.GodotExtensions.NButton
+    Godot.TextureRect _controllerHotkeyIcon=Godot.TextureRect
+  declaringType=MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl
+    System.Boolean <IsFocused>k__BackingField=System.Boolean:False
+    Godot.Vector2 _beginDragPosition=Godot.Vector2:(0, 0)
+    System.Single _ignoreDragThreshold=System.Single:-1
+    System.Boolean _isControllerFocused=System.Boolean:False
+    System.Boolean _isControllerNavigable=System.Boolean:False
+    System.Boolean _isEnabled=System.Boolean:True
+    System.Boolean _isHovered=System.Boolean:False
+    System.Boolean _isPressed=System.Boolean:False
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+FocusedEventHandler backing_Focused=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+MousePressedEventHandler backing_MousePressed=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+MouseReleasedEventHandler backing_MouseReleased=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+ReleasedEventHandler backing_Released=NULL
+    MegaCrit.Sts2.Core.Nodes.GodotExtensions.NClickableControl+UnfocusedEventHandler backing_Unfocused=NULL
+  declaringType=Godot.GodotObject
+    System.IntPtr NativePtr=System.IntPtr:5657285632
+    System.Boolean _disposed=System.Boolean:False
+    System.Boolean _memoryOwn=System.Boolean:False
+    System.WeakReference`1[[Godot.GodotObject, GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null]] _weakReferenceToSelf=System.WeakReference`1[[Godot.GodotObject, GodotSharp, Version=4.5.1.0, Culture=neutral, PublicKeyToken=null]]
+[RETAINED EMBARK OBSERVATIONAL ACCESSORS]
+  IsInsideTree()=System.Boolean:True
+  IsNodeReady()=System.Boolean:True
+  IsVisibleInTree()=System.Boolean:False
+  GetViewport()=Godot.Window
+  GetTree()=Godot.SceneTree
+  GetParent()=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen
+  GetOwner()=MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen
+[LIVE NCONFIRMBUTTON PEER MATRIX — WHOLE RETAINED SCENETREE]
+  peer-matrix-failed=System.IO.InvalidDataException: Step 39.0 node-graph traversal exceeded 256 nodes.
+[NULL-FIELD LIVE NODE CANDIDATE MATRIX]
+  _outline: already-bound=Godot.TextureRect
+  _buttonImage: already-bound=Godot.TextureRect
+  _viewport: already-bound=Godot.Window
+  _hotkeys: already-bound=System.String[][Length=1]
+  _controllerHotkeyIcon: already-bound=Godot.TextureRect

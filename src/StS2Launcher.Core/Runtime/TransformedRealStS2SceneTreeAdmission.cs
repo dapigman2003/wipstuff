@@ -652,15 +652,17 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         }
     }
 
-    private static List<Step39NodeObservation> EnumerateStep39NodeGraph(object root, Type nodeType)
+    private static List<Step39NodeObservation> EnumerateStep39NodeGraph(object root, Type nodeType, int maxNodes = 256)
     {
+        if (maxNodes < 1)
+            throw new ArgumentOutOfRangeException(nameof(maxNodes));
         var observations = new List<Step39NodeObservation>();
         var queue = new Queue<(object Node, string Path)>();
         queue.Enqueue((root, "/Game"));
         while (queue.Count != 0)
         {
-            if (observations.Count >= 256)
-                throw new InvalidDataException("Step 39.0 node-graph traversal exceeded 256 nodes.");
+            if (observations.Count >= maxNodes)
+                throw new InvalidDataException($"Step 39.0 node-graph traversal exceeded {maxNodes} nodes.");
             var (node, path) = queue.Dequeue();
             observations.Add(new Step39NodeObservation(path, node));
             var getChildren = node.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)

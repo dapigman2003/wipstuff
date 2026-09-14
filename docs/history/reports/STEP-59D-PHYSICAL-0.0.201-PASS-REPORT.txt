@@ -1,0 +1,22 @@
+StS2 Launcher — Step 59D Compilation-Efficient Deep Diagnostic Deck
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-14T01:43:55.5430890+00:00
+
+RESULT
+STEP 59D: DIAGNOSTIC DECK COMPLETE / NO HANDLER ARMED
+
+METADATA
+App version: 0.0.201 (201)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Deep preflight found no definite blocker. Preserve this report; the same compiled IPA can next run the separate real Step 59 transition in a fresh process if desired.
+
+END OF REPORT
