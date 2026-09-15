@@ -1,10 +1,12 @@
-# 0.0.209 native Tween rejection frontier
+# 0.0.210 scripted-object property bridge frontier
 
-**Active candidate: 0.0.209 (209).** Physical 0.0.208 successfully exercised the isolated Step-59 tail under both Wrapper and Full profiles. In both runs, repair was enabled but the failing embark `TweenProperty` call recorded a **native pointer of 0x0**. Prior observations in the same runtime had nonzero pointers and real `Godot.PropertyTweener` wrappers; `managedNulls`, `wrongTypes`, and repair counters did not explain the failure. Managed-wrapper repair is therefore no longer the active hypothesis.
+**Active candidate: 0.0.210 (210).** Physical 0.0.209 / 59N disproved the remaining Tween-state and creation-path explanations. Fresh Node/SceneTree Tweens were valid and running, and `TweenInterval()` returned valid `IntervalTweener` objects through Node, SceneTree, and SceneTree+BindNode. The old retained tween was distinct from every new tween.
 
-0.0.209 keeps the 0.0.208 three-profile bootstrap unchanged and adds **59N / 59Y / 59Z** on Full. 59N is a row-isolated native rejection matrix spanning Tween state/identity, old-tween kill interaction, Node-vs-SceneTree creation, optional BindNode, interval-vs-property operations, and position/scale/modulate combinations. 59Y and 59Z are focused full-tail confirmation probes for SceneTree-created Tweens without and with BindNode.
+The target/property matrix was decisive: `TweenProperty()` returned native null for `NConfirmButton.position`, `NConfirmButton.scale`, and `NConfirmButton.modulate`, including current-value type matches and SceneTree-created Tweens. The same `TweenProperty()` machinery succeeded for `Outline.modulate` on the native `TextureRect` child. The active frontier is therefore **generic native property resolution on C#-scripted game objects**.
 
-Phone plan: **fresh FULL closed path → 58 → 59N** first. Preserve the matrix report. Then use fresh FULL runs for **59Y** and/or **59Z** matching the useful matrix result. Existing 59T/W/X remain controls/history; 59E and real 59 should not be treated as the next-value runs until a compatible creation path is established. If real 59 later passes, continue 60/61/62.
+0.0.210 keeps the physically viable Baseline / Wrapper / Full GodotSharp derivative builder byte-for-byte unchanged from 0.0.209 and adds **59P / 59I / 59Q** only in the Step-59 runtime/UI layer. 59P compares direct managed access against Godot generic Get/GetIndexed/Set/SetIndexed on two game-scripted Controls and one native child. 59I compares native-pointer-to-managed identity through private GodotSharp. 59Q is a targeted progression fallback: it pre-enables the retained embark button with required direct managed state plus best-effort button-fidelity stages and then runs the original `OpenCharacterSelect`; if successful, it closes Step 59 and unlocks 60–62 without another compilation.
+
+Phone plan: **fresh FULL closed path → 58 → 59P**; preserve all files. Then **fresh FULL → 58 → 59I**. Then **fresh FULL → 58 → 59Q**. If 59Q closes Step 59 4/4, continue **60 → 61 → 62 in that same process**. Older 59N/Y/Z are now retained controls rather than preferred next-value runs.
 
 ## Retained historical invariants used by validation
 

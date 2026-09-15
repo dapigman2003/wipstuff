@@ -1,0 +1,21 @@
+StS2 Launcher — Step 59.16 physical 0.0.209 native Tween rejection matrix
+
+Authority: physical iPhone run, app 0.0.209 (209), .NET 9.0.16 Arm64.
+Run ID: 20260915T0713298134570Z-pid10502-9eb014f4a5a947a5a6e37836209c5570
+
+RESULT
+- Step 58 retained 4/4 ownership authority and the Step-59 ready-binding preflight had no blocker.
+- The retained old _moveTween was native-nonzero but IsValid=False before kill. Kill returned and left IsValid=False / IsRunning=False.
+- Fresh Node.CreateTween() Tweens before and after the old-tween kill were distinct from the old Tween, IsValid=True, IsRunning=True, and TweenInterval returned a valid IntervalTweener.
+- Fresh SceneTree.CreateTween() and SceneTree.CreateTween().BindNode(embark) Tweens were also IsValid=True / IsRunning=True and TweenInterval returned valid IntervalTweener objects.
+- TweenProperty on the scripted MegaCrit.Sts2.Core.Nodes.CommonUi.NConfirmButton returned native null for: position with current Vector2, position with _showPos Vector2, scale with current Vector2, and modulate with current Color.
+- The same scripted-target failures reproduced with SceneTree-created Tweens; SceneTree + BindNode did not rescue the position full tail.
+- TweenProperty on the plain Godot.TextureRect Outline child, property modulate with current Color, returned a valid Godot.PropertyTweener through both Node-created and SceneTree-created Tweens.
+- PropertyTweener bridge telemetry remained healthy for successful rows and recorded native pointer 0x0 on each scripted NConfirmButton property failure. No managed-null/wrong-type repair was implicated.
+- Matrix completed normally with workingAlternativeFound=False. The UI operation ended normally; no original OpenCharacterSelect invocation occurred.
+
+CONCLUSION
+The Step-59 blocker is not stale Tween identity, old-tween kill ordering, Tween validity/running state, Node versus SceneTree creation, SceneTree BindNode, or a general TweenProperty/PropertyTweener failure. The failure follows the C#-scripted NConfirmButton target: generic native Tween property access fails for multiple inherited native properties on that scripted object while the same mechanism succeeds on a plain native child.
+
+NEXT
+Preserve the physically viable 0.0.208/0.0.209 Baseline / Wrapper / Full bootstrap unchanged. 0.0.210 should diagnose generic property resolution and native-to-managed identity on scripted objects, while carrying a direct-managed embark preconditioning path that can immediately attempt the original OpenCharacterSelect transition and unlock Steps 60–62 in the same compiled IPA.

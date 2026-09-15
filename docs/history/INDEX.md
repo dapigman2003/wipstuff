@@ -624,3 +624,7 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-59W-PHYSICAL-0.0.208-REPORT.txt` / `...-CHECKPOINT.txt` / `...-STATIC-MAP.txt` — Wrapper-profile physical evidence that repair was enabled but the failing embark `TweenProperty` produced `lastNativePtr=0x0`, `nativeNulls+1`, and zero wrapper repairs.
 - `reports/STEP-59X-PHYSICAL-0.0.208-REPORT.txt` / `...-CHECKPOINT.txt` / `...-STATIC-MAP.txt` — Full-profile independent reproduction with healthy prior PropertyTweener/fluent observations but the same native-null embark call.
 - `steps/STEP-59.15-NATIVE-TWEEN-NULL-0.0.209.md` — rejects the managed-wrapper hypothesis for the actual failure and defines the 59N native rejection matrix plus 59Y/59Z SceneTree alternative-tail confirmation branches.
+
+## Step 59 scripted-object generic property bridge / 0.0.210
+- `reports/STEP-59.16-PHYSICAL-0.0.209-NATIVE-TWEEN-MATRIX.txt` — physical 59N evidence: fresh Node/SceneTree/bound Tweens are valid and accept TweenInterval; TweenProperty fails on scripted NConfirmButton position/scale/modulate but succeeds on native Outline.modulate.
+- `steps/STEP-59.17-SCRIPTED-PROPERTY-BRIDGE-0.0.210.md` — keeps the proven bootstrap/profile transforms unchanged and adds 59P generic property resolution, 59I native-to-managed identity, and 59Q direct-managed embark preconditioning plus original transition for same-IPA progression into 60–62.

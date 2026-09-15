@@ -14,7 +14,7 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT SUSTAINED RENDER RESIDENCY");
 
     private UIButton? _step58Button; private UIButton? _step59Button; private UIButton? _step60Button; private UIButton? _step61Button; private UIButton? _step62Button;
-    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59RegisterHotkeysProbeButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59ConfirmTailProbeButton; private UIButton? _step59ConfirmTailWrapperRepairProbeButton; private UIButton? _step59ConfirmTailRepairProbeButton; private UIButton? _step59NativeTweenMatrixButton; private UIButton? _step59SceneTreeTailProbeButton; private UIButton? _step59SceneTreeBoundTailProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
+    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59RegisterHotkeysProbeButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59ConfirmTailProbeButton; private UIButton? _step59ConfirmTailWrapperRepairProbeButton; private UIButton? _step59ConfirmTailRepairProbeButton; private UIButton? _step59NativeTweenMatrixButton; private UIButton? _step59GenericPropertyMatrixButton; private UIButton? _step59ManagedIdentityMatrixButton; private UIButton? _step59ManagedPropertyBypassTransitionButton; private UIButton? _step59SceneTreeTailProbeButton; private UIButton? _step59SceneTreeBoundTailProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
     private UILabel? _step58ResultLabel; private UILabel? _step59ResultLabel; private UILabel? _step60ResultLabel; private UILabel? _step61ResultLabel; private UILabel? _step62ResultLabel;
     private UILabel? _step58DetailLabel; private UILabel? _step59DetailLabel; private UILabel? _step60DetailLabel; private UILabel? _step61DetailLabel; private UILabel? _step62DetailLabel;
     private UILabel? _step59DiagnosticDeckResultLabel; private UILabel? _step59DiagnosticDeckDetailLabel;
@@ -25,6 +25,9 @@ public sealed partial class RootViewController
     private UILabel? _step59ConfirmTailWrapperRepairProbeResultLabel; private UILabel? _step59ConfirmTailWrapperRepairProbeDetailLabel;
     private UILabel? _step59ConfirmTailRepairProbeResultLabel; private UILabel? _step59ConfirmTailRepairProbeDetailLabel;
     private UILabel? _step59NativeTweenMatrixResultLabel; private UILabel? _step59NativeTweenMatrixDetailLabel;
+    private UILabel? _step59GenericPropertyMatrixResultLabel; private UILabel? _step59GenericPropertyMatrixDetailLabel;
+    private UILabel? _step59ManagedIdentityMatrixResultLabel; private UILabel? _step59ManagedIdentityMatrixDetailLabel;
+    private UILabel? _step59ManagedPropertyBypassTransitionResultLabel; private UILabel? _step59ManagedPropertyBypassTransitionDetailLabel;
     private UILabel? _step59SceneTreeTailProbeResultLabel; private UILabel? _step59SceneTreeTailProbeDetailLabel;
     private UILabel? _step59SceneTreeBoundTailProbeResultLabel; private UILabel? _step59SceneTreeBoundTailProbeDetailLabel;
     private UILabel? _step59IsolatedEnableProbeResultLabel; private UILabel? _step59IsolatedEnableProbeDetailLabel;
@@ -35,7 +38,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "0.0.209 keeps the proven 0.0.208 three-profile bootstrap unchanged and adds native Tween rejection experiments on FULL. Physical 0.0.208 proved the failing embark TweenProperty gets native pointer 0x0 while other TweenProperty observations produce valid PropertyTweeners, so 0.0.209 focuses on Tween state, creation path, target/property, and value type. 59N is the broad matrix; 59Y/59Z are focused SceneTree alternative-tail confirmations. BASELINE/WRAPPER/FULL isolation still protects the compiled IPA from one experimental profile invalidating the others.",
+            "0.0.210 keeps the proven 0.0.208/0.0.209 three-profile bootstrap unchanged. Physical 0.0.209 proved fresh Tweens are valid and TweenInterval succeeds through Node/SceneTree paths, while TweenProperty fails on inherited position/scale/modulate of the C#-scripted NConfirmButton yet succeeds on the plain Godot Outline child. 59P now compares direct managed property access with Godot Get/GetIndexed/Set/SetIndexed across scripted and native targets; 59I compares native-pointer-to-managed identity; 59Q preconditions the embark button through direct managed setters and then immediately runs the original OpenCharacterSelect as a progression fallback. Existing diagnostic branches remain compiled.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -92,16 +95,34 @@ public sealed partial class RootViewController
             "Fresh-process FULL-profile diagnostic. Uses separate fresh Tweens to compare Node.CreateTween vs SceneTree.CreateTween vs SceneTree.CreateTween+BindNode, TweenInterval vs TweenProperty, pre/post old-tween Kill state, Tween IsValid/IsRunning/native identity, and position/scale/modulate target/value combinations. One failing row does not abort the rest. It also runs full fluent tails on both SceneTree position alternatives and records whether either is viable.");
         _step59NativeTweenMatrixButton.TouchUpInside += async (_, _) => await RunStep59NativeTweenMatrixAsync();
 
+        (_step59GenericPropertyMatrixButton, _step59GenericPropertyMatrixResultLabel, _step59GenericPropertyMatrixDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59P — C# scripted-object generic property resolution matrix",
+            "Run Step 59P — PROPERTY BRIDGE MATRIX", "STEP 59P PROPERTY BRIDGE MATRIX: LOCKED",
+            "Fresh-process FULL-profile diagnostic anchored to physical 0.0.209. Compares direct managed Position/Scale/Modulate access with GodotObject.Get, GetIndexed, same-value Set, and SetIndexed on the scripted NConfirmButton, scripted NActDropdown, and plain native Outline TextureRect. It records Variant kinds, script identity, native pointers, and whether same-value writes survive. This is designed to distinguish a C# script-instance generic-property bridge failure from a Tween-specific failure.");
+        _step59GenericPropertyMatrixButton.TouchUpInside += async (_, _) => await RunStep59GenericPropertyMatrixAsync();
+
+        (_step59ManagedIdentityMatrixButton, _step59ManagedIdentityMatrixResultLabel, _step59ManagedIdentityMatrixDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59I — managed/native object identity matrix",
+            "Run Step 59I — OBJECT IDENTITY MATRIX", "STEP 59I OBJECT IDENTITY MATRIX: LOCKED",
+            "Fresh-process FULL-profile identity diagnostic. For the scripted embark button, another scripted Control, and the native Outline child, compares the retained managed object with GodotSharp InteropUtils.UnmanagedGetManaged(NativePtr), including ReferenceEquals, managed/native identity, instance IDs, script identity, and the private native callback signatures. It does not invoke OpenCharacterSelect.");
+        _step59ManagedIdentityMatrixButton.TouchUpInside += async (_, _) => await RunStep59ManagedIdentityMatrixAsync();
+
+        (_step59ManagedPropertyBypassTransitionButton, _step59ManagedPropertyBypassTransitionResultLabel, _step59ManagedPropertyBypassTransitionDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59Q — direct-managed embark compatibility + ORIGINAL transition",
+            "Run Step 59Q — BYPASS TWEEN + OPEN CHARACTER SELECT", "STEP 59Q MANAGED-PROPERTY BYPASS: LOCKED",
+            "Fresh-process FULL-profile progression experiment. Emulates the safe NConfirmButton enable work using direct managed property setters: marks the button enabled, registers hotkeys/controller state, applies enabled visuals, kills/clears the stale tween, sets Position directly to _showPos, and refreshes focus. It then invokes the original game-owned OpenCharacterSelect exactly once. If the original transition closes, Step 60–62 are immediately unlocked in this same IPA. This is a targeted compatibility fallback, not yet the final generic property-bridge fix.");
+        _step59ManagedPropertyBypassTransitionButton.TouchUpInside += async (_, _) => await RunStep59ManagedPropertyBypassTransitionAsync();
+
         (_step59SceneTreeTailProbeButton, _step59SceneTreeTailProbeResultLabel, _step59SceneTreeTailProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59Y — focused SceneTree.CreateTween confirm-button tail",
             "Run Step 59Y — SCENETREE TAIL", "STEP 59Y SCENETREE TAIL: LOCKED",
-            "Fresh-process FULL-profile confirmation branch. Kills the retained old tween, creates a fresh tween with SceneTree.CreateTween(), then runs the exact position TweenProperty + SetEase + SetTrans + FromCurrent tail. Repair remains disabled so this validates the alternative creation path itself.");
+            "Historical control retained from 0.0.209. Physical 59N already proved SceneTree.CreateTween() does not repair the scripted NConfirmButton.position failure, so this branch is not part of the preferred 0.0.210 run order. It remains available for regression comparison.");
         _step59SceneTreeTailProbeButton.TouchUpInside += async (_, _) => await RunStep59SceneTreeAlternativeTailAsync(bindNode: false);
 
         (_step59SceneTreeBoundTailProbeButton, _step59SceneTreeBoundTailProbeResultLabel, _step59SceneTreeBoundTailProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59Z — focused SceneTree.CreateTween + BindNode confirm-button tail",
             "Run Step 59Z — SCENETREE + BINDNODE TAIL", "STEP 59Z SCENETREE BOUND TAIL: LOCKED",
-            "Fresh-process FULL-profile confirmation branch. Uses SceneTree.CreateTween().BindNode(embark) before the exact position TweenProperty + fluent tail. Repair remains disabled. If 59Z passes while Node.CreateTween fails, the next compatibility correction has a directly validated replacement path.");
+            "Historical control retained from 0.0.209. Physical 59N already proved SceneTree.CreateTween().BindNode(embark) still fails on scripted NConfirmButton.position, so this branch is not part of the preferred 0.0.210 run order.");
         _step59SceneTreeBoundTailProbeButton.TouchUpInside += async (_, _) => await RunStep59SceneTreeAlternativeTailAsync(bindNode: true);
 
         (_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel) = AddStartupLadderStepControls(content,

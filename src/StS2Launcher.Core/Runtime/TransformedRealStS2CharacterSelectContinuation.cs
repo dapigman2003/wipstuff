@@ -113,10 +113,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step59UpdateControllerProbeDiagnostics = string.Empty;
     private string _step59ConfirmButtonTailProbeDiagnostics = string.Empty;
     private string _step59NativeTweenMatrixDiagnostics = string.Empty;
+    private string _step59GenericPropertyMatrixDiagnostics = string.Empty;
+    private string _step59ManagedIdentityDiagnostics = string.Empty;
+    private string _step59ManagedPropertyBypassDiagnostics = string.Empty;
     private string _step59AlternativeTweenTailDiagnostics = string.Empty;
     private string _step59IsolatedEnableProbeDiagnostics = string.Empty;
     private bool _step59ReadyBindingPreflightPassed;
     private bool _step59DiagnosticMutationProbeStarted;
+    private bool _step59ManagedPropertyBypassPrepared;
     private object? _step58ObservedCharacterSelect;
     private CharacterSelectRuntimeState? _step58ObservedState;
     private bool _step58TransitionAlreadyComplete;
@@ -191,10 +195,14 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59UpdateControllerProbeDiagnostics = string.Empty;
         _step59ConfirmButtonTailProbeDiagnostics = string.Empty;
         _step59NativeTweenMatrixDiagnostics = string.Empty;
+        _step59GenericPropertyMatrixDiagnostics = string.Empty;
+        _step59ManagedIdentityDiagnostics = string.Empty;
+        _step59ManagedPropertyBypassDiagnostics = string.Empty;
         _step59AlternativeTweenTailDiagnostics = string.Empty;
         _step59IsolatedEnableProbeDiagnostics = string.Empty;
         _step59ReadyBindingPreflightPassed = false;
         _step59DiagnosticMutationProbeStarted = false;
+        _step59ManagedPropertyBypassPrepared = false;
         _step58ObservedCharacterSelect = null;
         _step58ObservedState = null;
         _step58TransitionAlreadyComplete = false;
@@ -1042,6 +1050,357 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59StaticMap += "\n[STEP 59N NATIVE TWEEN REJECTION MATRIX]\n" + _step59NativeTweenMatrixDiagnostics + "\n";
         Checkpoint(checkpoint, $"M59N_COMPLETE — workingAlternativeFound={workingAlternativeFound}; rows={rows.Count}; freshProcessRequired=True; realHandlerArmed=False.");
         return (true, workingAlternativeFound, _step59NativeTweenMatrixDiagnostics);
+    }
+
+    public string RunStep59GenericPropertyResolutionMatrix(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59P generic property-resolution matrix entry");
+        if (!_step59TransitionBound) throw new InvalidOperationException("Step 59P requires Step-59 Gate B binding before the matrix.");
+        if (!_step59ReadyBindingPreflightPassed) throw new InvalidOperationException("Step 59P requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted) throw new InvalidOperationException("Step 59P requires a fresh process with no prior Step-59 mutation/handler probe.");
+        RequireStep59PropertyTweenerProfile(PropertyTweenerExperimentProfile.Full, "Step 59P generic property-resolution matrix");
+        _step59DiagnosticMutationProbeStarted = true;
+        SetStep59PropertyTweenerRepairMode(wrapperRepairEnabled: false, fluentRepairEnabled: false, checkpoint: checkpoint, checkpointMarker: "M59P_PROPERTY_TWEENER_REPAIR_MODE");
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var screen = CaptureCurrentCharacterSelectState(step, context).Screen
+            ?? throw new InvalidOperationException("Step 59P character-select screen is absent.");
+        var scriptedPeer = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), "_actDropdown", step).GetValue(screen)
+            ?? throw new InvalidDataException("Step 59P retained _actDropdown is null.");
+        var outline = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_outline", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59P retained embark _outline is null.");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59P GodotSharp handoff absent.")).GodotSharpAssembly;
+        var godotObjectType = godotAssembly.GetType("Godot.GodotObject", true, false) ?? throw new MissingMemberException("Godot.GodotObject");
+        var stringNameType = godotAssembly.GetType("Godot.StringName", true, false) ?? throw new MissingMemberException("Godot.StringName");
+        var nodePathType = godotAssembly.GetType("Godot.NodePath", true, false) ?? throw new MissingMemberException("Godot.NodePath");
+        var variantType = godotAssembly.GetType("Godot.Variant", true, false) ?? throw new MissingMemberException("Godot.Variant");
+        var stringNameImplicit = stringNameType.GetMethod("op_Implicit", BindingFlags.Static | BindingFlags.Public, binder: null, types: new[] { typeof(string) }, modifiers: null)
+            ?? throw new MissingMethodException("Godot.StringName", "op_Implicit(string)");
+        var nodePathImplicit = nodePathType.GetMethod("op_Implicit", BindingFlags.Static | BindingFlags.Public, binder: null, types: new[] { typeof(string) }, modifiers: null)
+            ?? throw new MissingMethodException("Godot.NodePath", "op_Implicit(string)");
+        var genericGet = godotObjectType.GetMethod("Get", BindingFlags.Instance | BindingFlags.Public, binder: null, types: new[] { stringNameType }, modifiers: null)
+            ?? throw new MissingMethodException("Godot.GodotObject", "Get(StringName)");
+        var genericGetIndexed = godotObjectType.GetMethod("GetIndexed", BindingFlags.Instance | BindingFlags.Public, binder: null, types: new[] { nodePathType }, modifiers: null)
+            ?? throw new MissingMethodException("Godot.GodotObject", "GetIndexed(NodePath)");
+        var genericSet = godotObjectType.GetMethod("Set", BindingFlags.Instance | BindingFlags.Public, binder: null, types: new[] { stringNameType, variantType }, modifiers: null)
+            ?? throw new MissingMethodException("Godot.GodotObject", "Set(StringName,Variant)");
+        var genericSetIndexed = godotObjectType.GetMethod("SetIndexed", BindingFlags.Instance | BindingFlags.Public, binder: null, types: new[] { nodePathType, variantType }, modifiers: null)
+            ?? throw new MissingMethodException("Godot.GodotObject", "SetIndexed(NodePath,Variant)");
+        var getScript = godotObjectType.GetMethod("GetScript", BindingFlags.Instance | BindingFlags.Public, binder: null, types: Type.EmptyTypes, modifiers: null);
+
+        object MakeStringName(string name) => stringNameImplicit.Invoke(null, new object?[] { name }) ?? throw new NullReferenceException("StringName implicit conversion returned null.");
+        object MakeNodePath(string name) => nodePathImplicit.Invoke(null, new object?[] { name }) ?? throw new NullReferenceException("NodePath implicit conversion returned null.");
+        object MakeVariant(object value)
+        {
+            var implicitMethod = variantType.GetMethod("op_Implicit", BindingFlags.Static | BindingFlags.Public, binder: null, types: new[] { value.GetType() }, modifiers: null)
+                ?? throw new MissingMethodException("Godot.Variant", "op_Implicit(" + value.GetType().FullName + ")");
+            return implicitMethod.Invoke(null, new[] { value }) ?? throw new NullReferenceException("Variant implicit conversion returned null.");
+        }
+
+        IntPtr ReadNativePtr(object? target)
+        {
+            if (target is null) return IntPtr.Zero;
+            for (var type = target.GetType(); type is not null; type = type.BaseType)
+            {
+                var field = type.GetField("NativePtr", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                if (field?.GetValue(target) is IntPtr ptr) return ptr;
+            }
+            return IntPtr.Zero;
+        }
+
+        string DescribeVariant(object? value)
+        {
+            if (value is null) return "<null>";
+            string variantKind = "<unknown>";
+            try
+            {
+                var getVariantType = value.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(m => m.Name == "GetVariantType" && m.GetParameters().Length == 0);
+                if (getVariantType is not null) variantKind = getVariantType.Invoke(value, null)?.ToString() ?? "<null>";
+                else variantKind = value.GetType().GetProperty("VariantType", BindingFlags.Instance | BindingFlags.Public)?.GetValue(value)?.ToString() ?? "<absent>";
+            }
+            catch (Exception ex) { variantKind = "<" + DescribeStep59ProbeException(ex) + ">"; }
+            string text;
+            try { text = value.ToString() ?? "<null-string>"; }
+            catch (Exception ex) { text = "<" + DescribeStep59ProbeException(ex) + ">"; }
+            return $"boxedType={value.GetType().FullName}; variantType={variantKind}; text={text}";
+        }
+
+        string DescribeScript(object target)
+        {
+            try
+            {
+                var script = getScript?.Invoke(target, null);
+                return script is null ? "<null>" : $"type={script.GetType().FullName}; value={script}";
+            }
+            catch (Exception ex) { return "<" + DescribeStep59ProbeException(ex) + ">"; }
+        }
+
+        string ProbeProperty(object target, string label, string propertyName)
+        {
+            var directProperty = target.GetType().GetProperty(char.ToUpperInvariant(propertyName[0]) + propertyName[1..], BindingFlags.Instance | BindingFlags.Public);
+            object? directValue = null;
+            string directDescription;
+            try
+            {
+                directValue = directProperty?.GetValue(target);
+                directDescription = directProperty is null ? "ABSENT" : $"PASS:type={directValue?.GetType().FullName ?? "<null>"};value={directValue}";
+            }
+            catch (Exception ex) { directDescription = "FAIL:" + DescribeStep59ProbeException(ex); }
+
+            string getDescription;
+            try
+            {
+                getDescription = "PASS:" + DescribeVariant(genericGet.Invoke(target, new[] { MakeStringName(propertyName) }));
+            }
+            catch (Exception ex) { getDescription = "FAIL:" + DescribeStep59ProbeException(ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex); }
+
+            string indexedDescription;
+            try
+            {
+                indexedDescription = "PASS:" + DescribeVariant(genericGetIndexed.Invoke(target, new[] { MakeNodePath(propertyName) }));
+            }
+            catch (Exception ex) { indexedDescription = "FAIL:" + DescribeStep59ProbeException(ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex); }
+
+            string setDescription = "SKIP:no-direct-value";
+            string setIndexedDescription = "SKIP:no-direct-value";
+            if (directValue is not null)
+            {
+                object? variant = null;
+                try { variant = MakeVariant(directValue); }
+                catch (Exception ex)
+                {
+                    var description = DescribeStep59ProbeException(ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex);
+                    setDescription = "FAIL:VariantConversion:" + description;
+                    setIndexedDescription = "FAIL:VariantConversion:" + description;
+                }
+                if (variant is not null)
+                {
+                    try
+                    {
+                        genericSet.Invoke(target, new[] { MakeStringName(propertyName), variant });
+                        var after = directProperty?.GetValue(target);
+                        setDescription = $"PASS:directAfter={after};equalToBefore={Equals(after, directValue)}";
+                    }
+                    catch (Exception ex) { setDescription = "FAIL:" + DescribeStep59ProbeException(ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex); }
+                    try
+                    {
+                        genericSetIndexed.Invoke(target, new[] { MakeNodePath(propertyName), variant });
+                        var after = directProperty?.GetValue(target);
+                        setIndexedDescription = $"PASS:directAfter={after};equalToBefore={Equals(after, directValue)}";
+                    }
+                    catch (Exception ex) { setIndexedDescription = "FAIL:" + DescribeStep59ProbeException(ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex); }
+                }
+            }
+
+            return $"{label}.{propertyName}; targetType={target.GetType().FullName}; nativePtr=0x{ReadNativePtr(target).ToInt64():X}; script=[{DescribeScript(target)}]; direct={directDescription}; Get={getDescription}; GetIndexed={indexedDescription}; SetSame={setDescription}; SetIndexedSame={setIndexedDescription}";
+        }
+
+        var rows = new List<string>();
+        foreach (var (label, target) in new[] { ("EMBARK_SCRIPTED", embark), ("ACT_DROPDOWN_SCRIPTED", scriptedPeer), ("OUTLINE_NATIVE", outline) })
+        {
+            foreach (var property in new[] { "position", "scale", "modulate" })
+            {
+                var row = ProbeProperty(target, label, property);
+                rows.Add(row);
+                Checkpoint(checkpoint, "M59P_ROW — " + SanitizeCheckpoint(row));
+            }
+        }
+
+        _step59GenericPropertyMatrixDiagnostics = string.Join("\n", rows);
+        _step59StaticMap += "\n[STEP 59P GENERIC PROPERTY RESOLUTION MATRIX]\n" + _step59GenericPropertyMatrixDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59P_COMPLETE — rows={rows.Count}; same-value Set/SetIndexed probes executed; freshProcessRequired=True; realHandlerArmed=False.");
+        return _step59GenericPropertyMatrixDiagnostics;
+    }
+
+    public string RunStep59ManagedNativeIdentityMatrix(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59I managed/native identity matrix entry");
+        if (!_step59TransitionBound) throw new InvalidOperationException("Step 59I requires Step-59 Gate B binding before the matrix.");
+        if (!_step59ReadyBindingPreflightPassed) throw new InvalidOperationException("Step 59I requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted) throw new InvalidOperationException("Step 59I requires a fresh process with no prior Step-59 mutation/handler probe.");
+        RequireStep59PropertyTweenerProfile(PropertyTweenerExperimentProfile.Full, "Step 59I managed/native identity matrix");
+        _step59DiagnosticMutationProbeStarted = true;
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var screen = CaptureCurrentCharacterSelectState(step, context).Screen
+            ?? throw new InvalidOperationException("Step 59I character-select screen is absent.");
+        var scriptedPeer = RequireRuntimeInstanceFieldForOwnership(screen.GetType(), "_actDropdown", step).GetValue(screen)
+            ?? throw new InvalidDataException("Step 59I retained _actDropdown is null.");
+        var outline = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_outline", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59I retained embark _outline is null.");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59I GodotSharp handoff absent.")).GodotSharpAssembly;
+        var godotObjectType = godotAssembly.GetType("Godot.GodotObject", true, false) ?? throw new MissingMemberException("Godot.GodotObject");
+        var interopUtils = godotAssembly.GetType("Godot.NativeInterop.InteropUtils", true, false) ?? throw new MissingMemberException("Godot.NativeInterop.InteropUtils");
+        var unmanagedGetManaged = interopUtils.GetMethod("UnmanagedGetManaged", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, binder: null, types: new[] { typeof(IntPtr) }, modifiers: null)
+            ?? throw new MissingMethodException("Godot.NativeInterop.InteropUtils", "UnmanagedGetManaged(IntPtr)");
+        var getScript = godotObjectType.GetMethod("GetScript", BindingFlags.Instance | BindingFlags.Public, binder: null, types: Type.EmptyTypes, modifiers: null);
+        var getInstanceId = godotObjectType.GetMethod("GetInstanceId", BindingFlags.Instance | BindingFlags.Public, binder: null, types: Type.EmptyTypes, modifiers: null);
+
+        IntPtr ReadNativePtr(object? target)
+        {
+            if (target is null) return IntPtr.Zero;
+            for (var type = target.GetType(); type is not null; type = type.BaseType)
+            {
+                var field = type.GetField("NativePtr", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                if (field?.GetValue(target) is IntPtr ptr) return ptr;
+            }
+            return IntPtr.Zero;
+        }
+
+        string ScriptOf(object? target)
+        {
+            if (target is null) return "<null-target>";
+            try
+            {
+                var script = getScript?.Invoke(target, null);
+                return script is null ? "<null>" : $"{script.GetType().FullName}:{script}";
+            }
+            catch (Exception ex) { return "<" + DescribeStep59ProbeException(ex) + ">"; }
+        }
+
+        string InstanceIdOf(object? target)
+        {
+            if (target is null) return "<null>";
+            try
+            {
+                return getInstanceId?.Invoke(target, null)?.ToString() ?? "<absent>";
+            }
+            catch (Exception ex) { return "<" + DescribeStep59ProbeException(ex) + ">"; }
+        }
+
+        string Probe(string label, object retained)
+        {
+            var ptr = ReadNativePtr(retained);
+            object? mapped = null;
+            string mapError = "<none>";
+            try { mapped = unmanagedGetManaged.Invoke(null, new object?[] { ptr }); }
+            catch (Exception ex) { mapError = DescribeStep59ProbeException(ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex); }
+            return $"{label}; retainedType={retained.GetType().FullName}; retainedManagedId={System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(retained)}; nativePtr=0x{ptr.ToInt64():X}; retainedInstanceId={InstanceIdOf(retained)}; retainedScript=[{ScriptOf(retained)}]; mappedType={mapped?.GetType().FullName ?? "<null>"}; mappedManagedId={(mapped is null ? "<null>" : System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(mapped).ToString())}; mappedNativePtr=0x{ReadNativePtr(mapped).ToInt64():X}; mappedInstanceId={InstanceIdOf(mapped)}; mappedScript=[{ScriptOf(mapped)}]; referenceEquals={ReferenceEquals(retained, mapped)}; mapError={mapError}";
+        }
+
+        var nativeFuncs = godotAssembly.GetType("Godot.NativeInterop.NativeFuncs", false, false);
+        string DescribeNativeCallback(string name)
+        {
+            if (nativeFuncs is null) return name + "=<NativeFuncs absent>";
+            try
+            {
+                var method = nativeFuncs.GetMethod(name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                return name + "=" + (method?.ToString() ?? "<absent>");
+            }
+            catch (Exception ex) { return name + "=<" + DescribeStep59ProbeException(ex) + ">"; }
+        }
+        var callbackSignatures = string.Join(" | ", new[]
+        {
+            DescribeNativeCallback("godotsharp_internal_unmanaged_get_script_instance_managed"),
+            DescribeNativeCallback("godotsharp_internal_unmanaged_get_instance_binding_managed"),
+        });
+
+        var rows = new List<string>
+        {
+            Probe("EMBARK_SCRIPTED", embark),
+            Probe("ACT_DROPDOWN_SCRIPTED", scriptedPeer),
+            Probe("OUTLINE_NATIVE", outline),
+            "NATIVE_CALLBACK_SIGNATURES; " + callbackSignatures,
+        };
+        foreach (var row in rows) Checkpoint(checkpoint, "M59I_ROW — " + SanitizeCheckpoint(row));
+        _step59ManagedIdentityDiagnostics = string.Join("\n", rows);
+        _step59StaticMap += "\n[STEP 59I MANAGED / NATIVE IDENTITY MATRIX]\n" + _step59ManagedIdentityDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59I_COMPLETE — rows={rows.Count}; freshProcessRequired=True; realHandlerArmed=False.");
+        return _step59ManagedIdentityDiagnostics;
+    }
+
+    public (bool Prepared, string Diagnostics) RunStep59ManagedPropertyBypassPreparation(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59Q managed-property bypass preparation entry");
+        if (!_step59TransitionBound) throw new InvalidOperationException("Step 59Q requires Step-59 Gate B binding before preparation.");
+        if (!_step59ReadyBindingPreflightPassed) throw new InvalidOperationException("Step 59Q requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted) throw new InvalidOperationException("Step 59Q requires a fresh process with no prior Step-59 mutation/handler probe.");
+        RequireStep59PropertyTweenerProfile(PropertyTweenerExperimentProfile.Full, "Step 59Q managed-property bypass preparation");
+        _step59DiagnosticMutationProbeStarted = true;
+        SetStep59PropertyTweenerRepairMode(wrapperRepairEnabled: false, fluentRepairEnabled: false, checkpoint: checkpoint, checkpointMarker: "M59Q_PROPERTY_TWEENER_REPAIR_MODE");
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var embarkType = embark.GetType();
+        var before = BuildStep59FullInheritedFieldMatrix(embark, "STEP59Q PRE-BYPASS EMBARK FIELDS");
+        var stages = new List<string>();
+        var optionalFailures = new List<string>();
+        Exception? requiredFailure = null;
+
+        bool Stage(string name, Action action, bool required)
+        {
+            if (requiredFailure is not null) return false;
+            Checkpoint(checkpoint, $"M59Q_STAGE_PRE — {name}; required={required}");
+            try
+            {
+                action();
+                stages.Add(name + "=PASS");
+                Checkpoint(checkpoint, "M59Q_STAGE_POST — " + name + " returned normally.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var observed = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+                stages.Add(name + "=FAIL:" + DescribeStep59ProbeException(observed));
+                if (required) requiredFailure = observed;
+                else optionalFailures.Add(name + ":" + DescribeStep59ProbeException(observed));
+                Checkpoint(checkpoint, $"M59Q_STAGE_FAIL — {name}; required={required}; {SanitizeCheckpoint(DescribeStep59ProbeException(observed))}");
+                return false;
+            }
+        }
+
+        var enabledField = RequireRuntimeInstanceFieldForOwnership(embarkType, "_isEnabled", step);
+        var moveTweenField = RequireRuntimeInstanceFieldForOwnership(embarkType, "_moveTween", step);
+        var showPos = RequireRuntimeInstanceFieldForOwnership(embarkType, "_showPos", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59Q retained embark _showPos is null.");
+        var outline = RequireRuntimeInstanceFieldForOwnership(embarkType, "_outline", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59Q retained embark _outline is null.");
+        var image = RequireRuntimeInstanceFieldForOwnership(embarkType, "_buttonImage", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59Q retained embark _buttonImage is null.");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59Q GodotSharp handoff absent.")).GodotSharpAssembly;
+        var colorsType = godotAssembly.GetType("Godot.Colors", true, false) ?? throw new MissingMemberException("Godot.Colors");
+        var transparent = colorsType.GetProperty("Transparent", BindingFlags.Static | BindingFlags.Public)?.GetValue(null) ?? throw new MissingMemberException("Godot.Colors.Transparent");
+        var white = colorsType.GetProperty("White", BindingFlags.Static | BindingFlags.Public)?.GetValue(null) ?? throw new MissingMemberException("Godot.Colors.White");
+        var positionProperty = embarkType.GetProperty("Position", BindingFlags.Instance | BindingFlags.Public) ?? throw new MissingMemberException(embarkType.FullName, "Position");
+        var outlineModulate = outline.GetType().GetProperty("Modulate", BindingFlags.Instance | BindingFlags.Public) ?? throw new MissingMemberException(outline.GetType().FullName, "Modulate");
+        var imageModulate = image.GetType().GetProperty("Modulate", BindingFlags.Instance | BindingFlags.Public) ?? throw new MissingMemberException(image.GetType().FullName, "Modulate");
+
+        Stage("_isEnabled=true", () => enabledField.SetValue(embark, true), required: true);
+        Stage("NButton.RegisterHotkeys", () => RequireStep59InstanceRuntimeMethod(embarkType, "RegisterHotkeys", 0, step).Invoke(embark, null), required: false);
+        Stage("NButton.UpdateControllerButton", () => RequireStep59InstanceRuntimeMethod(embarkType, "UpdateControllerButton", 0, step).Invoke(embark, null), required: false);
+        Stage("outline.Modulate=Transparent", () => outlineModulate.SetValue(outline, transparent), required: false);
+        Stage("buttonImage.Modulate=White", () => imageModulate.SetValue(image, white), required: false);
+        var oldTween = moveTweenField.GetValue(embark);
+        if (oldTween is not null)
+            Stage("existingTween.Kill", () => RequireStep59InstanceRuntimeMethod(oldTween.GetType(), "Kill", 0, step).Invoke(oldTween, null), required: false);
+        else
+            stages.Add("existingTween.Kill=SKIP_NULL");
+        Stage("_moveTween=null", () => moveTweenField.SetValue(embark, null), required: false);
+        Stage("Position=_showPos direct managed setter", () => positionProperty.SetValue(embark, showPos), required: true);
+        Stage("RefreshFocus", () => RequireStep59InstanceRuntimeMethod(embarkType, "RefreshFocus", 0, step).Invoke(embark, null), required: false);
+
+        if (requiredFailure is null)
+        {
+            if (enabledField.GetValue(embark) is not bool enabled || !enabled)
+                requiredFailure = new InvalidDataException("Step 59Q preparation returned with _isEnabled != true.");
+            else if (!Equals(positionProperty.GetValue(embark), showPos))
+                requiredFailure = new InvalidDataException("Step 59Q direct Position setter did not retain _showPos.");
+        }
+
+        _step59ManagedPropertyBypassPrepared = requiredFailure is null;
+        var after = BuildStep59FullInheritedFieldMatrix(embark, "STEP59Q POST-BYPASS EMBARK FIELDS");
+        _step59ManagedPropertyBypassDiagnostics =
+            $"prepared={_step59ManagedPropertyBypassPrepared}; optionalFailures={optionalFailures.Count}; stages={string.Join(" | ", stages)}\n" + before + "\n" + after +
+            (requiredFailure is null ? "\nrequiredException=<none>" : "\nrequiredException=" + DescribeStep59ProbeException(requiredFailure)) +
+            "\noptionalExceptions=" + (optionalFailures.Count == 0 ? "<none>" : string.Join(" | ", optionalFailures));
+        _step59StaticMap += "\n[STEP 59Q MANAGED-PROPERTY BYPASS PREPARATION]\n" + _step59ManagedPropertyBypassDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59Q_PREP_COMPLETE — prepared={_step59ManagedPropertyBypassPrepared}; realHandlerArmed=False; stages={SanitizeCheckpoint(string.Join(" | ", stages))}.");
+        return (_step59ManagedPropertyBypassPrepared, _step59ManagedPropertyBypassDiagnostics);
     }
 
     public (bool Passed, string Diagnostics) RunStep59SceneTreeAlternativeTailProbe(bool bindNode, Action<string>? checkpoint = null)

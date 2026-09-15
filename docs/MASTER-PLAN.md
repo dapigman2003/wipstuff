@@ -1,10 +1,10 @@
-# 0.0.209 active frontier
+# 0.0.210 active frontier
 
-**Active candidate — 0.0.209 native Tween rejection matrix + alternative creation paths.** Physical 0.0.208 disproved the managed-wrapper explanation for the actual embark failure: the failing `TweenProperty` call itself returns native null while other TweenProperty calls in the same private GodotSharp runtime produce valid native pointers and managed `PropertyTweener` objects.
+**Active candidate — 0.0.210 scripted-object generic property bridge diagnostics + direct-managed progression fallback.** Physical 0.0.209 proved Tween creation/state is healthy but `TweenProperty()` fails specifically when its target is the game-scripted `NConfirmButton`; the same operation succeeds on a plain Godot child.
 
-Compilation efficiency remains first-class. The stable 0.0.208 Baseline / Wrapper / Full profile architecture is retained unchanged. The new FULL-profile 59N matrix tests multiple rejection families in one fresh-process run without aborting after the first row, while 59Y/59Z provide separate focused confirmation of the two SceneTree-created full-tail candidates. Existing 59D/R/H/U/T/W/X/E, real 59, and 60–62 remain compiled into the same IPA.
+Compilation efficiency remains first-class. The stable 0.0.208/0.0.209 Baseline / Wrapper / Full profile architecture and GodotSharp derivative builder are retained unchanged. New FULL-profile 59P and 59I isolate generic property resolution and managed/native identity; 59Q is already compiled as a targeted direct-managed bypass plus original game transition so the same IPA can progress into 60–62 if the bridge diagnosis confirms the current model. Existing 59D/R/H/U/T/W/X/N/Y/Z/E and real 59 remain compiled.
 
-Viability rule: 0.0.209 does not add another bootstrap-critical IL transform. The new work is runtime reflection/probing on the already physically viable Full profile; missing optional methods or failed matrix rows are evidence, not bootstrap blockers.
+Viability rule: 0.0.210 adds no bootstrap-critical IL transform. New reflection/property probes and the direct-managed fallback live entirely in Step 59. A failed diagnostic row is evidence, not a Step-35 blocker.
 
 ---
 
