@@ -1,6 +1,6 @@
-# 0.0.206 PropertyTweener three-mode release checklist
+# 0.0.207 PropertyTweener three-mode release checklist
 
-- Bundle identity: **0.0.206 (206)**.
+- Bundle identity: **0.0.207 (207)**.
 - Step52→58 current ownership path remains active; legacy 53–57 remain optional.
 - PackedScene unique-name compatibility implementation remains hash-pinned unchanged.
 - Rejected 0.0.202 runtime-wide trace bridge remains absent.

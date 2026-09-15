@@ -606,3 +606,9 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-35-PHYSICAL-0.0.205-PREFLIGHT-FAIL-REPORT.txt` — Step-35 normal report proving the speculative SetEase cast-shape assumption failed before game progress.
 - `reports/STEP-35-PHYSICAL-0.0.205-PREFLIGHT-FAIL-CHECKPOINT.txt` — same-run checkpoint showing Gate A fail and normal teardown.
 - `reports/PHYSICALLY-CLOSED-PATH-0.0.205-STOPPED.txt` — convenience path stopped because Step 35 did not close; no later stage invoked.
+
+## 0.0.207 — viability hardening after 0.0.206 host-test compile stop
+
+- Codemagic 0.0.206: static validation 1437/1437 and `StS2Launcher.Core` compilation succeeded; host-test compilation stopped on unsupported `Assert.Greater`.
+- 0.0.207 freezes the 0.0.206 Core runtime bytes, uses `Assert.IsTrue` instead, and adds repository-wide MSTest assertion-API validation.
+- See `steps/STEP-59.13-VIABILITY-HARDENING-0.0.207.md` and `reports/STEP-59.13-CODEMAGIC-0.0.206-HOST-TEST-COMPILE-FAILURE.txt`.

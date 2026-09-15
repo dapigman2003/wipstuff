@@ -32,7 +32,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "0.0.206 keeps Step52→58 and the proven PackedScene correction, but makes the PropertyTweener work a three-mode experiment deck verified against the real GodotSharp binary shape. Run 59T CONTROL first with both repairs disabled. Then 59W enables only the TweenProperty native-wrapper repair while leaving fluent returns natural. Then 59X enables both wrapper repair and typed-return fluent repair. The fluent transform no longer assumes any internal native-call/cast IL shape; it observes/repairs only typed PropertyTweener return boundaries. If 59X passes, fresh-process 59E and real Step59 use full repair automatically; 60–62 can follow without recompiling.",
+            "0.0.207 carries forward the Codemagic-compiled 0.0.206 Core runtime unchanged: Step52→58, the proven PackedScene correction, and the three-mode PropertyTweener experiment deck. Run 59T CONTROL first with both repairs disabled. Then 59W enables only the TweenProperty native-wrapper repair while leaving fluent returns natural. Then 59X enables both wrapper repair and typed-return fluent repair. The fluent transform no longer assumes any internal native-call/cast IL shape; it observes/repairs only typed PropertyTweener return boundaries. If 59X passes, fresh-process 59E and real Step59 use full repair automatically; 60–62 can follow without recompiling.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -86,13 +86,13 @@ public sealed partial class RootViewController
         (_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59E — isolated retained embark Enable probe",
             "Run Step 59E — ISOLATED EMBARK ENABLE", "STEP 59E ISOLATED EMBARK ENABLE: LOCKED",
-            "Fresh-process repair validation. Enables the 0.0.206 full PropertyTweener repair, then calls retained embark NClickableControl.Enable() directly outside OpenCharacterSelect. If 59X passes but 59E fails, the remaining failure is outside the isolated tween tail. Relaunch afterward.");
+            "Fresh-process repair validation. Enables the carried-forward full PropertyTweener repair, then calls retained embark NClickableControl.Enable() directly outside OpenCharacterSelect. If 59X passes but 59E fails, the remaining failure is outside the isolated tween tail. Relaunch afterward.");
         _step59IsolatedEnableProbeButton.TouchUpInside += async (_, _) => await RunStep59IsolatedEnableProbeAsync();
 
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. Gate C enables the same 0.0.206 full PropertyTweener repair validated by 59X/59E, then invokes exact original OpenCharacterSelect once. If it succeeds, continue directly to 60–62 in this IPA; if it throws, post-failure wrapper/button evidence is captured.");
+            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. Gate C enables the same carried-forward full PropertyTweener repair validated by 59X/59E, then invokes exact original OpenCharacterSelect once. If it succeeds, continue directly to 60–62 in this IPA; if it throws, post-failure wrapper/button evidence is captured.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,

@@ -1251,7 +1251,7 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                     call.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName &&
                     call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackMethodName);
                 var fluentReturns = fluentMethod.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Ret);
-                Assert.Greater(fluentRepairCalls, 0, fluentName);
+                Assert.IsTrue(fluentRepairCalls > 0, fluentName);
                 Assert.AreEqual(fluentReturns, fluentRepairCalls, fluentName);
             }
 

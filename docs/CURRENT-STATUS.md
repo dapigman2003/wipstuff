@@ -1,8 +1,8 @@
-# 0.0.206 PropertyTweener three-mode frontier
+# 0.0.207 viability-hardened PropertyTweener frontier
 
-**Active candidate: 0.0.206 (206).** Step 52 remains the current architecture baseline for Step 58; legacy Steps 53–57 are optional. Physical 0.0.205 failed safely in Step-35 preflight because its fluent repair expected a specific `isinst PropertyTweener` sequence after `SetEase`'s native call. 0.0.206 removes that assumption and patches only typed return boundaries for fluent methods.
+**Active candidate: 0.0.207 (207).** Step 52 remains the current architecture baseline for Step 58; legacy Steps 53–57 are optional. Codemagic for 0.0.206 compiled `StS2Launcher.Core` successfully, proving the current Core runtime source compiles. The pipeline then stopped on exactly one host-test compile error: `Assert.Greater` is not available in the pinned MSTest 4.3.2 framework. No iOS/device run occurred.
 
-Phone sequence: fresh process through Step 52 → Step 58 → **59T CONTROL**. Then fresh process → 58 → **59W WRAPPER-ONLY**. Then, when needed, fresh process → 58 → **59X FULL REPAIR**. If 59X passes, use fresh processes for 59E and real Step 59; if real Step 59 passes, continue 60/61/62 in that same process. Step 63 remains unopened.
+0.0.207 therefore freezes the 0.0.206 Core runtime byte-for-byte and changes only the host test, release identity, validation, and history. Phone sequence remains: fresh process through Step 52 → Step 58 → **59T CONTROL**; then fresh-process **59W WRAPPER-ONLY**; then **59X FULL REPAIR** if needed. If 59X passes, use fresh processes for 59E and real Step 59; if real Step 59 passes, continue 60/61/62 in that same process. Step 63 remains unopened.
 
 ## Retained historical invariants used by validation
 

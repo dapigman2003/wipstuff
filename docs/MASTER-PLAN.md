@@ -1,8 +1,10 @@
-# 0.0.206 active frontier
+# 0.0.207 active frontier
 
-**Active candidate — 0.0.206 current ownership + three-mode PropertyTweener observe/repair.** Physical history through Step 57 remains retained, Step 58 starts directly from Step 52, and legacy Steps 53–57 remain optional. Physical 0.0.205 rejected before Step 59 because the candidate assumed an internal `SetEase` post-native `isinst` shape that the real GodotSharp binary does not have. 0.0.206 preserves the proven `PackedScene.Instantiate(GenEditState)` unique-name compatibility and maximizes information/optionality per compilation: **59T CONTROL** disables both repairs; **59W WRAPPER-ONLY** enables only nonzero-pointer null/wrong-type `PropertyTweener(IntPtr)` recovery; **59X FULL REPAIR** additionally enables shape-independent typed-return repair for `SetEase`/`SetTrans`/`FromCurrent`. 59E and real Step 59 use full repair, while 59D/R/H/U remain controls and Steps 60–62 stay available after a clean transition. Step 63 remains unopened.
+**Active candidate — 0.0.207 current ownership + three-mode PropertyTweener observe/repair, viability-hardened.** The 0.0.206 Core runtime is frozen byte-for-byte because Codemagic already compiled it successfully. 0.0.207 fixes only the unsupported host-test assertion and strengthens validation so a novel MSTest assertion API cannot silently pass the Python contract again.
 
-Compilation efficiency is a first-class rule: use multiple fresh-process phone experiments per build and make candidate transforms fail only on real authority/safety violations, not speculative internal IL shapes.
+Compilation efficiency remains the first-class rule: one IPA retains **59T CONTROL**, **59W WRAPPER-ONLY**, **59X FULL REPAIR**, 59E, real Step 59, and Steps 60–62, with 59D/R/H/U still available. Multiple fresh-process phone experiments should exhaust those branches before another compilation.
+
+Targeted tech-debt decision: the overall launcher/runtime architecture remains sound. The debt is localized to the Step-35 GodotSharp derivative builder carrying both bootstrap-critical compatibility and experimental Step-59 rewrites. We are **not** refactoring that compiled Core in 0.0.207 because doing so would discard the strongest new evidence—successful Core compilation—and add avoidable risk. Once the PropertyTweener behavior is physically characterized, the experiment should be split from bootstrap-critical compatibility in a dedicated cleanup iteration.
 
 ---
 

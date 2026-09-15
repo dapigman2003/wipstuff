@@ -1,6 +1,8 @@
-# 0.0.206 PropertyTweener three-mode / compilation-efficient testing
+# 0.0.207 PropertyTweener three-mode / compilation-efficient testing
 
-- Bundle identity must be **0.0.206 (206)**.
+0.0.207 carries the Codemagic-compiled 0.0.206 Core runtime byte-for-byte; the only functional source correction is in the host-test/build-validation surface.
+
+- Bundle identity must be **0.0.207 (207)**.
 - Every mutating Step-59 branch requires a fresh process.
 - Recommended high-information sequence: **59T CONTROL → 59W WRAPPER-ONLY → 59X FULL REPAIR → 59E → real 59 → 60 → 61 → 62**, stopping only when a branch fails or supplies the needed distinction.
 - 59D/R/H/U remain optional controls in the same IPA.
