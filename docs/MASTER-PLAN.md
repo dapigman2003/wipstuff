@@ -1,10 +1,10 @@
-# 0.0.208 active frontier
+# 0.0.209 active frontier
 
-**Active candidate — 0.0.208 profile-isolated Step-59 GodotSharp experiments.** Physical 0.0.207 crossed the threshold for refactoring: the experimental derivative itself constructed and loaded, but bootstrap reflection over its Godot-typed helpers caused another pre-Step-59 candidate failure. The overall launcher architecture remains retained; the refactor is localized to the Step-35/GodotSharp experiment boundary.
+**Active candidate — 0.0.209 native Tween rejection matrix + alternative creation paths.** Physical 0.0.208 disproved the managed-wrapper explanation for the actual embark failure: the failing `TweenProperty` call itself returns native null while other TweenProperty calls in the same private GodotSharp runtime produce valid native pointers and managed `PropertyTweener` objects.
 
-Compilation efficiency remains first-class. One IPA contains three independently generated profiles: **BASELINE** (PackedScene only), **WRAPPER** (TweenProperty pointer/wrapper observe+repair), and **FULL** (Wrapper + fluent typed-return observe+repair). Fresh-process profile selection happens before Step 35. 59T/59W/59X are profile-gated; 59E and real 59 require Full; 59D/R/H/U remain optional controls; 60–62 remain available after a clean real transition.
+Compilation efficiency remains first-class. The stable 0.0.208 Baseline / Wrapper / Full profile architecture is retained unchanged. The new FULL-profile 59N matrix tests multiple rejection families in one fresh-process run without aborting after the first row, while 59Y/59Z provide separate focused confirmation of the two SceneTree-created full-tail candidates. Existing 59D/R/H/U/T/W/X/E, real 59, and 60–62 remain compiled into the same IPA.
 
-Viability rule: an experimental Wrapper/Full defect must not prevent Baseline from reaching the proven Step52→58 path. Bootstrap therefore does not reflect Godot-typed experimental helper signatures; those are verified statically before load. Runtime loader diagnostics preserve full exception chains including FileName/FusionLog/stack.
+Viability rule: 0.0.209 does not add another bootstrap-critical IL transform. The new work is runtime reflection/probing on the already physically viable Full profile; missing optional methods or failed matrix rows are evidence, not bootstrap blockers.
 
 ---
 

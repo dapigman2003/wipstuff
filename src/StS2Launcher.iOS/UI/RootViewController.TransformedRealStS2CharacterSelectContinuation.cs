@@ -14,7 +14,7 @@ public sealed partial class RootViewController
     private readonly TransformedRealStS2StartupLadderGateSequence _step62Gates = new(62, "CHARACTER SELECT SUSTAINED RENDER RESIDENCY");
 
     private UIButton? _step58Button; private UIButton? _step59Button; private UIButton? _step60Button; private UIButton? _step61Button; private UIButton? _step62Button;
-    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59RegisterHotkeysProbeButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59ConfirmTailProbeButton; private UIButton? _step59ConfirmTailWrapperRepairProbeButton; private UIButton? _step59ConfirmTailRepairProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
+    private UIButton? _step59DiagnosticDeckButton; private UIButton? _step59ControllerRehearsalButton; private UIButton? _step59RegisterHotkeysProbeButton; private UIButton? _step59UpdateControllerProbeButton; private UIButton? _step59ConfirmTailProbeButton; private UIButton? _step59ConfirmTailWrapperRepairProbeButton; private UIButton? _step59ConfirmTailRepairProbeButton; private UIButton? _step59NativeTweenMatrixButton; private UIButton? _step59SceneTreeTailProbeButton; private UIButton? _step59SceneTreeBoundTailProbeButton; private UIButton? _step59IsolatedEnableProbeButton;
     private UILabel? _step58ResultLabel; private UILabel? _step59ResultLabel; private UILabel? _step60ResultLabel; private UILabel? _step61ResultLabel; private UILabel? _step62ResultLabel;
     private UILabel? _step58DetailLabel; private UILabel? _step59DetailLabel; private UILabel? _step60DetailLabel; private UILabel? _step61DetailLabel; private UILabel? _step62DetailLabel;
     private UILabel? _step59DiagnosticDeckResultLabel; private UILabel? _step59DiagnosticDeckDetailLabel;
@@ -24,6 +24,9 @@ public sealed partial class RootViewController
     private UILabel? _step59ConfirmTailProbeResultLabel; private UILabel? _step59ConfirmTailProbeDetailLabel;
     private UILabel? _step59ConfirmTailWrapperRepairProbeResultLabel; private UILabel? _step59ConfirmTailWrapperRepairProbeDetailLabel;
     private UILabel? _step59ConfirmTailRepairProbeResultLabel; private UILabel? _step59ConfirmTailRepairProbeDetailLabel;
+    private UILabel? _step59NativeTweenMatrixResultLabel; private UILabel? _step59NativeTweenMatrixDetailLabel;
+    private UILabel? _step59SceneTreeTailProbeResultLabel; private UILabel? _step59SceneTreeTailProbeDetailLabel;
+    private UILabel? _step59SceneTreeBoundTailProbeResultLabel; private UILabel? _step59SceneTreeBoundTailProbeDetailLabel;
     private UILabel? _step59IsolatedEnableProbeResultLabel; private UILabel? _step59IsolatedEnableProbeDetailLabel;
     private bool _step59TransitionUiStarted; private bool _step59DiagnosticDeckUiStarted; private bool _step59ControllerRehearsalUiStarted; private bool _step59MutationProbeUiStarted; private bool _step61PulseUiStarted; private bool _step62PulseUiStarted;
 
@@ -32,7 +35,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "0.0.208 isolates Step-59 GodotSharp experimentation into three fresh-process profiles selected BEFORE Step 35. BASELINE contains only the physically proven PackedScene correction and is used for 59T. WRAPPER adds TweenProperty native-pointer/original-wrapper observation plus wrapper repair and is used for 59W. FULL adds typed-return SetEase/SetTrans/FromCurrent observation/repair and is used for 59X, 59E, and real Step 59. A broken experimental profile no longer prevents the other profiles in this IPA from reaching the proven bootstrap path.",
+            "0.0.209 keeps the proven 0.0.208 three-profile bootstrap unchanged and adds native Tween rejection experiments on FULL. Physical 0.0.208 proved the failing embark TweenProperty gets native pointer 0x0 while other TweenProperty observations produce valid PropertyTweeners, so 0.0.209 focuses on Tween state, creation path, target/property, and value type. 59N is the broad matrix; 59Y/59Z are focused SceneTree alternative-tail confirmations. BASELINE/WRAPPER/FULL isolation still protects the compiled IPA from one experimental profile invalidating the others.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -82,6 +85,24 @@ public sealed partial class RootViewController
             "Run Step 59X — FULL REPAIR / FULL TAIL", "STEP 59X FULL REPAIR: LOCKED",
             "Fresh-process full repair experiment using the same compiled IPA. Enables native-pointer-aware TweenProperty wrapper repair plus typed-return fluent return-self repair for SetEase/SetTrans/FromCurrent. The fluent repair is independent of their internal generated IL shape. Stage checkpoints and bridge counters prove which repair fired. If this passes, relaunch for 59E, then real Step59.");
         _step59ConfirmTailRepairProbeButton.TouchUpInside += async (_, _) => await RunStep59ConfirmTailRepairProbeAsync();
+
+        (_step59NativeTweenMatrixButton, _step59NativeTweenMatrixResultLabel, _step59NativeTweenMatrixDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59N — native Tween rejection matrix (FULL profile)",
+            "Run Step 59N — NATIVE TWEEN MATRIX", "STEP 59N NATIVE TWEEN MATRIX: LOCKED",
+            "Fresh-process FULL-profile diagnostic. Uses separate fresh Tweens to compare Node.CreateTween vs SceneTree.CreateTween vs SceneTree.CreateTween+BindNode, TweenInterval vs TweenProperty, pre/post old-tween Kill state, Tween IsValid/IsRunning/native identity, and position/scale/modulate target/value combinations. One failing row does not abort the rest. It also runs full fluent tails on both SceneTree position alternatives and records whether either is viable.");
+        _step59NativeTweenMatrixButton.TouchUpInside += async (_, _) => await RunStep59NativeTweenMatrixAsync();
+
+        (_step59SceneTreeTailProbeButton, _step59SceneTreeTailProbeResultLabel, _step59SceneTreeTailProbeDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59Y — focused SceneTree.CreateTween confirm-button tail",
+            "Run Step 59Y — SCENETREE TAIL", "STEP 59Y SCENETREE TAIL: LOCKED",
+            "Fresh-process FULL-profile confirmation branch. Kills the retained old tween, creates a fresh tween with SceneTree.CreateTween(), then runs the exact position TweenProperty + SetEase + SetTrans + FromCurrent tail. Repair remains disabled so this validates the alternative creation path itself.");
+        _step59SceneTreeTailProbeButton.TouchUpInside += async (_, _) => await RunStep59SceneTreeAlternativeTailAsync(bindNode: false);
+
+        (_step59SceneTreeBoundTailProbeButton, _step59SceneTreeBoundTailProbeResultLabel, _step59SceneTreeBoundTailProbeDetailLabel) = AddStartupLadderStepControls(content,
+            "Step 59Z — focused SceneTree.CreateTween + BindNode confirm-button tail",
+            "Run Step 59Z — SCENETREE + BINDNODE TAIL", "STEP 59Z SCENETREE BOUND TAIL: LOCKED",
+            "Fresh-process FULL-profile confirmation branch. Uses SceneTree.CreateTween().BindNode(embark) before the exact position TweenProperty + fluent tail. Repair remains disabled. If 59Z passes while Node.CreateTween fails, the next compatibility correction has a directly validated replacement path.");
+        _step59SceneTreeBoundTailProbeButton.TouchUpInside += async (_, _) => await RunStep59SceneTreeAlternativeTailAsync(bindNode: true);
 
         (_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59E — isolated retained embark Enable probe",

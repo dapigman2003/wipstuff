@@ -236,6 +236,96 @@ public sealed partial class RootViewController
         finally { await FinishStartupLadderStepAsync(step, reportName, reportTitle, resultLabel, detailLabel, $"Step {code} mutates only retained confirm-button visual/tween state and requires a fresh process afterward."); }
     }
 
+    private async Task RunStep59NativeTweenMatrixAsync()
+    {
+        const int step = 59;
+        if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted || _step59TransitionUiStarted || _step59MutationProbeUiStarted ||
+            _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
+        {
+            SetStartupLadderRefusal(step, _step59NativeTweenMatrixResultLabel!, _step59NativeTweenMatrixDetailLabel!, "FRESH PROCESS REQUIRED", "Step 59N is a one-shot native Tween matrix. Relaunch and reproduce through Step 58 under the FULL profile without running another Step-59 branch first.");
+            return;
+        }
+        if (_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile != PropertyTweenerExperimentProfile.Full)
+        {
+            SetStartupLadderRefusal(step, _step59NativeTweenMatrixResultLabel!, _step59NativeTweenMatrixDetailLabel!, "FULL PROFILE REQUIRED", $"Step 59N requires profile=Full, but this process uses {_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile}. Relaunch and choose the FULL closed-path button before Step 35.");
+            return;
+        }
+        if (!TryPrepareStep59Auxiliary(_step59NativeTweenMatrixButton, _step59NativeTweenMatrixResultLabel, _step59NativeTweenMatrixDetailLabel, "Step 59N", out var button, out var resultLabel, out var detailLabel)) return;
+        if (!TryInitializeStartupLadderTelemetry(step, "Step-59 native Tween rejection matrix", "Step59N-NativeTweenRejectionMatrix-StaticMap", out var error))
+        {
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return;
+        }
+        BeginSteamOperation(allowCancel: false); _step59Gates.Reset();
+        try
+        {
+            WriteStartupLadderCheckpoint(step, "RUN_START_59N — native Tween rejection matrix started. FULL profile; wrapper/fluent repair explicitly disabled. Each matrix row uses a separate fresh Tween and row failure does not abort later rows.");
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException("Step 59N preflight map write failed: " + preflightMapError);
+            _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten(); _step59MutationProbeUiStarted = true; button.Enabled = false;
+            var probe = _transformedRealStS2VeryEarlyInitialization.RunStep59NativeTweenRejectionMatrix(d => WriteStartupLadderCheckpoint(step, d));
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException("Step 59N post-matrix map refresh failed: " + mapError);
+            WriteStartupLadderCheckpoint(step, $"M59N_STATIC_MAP_REFRESH_RETURNED — completed={probe.Completed}; workingAlternativeFound={probe.WorkingAlternativeFound}; freshProcessRequired=True.");
+            resultLabel.Text = probe.WorkingAlternativeFound ? "STEP 59N: WORKING ALTERNATIVE FOUND" : "STEP 59N: MATRIX COMPLETE — NO WORKING ALTERNATIVE YET";
+            resultLabel.TextColor = probe.WorkingAlternativeFound ? UIColor.SystemGreen : UIColor.SystemOrange;
+            detailLabel.Text = probe.WorkingAlternativeFound
+                ? "At least one SceneTree-created full position tail passed. Preserve the report; relaunch and use 59Y/59Z to confirm the exact passing path in isolation."
+                : "All planned native-rejection rows completed. Preserve the report; it distinguishes Tween state/creation/property/type families even if no alternative passed.";
+        }
+        catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted); }
+        finally { await FinishStartupLadderStepAsync(step, "Step59N-NativeTweenRejectionMatrix.txt", "StS2 Launcher — Step 59N Native Tween Rejection Matrix", resultLabel, detailLabel, "Step 59N creates/kills diagnostic Tweens and requires a fresh process afterward. It never calls OpenCharacterSelect."); }
+    }
+
+    private async Task RunStep59SceneTreeAlternativeTailAsync(bool bindNode)
+    {
+        const int step = 59;
+        var code = bindNode ? "59Z" : "59Y";
+        var requestedButton = bindNode ? _step59SceneTreeBoundTailProbeButton : _step59SceneTreeTailProbeButton;
+        var requestedResult = bindNode ? _step59SceneTreeBoundTailProbeResultLabel : _step59SceneTreeTailProbeResultLabel;
+        var requestedDetail = bindNode ? _step59SceneTreeBoundTailProbeDetailLabel : _step59SceneTreeTailProbeDetailLabel;
+        if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted || _step59TransitionUiStarted || _step59MutationProbeUiStarted ||
+            _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
+        {
+            SetStartupLadderRefusal(step, requestedResult!, requestedDetail!, "FRESH PROCESS REQUIRED", $"Step {code} is a one-shot alternative Tween tail. Relaunch and reproduce through Step 58 under the FULL profile without running another Step-59 branch first.");
+            return;
+        }
+        if (_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile != PropertyTweenerExperimentProfile.Full)
+        {
+            SetStartupLadderRefusal(step, requestedResult!, requestedDetail!, "FULL PROFILE REQUIRED", $"Step {code} requires profile=Full, but this process uses {_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile}. Relaunch and choose the FULL closed-path button before Step 35.");
+            return;
+        }
+        if (!TryPrepareStep59Auxiliary(requestedButton, requestedResult, requestedDetail, $"Step {code}", out var button, out var resultLabel, out var detailLabel)) return;
+        var prefix = bindNode ? "Step59Z-SceneTreeBoundAlternativeTail-StaticMap" : "Step59Y-SceneTreeAlternativeTail-StaticMap";
+        if (!TryInitializeStartupLadderTelemetry(step, $"Step-{code} SceneTree alternative confirm-button tail", prefix, out var error))
+        {
+            SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return;
+        }
+        BeginSteamOperation(allowCancel: false); _step59Gates.Reset();
+        try
+        {
+            WriteStartupLadderCheckpoint(step, $"RUN_START_{code} — SceneTree alternative confirm-button tail started; bindNode={bindNode}; PropertyTweener repair disabled.");
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59ClosedStep58Authority(!GodotStep15NativeBridge.IsRenderingActive, d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!RecordStartupLadderGate(_step59Gates, _transformedRealStS2VeryEarlyInitialization.RunStep59RealHandlerBinding(d => WriteStartupLadderCheckpoint(step, d)), resultLabel, detailLabel)) return;
+            if (!WriteStartupLadderStaticMap(step, out var preflightMapError)) throw new IOException($"Step {code} preflight map write failed: " + preflightMapError);
+            _transformedRealStS2VeryEarlyInitialization.MarkStep59StaticMapDurablyWritten(); _step59MutationProbeUiStarted = true; button.Enabled = false;
+            var probe = _transformedRealStS2VeryEarlyInitialization.RunStep59SceneTreeAlternativeTailProbe(bindNode, d => WriteStartupLadderCheckpoint(step, d));
+            if (!WriteStartupLadderStaticMap(step, out var mapError)) throw new IOException($"Step {code} post-probe map refresh failed: " + mapError);
+            WriteStartupLadderCheckpoint(step, $"M{code}_STATIC_MAP_REFRESH_RETURNED — passed={probe.Passed}; bindNode={bindNode}; freshProcessRequired=True.");
+            resultLabel.Text = probe.Passed ? $"STEP {code}: ALTERNATIVE FULL TAIL RETURNED" : $"STEP {code}: ALTERNATIVE TAIL THREW — STAGE CAPTURED";
+            resultLabel.TextColor = probe.Passed ? UIColor.SystemGreen : UIColor.SystemOrange;
+            detailLabel.Text = probe.Passed
+                ? "The complete SceneTree-created position tween tail returned with repair disabled. Preserve the report; this is a validated candidate creation path."
+                : "The focused alternative failed. Preserve the stage report and relaunch before another Step-59 branch.";
+        }
+        catch (Exception ex) { HandleStartupLadderException(step, resultLabel, detailLabel, ex, mutationArmed: _step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted); }
+        finally
+        {
+            var reportName = bindNode ? "Step59Z-SceneTreeBoundAlternativeTail.txt" : "Step59Y-SceneTreeAlternativeTail.txt";
+            var title = bindNode ? "StS2 Launcher — Step 59Z SceneTree + BindNode Alternative Tail" : "StS2 Launcher — Step 59Y SceneTree Alternative Tail";
+            await FinishStartupLadderStepAsync(step, reportName, title, resultLabel, detailLabel, $"Step {code} creates/kills diagnostic Tweens and requires a fresh process afterward. It never calls OpenCharacterSelect.");
+        }
+    }
+
     private async Task RunStep59IsolatedEnableProbeAsync()
     {
         const int step = 59;

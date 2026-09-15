@@ -112,6 +112,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
     private string _step59RegisterHotkeysProbeDiagnostics = string.Empty;
     private string _step59UpdateControllerProbeDiagnostics = string.Empty;
     private string _step59ConfirmButtonTailProbeDiagnostics = string.Empty;
+    private string _step59NativeTweenMatrixDiagnostics = string.Empty;
+    private string _step59AlternativeTweenTailDiagnostics = string.Empty;
     private string _step59IsolatedEnableProbeDiagnostics = string.Empty;
     private bool _step59ReadyBindingPreflightPassed;
     private bool _step59DiagnosticMutationProbeStarted;
@@ -188,6 +190,8 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59RegisterHotkeysProbeDiagnostics = string.Empty;
         _step59UpdateControllerProbeDiagnostics = string.Empty;
         _step59ConfirmButtonTailProbeDiagnostics = string.Empty;
+        _step59NativeTweenMatrixDiagnostics = string.Empty;
+        _step59AlternativeTweenTailDiagnostics = string.Empty;
         _step59IsolatedEnableProbeDiagnostics = string.Empty;
         _step59ReadyBindingPreflightPassed = false;
         _step59DiagnosticMutationProbeStarted = false;
@@ -829,6 +833,295 @@ public sealed partial class TransformedRealStS2VeryEarlyInitialization
         _step59StaticMap += $"\n[STEP {probeCode} ISOLATED NCONFIRMBUTTON POST-BASE TAIL PROBE]\n" + _step59ConfirmButtonTailProbeDiagnostics + "\n";
         Checkpoint(checkpoint, $"M{probeCode}_COMPLETE — wrapperRepairEnabled={wrapperRepairEnabled}; fluentRepairEnabled={fluentRepairEnabled}; passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False; stages={SanitizeCheckpoint(string.Join(" | ", stages))}.");
         return (failure is null, _step59ConfirmButtonTailProbeDiagnostics);
+    }
+
+    public (bool Completed, bool WorkingAlternativeFound, string Diagnostics) RunStep59NativeTweenRejectionMatrix(Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite("Step 59N native Tween rejection matrix entry");
+        if (!_step59TransitionBound) throw new InvalidOperationException("Step 59N requires Step-59 Gate B binding before the matrix.");
+        if (!_step59ReadyBindingPreflightPassed) throw new InvalidOperationException("Step 59N requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted) throw new InvalidOperationException("Step 59N is one-shot and requires a fresh process with no prior Step-59 mutation/handler probe.");
+        RequireStep59PropertyTweenerProfile(PropertyTweenerExperimentProfile.Full, "Step 59N native Tween rejection matrix");
+        _step59DiagnosticMutationProbeStarted = true;
+        SetStep59PropertyTweenerRepairMode(wrapperRepairEnabled: false, fluentRepairEnabled: false, checkpoint: checkpoint, checkpointMarker: "M59N_PROPERTY_TWEENER_REPAIR_MODE");
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var embarkType = embark.GetType();
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException("Step 59N GodotSharp handoff absent.")).GodotSharpAssembly;
+        var oldTween = RequireRuntimeInstanceFieldForOwnership(embarkType, "_moveTween", step).GetValue(embark);
+        var showPos = RequireRuntimeInstanceFieldForOwnership(embarkType, "_showPos", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59N retained embark _showPos could not be read.");
+        var outline = RequireRuntimeInstanceFieldForOwnership(embarkType, "_outline", step).GetValue(embark)
+            ?? throw new InvalidDataException("Step 59N retained embark _outline is null.");
+
+        object? ReadPublicProperty(object target, string name)
+            => target.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public)?.GetValue(target);
+
+        string SafeCallBool(object target, string methodName)
+        {
+            try
+            {
+                var method = target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault(m => m.Name == methodName && m.GetParameters().Length == 0);
+                if (method is null) return "<method-absent>";
+                var value = method.Invoke(target, null);
+                return value?.ToString() ?? "<null>";
+            }
+            catch (Exception ex) { return "<" + DescribeStep59ProbeException(ex) + ">"; }
+        }
+
+        IntPtr ReadNativePtr(object? target)
+        {
+            if (target is null) return IntPtr.Zero;
+            for (var type = target.GetType(); type is not null; type = type.BaseType)
+            {
+                var field = type.GetField("NativePtr", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                if (field?.GetValue(target) is IntPtr ptr) return ptr;
+            }
+            return IntPtr.Zero;
+        }
+
+        string DescribeTween(object? tween)
+        {
+            if (tween is null) return "NULL";
+            var ptr = ReadNativePtr(tween);
+            return $"type={tween.GetType().FullName}; managedId={System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(tween)}; nativePtr=0x{ptr.ToInt64():X}; isValid={SafeCallBool(tween, "IsValid")}; isRunning={SafeCallBool(tween, "IsRunning")}; sameAsOld={ReferenceEquals(tween, oldTween)}; sameNativeAsOld={(oldTween is not null && ptr != IntPtr.Zero && ptr == ReadNativePtr(oldTween))}";
+        }
+
+        object CreateNodeTween()
+            => RequireStep59InstanceRuntimeMethod(embarkType, "CreateTween", 0, step).Invoke(embark, null)
+               ?? throw new NullReferenceException("Node.CreateTween returned null.");
+
+        object CreateSceneTreeTween(bool bindNode)
+        {
+            var tree = RequireStep59InstanceRuntimeMethod(embarkType, "GetTree", 0, step).Invoke(embark, null)
+                ?? throw new NullReferenceException("Node.GetTree returned null.");
+            var create = tree.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).SingleOrDefault(m => m.Name == "CreateTween" && m.GetParameters().Length == 0)
+                ?? throw new MissingMethodException(tree.GetType().FullName, "CreateTween()");
+            var tween = create.Invoke(tree, null) ?? throw new NullReferenceException("SceneTree.CreateTween returned null.");
+            if (bindNode)
+            {
+                var bind = tween.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).SingleOrDefault(m => m.Name == "BindNode" && m.GetParameters().Length == 1)
+                    ?? throw new MissingMethodException(tween.GetType().FullName, "BindNode(Node)");
+                var bound = bind.Invoke(tween, new[] { embark });
+                if (bound is null) throw new NullReferenceException("Tween.BindNode returned null.");
+                tween = bound;
+            }
+            return tween;
+        }
+
+        object MakeNodePath(string property)
+        {
+            var nodePathType = godotAssembly.GetType("Godot.NodePath", true, false) ?? throw new MissingMemberException("Godot.NodePath");
+            var implicitMethod = nodePathType.GetMethods(BindingFlags.Static | BindingFlags.Public).Single(m => m.Name == "op_Implicit" && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string));
+            return implicitMethod.Invoke(null, new object?[] { property }) ?? throw new NullReferenceException("NodePath implicit conversion returned null.");
+        }
+
+        object MakeVariant(object value)
+        {
+            var variantType = godotAssembly.GetType("Godot.Variant", true, false) ?? throw new MissingMemberException("Godot.Variant");
+            var implicitMethod = variantType.GetMethods(BindingFlags.Static | BindingFlags.Public).Single(m => m.Name == "op_Implicit" && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == value.GetType());
+            return implicitMethod.Invoke(null, new[] { value }) ?? throw new NullReferenceException("Variant implicit conversion returned null.");
+        }
+
+        object InvokeTweenProperty(object tween, object target, string property, object value)
+        {
+            var method = tween.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).Single(m => m.Name == "TweenProperty" && m.GetParameters().Length == 4);
+            return method.Invoke(tween, new object?[] { target, MakeNodePath(property), MakeVariant(value), 0.35D })
+                ?? throw new NullReferenceException($"Tween.TweenProperty returned null for {target.GetType().FullName}.{property} valueType={value.GetType().FullName}.");
+        }
+
+        void InvokeFullFluentTail(object propertyTweener)
+        {
+            var ease = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "SetEase", 1, step);
+            var easeValue = Enum.ToObject(ease.GetParameters()[0].ParameterType, 1L);
+            propertyTweener = ease.Invoke(propertyTweener, new[] { easeValue }) ?? throw new NullReferenceException("PropertyTweener.SetEase returned null.");
+            var trans = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "SetTrans", 1, step);
+            var transValue = Enum.ToObject(trans.GetParameters()[0].ParameterType, 10L);
+            propertyTweener = trans.Invoke(propertyTweener, new[] { transValue }) ?? throw new NullReferenceException("PropertyTweener.SetTrans returned null.");
+            propertyTweener = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "FromCurrent", 0, step).Invoke(propertyTweener, null)
+                ?? throw new NullReferenceException("PropertyTweener.FromCurrent returned null.");
+        }
+
+        var rows = new List<string>();
+        var workingAlternativeFound = false;
+        bool RunRow(string name, Func<object> createTween, Func<object, object?> operation, bool marksAlternative = false)
+        {
+            Checkpoint(checkpoint, $"M59N_ROW_PRE — {name}");
+            try
+            {
+                var tween = createTween();
+                var beforeState = DescribeTween(tween);
+                var result = operation(tween);
+                var resultPtr = ReadNativePtr(result);
+                var afterState = DescribeTween(tween);
+                var compat = BuildStep59PropertyTweenerCompatibilityRuntimeState();
+                rows.Add($"{name}=PASS; tweenBefore=[{beforeState}]; resultType={result?.GetType().FullName ?? "<null>"}; resultNativePtr=0x{resultPtr.ToInt64():X}; tweenAfter=[{afterState}]; compat=[{compat}]");
+                if (marksAlternative) workingAlternativeFound = true;
+                Checkpoint(checkpoint, $"M59N_ROW_POST — {name}; PASS; resultType={result?.GetType().FullName ?? "<null>"}; resultNativePtr=0x{resultPtr.ToInt64():X}; {SanitizeCheckpoint(afterState)}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+                var compat = BuildStep59PropertyTweenerCompatibilityRuntimeState();
+                rows.Add($"{name}=FAIL; {DescribeStep59ProbeException(failure)}; compat=[{compat}]");
+                Checkpoint(checkpoint, $"M59N_ROW_FAIL — {name}; {SanitizeCheckpoint(DescribeStep59ProbeException(failure))}; {SanitizeCheckpoint(compat)}");
+                return false;
+            }
+        }
+
+        var position = ReadPublicProperty(embark, "Position");
+        var scale = ReadPublicProperty(embark, "Scale");
+        var embarkModulate = ReadPublicProperty(embark, "Modulate");
+        var outlineModulate = ReadPublicProperty(outline, "Modulate");
+        var compatBefore = BuildStep59PropertyTweenerCompatibilityRuntimeState();
+        rows.Add($"MATRIX_CONTEXT; embarkNativePtr=0x{ReadNativePtr(embark).ToInt64():X}; oldTweenBefore=[{DescribeTween(oldTween)}]; showPosType={showPos.GetType().FullName}; positionType={position?.GetType().FullName ?? "<null>"}; scaleType={scale?.GetType().FullName ?? "<null>"}; embarkModulateType={embarkModulate?.GetType().FullName ?? "<null>"}; outlineModulateType={outlineModulate?.GetType().FullName ?? "<null>"}; compatBefore=[{compatBefore}]");
+
+        RunRow("NODE_INTERVAL_PRE_OLD_KILL", CreateNodeTween, tween =>
+        {
+            var method = tween.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).SingleOrDefault(m => m.Name == "TweenInterval" && m.GetParameters().Length == 1)
+                ?? throw new MissingMethodException(tween.GetType().FullName, "TweenInterval(double)");
+            return method.Invoke(tween, new object?[] { 0.35D }) ?? throw new NullReferenceException("Tween.TweenInterval returned null.");
+        });
+
+        if (oldTween is not null)
+        {
+            try
+            {
+                RequireStep59InstanceRuntimeMethod(oldTween.GetType(), "Kill", 0, step).Invoke(oldTween, null);
+                rows.Add("OLD_TWEEN_KILL=PASS; after=[" + DescribeTween(oldTween) + "]");
+                Checkpoint(checkpoint, "M59N_OLD_TWEEN_KILL_POST — " + SanitizeCheckpoint(DescribeTween(oldTween)));
+            }
+            catch (Exception ex)
+            {
+                var failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex;
+                rows.Add("OLD_TWEEN_KILL=FAIL; " + DescribeStep59ProbeException(failure));
+                Checkpoint(checkpoint, "M59N_OLD_TWEEN_KILL_FAIL — " + SanitizeCheckpoint(DescribeStep59ProbeException(failure)));
+            }
+        }
+        else rows.Add("OLD_TWEEN_KILL=SKIP_NULL");
+
+        Func<object, object?> interval = tween =>
+        {
+            var method = tween.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).SingleOrDefault(m => m.Name == "TweenInterval" && m.GetParameters().Length == 1)
+                ?? throw new MissingMethodException(tween.GetType().FullName, "TweenInterval(double)");
+            return method.Invoke(tween, new object?[] { 0.35D }) ?? throw new NullReferenceException("Tween.TweenInterval returned null.");
+        };
+        RunRow("NODE_INTERVAL_POST_OLD_KILL", CreateNodeTween, interval);
+        RunRow("SCENETREE_INTERVAL", () => CreateSceneTreeTween(false), interval);
+        RunRow("SCENETREE_BOUND_INTERVAL", () => CreateSceneTreeTween(true), interval);
+
+        if (position is not null) RunRow("NODE_PROPERTY_POSITION_CURRENT", CreateNodeTween, tween => InvokeTweenProperty(tween, embark, "position", position));
+        RunRow("NODE_PROPERTY_POSITION_SHOWPOS", CreateNodeTween, tween => InvokeTweenProperty(tween, embark, "position", showPos));
+        if (scale is not null) RunRow("NODE_PROPERTY_SCALE_CURRENT", CreateNodeTween, tween => InvokeTweenProperty(tween, embark, "scale", scale));
+        if (embarkModulate is not null) RunRow("NODE_PROPERTY_MODULATE_CURRENT", CreateNodeTween, tween => InvokeTweenProperty(tween, embark, "modulate", embarkModulate));
+        if (outlineModulate is not null) RunRow("NODE_PROPERTY_OUTLINE_MODULATE_CURRENT", CreateNodeTween, tween => InvokeTweenProperty(tween, outline, "modulate", outlineModulate));
+        if (position is not null) RunRow("SCENETREE_PROPERTY_POSITION_CURRENT", () => CreateSceneTreeTween(false), tween => InvokeTweenProperty(tween, embark, "position", position));
+        if (embarkModulate is not null) RunRow("SCENETREE_PROPERTY_MODULATE_CURRENT", () => CreateSceneTreeTween(false), tween => InvokeTweenProperty(tween, embark, "modulate", embarkModulate));
+        if (outlineModulate is not null) RunRow("SCENETREE_PROPERTY_OUTLINE_MODULATE_CURRENT", () => CreateSceneTreeTween(false), tween => InvokeTweenProperty(tween, outline, "modulate", outlineModulate));
+
+        RunRow("SCENETREE_PROPERTY_POSITION_SHOWPOS_FULLTAIL", () => CreateSceneTreeTween(false), tween =>
+        {
+            var result = InvokeTweenProperty(tween, embark, "position", showPos);
+            InvokeFullFluentTail(result);
+            return result;
+        }, marksAlternative: true);
+        RunRow("SCENETREE_BOUND_PROPERTY_POSITION_SHOWPOS_FULLTAIL", () => CreateSceneTreeTween(true), tween =>
+        {
+            var result = InvokeTweenProperty(tween, embark, "position", showPos);
+            InvokeFullFluentTail(result);
+            return result;
+        }, marksAlternative: true);
+
+        var compatAfter = BuildStep59PropertyTweenerCompatibilityRuntimeState();
+        _step59NativeTweenMatrixDiagnostics =
+            $"completed=True; workingAlternativeFound={workingAlternativeFound}; profile={SelectedPropertyTweenerProfile}; oldTweenFinal=[{DescribeTween(oldTween)}]\n" +
+            string.Join("\n", rows) + "\ncompatAfter=" + compatAfter;
+        _step59StaticMap += "\n[STEP 59N NATIVE TWEEN REJECTION MATRIX]\n" + _step59NativeTweenMatrixDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M59N_COMPLETE — workingAlternativeFound={workingAlternativeFound}; rows={rows.Count}; freshProcessRequired=True; realHandlerArmed=False.");
+        return (true, workingAlternativeFound, _step59NativeTweenMatrixDiagnostics);
+    }
+
+    public (bool Passed, string Diagnostics) RunStep59SceneTreeAlternativeTailProbe(bool bindNode, Action<string>? checkpoint = null)
+    {
+        const int step = 59;
+        var code = bindNode ? "59Z" : "59Y";
+        ThrowIfDisposed();
+        var context = RequireStep59Prerequisite($"Step {code} SceneTree alternative tail entry");
+        if (!_step59TransitionBound) throw new InvalidOperationException($"Step {code} requires Step-59 Gate B binding.");
+        if (!_step59ReadyBindingPreflightPassed) throw new InvalidOperationException($"Step {code} requires a clean Step-59 ready-binding preflight.");
+        if (_step59TransitionStarted || _step59DiagnosticMutationProbeStarted) throw new InvalidOperationException($"Step {code} is one-shot and requires a fresh process.");
+        RequireStep59PropertyTweenerProfile(PropertyTweenerExperimentProfile.Full, $"Step {code} SceneTree alternative tail");
+        _step59DiagnosticMutationProbeStarted = true;
+        SetStep59PropertyTweenerRepairMode(wrapperRepairEnabled: false, fluentRepairEnabled: false, checkpoint: checkpoint, checkpointMarker: $"M{code}_PROPERTY_TWEENER_REPAIR_MODE");
+
+        var embark = RequireStep59EmbarkButtonForProbe(context, step);
+        var oldTween = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_moveTween", step).GetValue(embark);
+        var showPos = RequireRuntimeInstanceFieldForOwnership(embark.GetType(), "_showPos", step).GetValue(embark)
+            ?? throw new InvalidDataException($"Step {code} retained embark _showPos could not be read.");
+        var godotAssembly = (_callbackHandoff ?? throw new InvalidOperationException($"Step {code} GodotSharp handoff absent.")).GodotSharpAssembly;
+        var stages = new List<string>();
+        Exception? failure = null;
+        object? tween = null;
+        object? propertyTweener = null;
+
+        bool Stage(string name, Action action)
+        {
+            if (failure is not null) return false;
+            Checkpoint(checkpoint, $"M{code}_STAGE_PRE — {name}");
+            try { action(); stages.Add(name + "=PASS"); Checkpoint(checkpoint, $"M{code}_STAGE_POST — {name} returned normally."); return true; }
+            catch (Exception ex) { failure = ex is TargetInvocationException tie && tie.InnerException is not null ? tie.InnerException : ex; stages.Add(name + "=FAIL:" + DescribeStep59ProbeException(failure)); Checkpoint(checkpoint, $"M{code}_STAGE_FAIL — {name}; {SanitizeCheckpoint(DescribeStep59ProbeException(failure))}"); return false; }
+        }
+
+        if (oldTween is not null) Stage("existingTween.Kill", () => RequireStep59InstanceRuntimeMethod(oldTween.GetType(), "Kill", 0, step).Invoke(oldTween, null));
+        else stages.Add("existingTween.Kill=SKIP_NULL");
+        Stage("SceneTree.CreateTween", () =>
+        {
+            var tree = RequireStep59InstanceRuntimeMethod(embark.GetType(), "GetTree", 0, step).Invoke(embark, null) ?? throw new NullReferenceException("Node.GetTree returned null.");
+            var create = tree.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).SingleOrDefault(m => m.Name == "CreateTween" && m.GetParameters().Length == 0) ?? throw new MissingMethodException(tree.GetType().FullName, "CreateTween()");
+            tween = create.Invoke(tree, null) ?? throw new NullReferenceException("SceneTree.CreateTween returned null.");
+        });
+        if (bindNode) Stage("Tween.BindNode(embark)", () =>
+        {
+            if (tween is null) throw new InvalidOperationException("SceneTree.CreateTween did not produce a Tween.");
+            var bind = tween.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).SingleOrDefault(m => m.Name == "BindNode" && m.GetParameters().Length == 1) ?? throw new MissingMethodException(tween.GetType().FullName, "BindNode(Node)");
+            tween = bind.Invoke(tween, new[] { embark }) ?? throw new NullReferenceException("Tween.BindNode returned null.");
+        });
+        Stage("Tween.TweenProperty(position)", () =>
+        {
+            if (tween is null) throw new InvalidOperationException("Alternative path did not produce a Tween.");
+            var nodePathType = godotAssembly.GetType("Godot.NodePath", true, false) ?? throw new MissingMemberException("Godot.NodePath");
+            var variantType = godotAssembly.GetType("Godot.Variant", true, false) ?? throw new MissingMemberException("Godot.Variant");
+            var nodePath = nodePathType.GetMethods(BindingFlags.Static | BindingFlags.Public).Single(m => m.Name == "op_Implicit" && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string)).Invoke(null, new object?[] { "position" }) ?? throw new NullReferenceException("NodePath implicit conversion returned null.");
+            var variant = variantType.GetMethods(BindingFlags.Static | BindingFlags.Public).Single(m => m.Name == "op_Implicit" && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == showPos.GetType()).Invoke(null, new[] { showPos }) ?? throw new NullReferenceException("Variant implicit conversion returned null.");
+            var method = tween.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).Single(m => m.Name == "TweenProperty" && m.GetParameters().Length == 4);
+            propertyTweener = method.Invoke(tween, new object?[] { embark, nodePath, variant, 0.35D }) ?? throw new NullReferenceException("Tween.TweenProperty returned null.");
+        });
+        Stage("PropertyTweener.SetEase", () =>
+        {
+            if (propertyTweener is null) throw new InvalidOperationException("TweenProperty did not produce a PropertyTweener.");
+            var method = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "SetEase", 1, step); var value = Enum.ToObject(method.GetParameters()[0].ParameterType, 1L);
+            propertyTweener = method.Invoke(propertyTweener, new[] { value }) ?? throw new NullReferenceException("PropertyTweener.SetEase returned null.");
+        });
+        Stage("PropertyTweener.SetTrans", () =>
+        {
+            if (propertyTweener is null) throw new InvalidOperationException("SetEase did not preserve a PropertyTweener.");
+            var method = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "SetTrans", 1, step); var value = Enum.ToObject(method.GetParameters()[0].ParameterType, 10L);
+            propertyTweener = method.Invoke(propertyTweener, new[] { value }) ?? throw new NullReferenceException("PropertyTweener.SetTrans returned null.");
+        });
+        Stage("PropertyTweener.FromCurrent", () =>
+        {
+            if (propertyTweener is null) throw new InvalidOperationException("SetTrans did not preserve a PropertyTweener.");
+            propertyTweener = RequireStep59InstanceRuntimeMethod(propertyTweener.GetType(), "FromCurrent", 0, step).Invoke(propertyTweener, null) ?? throw new NullReferenceException("PropertyTweener.FromCurrent returned null.");
+        });
+
+        var compat = BuildStep59PropertyTweenerCompatibilityRuntimeState();
+        _step59AlternativeTweenTailDiagnostics = $"probeCode={code}; bindNode={bindNode}; passed={failure is null}; stages={string.Join(" | ", stages)}\n{compat}" + (failure is null ? "\nexception=<none>" : "\nexception=" + DescribeStep59ProbeException(failure));
+        _step59StaticMap += $"\n[STEP {code} SCENETREE ALTERNATIVE CONFIRM-BUTTON TAIL]\n" + _step59AlternativeTweenTailDiagnostics + "\n";
+        Checkpoint(checkpoint, $"M{code}_COMPLETE — bindNode={bindNode}; passed={failure is null}; freshProcessRequired=True; realHandlerArmed=False.");
+        return (failure is null, _step59AlternativeTweenTailDiagnostics);
     }
 
     public TransformedRealStS2StartupLadderGateResult RunStep59RealHandlerTransition(Action<string>? checkpoint = null)

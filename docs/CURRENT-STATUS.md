@@ -1,10 +1,10 @@
-# 0.0.208 isolated PropertyTweener profiles
+# 0.0.209 native Tween rejection frontier
 
-**Active candidate: 0.0.208 (208).** Physical 0.0.207 no longer fails at derivative construction: Step-35 Gate A passed, Gate B admitted the transformed sts2 authority, and the profile-capable GodotSharp derivative loaded. It then failed during bootstrap reflection with `FileNotFoundException` immediately after PackedScene compatibility was armed and before the PropertyTweener bridge was armed. No Step-58/59 runtime experiment occurred.
+**Active candidate: 0.0.209 (209).** Physical 0.0.208 successfully exercised the isolated Step-59 tail under both Wrapper and Full profiles. In both runs, repair was enabled but the failing embark `TweenProperty` call recorded a **native pointer of 0x0**. Prior observations in the same runtime had nonzero pointers and real `Godot.PropertyTweener` wrappers; `managedNulls`, `wrongTypes`, and repair counters did not explain the failure. Managed-wrapper repair is therefore no longer the active hypothesis.
 
-0.0.208 treats that as concentrated infrastructure tech debt and separates the experiment into **Baseline / Wrapper / Full** derivatives generated independently from the same verified prepared GodotSharp source. Baseline has only the physically proven PackedScene compatibility. Wrapper adds only dedicated TweenProperty observation/repair. Full adds fluent typed-return observation/repair. The Step-35 loader no longer reflects Godot-typed experimental helper methods; only primitive fields are inspected for Wrapper/Full.
+0.0.209 keeps the 0.0.208 three-profile bootstrap unchanged and adds **59N / 59Y / 59Z** on Full. 59N is a row-isolated native rejection matrix spanning Tween state/identity, old-tween kill interaction, Node-vs-SceneTree creation, optional BindNode, interval-vs-property operations, and position/scale/modulate combinations. 59Y and 59Z are focused full-tail confirmation probes for SceneTree-created Tweens without and with BindNode.
 
-Phone plan is profile-specific: **BASELINE closed path → 58 → 59T**; fresh **WRAPPER → 58 → 59W**; fresh **FULL → 58 → 59X**. If 59X passes, use fresh FULL processes for 59E and real 59; if real 59 passes, continue 60/61/62. A failed experimental profile does not invalidate the other profiles in the same compiled IPA.
+Phone plan: **fresh FULL closed path → 58 → 59N** first. Preserve the matrix report. Then use fresh FULL runs for **59Y** and/or **59Z** matching the useful matrix result. Existing 59T/W/X remain controls/history; 59E and real 59 should not be treated as the next-value runs until a compatible creation path is established. If real 59 later passes, continue 60/61/62.
 
 ## Retained historical invariants used by validation
 

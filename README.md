@@ -1,17 +1,15 @@
 # StS2Launcher — Steps 58–62
 
-Active candidate: **0.0.208 (208)**. The current architecture uses **Step 52 as the prerequisite baseline for Step 58**; legacy Steps 53–57 remain optional regression/history diagnostics.
+Active candidate: **0.0.209 (209)**. The active architecture still uses **Step 52 as the prerequisite baseline for Step 58**; legacy Steps 53–57 remain optional regression/history diagnostics.
 
-**0.0.208 is a profile-isolation refactor.** Physical 0.0.207 proved that the PropertyTweener GodotSharp derivative could be emitted, serialized, hash-verified, and loaded, but Step 35 then failed during bootstrap reflection over Godot-typed experimental bridge members. That was another candidate-construction failure before the intended Step-59 phone experiment, so the Step-59 experiment is no longer allowed to share one bootstrap-critical derivative.
+Physical **0.0.208** resolved the current Step-59 ambiguity. Both 59W and 59X reached the isolated confirm-button tail with repair enabled. Before the failing call, the instrumented runtime had already observed valid nonzero native pointers becoming real `Godot.PropertyTweener` objects. The embark-button `TweenProperty(position, _showPos, 0.35)` call then incremented `nativeNulls`, recorded `lastNativePtr=0x0`, left `managedNulls=0`, `wrongTypes=0`, and `repairs=0`, and returned null. The active failure is therefore **native TweenProperty rejection**, not managed PropertyTweener wrapper loss.
 
-One IPA now contains three independently generated GodotSharp profiles from the same verified prepared source:
+0.0.209 deliberately **does not change the 0.0.208 Baseline / Wrapper / Full GodotSharp profile transform**. It adds exploratory Step-59 branches on the already-working FULL profile:
 
-- **BASELINE** — physically proven PackedScene unique-name compatibility only; no PropertyTweener experimental fields/helpers. Use this profile for **59T**.
-- **WRAPPER** — Baseline + dedicated `TweenProperty` native-pointer/original-managed-wrapper observation and wrapper repair. Fluent returns remain natural. Use this profile for **59W**.
-- **FULL** — Wrapper + typed-return `SetEase` / `SetTrans` / `FromCurrent` observation and fallback. Use this profile for **59X**, **59E**, and real **Step 59**.
+- **59N — native Tween rejection matrix.** Separate fresh Tweens compare Node vs SceneTree creation, optional `BindNode`, pre/post old-tween `Kill`, `IsValid` / `IsRunning` / native identity, `TweenInterval` vs `TweenProperty`, and `position` / `scale` / `modulate` target-value combinations. A failing row does not abort the matrix. Two SceneTree position rows run the complete `SetEase` → `SetTrans` → `FromCurrent` tail.
+- **59Y — SceneTree alternative full tail.** Focused fresh-process confirmation of `SceneTree.CreateTween()` + exact embark position tween tail with repair disabled.
+- **59Z — SceneTree + BindNode alternative full tail.** Same, but with `BindNode(embark)` before the exact tail.
 
-Choose the matching **closed-path profile button before Step 35**. Each button runs Step 15 A–C → Step 35–37 → skips 38 → Step 39–52, ending frozen. Then run Step 58. A defect in Wrapper or Full no longer prevents a fresh-process Baseline run from reaching the previously proven path. Bootstrap reflects only primitive experimental telemetry/control fields; Godot-typed helper signatures are verified statically with Cecil and are not reflected during Step 35 load. Loader failures now record full exception/stack/FileName/FusionLog chains.
-
-Recommended use of this compilation: fresh BASELINE → Step 58 → **59T**; fresh WRAPPER → Step 58 → **59W**; fresh FULL → Step 58 → **59X**. If 59X passes, use fresh FULL processes for **59E** and then real **Step 59**. If real Step 59 succeeds, continue **60 → 61 → 62** in that same process. 59D/R/H/U remain optional controls.
+Recommended first use: fresh **FULL** closed path → Step 58 → **59N**. Preserve all 59N files. Then use fresh FULL runs for **59Y** and/or **59Z** if the matrix identifies a path worth confirming. Existing 59D/R/H/U/T/W/X/E, real 59, and 60–62 remain in the same IPA. Do not retry a mutating Step-59 branch in-process.
 
 The source archive intentionally contains no proprietary StS2 game payload.

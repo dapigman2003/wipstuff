@@ -619,3 +619,8 @@ The current architecture and plan always live one level up in `docs/`.
 - 0.0.208 isolates Baseline / Wrapper / Full GodotSharp derivatives so one experimental profile cannot invalidate the entire compiled IPA.
 - Bootstrap no longer reflects Godot-typed experimental helper methods; profile-specific probes are selected before Step 35 and fail closed on mismatch.
 - See `steps/STEP-59.14-PROFILE-ISOLATION-0.0.208.md` and the preserved 0.0.207 Step-35/closed-path reports.
+
+## Step 59 native TweenProperty rejection / 0.0.209
+- `reports/STEP-59W-PHYSICAL-0.0.208-REPORT.txt` / `...-CHECKPOINT.txt` / `...-STATIC-MAP.txt` — Wrapper-profile physical evidence that repair was enabled but the failing embark `TweenProperty` produced `lastNativePtr=0x0`, `nativeNulls+1`, and zero wrapper repairs.
+- `reports/STEP-59X-PHYSICAL-0.0.208-REPORT.txt` / `...-CHECKPOINT.txt` / `...-STATIC-MAP.txt` — Full-profile independent reproduction with healthy prior PropertyTweener/fluent observations but the same native-null embark call.
+- `steps/STEP-59.15-NATIVE-TWEEN-NULL-0.0.209.md` — rejects the managed-wrapper hypothesis for the actual failure and defines the 59N native rejection matrix plus 59Y/59Z SceneTree alternative-tail confirmation branches.

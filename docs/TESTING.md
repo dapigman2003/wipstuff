@@ -1,14 +1,14 @@
-# 0.0.208 profile-isolated PropertyTweener testing
+# 0.0.209 native Tween rejection testing
 
-- Bundle identity must be **0.0.208 (208)**.
-- Every closed-path/profile run and every mutating Step-59 branch requires a fresh process.
-- **BASELINE run:** press `Run Closed Path — BASELINE (PackedScene only) → Step 52`, then Step 58, then **59T**. Baseline contains no PropertyTweener experiment.
-- **WRAPPER run:** fresh process, press `Run Closed Path — WRAPPER profile → Step 52`, then Step 58, then **59W**. The bridge records the original native pointer and managed wrapper/null/wrong-type state before wrapper repair. Fluent returns remain natural.
-- **FULL run:** fresh process, press `Run Closed Path — FULL profile → Step 52`, then Step 58, then **59X**. If it passes, fresh FULL processes may run **59E** and then real **59**.
-- If real Step 59 passes, continue **60 → 61 → 62** without recompiling.
-- 59D/R/H/U remain optional controls under any profile.
-- Wrong-profile Step-59 buttons must fail closed before mutation and instruct a relaunch with the matching profile.
-- Preserve crash checkpoint, last checkpoint, report, and static map for each experimental branch.
+- Bundle identity must be **0.0.209 (209)**.
+- Every mutating Step-59 branch requires a fresh process.
+- Primary run: fresh **FULL** closed path → Step 58 → **59N**. Preserve checkpoint, report, and static map.
+- 59N must continue after individual row failures and record Tween managed/native identity, `IsValid`, `IsRunning`, old-tween relation, and PropertyTweener bridge state for each relevant row.
+- 59N rows cover Node/SceneTree/SceneTree+BindNode creation, pre/post old-tween Kill context, TweenInterval, embark position current/showPos, embark scale/modulate current, outline modulate current, and two SceneTree full position tails.
+- If the SceneTree full-tail row passes, confirm in a fresh FULL process with **59Y**. If the bound SceneTree row passes, confirm with **59Z**.
+- 59Y/59Z run with wrapper/fluent repair disabled; a pass therefore validates the alternative creation path rather than a PropertyTweener repair.
+- 59T/W/X remain available as controls and 59D/R/H/U remain optional controls.
+- Preserve all files from a surprising failure; no matrix-row assumption is allowed to block Step 35.
 
 ## Retained 0.0.201 regression procedure
 
