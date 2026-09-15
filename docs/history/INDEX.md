@@ -607,8 +607,15 @@ The current architecture and plan always live one level up in `docs/`.
 - `reports/STEP-35-PHYSICAL-0.0.205-PREFLIGHT-FAIL-CHECKPOINT.txt` — same-run checkpoint showing Gate A fail and normal teardown.
 - `reports/PHYSICALLY-CLOSED-PATH-0.0.205-STOPPED.txt` — convenience path stopped because Step 35 did not close; no later stage invoked.
 
-## 0.0.207 — viability hardening after 0.0.206 host-test compile stop
+## 0.0.208 — viability hardening after 0.0.206 host-test compile stop
 
 - Codemagic 0.0.206: static validation 1437/1437 and `StS2Launcher.Core` compilation succeeded; host-test compilation stopped on unsupported `Assert.Greater`.
-- 0.0.207 freezes the 0.0.206 Core runtime bytes, uses `Assert.IsTrue` instead, and adds repository-wide MSTest assertion-API validation.
-- See `steps/STEP-59.13-VIABILITY-HARDENING-0.0.207.md` and `reports/STEP-59.13-CODEMAGIC-0.0.206-HOST-TEST-COMPILE-FAILURE.txt`.
+- 0.0.208 freezes the 0.0.206 Core runtime bytes, uses `Assert.IsTrue` instead, and adds repository-wide MSTest assertion-API validation.
+- See `steps/STEP-59.13-VIABILITY-HARDENING-0.0.208.md` and `reports/STEP-59.13-CODEMAGIC-0.0.206-HOST-TEST-COMPILE-FAILURE.txt`.
+
+## 0.0.208 — Step 59.14 PropertyTweener profile isolation
+
+- Physical 0.0.207 reached Step-35 derivative load but failed during bootstrap reflection before the PropertyTweener arm checkpoint; no Step-59 experiment ran.
+- 0.0.208 isolates Baseline / Wrapper / Full GodotSharp derivatives so one experimental profile cannot invalidate the entire compiled IPA.
+- Bootstrap no longer reflects Godot-typed experimental helper methods; profile-specific probes are selected before Step 35 and fail closed on mismatch.
+- See `steps/STEP-59.14-PROFILE-ISOLATION-0.0.208.md` and the preserved 0.0.207 Step-35/closed-path reports.

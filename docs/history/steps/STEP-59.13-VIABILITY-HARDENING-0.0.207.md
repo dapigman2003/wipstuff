@@ -1,8 +1,8 @@
-# Step 59.13 — 0.0.207 viability hardening
+# Step 59.13 — 0.0.208 viability hardening
 
 0.0.206 did not reach iOS compilation. Codemagic compiled the complete `StS2Launcher.Core` project, then the host-test project failed on one unsupported MSTest API: `Assert.Greater`. Static validation had passed 1437 checks, exposing a validation blind spot.
 
-0.0.207 intentionally does **not** rewrite the runtime again. The three critical Core runtime files are hash-frozen to the exact 0.0.206 bytes that Codemagic compiled:
+0.0.208 intentionally does **not** rewrite the runtime again. The three critical Core runtime files are hash-frozen to the exact 0.0.206 bytes that Codemagic compiled:
 
 - `TransformedRealStS2VeryEarlyInitialization.cs` — `f32eef56c8120b30a453237cfbcb63c89eb39e0a3dae6946a5a780f07002e342`
 - `TransformedRealStS2CharacterSelectContinuation.cs` — `2e9665de425a0ce2e0478ea755a05e3b22a4909f9b9c5cee41d2b19cf4ce734c`

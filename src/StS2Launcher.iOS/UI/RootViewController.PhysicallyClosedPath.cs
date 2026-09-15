@@ -6,10 +6,13 @@ namespace StS2Launcher.iOS;
 
 public sealed partial class RootViewController
 {
-    private UIButton? _physicallyClosedPathButton;
+    private UIButton? _physicallyClosedPathBaselineButton;
+    private UIButton? _physicallyClosedPathWrapperButton;
+    private UIButton? _physicallyClosedPathFullButton;
     private UILabel? _physicallyClosedPathResultLabel;
     private UILabel? _physicallyClosedPathDetailLabel;
     private bool _physicallyClosedPathStarted;
+    private PropertyTweenerExperimentProfile? _physicallyClosedPathSelectedProfile;
     private readonly List<string> _physicallyClosedPathCompleted = new();
 
     private void AddPhysicallyClosedPathControls(UIStackView content)
@@ -19,11 +22,23 @@ public sealed partial class RootViewController
             UIFont.BoldSystemFontOfSize(18),
             UIColor.Label));
 
-        _physicallyClosedPathButton = SystemButton(
-            "Run Physically Closed Path — Step 15 A–C → 35–37 → SKIP 38 → 39–52",
+        _physicallyClosedPathBaselineButton = SystemButton(
+            "Run Closed Path — BASELINE (PackedScene only) → Step 52",
             16);
-        _physicallyClosedPathButton.TouchUpInside += async (_, _) => await RunPhysicallyClosedPathThroughStep52Async();
-        content.AddArrangedSubview(_physicallyClosedPathButton);
+        _physicallyClosedPathBaselineButton.TouchUpInside += async (_, _) => await RunPhysicallyClosedPathThroughStep52Async(PropertyTweenerExperimentProfile.Baseline);
+        content.AddArrangedSubview(_physicallyClosedPathBaselineButton);
+
+        _physicallyClosedPathWrapperButton = SystemButton(
+            "Run Closed Path — WRAPPER profile → Step 52",
+            16);
+        _physicallyClosedPathWrapperButton.TouchUpInside += async (_, _) => await RunPhysicallyClosedPathThroughStep52Async(PropertyTweenerExperimentProfile.Wrapper);
+        content.AddArrangedSubview(_physicallyClosedPathWrapperButton);
+
+        _physicallyClosedPathFullButton = SystemButton(
+            "Run Closed Path — FULL profile → Step 52",
+            16);
+        _physicallyClosedPathFullButton.TouchUpInside += async (_, _) => await RunPhysicallyClosedPathThroughStep52Async(PropertyTweenerExperimentProfile.Full);
+        content.AddArrangedSubview(_physicallyClosedPathFullButton);
 
         _physicallyClosedPathResultLabel = Label(
             "PHYSICALLY CLOSED PATH: READY — FRESH PROCESS REQUIRED",
@@ -32,15 +47,17 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(_physicallyClosedPathResultLabel);
 
         _physicallyClosedPathDetailLabel = Label(
-            "Convenience runner only. It calls the existing physically closed step implementations in their proven order, preserves every normal per-step report/checkpoint, verifies exact closure after each return, explicitly skips Step 38, and stops at the first failure. Step 15 Gate D is not part of this same-process execution prerequisite. Once armed, never retry this runner or any failed one-shot rung in-process; relaunch instead. After a successful closed-path reproof, Step 53 is the active frontier and may be run manually.",
+            "Choose the GodotSharp profile BEFORE Step 35: BASELINE = physically proven PackedScene compatibility only; WRAPPER = Baseline plus TweenProperty pointer/wrapper observation+repair; FULL = Wrapper plus typed-return SetEase/SetTrans/FromCurrent observation+repair. Each button then runs the same closed path through Step 52. A defect in one experimental profile does not invalidate the other profiles in this compiled IPA. Fresh process required for every profile/run.",
             UIFont.SystemFontOfSize(13),
             UIColor.SecondaryLabel);
         content.AddArrangedSubview(_physicallyClosedPathDetailLabel);
     }
 
-    private async Task RunPhysicallyClosedPathThroughStep52Async()
+    private async Task RunPhysicallyClosedPathThroughStep52Async(PropertyTweenerExperimentProfile profile)
     {
-        if (_physicallyClosedPathButton is null ||
+        if (_physicallyClosedPathBaselineButton is null ||
+            _physicallyClosedPathWrapperButton is null ||
+            _physicallyClosedPathFullButton is null ||
             _physicallyClosedPathResultLabel is null ||
             _physicallyClosedPathDetailLabel is null ||
             _statusLabel is null)
@@ -67,13 +84,15 @@ public sealed partial class RootViewController
         }
 
         _physicallyClosedPathStarted = true;
-        _physicallyClosedPathButton.Enabled = false;
+        _physicallyClosedPathSelectedProfile = profile;
+        _transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile = profile;
+        DisablePhysicallyClosedPathProfileButtons();
         DisableClosedPhysicalPathManualControls();
         _physicallyClosedPathCompleted.Clear();
         SetPhysicallyClosedPathUi(
-            "PHYSICALLY CLOSED PATH: RUNNING",
+            $"PHYSICALLY CLOSED PATH: RUNNING — {profile.ToString().ToUpperInvariant()} PROFILE",
             UIColor.Label,
-            "Fresh-process authority accepted. Starting Step 15 Gates A–C; Step 15 Gate D will intentionally remain unrun.");
+            $"Fresh-process authority accepted. PropertyTweener profile={profile} was sealed before Step 15/35. Starting Step 15 Gates A–C; Step 15 Gate D will intentionally remain unrun.");
         await WritePhysicallyClosedPathReportAsync();
 
         try
@@ -154,8 +173,8 @@ public sealed partial class RootViewController
             SetPhysicallyClosedPathUi(
                 "PHYSICALLY CLOSED PATH PASS — THROUGH STEP 52",
                 UIColor.Label,
-                "All physically closed same-process gates returned their exact pass/closure authority. Step 38 was skipped by contract, Step 15 Gate D was not run, rendering is frozen after Step 52, and Step 53 is unlocked as the active manual frontier.");
-            _statusLabel.Text = "PASS: PHYSICALLY CLOSED PATH THROUGH STEP 52. Renderer is frozen; current frontier is Step 53.";
+                $"All physically closed same-process gates returned their exact pass/closure authority under PropertyTweener profile={profile}. Step 38 was skipped by contract, Step 15 Gate D was not run, rendering is frozen after Step 52, and Step 58 is unlocked directly by the current ownership architecture.");
+            _statusLabel.Text = $"PASS: CLOSED PATH THROUGH STEP 52 — profile={profile}. Renderer is frozen; run Step 58 next.";
             _statusLabel.TextColor = UIColor.Label;
         }
         catch (Exception ex)
@@ -196,6 +215,14 @@ public sealed partial class RootViewController
             UIColor.Label,
             $"Last completed: {label}. Exact pass/closure predicate re-established; advancing to the next already-closed stage.");
         await WritePhysicallyClosedPathReportAsync();
+    }
+
+
+    private void DisablePhysicallyClosedPathProfileButtons()
+    {
+        if (_physicallyClosedPathBaselineButton is not null) _physicallyClosedPathBaselineButton.Enabled = false;
+        if (_physicallyClosedPathWrapperButton is not null) _physicallyClosedPathWrapperButton.Enabled = false;
+        if (_physicallyClosedPathFullButton is not null) _physicallyClosedPathFullButton.Enabled = false;
     }
 
     private void DisableClosedPhysicalPathManualControls()

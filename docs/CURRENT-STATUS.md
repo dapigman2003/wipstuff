@@ -1,8 +1,10 @@
-# 0.0.207 viability-hardened PropertyTweener frontier
+# 0.0.208 isolated PropertyTweener profiles
 
-**Active candidate: 0.0.207 (207).** Step 52 remains the current architecture baseline for Step 58; legacy Steps 53–57 are optional. Codemagic for 0.0.206 compiled `StS2Launcher.Core` successfully, proving the current Core runtime source compiles. The pipeline then stopped on exactly one host-test compile error: `Assert.Greater` is not available in the pinned MSTest 4.3.2 framework. No iOS/device run occurred.
+**Active candidate: 0.0.208 (208).** Physical 0.0.207 no longer fails at derivative construction: Step-35 Gate A passed, Gate B admitted the transformed sts2 authority, and the profile-capable GodotSharp derivative loaded. It then failed during bootstrap reflection with `FileNotFoundException` immediately after PackedScene compatibility was armed and before the PropertyTweener bridge was armed. No Step-58/59 runtime experiment occurred.
 
-0.0.207 therefore freezes the 0.0.206 Core runtime byte-for-byte and changes only the host test, release identity, validation, and history. Phone sequence remains: fresh process through Step 52 → Step 58 → **59T CONTROL**; then fresh-process **59W WRAPPER-ONLY**; then **59X FULL REPAIR** if needed. If 59X passes, use fresh processes for 59E and real Step 59; if real Step 59 passes, continue 60/61/62 in that same process. Step 63 remains unopened.
+0.0.208 treats that as concentrated infrastructure tech debt and separates the experiment into **Baseline / Wrapper / Full** derivatives generated independently from the same verified prepared GodotSharp source. Baseline has only the physically proven PackedScene compatibility. Wrapper adds only dedicated TweenProperty observation/repair. Full adds fluent typed-return observation/repair. The Step-35 loader no longer reflects Godot-typed experimental helper methods; only primitive fields are inspected for Wrapper/Full.
+
+Phone plan is profile-specific: **BASELINE closed path → 58 → 59T**; fresh **WRAPPER → 58 → 59W**; fresh **FULL → 58 → 59X**. If 59X passes, use fresh FULL processes for 59E and real 59; if real 59 passes, continue 60/61/62. A failed experimental profile does not invalidate the other profiles in the same compiled IPA.
 
 ## Retained historical invariants used by validation
 

@@ -1,10 +1,10 @@
-# 0.0.207 active frontier
+# 0.0.208 active frontier
 
-**Active candidate — 0.0.207 current ownership + three-mode PropertyTweener observe/repair, viability-hardened.** The 0.0.206 Core runtime is frozen byte-for-byte because Codemagic already compiled it successfully. 0.0.207 fixes only the unsupported host-test assertion and strengthens validation so a novel MSTest assertion API cannot silently pass the Python contract again.
+**Active candidate — 0.0.208 profile-isolated Step-59 GodotSharp experiments.** Physical 0.0.207 crossed the threshold for refactoring: the experimental derivative itself constructed and loaded, but bootstrap reflection over its Godot-typed helpers caused another pre-Step-59 candidate failure. The overall launcher architecture remains retained; the refactor is localized to the Step-35/GodotSharp experiment boundary.
 
-Compilation efficiency remains the first-class rule: one IPA retains **59T CONTROL**, **59W WRAPPER-ONLY**, **59X FULL REPAIR**, 59E, real Step 59, and Steps 60–62, with 59D/R/H/U still available. Multiple fresh-process phone experiments should exhaust those branches before another compilation.
+Compilation efficiency remains first-class. One IPA contains three independently generated profiles: **BASELINE** (PackedScene only), **WRAPPER** (TweenProperty pointer/wrapper observe+repair), and **FULL** (Wrapper + fluent typed-return observe+repair). Fresh-process profile selection happens before Step 35. 59T/59W/59X are profile-gated; 59E and real 59 require Full; 59D/R/H/U remain optional controls; 60–62 remain available after a clean real transition.
 
-Targeted tech-debt decision: the overall launcher/runtime architecture remains sound. The debt is localized to the Step-35 GodotSharp derivative builder carrying both bootstrap-critical compatibility and experimental Step-59 rewrites. We are **not** refactoring that compiled Core in 0.0.207 because doing so would discard the strongest new evidence—successful Core compilation—and add avoidable risk. Once the PropertyTweener behavior is physically characterized, the experiment should be split from bootstrap-critical compatibility in a dedicated cleanup iteration.
+Viability rule: an experimental Wrapper/Full defect must not prevent Baseline from reaching the proven Step52→58 path. Bootstrap therefore does not reflect Godot-typed experimental helper signatures; those are verified statically before load. Runtime loader diagnostics preserve full exception chains including FileName/FusionLog/stack.
 
 ---
 

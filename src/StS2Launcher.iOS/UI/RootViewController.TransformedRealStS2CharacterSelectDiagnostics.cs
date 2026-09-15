@@ -190,6 +190,17 @@ public sealed partial class RootViewController
             requestedButton = _step59ConfirmTailRepairProbeButton; requestedResult = _step59ConfirmTailRepairProbeResultLabel; requestedDetail = _step59ConfirmTailRepairProbeDetailLabel;
             telemetryName = "Step-59X PropertyTweener full repair tail probe"; staticMapPrefix = "Step59X-PropertyTweenerFullRepair-StaticMap"; reportName = "Step59X-PropertyTweenerFullRepairTail.txt"; reportTitle = "StS2 Launcher — Step 59X PropertyTweener Full Repair Tail";
         }
+        var requiredProfile = code switch
+        {
+            "59T" => PropertyTweenerExperimentProfile.Baseline,
+            "59W" => PropertyTweenerExperimentProfile.Wrapper,
+            _ => PropertyTweenerExperimentProfile.Full,
+        };
+        if (_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile != requiredProfile)
+        {
+            SetStartupLadderRefusal(step, requestedResult!, requestedDetail!, $"{requiredProfile.ToString().ToUpperInvariant()} PROFILE REQUIRED", $"Step {code} requires PropertyTweener profile={requiredProfile}, but this process uses {_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile}. Relaunch and choose the matching closed-path profile before Step 35.");
+            return;
+        }
         if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted || _step59TransitionUiStarted || _step59MutationProbeUiStarted ||
             _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
         {
@@ -232,6 +243,11 @@ public sealed partial class RootViewController
             _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted)
         {
             SetStartupLadderRefusal(step, _step59IsolatedEnableProbeResultLabel!, _step59IsolatedEnableProbeDetailLabel!, "FRESH PROCESS REQUIRED", "Step 59E is a one-shot button-lifecycle diagnostic. Relaunch and reproduce through Step 58 without running another Step-59 branch first.");
+            return;
+        }
+        if (_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile != PropertyTweenerExperimentProfile.Full)
+        {
+            SetStartupLadderRefusal(step, _step59IsolatedEnableProbeResultLabel!, _step59IsolatedEnableProbeDetailLabel!, "FULL PROFILE REQUIRED", $"Step 59E requires PropertyTweener profile=Full, but this process uses {_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile}. Relaunch and choose the FULL closed-path button before Step 35.");
             return;
         }
         if (!TryPrepareStep59Auxiliary(_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel, "Step 59E", out var button, out var resultLabel, out var detailLabel))

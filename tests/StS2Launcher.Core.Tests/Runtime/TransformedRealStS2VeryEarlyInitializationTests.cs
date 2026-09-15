@@ -1270,6 +1270,52 @@ public sealed class TransformedRealStS2VeryEarlyInitializationTests
                 method.DeclaringType.FullName == "System.Action`2<System.Object,System.Object>"));
             Assert.AreEqual(1, serializedInstantiate.Body.Instructions.Count(instruction => instruction.OpCode.Code == Code.Ret));
 
+            // 0.0.208 viability contract: the same trusted source must emit three independently
+            // survivable profiles. Baseline contains no PropertyTweener experiment; Wrapper contains
+            // only TweenProperty observation/repair; Full (validated above) also patches fluent returns.
+            var baselineClone = Path.Combine(root, "GodotSharp.step59.baseline.dll");
+            var baselineResult = TransformedRealStS2VeryEarlyInitialization.CreateInstrumentedGodotSharpDiagnosticClone(
+                source, baselineClone, PropertyTweenerExperimentProfile.Baseline);
+            Assert.AreEqual(PropertyTweenerExperimentProfile.Baseline, baselineResult.PropertyTweenerProfile);
+            StringAssert.Contains(baselineResult.PropertyTweenerCompatibilityReport, "profile=Baseline");
+            using (var baselineReopened = AssemblyDefinition.ReadAssembly(baselineClone, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred }))
+            {
+                var baselineBridge = baselineReopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName);
+                Assert.IsFalse(baselineBridge.Fields.Any(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerRepairEnabledFieldName));
+                Assert.IsFalse(baselineBridge.Methods.Any(method => method.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackMethodName));
+                Assert.IsFalse(baselineBridge.Methods.Any(method => method.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackMethodName));
+                Assert.IsNotNull(baselineBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPackedSceneCompatibilityCallbackFieldName));
+            }
+
+            var wrapperClone = Path.Combine(root, "GodotSharp.step59.wrapper.dll");
+            var wrapperResult = TransformedRealStS2VeryEarlyInitialization.CreateInstrumentedGodotSharpDiagnosticClone(
+                source, wrapperClone, PropertyTweenerExperimentProfile.Wrapper);
+            Assert.AreEqual(PropertyTweenerExperimentProfile.Wrapper, wrapperResult.PropertyTweenerProfile);
+            StringAssert.Contains(wrapperResult.PropertyTweenerCompatibilityReport, "profile=Wrapper");
+            StringAssert.Contains(wrapperResult.PropertyTweenerCompatibilityReport, "Godot.PropertyTweener.SetEase=NATURAL_TYPED_RETURN");
+            using (var wrapperReopened = AssemblyDefinition.ReadAssembly(wrapperClone, new ReaderParameters { ReadSymbols = false, ReadingMode = ReadingMode.Deferred }))
+            {
+                var wrapperBridge = wrapperReopened.MainModule.Types.Single(type => type.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName);
+                Assert.IsNotNull(wrapperBridge.Fields.SingleOrDefault(field => field.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerRepairEnabledFieldName));
+                Assert.IsNotNull(wrapperBridge.Methods.SingleOrDefault(method => method.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackMethodName));
+                var wrapperTween = wrapperReopened.MainModule.Types.Single(type => type.FullName == "Godot.Tween");
+                var wrapperTweenProperty = wrapperTween.Methods.Single(method => method.Name == "TweenProperty" && method.Parameters.Count == 4);
+                var wrapperNativeRef = (MethodReference)wrapperTweenProperty.Body.Instructions.Single(instruction =>
+                    instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
+                    call.DeclaringType.FullName == "Godot.NativeCalls" && call.ReturnType.FullName == "Godot.GodotObject").Operand;
+                var wrapperNativeHelper = wrapperReopened.MainModule.Types.SelectMany(type => type.Methods).Single(method => method.FullName == wrapperNativeRef.FullName);
+                Assert.AreEqual(1, wrapperNativeHelper.Body.Instructions.Count(instruction =>
+                    instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
+                    call.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName &&
+                    call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFallbackMethodName));
+                var wrapperPropertyTweener = wrapperReopened.MainModule.Types.Single(type => type.FullName == "Godot.PropertyTweener");
+                foreach (var fluentName in new[] { "SetEase", "SetTrans", "FromCurrent" })
+                    Assert.AreEqual(0, wrapperPropertyTweener.Methods.Single(method => method.Name == fluentName && method.HasBody).Body.Instructions.Count(instruction =>
+                        instruction.OpCode.Code == Code.Call && instruction.Operand is MethodReference call &&
+                        call.DeclaringType.FullName == TransformedRealStS2VeryEarlyInitialization.GodotSharpDiagnosticBridgeTypeFullName &&
+                        call.Name == TransformedRealStS2VeryEarlyInitialization.GodotSharpPropertyTweenerFluentFallbackMethodName), fluentName);
+            }
+
             var serializedGodotEntryMarkers = reopened.MainModule.Types
                 .SelectMany(type => type.Methods)
                 .Where(method => method.HasBody && method.Body.Instructions.Count >= 2 &&

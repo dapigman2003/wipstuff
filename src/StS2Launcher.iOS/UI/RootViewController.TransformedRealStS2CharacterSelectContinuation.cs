@@ -32,7 +32,7 @@ public sealed partial class RootViewController
         content.AddArrangedSubview(Separator());
         content.AddArrangedSubview(Label("Steps 58–62 — real character-select ownership + visible Godot render trial", UIFont.BoldSystemFontOfSize(18), UIColor.Label));
         content.AddArrangedSubview(Label(
-            "0.0.207 carries forward the Codemagic-compiled 0.0.206 Core runtime unchanged: Step52→58, the proven PackedScene correction, and the three-mode PropertyTweener experiment deck. Run 59T CONTROL first with both repairs disabled. Then 59W enables only the TweenProperty native-wrapper repair while leaving fluent returns natural. Then 59X enables both wrapper repair and typed-return fluent repair. The fluent transform no longer assumes any internal native-call/cast IL shape; it observes/repairs only typed PropertyTweener return boundaries. If 59X passes, fresh-process 59E and real Step59 use full repair automatically; 60–62 can follow without recompiling.",
+            "0.0.208 isolates Step-59 GodotSharp experimentation into three fresh-process profiles selected BEFORE Step 35. BASELINE contains only the physically proven PackedScene correction and is used for 59T. WRAPPER adds TweenProperty native-pointer/original-wrapper observation plus wrapper repair and is used for 59W. FULL adds typed-return SetEase/SetTrans/FromCurrent observation/repair and is used for 59X, 59E, and real Step 59. A broken experimental profile no longer prevents the other profiles in this IPA from reaching the proven bootstrap path.",
             UIFont.SystemFontOfSize(13), UIColor.SecondaryLabel));
 
         (_step58Button, _step58ResultLabel, _step58DetailLabel) = AddStartupLadderStepControls(content,
@@ -68,13 +68,13 @@ public sealed partial class RootViewController
         (_step59ConfirmTailProbeButton, _step59ConfirmTailProbeResultLabel, _step59ConfirmTailProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59T — CONTROL: isolated confirm-button tween tail, repair disabled",
             "Run Step 59T — CONTROL / OBSERVE", "STEP 59T CONTROL: LOCKED",
-            "Fresh-process control. Runs the real post-base tail with PropertyTweener repair explicitly disabled and records every TweenProperty native pointer plus managed wrapper type/null/wrong-type outcome. It also observes SetEase/SetTrans/FromCurrent if reached. Relaunch afterward.");
+            "Requires a fresh process bootstrapped with the BASELINE closed-path button. Runs the real post-base tail with no PropertyTweener experimental bridge installed at all. This is the safest regression/control profile and should reproduce the known natural TweenProperty boundary without risking Step-35 experimental load logic. Relaunch afterward.");
         _step59ConfirmTailProbeButton.TouchUpInside += async (_, _) => await RunStep59ConfirmTailProbeAsync();
 
         (_step59ConfirmTailWrapperRepairProbeButton, _step59ConfirmTailWrapperRepairProbeResultLabel, _step59ConfirmTailWrapperRepairProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59W — WRAPPER-ONLY REPAIR: isolated confirm-button tween tail",
             "Run Step 59W — WRAPPER REPAIR ONLY", "STEP 59W WRAPPER REPAIR: LOCKED",
-            "Fresh-process middle experiment using the same compiled IPA. Enables only native-pointer-aware TweenProperty wrapper repair; fluent SetEase/SetTrans/FromCurrent return repair stays disabled. If TweenProperty starts working but a fluent call returns null, this run proves the wrapper fix and localizes the next boundary without conflating repairs.");
+            "Requires a fresh process bootstrapped with the WRAPPER closed-path button. The dedicated TweenProperty helper records the native pointer and original managed wrapper/null/wrong-type state before any repair, then enables only native-pointer-aware wrapper repair. SetEase/SetTrans/FromCurrent remain completely natural. If a later fluent call fails, this run proves the wrapper repair independently.");
         _step59ConfirmTailWrapperRepairProbeButton.TouchUpInside += async (_, _) => await RunStep59ConfirmTailWrapperRepairProbeAsync();
 
         (_step59ConfirmTailRepairProbeButton, _step59ConfirmTailRepairProbeResultLabel, _step59ConfirmTailRepairProbeDetailLabel) = AddStartupLadderStepControls(content,
@@ -86,13 +86,13 @@ public sealed partial class RootViewController
         (_step59IsolatedEnableProbeButton, _step59IsolatedEnableProbeResultLabel, _step59IsolatedEnableProbeDetailLabel) = AddStartupLadderStepControls(content,
             "Step 59E — isolated retained embark Enable probe",
             "Run Step 59E — ISOLATED EMBARK ENABLE", "STEP 59E ISOLATED EMBARK ENABLE: LOCKED",
-            "Fresh-process repair validation. Enables the carried-forward full PropertyTweener repair, then calls retained embark NClickableControl.Enable() directly outside OpenCharacterSelect. If 59X passes but 59E fails, the remaining failure is outside the isolated tween tail. Relaunch afterward.");
+            "Requires a fresh process bootstrapped with the FULL closed-path button. Enables the full PropertyTweener profile and calls retained embark NClickableControl.Enable() directly outside OpenCharacterSelect. If 59X passes but 59E fails, the remaining failure is outside the isolated tween tail. Relaunch afterward.");
         _step59IsolatedEnableProbeButton.TouchUpInside += async (_, _) => await RunStep59IsolatedEnableProbeAsync();
 
         (_step59Button, _step59ResultLabel, _step59DetailLabel) = AddStartupLadderStepControls(content,
             "Step 59.0 — forensic prerequisites + one real OpenCharacterSelect transition",
             "Run Step 59.0 A–D — FORENSIC HANDLER", "FORENSIC REAL OPENCHARACTERSELECT TRANSITION: LOCKED",
-            "Requires Step 58.0 4/4 in a fresh process with no prior Step-59 mutation probe. Gate C enables the same carried-forward full PropertyTweener repair validated by 59X/59E, then invokes exact original OpenCharacterSelect once. If it succeeds, continue directly to 60–62 in this IPA; if it throws, post-failure wrapper/button evidence is captured.");
+            "Requires Step 58.0 4/4 under the FULL closed-path profile in a fresh process with no prior Step-59 mutation probe. Gate C enables the same full PropertyTweener repair validated by 59X/59E, then invokes exact original OpenCharacterSelect once. If it succeeds, continue directly to 60–62 in this IPA; if it throws, post-failure wrapper/button evidence is captured.");
         _step59Button.TouchUpInside += async (_, _) => await RunStep59StartupLadderAsync();
 
         (_step60Button, _step60ResultLabel, _step60DetailLabel) = AddStartupLadderStepControls(content,
@@ -234,6 +234,7 @@ public sealed partial class RootViewController
         if (_step59DiagnosticDeckUiStarted || _step59ControllerRehearsalUiStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "FRESH PROCESS REQUIRED", "A Step-59 observational diagnostic already ran in this process. Preserve its evidence and relaunch before the separate real-handler Step 59 experiment."); return; }
         if (_step59MutationProbeUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59DiagnosticMutationProbeStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "FRESH PROCESS REQUIRED", "A Step-59 mutating micro-probe already ran in this process. Relaunch before the original real-handler transition."); return; }
         if (_step59TransitionUiStarted || _transformedRealStS2VeryEarlyInitialization.Step59TransitionStarted) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "ONE-SHOT ALREADY ARMED", "Step 59 real handler was already armed in this process. Preserve reports and relaunch; never retry it in-process."); return; }
+        if (_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile != PropertyTweenerExperimentProfile.Full) { var labels = GetStartupLadderLabels(step); SetStartupLadderRefusal(step, labels.Result, labels.Detail, "FULL PROFILE REQUIRED", $"Real Step 59 requires the FULL PropertyTweener profile, but this process uses {_transformedRealStS2VeryEarlyInitialization.SelectedPropertyTweenerProfile}. Relaunch and choose the FULL closed-path button before Step 35."); return; }
         if (!TryPrepareStartupLadderStep(step, _step58Gates.Snapshot().Passed && _transformedRealStS2VeryEarlyInitialization.ExactStep58ClosurePassed,
                 "Step 59.0 requires Step 58.0 4/4 runtime-ownership authority in this same process.", out var button, out var resultLabel, out var detailLabel)) return;
         if (!TryInitializeStartupLadderTelemetry(step, "Forensic real OpenCharacterSelect frozen transition", "Step59-RealOpenCharacterSelect-StaticMap", out var error)) { SetStartupLadderRefusal(step, resultLabel, detailLabel, "TELEMETRY FAIL / NOT RUN", error); return; }

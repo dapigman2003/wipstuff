@@ -1,0 +1,110 @@
+StS2 Launcher — Step 35.0.32 Exact-Authority Closure + Explicit Main-Queue Finalization
+Report format: 1
+Trust note: output only; this text file is never consumed as trusted runtime input.
+Secret note: this report intentionally excludes Steam passwords, refresh tokens, Steam Guard material, and Apple signing secrets.
+Generated UTC: 2026-09-15T02:10:10.3679810+00:00
+
+RESULT
+TRANSFORMED REAL STS2 VERY-EARLY INITIALIZATION: EXCEPTION
+
+METADATA
+App version: 0.0.207 (207)
+Runtime: .NET 9.0.16
+OS architecture: Arm64
+Process architecture: Arm64
+RuntimeFeature.IsDynamicCodeSupported: True
+RuntimeFeature.IsDynamicCodeCompiled: False
+Reports root: Documents/StS2Launcher/Reports
+
+DETAIL
+Gate A — VerifiedExecutionPreflight: PASS
+EXACT CLOSED TRANSFORMED IMAGE, VERY-EARLY ASYNC STARTUP TARGET, AND EXECUTION RESOLVER PLAN REQUALIFIED; NO STS2 CLR LOAD OR GAME INVOCATION OCCURRED.
+Physical Step-32 transform closure re-run: 4/4 PASS
+Source SHA-256: e7ceb80669bfaf5c8fccabaa126ae2bb283aba514be5b5b55612579cfd285f18
+Transformed SHA-256: 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef
+Transformed bytes: 9,304,576
+Selected sts2 derivative SHA-256: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a
+Selected sts2 derivative bytes: 9,294,336
+Injected durable sts2 checkpoint markers: 0
+Diagnostic mode: GodotCoreModelBootstrapCompatibility
+ModelDb bootstrap compatibility plan: STEP 36.0.5 MODELDB BOOTSTRAP COMPATIBILITY PLAN Canonical generated model types: 1,624 Direct static-cctor ModelDb<T> dependency edges: 56 Backward edges requiring early availability under eager cctor execution: 47 Dependency-closure types pre-injected: 41 Physical failing edge: MegaCrit.Sts2.Core.Models.Encounters.BowlbugsNormal index 658 -> MegaCrit.Sts2.Core.Models.Monsters.BowlbugEgg index 846; BowlbugEgg pre-injected before normal iteration: YES Final ModelDb insertion order: preserved — pre-injected objects are removed/re-added with the same instance when their original generated-list position is reached. Model constructors for pre-injected targets: exactly once; normal-loop duplicate construction: NO Pre-inject order sample: 839:MegaCrit.Sts2.Core.Models.Monsters.AssassinRubyRaider | 841:MegaCrit.Sts2.Core.Models.Monsters.AxeRubyRaider | 846:MegaCrit.Sts2.Core.Models.Monsters.BowlbugEgg | 847:MegaCrit.Sts2.Core.Models.Monsters.BowlbugNectar | 849:MegaCrit.Sts2.Core.Models.Monsters.BowlbugSilk | 850:MegaCrit.Sts2.Core.Models.Monsters.BruteRubyRaider | 854:MegaCrit.Sts2.Core.Models.Monsters.CalcifiedCultist | 858:MegaCrit.Sts2.Core.Models.Monsters.CrossbowRubyRaider | 861:MegaCrit.Sts2.Core.Models.Monsters.DampCultist | 882:MegaCrit.Sts2.Core.Models.Monsters.Guardbot | 891:MegaCrit.Sts2.Core.Models.Monsters.LeafSlimeM | 892:MegaCrit.Sts2.Core.Models.Monsters.LeafSlimeS | 909:MegaCrit.Sts2.Core.Models.Monsters.Noisebot | 937:MegaCrit.Sts2.Core.Models.Monsters.Stabbot | 952:MegaCrit.Sts2.Core.Models.Monsters.TrackerRubyRaider | 955:MegaCrit.Sts2.Core.Models.Monsters.TwigSlimeM | 956:MegaCrit.Sts2.Core.Models.Monsters.TwigSlimeS | 962:MegaCrit.Sts2.Core.Models.Monsters.Zapbot | 1333:MegaCrit.Sts2.Core.Models.Relics.Astrolabe | 1343:MegaCrit.Sts2.Core.Models.Relics.BingBong | 1345:MegaCrit.Sts2.Core.Models.Relics.BlackStar | 1364:MegaCrit.Sts2.Core.Models.Relics.CallingBell | 1382:MegaCrit.Sts2.Core.Models.Relics.DaughterOfTheWind | 1396:MegaCrit.Sts2.Core.Models.Relics.Ectoplasm | 1400:MegaCrit.Sts2.Core.Models.Relics.EmptyCage | 1402:MegaCrit.Sts2.Core.Models.Relics.FakeAnchor | 1403:MegaCrit.Sts2.Core.Models.Relics.FakeBloodVial | 1404:MegaCrit.Sts2.Core.Models.Relics.FakeHappyFlower | 1405:MegaCrit.Sts2.Core.Models.Relics.FakeLeesWaffle | 1406:MegaCrit.Sts2.Core.Models.Relics.FakeMango | 1408:MegaCrit.Sts2.Core.Models.Relics.FakeOrichalcum | 1409:MegaCrit.Sts2.Core.Models.Relics.FakeSneckoEye | … +9 more Compatibility SHA-256: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a Compatibility bytes: 9,294,336 Writer-only constant metadata requests: 9; identities=System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0 | Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0 STEP 38.2 IOS/OFFTREE LIFECYCLE-BOOTSTRAP COMPATIBILITY PLAN NGame.GameStartupWrapper token: 0x06001BCE Original GameStartupWrapper instructions: 17 Serialized GameStartupWrapper instructions: 2 (call Task.get_CompletedTask; ret) Reused completed-task MemberRef: System.Threading.Tasks.Task System.Threading.Tasks.Task::get_CompletedTask() NGame._EnterTree original instructions/NOPs: 135/0 Suppressed SentryService.Initialize MemberRef token: 0x0600B96C; substitutions=1 Suppressed off-tree GetWindow/FilesDropped/Connect block instructions: 16 NGame._EnterTree exact direct GameStartupWrapper call count preserved at 1; all non-authorized lifecycle IL remains in place GameStartup/InitializePlatform/LaunchMainMenu/ExecuteDeferred: not rewritten and not invoked by this compatibility transform STEP 39.1 GATE-B LIFECYCLE-ADMISSION COMPATIBILITY PLAN SaveManager.ConstructDefault SteamRemoteStorage cloud probes forced unavailable: 2 (exact IsCloudEnabledForAccount + IsCloudEnabledForApp) SentryService methods replaced by inert default-return bodies: 29 SentryService nested/compiler-helper methods replaced by inert default-return bodies: 25 External-Sentry compiler-generated delegate helpers outside SentryService inerted: 3 Sentry policy: disabled at the game-owned wrapper boundary; Gate B still rejects surviving external Sentry references outside the sealed inert surface Steam policy: cloud capability only forced FALSE; Steam initialization/native API remain forbidden and deferred
+GodotSharp diagnostic clone SHA-256: 6c1d134ed1f4717eb5b94256b56125ba072be801c765e857e23f12d6fdba9599
+GodotSharp diagnostic clone bytes: 5,590,528
+GodotSharp entry-only checkpoint markers: 60
+GodotSharp MVID preserved: 1c378f45-9c05-4fec-af44-84a0fa6d44c0
+GodotSharp PropertyTweener wrapper compatibility: Godot.Tween.TweenProperty=PATCHED_DEDICATED_HELPER_OBSERVE_REPAIR:godot_icall_4_1441; helperCallsites=1; Godot.PropertyTweener.SetEase=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns=1 | Godot.PropertyTweener.SetTrans=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns=1 | Godot.PropertyTweener.FromCurrent=PATCHED_TYPED_RETURN_EPILOGUE_OBSERVE_REPAIR:returns=1
+GodotSharp writer constant-requirement fingerprint SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+GodotSharp writer-only resolution requests / scopes / requirements: 0 / 0 / 0
+Read-only installed-bundle Mach-O/native reconnaissance: COMPLETE
+CommandLineHelper cctor MaxStack exact-source/diagnostic: 0 / 0
+CommandLineHelper critical stack-neutral markers: 4
+CommandLineHelper managed dictionary compatibility substitutions: 0
+CommandLineHelper managed command-line provider substitutions: 0
+CommandLineHelper Godot.OS.GetCmdlineArgs remains natural: YES
+Diagnostic constant-metadata fingerprint SHA-256: 945f87ca177cabe587a3c8d6eef3b0ef419cbe4327349c0ffc7c541a4652ad37
+Cecil writer-only constant-metadata resolution requests: 9
+Cecil writer-only resolution identities: System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | System.Runtime, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a | Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0 | Sentry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0
+Cecil writer-only synthetic constant types / approved scopes / approved requirements: 3 / 2 / 3
+External assembly bytes opened by the writer-only surrogate resolver: 0
+Diagnostic reopen/verification dependency resolution requests: 0
+Assembly identity: sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Module MVID: 518e4758-52d7-47c2-b776-471a0e29e49d
+Source ExecuteVeryEarly MethodDef token: 0x06007D02
+Transformed ExecuteVeryEarly MethodDef token: 0x0600AFE7
+ExecuteVeryEarly semantic fingerprint source/transformed: a38263ecf4d96499efa50d275a13ae8b7154e71593d8a585527a0eb327152667 / a38263ecf4d96499efa50d275a13ae8b7154e71593d8a585527a0eb327152667
+Source ExecuteVeryEarly MoveNext token: 0x0600BC71
+Transformed ExecuteVeryEarly MoveNext token: 0x0600AFEB
+ExecuteVeryEarly MoveNext semantic fingerprint source/transformed: d783a30831bcd6d8fcc7533b6e3a9d9e9ecff9d690a6eadce5a4fb6d8e9c0a9f / d783a30831bcd6d8fcc7533b6e3a9d9e9ecff9d690a6eadce5a4fb6d8e9c0a9f
+Direct later OneTimeInitialization calls from ExecuteVeryEarly MoveNext: 0
+Direct Harmony method references from ExecuteVeryEarly MoveNext: 0
+Prepared runtime-binding plan SHA-256: 613babc63caa4f1df310cd038593f239fd33b9d2bc113e7db7724318d11898b0
+Prepared assemblies requalified: 7
+Initializer-free private dependencies eligible on demand: 5
+Initializer-bearing dependencies kept forbidden: 0Harmony, Version=2.4.2.0, Culture=neutral, PublicKeyToken=null
+Host framework binding entries available: 67
+Original receipt-backed/prepared sts2.dll CLR-loaded: NO
+Game type/member reflection or invocation: NO
+Native game loading: NO
+
+Gate B — ExecutionCapableClrAdmission: PASS
+STEP-33 ZERO-RESOLUTION ADMISSION BEHAVIOR RE-ESTABLISHED FOR THE STEP-35 INSTRUMENTED DIAGNOSTIC CLONE; NO GAME MEMBER REFLECTION/INVOCATION YET.
+Loaded identity: sts2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+Loaded MVID: 518e4758-52d7-47c2-b776-471a0e29e49d
+AssemblyLoadContext: StS2Launcher-Step35-VeryEarly
+Selected CLR input SHA-256 immediately before LoadFromStream: 89e7ef79d74457fa4e96078c2363d1c0f6342e8b96a2e6e13bd308024bfbf60a
+CLR input authority: INSTRUMENTED DIAGNOSTIC DERIVATIVE
+Managed resolver requests during primary admission: 0
+Private dependency loads during primary admission: 0
+Initializer-bearing dependency requests during primary admission: 0
+Rejected managed requests during primary admission: 0
+Native load attempts during primary admission: 0
+Receipt-backed/prepared original sts2.dll used as CLR input: NO
+Game type/member reflection performed: NO
+Game method invoked: NO
+Godot/game initialization requested: NO
+
+Step 32 physical baseline: CLOSED POSITIVE — 0.0.120 passed 4/4. Exact transformed SHA-256 39c0a89ad0d5c6eb1553e23dd8537a7b7ab8278fad4115d186db5751570211ef; transformed PrewarmJit token 0x0600AFEA; semantic fingerprint 47fadf2a46eda098f310b7d0ee54e37d1e952ac272fc966d16d557ed46a0b74a; zero PrepareMethod references; trusted install unchanged.
+Step 33 physical baseline: CLOSED POSITIVE — 0.0.121 passed 4/4. Only the exact transformed primary entered StS2Launcher-Step33-TransformedGame; admission caused zero managed resolver requests, zero private dependency loads and zero native attempts; no game member was reflected or invoked.
+Step 34 physical baseline: CLOSED POSITIVE — 0.0.122 passed 4/4. Exact transformed PrewarmJit was invoked once and returned normally; 8 managed requests produced 6 exact host loads + 2 initializer-free private loads, with zero initializer-bearing/unplanned/native escape and no entry point/Godot startup.
+Step 35.0 physical 0.0.123 observation: app hard-terminated while the UI still appeared near Gate B; the matching iOS .ips reported EXC_BAD_ACCESS/SIGKILL with faulting main-thread PC=0x0 and no managed Step-35 report.
+Step 35.0.1 physical 0.0.124 localization: Gate A passed; Gate B passed fully through LoadFromStream/identity/MVID/zero-resolution/residency checks; Gate C bound exact transformed ExecuteVeryEarly, entered MethodInfo.Invoke, loaded GodotSharp and Steamworks.NET plus exact host frameworks, then hard-terminated before C_INVOKE_RETURNED. The matching .ips repeats the main-thread PC=0x0 native signature and essentially the same runtime stack shape as 0.0.123.
+Step 35.0.2 / 0.0.125 physical observation: the same main-thread PC=0x0 / CODESIGNING Invalid Page hard-kill family reproduced. The available static map predated the matching .ips process, while the expected fixed-name crash checkpoint was absent, proving that cross-run artifact correlation and silently swallowed telemetry errors were an evidence-quality gap.
+Step 35.0.3 / 0.0.126 physical observation: same-run telemetry succeeded and the durable frontier again ended after the final planned System.Collections.Concurrent 8→9 host resolution with no C_INVOKE_RETURNED, so resolver traffic alone cannot distinguish the pre-first-await game callsite.
+Step 35.0.6 / physical 0.0.129 observation: deferred-open bounded Cecil writing succeeded through Gate A/B and Gate C armed the callback, but the diagnostic bridge failed normally with MissingMethodException on synthetic Action<string>::Invoke(string) before INMETHOD_001. This was an instrumentation metadata defect, not a new exact-game compatibility frontier.
+Step 35.0.7 / physical 0.0.130 observation: the ECMA-correct Action<string>::Invoke(!0) bridge worked. Durable markers proved ExecuteVeryEarly.MoveNext → TestMode.get_IsOn → SaveManager..cctor → SaveManager.get_Instance, then a second TestMode.get_IsOn from work under that getter. System.Text.Json and System.Collections.Concurrent 8→9 resolutions followed, then the process hard-terminated before InitSettingsDataForTest/InitSettingsData. No matching .ips is available for this run.
+Step 35.0.8 / physical 0.0.131 observation: durable markers reached SaveManager.ConstructDefault, UserDataPathProvider.GetAccountScopedBasePath, PlatformUtil..cctor, and INMETHOD_024 — NullPlatformUtilStrategy..ctor entered. The last durable event was then the planned System.Collections.Concurrent 8.0.0.0 → host 9.0.0.0 binding. INMETHOD_025 — GodotFileIo..ctor never appeared, so the failure is physically inside work executed by NullPlatformUtilStrategy..ctor before that constructor call returns or begins.
+Step 35.0.9 / physical 0.0.132 observation: the diagnostic clone emitted INMETHOD_NP003_PRE immediately before CommandLineHelper.TryGetValue and never emitted its POST or INMETHOD_027. The same-run exact-source [NULL PLATFORM CTOR IL] map identifies CommandLineHelper.TryGetValue as CALLSITE#002, so the run both localizes the hard-kill interval to type-initialization/call work triggered by TryGetValue and physically proves the +1 NP ordinal defect caused by counting the injected entry-marker bridge call. The final durable resolver event was System.Collections.Concurrent 8.0.0.0 → host 9.0.0.0; that remains contextual, not causal evidence.
+Step 35.0.10 / physical 0.0.133 observation: NP ordinal accounting was corrected to INMETHOD_NP002_PRE, but no CommandLineHelper cctor entry/CL/CLTV marker executed. MethodInfo.Invoke returned a faulted Task whose nested cause was System.InvalidProgramException, and the launcher reached normal RUN_END. This is a diagnostic instrumentation defect: the live-stack sweep raised transient stack depth without raising the serialized cctor MaxStack header; it does not advance or retreat the exact-game frontier from 0.0.132.
+Step 35.0.12 / physical 0.0.135 observation: verified cctor MaxStack headroom still produced the same pre-instruction-zero InvalidProgramException, disproving MaxStack-only causation and motivating retirement of all live-stack CL/CLTV runtime callbacks.
+Step 35.0.13 / physical 0.0.136 observation: the stack-neutral-only clone entered CommandLineHelper..cctor and emitted INMETHOD_CL_CRITICAL_001_PRE before _args dictionary construction, then hard-terminated before CL_CRITICAL_001_POST, CL_CRITICAL_002_PRE, INMETHOD_027, NP002_POST, or C_INVOKE_RETURNED. The final durable resolver event was the planned System.Collections.Concurrent 8.0.0.0 -> host 9.0.0.0 binding; it remains contextual, while the PRE/no-POST pair physically localizes the interval to Godot.Collections.Dictionary<string,string> construction before assignment.
+Step 35.0.32 comprehensive scope: preserve every prior exact source/resolver/later-startup authority and keep live-stack CL/CLTV callbacks retired. Gate A still performs read-only bundle-wide Mach-O dependency/rpath/symbol/string reconnaissance plus a GodotSharp IL/native-callback map and emits separately verified sts2 + GodotSharp diagnostic derivatives. Reconnaissance itself never loads or executes a native game image.
+Physical 0.0.140 three-mode proof: NATURAL reached GS031 godot_dictionary::GetUnsafeAddress; OS-RECON passed CL_CRITICAL_001_POST and reached Godot.OS..cctor -> StringName.op_Implicit -> GS024 NativeFuncs.godotsharp_string_name_new_from_string; FORWARD passed CL_CRITICAL_002_POST, INMETHOD_027 and NP002_POST, then reached GodotFileIo.CreateDirectory -> Godot.DirAccess.DirExistsAbsolute -> StringName -> GS024. The repeated callback boundary is therefore not command-line-specific.
+Physical 0.0.146 proved the coordinated managed-plugin bootstrap itself: the 37-pointer ManagedCallbacks table was created, ScriptManagerBridge.LookupScriptsInAssembly returned, native GDMonoCache adoption set godotApiCacheUpdated/createManagedBindingCallback/reverseBindingReady/externalBridgeInstalled true, and GD_OnCoreApiAssemblyLoaded returned. Gate C then failed before target binding because the old callback-handoff resolver snapshot did not account for the bootstrap's exact eight additional planned host-framework requests; initializer-bearing/rejected/native activity remained zero.
+Physical 0.0.153 exact-authority evidence: exact ExecuteVeryEarly returned RanToCompletion; Gate D re-proved OfflineReady 428/428 and all authority/plan/dependency/resolver/context checks; the core returned passed=true/exactAuthority=true; and the outer worker durably recorded D_WORKER_RETURN. The remaining defect is only the captured UIKit continuation. 0.0.154 removes that capture with ConfigureAwait(false) and explicit main-thread finalization without changing core authority behavior.
+Resolver boundary: exact persisted host-framework bindings and hash-pinned initializer-free prepared private dependencies may be serviced on demand. The known initializer-bearing 0Harmony 2.4.2.0 dependency remains forbidden; any changed/additional initializer-bearing dependency, unplanned managed request, or native game request fails closed.
+Forbidden in every Step-35.0.27 mode: receipt-backed/prepared original sts2.dll CLR admission, intentional ExecuteEssential/ExecuteDeferred/PrewarmJit invocation by the launcher, game entry-point execution, Harmony/MonoMod API invocation or runtime patching, native game loading, arbitrary resolver fallback, or broad game startup sequencing. NATURAL/OS-RECON/FORWARD additionally forbid any Godot startup; CORE-HANDOFF and EXACT-CLOSURE permit only the already-proven Step-15 smoke engine plus the complete managed/native bridge bootstrap. EXACT-CLOSURE uniquely admits the exact closed transformed sts2 artifact and exact prepared GodotSharp as CLR authority inputs.
+Cancellation semantics: CANCELLED is INCONCLUSIVE, not a compatibility FAIL. If Gate B has begun the process is spent; after Gate C invocation begins, cancellation cannot undo any code that already ran. Force-quit before retry.
+After Gate B, the selected sts2 CLR input remains resident until force-quit on the physical non-collectible context. In diagnostic modes it is the instrumented derivative; in EXACT-CLOSURE it is the exact closed transformed artifact. After Gate C, the selected ExecuteVeryEarly has executed once; do not rerun Step 35.0.32 in the same process.
+Unhandled Step 35.0.32 model-bootstrap-authority exception: FileNotFoundException:
+
+END OF REPORT
